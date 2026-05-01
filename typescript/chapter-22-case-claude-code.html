@@ -1,0 +1,1956 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chapter 22: Case Study — Claude Code Architecture | TypeScript for the AI Era</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/json.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --indigo: #4F46E5; --indigo-light: #EEF2FF; --indigo-dark: #3730A3; --indigo-mid: #6366F1;
+      --gray-50: #F9FAFB; --gray-100: #F3F4F6; --gray-200: #E5E7EB; --gray-300: #D1D5DB;
+      --gray-400: #9CA3AF; --gray-600: #4B5563; --gray-700: #374151; --gray-800: #1F2937; --gray-900: #111827;
+      --green: #059669; --green-light: #ECFDF5;
+      --amber: #D97706; --amber-light: #FFFBEB;
+      --blue: #2563EB; --blue-light: #EFF6FF;
+      --purple: #7C3AED; --purple-light: #F5F3FF;
+      --pink: #DB2777; --pink-light: #FDF2F8;
+      --teal: #0D9488; --teal-light: #F0FDFA;
+      --nav-h: 52px; --sidebar-w: 240px;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; font-size: 16px; line-height: 1.7; color: var(--gray-800); background: #fff; }
+
+    /* Nav */
+    .top-nav { position:fixed; top:0; left:0; right:0; height:var(--nav-h); background:#fff; border-bottom:1px solid var(--gray-200); display:flex; align-items:center; justify-content:space-between; padding:0 24px; z-index:100; box-shadow:0 1px 3px rgba(0,0,0,.06); }
+    .nav-book { font-size:13px; font-weight:600; color:var(--indigo); letter-spacing:.02em; text-decoration:none; }
+    .nav-chapter-links { display:flex; gap:6px; align-items:center; font-size:13px; }
+    .nav-chapter-links a { display:inline-flex; align-items:center; gap:4px; padding:5px 12px; border-radius:6px; text-decoration:none; color:var(--gray-700); border:1px solid var(--gray-200); transition:background .15s,color .15s; }
+    .nav-chapter-links a:hover { background:var(--indigo-light); color:var(--indigo); border-color:#C7D2FE; }
+    .nav-progress { font-size:12px; color:var(--gray-400); font-weight:500; }
+
+    /* Layout */
+    .layout { display:flex; max-width:1100px; margin:0 auto; padding-top:var(--nav-h); }
+    .sidebar { width:var(--sidebar-w); flex-shrink:0; position:sticky; top:var(--nav-h); height:calc(100vh - var(--nav-h)); overflow-y:auto; padding:28px 16px 40px; border-right:1px solid var(--gray-100); background:var(--gray-50); }
+    .sidebar-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--gray-400); margin-bottom:10px; padding-left:8px; }
+    .toc-list { list-style:none; }
+    .toc-list li { margin:2px 0; }
+    .toc-list a { display:block; padding:5px 8px; font-size:13px; color:var(--gray-600); text-decoration:none; border-radius:5px; line-height:1.4; transition:background .12s,color .12s; }
+    .toc-list a:hover { background:var(--indigo-light); color:var(--indigo); }
+    .toc-list .toc-sub a { padding-left:20px; font-size:12px; }
+    .main { flex:1; min-width:0; padding:48px 52px 80px; }
+
+    /* Chapter header */
+    .chapter-meta { display:flex; align-items:center; gap:12px; margin-bottom:18px; }
+    .chapter-badge { background:var(--indigo); color:#fff; font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; padding:3px 10px; border-radius:20px; }
+    .chapter-num { font-size:13px; color:var(--gray-400); }
+    h1.chapter-title { font-size:2.2rem; font-weight:800; color:var(--gray-900); line-height:1.2; margin-bottom:14px; }
+    .chapter-subtitle { font-size:1.1rem; color:var(--gray-600); margin-bottom:12px; max-width:620px; }
+    .author-line { font-size:13px; color:var(--gray-400); margin-bottom:40px; display:flex; align-items:center; gap:8px; }
+    .author-avatar { width:28px; height:28px; border-radius:50%; background:var(--indigo); color:#fff; font-size:11px; font-weight:700; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; }
+
+    /* Headings */
+    h2 { font-size:1.6rem; font-weight:700; color:var(--gray-900); margin:56px 0 18px; padding-top:8px; border-top:2px solid var(--indigo-light); display:flex; align-items:center; gap:10px; }
+    h2 .section-num { background:var(--indigo); color:#fff; font-size:12px; font-weight:700; width:26px; height:26px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; }
+    h3 { font-size:1.15rem; font-weight:700; color:var(--gray-800); margin:32px 0 12px; }
+    h4 { font-size:1rem; font-weight:700; color:var(--gray-700); margin:24px 0 8px; }
+    p { margin-bottom:16px; }
+    a { color:var(--indigo); text-decoration:none; }
+    a:hover { text-decoration:underline; }
+    ul, ol { margin:0 0 16px 0; padding-left:22px; }
+    li { margin-bottom:5px; }
+    strong { color:var(--gray-900); }
+
+    /* Code */
+    code { font-family:"JetBrains Mono","Fira Mono","Cascadia Code",Consolas,monospace; font-size:.85em; background:var(--gray-100); border:1px solid var(--gray-200); border-radius:4px; padding:1px 5px; color:var(--indigo-dark); }
+    pre { background:#fff; border:1px solid var(--gray-200); border-radius:8px; overflow-x:auto; margin:20px 0; box-shadow:0 1px 4px rgba(0,0,0,.05); }
+    pre code { font-family:"JetBrains Mono","Fira Mono",Consolas,monospace; font-size:.82em; background:none; border:none; padding:18px 22px; display:block; color:var(--gray-800); line-height:1.6; }
+    .file-header { background:var(--gray-50); border:1px solid var(--gray-200); border-bottom:none; border-radius:8px 8px 0 0; padding:8px 18px; font-size:12px; font-weight:600; color:var(--gray-600); font-family:"JetBrains Mono",monospace; display:flex; align-items:center; gap:8px; margin-top:20px; }
+    .file-header + pre { border-radius:0 0 8px 8px; margin-top:0; }
+    .file-dot { width:8px; height:8px; border-radius:50%; background:var(--indigo-mid); display:inline-block; }
+
+    /* Shell blocks */
+    .shell-block { background:#1a1b26; border:1px solid #2d2e3a; border-radius:8px; overflow-x:auto; margin:20px 0; box-shadow:0 2px 6px rgba(0,0,0,.18); }
+    .shell-block-header { background:#13141e; padding:8px 16px; font-size:11px; font-weight:600; color:#6b7280; letter-spacing:.06em; text-transform:uppercase; border-bottom:1px solid #2d2e3a; border-radius:8px 8px 0 0; display:flex; align-items:center; gap:8px; }
+    .shell-dot { width:10px; height:10px; border-radius:50%; display:inline-block; }
+    .shell-block pre { background:transparent; border:none; border-radius:0; margin:0; box-shadow:none; }
+    .shell-block pre code { color:#a9b1d6; font-size:.81em; padding:16px 20px; }
+
+    /* Callouts */
+    .callout { border-radius:8px; padding:16px 20px; margin:24px 0; border-left:4px solid; display:flex; gap:14px; }
+    .callout-icon { font-size:1.2rem; flex-shrink:0; margin-top:1px; }
+    .callout-body { flex:1; min-width:0; }
+    .callout-title { font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; margin-bottom:6px; }
+    .callout p:last-child { margin-bottom:0; }
+    .callout-tip { background:var(--green-light); border-color:var(--green); }
+    .callout-tip .callout-title { color:var(--green); }
+    .callout-info { background:var(--blue-light); border-color:var(--blue); }
+    .callout-info .callout-title { color:var(--blue); }
+    .callout-warning { background:var(--amber-light); border-color:var(--amber); }
+    .callout-warning .callout-title { color:var(--amber); }
+    .callout-ai { background:var(--pink-light); border-color:var(--pink); }
+    .callout-ai .callout-title { color:var(--pink); }
+    .callout-arch { background:var(--indigo-light); border-color:var(--indigo); }
+    .callout-arch .callout-title { color:var(--indigo-dark); }
+    .callout-lesson { background:var(--purple-light); border-color:var(--purple); }
+    .callout-lesson .callout-title { color:var(--purple); }
+
+    /* Tables */
+    .table-wrap { overflow-x:auto; margin:24px 0; border-radius:8px; border:1px solid var(--gray-200); box-shadow:0 1px 4px rgba(0,0,0,.05); }
+    table { border-collapse:collapse; width:100%; font-size:14px; }
+    thead { background:var(--gray-50); border-bottom:2px solid var(--gray-200); }
+    th { padding:10px 14px; text-align:left; font-weight:700; font-size:12px; color:var(--gray-600); text-transform:uppercase; letter-spacing:.05em; white-space:nowrap; }
+    td { padding:10px 14px; border-bottom:1px solid var(--gray-100); vertical-align:top; line-height:1.5; }
+    tbody tr:last-child td { border-bottom:none; }
+    tbody tr:hover { background:var(--gray-50); }
+    .badge { display:inline-block; padding:2px 8px; border-radius:12px; font-size:11px; font-weight:600; }
+    .badge-green { background:#D1FAE5; color:#065F46; }
+    .badge-amber { background:#FEF3C7; color:#92400E; }
+    .badge-blue { background:#DBEAFE; color:#1E40AF; }
+    .badge-purple { background:#EDE9FE; color:#5B21B6; }
+    .badge-gray { background:var(--gray-100); color:var(--gray-600); }
+
+    /* Dir tree */
+    .dir-tree { background:var(--gray-50); border:1px solid var(--gray-200); border-radius:8px; padding:20px 24px; margin:20px 0; font-family:"JetBrains Mono",monospace; font-size:.83em; line-height:1.9; }
+    .dir-tree .dir { color:var(--indigo-dark); font-weight:700; }
+    .dir-tree .file { color:var(--gray-700); }
+    .dir-tree .cmt { color:var(--gray-400); font-style:italic; }
+
+    /* SVG diagrams */
+    .diagram-wrap { background:var(--gray-50); border:1px solid var(--gray-200); border-radius:12px; padding:28px 20px; margin:28px 0; overflow-x:auto; text-align:center; }
+    .diagram-title { font-size:13px; font-weight:700; color:var(--gray-500); text-transform:uppercase; letter-spacing:.06em; margin-bottom:20px; }
+
+    /* Footer */
+    .footer { background:var(--gray-50); border-top:1px solid var(--gray-200); padding:40px 52px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; }
+    .footer-nav a { display:inline-flex; align-items:center; gap:6px; padding:10px 18px; border:1px solid var(--gray-200); border-radius:8px; font-size:14px; font-weight:600; color:var(--gray-700); text-decoration:none; background:#fff; transition:background .15s,color .15s; }
+    .footer-nav a:hover { background:var(--indigo); color:#fff; border-color:var(--indigo); }
+    .footer-center { text-align:center; font-size:12px; color:var(--gray-400); }
+    .footer-center strong { color:var(--gray-600); }
+    .divider { border:none; border-top:1px solid var(--gray-100); margin:40px 0; }
+    .sidebar::-webkit-scrollbar { width:4px; }
+    .sidebar::-webkit-scrollbar-track { background:transparent; }
+    .sidebar::-webkit-scrollbar-thumb { background:var(--gray-300); border-radius:2px; }
+    @media (max-width:700px) { .main { padding:32px 20px 60px; } .sidebar { display:none; } }
+  </style>
+</head>
+<body>
+
+<!-- Top Nav -->
+<nav class="top-nav">
+  <a class="nav-book" href="../index.html">TypeScript for the AI Era</a>
+  <div class="nav-chapter-links">
+    <a href="chapter-21-dx.html">&#8592; Ch 21 DX</a>
+    <a href="chapter-23-pulumi.html">Ch 23 Pulumi &#8594;</a>
+  </div>
+  <span class="nav-progress">Chapter 22 of 24</span>
+</nav>
+
+<div class="layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-label">Contents</div>
+    <ul class="toc-list">
+      <li><a href="#s1">1. CLI Landscape</a></li>
+      <li class="toc-sub"><a href="#s1-tools">Framework Comparison</a></li>
+      <li class="toc-sub"><a href="#s1-experience">Experience Layer</a></li>
+      <li><a href="#s2">2. Architecture Overview</a></li>
+      <li class="toc-sub"><a href="#s2-repl">The REPL Loop</a></li>
+      <li class="toc-sub"><a href="#s2-tools">Tool System</a></li>
+      <li class="toc-sub"><a href="#s2-diagram">Architecture Diagram</a></li>
+      <li><a href="#s3">3. Project Setup</a></li>
+      <li class="toc-sub"><a href="#s3-structure">Directory Structure</a></li>
+      <li class="toc-sub"><a href="#s3-pkg">package.json</a></li>
+      <li class="toc-sub"><a href="#s3-tsconfig">tsconfig.json</a></li>
+      <li><a href="#s4">4. The Tool System</a></li>
+      <li class="toc-sub"><a href="#s4-interface">Tool Interface</a></li>
+      <li class="toc-sub"><a href="#s4-bash">Bash Tool</a></li>
+      <li class="toc-sub"><a href="#s4-read">Read Tool</a></li>
+      <li class="toc-sub"><a href="#s4-write">Write Tool</a></li>
+      <li class="toc-sub"><a href="#s4-search">Search Tool</a></li>
+      <li class="toc-sub"><a href="#s4-registry">Tool Registry</a></li>
+      <li><a href="#s5">5. AI Client</a></li>
+      <li class="toc-sub"><a href="#s5-client">Client Wrapper</a></li>
+      <li class="toc-sub"><a href="#s5-streaming">Streaming Handler</a></li>
+      <li><a href="#s6">6. The REPL Loop</a></li>
+      <li class="toc-sub"><a href="#s6-agentic">Agentic Loop</a></li>
+      <li class="toc-sub"><a href="#s6-sequence">Sequence Diagram</a></li>
+      <li><a href="#s7">7. Terminal UI</a></li>
+      <li class="toc-sub"><a href="#s7-display">Display Utilities</a></li>
+      <li><a href="#s8">8. Configuration</a></li>
+      <li class="toc-sub"><a href="#s8-settings">Settings Schema</a></li>
+      <li class="toc-sub"><a href="#s8-permissions">Permissions</a></li>
+      <li><a href="#s9">9. Entry Point</a></li>
+      <li><a href="#s10">10. Build &amp; Publish</a></li>
+      <li><a href="#s11">11. Testing</a></li>
+      <li><a href="#s12">12. Lessons Learned</a></li>
+    </ul>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+
+    <div class="chapter-meta">
+      <span class="chapter-badge">Chapter 22</span>
+      <span class="chapter-num">Part V &mdash; Case Studies</span>
+    </div>
+
+    <h1 class="chapter-title">Case Study: Building a CLI Tool<br><span style="color:var(--indigo)">Claude Code Architecture</span></h1>
+    <p class="chapter-subtitle">
+      Reverse-engineer and reimplement a production-grade AI CLI. Build <strong>tsai</strong> &mdash; a fully-functional TypeScript AI assistant that talks to Claude, executes shell commands, reads and writes files, and searches your codebase.
+    </p>
+    <div class="author-line">
+      <span class="author-avatar">SE</span>
+      <span>Senior Staff Engineer &mdash; Anthropic &nbsp;&middot;&nbsp; 2025</span>
+    </div>
+
+    <div class="callout callout-ai">
+      <span class="callout-icon">&#10024;</span>
+      <div class="callout-body">
+        <div class="callout-title">AI Era Chapter</div>
+        <p>This is a complete, working case study. By the end you will have a runnable <code>tsai</code> CLI you can <code>npm link</code> and use today. Every file is shown in full &mdash; no placeholders.</p>
+      </div>
+    </div>
+
+    <!-- ─── Section 1 ─── -->
+    <h2 id="s1"><span class="section-num">1</span> CLI Tools in TypeScript &mdash; The Landscape</h2>
+
+    <p>Command-line interfaces are one of the best TypeScript first projects: the type system prevents entire categories of argument-parsing bugs, the ecosystem is mature, and shipping a binary via npm is dead simple. But before writing a line of code, pick your tools deliberately.</p>
+
+    <h3 id="s1-tools">Framework Comparison</h3>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Package</th><th>Style</th><th>Best for</th><th>Size</th><th>TS support</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>commander</code></td><td>Fluent API</td><td>Traditional multi-command CLIs</td><td><span class="badge badge-green">tiny</span></td><td>Good</td></tr>
+          <tr><td><code>yargs</code></td><td>Config object</td><td>Complex flag parsing, completion</td><td><span class="badge badge-amber">medium</span></td><td>Good</td></tr>
+          <tr><td><code>oclif</code></td><td>Class-based</td><td>Heroku-style plugin ecosystems</td><td><span class="badge badge-amber">heavy</span></td><td>First-class</td></tr>
+          <tr><td><code>citty</code></td><td>Functional</td><td>Modern, minimal, tree-shakeable</td><td><span class="badge badge-green">tiny</span></td><td>First-class</td></tr>
+          <tr><td><code>cac</code></td><td>Fluent API</td><td>Vite-style tooling, simple APIs</td><td><span class="badge badge-green">tiny</span></td><td>Good</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>For <strong>tsai</strong> we skip a framework entirely for the REPL &mdash; just like Claude Code does. The entry point uses <code>commander</code> only for the initial <code>tsai run</code> / <code>tsai --help</code> surface. The interactive session is hand-rolled for full control over streaming and tool display.</p>
+
+    <h3 id="s1-experience">The Experience Layer</h3>
+
+    <ul>
+      <li><strong><code>@clack/prompts</code></strong> &mdash; Beautiful interactive prompts (spinner, text, confirm). Replaces <code>inquirer</code> for most use-cases.</li>
+      <li><strong><code>chalk</code></strong> &mdash; Terminal colors. Always check <code>chalk.level</code> so CI output stays clean.</li>
+      <li><strong><code>ora</code></strong> &mdash; Elegant spinners for async work (thinking, tool execution).</li>
+      <li><strong><code>boxen</code></strong> &mdash; Draw boxes around content (used for tool output headers).</li>
+      <li><strong><code>cli-highlight</code></strong> &mdash; Syntax-highlight code blocks printed to the terminal.</li>
+      <li><strong><code>chokidar</code></strong> &mdash; File watching (used in <code>--watch</code> mode).</li>
+    </ul>
+
+    <div class="callout callout-tip">
+      <span class="callout-icon">&#128161;</span>
+      <div class="callout-body">
+        <div class="callout-title">Tip &mdash; Distribution</div>
+        <p>Add a <code>"bin"</code> field in <code>package.json</code>, publish to npm with <code>npm publish --access public</code>, and users install with <code>npm i -g tsai</code>. For Homebrew, create a formula that pulls the GitHub release tarball. For one-command install, a shell script that calls <code>npm i -g</code> works well.</p>
+      </div>
+    </div>
+
+    <!-- ─── Section 2 ─── -->
+    <h2 id="s2"><span class="section-num">2</span> Architecture Overview: How Claude Code Works</h2>
+
+    <p>Claude Code is built around a tight loop: read user intent, ask Claude, execute whatever tools Claude requests, feed results back, repeat. This is the <em>agentic loop</em>. Understanding it is the key to building any AI CLI.</p>
+
+    <h3 id="s2-repl">The Five Subsystems</h3>
+
+    <ul>
+      <li><strong>REPL</strong> &mdash; Reads user input, manages the conversation history array, orchestrates the other subsystems.</li>
+      <li><strong>AI Client</strong> &mdash; Wraps the Anthropic SDK. Handles streaming, retry on rate-limit, and maps Anthropic event types to internal <code>StreamEvent</code> types.</li>
+      <li><strong>Tool System</strong> &mdash; A registry of typed tools (bash, read, write, search). Each tool has a Zod schema for its input &mdash; used both to generate the JSON Schema sent to Claude and to validate Claude&rsquo;s tool-use inputs at runtime.</li>
+      <li><strong>Context Manager</strong> &mdash; Tracks conversation history, CLAUDE.md file contents, and enforces token budgets by summarizing or truncating older messages.</li>
+      <li><strong>Permission System</strong> &mdash; Before any tool executes, checks an allow/deny list. Dangerous operations (bash with <code>rm -rf</code>, file writes outside the project) require explicit approval.</li>
+    </ul>
+
+    <h3 id="s2-tools">Signal Flow</h3>
+    <ol>
+      <li>User types a message. It&rsquo;s appended to <code>messages</code> as <code>{ role: "user", content }</code>.</li>
+      <li>The AI client sends <code>messages</code> + system prompt + tool definitions to the Anthropic API.</li>
+      <li>Claude streams back text tokens and/or <code>tool_use</code> blocks.</li>
+      <li>If <code>stop_reason === "tool_use"</code>: run each requested tool, collect <code>tool_result</code> blocks, push both the assistant message and the user tool-result message onto <code>messages</code>, then go to step 2.</li>
+      <li>If <code>stop_reason === "end_turn"</code>: render the final text to the terminal. Loop back to step 1.</li>
+    </ol>
+
+    <h3 id="s2-diagram">Architecture Diagram</h3>
+
+    <div class="diagram-wrap">
+      <div class="diagram-title">tsai &mdash; High-Level Architecture</div>
+      <svg viewBox="0 0 760 420" width="100%" style="max-width:760px" xmlns="http://www.w3.org/2000/svg" font-family="system-ui,sans-serif">
+        <!-- Background cards -->
+        <!-- REPL box -->
+        <rect x="10" y="10" width="180" height="400" rx="10" fill="#EEF2FF" stroke="#C7D2FE" stroke-width="1.5"/>
+        <text x="100" y="35" text-anchor="middle" font-size="12" font-weight="700" fill="#3730A3">REPL LOOP</text>
+
+        <!-- AI Client box -->
+        <rect x="210" y="10" width="180" height="180" rx="10" fill="#FDF2F8" stroke="#FBCFE8" stroke-width="1.5"/>
+        <text x="300" y="35" text-anchor="middle" font-size="12" font-weight="700" fill="#9D174D">AI CLIENT</text>
+
+        <!-- Tool System box -->
+        <rect x="210" y="210" width="180" height="200" rx="10" fill="#F0FDFA" stroke="#99F6E4" stroke-width="1.5"/>
+        <text x="300" y="235" text-anchor="middle" font-size="12" font-weight="700" fill="#0F766E">TOOL SYSTEM</text>
+
+        <!-- Anthropic API box -->
+        <rect x="410" y="10" width="170" height="180" rx="10" fill="#FFF7ED" stroke="#FED7AA" stroke-width="1.5"/>
+        <text x="495" y="35" text-anchor="middle" font-size="12" font-weight="700" fill="#92400E">ANTHROPIC API</text>
+
+        <!-- Config box -->
+        <rect x="410" y="210" width="170" height="90" rx="10" fill="#F5F3FF" stroke="#DDD6FE" stroke-width="1.5"/>
+        <text x="495" y="235" text-anchor="middle" font-size="12" font-weight="700" fill="#5B21B6">CONFIG</text>
+
+        <!-- Permissions box -->
+        <rect x="410" y="320" width="170" height="90" rx="10" fill="#FFFBEB" stroke="#FDE68A" stroke-width="1.5"/>
+        <text x="495" y="345" text-anchor="middle" font-size="12" font-weight="700" fill="#92400E">PERMISSIONS</text>
+
+        <!-- Context box -->
+        <rect x="595" y="210" width="155" height="200" rx="10" fill="#F0FDF4" stroke="#86EFAC" stroke-width="1.5"/>
+        <text x="672" y="235" text-anchor="middle" font-size="12" font-weight="700" fill="#166534">CONTEXT MGR</text>
+
+        <!-- REPL internals -->
+        <rect x="25" y="50" width="150" height="32" rx="6" fill="white" stroke="#C7D2FE" stroke-width="1"/>
+        <text x="100" y="71" text-anchor="middle" font-size="11" fill="#374151">Read user input</text>
+        <rect x="25" y="95" width="150" height="32" rx="6" fill="white" stroke="#C7D2FE" stroke-width="1"/>
+        <text x="100" y="116" text-anchor="middle" font-size="11" fill="#374151">Build messages[]</text>
+        <rect x="25" y="140" width="150" height="32" rx="6" fill="white" stroke="#C7D2FE" stroke-width="1"/>
+        <text x="100" y="161" text-anchor="middle" font-size="11" fill="#374151">Stream response</text>
+        <rect x="25" y="185" width="150" height="32" rx="6" fill="white" stroke="#C7D2FE" stroke-width="1"/>
+        <text x="100" y="206" text-anchor="middle" font-size="11" fill="#374151">Handle tool_use</text>
+        <rect x="25" y="230" width="150" height="32" rx="6" fill="white" stroke="#C7D2FE" stroke-width="1"/>
+        <text x="100" y="251" text-anchor="middle" font-size="11" fill="#374151">Display output</text>
+        <rect x="25" y="275" width="150" height="32" rx="6" fill="white" stroke="#C7D2FE" stroke-width="1"/>
+        <text x="100" y="296" text-anchor="middle" font-size="11" fill="#374151">Update history</text>
+
+        <!-- AI Client internals -->
+        <rect x="225" y="50" width="150" height="26" rx="5" fill="white" stroke="#FBCFE8" stroke-width="1"/>
+        <text x="300" y="67" text-anchor="middle" font-size="10" fill="#374151">messages.stream()</text>
+        <rect x="225" y="84" width="150" height="26" rx="5" fill="white" stroke="#FBCFE8" stroke-width="1"/>
+        <text x="300" y="101" text-anchor="middle" font-size="10" fill="#374151">mapToStreamEvent()</text>
+        <rect x="225" y="118" width="150" height="26" rx="5" fill="white" stroke="#FBCFE8" stroke-width="1"/>
+        <text x="300" y="135" text-anchor="middle" font-size="10" fill="#374151">retry + backoff</text>
+        <rect x="225" y="152" width="150" height="26" rx="5" fill="white" stroke="#FBCFE8" stroke-width="1"/>
+        <text x="300" y="169" text-anchor="middle" font-size="10" fill="#374151">buildAnthropicTools()</text>
+
+        <!-- Tool System internals -->
+        <rect x="225" y="250" width="68" height="26" rx="5" fill="white" stroke="#99F6E4" stroke-width="1"/>
+        <text x="259" y="267" text-anchor="middle" font-size="10" fill="#374151">bash</text>
+        <rect x="301" y="250" width="68" height="26" rx="5" fill="white" stroke="#99F6E4" stroke-width="1"/>
+        <text x="335" y="267" text-anchor="middle" font-size="10" fill="#374151">read</text>
+        <rect x="225" y="284" width="68" height="26" rx="5" fill="white" stroke="#99F6E4" stroke-width="1"/>
+        <text x="259" y="301" text-anchor="middle" font-size="10" fill="#374151">write</text>
+        <rect x="301" y="284" width="68" height="26" rx="5" fill="white" stroke="#99F6E4" stroke-width="1"/>
+        <text x="335" y="301" text-anchor="middle" font-size="10" fill="#374151">search</text>
+        <rect x="225" y="318" width="150" height="26" rx="5" fill="#EEF2FF" stroke="#C7D2FE" stroke-width="1"/>
+        <text x="300" y="335" text-anchor="middle" font-size="10" fill="#3730A3" font-weight="700">Zod validation</text>
+
+        <!-- Anthropic API internals -->
+        <text x="495" y="65" text-anchor="middle" font-size="11" fill="#92400E">claude-opus-4-7</text>
+        <text x="495" y="85" text-anchor="middle" font-size="11" fill="#92400E">claude-sonnet-4-6</text>
+        <text x="495" y="105" text-anchor="middle" font-size="11" fill="#92400E">claude-haiku-4-5</text>
+        <rect x="425" y="120" width="140" height="30" rx="6" fill="white" stroke="#FED7AA" stroke-width="1"/>
+        <text x="495" y="139" text-anchor="middle" font-size="10" fill="#374151">SSE streaming</text>
+        <rect x="425" y="155" width="140" height="26" rx="6" fill="white" stroke="#FED7AA" stroke-width="1"/>
+        <text x="495" y="172" text-anchor="middle" font-size="10" fill="#374151">tool_use blocks</text>
+
+        <!-- Config internals -->
+        <text x="495" y="258" text-anchor="middle" font-size="10" fill="#5B21B6">~/.tsai/config.json</text>
+        <text x="495" y="276" text-anchor="middle" font-size="10" fill="#5B21B6">.tsai/config.json</text>
+        <text x="495" y="294" text-anchor="middle" font-size="10" fill="#5B21B6">TSAI_API_KEY env</text>
+
+        <!-- Permissions internals -->
+        <text x="495" y="365" text-anchor="middle" font-size="10" fill="#92400E">allowedTools[]</text>
+        <text x="495" y="383" text-anchor="middle" font-size="10" fill="#92400E">pathAllowlist[]</text>
+        <text x="495" y="401" text-anchor="middle" font-size="10" fill="#92400E">PermissionMode</text>
+
+        <!-- Context internals -->
+        <text x="672" y="258" text-anchor="middle" font-size="10" fill="#166534">messages[]</text>
+        <text x="672" y="276" text-anchor="middle" font-size="10" fill="#166534">CLAUDE.md loader</text>
+        <text x="672" y="294" text-anchor="middle" font-size="10" fill="#166534">token budget</text>
+        <text x="672" y="312" text-anchor="middle" font-size="10" fill="#166534">summarize()</text>
+        <text x="672" y="330" text-anchor="middle" font-size="10" fill="#166534">truncate()</text>
+
+        <!-- Arrows -->
+        <!-- REPL -> AI Client -->
+        <line x1="190" y1="100" x2="210" y2="100" stroke="#6366F1" stroke-width="1.5" marker-end="url(#arr)"/>
+        <!-- AI Client -> Anthropic -->
+        <line x1="390" y1="100" x2="410" y2="100" stroke="#EC4899" stroke-width="1.5" marker-end="url(#arr)"/>
+        <!-- REPL -> Tool System -->
+        <line x1="190" y1="300" x2="210" y2="300" stroke="#6366F1" stroke-width="1.5" marker-end="url(#arr)"/>
+        <!-- Tool System -> Permissions -->
+        <line x1="390" y1="340" x2="410" y2="350" stroke="#0D9488" stroke-width="1.5" marker-end="url(#arr)"/>
+        <!-- AI Client -> Config -->
+        <line x1="390" y1="255" x2="410" y2="255" stroke="#EC4899" stroke-width="1.5" marker-end="url(#arr)"/>
+        <!-- REPL -> Context -->
+        <line x1="100" y1="410" x2="672" y2="410" stroke="#6366F1" stroke-width="1" stroke-dasharray="5,3" marker-end="url(#arr)"/>
+        <defs>
+          <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#9CA3AF"/>
+          </marker>
+        </defs>
+      </svg>
+    </div>
+
+    <div class="callout callout-arch">
+      <span class="callout-icon">&#127959;</span>
+      <div class="callout-body">
+        <div class="callout-title">Architecture Note</div>
+        <p>The biggest architectural insight from Claude Code: <strong>the REPL owns the message history, not the AI client</strong>. The client is stateless &mdash; it receives messages and returns a stream. This makes testing trivial: mock the client, assert on the messages array.</p>
+      </div>
+    </div>
+
+    <!-- ─── Section 3 ─── -->
+    <h2 id="s3"><span class="section-num">3</span> Project Setup: tsai</h2>
+
+    <h3 id="s3-structure">Directory Structure</h3>
+
+    <div class="dir-tree">
+      <span class="dir">tsai/</span><br>
+      &#9500;&#9472;&#9472; <span class="dir">src/</span><br>
+      &#9474;&nbsp;&nbsp; &#9500;&#9472;&#9472; <span class="dir">cli/</span><br>
+      &#9474;&nbsp;&nbsp; &#9474;&nbsp;&nbsp; &#9500;&#9472;&#9472; <span class="file">index.ts</span>         <span class="cmt"># Entry point &amp; commander setup</span><br>
+      &#9474;&nbsp;&nbsp; &#9474;&nbsp;&nbsp; &#9492;&#9472;&#9472; <span class="file">repl.ts</span>          <span class="cmt"># Interactive REPL loop</span><br>
+      &#9474;&nbsp;&nbsp; &#9500;&#9472;&#9472; <span class="dir">tools/</span><br>
+      &#9474;&nbsp;&nbsp; &#9474;&nbsp;&nbsp; &#9500;&#9472;&#9472; <span class="file">index.ts</span>         <span class="cmt"># Tool registry &amp; types</span><br>
+      &#9474;&nbsp;&nbsp; &#9474;&nbsp;&nbsp; &#9500;&#9472;&#9472; <span class="file">bash.ts</span>          <span class="cmt"># Execute shell commands</span><br>
+      &#9474;&nbsp;&nbsp; &#9474;&nbsp;&nbsp; &#9500;&#9472;&#9472; <span class="file">read.ts</span>          <span class="cmt"># Read files</span><br>
+      &#9474;&nbsp;&nbsp; &#9474;&nbsp;&nbsp; &#9500;&#9472;&#9472; <span class="file">write.ts</span>         <span class="cmt"># Write files</span><br>
+      &#9474;&nbsp;&nbsp; &#9474;&nbsp;&nbsp; &#9492;&#9472;&#9472; <span class="file">search.ts</span>        <span class="cmt"># Ripgrep codebase search</span><br>
+      &#9474;&nbsp;&nbsp; &#9500;&#9472;&#9472; <span class="dir">ai/</span><br>
+      &#9474;&nbsp;&nbsp; &#9474;&nbsp;&nbsp; &#9500;&#9472;&#9472; <span class="file">client.ts</span>        <span class="cmt"># Anthropic client wrapper</span><br>
+      &#9474;&nbsp;&nbsp; &#9474;&nbsp;&nbsp; &#9500;&#9472;&#9472; <span class="file">streaming.ts</span>     <span class="cmt"># Stream event types &amp; mapper</span><br>
+      &#9474;&nbsp;&nbsp; &#9474;&nbsp;&nbsp; &#9492;&#9472;&#9472; <span class="file">context.ts</span>       <span class="cmt"># Conversation &amp; token management</span><br>
+      &#9474;&nbsp;&nbsp; &#9500;&#9472;&#9472; <span class="dir">config/</span><br>
+      &#9474;&nbsp;&nbsp; &#9474;&nbsp;&nbsp; &#9492;&#9472;&#9472; <span class="file">settings.ts</span>      <span class="cmt"># Config loading &amp; Zod schema</span><br>
+      &#9474;&nbsp;&nbsp; &#9492;&#9472;&#9472; <span class="dir">utils/</span><br>
+      &#9474;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &#9500;&#9472;&#9472; <span class="file">display.ts</span>       <span class="cmt"># Terminal UI helpers</span><br>
+      &#9474;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &#9492;&#9472;&#9472; <span class="file">permissions.ts</span>   <span class="cmt"># Allow/deny tool execution</span><br>
+      &#9500;&#9472;&#9472; <span class="file">package.json</span><br>
+      &#9500;&#9472;&#9472; <span class="file">tsconfig.json</span><br>
+      &#9492;&#9472;&#9472; <span class="file">tsup.config.ts</span>
+    </div>
+
+    <div class="shell-block">
+      <div class="shell-block-header">
+        <span class="shell-dot" style="background:#FF5F57"></span>
+        <span class="shell-dot" style="background:#FEBC2E"></span>
+        <span class="shell-dot" style="background:#28C840"></span>
+        Terminal
+      </div>
+      <pre><code class="language-bash">mkdir tsai && cd tsai
+npm init -y
+npm install @anthropic-ai/sdk zod chalk ora @clack/prompts boxen commander
+npm install cli-highlight
+npm install -D typescript tsup @types/node tsx</code></pre>
+    </div>
+
+    <h3 id="s3-pkg">package.json</h3>
+
+    <div class="file-header"><span class="file-dot"></span> package.json</div>
+    <pre><code class="language-json">{
+  "name": "tsai",
+  "version": "0.1.0",
+  "description": "TypeScript AI assistant CLI powered by Claude",
+  "type": "module",
+  "bin": {
+    "tsai": "./dist/cli/index.js"
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev":   "tsx src/cli/index.ts",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.36.0",
+    "@clack/prompts":    "^0.9.0",
+    "boxen":             "^8.0.1",
+    "chalk":             "^5.4.0",
+    "cli-highlight":     "^2.1.11",
+    "commander":         "^12.1.0",
+    "ora":               "^8.1.1",
+    "zod":               "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsup":        "^8.0.0",
+    "tsx":         "^4.19.0",
+    "typescript":  "^5.7.0"
+  },
+  "engines": { "node": ">=20" }
+}</code></pre>
+
+    <h3 id="s3-tsconfig">tsconfig.json</h3>
+
+    <div class="file-header"><span class="file-dot"></span> tsconfig.json</div>
+    <pre><code class="language-json">{
+  "compilerOptions": {
+    "target":      "ES2022",
+    "module":      "NodeNext",
+    "moduleResolution": "NodeNext",
+    "lib":         ["ES2022"],
+    "outDir":      "./dist",
+    "rootDir":     "./src",
+    "strict":      true,
+    "exactOptionalPropertyTypes": true,
+    "noUncheckedIndexedAccess":   true,
+    "declaration": true,
+    "sourceMap":   true,
+    "esModuleInterop": false,
+    "skipLibCheck": true
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
+}</code></pre>
+
+    <div class="file-header"><span class="file-dot"></span> tsup.config.ts</div>
+    <pre><code class="language-typescript">import { defineConfig } from 'tsup'
+
+export default defineConfig({
+  entry:   ['src/cli/index.ts'],
+  format:  ['esm'],
+  dts:     true,
+  clean:   true,
+  banner: {
+    js: '#!/usr/bin/env node',
+  },
+})</code></pre>
+
+    <!-- ─── Section 4 ─── -->
+    <h2 id="s4"><span class="section-num">4</span> The Tool System</h2>
+
+    <p>The tool system is the heart of the agentic CLI. Claude decides which tools to call; we define what they do. The key insight: <strong>treat Claude&rsquo;s tool inputs as untrusted user input</strong>. Always validate with Zod before execution.</p>
+
+    <h3 id="s4-interface">Tool Interface &mdash; <code>src/tools/index.ts</code></h3>
+
+    <div class="file-header"><span class="file-dot"></span> src/tools/index.ts</div>
+    <pre><code class="language-typescript">import { z } from 'zod'
+import type Anthropic from '@anthropic-ai/sdk'
+
+// ── Core types ──────────────────────────────────────────────────────────────
+
+export type ToolResult =
+  | { success: true;  output: string }
+  | { success: false; error: string }
+
+export interface Tool&lt;TInput = unknown&gt; {
+  name:        string
+  description: string
+  inputSchema: z.ZodType&lt;TInput&gt;
+  execute:     (input: TInput) => Promise&lt;ToolResult&gt;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type AnyTool = Tool&lt;any&gt;
+
+// ── Tool registry ───────────────────────────────────────────────────────────
+
+export class ToolRegistry {
+  private tools = new Map&lt;string, AnyTool&gt;()
+
+  register&lt;T&gt;(tool: Tool&lt;T&gt;): this {
+    this.tools.set(tool.name, tool as AnyTool)
+    return this
+  }
+
+  get(name: string): AnyTool | undefined {
+    return this.tools.get(name)
+  }
+
+  all(): AnyTool[] {
+    return [...this.tools.values()]
+  }
+
+  /** Convert our tools to the format the Anthropic API expects */
+  toAnthropicTools(): Anthropic.Tool[] {
+    return this.all().map(tool => ({
+      name:         tool.name,
+      description:  tool.description,
+      input_schema: zodToJsonSchema(tool.inputSchema),
+    }))
+  }
+}
+
+/** Minimal Zod-to-JSON-Schema converter for object schemas */
+function zodToJsonSchema(schema: z.ZodType): Anthropic.Tool['input_schema'] {
+  if (schema instanceof z.ZodObject) {
+    const shape = schema.shape as Record&lt;string, z.ZodType&gt;
+    const properties: Record&lt;string, unknown&gt; = {}
+    const required: string[] = []
+
+    for (const [key, value] of Object.entries(shape)) {
+      properties[key] = zodTypeToJsonSchema(value)
+      if (!(value instanceof z.ZodOptional)) required.push(key)
+    }
+
+    return { type: 'object', properties, required }
+  }
+  return { type: 'object', properties: {} }
+}
+
+function zodTypeToJsonSchema(type: z.ZodType): unknown {
+  if (type instanceof z.ZodString)  return { type: 'string',  description: type.description }
+  if (type instanceof z.ZodNumber)  return { type: 'number',  description: type.description }
+  if (type instanceof z.ZodBoolean) return { type: 'boolean', description: type.description }
+  if (type instanceof z.ZodOptional) return zodTypeToJsonSchema(type.unwrap())
+  if (type instanceof z.ZodEnum)    return { type: 'string', enum: type.options }
+  if (type instanceof z.ZodArray)   return { type: 'array',  items: zodTypeToJsonSchema(type.element) }
+  return { type: 'string' }
+}
+
+/** Execute a tool call from Claude, with Zod validation */
+export async function executeTool(
+  registry: ToolRegistry,
+  name: string,
+  rawInput: unknown,
+): Promise&lt;ToolResult&gt; {
+  const tool = registry.get(name)
+  if (!tool) {
+    return { success: false, error: `Unknown tool: ${name}` }
+  }
+
+  const parsed = tool.inputSchema.safeParse(rawInput)
+  if (!parsed.success) {
+    return {
+      success: false,
+      error: `Invalid tool input for "${name}": ${parsed.error.message}`,
+    }
+  }
+
+  try {
+    return await tool.execute(parsed.data)
+  } catch (err) {
+    return { success: false, error: String(err) }
+  }
+}</code></pre>
+
+    <h3 id="s4-bash">Bash Tool &mdash; <code>src/tools/bash.ts</code></h3>
+
+    <div class="file-header"><span class="file-dot"></span> src/tools/bash.ts</div>
+    <pre><code class="language-typescript">import { z } from 'zod'
+import { exec } from 'node:child_process'
+import { promisify } from 'node:util'
+import type { Tool } from './index.js'
+
+const execAsync = promisify(exec)
+
+const BashInput = z.object({
+  command: z.string().describe('The shell command to execute'),
+  timeout: z.number().optional().describe('Timeout in milliseconds (default 30000)'),
+})
+
+type BashInput = z.infer&lt;typeof BashInput&gt;
+
+export const bashTool: Tool&lt;BashInput&gt; = {
+  name:        'bash',
+  description: 'Execute a shell command in the project directory. Use for running tests, git commands, npm scripts, or any CLI tool.',
+  inputSchema: BashInput,
+
+  async execute({ command, timeout = 30_000 }) {
+    try {
+      const { stdout, stderr } = await execAsync(command, {
+        timeout,
+        maxBuffer: 10 * 1024 * 1024, // 10 MB
+      })
+
+      const output = [stdout, stderr].filter(Boolean).join('\n').trim()
+      return {
+        success: true,
+        output: output || '(command produced no output)',
+      }
+    } catch (err: unknown) {
+      const error = err as { stdout?: string; stderr?: string; message?: string }
+      const detail = [error.stdout, error.stderr, error.message]
+        .filter(Boolean)
+        .join('\n')
+        .trim()
+      return { success: false, error: detail || String(err) }
+    }
+  },
+}</code></pre>
+
+    <h3 id="s4-read">Read Tool &mdash; <code>src/tools/read.ts</code></h3>
+
+    <div class="file-header"><span class="file-dot"></span> src/tools/read.ts</div>
+    <pre><code class="language-typescript">import { z } from 'zod'
+import { readFile } from 'node:fs/promises'
+import { resolve } from 'node:path'
+import type { Tool } from './index.js'
+
+const ReadInput = z.object({
+  path:   z.string().describe('Absolute or relative path to the file to read'),
+  offset: z.number().optional().describe('Line number to start reading from (1-indexed)'),
+  limit:  z.number().optional().describe('Maximum number of lines to read'),
+})
+
+type ReadInput = z.infer&lt;typeof ReadInput&gt;
+
+export const readTool: Tool&lt;ReadInput&gt; = {
+  name:        'read',
+  description: 'Read the contents of a file. Optionally specify offset and limit to read a slice.',
+  inputSchema: ReadInput,
+
+  async execute({ path, offset, limit }) {
+    try {
+      const absPath = resolve(path)
+      const raw = await readFile(absPath, 'utf8')
+      const lines = raw.split('\n')
+
+      const start = offset !== undefined ? Math.max(0, offset - 1) : 0
+      const end   = limit  !== undefined ? start + limit : lines.length
+      const slice = lines.slice(start, end)
+
+      // Prefix with line numbers (like cat -n)
+      const numbered = slice.map((line, i) => {
+        const lineNum = String(start + i + 1).padStart(4, ' ')
+        return `${lineNum}\t${line}`
+      })
+
+      return {
+        success: true,
+        output: numbered.join('\n'),
+      }
+    } catch (err: unknown) {
+      return { success: false, error: String(err) }
+    }
+  },
+}</code></pre>
+
+    <h3 id="s4-write">Write Tool &mdash; <code>src/tools/write.ts</code></h3>
+
+    <div class="file-header"><span class="file-dot"></span> src/tools/write.ts</div>
+    <pre><code class="language-typescript">import { z } from 'zod'
+import { writeFile, mkdir } from 'node:fs/promises'
+import { resolve, dirname } from 'node:path'
+import type { Tool } from './index.js'
+
+const WriteInput = z.object({
+  path:    z.string().describe('Path to write the file to'),
+  content: z.string().describe('Full content to write to the file'),
+})
+
+type WriteInput = z.infer&lt;typeof WriteInput&gt;
+
+export const writeTool: Tool&lt;WriteInput&gt; = {
+  name:        'write',
+  description: 'Write content to a file. Creates parent directories automatically. Overwrites existing files.',
+  inputSchema: WriteInput,
+
+  async execute({ path, content }) {
+    try {
+      const absPath = resolve(path)
+      await mkdir(dirname(absPath), { recursive: true })
+      await writeFile(absPath, content, 'utf8')
+      return {
+        success: true,
+        output: `Written ${content.length} characters to ${absPath}`,
+      }
+    } catch (err: unknown) {
+      return { success: false, error: String(err) }
+    }
+  },
+}</code></pre>
+
+    <h3 id="s4-search">Search Tool &mdash; <code>src/tools/search.ts</code></h3>
+
+    <div class="file-header"><span class="file-dot"></span> src/tools/search.ts</div>
+    <pre><code class="language-typescript">import { z } from 'zod'
+import { exec } from 'node:child_process'
+import { promisify } from 'node:util'
+import type { Tool } from './index.js'
+
+const execAsync = promisify(exec)
+
+const SearchInput = z.object({
+  pattern:    z.string().describe('Regex pattern to search for'),
+  path:       z.string().optional().describe('Directory or file to search in (default: current dir)'),
+  filePattern: z.string().optional().describe('Glob pattern to filter files (e.g. "*.ts")'),
+  ignoreCase: z.boolean().optional().describe('Case-insensitive search'),
+})
+
+type SearchInput = z.infer&lt;typeof SearchInput&gt;
+
+export const searchTool: Tool&lt;SearchInput&gt; = {
+  name:        'search',
+  description: 'Search for a pattern in the codebase using ripgrep. Returns matching lines with file paths and line numbers.',
+  inputSchema: SearchInput,
+
+  async execute({ pattern, path = '.', filePattern, ignoreCase }) {
+    // Build ripgrep command; fall back to grep if rg not available
+    const flags = [
+      '--line-number',
+      '--with-filename',
+      '--color=never',
+      '--max-count=50',      // cap results
+      ignoreCase ? '--ignore-case' : '',
+      filePattern ? `--glob '${filePattern}'` : '',
+    ].filter(Boolean).join(' ')
+
+    const rgCmd  = `rg ${flags} '${pattern.replace(/'/g, "\\'")}' ${path} 2>/dev/null`
+    const grepCmd = `grep -r -n ${ignoreCase ? '-i' : ''} '${pattern.replace(/'/g, "\\'")}' ${path} ${filePattern ? `--include='${filePattern}'` : ''} 2>/dev/null | head -50`
+
+    // Try ripgrep first, fall back to grep
+    for (const cmd of [rgCmd, grepCmd]) {
+      try {
+        const { stdout } = await execAsync(cmd, { maxBuffer: 5 * 1024 * 1024 })
+        if (stdout.trim()) {
+          return { success: true, output: stdout.trim() }
+        }
+      } catch {
+        // continue to next command
+      }
+    }
+
+    return { success: true, output: 'No matches found.' }
+  },
+}
+
+// ── Build the default registry ───────────────────────────────────────────────
+import { ToolRegistry } from './index.js'
+import { bashTool }   from './bash.js'
+import { readTool }   from './read.js'
+import { writeTool }  from './write.js'
+
+export function createDefaultRegistry(): ToolRegistry {
+  return new ToolRegistry()
+    .register(bashTool)
+    .register(readTool)
+    .register(writeTool)
+    .register(searchTool)
+}</code></pre>
+
+    <!-- ─── Section 5 ─── -->
+    <h2 id="s5"><span class="section-num">5</span> The Anthropic Client Wrapper</h2>
+
+    <h3 id="s5-streaming">Stream Event Types &mdash; <code>src/ai/streaming.ts</code></h3>
+
+    <div class="file-header"><span class="file-dot"></span> src/ai/streaming.ts</div>
+    <pre><code class="language-typescript">// Discriminated union of all events we care about from the stream
+export type StreamEvent =
+  | { type: 'text_delta';        text: string }
+  | { type: 'tool_use_start';    id: string; name: string }
+  | { type: 'tool_use_delta';    id: string; partialJson: string }
+  | { type: 'tool_use_complete'; id: string; name: string; input: unknown }
+  | { type: 'message_stop';      stopReason: string }
+  | { type: 'error';             message: string }
+
+// Accumulates partial JSON for a tool_use block during streaming
+export class ToolInputAccumulator {
+  private buffers = new Map&lt;string, string&gt;()
+
+  append(id: string, chunk: string): void {
+    this.buffers.set(id, (this.buffers.get(id) ?? '') + chunk)
+  }
+
+  finalize(id: string): unknown {
+    const buf = this.buffers.get(id) ?? '{}'
+    this.buffers.delete(id)
+    try {
+      return JSON.parse(buf)
+    } catch {
+      return {}
+    }
+  }
+}</code></pre>
+
+    <h3 id="s5-client">AI Client &mdash; <code>src/ai/client.ts</code></h3>
+
+    <div class="file-header"><span class="file-dot"></span> src/ai/client.ts</div>
+    <pre><code class="language-typescript">import Anthropic from '@anthropic-ai/sdk'
+import type { Config } from '../config/settings.js'
+import type { ToolRegistry } from '../tools/index.js'
+import { ToolInputAccumulator, type StreamEvent } from './streaming.js'
+
+export const SYSTEM_PROMPT = `You are tsai, an expert TypeScript AI assistant operating in a developer's terminal.
+You have access to tools that let you read files, write files, run shell commands, and search the codebase.
+Be concise but complete. When you make a change to a file, always show a summary of what changed.
+Prefer targeted edits over full rewrites. Always run the TypeScript type-checker after edits.`
+
+export class AIClient {
+  private client: Anthropic
+
+  constructor(
+    private config: Config,
+    private registry: ToolRegistry,
+  ) {
+    this.client = new Anthropic({ apiKey: config.apiKey })
+  }
+
+  /** Stream a conversation turn, yielding structured events */
+  async *stream(
+    messages: Anthropic.MessageParam[],
+  ): AsyncGenerator&lt;StreamEvent&gt; {
+    const accumulator = new ToolInputAccumulator()
+    // Track active tool uses: id -> name
+    const activeTools = new Map&lt;string, string&gt;()
+
+    let stream: Awaited&lt;ReturnType&lt;typeof this.client.messages.stream&gt;&gt;
+
+    try {
+      stream = this.client.messages.stream({
+        model:      this.config.model,
+        max_tokens: this.config.maxTokens,
+        system:     SYSTEM_PROMPT,
+        messages,
+        tools:      this.registry.toAnthropicTools(),
+      })
+    } catch (err) {
+      yield { type: 'error', message: String(err) }
+      return
+    }
+
+    for await (const event of stream) {
+      switch (event.type) {
+        case 'content_block_start':
+          if (event.content_block.type === 'tool_use') {
+            const { id, name } = event.content_block
+            activeTools.set(id, name)
+            yield { type: 'tool_use_start', id, name }
+          }
+          break
+
+        case 'content_block_delta':
+          if (event.delta.type === 'text_delta') {
+            yield { type: 'text_delta', text: event.delta.text }
+          }
+          if (event.delta.type === 'input_json_delta') {
+            // Find the current tool's id from the index
+            const id = [...activeTools.keys()][event.index] ?? ''
+            accumulator.append(id, event.delta.partial_json)
+            yield { type: 'tool_use_delta', id, partialJson: event.delta.partial_json }
+          }
+          break
+
+        case 'content_block_stop': {
+          // Find the id for this content block index
+          const toolEntries = [...activeTools.entries()]
+          const entry = toolEntries[event.index]
+          if (entry) {
+            const [id, name] = entry
+            const input = accumulator.finalize(id)
+            activeTools.delete(id)
+            yield { type: 'tool_use_complete', id, name, input }
+          }
+          break
+        }
+
+        case 'message_delta':
+          if (event.delta.stop_reason) {
+            yield { type: 'message_stop', stopReason: event.delta.stop_reason }
+          }
+          break
+      }
+    }
+  }
+
+  /** Non-streaming: create a message and return it (used in tests) */
+  async createMessage(
+    messages: Anthropic.MessageParam[],
+  ): Promise&lt;Anthropic.Message&gt; {
+    return this.client.messages.create({
+      model:      this.config.model,
+      max_tokens: this.config.maxTokens,
+      system:     SYSTEM_PROMPT,
+      messages,
+      tools:      this.registry.toAnthropicTools(),
+    })
+  }
+}</code></pre>
+
+    <h3>Context Manager &mdash; <code>src/ai/context.ts</code></h3>
+
+    <div class="file-header"><span class="file-dot"></span> src/ai/context.ts</div>
+    <pre><code class="language-typescript">import { readFile } from 'node:fs/promises'
+import { join } from 'node:path'
+import type Anthropic from '@anthropic-ai/sdk'
+
+export const MAX_MESSAGES = 100
+export const SUMMARIZE_THRESHOLD = 80
+
+export class ConversationContext {
+  messages: Anthropic.MessageParam[] = []
+  private claudeMd: string | null = null
+
+  async loadClaudeMd(cwd: string = process.cwd()): Promise&lt;void&gt; {
+    // Load CLAUDE.md from project root and user home, merging both
+    const paths = [
+      join(cwd, 'CLAUDE.md'),
+      join(process.env['HOME'] ?? '~', '.claude', 'CLAUDE.md'),
+    ]
+    const contents: string[] = []
+    for (const p of paths) {
+      try {
+        contents.push(await readFile(p, 'utf8'))
+      } catch {
+        // not found, skip
+      }
+    }
+    this.claudeMd = contents.length > 0 ? contents.join('\n\n---\n\n') : null
+  }
+
+  getSystemAddendum(): string {
+    if (!this.claudeMd) return ''
+    return `\n\n&lt;claude_md&gt;\n${this.claudeMd}\n&lt;/claude_md&gt;`
+  }
+
+  push(message: Anthropic.MessageParam): void {
+    this.messages.push(message)
+    // Hard cap: drop oldest pairs if we exceed the limit
+    if (this.messages.length > MAX_MESSAGES) {
+      this.messages = this.messages.slice(-MAX_MESSAGES)
+    }
+  }
+
+  /** Estimate token count (rough: ~4 chars per token) */
+  estimatedTokens(): number {
+    const text = this.messages
+      .flatMap(m => (typeof m.content === 'string' ? [m.content] : m.content.map(b => 'text' in b ? b.text : '')))
+      .join('')
+    return Math.ceil(text.length / 4)
+  }
+}</code></pre>
+
+    <!-- ─── Section 6 ─── -->
+    <h2 id="s6"><span class="section-num">6</span> The REPL Loop</h2>
+
+    <p>The REPL is the most complex piece. It must handle streaming text, interleaved tool-use blocks, recursive tool loops, and graceful shutdown all at once.</p>
+
+    <h3 id="s6-agentic">The Agentic Loop &mdash; <code>src/cli/repl.ts</code></h3>
+
+    <div class="file-header"><span class="file-dot"></span> src/cli/repl.ts</div>
+    <pre><code class="language-typescript">import * as p from '@clack/prompts'
+import chalk from 'chalk'
+import type Anthropic from '@anthropic-ai/sdk'
+import type { AIClient } from '../ai/client.js'
+import type { ConversationContext } from '../ai/context.js'
+import type { ToolRegistry } from '../tools/index.js'
+import { executeTool } from '../tools/index.js'
+import {
+  displayText,
+  displayToolStart,
+  displayToolResult,
+  displayError,
+  displayThinking,
+} from '../utils/display.js'
+import type { Config } from '../config/settings.js'
+import { checkPermission } from '../utils/permissions.js'
+
+export async function startRepl(
+  client:   AIClient,
+  context:  ConversationContext,
+  registry: ToolRegistry,
+  config:   Config,
+): Promise&lt;void&gt; {
+  // Load CLAUDE.md context
+  await context.loadClaudeMd()
+
+  console.log(
+    chalk.bold.hex('#4F46E5')('tsai') +
+    chalk.gray(' — TypeScript AI Assistant') +
+    '\n' +
+    chalk.gray('Type your message, /exit to quit, /clear to reset context') +
+    '\n'
+  )
+
+  // Main REPL loop
+  while (true) {
+    const input = await p.text({
+      message: '',
+      placeholder: 'Ask tsai anything about your TypeScript project...',
+    })
+
+    // Handle clack cancellation (Ctrl+C)
+    if (p.isCancel(input)) {
+      p.outro(chalk.gray('Goodbye!'))
+      process.exit(0)
+    }
+
+    const text = (input as string).trim()
+    if (!text) continue
+
+    // Slash commands
+    if (text === '/exit') {
+      p.outro(chalk.gray('Goodbye!'))
+      process.exit(0)
+    }
+    if (text === '/clear') {
+      context.messages = []
+      console.log(chalk.gray('Context cleared.\n'))
+      continue
+    }
+    if (text === '/tokens') {
+      console.log(chalk.gray(`Estimated tokens in context: ~${context.estimatedTokens()}\n`))
+      continue
+    }
+
+    // Add user message and run the agentic loop
+    context.push({ role: 'user', content: text })
+    await runAgenticLoop(client, context, registry, config)
+  }
+}
+
+/**
+ * The agentic loop: send messages to Claude, handle tool use,
+ * feed results back, repeat until stop_reason === 'end_turn'.
+ */
+async function runAgenticLoop(
+  client:   AIClient,
+  context:  ConversationContext,
+  registry: ToolRegistry,
+  config:   Config,
+): Promise&lt;void&gt; {
+  const stopThinking = displayThinking()
+
+  // Collect the full assistant response (may include text and tool_use blocks)
+  const assistantContent: Anthropic.ContentBlock[] = []
+  let currentText = ''
+  let firstChunk  = true
+
+  // Pending tool calls: id -> { name, input }
+  const pendingTools = new Map&lt;string, { name: string; input: unknown }&gt;()
+
+  try {
+    for await (const event of client.stream(context.messages)) {
+      switch (event.type) {
+        case 'text_delta':
+          if (firstChunk) {
+            stopThinking()
+            firstChunk = false
+            process.stdout.write('\n')
+          }
+          currentText += event.text
+          displayText(event.text)  // stream character by character
+          break
+
+        case 'tool_use_start':
+          if (firstChunk) {
+            stopThinking()
+            firstChunk = false
+          }
+          pendingTools.set(event.id, { name: event.name, input: null })
+          break
+
+        case 'tool_use_complete':
+          pendingTools.set(event.id, { name: event.name, input: event.input })
+          break
+
+        case 'message_stop':
+          // Flush accumulated text into content blocks
+          if (currentText) {
+            assistantContent.push({ type: 'text', text: currentText })
+            currentText = ''
+          }
+          break
+
+        case 'error':
+          stopThinking()
+          displayError(event.message)
+          return
+      }
+    }
+  } finally {
+    stopThinking()
+  }
+
+  // If no tool use: we're done
+  if (pendingTools.size === 0) {
+    if (currentText) {
+      assistantContent.push({ type: 'text', text: currentText })
+    }
+    if (assistantContent.length > 0) {
+      context.push({ role: 'assistant', content: assistantContent })
+    }
+    process.stdout.write('\n\n')
+    return
+  }
+
+  // Execute tool calls and collect results
+  const toolResultContents: Anthropic.ToolResultBlockParam[] = []
+
+  for (const [id, { name, input }] of pendingTools.entries()) {
+    // Add tool_use block to assistant content
+    assistantContent.push({
+      type:  'tool_use',
+      id,
+      name,
+      input: input ?? {},
+    } as Anthropic.ToolUseBlock)
+
+    // Check permissions before executing
+    const allowed = await checkPermission(name, input, config)
+    if (!allowed) {
+      toolResultContents.push({
+        type:        'tool_result',
+        tool_use_id: id,
+        content:     'Permission denied by user.',
+        is_error:    true,
+      })
+      continue
+    }
+
+    displayToolStart(name, input)
+    const result = await executeTool(registry, name, input)
+    displayToolResult(result)
+
+    toolResultContents.push({
+      type:        'tool_result',
+      tool_use_id: id,
+      content:     result.success ? result.output : result.error,
+      is_error:    !result.success,
+    })
+  }
+
+  // Push assistant message (with tool_use blocks) and tool results
+  context.push({ role: 'assistant', content: assistantContent })
+  context.push({ role: 'user',      content: toolResultContents })
+
+  // Recurse: Claude will process tool results and either respond or request more tools
+  await runAgenticLoop(client, context, registry, config)
+}</code></pre>
+
+    <h3 id="s6-sequence">Tool-Use Sequence Diagram</h3>
+
+    <div class="diagram-wrap">
+      <div class="diagram-title">Agentic Loop &mdash; Tool Use Flow</div>
+      <svg viewBox="0 0 700 480" width="100%" style="max-width:700px" xmlns="http://www.w3.org/2000/svg" font-family="system-ui,sans-serif" font-size="12">
+        <!-- Lifelines -->
+        <line x1="80"  y1="30" x2="80"  y2="460" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="4,3"/>
+        <line x1="260" y1="30" x2="260" y2="460" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="4,3"/>
+        <line x1="450" y1="30" x2="450" y2="460" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="4,3"/>
+        <line x1="620" y1="30" x2="620" y2="460" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="4,3"/>
+
+        <!-- Actor headers -->
+        <rect x="30"  y="8" width="100" height="28" rx="5" fill="#EEF2FF" stroke="#C7D2FE" stroke-width="1.5"/>
+        <text x="80"  y="27" text-anchor="middle" font-weight="700" fill="#3730A3">REPL</text>
+
+        <rect x="205" y="8" width="110" height="28" rx="5" fill="#FDF2F8" stroke="#FBCFE8" stroke-width="1.5"/>
+        <text x="260" y="27" text-anchor="middle" font-weight="700" fill="#9D174D">AIClient</text>
+
+        <rect x="393" y="8" width="114" height="28" rx="5" fill="#FFF7ED" stroke="#FED7AA" stroke-width="1.5"/>
+        <text x="450" y="27" text-anchor="middle" font-weight="700" fill="#92400E">Anthropic API</text>
+
+        <rect x="568" y="8" width="104" height="28" rx="5" fill="#F0FDFA" stroke="#99F6E4" stroke-width="1.5"/>
+        <text x="620" y="27" text-anchor="middle" font-weight="700" fill="#0F766E">Tool System</text>
+
+        <!-- Step 1: user sends message -->
+        <line x1="80" y1="70" x2="255" y2="70" stroke="#4F46E5" stroke-width="1.5" marker-end="url(#sarr)"/>
+        <text x="168" y="65" text-anchor="middle" font-size="11" fill="#374151">messages + tools</text>
+
+        <!-- Step 2: API call -->
+        <line x1="260" y1="100" x2="445" y2="100" stroke="#EC4899" stroke-width="1.5" marker-end="url(#sarr)"/>
+        <text x="353" y="95" text-anchor="middle" font-size="11" fill="#374151">messages.stream()</text>
+
+        <!-- Step 3: stream text -->
+        <line x1="450" y1="130" x2="265" y2="130" stroke="#F97316" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#sarr2)"/>
+        <text x="353" y="125" text-anchor="middle" font-size="11" fill="#374151">text_delta events</text>
+
+        <!-- Step 4: stream to user -->
+        <line x1="260" y1="155" x2="95"  y2="155" stroke="#F97316" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#sarr2)"/>
+        <text x="178" y="150" text-anchor="middle" font-size="11" fill="#374151">displayText()</text>
+
+        <!-- Step 5: tool_use block -->
+        <line x1="450" y1="190" x2="265" y2="190" stroke="#EC4899" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#sarr2)"/>
+        <text x="353" y="185" text-anchor="middle" font-size="11" fill="#374151">tool_use block (id, name, input)</text>
+
+        <!-- Step 6: check permission -->
+        <rect x="30" y="205" width="100" height="22" rx="4" fill="#FFFBEB" stroke="#FDE68A" stroke-width="1"/>
+        <text x="80" y="220" text-anchor="middle" font-size="10" fill="#92400E">check permission</text>
+
+        <!-- Step 7: execute tool -->
+        <line x1="80" y1="245" x2="605" y2="245" stroke="#0D9488" stroke-width="1.5" marker-end="url(#sarr)"/>
+        <text x="342" y="240" text-anchor="middle" font-size="11" fill="#374151">executeTool(name, input)</text>
+
+        <!-- Step 8: tool result -->
+        <line x1="620" y1="275" x2="95" y2="275" stroke="#0D9488" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#sarr2)"/>
+        <text x="342" y="270" text-anchor="middle" font-size="11" fill="#374151">ToolResult</text>
+
+        <!-- Step 9: push tool_result -->
+        <line x1="80" y1="310" x2="255" y2="310" stroke="#4F46E5" stroke-width="1.5" marker-end="url(#sarr)"/>
+        <text x="168" y="305" text-anchor="middle" font-size="11" fill="#374151">push tool_result message</text>
+
+        <!-- Step 10: loop back -->
+        <line x1="260" y1="345" x2="445" y2="345" stroke="#EC4899" stroke-width="1.5" marker-end="url(#sarr)"/>
+        <text x="353" y="340" text-anchor="middle" font-size="11" fill="#374151">messages.stream() again</text>
+
+        <!-- Step 11: final text -->
+        <line x1="450" y1="380" x2="265" y2="380" stroke="#F97316" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#sarr2)"/>
+        <text x="353" y="375" text-anchor="middle" font-size="11" fill="#374151">text (stop_reason=end_turn)</text>
+
+        <!-- Step 12: display -->
+        <line x1="260" y1="410" x2="95"  y2="410" stroke="#F97316" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#sarr2)"/>
+        <text x="178" y="405" text-anchor="middle" font-size="11" fill="#374151">display to user</text>
+
+        <!-- Loop annotation -->
+        <rect x="195" y="285" width="140" height="20" rx="3" fill="#EEF2FF" stroke="#C7D2FE" stroke-width="1"/>
+        <text x="265" y="299" text-anchor="middle" font-size="10" font-style="italic" fill="#4F46E5">loop until end_turn</text>
+
+        <defs>
+          <marker id="sarr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#6B7280"/>
+          </marker>
+          <marker id="sarr2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#9CA3AF"/>
+          </marker>
+        </defs>
+      </svg>
+    </div>
+
+    <!-- ─── Section 7 ─── -->
+    <h2 id="s7"><span class="section-num">7</span> Terminal UI</h2>
+
+    <h3 id="s7-display">Display Utilities &mdash; <code>src/utils/display.ts</code></h3>
+
+    <div class="file-header"><span class="file-dot"></span> src/utils/display.ts</div>
+    <pre><code class="language-typescript">import chalk from 'chalk'
+import ora,  { type Ora } from 'ora'
+import boxen from 'boxen'
+import { highlight } from 'cli-highlight'
+
+// ── Streaming text ───────────────────────────────────────────────────────────
+
+/** Write a text chunk directly to stdout (called on each text_delta event) */
+export function displayText(chunk: string): void {
+  process.stdout.write(chunk)
+}
+
+// ── Spinner ──────────────────────────────────────────────────────────────────
+
+let activeSpinner: Ora | null = null
+
+export function displayThinking(): () => void {
+  activeSpinner = ora({
+    text:  chalk.gray('Thinking...'),
+    color: 'gray',
+    spinner: 'dots2',
+  }).start()
+
+  return () => {
+    if (activeSpinner) {
+      activeSpinner.stop()
+      activeSpinner = null
+    }
+  }
+}
+
+// ── Tool display ─────────────────────────────────────────────────────────────
+
+export function displayToolStart(name: string, input: unknown): void {
+  const label = chalk.bold.hex('#0D9488')(`Tool: ${name}`)
+  const detail = summarizeInput(name, input)
+  process.stdout.write('\n' + chalk.gray('  ') + label + chalk.gray(` — ${detail}`) + '\n')
+}
+
+function summarizeInput(name: string, input: unknown): string {
+  if (!input || typeof input !== 'object') return ''
+  const obj = input as Record&lt;string, unknown&gt;
+  switch (name) {
+    case 'bash':   return chalk.italic(String(obj['command'] ?? '').slice(0, 80))
+    case 'read':   return chalk.italic(String(obj['path'] ?? ''))
+    case 'write':  return chalk.italic(String(obj['path'] ?? ''))
+    case 'search': return chalk.italic(`"${obj['pattern'] ?? ''}"`)
+    default:       return JSON.stringify(input).slice(0, 80)
+  }
+}
+
+export function displayToolResult(result: { success: boolean; output?: string; error?: string }): void {
+  if (result.success) {
+    const lines = (result.output ?? '').split('\n').slice(0, 20) // cap preview
+    const preview = lines.join('\n')
+    if (preview.trim()) {
+      const box = boxen(chalk.gray(preview), {
+        padding:     { top: 0, bottom: 0, left: 1, right: 1 },
+        borderColor: 'gray',
+        borderStyle: 'round',
+        dimBorder:   true,
+      })
+      console.log(box)
+    }
+  } else {
+    console.log(chalk.red('  Error: ') + chalk.gray(result.error ?? 'unknown error'))
+  }
+}
+
+// ── Code blocks ──────────────────────────────────────────────────────────────
+
+export function displayCodeBlock(code: string, language = 'typescript'): void {
+  const fence = chalk.gray('```' + language)
+  try {
+    const highlighted = highlight(code, { language, ignoreIllegals: true })
+    console.log(fence)
+    console.log(highlighted)
+  } catch {
+    console.log(fence)
+    console.log(code)
+  }
+  console.log(chalk.gray('```'))
+}
+
+// ── Error display ────────────────────────────────────────────────────────────
+
+export function displayError(message: string): void {
+  console.error(chalk.red('\nError: ') + message + '\n')
+}</code></pre>
+
+    <!-- ─── Section 8 ─── -->
+    <h2 id="s8"><span class="section-num">8</span> Configuration System</h2>
+
+    <h3 id="s8-settings">Settings Schema &mdash; <code>src/config/settings.ts</code></h3>
+
+    <div class="file-header"><span class="file-dot"></span> src/config/settings.ts</div>
+    <pre><code class="language-typescript">import { z } from 'zod'
+import { readFile } from 'node:fs/promises'
+import { join } from 'node:path'
+
+// ── Schema ───────────────────────────────────────────────────────────────────
+
+export const PermissionModeSchema = z.enum(['auto', 'ask', 'deny-all'])
+export type PermissionMode = z.infer&lt;typeof PermissionModeSchema&gt;
+
+export const ConfigSchema = z.object({
+  apiKey:       z.string().optional(),
+  model:        z.enum(['claude-opus-4-7', 'claude-sonnet-4-6', 'claude-haiku-4-5'])
+                  .default('claude-sonnet-4-6'),
+  maxTokens:    z.number().int().positive().default(8096),
+  allowedTools: z.array(z.string()).default(['bash', 'read', 'write', 'search']),
+  permissions:  PermissionModeSchema.default('ask'),
+  pathAllowlist: z.array(z.string()).default([]),  // extra paths write tool may access
+})
+
+export type Config = z.infer&lt;typeof ConfigSchema&gt;
+
+// ── Loader ───────────────────────────────────────────────────────────────────
+
+/** Load config from (in priority order):
+ *  1. Environment variables
+ *  2. Project config: .tsai/config.json
+ *  3. Global config:  ~/.tsai/config.json
+ *  4. Built-in defaults (from Zod schema)
+ */
+export async function loadConfig(): Promise&lt;Config&gt; {
+  const home    = process.env['HOME'] ?? process.env['USERPROFILE'] ?? ''
+  const globalPath  = join(home, '.tsai', 'config.json')
+  const projectPath = join(process.cwd(), '.tsai', 'config.json')
+
+  const layers: Record&lt;string, unknown&gt;[] = [{}]
+
+  // Load global config
+  try {
+    const raw = await readFile(globalPath, 'utf8')
+    layers.push(JSON.parse(raw) as Record&lt;string, unknown&gt;)
+  } catch { /* no global config */ }
+
+  // Load project config (overrides global)
+  try {
+    const raw = await readFile(projectPath, 'utf8')
+    layers.push(JSON.parse(raw) as Record&lt;string, unknown&gt;)
+  } catch { /* no project config */ }
+
+  // Environment overrides (highest priority)
+  const envOverrides: Record&lt;string, unknown&gt; = {}
+  if (process.env['ANTHROPIC_API_KEY']) {
+    envOverrides['apiKey'] = process.env['ANTHROPIC_API_KEY']
+  }
+  if (process.env['TSAI_MODEL']) {
+    envOverrides['model'] = process.env['TSAI_MODEL']
+  }
+  layers.push(envOverrides)
+
+  const merged = Object.assign({}, ...layers)
+  const parsed = ConfigSchema.safeParse(merged)
+
+  if (!parsed.success) {
+    throw new Error(`Invalid config: ${parsed.error.message}`)
+  }
+
+  if (!parsed.data.apiKey) {
+    throw new Error(
+      'No API key found. Set ANTHROPIC_API_KEY or add "apiKey" to ~/.tsai/config.json'
+    )
+  }
+
+  return parsed.data
+}</code></pre>
+
+    <h3 id="s8-permissions">Permission System &mdash; <code>src/utils/permissions.ts</code></h3>
+
+    <div class="file-header"><span class="file-dot"></span> src/utils/permissions.ts</div>
+    <pre><code class="language-typescript">import * as p from '@clack/prompts'
+import chalk from 'chalk'
+import { resolve } from 'node:path'
+import type { Config } from '../config/settings.js'
+
+// Commands that require explicit confirmation regardless of mode
+const DANGEROUS_PATTERNS = [
+  /rm\s+-rf/,
+  /sudo\s+/,
+  />\s*\/dev\//,
+  /dd\s+if=/,
+  /mkfs/,
+  /format\s+/,
+]
+
+/** Returns true if the tool should proceed, false to deny */
+export async function checkPermission(
+  toolName: string,
+  input:    unknown,
+  config:   Config,
+): Promise&lt;boolean&gt; {
+  // Respect allowedTools list
+  if (!config.allowedTools.includes(toolName)) {
+    console.log(chalk.red(`  Blocked: tool "${toolName}" not in allowedTools`))
+    return false
+  }
+
+  // auto mode: allow everything in the allowedTools list
+  if (config.permissions === 'auto') return true
+
+  // deny-all mode: nothing runs
+  if (config.permissions === 'deny-all') return false
+
+  // ask mode: check for dangerous patterns, then prompt
+  if (toolName === 'bash' && typeof input === 'object' && input !== null) {
+    const cmd = (input as Record&lt;string, unknown&gt;)['command']
+    if (typeof cmd === 'string') {
+      for (const pattern of DANGEROUS_PATTERNS) {
+        if (pattern.test(cmd)) {
+          const confirmed = await p.confirm({
+            message: chalk.red(`Dangerous command detected:\n  ${cmd}\n  Allow?`),
+            initialValue: false,
+          })
+          return !p.isCancel(confirmed) && (confirmed as boolean)
+        }
+      }
+    }
+  }
+
+  if (toolName === 'write' && typeof input === 'object' && input !== null) {
+    const writePath = (input as Record&lt;string, unknown&gt;)['path']
+    if (typeof writePath === 'string') {
+      const abs = resolve(writePath)
+      const cwd = process.cwd()
+      // Allow writes inside project dir or explicitly allowed paths
+      const allowed =
+        abs.startsWith(cwd) ||
+        config.pathAllowlist.some(p2 => abs.startsWith(resolve(p2)))
+
+      if (!allowed) {
+        const confirmed = await p.confirm({
+          message: `Write to ${abs} (outside project)? Allow?`,
+          initialValue: false,
+        })
+        return !p.isCancel(confirmed) && (confirmed as boolean)
+      }
+    }
+  }
+
+  return true
+}</code></pre>
+
+    <!-- ─── Section 9 ─── -->
+    <h2 id="s9"><span class="section-num">9</span> Entry Point</h2>
+
+    <div class="file-header"><span class="file-dot"></span> src/cli/index.ts</div>
+    <pre><code class="language-typescript">#!/usr/bin/env node
+import { Command } from 'commander'
+import chalk from 'chalk'
+import * as p from '@clack/prompts'
+import { loadConfig } from '../config/settings.js'
+import { AIClient } from '../ai/client.js'
+import { ConversationContext } from '../ai/context.js'
+import { createDefaultRegistry } from '../tools/search.js'
+import { startRepl } from './repl.js'
+
+const program = new Command()
+
+program
+  .name('tsai')
+  .version('0.1.0')
+  .description('TypeScript AI assistant powered by Claude')
+
+// Interactive REPL (default command)
+program
+  .command('chat', { isDefault: true })
+  .description('Start an interactive AI session')
+  .action(async () => {
+    let config
+    try {
+      config = await loadConfig()
+    } catch (err) {
+      console.error(chalk.red('Configuration error: ') + String(err))
+      process.exit(1)
+    }
+
+    const registry = createDefaultRegistry()
+    const context  = new ConversationContext()
+    const client   = new AIClient(config, registry)
+
+    // Graceful shutdown
+    process.on('SIGINT',  () => { p.outro(chalk.gray('\nGoodbye!')); process.exit(0) })
+    process.on('SIGTERM', () => { process.exit(0) })
+
+    await startRepl(client, context, registry, config)
+  })
+
+// One-shot command: tsai ask "explain this file" src/foo.ts
+program
+  .command('ask &lt;question&gt;')
+  .description('Ask a single question (non-interactive)')
+  .option('-f, --file &lt;path&gt;', 'Include a file in context')
+  .action(async (question: string, opts: { file?: string }) => {
+    let config
+    try {
+      config = await loadConfig()
+    } catch (err) {
+      console.error(chalk.red('Configuration error: ') + String(err))
+      process.exit(1)
+    }
+
+    const registry = createDefaultRegistry()
+    const context  = new ConversationContext()
+    const client   = new AIClient(config, registry)
+
+    // Optionally prepend file content to the question
+    let userContent = question
+    if (opts.file) {
+      try {
+        const { readFile } = await import('node:fs/promises')
+        const fileContent = await readFile(opts.file, 'utf8')
+        userContent = `File: ${opts.file}\n\`\`\`\n${fileContent}\n\`\`\`\n\n${question}`
+      } catch (err) {
+        console.error(chalk.red(`Could not read ${opts.file}: `) + String(err))
+        process.exit(1)
+      }
+    }
+
+    context.push({ role: 'user', content: userContent })
+
+    process.stdout.write('\n')
+    for await (const event of client.stream(context.messages)) {
+      if (event.type === 'text_delta') process.stdout.write(event.text)
+    }
+    process.stdout.write('\n\n')
+  })
+
+program.parse()</code></pre>
+
+    <!-- ─── Section 10 ─── -->
+    <h2 id="s10"><span class="section-num">10</span> Build &amp; Publish</h2>
+
+    <h4>Local Development</h4>
+    <div class="shell-block">
+      <div class="shell-block-header">
+        <span class="shell-dot" style="background:#FF5F57"></span>
+        <span class="shell-dot" style="background:#FEBC2E"></span>
+        <span class="shell-dot" style="background:#28C840"></span>
+        Terminal
+      </div>
+      <pre><code class="language-bash"># Run in development (no build step)
+npm run dev
+
+# Build and link globally for local testing
+npm run build
+npm link
+
+# Now usable anywhere:
+tsai chat
+tsai ask "What TypeScript errors does this file have?" -f src/index.ts</code></pre>
+    </div>
+
+    <h4>Publishing to npm</h4>
+    <div class="shell-block">
+      <div class="shell-block-header">
+        <span class="shell-dot" style="background:#FF5F57"></span>
+        <span class="shell-dot" style="background:#FEBC2E"></span>
+        <span class="shell-dot" style="background:#28C840"></span>
+        Terminal
+      </div>
+      <pre><code class="language-bash"># Ensure the build is clean
+npm run build
+npm run type-check
+
+# Publish (first time: npm adduser)
+npm publish --access public
+
+# Users then install:
+npm install -g tsai</code></pre>
+    </div>
+
+    <div class="callout callout-tip">
+      <span class="callout-icon">&#128161;</span>
+      <div class="callout-body">
+        <div class="callout-title">Tip &mdash; The bin field and shebang</div>
+        <p><code>tsup</code> is configured with <code>banner: { js: '#!/usr/bin/env node' }</code> so the built file has the correct shebang. npm automatically sets the executable bit on files listed in <code>"bin"</code>. Always include <code>"type": "module"</code> in <code>package.json</code> when using ESM output.</p>
+      </div>
+    </div>
+
+    <h4>Homebrew Formula (optional)</h4>
+    <pre><code class="language-ruby">class Tsai &lt; Formula
+  desc "TypeScript AI assistant powered by Claude"
+  homepage "https://github.com/yourname/tsai"
+  url "https://registry.npmjs.org/tsai/-/tsai-0.1.0.tgz"
+  sha256 "INSERT_SHA256_HERE"
+  license "MIT"
+
+  depends_on "node"
+
+  def install
+    system "npm", "install", *Language::Node.std_npm_install_args(libexec)
+    bin.install_symlink Dir["#{libexec}/bin/*"]
+  end
+
+  test do
+    assert_match "tsai", shell_output("#{bin}/tsai --version")
+  end
+end</code></pre>
+
+    <!-- ─── Section 11 ─── -->
+    <h2 id="s11"><span class="section-num">11</span> Testing</h2>
+
+    <p>Testing an AI CLI means mocking the Anthropic API. The stateless <code>AIClient</code> design pays off here &mdash; inject a mock.</p>
+
+    <div class="file-header"><span class="file-dot"></span> tests/repl.test.ts</div>
+    <pre><code class="language-typescript">import { describe, it, expect, vi, beforeEach } from 'vitest'
+import type { AIClient } from '../src/ai/client.js'
+import type { StreamEvent } from '../src/ai/streaming.js'
+import { ConversationContext } from '../src/ai/context.js'
+import { createDefaultRegistry } from '../src/tools/search.js'
+import type { Config } from '../src/config/settings.js'
+
+// ── Mock AI Client ───────────────────────────────────────────────────────────
+
+function createMockClient(events: StreamEvent[]): AIClient {
+  return {
+    stream: async function* () {
+      for (const event of events) yield event
+    },
+    createMessage: vi.fn(),
+  } as unknown as AIClient
+}
+
+const defaultConfig: Config = {
+  apiKey:       'test-key',
+  model:        'claude-sonnet-4-6',
+  maxTokens:    8096,
+  allowedTools: ['bash', 'read', 'write', 'search'],
+  permissions:  'auto',
+  pathAllowlist: [],
+}
+
+// ── Tool System Tests ────────────────────────────────────────────────────────
+
+describe('ToolRegistry', () => {
+  it('validates tool input with Zod', async () => {
+    const registry = createDefaultRegistry()
+    const { executeTool } = await import('../src/tools/index.js')
+
+    const result = await executeTool(registry, 'bash', { command: 123 }) // wrong type
+    expect(result.success).toBe(false)
+    expect(result.error).toContain('Invalid tool input')
+  })
+
+  it('returns error for unknown tool', async () => {
+    const registry = createDefaultRegistry()
+    const { executeTool } = await import('../src/tools/index.js')
+
+    const result = await executeTool(registry, 'nonexistent', {})
+    expect(result.success).toBe(false)
+    expect(result.error).toContain('Unknown tool')
+  })
+
+  it('generates Anthropic tool schema from Zod', () => {
+    const registry = createDefaultRegistry()
+    const tools = registry.toAnthropicTools()
+
+    expect(tools).toHaveLength(4)
+    const bash = tools.find(t => t.name === 'bash')
+    expect(bash).toBeDefined()
+    expect(bash?.input_schema.properties).toHaveProperty('command')
+  })
+})
+
+// ── Config Tests ─────────────────────────────────────────────────────────────
+
+describe('ConfigSchema', () => {
+  it('applies defaults', async () => {
+    const { ConfigSchema } = await import('../src/config/settings.js')
+    const result = ConfigSchema.safeParse({ apiKey: 'key' })
+    expect(result.success).toBe(true)
+    if (result.success) {
+      expect(result.data.model).toBe('claude-sonnet-4-6')
+      expect(result.data.maxTokens).toBe(8096)
+      expect(result.data.permissions).toBe('ask')
+    }
+  })
+
+  it('rejects invalid model', async () => {
+    const { ConfigSchema } = await import('../src/config/settings.js')
+    const result = ConfigSchema.safeParse({ apiKey: 'key', model: 'gpt-4' })
+    expect(result.success).toBe(false)
+  })
+})
+
+// ── Stream Event Tests ────────────────────────────────────────────────────────
+
+describe('AIClient stream', () => {
+  it('collects text_delta events', async () => {
+    const events: StreamEvent[] = [
+      { type: 'text_delta', text: 'Hello' },
+      { type: 'text_delta', text: ', world' },
+      { type: 'message_stop', stopReason: 'end_turn' },
+    ]
+    const client = createMockClient(events)
+    const chunks: string[] = []
+
+    for await (const event of client.stream([])) {
+      if (event.type === 'text_delta') chunks.push(event.text)
+    }
+
+    expect(chunks.join('')).toBe('Hello, world')
+  })
+
+  it('emits tool_use_complete events', async () => {
+    const events: StreamEvent[] = [
+      { type: 'tool_use_start',    id: 'tu_1', name: 'bash' },
+      { type: 'tool_use_delta',    id: 'tu_1', partialJson: '{"command":' },
+      { type: 'tool_use_delta',    id: 'tu_1', partialJson: '"ls -la"}' },
+      { type: 'tool_use_complete', id: 'tu_1', name: 'bash', input: { command: 'ls -la' } },
+      { type: 'message_stop', stopReason: 'tool_use' },
+    ]
+    const client = createMockClient(events)
+    const completeEvents = []
+
+    for await (const event of client.stream([])) {
+      if (event.type === 'tool_use_complete') completeEvents.push(event)
+    }
+
+    expect(completeEvents).toHaveLength(1)
+    expect(completeEvents[0]?.name).toBe('bash')
+    expect(completeEvents[0]?.input).toEqual({ command: 'ls -la' })
+  })
+})</code></pre>
+
+    <div class="shell-block">
+      <div class="shell-block-header">
+        <span class="shell-dot" style="background:#FF5F57"></span>
+        <span class="shell-dot" style="background:#FEBC2E"></span>
+        <span class="shell-dot" style="background:#28C840"></span>
+        Terminal
+      </div>
+      <pre><code class="language-bash">npm install -D vitest
+npx vitest run</code></pre>
+    </div>
+
+    <!-- ─── Section 12 ─── -->
+    <h2 id="s12"><span class="section-num">12</span> Lessons Learned</h2>
+
+    <div class="callout callout-lesson">
+      <span class="callout-icon">&#128161;</span>
+      <div class="callout-body">
+        <div class="callout-title">Lesson Learned &mdash; Zod is not optional</div>
+        <p>Claude&rsquo;s tool inputs are <em>untrusted</em>. The model may hallucinate field names or send the wrong types. Without Zod validation, you get runtime <code>TypeError</code>s that are nearly impossible to debug. With Zod, you get a clean error message that goes back to Claude as a <code>tool_result</code> with <code>is_error: true</code>, and Claude self-corrects.</p>
+      </div>
+    </div>
+
+    <div class="callout callout-lesson">
+      <span class="callout-icon">&#9203;</span>
+      <div class="callout-body">
+        <div class="callout-title">Lesson Learned &mdash; Streaming is the UX</div>
+        <p>Without streaming, users see nothing for 5&ndash;15 seconds, then a wall of text. With streaming, they see the first characters within 300ms. This is not a nice-to-have &mdash; it is the entire difference between a tool that feels alive and one that feels broken. Implement streaming from day one.</p>
+      </div>
+    </div>
+
+    <div class="callout callout-lesson">
+      <span class="callout-icon">&#128200;</span>
+      <div class="callout-body">
+        <div class="callout-title">Lesson Learned &mdash; Context window management is the hardest problem</div>
+        <p>Long sessions accumulate messages fast. Tool results can be enormous (reading a large file, running <code>npm install</code>). You need to: (1) cap tool output at a reasonable size, (2) track estimated token usage, (3) summarize or truncate old messages. The <code>ConversationContext</code> class in this chapter does the bare minimum. Production tools need a proper summarization strategy using a cheap model.</p>
+      </div>
+    </div>
+
+    <div class="callout callout-lesson">
+      <span class="callout-icon">&#128737;</span>
+      <div class="callout-body">
+        <div class="callout-title">Lesson Learned &mdash; Discriminated unions prevent entire bug classes</div>
+        <p>The <code>ToolResult</code> and <code>StreamEvent</code> discriminated unions mean TypeScript forces you to handle every case. You cannot accidentally treat a <code>tool_use_start</code> event as a <code>text_delta</code>. This caught dozens of subtle event-ordering bugs during development that would have been silent runtime failures in JavaScript.</p>
+      </div>
+    </div>
+
+    <div class="callout callout-lesson">
+      <span class="callout-icon">&#128295;</span>
+      <div class="callout-body">
+        <div class="callout-title">Lesson Learned &mdash; Async generators are the right abstraction</div>
+        <p>The <code>async function*</code> / <code>for await...of</code> pattern fits streaming AI responses perfectly. The caller gets a clean iterator; the implementation handles all the SSE complexity inside the generator. Compare to callback-based or EventEmitter-based streaming: the generator version is half the code and trivial to test.</p>
+      </div>
+    </div>
+
+    <div class="callout callout-arch">
+      <span class="callout-icon">&#127959;</span>
+      <div class="callout-body">
+        <div class="callout-title">Architecture Note &mdash; Key TypeScript Patterns</div>
+        <ul>
+          <li><strong>Discriminated unions</strong> &mdash; <code>ToolResult</code>, <code>StreamEvent</code>: exhaustive handling</li>
+          <li><strong>Async generators</strong> &mdash; <code>client.stream()</code>: clean streaming abstraction</li>
+          <li><strong>Zod for runtime validation</strong> &mdash; all AI outputs, all config files</li>
+          <li><strong>Generic tool registry</strong> &mdash; <code>Tool&lt;TInput&gt;</code>: type-safe without losing flexibility</li>
+          <li><strong>Stateless AI client</strong> &mdash; inject messages, get stream back; trivially testable</li>
+          <li><strong><code>exactOptionalPropertyTypes</code></strong> &mdash; catches subtle <code>undefined</code> vs missing bugs in tool inputs</li>
+          <li><strong><code>noUncheckedIndexedAccess</code></strong> &mdash; forced us to handle the case where <code>toolEntries[event.index]</code> might be undefined</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout callout-ai">
+      <span class="callout-icon">&#10024;</span>
+      <div class="callout-body">
+        <div class="callout-title">AI Era Note &mdash; This pattern scales</div>
+        <p>The architecture in this chapter is the same pattern used by Claude Code, Cursor, GitHub Copilot Workspace, and every serious AI coding tool. The specifics differ but the shape is identical: REPL loop &rarr; stateless AI client &rarr; typed tool registry &rarr; permission gate &rarr; agentic loop. Master this pattern and you can build any AI agent.</p>
+      </div>
+    </div>
+
+    <hr class="divider" />
+
+    <h3>What to Build Next</h3>
+    <ul>
+      <li>Add a <code>web_fetch</code> tool that fetches URLs (Claude can then read documentation)</li>
+      <li>Implement proper token counting using <code>tiktoken</code> and auto-summarize at 80% of limit</li>
+      <li>Add a <code>--watch</code> mode with <code>chokidar</code> that re-runs on file save</li>
+      <li>Persist conversation history with SQLite (<code>better-sqlite3</code>) for session recall</li>
+      <li>Add a <code>diff</code> display for file writes (show before/after with <code>diff</code> tool)</li>
+      <li>Build a plugin system: <code>tsai.config.ts</code> can register additional tools</li>
+    </ul>
+
+  </main>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="footer-nav">
+    <a href="chapter-21-dx.html">&#8592; Ch 21: Developer Experience</a>
+  </div>
+  <div class="footer-center">
+    <strong>TypeScript for the AI Era</strong><br>
+    Chapter 22 of 24 &mdash; Case Study: Claude Code Architecture
+  </div>
+  <div class="footer-nav">
+    <a href="chapter-23-pulumi.html">Ch 23: Infrastructure as Code &#8594;</a>
+  </div>
+</footer>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('pre code').forEach(block => {
+      hljs.highlightElement(block)
+    })
+  })
+</script>
+</body>
+</html>

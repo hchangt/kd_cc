@@ -1,0 +1,1621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chapter 5: Writing Patent Claims That Win — Patent Law for Technologists</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* Chapter-5 local overrides */
+    .claim-preamble  { color: #7d3c98; font-weight: 600; }
+    .claim-transition { color: #1a6b8a; font-weight: 700; }
+    .claim-body-text  { color: #1e8449; }
+    .claim-annotation-table td { vertical-align: middle; }
+    .breadth-label {
+      display: inline-block; padding: .2rem .65rem; border-radius: 12px;
+      font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em;
+      font-family: var(--font-sans); margin-right: .5rem;
+    }
+    .label-broad   { background: #fdedec; color: #922b21; border: 1px solid #f1948a; }
+    .label-medium  { background: #fef9e7; color: #b7770d; border: 1px solid #f0b429; }
+    .label-narrow  { background: #e8f8f5; color: #1e8449; border: 1px solid #82e0aa; }
+    .mistake-number { font-size: 1.125rem; font-weight: 800; color: var(--navy); margin-right: .4rem; }
+    .mistake-badge  { display: inline-flex; align-items: center; background: #fdedec; color: #922b21; border-radius: 4px; padding: .15rem .5rem; font-size: .75rem; font-weight: 700; margin-left: .5rem; }
+    .fix-badge      { display: inline-flex; align-items: center; background: #e8f8f5; color: #1e8449; border-radius: 4px; padding: .15rem .5rem; font-size: .75rem; font-weight: 700; margin-left: .5rem; }
+    .claim-set-label {
+      font-family: var(--font-sans); font-size: .7rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .12em; color: var(--gray-500); margin-bottom: .5rem;
+    }
+    .claim-box + .claim-box { margin-top: 1rem; }
+    .claim-group { border: 1px solid var(--gray-300); border-radius: var(--radius-lg); padding: 1.5rem; margin: 2rem 0; background: #fafbfc; }
+    .claim-group-title { font-family: var(--font-sans); font-weight: 700; font-size: .875rem; color: var(--navy); margin-bottom: 1rem; text-transform: uppercase; letter-spacing: .08em; border-bottom: 2px solid var(--gold); padding-bottom: .5rem; display: inline-block; }
+    .claim-box.dependent { border-color: var(--navy-light); border-width: 1px; background: #f7f9fc; }
+    .claim-box.dependent .claim-header { color: var(--navy-light); }
+    .transition-table td code { font-size: .8125rem; }
+    .annotation-legend { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 1.25rem; font-size: .875rem; font-family: var(--font-sans); }
+    .annotation-legend span { display: flex; align-items: center; gap: .4rem; }
+    .dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+    .dot-purple { background: #7d3c98; }
+    .dot-blue   { background: #1a6b8a; }
+    .dot-green  { background: #1e8449; }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════
+     TOP NAVIGATION
+     ═══════════════════════════════════════════════════════════ -->
+<nav class="top-nav">
+  <div class="nav-container">
+    <a href="index.html" class="nav-logo">Patent Law <span>for Technologists</span></a>
+    <div class="nav-links">
+      <a href="ch01_why_patents.html">Ch 1</a>
+      <a href="ch02_patent_system.html">Ch 2</a>
+      <a href="ch03_patentability.html">Ch 3</a>
+      <a href="ch04_patent_anatomy.html">Ch 4</a>
+      <a href="ch05_writing_claims.html" class="active">Ch 5</a>
+      <a href="ch06_specification.html">Ch 6</a>
+      <a href="ch07_prosecution.html">Ch 7</a>
+      <a href="ch08_101_eligibility.html">Ch 8</a>
+      <a href="ch09_prior_art.html">Ch 9</a>
+      <a href="ch10_ai_patents.html">Ch 10</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════════
+     CHAPTER HERO
+     ═══════════════════════════════════════════════════════════ -->
+<header class="chapter-hero">
+  <div class="chapter-hero-content">
+    <div class="chapter-badge">Chapter 5</div>
+    <h1>Writing Patent Claims That Win</h1>
+    <p class="subtitle">The Art and Science of Claim Drafting — from first principles to AI-era best practices</p>
+    <div class="chapter-meta">
+      <span>Frank G. Smith III &mdash; Fish &amp; Richardson, Washington, D.C.</span>
+      <span>~65 min read</span>
+      <span>12 Sections &bull; 35+ Claim Examples</span>
+    </div>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PAGE LAYOUT
+     ═══════════════════════════════════════════════════════════ -->
+<div class="page-layout">
+
+  <!-- ── Sidebar TOC ───────────────────────────────────────── -->
+  <aside class="sidebar">
+    <nav class="toc" aria-label="Chapter contents">
+      <h3>In This Chapter</h3>
+      <ol>
+        <li><a href="#why-claims-everything">Why Claims Are Everything</a></li>
+        <li><a href="#anatomy-of-a-claim">Anatomy of a Claim</a></li>
+        <li><a href="#claim-types">Claim Types</a></li>
+        <li><a href="#transition-phrases">Transition Phrases</a></li>
+        <li><a href="#independent-breadth">Independent Claims: Breadth Strategy</a></li>
+        <li><a href="#dependent-claims">Dependent Claims Strategy</a></li>
+        <li><a href="#method-claims">Writing Method Claims for Algorithms</a></li>
+        <li><a href="#apparatus-claims">Apparatus/System Claims for AI</a></li>
+        <li><a href="#crm-claims">Computer-Readable Medium Claims</a></li>
+        <li><a href="#common-mistakes">Common Drafting Mistakes</a></li>
+        <li><a href="#checklist">Claim Editing Checklist</a></li>
+        <li><a href="#aiml-examples">AI/ML Claim Examples</a></li>
+        <li><a href="#international-claims">International Claim Drafting</a></li>
+        <li><a href="#generative-ai-claims">Generative AI Claims</a></li>
+        <li><a href="#glossary">Key Terms Glossary</a></li>
+      </ol>
+    </nav>
+  </aside>
+
+  <!-- ── Main Content ──────────────────────────────────────── -->
+  <main class="chapter-content">
+
+    <!-- ══════════════════════════════════════════════════════
+         SECTION 1 — WHY CLAIMS ARE EVERYTHING
+         ══════════════════════════════════════════════════════ -->
+    <section id="why-claims-everything" class="section-anchor">
+      <h2>1. Why Claims Are Everything</h2>
+
+      <blockquote>
+        "Patent claims are to patents what the deed is to real property."
+        <cite>— Universally cited maxim in patent practice; echoed by the Federal Circuit in <em>Markman v. Westview Instruments</em>, 517 U.S. 370 (1996)</cite>
+      </blockquote>
+
+      <p>
+        Every practitioner who has spent time in patent litigation learns the same hard truth within the first year: the rest of the patent — the abstract, the drawings, the pages of detailed description — is context. Background. Supporting cast. The claims, and only the claims, define what the patentee actually owns. When a competitor copies your product, when your licensing team negotiates a royalty, when a court decides infringement, the question is always the same: do the claims read on the accused product or process? Nothing else matters.
+      </p>
+
+      <p>
+        This is not a formality. The statutory basis is unambiguous. <strong>35 U.S.C. § 112(b)</strong> requires that a patent "conclude with one or more claims particularly pointing out and distinctly claiming the subject matter which the inventor or a joint inventor regards as the invention." The specification — that long narrative document — serves only to support and enable those claims. If the claims are too broad, they are invalid. If the claims are too narrow, a competitor designs around them. The entire enterprise of patent prosecution is the search for that precise point of maximum defensible breadth.
+      </p>
+
+      <div class="stats-row">
+        <div class="stat-item">
+          <div class="stat-number">$3.2B</div>
+          <div class="stat-label">Average value of top-tier AI patent portfolios in 2024 licensing transactions</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">~68%</div>
+          <div class="stat-label">Of patent litigations turn on claim construction, not technical merit</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">2–4%</div>
+          <div class="stat-label">Typical royalty premium for patents with well-drafted independent claims vs. narrow ones</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">$500K+</div>
+          <div class="stat-label">Median cost of a single IPR proceeding — almost always about claim scope</div>
+        </div>
+      </div>
+
+      <p>
+        Consider two companies — call them Alpha Corp. and Beta Inc. — each filing a patent application on the same transformer-based text classification invention on the same day. Alpha's patent attorney spends two days drafting claims. Beta's senior partner spends two weeks. Three years later, a competitor launches a substantially similar product. Alpha's claims require "a BERT-base model with 110 million parameters fine-tuned on labeled examples," a description so specific that every variant escapes. Beta's independent claim covers "a method comprising processing a sequence of tokens with a multi-head self-attention mechanism and generating a classification output therefrom," language broad enough to capture virtually every transformer variant. The difference in litigation outcome is not a matter of engineering. It is entirely a matter of draftsmanship.
+      </p>
+
+      <div class="callout callout-tip">
+        <div class="callout-icon">&#9998;</div>
+        <div class="callout-body">
+          <div class="callout-title">The Fundamental Principle</div>
+          <p>Write the claims first. Not after you understand the invention — as the mechanism <em>by which</em> you come to understand what is genuinely novel and protectable about the invention. The discipline of stating, in one sentence, the minimum set of elements that distinguishes over the prior art forces clarity that no amount of specification drafting can substitute for.</p>
+        </div>
+      </div>
+
+      <h3>The Functional Relationship Between Claims and Specification</h3>
+      <p>
+        The claims define the boundary of the patent grant. The specification's role is to (a) enable a person of ordinary skill to make and use what is claimed, and (b) provide written description support for every claim element. This is a one-way dependency: claims drive the specification, not the other way around. In practice, many inventors — and some inexperienced patent attorneys — reverse this relationship, writing pages of technical description and then drafting narrow claims that simply describe what was built. That approach systematically undervalues the invention.
+      </p>
+      <p>
+        The correct workflow: begin with the broadest defensible claim you can articulate. Then ask: what prior art anticipates this? What prior art renders it obvious? Add limitations one at a time, only as necessary to distinguish. The final independent claim should contain exactly, and no more than, the elements required to clear the prior art and survive a validity challenge.
+      </p>
+
+      <div class="callout callout-warning">
+        <div class="callout-icon">&#9888;</div>
+        <div class="callout-body">
+          <div class="callout-title">Prosecution History Estoppel</div>
+          <p>Every limitation you add to a claim during prosecution — to distinguish prior art or respond to an examiner's rejection — can limit your ability to assert the doctrine of equivalents against a competitor who does the same thing slightly differently. Claim scope is not just set by the words on the page; it is constrained by every amendment, every argument, every remark you made in the file history. Draft with this in mind from day one.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════
+         SECTION 2 — ANATOMY OF A CLAIM
+         ══════════════════════════════════════════════════════ -->
+    <section id="anatomy-of-a-claim" class="section-anchor">
+      <h2>2. Anatomy of a Claim</h2>
+
+      <p>
+        Every patent claim has three structural components: the <span class="key-term" title="The opening clause that identifies the class of invention">preamble</span>, the <span class="key-term" title="The transitional word or phrase (comprising, consisting of, etc.)">transition phrase</span>, and the <span class="key-term" title="The list of elements or steps that define the invention">claim body</span> (also called limitations). Understanding these components is prerequisite to drafting competent claims.
+      </p>
+
+      <h3>The Three Parts in Detail</h3>
+
+      <div class="annotation-legend">
+        <span><span class="dot dot-purple"></span> Preamble (purple)</span>
+        <span><span class="dot dot-blue"></span> Transition Phrase (blue)</span>
+        <span><span class="dot dot-green"></span> Claim Body / Limitations (green)</span>
+      </div>
+
+      <div class="claim-box">
+        <div class="claim-header">Annotated Claim — Method Claim for AI-Based Document Classification</div>
+        <p>
+          <span class="claim-number">1.</span>
+          <span class="claim-preamble">A computer-implemented method for classifying electronic documents</span>
+          <span class="claim-transition"> comprising:</span><br>
+          <span class="claim-element claim-body-text">receiving, by one or more processors, an input document comprising a plurality of tokens;</span>
+          <span class="claim-element claim-body-text">generating, by the one or more processors, a contextualized embedding for each token of the plurality of tokens using a multi-head self-attention mechanism operating over the full sequence of tokens;</span>
+          <span class="claim-element claim-body-text">computing, by the one or more processors, an aggregate document representation by applying a pooling operation to the contextualized embeddings;</span>
+          <span class="claim-element claim-body-text">classifying, by the one or more processors, the input document into one of a plurality of predefined categories based on the aggregate document representation; and</span>
+          <span class="claim-element claim-body-text">outputting, by the one or more processors, a classification result identifying the predefined category.</span>
+        </p>
+      </div>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Component</th>
+              <th>What It Does</th>
+              <th>Legal Significance</th>
+              <th>Drafting Tips</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Preamble</strong></td>
+              <td>Names the class of invention ("A method for…", "A system comprising…", "A non-transitory computer-readable medium…")</td>
+              <td>Generally not a limitation unless it gives life or meaning to the claim. But courts sometimes treat it as limiting — draft carefully.</td>
+              <td>Use "computer-implemented method" rather than just "method" for software claims. Keep it concise. Avoid importing unnecessary limitations.</td>
+            </tr>
+            <tr>
+              <td><strong>Transition Phrase</strong></td>
+              <td>Bridges the preamble to the body ("comprising", "consisting of", "consisting essentially of")</td>
+              <td>Determines whether unlisted elements infringe (open) or not (closed). Enormously consequential.</td>
+              <td>Default to "comprising" for virtually all software and AI claims. See Section 4 for full treatment.</td>
+            </tr>
+            <tr>
+              <td><strong>Claim Body / Limitations</strong></td>
+              <td>Lists every element or step of the invention. For method claims: verb-object phrases. For apparatus claims: structural components with functional relationships.</td>
+              <td>Each limitation is a separate required element for infringement (All Elements Rule). Adding a limitation <em>narrows</em> the claim.</td>
+              <td>Use functional language anchored to structure. Maintain parallelism. Give antecedent basis for every term. Use "one or more" for flexibility.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>The All-Elements Rule</h3>
+      <p>
+        A claim is infringed — literally — only when every single element of the claim is present in the accused product or process. This is the <span class="key-term" title="Every limitation must be present in the accused product for literal infringement">All-Elements Rule</span>. Remove any element from the claim, and the scope of protection expands. Add any element, and the scope narrows. This rule explains the entire strategy of claim drafting: include only what you need to distinguish over the prior art, and nothing more.
+      </p>
+
+      <div class="highlight-box">
+        <h4>The "Deed to Real Property" Analogy — Unpacked</h4>
+        <p>Think of the preamble as the street address, the transition as "and the property includes," and the limitations as the metes-and-bounds description of the boundary lines. The specification is the survey supporting document — it proves you own what you describe, but the deed (claim) is what transfers rights. Just as a deed that says "approximately near the oak tree" creates title disputes, a claim that says "substantially similar to" without clear definition invites invalidity under 35 U.S.C. § 112(b).</p>
+      </div>
+
+      <h3>Claim Grammar Rules</h3>
+      <p>
+        A claim is a single sentence. No matter how many limitations, no matter how complex, it must be grammatically a single sentence ending in a period. This is not pedantry; courts have invalidated claims for ambiguity arising from improper punctuation. Key rules:
+      </p>
+      <ul>
+        <li>Use a semicolon (or "and" with semicolons) between limitations, never a period.</li>
+        <li>Introduce new elements with the indefinite article "a" or "an"; refer back to them with "the" (antecedent basis).</li>
+        <li>Use the present tense ("comprising," "receiving") — claims speak in the present tense regardless of when the steps are performed.</li>
+        <li>Maintain grammatical parallelism across limitations (all gerunds, or all noun phrases, but not mixed).</li>
+        <li>Never use the first person ("I" or "we").</li>
+      </ul>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════
+         SECTION 3 — CLAIM TYPES
+         ══════════════════════════════════════════════════════ -->
+    <section id="claim-types" class="section-anchor">
+      <h2>3. Claim Types</h2>
+
+      <p>
+        Patent law recognizes several categories of claims, each covering a different aspect of the same invention. For any AI or software invention of significance, you should typically file all three of the core claim types — method, apparatus/system, and computer-readable medium — plus any domain-specific claim types. Failing to pursue all available claim types leaves doors open for competitors.
+      </p>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Claim Type</th>
+              <th>What It Covers</th>
+              <th>When to Use</th>
+              <th>Typical Example Language</th>
+              <th>AI/ML Considerations</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Independent Claim</strong></td>
+              <td>Stands alone; defines the broadest scope of protection without reference to another claim</td>
+              <td>Always — at least 1 per claim type per invention</td>
+              <td>"A computer-implemented method comprising: [limitations]"</td>
+              <td>Write the broadest functional claim your prior art search supports. This is your primary asset.</td>
+            </tr>
+            <tr>
+              <td><strong>Dependent Claim</strong></td>
+              <td>Incorporates all limitations of the referenced claim and adds additional limitations</td>
+              <td>Always — to provide fallback positions if the independent claim is invalidated</td>
+              <td>"The method of claim 1, wherein the neural network model comprises a transformer architecture."</td>
+              <td>Add specific architecture details (transformer, CNN, GAN), hyperparameters, training procedures as dependent claims. Each is a fallback.</td>
+            </tr>
+            <tr>
+              <td><strong>Method (Process) Claim</strong></td>
+              <td>Covers a sequence of steps or operations</td>
+              <td>When the invention is a process, algorithm, or trained procedure</td>
+              <td>"A computer-implemented method comprising: receiving…; processing…; outputting…"</td>
+              <td>Best for capturing training pipelines, inference procedures, data preprocessing steps. Avoid purely mental steps.</td>
+            </tr>
+            <tr>
+              <td><strong>Apparatus / System Claim</strong></td>
+              <td>Covers a physical device, system, or machine with structural components</td>
+              <td>When the invention is a hardware configuration or deployed system</td>
+              <td>"A system comprising: one or more processors; a memory storing instructions that, when executed by the one or more processors, cause the system to…"</td>
+              <td>Essential for AI hardware accelerators, inference chips, training clusters. Also captures software running on hardware.</td>
+            </tr>
+            <tr>
+              <td><strong>Composition Claim</strong></td>
+              <td>Covers a chemical composition, material, or article of manufacture</td>
+              <td>Drug discovery AI (outputs a molecule); novel materials designed by ML</td>
+              <td>"A pharmaceutical composition comprising a compound having a predicted binding affinity…"</td>
+              <td>Increasingly important for AI-assisted drug discovery. The claimed composition is the output of the AI, not the AI itself.</td>
+            </tr>
+            <tr>
+              <td><strong>Computer-Readable Medium (CRM) Claim</strong></td>
+              <td>Covers a non-transitory storage medium storing instructions that cause a processor to perform steps</td>
+              <td>Always — in tandem with method and system claims</td>
+              <td>"A non-transitory computer-readable medium storing instructions that, when executed by one or more processors, cause the processors to: [steps]"</td>
+              <td>Critical for AI software products. The "non-transitory" qualifier avoids 35 U.S.C. § 101 issues with transitory signals. Always include.</td>
+            </tr>
+            <tr>
+              <td><strong>System Claim</strong></td>
+              <td>A variant of apparatus claim emphasizing interconnected components or distributed architecture</td>
+              <td>Cloud AI services, distributed training, federated learning</td>
+              <td>"A distributed machine learning system comprising: a parameter server configured to aggregate gradient updates…; a plurality of worker nodes…"</td>
+              <td>Use for MLOps platforms, federated learning architectures, multi-agent AI systems. Can cover the whole cloud stack.</td>
+            </tr>
+            <tr>
+              <td><strong>Means-Plus-Function (MPF) Claim</strong></td>
+              <td>Covers a "means for [function]" — interpreted to cover the disclosed structure and equivalents under 35 U.S.C. § 112(f)</td>
+              <td>Rarely recommended — use only when deliberate and with extensive specification support</td>
+              <td>"means for classifying the input document based on the aggregate representation"</td>
+              <td><strong>Danger zone for AI claims.</strong> MPF claims are construed narrowly to the structure disclosed in the spec. For a neural network, this may limit you to the specific architecture described. Avoid unless intentional.</td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="table-caption">Table 5.1 — Patent Claim Types: Characteristics, Use Cases, and AI/ML Considerations</p>
+      </div>
+
+      <div class="callout callout-danger">
+        <div class="callout-icon">&#9888;</div>
+        <div class="callout-body">
+          <div class="callout-title">Means-Plus-Function Trap</div>
+          <p>Under Federal Circuit precedent, any claim element using the word "means" is presumed to invoke § 112(f) and will be construed narrowly to the specific structure disclosed in the specification. More dangerously, courts have held that "module for," "unit for," and other functional nonce words can trigger MPF interpretation even without the word "means." When you write "a classification module for classifying documents," you may accidentally invoke § 112(f). Use "a classifier configured to classify documents" or "one or more processors configured to classify documents" instead.</p>
+        </div>
+      </div>
+
+      <h3>The Three-Legged Stool: Method + System + CRM</h3>
+      <p>
+        For virtually every AI software invention, you need all three legs of the stool: a <strong>method claim</strong> covering the process, a <strong>system/apparatus claim</strong> covering the machine executing the process, and a <strong>CRM claim</strong> covering the software product itself. This matters because infringers operate in different ways. A competitor who builds and sells an AI system but does not personally execute the method may not infringe a method claim but will infringe the system claim. A distributor who ships software but never runs it may not infringe a method claim but will infringe the CRM claim. Cover all three, always.
+      </p>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════
+         SECTION 4 — TRANSITION PHRASES
+         ══════════════════════════════════════════════════════ -->
+    <section id="transition-phrases" class="section-anchor">
+      <h2>4. Transition Phrases</h2>
+
+      <p>
+        The transition phrase — that single word or short phrase between the preamble and the body — may be the single highest-leverage word in a patent claim. It determines whether a product that contains all of the claimed elements <em>plus additional elements</em> still infringes. For most AI inventions, this question is not academic. Virtually every real-world implementation of a deep learning system adds layers, preprocessing steps, or post-processing operations beyond what is strictly claimed.
+      </p>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Transition Phrase</th>
+              <th>Open or Closed?</th>
+              <th>Meaning</th>
+              <th>Example Claim Snippet</th>
+              <th>AI/ML Implication</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>comprising</code></td>
+              <td><span class="badge badge-success">Open</span></td>
+              <td>"Includes at least the following" — additional elements are permitted and do not defeat infringement</td>
+              <td>"A method comprising: receiving input data; training a model…"</td>
+              <td><strong>Use this almost always.</strong> A system with 47 additional preprocessing layers still infringes if it contains all the claimed elements. Maximizes scope.</td>
+            </tr>
+            <tr>
+              <td><code>comprising at least</code></td>
+              <td><span class="badge badge-success">Open</span></td>
+              <td>Explicit open-ended language; redundant with "comprising" but sometimes used for emphasis</td>
+              <td>"…comprising at least: a first attention layer and a second attention layer…"</td>
+              <td>Used when you want to be explicit that a minimum number is satisfied. Slightly redundant but occasionally clarifying.</td>
+            </tr>
+            <tr>
+              <td><code>including</code></td>
+              <td><span class="badge badge-success">Open</span></td>
+              <td>Synonymous with "comprising" — treated identically by courts</td>
+              <td>"A system including: a processor; a memory…"</td>
+              <td>Equivalent to "comprising." Some drafters prefer for apparatus claims, but there is no substantive difference.</td>
+            </tr>
+            <tr>
+              <td><code>having</code></td>
+              <td><span class="badge badge-warning">Ambiguous</span></td>
+              <td>Generally treated as open in the U.S., but its interpretation is less settled than "comprising"</td>
+              <td>"A neural network having a plurality of layers…"</td>
+              <td>Avoid when precision matters. Use "comprising" for clarity. "Having" creates unnecessary uncertainty.</td>
+            </tr>
+            <tr>
+              <td><code>consisting of</code></td>
+              <td><span class="badge badge-danger">Closed</span></td>
+              <td>"Includes only the following" — any additional element defeats infringement</td>
+              <td>"A composition consisting of compound A and compound B…"</td>
+              <td>Essentially never use for AI/ML claims. A model with any additional layers or components would not infringe. Reserve for chemistry claims where purity matters.</td>
+            </tr>
+            <tr>
+              <td><code>consisting essentially of</code></td>
+              <td><span class="badge badge-warning">Semi-Closed</span></td>
+              <td>Includes listed elements plus those that do not "materially affect the basic and novel characteristics" of the invention</td>
+              <td>"A composition consisting essentially of the active compound and a pharmaceutically acceptable carrier…"</td>
+              <td>Rare for software/AI. Used in drug discovery AI where the claimed molecule's properties are sensitive to impurities. Must define "basic and novel characteristics" in the spec.</td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="table-caption">Table 5.2 — Transition Phrases: Open vs. Closed Scope and AI/ML Implications</p>
+      </div>
+
+      <h3>Why "Comprising" Is Almost Always Right for AI Claims</h3>
+      <p>
+        Consider a claim to a method of training a neural network using stochastic gradient descent. If you use "comprising," then a competitor who uses SGD with an additional Adam optimizer variant, a learning rate scheduler, and a gradient clipping step still infringes — because all your claimed elements are present, along with extras. If you use "consisting of," that competitor does not infringe — because they have more steps than you claimed.
+      </p>
+      <p>
+        AI systems are almost always implemented with additional components beyond the core inventive concept. Data preprocessing, logging, model serialization, deployment plumbing — none of these extras should defeat infringement. "Comprising" ensures they do not.
+      </p>
+
+      <div class="callout callout-tip">
+        <div class="callout-icon">&#9998;</div>
+        <div class="callout-body">
+          <div class="callout-title">The "Comprising" Default</div>
+          <p>At Fish &amp; Richardson, we have a simple rule: use "comprising" unless you have an affirmative reason not to. In twenty-five years of drafting software and AI patents, I can count on one hand the times when "consisting of" was appropriate for a software claim. Save "consisting of" for chemistry. Use "comprising" for everything in the AI/ML space.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════
+         SECTION 5 — INDEPENDENT CLAIMS: BREADTH STRATEGY
+         ══════════════════════════════════════════════════════ -->
+    <section id="independent-breadth" class="section-anchor">
+      <h2>5. Independent Claims: Breadth Strategy</h2>
+
+      <p>
+        The correct strategy for drafting independent claims is to write from the broadest defensible scope inward — not from the specific implementation outward. Begin by asking: "What is the absolute minimum set of elements that (a) distinguishes over all prior art I can find, and (b) is enabled by my disclosure?" That is your broadest independent claim. Then write a medium-scope claim that adds the most important structural or operational feature. Then a narrow claim that describes the preferred embodiment in considerable detail. This is the <span class="key-term" title="Strategy of writing claims at three levels of breadth: broad, medium, and narrow">1-3-5 strategy</span>.
+      </p>
+
+      <h3>The 1-3-5 Strategy Explained</h3>
+
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-icon">&#11088;</div>
+          <h3>Claim 1 — Very Broad</h3>
+          <p>Contains only the elements strictly necessary to distinguish over the prior art. Functional language, minimal structure. This is your primary enforcement weapon. If it survives examination, it is extremely powerful.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">&#11089;</div>
+          <h3>Claim 3 — Medium Scope</h3>
+          <p>Adds the most important distinguishing feature — typically the key architectural choice or novel mechanism. Provides a fallback if Claim 1 is invalidated, and sometimes easier to assert because the scope is clearer.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">&#11090;</div>
+          <h3>Claim 5 — Narrow / Preferred Embodiment</h3>
+          <p>Describes the actual system built, with specific details. Harder to invalidate because it maps precisely to the specification. Essential for design-around prevention when broad claims are challenged.</p>
+        </div>
+      </div>
+
+      <p>
+        The following three claim versions all cover the same invention — a method for few-shot learning with in-context examples — but at radically different breadth levels. Study how each additional limitation in claims 3 and 5 narrows the scope.
+      </p>
+
+      <div class="claim-box">
+        <div class="claim-header"><span class="breadth-label label-broad">Broad</span> Claim 1 (Independent — Method, Very Broad)</div>
+        <p>
+          <span class="claim-number">1.</span> A computer-implemented method comprising:<br>
+          <span class="claim-element">receiving, by one or more processors, a natural language query;</span>
+          <span class="claim-element">generating, by the one or more processors, a response to the natural language query by conditioning a language model on a context comprising one or more demonstration examples, wherein each demonstration example associates an input with a corresponding output; and</span>
+          <span class="claim-element">outputting, by the one or more processors, the generated response.</span>
+        </p>
+      </div>
+
+      <div class="claim-box">
+        <div class="claim-header"><span class="breadth-label label-medium">Medium</span> Claim 3 (Independent — Method, Medium Scope)</div>
+        <p>
+          <span class="claim-number">3.</span> A computer-implemented method comprising:<br>
+          <span class="claim-element">receiving, by one or more processors, a natural language query and a plurality of labeled demonstration examples, wherein each demonstration example comprises an input text and a corresponding target label;</span>
+          <span class="claim-element">constructing, by the one or more processors, a prompt comprising a concatenation of the plurality of labeled demonstration examples followed by the natural language query;</span>
+          <span class="claim-element">processing, by the one or more processors, the prompt using a pre-trained autoregressive language model to generate a predicted label for the natural language query; and</span>
+          <span class="claim-element">outputting, by the one or more processors, the predicted label.</span>
+        </p>
+      </div>
+
+      <div class="claim-box">
+        <div class="claim-header"><span class="breadth-label label-narrow">Narrow</span> Claim 5 (Independent — Method, Narrow / Preferred Embodiment)</div>
+        <p>
+          <span class="claim-number">5.</span> A computer-implemented method comprising:<br>
+          <span class="claim-element">receiving, by one or more processors, a natural language classification query and a set of k labeled demonstration examples, where k is between 4 and 32, wherein each demonstration example comprises an input text of at most 512 tokens and a corresponding categorical label selected from a predefined label set;</span>
+          <span class="claim-element">selecting, by the one or more processors, the set of k labeled demonstration examples from a demonstration pool by computing cosine similarity between sentence embeddings of the classification query and candidate demonstration examples;</span>
+          <span class="claim-element">constructing, by the one or more processors, a formatted prompt comprising: (i) a task description, (ii) the k labeled demonstration examples arranged in order of descending similarity score, and (iii) the classification query;</span>
+          <span class="claim-element">generating, by the one or more processors, a predicted label by performing a single forward pass through a pre-trained autoregressive transformer language model having at least one billion parameters; and</span>
+          <span class="claim-element">outputting, by the one or more processors, the predicted label along with a confidence score derived from the softmax probability distribution over the label set.</span>
+        </p>
+      </div>
+
+      <div class="callout callout-info">
+        <div class="callout-icon">&#128161;</div>
+        <div class="callout-body">
+          <div class="callout-title">Breadth vs. Validity Tradeoff</div>
+          <p>Notice what was lost as we moved from Claim 1 to Claim 5: every additional element is a potential design-around and a potential invalidity argument. Claim 1 is hard to design around but may be challenged as obvious over prior work on conditional language generation. Claim 5 is difficult to invalidate but easy to design around — change the similarity metric or the ordering and you may escape. The goal is for your claims to span all three breadth levels, so that no matter where a challenger attacks, something survives.</p>
+        </div>
+      </div>
+
+      <h3>How Many Independent Claims?</h3>
+      <p>
+        The USPTO charges additional fees for more than three independent claims and more than twenty total claims per application. As a baseline, file three independent claims (method, system, CRM) at a minimum. For strategically important inventions, consider multiple independent claims at different breadth levels per claim type — paying the additional claim fees is almost always worthwhile when the commercial stakes are high. The claim fee for a fourth independent claim is approximately $480 at the large entity rate. The potential royalty differential between a broad and a narrow claim in a licensing context can be in the millions.
+      </p>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════
+         SECTION 6 — DEPENDENT CLAIMS STRATEGY
+         ══════════════════════════════════════════════════════ -->
+    <section id="dependent-claims" class="section-anchor">
+      <h2>6. Dependent Claims Strategy</h2>
+
+      <p>
+        If independent claims are the primary fortification, dependent claims are the fallback defensive perimeter. Every dependent claim incorporates all limitations of the claim to which it depends and adds one or more additional limitations. When an independent claim is invalidated — whether in IPR proceedings, district court litigation, or reexamination — the dependent claims remain standing (if independently valid).
+      </p>
+
+      <h3>Claim Laddering</h3>
+      <p>
+        <span class="key-term" title="The practice of drafting a set of claims that progressively narrow from a broad independent claim to highly specific dependent claims">Claim laddering</span> is the systematic strategy of drafting claims at progressively narrower levels of specificity, ensuring that the patent holder always has a valid, infringed claim regardless of what prior art surfaces during litigation. A well-laddered claim set looks like this:
+      </p>
+
+      <div class="figure">
+        <div class="figure-content">
+          <div class="flowchart" style="gap: .5rem;">
+            <div class="flow-node" style="background: #922b21;">Claim 1 — Broadest Independent (most valuable, most vulnerable)</div>
+            <div class="flow-arrow"></div>
+            <div class="flow-node" style="background: #c0392b;">Claim 2 — Key architectural feature added (e.g., transformer-based)</div>
+            <div class="flow-arrow"></div>
+            <div class="flow-node" style="background: #e74c3c;">Claim 3 — Training method specified (e.g., contrastive learning)</div>
+            <div class="flow-arrow"></div>
+            <div class="flow-node" style="background: #e67e22;">Claim 4 — Data preprocessing specified</div>
+            <div class="flow-arrow"></div>
+            <div class="flow-node" style="background: #d4a017;">Claim 5 — Specific loss function (e.g., cross-entropy with label smoothing)</div>
+            <div class="flow-arrow"></div>
+            <div class="flow-node" style="background: #1e8449;">Claim 6 — Narrowest: preferred embodiment with all specific details</div>
+          </div>
+        </div>
+        <p class="figure-caption">Figure 5.1 — Claim Ladder: Each rung adds specificity and reduces vulnerability to invalidity attacks</p>
+      </div>
+
+      <h3>Complete Dependent Claim Set — ML Training Method</h3>
+      <p>
+        The following is a complete claim set for a method of training a machine learning model using a novel data augmentation technique. Claims 2 through 10 each depend (directly or indirectly) on Claim 1 and add progressively specific limitations, creating a robust fallback ladder.
+      </p>
+
+      <div class="claim-group">
+        <div class="claim-group-title">ML Training Method — Complete Claim Set (Claims 1–10)</div>
+
+        <div class="claim-box">
+          <div class="claim-header">Claim 1 (Independent — Method)</div>
+          <p>
+            <span class="claim-number">1.</span> A computer-implemented method comprising:<br>
+            <span class="claim-element">accessing, by one or more processors, a training dataset comprising a plurality of labeled training examples;</span>
+            <span class="claim-element">generating, by the one or more processors, a plurality of augmented training examples by applying one or more data augmentation operations to at least a portion of the labeled training examples;</span>
+            <span class="claim-element">training, by the one or more processors, a machine learning model using a combined dataset comprising the labeled training examples and the augmented training examples; and</span>
+            <span class="claim-element">storing, by the one or more processors, trained parameters of the machine learning model in a non-transitory computer-readable medium.</span>
+          </p>
+        </div>
+
+        <div class="claim-box dependent">
+          <div class="claim-header">Claim 2 (Dependent on Claim 1 — Augmentation Type)</div>
+          <p>
+            <span class="claim-number">2.</span> The method of claim 1, wherein the one or more data augmentation operations comprise at least one of: a lexical substitution operation that replaces one or more words in a training example with semantically similar words; a back-translation operation that translates a training example to an intermediate language and back to the original language; or a sentence mixing operation that combines portions of two or more training examples.
+          </p>
+        </div>
+
+        <div class="claim-box dependent">
+          <div class="claim-header">Claim 3 (Dependent on Claim 1 — Model Architecture)</div>
+          <p>
+            <span class="claim-number">3.</span> The method of claim 1, wherein the machine learning model comprises a transformer neural network having a plurality of encoder layers, each encoder layer comprising a multi-head self-attention sub-layer and a position-wise feed-forward sub-layer.
+          </p>
+        </div>
+
+        <div class="claim-box dependent">
+          <div class="claim-header">Claim 4 (Dependent on Claim 3 — Pre-training)</div>
+          <p>
+            <span class="claim-number">4.</span> The method of claim 3, wherein training the machine learning model comprises fine-tuning a pre-trained transformer neural network, wherein the pre-trained transformer neural network was previously trained on an unlabeled corpus using a masked language modeling objective.
+          </p>
+        </div>
+
+        <div class="claim-box dependent">
+          <div class="claim-header">Claim 5 (Dependent on Claim 1 — Loss Function)</div>
+          <p>
+            <span class="claim-number">5.</span> The method of claim 1, wherein training the machine learning model comprises minimizing a loss function comprising a cross-entropy term computed over the labeled training examples and a consistency regularization term computed between predictions on the labeled training examples and predictions on corresponding augmented training examples.
+          </p>
+        </div>
+
+        <div class="claim-box dependent">
+          <div class="claim-header">Claim 6 (Dependent on Claim 5 — Weighting)</div>
+          <p>
+            <span class="claim-number">6.</span> The method of claim 5, wherein the consistency regularization term is weighted by a ramp-up function that increases from zero to a maximum weight value over a predefined number of training iterations.
+          </p>
+        </div>
+
+        <div class="claim-box dependent">
+          <div class="claim-header">Claim 7 (Dependent on Claim 1 — Semi-supervised)</div>
+          <p>
+            <span class="claim-number">7.</span> The method of claim 1, further comprising: accessing a plurality of unlabeled training examples; generating predicted labels for the unlabeled training examples using the machine learning model at a current training iteration; and incorporating, into the combined dataset, unlabeled training examples having predicted labels with a confidence score exceeding a predefined threshold.
+          </p>
+        </div>
+
+        <div class="claim-box dependent">
+          <div class="claim-header">Claim 8 (Dependent on Claim 1 — Optimization)</div>
+          <p>
+            <span class="claim-number">8.</span> The method of claim 1, wherein training the machine learning model comprises applying a gradient-based optimization algorithm that maintains an exponential moving average of model parameters and uses the exponential moving average parameters for generating augmented training example predictions.
+          </p>
+        </div>
+
+        <div class="claim-box dependent">
+          <div class="claim-header">Claim 9 (Dependent on Claim 1 — Evaluation)</div>
+          <p>
+            <span class="claim-number">9.</span> The method of claim 1, further comprising: evaluating the trained machine learning model on a held-out validation dataset; and selecting, based on the evaluating, a checkpoint of the machine learning model having a highest validation accuracy for storing the trained parameters.
+          </p>
+        </div>
+
+        <div class="claim-box dependent">
+          <div class="claim-header">Claim 10 (Dependent on Claim 1 — Output Application)</div>
+          <p>
+            <span class="claim-number">10.</span> The method of claim 1, further comprising: receiving, after the storing, an input sequence; generating, using the stored trained parameters of the machine learning model, a classification output for the input sequence; and providing the classification output to a downstream application.
+          </p>
+        </div>
+      </div>
+
+      <h3>Dependent Claim Best Practices</h3>
+      <ul>
+        <li><strong>One new limitation per dependent claim</strong> is the cleanest approach. Adding multiple limitations per dependent claim reduces the number of distinct fallback positions.</li>
+        <li><strong>Claim from multiple independent claims.</strong> If you have three independent claims (method, system, CRM), draft dependent claims from each, or draft method-dependent claims and mirror them in the system and CRM claims.</li>
+        <li><strong>Cover all commercially important embodiments.</strong> For an AI system, ensure that each of the architectures, training approaches, and deployment configurations you are likely to commercialize appears somewhere in the dependent claim tree.</li>
+        <li><strong>Do not chain dependencies too deep</strong> (beyond 4–5 levels) without good reason. Multi-level dependencies are harder to manage and can create antecedent basis problems.</li>
+      </ul>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════
+         SECTION 7 — METHOD CLAIMS FOR ALGORITHMS
+         ══════════════════════════════════════════════════════ -->
+    <section id="method-claims" class="section-anchor">
+      <h2>7. Writing Method Claims for Algorithms</h2>
+
+      <p>
+        Method claims for algorithms are the backbone of AI/ML patent portfolios. They must thread a difficult needle: broad enough to capture the core inventive concept across implementations, but sufficiently grounded in computer-executed operations to survive § 101 eligibility challenges (<em>Alice Corp. v. CLS Bank Int'l</em>, 573 U.S. 208 (2014)).
+      </p>
+
+      <h3>The Computer-Implementation Anchor</h3>
+      <p>
+        Every limitation in a method claim for an algorithm should be anchored to computer execution. Compare these two formulations of the same step:
+      </p>
+
+      <div class="comparison-grid">
+        <div class="comparison-item bad">
+          <h4>Weak — Abstract / Mental Process Risk</h4>
+          <p>"comparing the input features to a stored prototype to determine the nearest class"</p>
+          <p style="margin-top:.75rem; font-size:.875rem; color:var(--danger);">Problem: This step could be performed mentally. No computer is required. Under <em>Alice</em>, purely mental processes are abstract ideas, and a claim dominated by such steps is § 101-vulnerable.</p>
+        </div>
+        <div class="comparison-item good">
+          <h4>Strong — Computer-Anchored</h4>
+          <p>"computing, by one or more processors, a distance metric between an input feature vector and each prototype vector in a prototype matrix stored in a memory, and identifying, by the one or more processors, a class label associated with a prototype vector having a minimum computed distance"</p>
+          <p style="margin-top:.75rem; font-size:.875rem; color:var(--success);">Strength: Explicitly requires computer execution. Specifies data structures (feature vector, prototype matrix). Ties the abstract comparison operation to concrete computational steps.</p>
+        </div>
+      </div>
+
+      <h3>Parallelism and Grammar in Method Claims</h3>
+      <p>
+        Each step in a method claim should follow the pattern: <strong>[gerund verb], by [agent], [object] [optional modifier]</strong>. The verb should be active and specific: "computing," "generating," "transmitting," "storing" — not "processing" (too vague), not "using" (not a step), not "performing" (circular). Maintain strict grammatical parallelism across all steps.
+      </p>
+
+      <h3>Example: Gradient Descent Optimization Method</h3>
+      <p>
+        The following claim covers a novel variant of gradient descent with an adaptive learning rate based on gradient history — a form of adaptive optimization. Note the careful use of defined terms with antecedent basis.
+      </p>
+
+      <div class="claim-box">
+        <div class="claim-header">Claim 1 (Independent — Method: Adaptive Gradient Descent)</div>
+        <p>
+          <span class="claim-number">1.</span> A computer-implemented method for training a machine learning model, the method comprising:<br>
+          <span class="claim-element">initializing, by one or more processors, model parameters of a machine learning model and a first moment vector and a second moment vector, each having a same dimensionality as the model parameters;</span>
+          <span class="claim-element">iterating, by the one or more processors, over a plurality of training iterations, each training iteration comprising:</span>
+          <span class="claim-element" style="padding-left: 4rem; text-indent: -1rem;">sampling, by the one or more processors, a mini-batch of training examples from a training dataset;</span>
+          <span class="claim-element" style="padding-left: 4rem; text-indent: -1rem;">computing, by the one or more processors, a gradient of a loss function with respect to the model parameters based on the mini-batch of training examples;</span>
+          <span class="claim-element" style="padding-left: 4rem; text-indent: -1rem;">updating, by the one or more processors, the first moment vector as a weighted average of the first moment vector and the computed gradient using a first decay rate;</span>
+          <span class="claim-element" style="padding-left: 4rem; text-indent: -1rem;">updating, by the one or more processors, the second moment vector as a weighted average of the second moment vector and an element-wise square of the computed gradient using a second decay rate;</span>
+          <span class="claim-element" style="padding-left: 4rem; text-indent: -1rem;">computing, by the one or more processors, bias-corrected first and second moment estimates by dividing the first moment vector and the second moment vector, respectively, by bias correction factors derived from the first decay rate, the second decay rate, and a current iteration count; and</span>
+          <span class="claim-element" style="padding-left: 4rem; text-indent: -1rem;">updating, by the one or more processors, the model parameters by subtracting, for each parameter, a quotient of a product of a learning rate and the bias-corrected first moment estimate divided by a sum of a square root of the bias-corrected second moment estimate and a stability constant; and</span>
+          <span class="claim-element">outputting, by the one or more processors, the model parameters upon completion of the plurality of training iterations.</span>
+        </p>
+      </div>
+
+      <div class="callout callout-warning">
+        <div class="callout-icon">&#9888;</div>
+        <div class="callout-body">
+          <div class="callout-title">Purely Functional Claiming — The § 112 Trap</div>
+          <p>There is a competing tension: claim steps too abstractly ("performing machine learning") and you face § 101 invalidity. Claim steps too specifically (describing an exact algorithm with specific numeric parameters) and you create a narrow claim easily designed around. The sweet spot is functional claiming with structural anchors: "computing a gradient by backpropagation through the neural network" is better than either "improving the model" (too abstract) or "computing a gradient using the Adam algorithm with beta1=0.9 and beta2=0.999" (too narrow).</p>
+        </div>
+      </div>
+
+      <h3>Step Order in Method Claims</h3>
+      <p>
+        By default, the steps of a method claim need not be performed in the order written unless the claim language or logic requires it. If step order matters, use explicit sequencing language: "after generating the embedding, classifying the embedding" or "prior to training, preprocessing the training data." If step order does not matter and you want to preserve flexibility, do not use "first," "then," "subsequently" unless the method genuinely requires that sequence.
+      </p>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════
+         SECTION 8 — APPARATUS/SYSTEM CLAIMS FOR AI
+         ══════════════════════════════════════════════════════ -->
+    <section id="apparatus-claims" class="section-anchor">
+      <h2>8. Writing Apparatus/System Claims for AI</h2>
+
+      <p>
+        Apparatus and system claims cover the physical (or logical) machine that performs the claimed function. For AI systems, the canonical structure is: processors + memory + instructions (functional limitations). This structure is not merely a drafting convention — it has been broadly upheld by courts as patent-eligible under § 101 because it is directed to a specific machine, not an abstract idea.
+      </p>
+
+      <h3>The Standard AI Apparatus Claim Structure</h3>
+
+      <div class="claim-box">
+        <div class="claim-header">Claim 11 (Independent — System: Neural Network Inference System)</div>
+        <p>
+          <span class="claim-number">11.</span> A system comprising:<br>
+          <span class="claim-element">one or more processors;</span>
+          <span class="claim-element">a non-transitory computer-readable memory storing a trained neural network model and instructions that, when executed by the one or more processors, cause the one or more processors to:</span>
+          <span class="claim-element" style="padding-left: 4rem; text-indent: -1rem;">receive an input text sequence;</span>
+          <span class="claim-element" style="padding-left: 4rem; text-indent: -1rem;">tokenize the input text sequence into a plurality of token identifiers using a tokenization vocabulary;</span>
+          <span class="claim-element" style="padding-left: 4rem; text-indent: -1rem;">compute a contextualized representation of the input text sequence by processing the plurality of token identifiers through the trained neural network model comprising a plurality of transformer layers;</span>
+          <span class="claim-element" style="padding-left: 4rem; text-indent: -1rem;">apply a classification head to the contextualized representation to generate a probability distribution over a plurality of output classes; and</span>
+          <span class="claim-element" style="padding-left: 4rem; text-indent: -1rem;">output a predicted class label corresponding to an output class having a highest probability in the probability distribution.</span>
+        </p>
+      </div>
+
+      <div class="claim-box dependent">
+        <div class="claim-header">Claim 12 (Dependent on Claim 11 — Hardware Accelerator)</div>
+        <p>
+          <span class="claim-number">12.</span> The system of claim 11, wherein the one or more processors comprise at least one hardware accelerator comprising a matrix multiplication unit configured to perform batched matrix multiplication operations used in computing the contextualized representation.
+        </p>
+      </div>
+
+      <div class="claim-box dependent">
+        <div class="claim-header">Claim 13 (Dependent on Claim 11 — Quantization)</div>
+        <p>
+          <span class="claim-number">13.</span> The system of claim 11, wherein the trained neural network model is stored in a quantized representation in which one or more parameters of the trained neural network model are represented using fewer than 32 bits, and wherein the instructions further cause the one or more processors to dequantize the one or more parameters prior to performing matrix multiplication operations.
+        </p>
+      </div>
+
+      <h3>Claiming a Neural Network Architecture</h3>
+      <p>
+        When claiming a neural network architecture, describe it in terms of functional components and their relationships, not in terms of specific weight values or layer counts that will inevitably change. Use language like "a first attention layer configured to compute queries, keys, and values from the input," rather than "a 12-layer, 768-hidden-dimension, 12-head attention mechanism." The former captures all transformer-family architectures; the latter covers only BERT-base.
+      </p>
+
+      <div class="claim-box">
+        <div class="claim-header">Claim 14 (Independent — System: Transformer Architecture Claim)</div>
+        <p>
+          <span class="claim-number">14.</span> A machine learning system comprising:<br>
+          <span class="claim-element">an encoder comprising a plurality of encoder layers, each encoder layer comprising:</span>
+          <span class="claim-element" style="padding-left: 4rem; text-indent: -1rem;">a self-attention sub-layer configured to compute, for each position in an input sequence, a weighted sum of value vectors, wherein the weights are determined by scaled dot-product attention between query and key vectors derived from the input sequence at all positions; and</span>
+          <span class="claim-element" style="padding-left: 4rem; text-indent: -1rem;">a feed-forward sub-layer configured to apply a position-wise transformation to outputs of the self-attention sub-layer;</span>
+          <span class="claim-element">a decoder comprising a plurality of decoder layers, each decoder layer comprising a masked self-attention sub-layer, a cross-attention sub-layer configured to attend to outputs of the encoder, and a feed-forward sub-layer; and</span>
+          <span class="claim-element">one or more processors configured to execute the encoder and the decoder to generate an output sequence from an input sequence.</span>
+        </p>
+      </div>
+
+      <h3>Training System Claims</h3>
+      <p>
+        Do not neglect claims directed to the training system as distinct from the inference system. The entity that trains the model may be different from the entity that deploys it, and training system claims provide independent coverage.
+      </p>
+
+      <div class="claim-box">
+        <div class="claim-header">Claim 15 (Independent — System: Distributed Training System)</div>
+        <p>
+          <span class="claim-number">15.</span> A distributed machine learning training system comprising:<br>
+          <span class="claim-element">a parameter server comprising one or more processors and a parameter store storing current values of parameters of a machine learning model;</span>
+          <span class="claim-element">a plurality of worker nodes, each worker node configured to:</span>
+          <span class="claim-element" style="padding-left: 4rem; text-indent: -1rem;">receive a current copy of the parameters from the parameter server;</span>
+          <span class="claim-element" style="padding-left: 4rem; text-indent: -1rem;">compute gradient estimates by processing a local mini-batch of training data using the current copy of the parameters; and</span>
+          <span class="claim-element" style="padding-left: 4rem; text-indent: -1rem;">transmit the gradient estimates to the parameter server; and</span>
+          <span class="claim-element">wherein the parameter server is further configured to update the parameters based on an aggregation of gradient estimates received from the plurality of worker nodes and to transmit updated parameters to one or more of the plurality of worker nodes.</span>
+        </p>
+      </div>
+
+      <div class="callout callout-danger">
+        <div class="callout-icon">&#9888;</div>
+        <div class="callout-body">
+          <div class="callout-title">Avoiding Accidental Means-Plus-Function in System Claims</div>
+          <p>When drafting system claims, use "configured to" rather than "for" or "adapted to" when possible. While all three can trigger MPF analysis, "configured to" is the most clearly structural. Avoid: "a classification module for classifying the input." Prefer: "a classifier, implemented by the one or more processors, configured to generate a class label from the input representation." The latter is harder to attack as invoking § 112(f).</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════
+         SECTION 9 — COMPUTER-READABLE MEDIUM CLAIMS
+         ══════════════════════════════════════════════════════ -->
+    <section id="crm-claims" class="section-anchor">
+      <h2>9. Computer-Readable Medium (CRM) Claims</h2>
+
+      <p>
+        The <span class="key-term" title="A non-transitory storage medium storing software instructions — the third leg of the method/system/CRM claim triad">computer-readable medium claim</span> is the third leg of the claim triad that every AI/software patent should include. CRM claims cover the software product itself — the distribution mechanism (disk, download, cloud deployment) through which the invention reaches users. They are particularly important for software-as-a-service and open-source AI models where the software is distributed without necessarily being executed by the distributing party.
+      </p>
+
+      <h3>Why You Need All Three Claim Types</h3>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Scenario</th>
+              <th>Method Claim Infringed?</th>
+              <th>System Claim Infringed?</th>
+              <th>CRM Claim Infringed?</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Company runs the AI service internally (on their servers) for their own use</td>
+              <td>Yes (they perform the steps)</td>
+              <td>Yes (they operate the system)</td>
+              <td>Possibly (if they store the software)</td>
+            </tr>
+            <tr>
+              <td>Company builds and sells AI hardware (inference chip)</td>
+              <td>No (they don't run the method)</td>
+              <td>Yes (the system includes the chip)</td>
+              <td>Possibly</td>
+            </tr>
+            <tr>
+              <td>Company distributes AI software (model weights + inference code)</td>
+              <td>No (they don't perform the inference)</td>
+              <td>No (they don't operate the system)</td>
+              <td><strong>Yes (they distribute the medium)</strong></td>
+            </tr>
+            <tr>
+              <td>Company provides cloud AI API (customers run their own queries)</td>
+              <td>Possibly (divided infringement analysis required)</td>
+              <td>Yes (they operate the API system)</td>
+              <td>Yes (instructions stored on their servers)</td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="table-caption">Table 5.3 — Which Claim Type Covers Which Infringement Scenario</p>
+      </div>
+
+      <h3>The "Non-Transitory" Qualifier — Why It Matters</h3>
+      <p>
+        Always use "non-transitory computer-readable medium." The word "non-transitory" exists specifically to exclude transitory signals — electromagnetic waves, carrier signals — which are not patentable subject matter under <em>In re Nuijten</em>, 500 F.3d 1346 (Fed. Cir. 2007). Without "non-transitory," a CRM claim could theoretically encompass transitory signals and be vulnerable to a § 101 challenge. This is a drafting formality, but omitting it is a mistake no competent practitioner makes twice.
+      </p>
+
+      <div class="claim-box">
+        <div class="claim-header">Claim 16 (Independent — CRM: Document Classification)</div>
+        <p>
+          <span class="claim-number">16.</span> A non-transitory computer-readable medium storing instructions that, when executed by one or more processors, cause the one or more processors to perform operations comprising:<br>
+          <span class="claim-element">receiving an input document comprising a plurality of tokens;</span>
+          <span class="claim-element">generating a contextualized embedding for each token of the plurality of tokens by processing the plurality of tokens through a transformer-based neural network model stored in the non-transitory computer-readable medium;</span>
+          <span class="claim-element">computing a document-level representation by applying a pooling function to the contextualized embeddings;</span>
+          <span class="claim-element">generating a probability distribution over a plurality of predefined document categories by applying a learned linear transformation followed by a softmax function to the document-level representation; and</span>
+          <span class="claim-element">outputting a classification label corresponding to a document category having a highest probability in the probability distribution.</span>
+        </p>
+      </div>
+
+      <div class="claim-box dependent">
+        <div class="claim-header">Claim 17 (Dependent on Claim 16 — Stored Model)</div>
+        <p>
+          <span class="claim-number">17.</span> The non-transitory computer-readable medium of claim 16, wherein the transformer-based neural network model is stored as a serialized representation of model weights in a compressed format, and wherein the operations further comprise decompressing the serialized representation prior to generating the contextualized embeddings.
+        </p>
+      </div>
+
+      <h3>CRM Claims vs. Method Claims: Scope Equivalence</h3>
+      <p>
+        A well-drafted CRM claim that mirrors a method claim should have identical scope — it is the method claim restated as instructions stored on a medium. Courts generally treat method and CRM claims as equivalent in scope for § 101 purposes. The key is that the operations listed in the CRM claim must be identical in substance to the steps of the corresponding method claim. Do not add limitations to the CRM claim that are not in the method claim, or you create an asymmetry that can be exploited in claim construction.
+      </p>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════
+         SECTION 10 — COMMON CLAIM DRAFTING MISTAKES
+         ══════════════════════════════════════════════════════ -->
+    <section id="common-mistakes" class="section-anchor">
+      <h2>10. Common Claim Drafting Mistakes</h2>
+
+      <p>
+        In two decades of senior patent practice, I have reviewed thousands of patent applications — both as a drafter and as litigation counsel. The same mistakes appear repeatedly. The following ten (and then some) represent the most common and most costly errors in claim drafting for AI and software inventions. Study them. The cost of a drafting error is not the cost of fixing it at the USPTO; it is the cost of losing a lawsuit years later.
+      </p>
+
+      <!-- MISTAKE 1 -->
+      <details class="accordion">
+        <summary><span class="mistake-number">1.</span> Antecedent Basis Errors <span class="mistake-badge">Definiteness / § 112(b)</span></summary>
+        <div class="accordion-content">
+          <p><strong>The Mistake:</strong> Referring to an element with "the" before it has been introduced with "a" or "an." Example: "the processor" in claim 2 when claim 1 never introduced "a processor."</p>
+          <p><strong>Why It's a Problem:</strong> Under 35 U.S.C. § 112(b), claims must be definite. If "the processor" lacks antecedent basis, a court may find the claim indefinite and invalid. The MPEP § 2173.05(e) specifically addresses this issue.</p>
+          <p><strong>How to Fix:</strong> Conduct a systematic antecedent basis check. Every element introduced with "a" or "an" must be referenced with "the" on all subsequent appearances. For dependent claims, ensure that all elements referenced with "the" were introduced either in the dependent claim itself or in the referenced claim(s). Keep a running list of every introduced element as you draft.</p>
+          <div class="comparison-grid">
+            <div class="comparison-item bad">
+              <h4>Wrong</h4>
+              <p>"…processing the input data using the neural network model…" (if "a neural network model" was never introduced)</p>
+            </div>
+            <div class="comparison-item good">
+              <h4>Right</h4>
+              <p>"…training a neural network model using the input data; and outputting, using the neural network model, a prediction…"</p>
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <!-- MISTAKE 2 -->
+      <details class="accordion">
+        <summary><span class="mistake-number">2.</span> Relative Terms Without Specification Support <span class="mistake-badge">Indefiniteness / § 112(b)</span></summary>
+        <div class="accordion-content">
+          <p><strong>The Mistake:</strong> Using terms like "high accuracy," "low latency," "substantially similar," or "approximately equal" without defining them in the specification or by reference to a standard.</p>
+          <p><strong>Why It's a Problem:</strong> Post-<em>Nautilus, Inc. v. Biosig Instruments, Inc.</em>, 572 U.S. 898 (2014), a claim is indefinite if it fails to inform "with reasonable certainty" those skilled in the art about the scope. "High accuracy" in an AI context means nothing without a defined threshold, task, and metric.</p>
+          <p><strong>How to Fix:</strong> Either define the relative term in the specification with specific thresholds ("'high accuracy' as used herein means greater than 95% F1 score on the benchmark dataset") or replace it with a measurable parameter ("an accuracy exceeding 90% as measured on a held-out test dataset comprising at least 1,000 labeled examples").</p>
+        </div>
+      </details>
+
+      <!-- MISTAKE 3 -->
+      <details class="accordion">
+        <summary><span class="mistake-number">3.</span> Claim Too Broad — The Alice Problem <span class="mistake-badge">§ 101 Eligibility</span></summary>
+        <div class="accordion-content">
+          <p><strong>The Mistake:</strong> Writing an independent claim so broad that it covers the abstract idea itself rather than an application of the idea. Example: "A method for predicting outcomes using machine learning."</p>
+          <p><strong>Why It's a Problem:</strong> Under the two-step <em>Alice</em> framework, if a claim is directed to an abstract idea (Step 1) and does not recite significantly more than the abstract idea itself (Step 2), it fails § 101 and is unpatentable. Pure "apply it with a computer" claims have been invalidated en masse post-<em>Alice</em>.</p>
+          <p><strong>How to Fix:</strong> Ground the claim in a specific technical improvement. Do not claim "predicting outcomes using machine learning" — claim the novel mechanism by which the prediction is made. Add concrete technical elements: specific data structures, specific transformations, specific hardware configurations. Ask: "Could this be done by a human with pencil and paper?" If yes, add computer-specific limitations.</p>
+          <p>See Chapter 8 for a complete treatment of § 101 strategy for AI claims.</p>
+        </div>
+      </details>
+
+      <!-- MISTAKE 4 -->
+      <details class="accordion">
+        <summary><span class="mistake-number">4.</span> Claim Too Narrow — Easy Design-Around <span class="mistake-badge">Commercial Value</span></summary>
+        <div class="accordion-content">
+          <p><strong>The Mistake:</strong> Claiming the specific implementation built, with unnecessary precision. "A transformer model with 12 encoder layers, 768-dimensional embeddings, and 12 attention heads fine-tuned on the SST-2 dataset using a batch size of 32."</p>
+          <p><strong>Why It's a Problem:</strong> A competitor can use 11 layers, 512 dimensions, or a different dataset and avoid literal infringement entirely. The patent becomes a historical artifact, not a commercial weapon.</p>
+          <p><strong>How to Fix:</strong> Ask, for each limitation: "Is this necessary to distinguish over the prior art? Or is it just how we built it?" Every unnecessary limitation is a potential design-around. Strip claims to the functional essence of the inventive concept, then rebuild specificity only as needed for validity.</p>
+        </div>
+      </details>
+
+      <!-- MISTAKE 5 -->
+      <details class="accordion">
+        <summary><span class="mistake-number">5.</span> Missing Claim Types — Leaving Coverage Gaps <span class="mistake-badge">Portfolio Completeness</span></summary>
+        <div class="accordion-content">
+          <p><strong>The Mistake:</strong> Filing only method claims, or only system claims, without all three of the core triad (method, system, CRM) plus any domain-specific types.</p>
+          <p><strong>Why It's a Problem:</strong> Different infringing actors — users, distributors, manufacturers — infringe different claim types. Missing any one type allows an entire category of infringer to escape liability. In the AI space, this is particularly acute: model distributors (HuggingFace, etc.) may only infringe CRM claims; chip manufacturers may only infringe system claims.</p>
+          <p><strong>How to Fix:</strong> As a baseline, always draft method, system, and CRM claims. For AI/ML inventions, consider also: composition claims (for drug discovery), data structure claims (for novel data formats), and trained model claims if the jurisdiction supports them. The additional USPTO claim fees are trivial compared to the value of complete coverage.</p>
+        </div>
+      </details>
+
+      <!-- MISTAKE 6 -->
+      <details class="accordion">
+        <summary><span class="mistake-number">6.</span> Mixed-Class Claiming <span class="mistake-badge">§ 112(b) / Indefiniteness</span></summary>
+        <div class="accordion-content">
+          <p><strong>The Mistake:</strong> Mixing method steps and structural elements within the same claim. "A system comprising: a processor; and receiving, by the processor, input data." The step "receiving" is a method limitation; it cannot appear in an apparatus claim without creating a mixed-class claim.</p>
+          <p><strong>Why It's a Problem:</strong> Mixed-class claims are indefinite because it is unclear whether the claim covers a method, an apparatus, or both. Courts and examiners will reject them under § 112(b). They also create claim scope uncertainty in litigation.</p>
+          <p><strong>How to Fix:</strong> Apparatus claims must have structural limitations only. Convert method steps to structural/functional configurations: "a processor configured to receive input data" (apparatus) rather than "receiving, by a processor, input data" (method step). The test: if removing the words "configured to" leaves a verb phrase, it is a method step and does not belong in a system claim.</p>
+        </div>
+      </details>
+
+      <!-- MISTAKE 7 -->
+      <details class="accordion">
+        <summary><span class="mistake-number">7.</span> Accidental Means-Plus-Function Invocation <span class="mistake-badge">§ 112(f) Narrow Construction</span></summary>
+        <div class="accordion-content">
+          <p><strong>The Mistake:</strong> Using nonce words — "module," "unit," "element," "component," "mechanism" — followed by a function, without sufficient structural disclosure. "A classification module for classifying the input document." Courts may construe this as a means-plus-function element under § 112(f), limiting it to the specific structure disclosed in the specification.</p>
+          <p><strong>Why It's a Problem:</strong> MPF elements are construed to cover only the structure described in the specification and structural equivalents. If you described one specific neural network architecture, the MPF claim covers only that architecture and its equivalents — a dramatically narrowed scope.</p>
+          <p><strong>How to Fix:</strong> Either (a) use "configured to" with a structural component ("one or more processors configured to classify"), or (b) if you intend MPF claiming, provide extensive structural disclosure in the specification and be aware of the narrowed scope. Avoid "module," "unit," "means," "element for," and "circuit for" in claim elements unless you are intentionally invoking § 112(f).</p>
+        </div>
+      </details>
+
+      <!-- MISTAKE 8 -->
+      <details class="accordion">
+        <summary><span class="mistake-number">8.</span> Functional Claiming Without Structural Support <span class="mistake-badge">§ 112(a) Enablement / WD</span></summary>
+        <div class="accordion-content">
+          <p><strong>The Mistake:</strong> Claiming results rather than mechanisms: "a model that achieves greater than 95% accuracy on the GLUE benchmark." This claims the outcome, not the structural or operational means of achieving it.</p>
+          <p><strong>Why It's a Problem:</strong> Under § 112(a), the specification must enable one skilled in the art to make and use the full scope of the claimed invention. If you claim any model achieving 95% GLUE accuracy, you must enable every such model — an impossible disclosure. This invites written description and enablement rejections.</p>
+          <p><strong>How to Fix:</strong> Claim the mechanism, not the result. "A neural network trained using the method of claim 1, wherein the neural network achieves greater than 95% accuracy on the GLUE benchmark as measured at the time of training" is still problematic. Better: "A method comprising training a neural network using contrastive learning with the augmentation strategy of claim 1." The claim is to the process, not the output metric.</p>
+        </div>
+      </details>
+
+      <!-- MISTAKE 9 -->
+      <details class="accordion">
+        <summary><span class="mistake-number">9.</span> Failing to Claim Priority Data Structures and File Formats <span class="mistake-badge">Portfolio Gaps</span></summary>
+        <div class="accordion-content">
+          <p><strong>The Mistake:</strong> In AI/ML patents, focusing only on the algorithm and ignoring novel data structures, model formats, or serialization schemas that are equally inventive and commercially important.</p>
+          <p><strong>Why It's a Problem:</strong> The model weights in a novel format, a training data schema with specific metadata fields, or a custom quantization format may be as valuable as the algorithm itself — and may support independent patent claims that competitors cannot easily design around. Missing these means leaving value on the table.</p>
+          <p><strong>How to Fix:</strong> During invention disclosure, ask: "Is there a novel data structure, file format, API schema, or communication protocol that is part of this invention?" If yes, draft claims covering these explicitly. A "non-transitory computer-readable medium storing a machine learning model in a compressed quantized format comprising [specific structure]" claim may be the strongest in the portfolio.</p>
+        </div>
+      </details>
+
+      <!-- MISTAKE 10 -->
+      <details class="accordion">
+        <summary><span class="mistake-number">10.</span> Scope Creep Through Inconsistent Terminology <span class="mistake-badge">Claim Construction Risk</span></summary>
+        <div class="accordion-content">
+          <p><strong>The Mistake:</strong> Using multiple terms for the same concept within a claim or across claims ("neural network," "deep learning model," "machine learning classifier") creating ambiguity about whether they mean the same thing.</p>
+          <p><strong>Why It's a Problem:</strong> In claim construction, courts apply the doctrine that different claim terms have different meanings. If you use "neural network" in one claim and "machine learning model" in another, a court may find they mean different things — limiting each claim to a narrower scope than intended, or creating indefiniteness.</p>
+          <p><strong>How to Fix:</strong> Choose one term for each concept and use it consistently throughout all claims and the specification. Define the term broadly in the specification: "'machine learning model,' as used herein, includes neural networks, decision trees, support vector machines, and any other model trained on data." Then use that single term throughout. Consistency is not repetition — it is claim scope discipline.</p>
+        </div>
+      </details>
+
+      <!-- MISTAKE 11 -->
+      <details class="accordion">
+        <summary><span class="mistake-number">11.</span> Omitting "One or More" Flexibility <span class="mistake-badge">Design-Around Risk</span></summary>
+        <div class="accordion-content">
+          <p><strong>The Mistake:</strong> Writing "a processor" when you mean "one or more processors," or "a training example" when you mean "one or more training examples." The indefinite article "a" means "one or more" in patent law — but this is not universally understood, and explicit "one or more" language is cleaner and more defensible.</p>
+          <p><strong>Why It's a Problem:</strong> A competitor who uses a cluster of 1,000 GPUs may argue they do not infringe "a processor." While the law is clear that "a" means "one or more," using "one or more" explicitly eliminates any argument.</p>
+          <p><strong>How to Fix:</strong> For any element that could be instantiated multiple times in a real-world system, use "one or more" explicitly: "one or more processors," "one or more training examples," "one or more neural network layers." This is cleaner and prevents any design-around argument based on plurality.</p>
+        </div>
+      </details>
+
+      <!-- MISTAKE 12 -->
+      <details class="accordion">
+        <summary><span class="mistake-number">12.</span> Overclaiming in the Preamble <span class="mistake-badge">Prosecution History Estoppel</span></summary>
+        <div class="accordion-content">
+          <p><strong>The Mistake:</strong> Loading the preamble with purpose language that the claim body does not support: "A method for improving natural language processing performance comprising: [steps that do not necessarily improve NLP performance]."</p>
+          <p><strong>Why It's a Problem:</strong> If the preamble is construed as limiting (which it may be, when it "gives life and meaning" to the claim), any product that performs the recited steps but does not improve NLP performance may not infringe. Moreover, you may create a claim that does not stand on its own — if a competitor can argue their product performs the same steps but achieves worse performance, they may escape.</p>
+          <p><strong>How to Fix:</strong> Keep preambles short and technical: "A computer-implemented method for natural language processing comprising:" or "A system for text classification comprising:" — not "A method for achieving state-of-the-art natural language understanding performance." The claim body should do the work of defining what is novel; the preamble should do nothing more than name the class of invention.</p>
+        </div>
+      </details>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════
+         SECTION 11 — CLAIM EDITING CHECKLIST
+         ══════════════════════════════════════════════════════ -->
+    <section id="checklist" class="section-anchor">
+      <h2>11. Claim Editing Checklist</h2>
+
+      <p>
+        Before filing any patent application, every claim should pass through this checklist. Print it. Post it above your desk. Work through it systematically for every claim in every application you file. The cost of a checklist-level error is never discovered until litigation — at which point it is too late.
+      </p>
+
+      <div class="highlight-box">
+        <h4>How to Use This Checklist</h4>
+        <p>Work through each item for every independent claim first, then for each dependent claim. For dependent claims, you also need to verify the dependency chain — read the dependent claim together with all claims it depends from (directly and indirectly) and verify the combined claim passes all relevant items.</p>
+      </div>
+
+      <h3>Grammar and Form</h3>
+      <ul class="checklist">
+        <li>Each claim is a single sentence ending with a period.</li>
+        <li>The preamble identifies a statutory class (method, system, apparatus, composition, or CRM). There are no "method-apparatus" hybrids.</li>
+        <li>The transition phrase is appropriate for the claim type ("comprising" for most AI/software claims).</li>
+        <li>All claim limitations are grammatically parallel (all gerund phrases for method claims; all noun phrases for apparatus claims).</li>
+        <li>No periods appear within the claim body (only at the end of the claim).</li>
+        <li>Semicolons (or "; and") separate limitations in the claim body.</li>
+        <li>The claim uses present tense throughout.</li>
+        <li>No first person ("I," "we") appears anywhere in the claims.</li>
+      </ul>
+
+      <h3>Antecedent Basis</h3>
+      <ul class="checklist">
+        <li>Every element referenced with "the" was previously introduced with "a" or "an" (or is understood from context, e.g., "the processor" in a claim already reciting "one or more processors").</li>
+        <li>No element is introduced with "the" on its first appearance.</li>
+        <li>In dependent claims, all "the [element]" references trace back to an introduction in the same dependent claim or in a referenced independent/dependent claim.</li>
+        <li>When multiple instances of the same element are present (e.g., "a first layer" and "a second layer"), each is consistently referred back to with its specific designation.</li>
+      </ul>
+
+      <h3>Breadth and Scope</h3>
+      <ul class="checklist">
+        <li>The broadest independent claim contains no unnecessary limitations (ask: "Can I remove this element and still distinguish over all known prior art?").</li>
+        <li>The claim is not so broad that it reads on clearly non-inventive prior art.</li>
+        <li>All three claim types are present: method, system/apparatus, and CRM (unless a specific claim type is inapplicable).</li>
+        <li>Dependent claims provide at least 5–8 distinct fallback positions from each independent claim.</li>
+        <li>Every commercially important embodiment is covered by at least one dependent claim.</li>
+      </ul>
+
+      <h3>35 U.S.C. § 101 — Patent Eligibility</h3>
+      <ul class="checklist">
+        <li>Independent method claims recite computer-executed steps, not purely mental processes.</li>
+        <li>Each step is anchored to a specific technical operation, not a result or an abstract concept.</li>
+        <li>Claims are not drafted in purely result-functional language (e.g., "classifying the document" without specifying how).</li>
+        <li>The claim, as a whole, recites a specific technical improvement to a computer or a specific technical solution to a specific technical problem.</li>
+      </ul>
+
+      <h3>35 U.S.C. § 102/103 — Novelty and Non-Obviousness</h3>
+      <ul class="checklist">
+        <li>A prior art search has been conducted for the broadest independent claim.</li>
+        <li>At least one limitation in each independent claim is not found in any single prior art reference (novelty).</li>
+        <li>The claimed combination is not obvious from a combination of prior art references under a rationale a court would recognize.</li>
+        <li>Any prior art admitted in the specification does not anticipate the broadest independent claim.</li>
+      </ul>
+
+      <h3>35 U.S.C. § 112 — Specification Support</h3>
+      <ul class="checklist">
+        <li>Every term in the claims is defined or used consistently in the specification.</li>
+        <li>The specification enables a person of ordinary skill to make and use every embodiment within the scope of the broadest independent claim.</li>
+        <li>Written description support exists for every claim element (not just in the claims themselves).</li>
+        <li>No claim element uses a nonce word ("module," "unit," "means") without either structural disclosure or explicit intent to invoke § 112(f).</li>
+        <li>All relative terms ("substantially," "approximately," "high") are defined with sufficient clarity in the specification.</li>
+        <li>There are no mixed-class claims (no method steps in apparatus claims or vice versa).</li>
+      </ul>
+
+      <h3>Dependent Claims Specific</h3>
+      <ul class="checklist">
+        <li>Each dependent claim references a valid claim number and depends from an existing claim.</li>
+        <li>No dependent claim is broader than the claim it depends from.</li>
+        <li>Each dependent claim adds at least one limitation not present in the referenced claim.</li>
+        <li>No dependent claim creates a circular dependency.</li>
+      </ul>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════
+         SECTION 12 — AI/ML CLAIM EXAMPLES
+         ══════════════════════════════════════════════════════ -->
+    <section id="aiml-examples" class="section-anchor">
+      <h2>12. AI/ML Claim Examples</h2>
+
+      <p>
+        The following three complete claim sets illustrate professional-grade AI/ML patent claims across different application domains. Each set includes an independent claim and five dependents. These are representative of the claims I would file on day one for each invention. Study the language choices, the progression of specificity, and the application of the principles discussed throughout this chapter.
+      </p>
+
+      <!-- ─── EXAMPLE SET A: Neural Network Training Method ─── -->
+      <h3>Example Set A: Neural Network Training Method with Contrastive Learning</h3>
+      <p>
+        This claim set covers a method of training a neural network using a novel contrastive learning objective that leverages augmented view pairs. The invention's core contribution is the specific augmentation-and-contrastive-loss pipeline, not the use of contrastive learning per se.
+      </p>
+
+      <div class="claim-group">
+        <div class="claim-group-title">Claim Set A — Contrastive Neural Network Training</div>
+
+        <div class="claim-box">
+          <div class="claim-header">Claim 1 (Independent — Method)</div>
+          <p>
+            <span class="claim-number">1.</span> A computer-implemented method for training a neural network model, the method comprising:<br>
+            <span class="claim-element">accessing, by one or more processors, a training dataset comprising a plurality of unlabeled data samples;</span>
+            <span class="claim-element">generating, by the one or more processors and for each data sample of at least a portion of the plurality of unlabeled data samples, a first augmented view and a second augmented view by applying stochastic data augmentation operations to the data sample;</span>
+            <span class="claim-element">computing, by the one or more processors, a first embedding vector and a second embedding vector by processing the first augmented view and the second augmented view, respectively, through an encoder network of the neural network model;</span>
+            <span class="claim-element">computing, by the one or more processors, a contrastive loss based on a similarity between the first embedding vector and the second embedding vector relative to similarities between the first embedding vector and embedding vectors corresponding to other data samples in a mini-batch; and</span>
+            <span class="claim-element">updating, by the one or more processors, parameters of the encoder network by backpropagating gradients of the contrastive loss through the encoder network.</span>
+          </p>
+        </div>
+
+        <div class="claim-box dependent">
+          <div class="claim-header">Claim 2 (Dependent on Claim 1 — Projection Head)</div>
+          <p>
+            <span class="claim-number">2.</span> The method of claim 1, wherein computing the first embedding vector and the second embedding vector comprises: processing the first augmented view and the second augmented view through the encoder network to obtain first and second intermediate representations; and projecting, by one or more projection layers, the first and second intermediate representations to a lower-dimensional embedding space to obtain the first embedding vector and the second embedding vector, wherein the contrastive loss is computed in the lower-dimensional embedding space.
+          </p>
+        </div>
+
+        <div class="claim-box dependent">
+          <div class="claim-header">Claim 3 (Dependent on Claim 1 — Momentum Encoder)</div>
+          <p>
+            <span class="claim-number">3.</span> The method of claim 1, wherein the embedding vectors corresponding to other data samples are computed using a momentum encoder, wherein parameters of the momentum encoder are updated as an exponential moving average of parameters of the encoder network with a momentum coefficient greater than 0.9.
+          </p>
+        </div>
+
+        <div class="claim-box dependent">
+          <div class="claim-header">Claim 4 (Dependent on Claim 1 — Augmentation Operations)</div>
+          <p>
+            <span class="claim-number">4.</span> The method of claim 1, wherein the stochastic data augmentation operations comprise at least two of: random cropping and resizing; color jitter comprising random changes to brightness, contrast, saturation, and hue; random horizontal flipping; random grayscale conversion; or Gaussian blur.
+          </p>
+        </div>
+
+        <div class="claim-box dependent">
+          <div class="claim-header">Claim 5 (Dependent on Claim 1 — Fine-Tuning)</div>
+          <p>
+            <span class="claim-number">5.</span> The method of claim 1, further comprising: after updating the parameters of the encoder network, fine-tuning the encoder network on a labeled dataset comprising a plurality of labeled examples by minimizing a cross-entropy classification loss, wherein the fine-tuning uses a learning rate at least ten times smaller than a learning rate used during contrastive training.
+          </p>
+        </div>
+
+        <div class="claim-box dependent">
+          <div class="claim-header">Claim 6 (Dependent on Claim 1 — Distributed Training)</div>
+          <p>
+            <span class="claim-number">6.</span> The method of claim 1, wherein computing the contrastive loss is performed across a plurality of processing nodes by aggregating embedding vectors from the plurality of processing nodes to form a distributed mini-batch having a larger effective batch size than a local mini-batch processed by any single processing node.
+          </p>
+        </div>
+      </div>
+
+      <!-- ─── EXAMPLE SET B: Transformer Text Classification System ─── -->
+      <h3>Example Set B: Transformer-Based Text Classification System</h3>
+      <p>
+        This claim set covers a system for classifying text documents using a pre-trained transformer model with a novel attention-based feature extraction mechanism. The system claims capture the deployed product as distinct from the training process.
+      </p>
+
+      <div class="claim-group">
+        <div class="claim-group-title">Claim Set B — Transformer Text Classification System</div>
+
+        <div class="claim-box">
+          <div class="claim-header">Claim 7 (Independent — System)</div>
+          <p>
+            <span class="claim-number">7.</span> A system for text classification comprising:<br>
+            <span class="claim-element">one or more processors; and</span>
+            <span class="claim-element">a non-transitory computer-readable memory storing a pre-trained transformer language model and instructions that, when executed by the one or more processors, cause the one or more processors to:</span>
+            <span class="claim-element" style="padding-left: 4rem; text-indent: -1rem;">receive an input text sequence;</span>
+            <span class="claim-element" style="padding-left: 4rem; text-indent: -1rem;">compute a plurality of token representations by processing the input text sequence through a plurality of transformer encoder layers of the pre-trained transformer language model, wherein each transformer encoder layer comprises a multi-head self-attention mechanism and a position-wise feed-forward network;</span>
+            <span class="claim-element" style="padding-left: 4rem; text-indent: -1rem;">compute an attention-weighted document representation by applying a learned attention weight to each token representation in the plurality of token representations and computing a weighted sum of the plurality of token representations;</span>
+            <span class="claim-element" style="padding-left: 4rem; text-indent: -1rem;">apply a classification head comprising one or more linear layers and a softmax activation to the attention-weighted document representation to produce a probability distribution over a plurality of predefined text categories; and</span>
+            <span class="claim-element" style="padding-left: 4rem; text-indent: -1rem;">output a classification result identifying a text category corresponding to a highest probability in the probability distribution.</span>
+          </p>
+        </div>
+
+        <div class="claim-box dependent">
+          <div class="claim-header">Claim 8 (Dependent on Claim 7 — Hierarchical Classification)</div>
+          <p>
+            <span class="claim-number">8.</span> The system of claim 7, wherein the plurality of predefined text categories is organized in a hierarchical taxonomy, and wherein the instructions further cause the one or more processors to apply a hierarchical classification head that produces a probability distribution at each level of the hierarchical taxonomy and to output a classification result identifying a leaf-level category.
+          </p>
+        </div>
+
+        <div class="claim-box dependent">
+          <div class="claim-header">Claim 9 (Dependent on Claim 7 — Multi-Label)</div>
+          <p>
+            <span class="claim-number">9.</span> The system of claim 7, wherein the instructions further cause the one or more processors to apply a sigmoid activation function, in place of the softmax activation, to produce independent probability scores for each of the plurality of predefined text categories, and to output classification results identifying all text categories for which the independent probability score exceeds a predefined threshold.
+          </p>
+        </div>
+
+        <div class="claim-box dependent">
+          <div class="claim-header">Claim 10 (Dependent on Claim 7 — Explanation Output)</div>
+          <p>
+            <span class="claim-number">10.</span> The system of claim 7, wherein the instructions further cause the one or more processors to: identify one or more tokens of the input text sequence having a highest attention weight in the attention-weighted document representation; and output, along with the classification result, an explanation identifying the one or more tokens as evidence supporting the classification result.
+          </p>
+        </div>
+
+        <div class="claim-box dependent">
+          <div class="claim-header">Claim 11 (Dependent on Claim 7 — Batch Processing)</div>
+          <p>
+            <span class="claim-number">11.</span> The system of claim 7, wherein the instructions further cause the one or more processors to: receive a plurality of input text sequences; dynamically batch the plurality of input text sequences into groups having similar sequence lengths; and process each group as a padded batch through the plurality of transformer encoder layers, thereby reducing inference latency relative to processing each input text sequence individually.
+          </p>
+        </div>
+
+        <div class="claim-box dependent">
+          <div class="claim-header">Claim 12 (Dependent on Claim 7 — Model Compression)</div>
+          <p>
+            <span class="claim-number">12.</span> The system of claim 7, wherein the pre-trained transformer language model stored in the non-transitory computer-readable memory is a distilled model having fewer transformer encoder layers than the pre-trained transformer language model from which it was distilled, and wherein the distilled model was trained by minimizing a combined loss comprising a task-specific cross-entropy loss and a knowledge distillation loss computed against soft labels produced by the pre-trained transformer language model.
+          </p>
+        </div>
+      </div>
+
+      <!-- ─── EXAMPLE SET C: Drug Discovery ML Pipeline ─── -->
+      <h3>Example Set C: Drug Discovery Machine Learning Pipeline</h3>
+      <p>
+        This claim set covers a machine learning pipeline for predicting molecular properties relevant to drug discovery — specifically, a method combining graph neural network-based molecular representation with multi-task learning. This is a high-value application domain where strong patent protection can be extremely valuable.
+      </p>
+
+      <div class="claim-group">
+        <div class="claim-group-title">Claim Set C — Drug Discovery ML Pipeline</div>
+
+        <div class="claim-box">
+          <div class="claim-header">Claim 13 (Independent — Method: Drug Discovery ML Pipeline)</div>
+          <p>
+            <span class="claim-number">13.</span> A computer-implemented method for predicting molecular properties, the method comprising:<br>
+            <span class="claim-element">receiving, by one or more processors, a representation of a candidate molecule comprising atoms and bonds;</span>
+            <span class="claim-element">constructing, by the one or more processors, a molecular graph representing the candidate molecule, wherein nodes of the molecular graph represent atoms and edges of the molecular graph represent bonds, and wherein each node and each edge is associated with a feature vector encoding chemical properties of the corresponding atom or bond;</span>
+            <span class="claim-element">generating, by the one or more processors, a molecular embedding by processing the molecular graph through a graph neural network comprising a plurality of graph convolution layers, wherein each graph convolution layer updates node representations by aggregating feature vectors of neighboring nodes and associated edge features;</span>
+            <span class="claim-element">computing, by the one or more processors, a plurality of molecular property predictions by applying a multi-task prediction head to the molecular embedding, wherein the multi-task prediction head produces simultaneous predictions for a plurality of distinct molecular properties; and</span>
+            <span class="claim-element">outputting, by the one or more processors, one or more of the plurality of molecular property predictions for use in identifying candidate drug compounds.</span>
+          </p>
+        </div>
+
+        <div class="claim-box dependent">
+          <div class="claim-header">Claim 14 (Dependent on Claim 13 — Graph Attention)</div>
+          <p>
+            <span class="claim-number">14.</span> The method of claim 13, wherein aggregating feature vectors of neighboring nodes comprises computing attention-weighted sums of neighboring node features, wherein the attention weights are computed based on learned attention coefficients that are a function of the feature vectors of a central node and each neighboring node.
+          </p>
+        </div>
+
+        <div class="claim-box dependent">
+          <div class="claim-header">Claim 15 (Dependent on Claim 13 — 3D Geometry)</div>
+          <p>
+            <span class="claim-number">15.</span> The method of claim 13, wherein the feature vector associated with each edge of the molecular graph further encodes three-dimensional geometric information comprising at least one of: an inter-atomic distance between the atoms corresponding to the edge's endpoints; a bond angle; or a dihedral angle.
+          </p>
+        </div>
+
+        <div class="claim-box dependent">
+          <div class="claim-header">Claim 16 (Dependent on Claim 13 — Transfer Learning)</div>
+          <p>
+            <span class="claim-number">16.</span> The method of claim 13, wherein the graph neural network is initialized with parameters pre-trained on a large-scale molecular dataset using a self-supervised pre-training objective comprising at least one of: masked atom prediction; masked bond prediction; or molecular graph-level property prediction; and wherein the graph neural network is fine-tuned on a smaller labeled dataset for predicting the plurality of molecular properties.
+          </p>
+        </div>
+
+        <div class="claim-box dependent">
+          <div class="claim-header">Claim 17 (Dependent on Claim 13 — Uncertainty Quantification)</div>
+          <p>
+            <span class="claim-number">17.</span> The method of claim 13, wherein the outputting further comprises outputting, for each of the one or more molecular property predictions, a prediction uncertainty estimate computed using Monte Carlo dropout by performing a plurality of forward passes through the graph neural network with different random dropout masks and computing a variance of the resulting plurality of molecular property predictions.
+          </p>
+        </div>
+
+        <div class="claim-box dependent">
+          <div class="claim-header">Claim 18 (Dependent on Claim 13 — Molecular Generation Application)</div>
+          <p>
+            <span class="claim-number">18.</span> The method of claim 13, further comprising: receiving, after the outputting, a target molecular property profile specifying desired values for one or more of the plurality of distinct molecular properties; generating, by the one or more processors, one or more modified candidate molecules by applying a molecular optimization procedure that iteratively modifies the molecular graph of the candidate molecule to improve alignment between the molecular property predictions and the target molecular property profile; and outputting the one or more modified candidate molecules.
+          </p>
+        </div>
+      </div>
+
+      <div class="callout callout-tip">
+        <div class="callout-icon">&#128218;</div>
+        <div class="callout-body">
+          <div class="callout-title">A Final Word on AI Claim Drafting</div>
+          <p>The AI/ML patent landscape is evolving faster than any area of patent law in the last fifty years. USPTO guidance on § 101 for AI claims, Federal Circuit decisions on abstract idea analysis, and international divergences (the EPO's "technical character" requirement; the CNIPA's functional claiming standards) all create a moving target. The practitioner who wins in this space is not the one who memorizes current rules but the one who masters the underlying principles: claims define scope; scope must be grounded in structure; structure must be enabled by disclosure. Everything else is commentary.</p>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════
+         SECTION 13 — INTERNATIONAL CLAIM DRAFTING CONSIDERATIONS
+         ══════════════════════════════════════════════════════ -->
+    <section id="international-claims" class="section-anchor">
+      <h2>13. International Claim Drafting Considerations for AI</h2>
+
+      <p>
+        If your AI patent is commercially important, it will likely be filed in multiple jurisdictions through the Patent Cooperation Treaty (PCT) or direct national filings. The drafting choices you make for the U.S. application will profoundly affect prosecution and scope in Europe, China, Japan, and South Korea. Understanding these differences before drafting — not after — prevents costly retrofitting.
+      </p>
+
+      <h3>European Patent Office (EPO): Technical Character Requirement</h3>
+      <p>
+        The EPO does not apply the U.S. <em>Alice</em> two-step framework. Instead, the EPO requires that claimed subject matter have "technical character" — it must be a technical invention solving a technical problem. Pure abstract algorithms, business methods, and mental acts are excluded under Article 52 EPC. However, the EPO's approach to AI claims is actually more permissive than post-<em>Alice</em> USPTO practice in some respects: if the AI method has a technical effect that goes beyond the normal physical interactions of running a program on a computer (e.g., improved image processing, improved noise reduction, improved data compression), it is patent-eligible.
+      </p>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Jurisdiction</th>
+              <th>Eligibility Framework</th>
+              <th>Key Issue for AI Claims</th>
+              <th>Drafting Adaptation</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>United States</strong></td>
+              <td><em>Alice/Mayo</em> two-step; USPTO 2019 Revised Guidance</td>
+              <td>Abstract idea + "significantly more" analysis</td>
+              <td>Ground every step in computer execution; claim specific technical improvements</td>
+            </tr>
+            <tr>
+              <td><strong>European Union (EPO)</strong></td>
+              <td>Article 52 EPC; technical character + inventive step having technical effect</td>
+              <td>AI algorithm must produce a "technical effect" beyond merely running the algorithm</td>
+              <td>Emphasize technical effects (faster processing, reduced error rate, improved signal quality). Tie AI outputs to technical systems.</td>
+            </tr>
+            <tr>
+              <td><strong>China (CNIPA)</strong></td>
+              <td>Patent Law Article 25; "technical solutions" requirement</td>
+              <td>AI algorithm by itself is excluded; must be implemented in a technical solution that solves a technical problem</td>
+              <td>Explicitly include hardware components. Chinese practice favors apparatus claims over pure method claims for AI.</td>
+            </tr>
+            <tr>
+              <td><strong>Japan (JPO)</strong></td>
+              <td>Patent Act § 2(1); "creation of technical ideas utilizing natural laws"</td>
+              <td>Software claims must specify the functional structure of the computer implementing the software</td>
+              <td>Draft method claims with explicit computer-execution language. System claims with specific functional configurations are well-received.</td>
+            </tr>
+            <tr>
+              <td><strong>South Korea (KIPO)</strong></td>
+              <td>Patent Act Article 2; generally aligned with JPO but with growing AI-specific guidance</td>
+              <td>AI inventions must be expressed as specific functional configurations of hardware/software</td>
+              <td>Follow JPO-style drafting. Korean examiners are receptive to claims that explicitly describe software-hardware interaction.</td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="table-caption">Table 5.4 — International AI Patent Eligibility Requirements and Drafting Adaptations</p>
+      </div>
+
+      <h3>PCT Filing Strategy for AI Patents</h3>
+      <p>
+        When filing a PCT application covering an AI invention, draft the claims to satisfy the most restrictive jurisdiction in your target markets. If you plan to file in both the U.S. and EPO, structure claims so they satisfy both frameworks simultaneously:
+      </p>
+      <ul>
+        <li><strong>Include explicit computer-execution language</strong> (satisfies U.S. § 101 and EPO technical character).</li>
+        <li><strong>Recite specific technical effects</strong> in the dependent claims and specification (critical for EPO; helpful for U.S.).</li>
+        <li><strong>Include both method and apparatus claims</strong> — method claims are slightly harder at EPO for pure AI, apparatus claims are preferred at CNIPA.</li>
+        <li><strong>Avoid purely result-functional claims</strong> in the independent claim (problematic in all jurisdictions).</li>
+        <li><strong>File a specification with global prosecution in mind</strong> — EPO examiners will read the specification to find technical effects; U.S. examiners will look for written description support; CNIPA examiners will look for technical solution disclosure. One specification must serve all three.</li>
+      </ul>
+
+      <div class="callout callout-info">
+        <div class="callout-icon">&#127758;</div>
+        <div class="callout-body">
+          <div class="callout-title">The EPO Technical Effect Doctrine for AI</div>
+          <p>Under EPO Guidelines G-II 3.3.1 (revised 2021), a claim to an AI method can have technical character if it serves a technical purpose — for example, a neural network for classifying chest X-ray images (a technical purpose) is eligible, while a neural network for classifying customer sentiment (a non-technical, commercial purpose) requires more work. The key insight: the same neural network architecture can be eligible or ineligible depending on what it is claimed to do. For AI claims targeting EPO, always tie the claimed AI process to a specific technical domain or technical system.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════
+         SECTION 14 — CLAIM DRAFTING FOR GENERATIVE AI
+         ══════════════════════════════════════════════════════ -->
+    <section id="generative-ai-claims" class="section-anchor">
+      <h2>14. Claim Drafting for Generative AI Inventions</h2>
+
+      <p>
+        Generative AI — large language models, diffusion models, generative adversarial networks — presents novel claim drafting challenges. The outputs of generative models are inherently probabilistic and variable. The training procedures involve massive datasets and compute resources. The distinctions over prior art are often subtle architectural or training innovations. This section addresses the specific strategies required for this fast-moving domain.
+      </p>
+
+      <h3>What Is Claimable in Generative AI</h3>
+      <p>
+        The most valuable generative AI patents fall into four categories:
+      </p>
+      <ol>
+        <li><strong>Architectural innovations</strong> — novel components or configurations of the model architecture (e.g., a new attention mechanism, a new positional encoding scheme, a new normalization technique)</li>
+        <li><strong>Training innovations</strong> — novel pretraining objectives, fine-tuning methods, alignment techniques (RLHF variants, DPO, constitutional AI approaches)</li>
+        <li><strong>Inference-time innovations</strong> — novel decoding strategies, retrieval-augmented generation methods, chain-of-thought reasoning frameworks</li>
+        <li><strong>Application-specific systems</strong> — novel applications of generative AI to specific technical problems (code generation with verification, drug molecule generation, protein structure prediction)</li>
+      </ol>
+
+      <h3>Example: RLHF-Based Alignment Method</h3>
+
+      <div class="claim-box">
+        <div class="claim-header">Claim 19 (Independent — Method: Reinforcement Learning from Human Feedback)</div>
+        <p>
+          <span class="claim-number">19.</span> A computer-implemented method for aligning a language model with human preferences, the method comprising:<br>
+          <span class="claim-element">receiving, by one or more processors, a plurality of prompt-response pairs, wherein each prompt-response pair comprises a prompt and two or more responses generated by a language model;</span>
+          <span class="claim-element">receiving, by the one or more processors, human preference data indicating, for each prompt-response pair, a ranking of the two or more responses according to human evaluator assessments;</span>
+          <span class="claim-element">training, by the one or more processors, a reward model to predict a scalar reward score for a given prompt-response pair by minimizing a pairwise ranking loss over the plurality of prompt-response pairs and the human preference data;</span>
+          <span class="claim-element">fine-tuning, by the one or more processors, the language model using a reinforcement learning algorithm by generating responses to prompts sampled from a prompt distribution, computing reward scores for the generated responses using the reward model, and updating parameters of the language model to maximize expected reward while minimizing divergence from a reference language model; and</span>
+          <span class="claim-element">storing, by the one or more processors, the fine-tuned language model parameters in a non-transitory computer-readable medium.</span>
+        </p>
+      </div>
+
+      <div class="claim-box dependent">
+        <div class="claim-header">Claim 20 (Dependent on Claim 19 — KL Penalty)</div>
+        <p>
+          <span class="claim-number">20.</span> The method of claim 19, wherein minimizing divergence from the reference language model comprises adding a per-token Kullback-Leibler divergence penalty to the reward signal, wherein the per-token KL divergence is computed between the token probability distributions of the fine-tuned language model and the reference language model at each generation step.
+        </p>
+      </div>
+
+      <div class="claim-box dependent">
+        <div class="claim-header">Claim 21 (Dependent on Claim 19 — Constitutional Filtering)</div>
+        <p>
+          <span class="claim-number">21.</span> The method of claim 19, wherein the plurality of prompt-response pairs are generated by prompting the language model with a plurality of prompts and filtering generated responses using one or more safety classifiers before presenting the responses to human evaluators for preference ranking.
+        </p>
+      </div>
+
+      <h3>Retrieval-Augmented Generation (RAG) Claims</h3>
+      <p>
+        Retrieval-augmented generation systems present interesting claim drafting opportunities because they combine a retrieval component (often based on dense vector similarity search) with a generative model. The novel combination, and novel methods of integrating the retrieved context into the generation process, are patentable.
+      </p>
+
+      <div class="claim-box">
+        <div class="claim-header">Claim 22 (Independent — System: Retrieval-Augmented Generation)</div>
+        <p>
+          <span class="claim-number">22.</span> A system for retrieval-augmented text generation comprising:<br>
+          <span class="claim-element">one or more processors;</span>
+          <span class="claim-element">a vector index storing dense vector representations of a corpus of documents;</span>
+          <span class="claim-element">a non-transitory computer-readable memory storing a pre-trained language model and instructions that, when executed by the one or more processors, cause the one or more processors to:</span>
+          <span class="claim-element" style="padding-left: 4rem; text-indent: -1rem;">receive a user query;</span>
+          <span class="claim-element" style="padding-left: 4rem; text-indent: -1rem;">encode the user query into a query vector using a query encoder;</span>
+          <span class="claim-element" style="padding-left: 4rem; text-indent: -1rem;">retrieve, from the vector index, a plurality of document passages having dense vector representations with highest similarity scores relative to the query vector;</span>
+          <span class="claim-element" style="padding-left: 4rem; text-indent: -1rem;">construct a generation prompt by concatenating the retrieved document passages with the user query according to a predefined template;</span>
+          <span class="claim-element" style="padding-left: 4rem; text-indent: -1rem;">generate a response to the user query by processing the generation prompt through the pre-trained language model; and</span>
+          <span class="claim-element" style="padding-left: 4rem; text-indent: -1rem;">output the generated response together with source attributions identifying the retrieved document passages.</span>
+        </p>
+      </div>
+
+      <div class="callout callout-warning">
+        <div class="callout-icon">&#9888;</div>
+        <div class="callout-body">
+          <div class="callout-title">The "Trained Model" Question</div>
+          <p>A recurring question in generative AI patent strategy: can you patent a trained model itself — the specific weights resulting from training? In the U.S., the answer is currently unsettled. A trained model could theoretically be claimed as a "manufacture" or "composition of matter" under § 101(b), but no Federal Circuit case has definitively addressed whether a specific configuration of floating-point weights is patent-eligible subject matter. The EPO has similarly not resolved this. The safest strategy is to claim the training method (which produces the model), the system that uses the model, and the CRM storing the model — rather than claiming the model weights directly. Monitor the case law; this will be resolved in the next five years.</p>
+        </div>
+      </div>
+
+      <h3>Prompt Engineering and In-Context Learning Claims</h3>
+      <p>
+        One of the more novel areas of generative AI patent practice concerns prompt engineering and in-context learning. Can you patent a prompt? Can you patent a prompting technique? The answer is nuanced. A bare prompt — text strings — is almost certainly not patent-eligible as a literary work (copyright) or as a patent claim (not a process, machine, manufacture, or composition of matter in any traditional sense). However, a <em>method</em> of generating prompts for a specific technical purpose, or a <em>system</em> that dynamically constructs prompts based on context, is more clearly patentable. The key is to claim the process or system, not the prompt text itself.
+      </p>
+
+      <div class="claim-box">
+        <div class="claim-header">Claim 23 (Independent — Method: Dynamic Prompt Construction)</div>
+        <p>
+          <span class="claim-number">23.</span> A computer-implemented method for generating responses using a large language model, the method comprising:<br>
+          <span class="claim-element">receiving, by one or more processors, a task specification identifying a target task and one or more task-relevant constraints;</span>
+          <span class="claim-element">selecting, by the one or more processors, a plurality of few-shot examples from an example pool by computing relevance scores between the task specification and candidate examples using a retrieval model, and selecting examples having relevance scores exceeding a threshold;</span>
+          <span class="claim-element">ordering, by the one or more processors, the selected plurality of few-shot examples according to a diversity criterion that maximizes coverage of the task-relevant constraints;</span>
+          <span class="claim-element">constructing, by the one or more processors, a structured prompt comprising the ordered few-shot examples, the task specification, and a chain-of-thought instruction directing the language model to explain its reasoning before providing a final answer;</span>
+          <span class="claim-element">generating, by the one or more processors, a response by processing the structured prompt through a large language model; and</span>
+          <span class="claim-element">extracting, by the one or more processors, a final answer from the generated response by parsing the response according to a predefined output format.</span>
+        </p>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════
+         SECTION 15 — KEY TERMS GLOSSARY
+         ══════════════════════════════════════════════════════ -->
+    <section id="glossary" class="section-anchor">
+      <h2>15. Key Terms: Claim Drafting Glossary</h2>
+
+      <p>
+        The following definitions are the working vocabulary of patent claim drafting. These terms have precise legal meanings that differ, in some cases significantly, from their ordinary English usage. Mastery of these definitions is non-negotiable for any technologist working with patent counsel.
+      </p>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Term</th>
+              <th>Definition</th>
+              <th>Practical Significance</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Claim</strong></td>
+              <td>A single sentence that defines the legally protected scope of the patent right. Claims appear at the end of every patent and are numbered sequentially.</td>
+              <td>The entire value of the patent is determined by the claims. Everything else is supporting material.</td>
+            </tr>
+            <tr>
+              <td><strong>Preamble</strong></td>
+              <td>The introductory clause of a claim that identifies the class of invention (e.g., "A computer-implemented method for…").</td>
+              <td>Generally not limiting unless it gives life and meaning to the claim. Draft it to name the class without importing unnecessary limitations.</td>
+            </tr>
+            <tr>
+              <td><strong>Transition Phrase</strong></td>
+              <td>The word or phrase connecting the preamble to the claim body ("comprising," "consisting of," etc.) that determines whether unlisted elements defeat infringement.</td>
+              <td>"Comprising" = open-ended (unlisted elements don't defeat infringement). "Consisting of" = closed (they do). Use "comprising" for AI/software.</td>
+            </tr>
+            <tr>
+              <td><strong>Limitation</strong></td>
+              <td>Any element, step, or condition in a claim. Each limitation narrows scope. Every limitation must be present for literal infringement.</td>
+              <td>Add limitations only when required to clear prior art. Every extra limitation is a potential design-around.</td>
+            </tr>
+            <tr>
+              <td><strong>Independent Claim</strong></td>
+              <td>A claim that stands alone, without reference to any other claim. Contains all elements needed for infringement on its own.</td>
+              <td>The broadest claims. Most valuable. Most likely targets of invalidity challenges.</td>
+            </tr>
+            <tr>
+              <td><strong>Dependent Claim</strong></td>
+              <td>A claim that incorporates all limitations of a referenced claim and adds one or more additional limitations.</td>
+              <td>Provides fallback positions. A dependent claim cannot be broader than the claim it depends from.</td>
+            </tr>
+            <tr>
+              <td><strong>Antecedent Basis</strong></td>
+              <td>The first introduction of a claim element using the indefinite article "a" or "an," which is subsequently referred to with the definite article "the."</td>
+              <td>Missing antecedent basis renders a claim potentially indefinite under § 112(b). Check every "the" reference.</td>
+            </tr>
+            <tr>
+              <td><strong>Means-Plus-Function (MPF)</strong></td>
+              <td>A claim element invoking 35 U.S.C. § 112(f) that uses "means for [function]" language, construed to cover only the disclosed structure and equivalents.</td>
+              <td>Dramatically narrows claim scope to specific structures disclosed in the spec. Avoid for AI unless intentional.</td>
+            </tr>
+            <tr>
+              <td><strong>All-Elements Rule</strong></td>
+              <td>The rule that literal infringement requires every element (limitation) of the claim to be present in the accused product or process.</td>
+              <td>Drives the claim drafting strategy of minimizing limitations. Every element is a potential escape hatch for competitors.</td>
+            </tr>
+            <tr>
+              <td><strong>Doctrine of Equivalents</strong></td>
+              <td>A legal doctrine allowing infringement to be found even when the accused product does not literally satisfy a claim limitation, if it performs substantially the same function in substantially the same way to achieve substantially the same result.</td>
+              <td>Provides a second layer of protection beyond literal claim scope. Constrained by prosecution history estoppel.</td>
+            </tr>
+            <tr>
+              <td><strong>Claim Construction</strong></td>
+              <td>The process by which a court determines the meaning and scope of patent claim terms, informed by the specification, prosecution history, and expert testimony.</td>
+              <td>The most consequential phase of patent litigation. Claim terms should be carefully chosen with their likely construction in mind.</td>
+            </tr>
+            <tr>
+              <td><strong>Prosecution History Estoppel</strong></td>
+              <td>The legal doctrine preventing a patent holder from asserting a claim scope that was surrendered during prosecution to overcome a rejection.</td>
+              <td>Every argument and amendment during prosecution can limit claim scope in litigation. Draft amendments narrowly and carefully.</td>
+            </tr>
+            <tr>
+              <td><strong>Written Description</strong></td>
+              <td>The requirement under 35 U.S.C. § 112(a) that the specification demonstrate the inventor possessed the claimed invention at the time of filing.</td>
+              <td>Every claim element must find support in the specification. Claims broader than the disclosure may be invalid for lack of written description.</td>
+            </tr>
+            <tr>
+              <td><strong>Enablement</strong></td>
+              <td>The requirement under 35 U.S.C. § 112(a) that the specification teach a person of ordinary skill to make and use the full scope of the claimed invention without undue experimentation.</td>
+              <td>Broad functional claims in AI (e.g., "any neural network achieving X accuracy") may fail enablement because the full scope cannot be practiced from the disclosure.</td>
+            </tr>
+            <tr>
+              <td><strong>Functional Claiming</strong></td>
+              <td>Claiming an element by what it does (its function) rather than by its structure. Common in software/AI patents.</td>
+              <td>Permissible and often desirable in AI claims, but must be anchored to sufficient structural disclosure to avoid § 112 and § 101 problems.</td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="table-caption">Table 5.5 — Key Patent Claim Drafting Terms and Their Practical Significance</p>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════
+         CHAPTER NAV FOOTER
+         ══════════════════════════════════════════════════════ -->
+    <nav class="chapter-nav" aria-label="Chapter navigation">
+      <a href="ch04_patent_anatomy.html" class="chapter-nav-btn">
+        <span class="nav-label">&larr; Previous Chapter</span>
+        <span class="nav-title">Chapter 4: Anatomy of a Patent Application</span>
+      </a>
+      <a href="ch06_specification.html" class="chapter-nav-btn nav-next">
+        <span class="nav-label">Next Chapter &rarr;</span>
+        <span class="nav-title">Chapter 6: Crafting the Patent Specification</span>
+      </a>
+    </nav>
+
+  </main>
+</div><!-- /.page-layout -->
+
+<!-- ══════════════════════════════════════════════════════════
+     FOOTER
+     ══════════════════════════════════════════════════════════ -->
+<footer>
+  <div class="footer-content">
+    <p><strong style="color:var(--gold-light);">Patent Law for Technologists</strong></p>
+    <p>Chapter 5: Writing Patent Claims That Win — The Art and Science of Claim Drafting</p>
+    <p>Frank G. Smith III &bull; Fish &amp; Richardson, Washington, D.C.</p>
+    <p style="margin-top:1.5rem; font-size:.8125rem; opacity:.55;">
+      This material is provided for educational purposes only and does not constitute legal advice.
+      Patent law varies by jurisdiction. Consult qualified patent counsel for advice specific to your situation.
+      &copy; 2026 Patent Law for Technologists. All rights reserved.
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>

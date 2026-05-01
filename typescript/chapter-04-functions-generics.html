@@ -1,0 +1,2284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chapter 4: Functions, Generics & Type Inference — TypeScript for the AI Era</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+  <style>
+    /* ── Reset & Base ─────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: 16px;
+      line-height: 1.7;
+      color: #111827;
+      background: #fff;
+    }
+
+    /* ── Top Nav ──────────────────────────────────────────────── */
+    .top-nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 52px;
+      background: #fff;
+      border-bottom: 1px solid #E5E7EB;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      z-index: 100;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+    .top-nav .series-title {
+      font-weight: 600;
+      font-size: 14px;
+      color: #4F46E5;
+      letter-spacing: 0.01em;
+    }
+    .top-nav .chapter-nav {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      font-size: 13px;
+    }
+    .top-nav .chapter-nav a {
+      color: #6B7280;
+      text-decoration: none;
+      padding: 4px 10px;
+      border-radius: 6px;
+      border: 1px solid #E5E7EB;
+      transition: all 0.15s;
+    }
+    .top-nav .chapter-nav a:hover { background: #EEF2FF; color: #4F46E5; border-color: #C7D2FE; }
+    .top-nav .progress-badge {
+      font-size: 12px;
+      color: #9CA3AF;
+      font-weight: 500;
+    }
+
+    /* ── Layout ───────────────────────────────────────────────── */
+    .layout {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding-top: 52px;
+      min-height: 100vh;
+      gap: 0;
+    }
+
+    /* ── Sidebar TOC ──────────────────────────────────────────── */
+    .sidebar {
+      position: sticky;
+      top: 52px;
+      height: calc(100vh - 52px);
+      overflow-y: auto;
+      padding: 28px 16px 28px 24px;
+      border-right: 1px solid #E5E7EB;
+      background: #F9FAFB;
+    }
+    .sidebar h3 {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #9CA3AF;
+      margin-bottom: 12px;
+    }
+    .sidebar ol {
+      list-style: none;
+      counter-reset: toc;
+    }
+    .sidebar ol li {
+      counter-increment: toc;
+      margin-bottom: 2px;
+    }
+    .sidebar ol li a {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      font-size: 13px;
+      color: #374151;
+      text-decoration: none;
+      padding: 5px 8px;
+      border-radius: 6px;
+      line-height: 1.4;
+      transition: all 0.15s;
+    }
+    .sidebar ol li a::before {
+      content: counter(toc) ".";
+      color: #9CA3AF;
+      font-size: 12px;
+      min-width: 18px;
+      flex-shrink: 0;
+      padding-top: 1px;
+    }
+    .sidebar ol li a:hover { background: #EEF2FF; color: #4F46E5; }
+    .sidebar .author-box {
+      margin-top: 28px;
+      padding: 12px;
+      background: #fff;
+      border: 1px solid #E5E7EB;
+      border-radius: 10px;
+    }
+    .sidebar .author-box .author-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: #111827;
+    }
+    .sidebar .author-box .author-title {
+      font-size: 11px;
+      color: #6B7280;
+      margin-top: 2px;
+    }
+
+    /* ── Main Content ─────────────────────────────────────────── */
+    .main {
+      padding: 40px 48px 80px;
+      min-width: 0;
+    }
+
+    .chapter-header {
+      margin-bottom: 40px;
+      padding-bottom: 32px;
+      border-bottom: 1px solid #E5E7EB;
+    }
+    .chapter-label {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #4F46E5;
+      margin-bottom: 8px;
+    }
+    h1 {
+      font-size: 36px;
+      font-weight: 800;
+      line-height: 1.15;
+      color: #111827;
+      margin-bottom: 16px;
+    }
+    .chapter-intro {
+      font-size: 17px;
+      color: #4B5563;
+      line-height: 1.75;
+      max-width: 720px;
+    }
+
+    h2 {
+      font-size: 24px;
+      font-weight: 700;
+      color: #111827;
+      margin: 48px 0 16px;
+      padding-top: 8px;
+    }
+    h2::before {
+      display: block;
+      height: 64px;
+      margin-top: -64px;
+      content: "";
+      visibility: hidden;
+    }
+    h3 {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1F2937;
+      margin: 32px 0 12px;
+    }
+    p { margin-bottom: 16px; color: #374151; }
+    ul, ol { padding-left: 24px; margin-bottom: 16px; color: #374151; }
+    li { margin-bottom: 6px; }
+    strong { color: #111827; }
+
+    /* ── Code Blocks ──────────────────────────────────────────── */
+    .code-block {
+      margin: 20px 0;
+      border: 1px solid #E5E7EB;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .code-block .code-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 14px;
+      background: #F6F8FA;
+      border-bottom: 1px solid #E5E7EB;
+      font-size: 12px;
+      font-weight: 600;
+      color: #57606A;
+      font-family: system-ui, sans-serif;
+    }
+    .code-block .code-label .lang-badge {
+      background: #E5E7EB;
+      color: #374151;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .code-block pre {
+      margin: 0;
+      border-radius: 0;
+      background: #F6F8FA !important;
+    }
+    .code-block pre code {
+      font-family: "JetBrains Mono", "Fira Code", "Cascadia Code", Consolas, monospace;
+      font-size: 13.5px;
+      line-height: 1.65;
+      background: #F6F8FA !important;
+    }
+
+    /* Before / After pairs */
+    .before-after {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 24px 0;
+    }
+    .before-after .ba-block { border-radius: 10px; overflow: hidden; border: 1px solid #E5E7EB; }
+    .before-after .ba-header {
+      padding: 7px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+    .before-after .ba-header.bad { background: #FEE2E2; color: #B91C1C; }
+    .before-after .ba-header.good { background: #DCFCE7; color: #15803D; }
+    .before-after pre {
+      margin: 0;
+      border-radius: 0;
+      background: #F6F8FA !important;
+    }
+    .before-after pre code {
+      font-family: "JetBrains Mono", "Fira Code", Consolas, monospace;
+      font-size: 13px;
+      line-height: 1.65;
+      background: #F6F8FA !important;
+    }
+
+    /* ── Callout Boxes ────────────────────────────────────────── */
+    .callout {
+      margin: 24px 0;
+      padding: 16px 20px;
+      border-radius: 10px;
+      border-left: 4px solid;
+    }
+    .callout-title {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .callout p:last-child { margin-bottom: 0; }
+
+    /* Tip — green */
+    .callout-tip { background: #F0FDF4; border-color: #10B981; }
+    .callout-tip .callout-title { color: #059669; }
+
+    /* Info — blue */
+    .callout-info { background: #EFF6FF; border-color: #3B82F6; }
+    .callout-info .callout-title { color: #2563EB; }
+
+    /* Warning — amber */
+    .callout-warning { background: #FFFBEB; border-color: #F59E0B; }
+    .callout-warning .callout-title { color: #D97706; }
+
+    /* Python Comparison — purple */
+    .callout-python { background: #FAF5FF; border-color: #8B5CF6; }
+    .callout-python .callout-title { color: #7C3AED; }
+
+    /* AI Era Note — pink */
+    .callout-ai { background: #FDF2F8; border-color: #EC4899; }
+    .callout-ai .callout-title { color: #DB2777; }
+
+    /* Mental Model — orange */
+    .callout-mental {
+      background: #FFF7ED;
+      border-color: #F97316;
+      border-left: 4px solid #F97316;
+    }
+    .callout-mental .callout-title { color: #EA580C; }
+
+    /* ── Comparison Table ─────────────────────────────────────── */
+    .table-wrap { overflow-x: auto; margin: 24px 0; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    th {
+      background: #EEF2FF;
+      color: #3730A3;
+      font-weight: 700;
+      text-align: left;
+      padding: 10px 14px;
+      border: 1px solid #C7D2FE;
+    }
+    td {
+      padding: 9px 14px;
+      border: 1px solid #E5E7EB;
+      vertical-align: top;
+    }
+    tr:nth-child(even) td { background: #F9FAFB; }
+    td code, th code {
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 12px;
+      background: #EEF2FF;
+      padding: 1px 5px;
+      border-radius: 4px;
+      color: #4F46E5;
+    }
+
+    /* ── SVG Diagram ──────────────────────────────────────────── */
+    .diagram-wrap {
+      margin: 28px 0;
+      padding: 28px;
+      background: #F9FAFB;
+      border: 1px solid #E5E7EB;
+      border-radius: 12px;
+      text-align: center;
+    }
+    .diagram-wrap .diagram-caption {
+      font-size: 13px;
+      color: #6B7280;
+      margin-top: 14px;
+      font-style: italic;
+    }
+
+    /* ── Exercises ────────────────────────────────────────────── */
+    .exercise {
+      margin: 20px 0;
+      border: 1px solid #E5E7EB;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .exercise-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 18px;
+      background: #F9FAFB;
+      border-bottom: 1px solid #E5E7EB;
+    }
+    .exercise-number {
+      width: 28px; height: 28px;
+      background: #4F46E5;
+      color: #fff;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700; flex-shrink: 0;
+    }
+    .exercise-title { font-weight: 600; font-size: 15px; color: #111827; }
+    .exercise-difficulty {
+      margin-left: auto;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .difficulty-beginner { background: #DCFCE7; color: #15803D; }
+    .difficulty-intermediate { background: #FEF3C7; color: #92400E; }
+    .difficulty-advanced { background: #FEE2E2; color: #B91C1C; }
+    .exercise-body { padding: 16px 18px; }
+    .exercise-body p { margin-bottom: 12px; }
+    .playground-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: #4F46E5;
+      text-decoration: none;
+      padding: 6px 12px;
+      border: 1px solid #C7D2FE;
+      border-radius: 6px;
+      background: #EEF2FF;
+      margin-top: 8px;
+      transition: all 0.15s;
+    }
+    .playground-link:hover { background: #4F46E5; color: #fff; border-color: #4F46E5; }
+
+    details.solution {
+      margin-top: 14px;
+      border: 1px solid #E5E7EB;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    details.solution summary {
+      padding: 10px 14px;
+      background: #F3F4F6;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      color: #374151;
+      user-select: none;
+      list-style: none;
+    }
+    details.solution summary::-webkit-details-marker { display: none; }
+    details.solution summary::before { content: "▶ "; font-size: 11px; }
+    details.solution[open] summary::before { content: "▼ "; }
+    details.solution .solution-body { padding: 0; }
+    details.solution .solution-body pre {
+      margin: 0; border-radius: 0;
+      background: #F6F8FA !important;
+    }
+    details.solution .solution-body pre code {
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 13px; line-height: 1.65;
+      background: #F6F8FA !important;
+    }
+
+    /* ── Footer Nav ───────────────────────────────────────────── */
+    .footer-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 64px;
+      padding-top: 32px;
+      border-top: 1px solid #E5E7EB;
+    }
+    .footer-nav a {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      text-decoration: none;
+      padding: 14px 18px;
+      border: 1px solid #E5E7EB;
+      border-radius: 10px;
+      max-width: 220px;
+      transition: all 0.15s;
+    }
+    .footer-nav a:hover { border-color: #C7D2FE; background: #EEF2FF; }
+    .footer-nav .nav-label { font-size: 11px; font-weight: 600; color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.06em; }
+    .footer-nav .nav-title { font-size: 14px; font-weight: 600; color: #4F46E5; }
+    .footer-nav .nav-prev .nav-label::before { content: "← "; }
+    .footer-nav .nav-next { text-align: right; }
+    .footer-nav .nav-next .nav-label::after { content: " →"; }
+
+    .footer-author {
+      text-align: center;
+      padding: 24px;
+      font-size: 13px;
+      color: #9CA3AF;
+      margin-top: 8px;
+    }
+
+    /* ── Inline code ──────────────────────────────────────────── */
+    p code, li code, td code {
+      font-family: "JetBrains Mono", "Fira Code", Consolas, monospace;
+      font-size: 13px;
+      background: #EEF2FF;
+      color: #4F46E5;
+      padding: 1px 5px;
+      border-radius: 4px;
+    }
+
+    /* ── Section dividers ─────────────────────────────────────── */
+    .section-divider {
+      height: 1px;
+      background: linear-gradient(to right, #E5E7EB, transparent);
+      margin: 48px 0 0;
+    }
+
+    /* ── Utility type pill ────────────────────────────────────── */
+    .utility-pill {
+      display: inline-block;
+      background: #EEF2FF;
+      color: #4F46E5;
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 4px;
+      border: 1px solid #C7D2FE;
+      margin: 2px;
+    }
+
+    /* ── Responsive ───────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      .layout { grid-template-columns: 1fr; }
+      .sidebar { display: none; }
+      .main { padding: 24px 20px 60px; }
+      .before-after { grid-template-columns: 1fr; }
+      h1 { font-size: 26px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Top Navigation ─────────────────────────────────────────── -->
+<nav class="top-nav">
+  <span class="series-title">TypeScript for the AI Era</span>
+  <div class="chapter-nav">
+    <a href="chapter-03-types.html" class="nav-prev">← Ch 3: Types &amp; Interfaces</a>
+    <a href="chapter-05-objects.html" class="nav-next">Ch 5: Objects &amp; Classes →</a>
+  </div>
+  <span class="progress-badge">Chapter 4 of 24</span>
+</nav>
+
+<!-- ── Layout ─────────────────────────────────────────────────── -->
+<div class="layout">
+
+  <!-- ── Sidebar ──────────────────────────────────────────────── -->
+  <aside class="sidebar">
+    <h3>In this chapter</h3>
+    <ol>
+      <li><a href="#functions">Functions in TypeScript</a></li>
+      <li><a href="#function-types">Function Types</a></li>
+      <li><a href="#inference">Type Inference — TypeScript's Superpower</a></li>
+      <li><a href="#generics">Generics — Heart of Reusable TS</a></li>
+      <li><a href="#constraints">Generic Constraints in Depth</a></li>
+      <li><a href="#higher-order">Higher-Order Functions</a></li>
+      <li><a href="#async">Async Functions</a></li>
+      <li><a href="#narrowing">Type Narrowing with Functions</a></li>
+      <li><a href="#patterns">Real-World Generic Patterns</a></li>
+      <li><a href="#exercises">Exercises</a></li>
+    </ol>
+    <div class="author-box">
+      <div class="author-name">Matt Pocock</div>
+      <div class="author-title">TypeScript Educator<br>Creator, Total TypeScript</div>
+    </div>
+  </aside>
+
+  <!-- ── Main ─────────────────────────────────────────────────── -->
+  <main class="main">
+
+    <!-- Chapter Header -->
+    <header class="chapter-header">
+      <div class="chapter-label">Chapter 4</div>
+      <h1>Functions, Generics &amp; Type Inference</h1>
+      <p class="chapter-intro">
+        This chapter is where TypeScript stops feeling like "annotated JavaScript" and starts feeling like a
+        powerful type system in its own right. Generics are the single most important thing to master — they
+        are how TypeScript remains expressive without losing safety. By the end of this chapter you will write
+        generic functions that work across types without sacrificing a single bit of type information.
+      </p>
+    </header>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         §1 FUNCTIONS IN TYPESCRIPT
+    ════════════════════════════════════════════════════════════ -->
+    <section id="functions">
+      <h2>1. Functions in TypeScript</h2>
+
+      <p>
+        TypeScript builds directly on JavaScript's three function syntaxes and adds optional type annotations
+        to parameters and return values. You never <em>have</em> to annotate return types — TypeScript infers
+        them — but annotating them is a form of documentation and a safety net.
+      </p>
+
+      <h3>Three syntaxes, one type system</h3>
+
+      <div class="code-block">
+        <div class="code-label">
+          <span>All three function syntaxes</span>
+          <span class="lang-badge">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">// 1. Function declaration
+function add(a: number, b: number): number {
+  return a + b;
+}
+
+// 2. Function expression (assigned to a variable)
+const subtract = function(a: number, b: number): number {
+  return a - b;
+};
+
+// 3. Arrow function — most common in modern TypeScript
+const multiply = (a: number, b: number): number => a * b;
+
+// Return type is INFERRED — annotation optional
+const divide = (a: number, b: number) => a / b; // inferred: number
+</code></pre>
+      </div>
+
+      <div class="callout callout-mental">
+        <div class="callout-title">Mental Model</div>
+        <p>
+          Think of the colon after each parameter name as a "is of type" declaration:
+          <code>a: number</code> reads as "a is of type number." The colon after the closing parenthesis
+          <code>): number</code> reads as "returns type number." Once you read it that way, the syntax
+          becomes second nature.
+        </p>
+      </div>
+
+      <h3>Optional parameters</h3>
+      <p>
+        Append <code>?</code> after a parameter name to make it optional. Inside the function, its type
+        becomes <code>T | undefined</code>, so you must handle both cases.
+      </p>
+
+      <div class="code-block">
+        <div class="code-label">
+          <span>Optional parameters</span>
+          <span class="lang-badge">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">function greet(name: string, greeting?: string): string {
+  // greeting is `string | undefined` here
+  return `${greeting ?? "Hello"}, ${name}!`;
+}
+
+greet("Alice");           // "Hello, Alice!"
+greet("Alice", "Hey");   // "Hey, Alice!"
+</code></pre>
+      </div>
+
+      <h3>Default parameters</h3>
+      <p>
+        Default parameters automatically infer their type from the default value. You rarely need an explicit
+        annotation.
+      </p>
+
+      <div class="code-block">
+        <div class="code-label">
+          <span>Default parameters — type is inferred from the default</span>
+          <span class="lang-badge">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">// greeting inferred as `string`, not `string | undefined`
+function greet(name: string, greeting = "Hello"): string {
+  return `${greeting}, ${name}!`;
+}
+
+// TypeScript error: Argument of type 'number' is not assignable
+// to parameter of type 'string'.
+greet("Alice", 42);
+</code></pre>
+      </div>
+
+      <h3>Rest parameters</h3>
+
+      <div class="code-block">
+        <div class="code-label">
+          <span>Rest parameters — typed as an array</span>
+          <span class="lang-badge">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">function sum(...numbers: number[]): number {
+  return numbers.reduce((acc, n) => acc + n, 0);
+}
+
+sum(1, 2, 3, 4); // 10
+
+// You can also use tuple rest for strongly-typed variadic functions
+function first<T>(...args: [T, ...unknown[]]): T {
+  return args[0];
+}
+</code></pre>
+      </div>
+
+      <h3>Python vs TypeScript functions — comparison table</h3>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Concept</th>
+              <th>Python</th>
+              <th>TypeScript</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Declaration</td>
+              <td><code>def greet(name: str) -&gt; str:</code></td>
+              <td><code>function greet(name: string): string {}</code></td>
+              <td>Python uses <code>-&gt;</code> for return; TS uses <code>: Type</code> after <code>)</code></td>
+            </tr>
+            <tr>
+              <td>Arrow / lambda</td>
+              <td><code>lambda x: x + 1</code></td>
+              <td><code>(x: number) =&gt; x + 1</code></td>
+              <td>TS arrow functions are full-featured; Python lambdas are expression-only</td>
+            </tr>
+            <tr>
+              <td>Optional param</td>
+              <td><code>def f(x: str = None)</code></td>
+              <td><code>function f(x?: string)</code></td>
+              <td>TS <code>?</code> makes the param <code>string | undefined</code></td>
+            </tr>
+            <tr>
+              <td>Default param</td>
+              <td><code>def f(x: str = "hi")</code></td>
+              <td><code>function f(x = "hi")</code></td>
+              <td>Both infer type from the default</td>
+            </tr>
+            <tr>
+              <td>Rest / variadic</td>
+              <td><code>def f(*args: int)</code></td>
+              <td><code>function f(...args: number[])</code></td>
+              <td>Syntax differs; semantics identical</td>
+            </tr>
+            <tr>
+              <td>Keyword args</td>
+              <td><code>def f(*, name: str)</code></td>
+              <td><code>function f({ name }: { name: string })</code></td>
+              <td>TS uses destructured object pattern</td>
+            </tr>
+            <tr>
+              <td>Generics</td>
+              <td><code>def f(x: T) -&gt; T:</code> with <code>TypeVar</code></td>
+              <td><code>function f&lt;T&gt;(x: T): T</code></td>
+              <td>TS generics are inline; Python uses separate <code>TypeVar</code></td>
+            </tr>
+            <tr>
+              <td>Async</td>
+              <td><code>async def f() -&gt; User:</code></td>
+              <td><code>async function f(): Promise&lt;User&gt;</code></td>
+              <td>TS wraps the return in <code>Promise&lt;T&gt;</code></td>
+            </tr>
+            <tr>
+              <td>No return value</td>
+              <td><code>-&gt; None</code></td>
+              <td><code>: void</code></td>
+              <td><code>void</code> means "caller should not use the return value"</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         §2 FUNCTION TYPES
+    ════════════════════════════════════════════════════════════ -->
+    <section id="function-types">
+      <h2>2. Function Types</h2>
+
+      <p>
+        In TypeScript, functions are first-class values, and so they need types. A function type
+        describes what a function accepts and returns — without saying how it does it.
+      </p>
+
+      <h3>Function type expressions</h3>
+
+      <div class="code-block">
+        <div class="code-label">
+          <span>Function type expressions</span>
+          <span class="lang-badge">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">// The type of "a function that takes a string and returns void"
+type StringCallback = (s: string) => void;
+
+// Use it as a parameter type
+function forEach(arr: string[], callback: StringCallback): void {
+  for (const item of arr) {
+    callback(item);
+  }
+}
+
+forEach(["a", "b", "c"], (item) => {
+  //                       ^^^^ TypeScript knows item: string
+  console.log(item.toUpperCase());
+});
+</code></pre>
+      </div>
+
+      <h3>Call signatures in type aliases</h3>
+      <p>
+        When you want to describe a callable object (a function that also has properties), use a
+        call signature inside an interface or object type.
+      </p>
+
+      <div class="code-block">
+        <div class="code-label">
+          <span>Call signatures</span>
+          <span class="lang-badge">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">type DescribableFunction = {
+  description: string;
+  // This is the call signature
+  (someArg: number): boolean;
+};
+
+function doSomething(fn: DescribableFunction) {
+  console.log(fn.description + " returned " + fn(6));
+}
+
+const myFn: DescribableFunction = (n: number) => n > 5;
+myFn.description = "Checks if number is greater than 5";
+
+doSomething(myFn);
+</code></pre>
+      </div>
+
+      <h3>Function overloads</h3>
+      <p>
+        Overloads let you declare multiple type signatures for a single function. TypeScript uses the
+        overload signatures for type checking and the implementation signature (which must be compatible
+        with all overloads) to do the actual work.
+      </p>
+
+      <div class="callout callout-warning">
+        <div class="callout-title">Warning</div>
+        <p>
+          The implementation signature is <strong>not visible</strong> to callers. Only the overload signatures
+          are. Do not put <code>string | number</code> in the overloads — put that only in the implementation.
+        </p>
+      </div>
+
+      <div class="code-block">
+        <div class="code-label">
+          <span>Function overloads</span>
+          <span class="lang-badge">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">// Overload signatures (visible to callers)
+function format(value: string): string;
+function format(value: number, decimals: number): string;
+
+// Implementation signature (not directly callable by callers)
+function format(value: string | number, decimals?: number): string {
+  if (typeof value === "string") {
+    return value.trim();
+  }
+  return value.toFixed(decimals ?? 2);
+}
+
+format("  hello  ");    // "hello"
+format(3.14159, 2);     // "3.14"
+format(3.14159);        // Error — no matching overload
+</code></pre>
+      </div>
+
+      <h3>The <code>this</code> parameter</h3>
+      <p>
+        Unlike Python's <code>self</code>, JavaScript's <code>this</code> is dynamic — its value depends on
+        how the function is called. TypeScript lets you annotate a fake first parameter named <code>this</code>
+        to document and enforce the expected <code>this</code> type. This parameter is erased at runtime.
+      </p>
+
+      <div class="code-block">
+        <div class="code-label">
+          <span>The this parameter</span>
+          <span class="lang-badge">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">interface User {
+  name: string;
+  greet(this: User): void;
+}
+
+const user: User = {
+  name: "Alice",
+  greet() {
+    console.log(`Hello, I'm ${this.name}`);
+  },
+};
+
+// Safe: called as a method
+user.greet();
+
+// Unsafe: TypeScript catches this
+const { greet } = user;
+greet(); // Error: The 'this' context of type 'void' is not assignable...
+</code></pre>
+      </div>
+
+      <div class="callout callout-python">
+        <div class="callout-title">Python Comparison</div>
+        <p>
+          In Python, <code>self</code> is always the first argument and always refers to the instance —
+          there is no ambiguity. In JavaScript, <code>this</code> is set by the <em>call site</em>, not the
+          definition site. This is a genuine source of bugs. Arrow functions capture <code>this</code>
+          lexically (like a Python method would), which is why you see them so often in class bodies.
+          TypeScript's <code>this</code> parameter lets the compiler catch the cases where you accidentally
+          lose <code>this</code> binding.
+        </p>
+      </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         §3 TYPE INFERENCE
+    ════════════════════════════════════════════════════════════ -->
+    <section id="inference">
+      <h2>3. Type Inference — TypeScript's Superpower</h2>
+
+      <p>
+        TypeScript's inference engine is sophisticated. In the majority of situations, you do not need to
+        write type annotations because TypeScript can figure them out from context. Over-annotating is a
+        sign of inexperience — it adds visual noise without adding safety.
+      </p>
+
+      <h3>Return type inference</h3>
+
+      <div class="before-after">
+        <div class="ba-block">
+          <div class="ba-header bad">Over-annotated (unnecessary)</div>
+          <pre><code class="language-typescript">// These annotations repeat information TypeScript
+// already knows. Don't do this.
+const double = (n: number): number => n * 2;
+const isEven = (n: number): boolean => n % 2 === 0;
+const toStr = (n: number): string => String(n);
+</code></pre>
+        </div>
+        <div class="ba-block">
+          <div class="ba-header good">Let TypeScript infer (preferred)</div>
+          <pre><code class="language-typescript">// TypeScript infers the return type from the body.
+// Cleaner, same safety.
+const double = (n: number) => n * 2;         // number
+const isEven = (n: number) => n % 2 === 0;   // boolean
+const toStr = (n: number) => String(n);       // string
+</code></pre>
+        </div>
+      </div>
+
+      <div class="callout callout-tip">
+        <div class="callout-title">Tip — When to annotate return types</div>
+        <p>
+          Annotate return types on <strong>public API functions</strong> and <strong>exported functions</strong>.
+          This acts as documentation and catches the case where you accidentally return the wrong type deep
+          inside the function body. For internal, short functions, trust inference.
+        </p>
+      </div>
+
+      <h3>Contextual typing</h3>
+      <p>
+        TypeScript infers types from context — when you pass a function to <code>.map()</code>,
+        TypeScript already knows the parameter type based on the array element type.
+      </p>
+
+      <div class="code-block">
+        <div class="code-label">
+          <span>Contextual typing in action</span>
+          <span class="lang-badge">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">const names = ["Alice", "Bob", "Charlie"];
+
+// TypeScript knows `name` is `string` because names is `string[]`
+const upper = names.map((name) => name.toUpperCase());
+//                       ^^^^ string — inferred from context
+
+const lengths = names.map((name) => name.length);
+//                                  ^^^^^^^^^^^^ number[] inferred
+</code></pre>
+      </div>
+
+      <h3>const assertions and literal type inference</h3>
+      <p>
+        By default, TypeScript widens literal types. <code>const x = "hello"</code> infers
+        <code>x: string</code>, not <code>x: "hello"</code>. Use <code>as const</code> to lock
+        the value to its narrowest literal type.
+      </p>
+
+      <div class="code-block">
+        <div class="code-label">
+          <span>as const — freeze to literal types</span>
+          <span class="lang-badge">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">// Without as const: widened types
+const config = {
+  endpoint: "/api/v1",
+  method: "GET",
+};
+// config.method: string  ← too wide
+
+// With as const: literal types, readonly deeply
+const config2 = {
+  endpoint: "/api/v1",
+  method: "GET",
+} as const;
+// config2.method: "GET"  ← exact literal
+// config2 is readonly — you can't mutate it
+
+// Useful for discriminated unions and exhaustive checks
+type HttpMethod = "GET" | "POST" | "PUT" | "DELETE";
+function request(url: string, method: HttpMethod) { /* ... */ }
+
+request(config.endpoint, config.method);   // Error: string not assignable to HttpMethod
+request(config2.endpoint, config2.method); // OK: "GET" matches
+</code></pre>
+      </div>
+
+      <h3>The <code>satisfies</code> operator (TypeScript 4.9+)</h3>
+      <p>
+        <code>satisfies</code> validates that a value conforms to a type <em>without widening</em> the
+        inferred type of the value. It gives you the best of both worlds: type safety from the constraint
+        and precise inference from the value.
+      </p>
+
+      <div class="before-after">
+        <div class="ba-block">
+          <div class="ba-header bad">Using type annotation — loses precision</div>
+          <pre><code class="language-typescript">type Palette = Record&lt;string, string[]&gt;;
+
+// TypeScript enforces the constraint, but loses
+// the specific key names in the inferred type.
+const palette: Palette = {
+  red: ["#ff0000", "#cc0000"],
+  blue: ["#0000ff"],
+};
+
+// Error: palette.red is string[] | string
+// TypeScript doesn't know "red" is a key
+palette.purple; // No error — but "purple" doesn't exist!
+</code></pre>
+        </div>
+        <div class="ba-block">
+          <div class="ba-header good">Using satisfies — keeps precision</div>
+          <pre><code class="language-typescript">type Palette = Record&lt;string, string[]&gt;;
+
+// satisfies validates the shape but keeps
+// the exact keys in the inferred type.
+const palette = {
+  red: ["#ff0000", "#cc0000"],
+  blue: ["#0000ff"],
+} satisfies Palette;
+
+palette.red;    // string[] ← TypeScript knows this key
+palette.purple; // Error: Property 'purple' does not exist
+</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         §4 GENERICS
+    ════════════════════════════════════════════════════════════ -->
+    <section id="generics">
+      <h2>4. Generics — The Heart of Reusable TypeScript</h2>
+
+      <p>
+        A generic function is a function that works over <em>many types</em> while preserving type
+        information. Without generics, you either write a separate function for each type, or you use
+        <code>any</code> and lose all safety. Generics are the third option — the correct option.
+      </p>
+
+      <div class="callout callout-python">
+        <div class="callout-title">Python Comparison — TypeVar</div>
+        <p>
+          Python's equivalent is <code>TypeVar</code>. In Python you write:
+          <code>T = TypeVar("T"); def identity(x: T) -&gt; T: return x</code>. TypeScript eliminates the
+          separate declaration and puts the type parameter inline on the function:
+          <code>function identity&lt;T&gt;(x: T): T { return x; }</code>. Python 3.12+ introduced
+          <code>def identity[T](x: T) -&gt; T</code> syntax that mirrors TypeScript more closely.
+        </p>
+      </div>
+
+      <h3>The identity function — simplest possible generic</h3>
+
+      <div class="code-block">
+        <div class="code-label">
+          <span>Generic identity function</span>
+          <span class="lang-badge">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">// T is a type parameter — a placeholder for a real type.
+// TypeScript fills it in when the function is called.
+function identity&lt;T&gt;(value: T): T {
+  return value;
+}
+
+// TypeScript infers T = string from the argument
+const str = identity("hello");   // string
+const num = identity(42);        // number
+const bool = identity(true);     // boolean
+
+// You can also pass T explicitly (rare — prefer inference)
+const explicit = identity&lt;string&gt;("world");
+</code></pre>
+      </div>
+
+      <!-- SVG Diagram -->
+      <div class="diagram-wrap">
+        <svg viewBox="0 0 720 260" width="100%" style="max-width:700px;" xmlns="http://www.w3.org/2000/svg">
+          <!-- Background -->
+          <rect x="0" y="0" width="720" height="260" rx="12" fill="#F9FAFB"/>
+
+          <!-- Call site box -->
+          <rect x="20" y="80" width="180" height="100" rx="10" fill="#EEF2FF" stroke="#C7D2FE" stroke-width="1.5"/>
+          <text x="110" y="108" text-anchor="middle" font-family="system-ui" font-size="12" font-weight="700" fill="#3730A3">CALL SITE</text>
+          <text x="110" y="132" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="13" fill="#4F46E5">identity("hello")</text>
+          <text x="110" y="155" text-anchor="middle" font-family="system-ui" font-size="11" fill="#6B7280">TypeScript sees: string</text>
+
+          <!-- Arrow 1 -->
+          <line x1="202" y1="130" x2="255" y2="130" stroke="#8B5CF6" stroke-width="2" marker-end="url(#arrow)"/>
+          <text x="228" y="120" text-anchor="middle" font-family="system-ui" font-size="11" fill="#8B5CF6" font-weight="600">T = string</text>
+
+          <!-- Function box -->
+          <rect x="258" y="60" width="210" height="140" rx="10" fill="#fff" stroke="#4F46E5" stroke-width="2"/>
+          <text x="363" y="88" text-anchor="middle" font-family="system-ui" font-size="12" font-weight="700" fill="#4F46E5">GENERIC FUNCTION</text>
+          <rect x="272" y="97" width="182" height="30" rx="5" fill="#EEF2FF"/>
+          <text x="363" y="117" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="12" fill="#4F46E5">function identity</text>
+          <text x="363" y="133" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="12" fill="#4F46E5">&lt;T&gt;(value: T): T</text>
+          <text x="363" y="158" text-anchor="middle" font-family="system-ui" font-size="11" fill="#6B7280">T is bound to</text>
+          <rect x="318" y="165" width="90" height="22" rx="5" fill="#FEF3C7" stroke="#F59E0B" stroke-width="1"/>
+          <text x="363" y="181" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="12" font-weight="700" fill="#D97706">string</text>
+
+          <!-- Arrow 2 -->
+          <line x1="470" y1="130" x2="523" y2="130" stroke="#10B981" stroke-width="2" marker-end="url(#arrow2)"/>
+          <text x="497" y="120" text-anchor="middle" font-family="system-ui" font-size="11" fill="#10B981" font-weight="600">returns T</text>
+
+          <!-- Return type box -->
+          <rect x="526" y="80" width="170" height="100" rx="10" fill="#F0FDF4" stroke="#86EFAC" stroke-width="1.5"/>
+          <text x="611" y="108" text-anchor="middle" font-family="system-ui" font-size="12" font-weight="700" fill="#15803D">RETURN VALUE</text>
+          <text x="611" y="132" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="13" fill="#059669">const str</text>
+          <text x="611" y="153" text-anchor="middle" font-family="system-ui" font-size="11" fill="#6B7280">inferred as: string</text>
+          <text x="611" y="170" text-anchor="middle" font-family="system-ui" font-size="10" fill="#9CA3AF">no information lost</text>
+
+          <!-- Title -->
+          <text x="360" y="235" text-anchor="middle" font-family="system-ui" font-size="13" fill="#6B7280" font-style="italic">
+            How T "flows" through a generic function call
+          </text>
+
+          <!-- Arrow markers -->
+          <defs>
+            <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+              <path d="M0,0 L0,6 L8,3 z" fill="#8B5CF6"/>
+            </marker>
+            <marker id="arrow2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+              <path d="M0,0 L0,6 L8,3 z" fill="#10B981"/>
+            </marker>
+          </defs>
+        </svg>
+        <div class="diagram-caption">
+          When you call <code>identity("hello")</code>, TypeScript binds <code>T = string</code> at the call site
+          and propagates it through the function, so the return type is exactly <code>string</code> — not the
+          wider <code>unknown</code> or <code>any</code>.
+        </div>
+      </div>
+
+      <h3>Multiple type parameters</h3>
+
+      <div class="code-block">
+        <div class="code-label">
+          <span>Multiple type parameters</span>
+          <span class="lang-badge">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">// Two independent type parameters A and B
+function pair&lt;A, B&gt;(a: A, b: B): [A, B] {
+  return [a, b];
+}
+
+const result = pair("Alice", 30);
+//    ^^^^^^  [string, number] — fully typed tuple
+
+// Real-world example: Map-like transform
+function mapValues&lt;K extends string, V, R&gt;(
+  obj: Record&lt;K, V&gt;,
+  fn: (value: V, key: K) =&gt; R
+): Record&lt;K, R&gt; {
+  const result = {} as Record&lt;K, R&gt;;
+  for (const key in obj) {
+    result[key] = fn(obj[key], key);
+  }
+  return result;
+}
+
+const doubled = mapValues({ a: 1, b: 2 }, (v) =&gt; v * 2);
+// { a: number, b: number }
+</code></pre>
+      </div>
+
+      <h3>Default type parameters</h3>
+
+      <div class="code-block">
+        <div class="code-label">
+          <span>Default type parameters</span>
+          <span class="lang-badge">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">// T defaults to string if not specified
+function createArray&lt;T = string&gt;(length: number, fill: T): T[] {
+  return Array.from({ length }, () =&gt; fill);
+}
+
+// T inferred from argument — default not used
+const nums = createArray(3, 0);       // number[]
+const strs = createArray(3, "hello"); // string[]
+
+// T = string (default) — you'd need to pass fill to use default
+</code></pre>
+      </div>
+
+      <h3>Real-world generic utilities</h3>
+
+      <div class="code-block">
+        <div class="code-label">
+          <span>wrap, unwrap, first, last, pick, omit</span>
+          <span class="lang-badge">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">// Wrap any value in a container
+function wrap&lt;T&gt;(value: T): { value: T } {
+  return { value };
+}
+
+function unwrap&lt;T&gt;(wrapped: { value: T }): T {
+  return wrapped.value;
+}
+
+// Safely get first/last elements
+function first&lt;T&gt;(arr: T[]): T | undefined {
+  return arr[0];
+}
+
+function last&lt;T&gt;(arr: T[]): T | undefined {
+  return arr[arr.length - 1];
+}
+
+// Pick specific keys from an object
+function pick&lt;T extends object, K extends keyof T&gt;(
+  obj: T,
+  keys: K[]
+): Pick&lt;T, K&gt; {
+  return keys.reduce(
+    (acc, key) =&gt; ({ ...acc, [key]: obj[key] }),
+    {} as Pick&lt;T, K&gt;
+  );
+}
+
+// Omit specific keys from an object
+function omit&lt;T extends object, K extends keyof T&gt;(
+  obj: T,
+  keys: K[]
+): Omit&lt;T, K&gt; {
+  const result = { ...obj };
+  for (const key of keys) delete result[key];
+  return result;
+}
+
+const user = { id: "1", name: "Alice", age: 30, role: "admin" };
+
+const publicInfo = pick(user, ["name", "role"]);
+// { name: string; role: string }
+
+const withoutRole = omit(user, ["role", "age"]);
+// { id: string; name: string }
+</code></pre>
+      </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         §5 GENERIC CONSTRAINTS
+    ════════════════════════════════════════════════════════════ -->
+    <section id="constraints">
+      <h2>5. Generic Constraints in Depth</h2>
+
+      <p>
+        Unconstrained generics are maximally flexible but minimally useful — you can only do things that
+        work on every possible type (i.e., almost nothing). Constraints narrow what T can be, unlocking
+        more capabilities.
+      </p>
+
+      <h3>The <code>extends</code> keyword</h3>
+
+      <div class="before-after">
+        <div class="ba-block">
+          <div class="ba-header bad">Without constraint — TypeScript error</div>
+          <pre><code class="language-typescript">// ERROR: Property 'length' does not exist
+// on type 'T' — T could be anything!
+function getLength&lt;T&gt;(value: T): number {
+  return value.length;
+  //     ^^^^^^^^^^^^^ Error
+}
+</code></pre>
+        </div>
+        <div class="ba-block">
+          <div class="ba-header good">With constraint — TypeScript happy</div>
+          <pre><code class="language-typescript">// T must have a .length property
+function getLength&lt;T extends { length: number }&gt;(
+  value: T
+): number {
+  return value.length; // safe: T has .length
+}
+
+getLength("hello");    // 5
+getLength([1, 2, 3]);  // 3
+getLength({ length: 7, name: "file" }); // 7
+getLength(42); // Error: number has no .length
+</code></pre>
+        </div>
+      </div>
+
+      <h3>The <code>keyof</code> operator</h3>
+      <p>
+        <code>keyof T</code> produces a union of all the keys of type <code>T</code>. Combining
+        <code>keyof</code> with generics gives you type-safe property access.
+      </p>
+
+      <div class="code-block">
+        <div class="code-label">
+          <span>keyof — type-safe property lookup</span>
+          <span class="lang-badge">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">// K must be a key of T — ensures obj[key] is valid
+function getProperty&lt;T, K extends keyof T&gt;(obj: T, key: K): T[K] {
+  return obj[key];
+}
+
+const user = { id: "u1", name: "Alice", age: 30 };
+
+const name = getProperty(user, "name");  // string — inferred!
+const age  = getProperty(user, "age");   // number — inferred!
+
+// TypeScript error: "email" is not a key of user
+getProperty(user, "email"); // Error
+</code></pre>
+      </div>
+
+      <div class="callout callout-mental">
+        <div class="callout-title">Mental Model — T[K] is "indexed access"</div>
+        <p>
+          <code>T[K]</code> is TypeScript's way of saying "the type you get when you look up key
+          <code>K</code> in type <code>T</code>." If <code>T = { name: string; age: number }</code>
+          and <code>K = "name"</code>, then <code>T[K] = string</code>. It is the type-level equivalent
+          of <code>obj[key]</code> at runtime.
+        </p>
+      </div>
+
+      <h3>Type-safe <code>fetch</code> wrapper</h3>
+
+      <div class="code-block">
+        <div class="code-label">
+          <span>Generic fetch wrapper</span>
+          <span class="lang-badge">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">// Without this wrapper, fetch returns Promise&lt;any&gt; effectively
+async function typedFetch&lt;T&gt;(
+  url: string,
+  options?: RequestInit
+): Promise&lt;T&gt; {
+  const response = await fetch(url, options);
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+  }
+  return response.json() as Promise&lt;T&gt;;
+}
+
+// Usage — T is specified at the call site
+interface User {
+  id: string;
+  name: string;
+  email: string;
+}
+
+const user = await typedFetch&lt;User&gt;("/api/users/1");
+//    ^^^^ User — fully typed. No manual casting needed.
+console.log(user.name); // TypeScript knows this is string
+</code></pre>
+      </div>
+
+      <h3>Type-safe event emitter</h3>
+
+      <div class="code-block">
+        <div class="code-label">
+          <span>Generic event emitter — maps event names to payload types</span>
+          <span class="lang-badge">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">type EventMap = Record&lt;string, unknown&gt;;
+
+class TypedEventEmitter&lt;Events extends EventMap&gt; {
+  private listeners = new Map&lt;keyof Events, Set&lt;Function&gt;&gt;();
+
+  on&lt;K extends keyof Events&gt;(
+    event: K,
+    listener: (payload: Events[K]) =&gt; void
+  ): this {
+    if (!this.listeners.has(event)) {
+      this.listeners.set(event, new Set());
+    }
+    this.listeners.get(event)!.add(listener);
+    return this;
+  }
+
+  emit&lt;K extends keyof Events&gt;(event: K, payload: Events[K]): void {
+    this.listeners.get(event)?.forEach((fn) =&gt; fn(payload));
+  }
+}
+
+// Define your event shape in one place
+interface AppEvents {
+  "user:login": { userId: string; timestamp: Date };
+  "user:logout": { userId: string };
+  "message:sent": { content: string; channelId: string };
+}
+
+const emitter = new TypedEventEmitter&lt;AppEvents&gt;();
+
+// TypeScript knows the shape of each event payload
+emitter.on("user:login", ({ userId, timestamp }) =&gt; {
+  //                        ^^^^^^  string, Date — inferred!
+  console.log(`${userId} logged in at ${timestamp}`);
+});
+
+emitter.emit("user:login", { userId: "u1", timestamp: new Date() }); // OK
+emitter.emit("user:login", { userId: "u1" }); // Error: missing timestamp
+emitter.emit("unknown:event", {}); // Error: not in AppEvents
+</code></pre>
+      </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         §6 HIGHER-ORDER FUNCTIONS
+    ════════════════════════════════════════════════════════════ -->
+    <section id="higher-order">
+      <h2>6. Higher-Order Functions</h2>
+
+      <h3>map, filter, reduce — typed correctly</h3>
+
+      <div class="code-block">
+        <div class="code-label">
+          <span>Typed HOFs</span>
+          <span class="lang-badge">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">// The built-in Array methods are generic — let's write our own
+function map&lt;T, U&gt;(arr: T[], fn: (item: T, i: number) =&gt; U): U[] {
+  return arr.map(fn);
+}
+
+function filter&lt;T&gt;(arr: T[], pred: (item: T) =&gt; boolean): T[] {
+  return arr.filter(pred);
+}
+
+function reduce&lt;T, Acc&gt;(
+  arr: T[],
+  fn: (acc: Acc, item: T) =&gt; Acc,
+  initial: Acc
+): Acc {
+  return arr.reduce(fn, initial);
+}
+
+const numbers = [1, 2, 3, 4, 5];
+
+// TypeScript infers U = string in map
+const strings = map(numbers, (n) =&gt; n.toString()); // string[]
+
+// TypeScript keeps T = number in filter
+const evens = filter(numbers, (n) =&gt; n % 2 === 0); // number[]
+
+// TypeScript infers Acc = number from initial value
+const total = reduce(numbers, (acc, n) =&gt; acc + n, 0); // number
+</code></pre>
+      </div>
+
+      <h3>Currying</h3>
+
+      <div class="code-block">
+        <div class="code-label">
+          <span>Typed currying</span>
+          <span class="lang-badge">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">// A curried function takes its arguments one at a time
+function curry&lt;A, B, C&gt;(fn: (a: A, b: B) =&gt; C): (a: A) =&gt; (b: B) =&gt; C {
+  return (a) =&gt; (b) =&gt; fn(a, b);
+}
+
+const add = (a: number, b: number) =&gt; a + b;
+const curriedAdd = curry(add);
+//    ^^^^^^^^^^  (a: number) =&gt; (b: number) =&gt; number
+
+const add5 = curriedAdd(5);  // (b: number) =&gt; number
+const ten = add5(5);          // 10
+
+// Practical use: pre-configuring callbacks
+const double = curry((factor: number, value: number) =&gt; factor * value)(2);
+const tripled = [1, 2, 3].map(
+  curry((factor: number, value: number) =&gt; factor * value)(3)
+); // [3, 6, 9]
+</code></pre>
+      </div>
+
+      <h3>Utility types: <code>ReturnType</code>, <code>Parameters</code>, <code>Awaited</code></h3>
+
+      <p>
+        TypeScript ships with several utility types that extract type information from functions.
+        These are invaluable when working with third-party code you do not control.
+      </p>
+
+      <div class="code-block">
+        <div class="code-label">
+          <span>ReturnType, Parameters, Awaited</span>
+          <span class="lang-badge">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">async function fetchUser(id: string) {
+  const res = await fetch(`/api/users/${id}`);
+  return res.json() as Promise&lt;{ id: string; name: string }&gt;;
+}
+
+// Extract return type — useful for typing derived data
+type FetchUserReturn = ReturnType&lt;typeof fetchUser&gt;;
+// Promise&lt;{ id: string; name: string }&gt;
+
+// Unwrap the Promise
+type User = Awaited&lt;ReturnType&lt;typeof fetchUser&gt;&gt;;
+// { id: string; name: string }
+
+// Extract parameter types as a tuple
+type FetchUserParams = Parameters&lt;typeof fetchUser&gt;;
+// [id: string]
+
+type FirstParam = FetchUserParams[0];
+// string
+
+// Real-world usage: mocking in tests
+function mockFetch(
+  ...args: Parameters&lt;typeof fetchUser&gt;
+): ReturnType&lt;typeof fetchUser&gt; {
+  return Promise.resolve({ id: args[0], name: "Mock User" });
+}
+</code></pre>
+      </div>
+
+      <div class="callout callout-ai">
+        <div class="callout-title">AI Era Note</div>
+        <p>
+          When building AI pipelines, you often chain async operations: fetch data, call an LLM API,
+          parse the response, store results. <code>Awaited&lt;T&gt;</code> and <code>ReturnType&lt;T&gt;</code>
+          let you derive types from your pipeline functions rather than re-declaring them, keeping your
+          AI agent's type system in sync automatically as the pipeline evolves.
+        </p>
+      </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         §7 ASYNC FUNCTIONS
+    ════════════════════════════════════════════════════════════ -->
+    <section id="async">
+      <h2>7. Async Functions</h2>
+
+      <p>
+        TypeScript's async/await mirrors JavaScript's exactly, adding one rule: an <code>async</code>
+        function's return type is always <code>Promise&lt;T&gt;</code>, where <code>T</code> is whatever
+        the function body resolves to.
+      </p>
+
+      <div class="code-block">
+        <div class="code-label">
+          <span>async/await with typed Promise</span>
+          <span class="lang-badge">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">interface User {
+  id: string;
+  name: string;
+  email: string;
+}
+
+// Return type annotation is optional — TypeScript infers Promise&lt;User&gt;
+async function fetchUser(id: string): Promise&lt;User&gt; {
+  const response = await fetch(`/api/users/${id}`);
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch user ${id}`);
+  }
+
+  return response.json();
+}
+
+// Callers use await to get the User — no Promise handling needed
+const user = await fetchUser("u1");
+console.log(user.name); // TypeScript knows: string
+</code></pre>
+      </div>
+
+      <h3>Error handling with typed errors</h3>
+
+      <div class="callout callout-warning">
+        <div class="callout-title">Warning — catch gives you unknown, not Error</div>
+        <p>
+          In TypeScript's strict mode, the <code>catch</code> variable is typed as <code>unknown</code>,
+          not <code>Error</code>. This is correct — anything can be thrown. Always narrow before using.
+        </p>
+      </div>
+
+      <div class="code-block">
+        <div class="code-label">
+          <span>Typed error handling</span>
+          <span class="lang-badge">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">class ApiError extends Error {
+  constructor(
+    message: string,
+    public readonly statusCode: number
+  ) {
+    super(message);
+    this.name = "ApiError";
+  }
+}
+
+async function fetchUserSafe(id: string): Promise&lt;User | null&gt; {
+  try {
+    return await fetchUser(id);
+  } catch (error: unknown) {
+    // Narrow the error type before using it
+    if (error instanceof ApiError) {
+      console.error(`API error ${error.statusCode}: ${error.message}`);
+      return null;
+    }
+    if (error instanceof Error) {
+      console.error(`Network error: ${error.message}`);
+      return null;
+    }
+    // Unknown error — re-throw
+    throw error;
+  }
+}
+</code></pre>
+      </div>
+
+      <h3>Promise combinators with generics</h3>
+
+      <div class="code-block">
+        <div class="code-label">
+          <span>Promise.all, allSettled, race — inferred types</span>
+          <span class="lang-badge">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">// Promise.all: tuple of types when given tuple input
+const [user, posts] = await Promise.all([
+  fetchUser("u1"),         // Promise&lt;User&gt;
+  fetchPosts("u1"),        // Promise&lt;Post[]&gt;
+]);
+// user: User, posts: Post[] — exact types preserved
+
+// Promise.allSettled: each result has status + value or reason
+const results = await Promise.allSettled([
+  fetchUser("u1"),
+  fetchUser("nonexistent"),
+]);
+
+for (const result of results) {
+  if (result.status === "fulfilled") {
+    console.log(result.value.name); // TypeScript: User
+  } else {
+    console.error(result.reason);   // TypeScript: any (unknown failure)
+  }
+}
+
+// Promise.race: returns the type of the fastest resolving promise
+async function withTimeout&lt;T&gt;(
+  promise: Promise&lt;T&gt;,
+  ms: number
+): Promise&lt;T&gt; {
+  const timeout = new Promise&lt;never&gt;((_resolve, reject) =&gt;
+    setTimeout(() =&gt; reject(new Error(`Timed out after ${ms}ms`)), ms)
+  );
+  return Promise.race([promise, timeout]);
+}
+</code></pre>
+      </div>
+
+      <h3>Python asyncio vs TypeScript async — comparison table</h3>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Concept</th>
+              <th>Python asyncio</th>
+              <th>TypeScript</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Async function</td>
+              <td><code>async def f() -&gt; User:</code></td>
+              <td><code>async function f(): Promise&lt;User&gt;</code></td>
+            </tr>
+            <tr>
+              <td>Await expression</td>
+              <td><code>user = await fetch_user()</code></td>
+              <td><code>const user = await fetchUser()</code></td>
+            </tr>
+            <tr>
+              <td>Parallel execution</td>
+              <td><code>asyncio.gather(f1(), f2())</code></td>
+              <td><code>Promise.all([f1(), f2()])</code></td>
+            </tr>
+            <tr>
+              <td>Timeout</td>
+              <td><code>asyncio.wait_for(coro, timeout=5)</code></td>
+              <td><code>Promise.race([coro, timeoutPromise])</code></td>
+            </tr>
+            <tr>
+              <td>Error catching</td>
+              <td><code>except SomeError as e:</code></td>
+              <td><code>catch (e: unknown) { if (e instanceof SomeError) }</code></td>
+            </tr>
+            <tr>
+              <td>Run event loop</td>
+              <td><code>asyncio.run(main())</code></td>
+              <td>Top-level <code>await</code> (ESM) or <code>.then()</code></td>
+            </tr>
+            <tr>
+              <td>Return type</td>
+              <td><code>Coroutine[Any, Any, User]</code></td>
+              <td><code>Promise&lt;User&gt;</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         §8 TYPE NARROWING WITH FUNCTIONS
+    ════════════════════════════════════════════════════════════ -->
+    <section id="narrowing">
+      <h2>8. Type Narrowing with Functions</h2>
+
+      <p>
+        TypeScript narrows types inside <code>if</code> blocks based on checks like
+        <code>typeof</code> and <code>instanceof</code>. But sometimes you want to put that narrowing
+        logic inside a reusable function. That requires a special return type: a <strong>type predicate</strong>.
+      </p>
+
+      <h3>Type predicates</h3>
+
+      <div class="code-block">
+        <div class="code-label">
+          <span>Type predicates — value is T</span>
+          <span class="lang-badge">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">// Without a type predicate, the return is just boolean
+// and TypeScript doesn't narrow after the call.
+function isString(value: unknown): value is string {
+  return typeof value === "string";
+}
+
+function processInput(value: unknown) {
+  if (isString(value)) {
+    // value: string here — TypeScript narrowed it!
+    console.log(value.toUpperCase());
+  }
+}
+
+// A more complex type guard
+interface Cat { meow(): void; }
+interface Dog { bark(): void; }
+
+function isCat(animal: Cat | Dog): animal is Cat {
+  return "meow" in animal;
+}
+
+function handleAnimal(animal: Cat | Dog) {
+  if (isCat(animal)) {
+    animal.meow(); // TypeScript: Cat
+  } else {
+    animal.bark(); // TypeScript: Dog
+  }
+}
+</code></pre>
+      </div>
+
+      <h3>Assertion functions</h3>
+
+      <div class="code-block">
+        <div class="code-label">
+          <span>Assertion functions — asserts condition</span>
+          <span class="lang-badge">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">// When the function returns normally (doesn't throw),
+// TypeScript knows the condition is true.
+function assert(condition: boolean, message?: string): asserts condition {
+  if (!condition) {
+    throw new Error(message ?? "Assertion failed");
+  }
+}
+
+function assertIsString(value: unknown): asserts value is string {
+  if (typeof value !== "string") {
+    throw new TypeError(`Expected string, got ${typeof value}`);
+  }
+}
+
+// Usage
+function processEnvVar(name: string) {
+  const value = process.env[name];
+  // value is `string | undefined` before the assertion
+  assertIsString(value);
+  // After the assertion, TypeScript knows value is string
+  return value.trim();
+}
+</code></pre>
+      </div>
+
+      <div class="callout callout-mental">
+        <div class="callout-title">Mental Model — Type predicates vs Assertion functions</div>
+        <p>
+          A <strong>type predicate</strong> (<code>value is string</code>) is used in an <code>if</code>
+          condition — "if this returns true, narrow the type inside the block." An
+          <strong>assertion function</strong> (<code>asserts condition</code>) says "if this function
+          returns at all (i.e., doesn't throw), then the condition is true from here on." Use predicates
+          for conditional branching; use assertions for "must be valid or crash" scenarios.
+        </p>
+      </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         §9 REAL-WORLD GENERIC PATTERNS
+    ════════════════════════════════════════════════════════════ -->
+    <section id="patterns">
+      <h2>9. Real-World Generic Patterns</h2>
+
+      <h3>Generic API response wrapper</h3>
+
+      <div class="code-block">
+        <div class="code-label">
+          <span>ApiResponse&lt;T&gt; — standardize all API returns</span>
+          <span class="lang-badge">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">// Define the wrapper once
+type ApiResponse&lt;T&gt; =
+  | { success: true; data: T; error: null }
+  | { success: false; data: null; error: string };
+
+// Helper constructors
+function ok&lt;T&gt;(data: T): ApiResponse&lt;T&gt; {
+  return { success: true, data, error: null };
+}
+
+function fail&lt;T&gt;(error: string): ApiResponse&lt;T&gt; {
+  return { success: false, data: null, error };
+}
+
+// Usage in route handlers
+async function getUserHandler(id: string): Promise&lt;ApiResponse&lt;User&gt;&gt; {
+  try {
+    const user = await db.users.findById(id);
+    if (!user) return fail("User not found");
+    return ok(user);
+  } catch (e) {
+    return fail("Database error");
+  }
+}
+
+// Caller gets perfect narrowing
+const result = await getUserHandler("u1");
+if (result.success) {
+  console.log(result.data.name); // TypeScript: User
+} else {
+  console.error(result.error);   // TypeScript: string
+}
+</code></pre>
+      </div>
+
+      <h3>Generic repository pattern</h3>
+
+      <div class="code-block">
+        <div class="code-label">
+          <span>Repository&lt;T&gt; — type-safe data access layer</span>
+          <span class="lang-badge">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">// Constraint: every entity must have an id
+interface Entity {
+  id: string;
+}
+
+interface Repository&lt;T extends Entity&gt; {
+  findById(id: string): Promise&lt;T | null&gt;;
+  findAll(): Promise&lt;T[]&gt;;
+  create(data: Omit&lt;T, "id"&gt;): Promise&lt;T&gt;;
+  update(id: string, data: Partial&lt;Omit&lt;T, "id"&gt;&gt;): Promise&lt;T | null&gt;;
+  delete(id: string): Promise&lt;boolean&gt;;
+}
+
+// Concrete implementation for User
+interface User extends Entity {
+  name: string;
+  email: string;
+}
+
+class UserRepository implements Repository&lt;User&gt; {
+  async findById(id: string): Promise&lt;User | null&gt; {
+    // db call...
+    return null;
+  }
+
+  async findAll(): Promise&lt;User[]&gt; {
+    return [];
+  }
+
+  async create(data: Omit&lt;User, "id"&gt;): Promise&lt;User&gt; {
+    // TypeScript ensures data has name + email but NOT id
+    return { id: crypto.randomUUID(), ...data };
+  }
+
+  async update(id: string, data: Partial&lt;Omit&lt;User, "id"&gt;&gt;): Promise&lt;User | null&gt; {
+    return null;
+  }
+
+  async delete(id: string): Promise&lt;boolean&gt; {
+    return true;
+  }
+}
+
+// Generic service that works with ANY repository
+async function paginate&lt;T extends Entity&gt;(
+  repo: Repository&lt;T&gt;,
+  page: number,
+  size: number
+): Promise&lt;{ items: T[]; total: number }&gt; {
+  const all = await repo.findAll();
+  const start = (page - 1) * size;
+  return {
+    items: all.slice(start, start + size),
+    total: all.length,
+  };
+}
+</code></pre>
+      </div>
+
+      <h3>Preview: type-safe React hooks</h3>
+
+      <div class="code-block">
+        <div class="code-label">
+          <span>useLocalStorage hook with generics (preview of Ch 16)</span>
+          <span class="lang-badge">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">import { useState } from "react";
+
+// A generic hook: the type follows what you put in
+function useLocalStorage&lt;T&gt;(
+  key: string,
+  initialValue: T
+): [T, (value: T) =&gt; void] {
+  const [storedValue, setStoredValue] = useState&lt;T&gt;(() =&gt; {
+    try {
+      const item = window.localStorage.getItem(key);
+      return item ? (JSON.parse(item) as T) : initialValue;
+    } catch {
+      return initialValue;
+    }
+  });
+
+  const setValue = (value: T) =&gt; {
+    try {
+      setStoredValue(value);
+      window.localStorage.setItem(key, JSON.stringify(value));
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  return [storedValue, setValue];
+}
+
+// Usage — T is inferred from initialValue
+const [theme, setTheme] = useLocalStorage("theme", "light");
+//     ^^^^^ string — inferred!
+
+const [count, setCount] = useLocalStorage("count", 0);
+//     ^^^^^ number — inferred!
+
+setTheme(42); // Error: Argument of type 'number' is not assignable to 'string'
+</code></pre>
+      </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         §10 EXERCISES
+    ════════════════════════════════════════════════════════════ -->
+    <section id="exercises">
+      <h2>10. Exercises</h2>
+
+      <p>
+        Apply what you have learned. Each exercise has a TypeScript Playground link. Try to solve it
+        before revealing the solution.
+      </p>
+
+      <!-- Exercise 1 -->
+      <div class="exercise">
+        <div class="exercise-header">
+          <div class="exercise-number">1</div>
+          <div class="exercise-title">Type-Safe Array Utilities</div>
+          <span class="exercise-difficulty difficulty-beginner">Beginner</span>
+        </div>
+        <div class="exercise-body">
+          <p>
+            Implement two generic functions:
+          </p>
+          <ul>
+            <li><code>head&lt;T&gt;(arr: T[]): T | undefined</code> — returns the first element or undefined</li>
+            <li><code>tail&lt;T&gt;(arr: T[]): T[]</code> — returns everything except the first element</li>
+          </ul>
+          <p>
+            Verify that TypeScript infers the correct types: calling <code>head([1, 2, 3])</code> should give
+            <code>number | undefined</code>, not <code>unknown | undefined</code>.
+          </p>
+          <a class="playground-link" href="https://www.typescriptlang.org/play?#code/PTAEAEFMCdoe" target="_blank" rel="noopener">Open in TypeScript Playground</a>
+          <details class="solution">
+            <summary>Show solution</summary>
+            <div class="solution-body">
+              <pre><code class="language-typescript">function head&lt;T&gt;(arr: T[]): T | undefined {
+  return arr[0];
+}
+
+function tail&lt;T&gt;(arr: T[]): T[] {
+  return arr.slice(1);
+}
+
+// Tests
+const first = head([1, 2, 3]);    // number | undefined
+const rest  = tail([1, 2, 3]);    // number[]
+const s     = head(["a", "b"]);   // string | undefined
+const empty = head([]);           // undefined
+
+// This must be a TypeScript error:
+// const bad: string = head([1, 2, 3]); // Error
+</code></pre>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- Exercise 2 -->
+      <div class="exercise">
+        <div class="exercise-header">
+          <div class="exercise-number">2</div>
+          <div class="exercise-title">Generic Pipe Function</div>
+          <span class="exercise-difficulty difficulty-intermediate">Intermediate</span>
+        </div>
+        <div class="exercise-body">
+          <p>
+            Implement a <code>pipe</code> function that chains two unary functions together. The output
+            type of the first function must match the input type of the second function.
+          </p>
+          <p>
+            Signature: <code>pipe&lt;A, B, C&gt;(f: (a: A) =&gt; B, g: (b: B) =&gt; C): (a: A) =&gt; C</code>
+          </p>
+          <p>
+            Test: <code>pipe((s: string) =&gt; s.length, (n: number) =&gt; n * 2)("hello")</code> should
+            produce <code>10</code> with type <code>number</code>.
+          </p>
+          <a class="playground-link" href="https://www.typescriptlang.org/play?#code/PTAEAEFMCdoe" target="_blank" rel="noopener">Open in TypeScript Playground</a>
+          <details class="solution">
+            <summary>Show solution</summary>
+            <div class="solution-body">
+              <pre><code class="language-typescript">function pipe&lt;A, B, C&gt;(
+  f: (a: A) =&gt; B,
+  g: (b: B) =&gt; C
+): (a: A) =&gt; C {
+  return (a) =&gt; g(f(a));
+}
+
+const lengthAndDouble = pipe(
+  (s: string) =&gt; s.length,   // A=string, B=number
+  (n: number) =&gt; n * 2       // B=number, C=number
+);
+
+const result = lengthAndDouble("hello"); // 10, type: number
+
+// This should error — incompatible types between functions:
+// pipe(
+//   (s: string) =&gt; s.length,
+//   (s: string) =&gt; s.toUpperCase() // Error: number not assignable to string
+// );
+</code></pre>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- Exercise 3 -->
+      <div class="exercise">
+        <div class="exercise-header">
+          <div class="exercise-number">3</div>
+          <div class="exercise-title">Type-Safe Object Merger</div>
+          <span class="exercise-difficulty difficulty-intermediate">Intermediate</span>
+        </div>
+        <div class="exercise-body">
+          <p>
+            Implement a <code>merge</code> function that combines two objects. The return type must
+            contain all properties from both objects. Use TypeScript's intersection type in the return.
+          </p>
+          <p>
+            Signature: <code>merge&lt;A extends object, B extends object&gt;(a: A, b: B): A &amp; B</code>
+          </p>
+          <p>
+            The result should have auto-complete for all properties from both arguments.
+            Properties in <code>b</code> should override properties in <code>a</code>.
+          </p>
+          <a class="playground-link" href="https://www.typescriptlang.org/play?#code/PTAEAEFMCdoe" target="_blank" rel="noopener">Open in TypeScript Playground</a>
+          <details class="solution">
+            <summary>Show solution</summary>
+            <div class="solution-body">
+              <pre><code class="language-typescript">function merge&lt;A extends object, B extends object&gt;(a: A, b: B): A &amp; B {
+  return { ...a, ...b } as A &amp; B;
+}
+
+const base = { id: "1", name: "Alice" };
+const extra = { role: "admin", age: 30 };
+
+const user = merge(base, extra);
+// { id: string; name: string; role: string; age: number }
+
+console.log(user.id);   // "1"    — from A
+console.log(user.role); // "admin" — from B
+
+// Override: later property wins at runtime
+const merged = merge({ x: 1, y: 2 }, { y: 99, z: 3 });
+// { x: number; y: number; z: number } — y is overridden
+console.log(merged.y); // 99
+</code></pre>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- Exercise 4 -->
+      <div class="exercise">
+        <div class="exercise-header">
+          <div class="exercise-number">4</div>
+          <div class="exercise-title">Generic Memoize</div>
+          <span class="exercise-difficulty difficulty-intermediate">Intermediate</span>
+        </div>
+        <div class="exercise-body">
+          <p>
+            Implement a <code>memoize</code> higher-order function that caches the results of any function
+            based on its first argument. The types of the input function must be fully preserved.
+          </p>
+          <p>
+            Hint: use <code>Parameters&lt;T&gt;</code> and <code>ReturnType&lt;T&gt;</code> utility types.
+            The returned function should have the same type as the input function.
+          </p>
+          <a class="playground-link" href="https://www.typescriptlang.org/play?#code/PTAEAEFMCdoe" target="_blank" rel="noopener">Open in TypeScript Playground</a>
+          <details class="solution">
+            <summary>Show solution</summary>
+            <div class="solution-body">
+              <pre><code class="language-typescript">function memoize&lt;T extends (arg: string) =&gt; unknown&gt;(fn: T): T {
+  const cache = new Map&lt;string, ReturnType&lt;T&gt;&gt;();
+  return ((arg: string) =&gt; {
+    if (cache.has(arg)) return cache.get(arg);
+    const result = fn(arg) as ReturnType&lt;T&gt;;
+    cache.set(arg, result);
+    return result;
+  }) as T;
+}
+
+// More general version using rest parameters
+function memoizeGeneral&lt;
+  Args extends unknown[],
+  R
+&gt;(fn: (...args: Args) =&gt; R): (...args: Args) =&gt; R {
+  const cache = new Map&lt;string, R&gt;();
+  return (...args: Args): R =&gt; {
+    const key = JSON.stringify(args);
+    if (cache.has(key)) return cache.get(key)!;
+    const result = fn(...args);
+    cache.set(key, result);
+    return result;
+  };
+}
+
+const expensiveCalc = (n: number): number =&gt; {
+  console.log("Computing...");
+  return n * n;
+};
+
+const memoCalc = memoizeGeneral(expensiveCalc);
+memoCalc(5); // "Computing..." then 25
+memoCalc(5); // 25 (from cache, no log)
+</code></pre>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- Exercise 5 -->
+      <div class="exercise">
+        <div class="exercise-header">
+          <div class="exercise-number">5</div>
+          <div class="exercise-title">Type-Safe Builder Pattern</div>
+          <span class="exercise-difficulty difficulty-advanced">Advanced</span>
+        </div>
+        <div class="exercise-body">
+          <p>
+            Implement a generic <code>QueryBuilder&lt;T&gt;</code> class that accumulates filter conditions
+            for an entity type <code>T</code>. The <code>where</code> method should only accept valid keys
+            of <code>T</code>, and the value type must match the property type.
+          </p>
+          <p>
+            Signature: <code>where&lt;K extends keyof T&gt;(key: K, value: T[K]): this</code>
+          </p>
+          <p>
+            Bonus: add a <code>build</code> method that returns a <code>Partial&lt;T&gt;</code> representing
+            all the accumulated filters.
+          </p>
+          <a class="playground-link" href="https://www.typescriptlang.org/play?#code/PTAEAEFMCdoe" target="_blank" rel="noopener">Open in TypeScript Playground</a>
+          <details class="solution">
+            <summary>Show solution</summary>
+            <div class="solution-body">
+              <pre><code class="language-typescript">class QueryBuilder&lt;T extends object&gt; {
+  private filters: Partial&lt;T&gt; = {};
+
+  where&lt;K extends keyof T&gt;(key: K, value: T[K]): this {
+    this.filters[key] = value;
+    return this; // enables chaining
+  }
+
+  build(): Partial&lt;T&gt; {
+    return { ...this.filters };
+  }
+}
+
+interface User {
+  id: string;
+  name: string;
+  age: number;
+  role: "admin" | "user";
+}
+
+const query = new QueryBuilder&lt;User&gt;()
+  .where("name", "Alice")        // OK: string
+  .where("role", "admin")        // OK: "admin" | "user"
+  .where("age", 30)              // OK: number
+  .build();
+// Partial&lt;User&gt;
+
+// These should error:
+// .where("name", 42)            // Error: number not assignable to string
+// .where("email", "a@b.com")    // Error: "email" not in User
+// .where("role", "superuser")   // Error: not in union
+
+console.log(query); // { name: "Alice", role: "admin", age: 30 }
+</code></pre>
+            </div>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer Nav -->
+    <nav class="footer-nav">
+      <a href="chapter-03-types.html" class="nav-prev">
+        <span class="nav-label">Previous</span>
+        <span class="nav-title">Ch 3: Types &amp; Interfaces</span>
+      </a>
+      <a href="chapter-05-objects.html" class="nav-next">
+        <span class="nav-label">Next</span>
+        <span class="nav-title">Ch 5: Objects &amp; Classes</span>
+      </a>
+    </nav>
+
+    <div class="footer-author">
+      Written by <strong>Matt Pocock</strong> &mdash; TypeScript Educator, Creator of Total TypeScript
+      &mdash; TypeScript for the AI Era, Chapter 4 of 24
+    </div>
+
+  </main>
+</div>
+
+</body>
+</html>

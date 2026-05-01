@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 9: MLOps Platforms - Modern MLOps Tutorial</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script>hljs.highlightAll(); mermaid.initialize({startOnLoad:true, theme:'default'});</script>
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; color: #1f2937; }
+    .callout-blue  { background:#eff6ff; border-left:4px solid #2563eb; }
+    .callout-green { background:#f0fdf4; border-left:4px solid #059669; }
+    .callout-amber { background:#fffbeb; border-left:4px solid #d97706; }
+    .callout-red   { background:#fef2f2; border-left:4px solid #dc2626; }
+    pre code.hljs  { border-radius:0.5rem; font-size:0.82rem; }
+    .mermaid       { background:#fff; }
+    table          { border-collapse:collapse; width:100%; }
+    th             { background:#f3f4f6; }
+    td, th         { padding:0.6rem 0.9rem; border:1px solid #e5e7eb; font-size:0.875rem; }
+    tr:hover td    { background:#f9fafb; }
+    .section-anchor { scroll-margin-top:4rem; }
+  </style>
+</head>
+<body class="bg-gray-50">
+
+<!-- NAVBAR -->
+<nav class="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-14">
+      <a href="index.html" class="flex items-center gap-2 text-blue-600 font-semibold hover:text-blue-800">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+        Modern MLOps Tutorial
+      </a>
+      <div class="hidden md:flex items-center gap-6 text-sm text-gray-600">
+        <a href="ch08b_model_monitoring.html" class="hover:text-blue-600">← Ch 8b</a>
+        <span class="text-blue-600 font-semibold">Ch 9: MLOps Platforms (Part 1)</span>
+        <a href="ch09b_databricks_kubeflow.html" class="hover:text-blue-600">Ch 9b →</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-12 px-4">
+  <div class="max-w-4xl mx-auto">
+    <div class="flex items-center gap-3 mb-4">
+      <span class="bg-white text-blue-700 font-bold px-3 py-1 rounded-full text-sm">Chapter 9 · Part 1</span>
+      <span class="bg-blue-500 text-white px-3 py-1 rounded-full text-sm">~60 min read</span>
+    </div>
+    <h1 class="text-3xl font-bold mb-3">MLOps Platforms: Vertex AI &amp; SageMaker</h1>
+    <p class="text-blue-100 text-lg">End-to-end managed platforms for training, pipelines, model registry, serving, and monitoring — with deep dives into Google Vertex AI and AWS SageMaker.</p>
+    <div class="mt-6 flex flex-wrap gap-2 text-sm">
+      <span class="bg-blue-700 px-3 py-1 rounded">Vertex AI</span>
+      <span class="bg-blue-700 px-3 py-1 rounded">SageMaker</span>
+      <span class="bg-blue-700 px-3 py-1 rounded">KFP v2</span>
+      <span class="bg-blue-700 px-3 py-1 rounded">Pipelines</span>
+      <span class="bg-blue-700 px-3 py-1 rounded">Model Registry</span>
+      <span class="bg-blue-700 px-3 py-1 rounded">CI/CD Integration</span>
+    </div>
+  </div>
+</div>
+
+<!-- TOC -->
+<div class="max-w-4xl mx-auto px-4 py-8">
+  <div class="bg-white rounded-xl border border-gray-200 p-6 mb-8">
+    <h2 class="font-bold text-gray-800 mb-4 text-lg">Table of Contents</h2>
+    <ol class="space-y-1 text-sm text-blue-600">
+      <li><a href="#s1" class="hover:underline">1. MLOps Platforms Overview</a></li>
+      <li><a href="#s2" class="hover:underline">2. Google Vertex AI</a></li>
+      <li><a href="#s3" class="hover:underline">3. AWS SageMaker Deep Dive</a></li>
+      <li><a href="#s4" class="hover:underline">4. Vertex AI vs SageMaker Comparison</a></li>
+      <li><a href="#s5" class="hover:underline">5. Integration Patterns</a></li>
+      <li><a href="#summary" class="hover:underline">Summary &amp; Key Takeaways</a></li>
+    </ol>
+  </div>
+
+<!-- ============================================================ SECTION 1 -->
+<h2 id="s1" class="section-anchor text-2xl font-bold text-gray-900 mb-4">1. MLOps Platforms Overview</h2>
+
+<p class="mb-4 text-gray-700">An <strong>MLOps platform</strong> bundles the full ML lifecycle — data preparation, training, experiment tracking, pipelines, model registry, serving, and monitoring — under one integrated surface. The alternative is assembling best-of-breed tools (MLflow + Airflow + KServe + Prometheus …), which maximises flexibility but multiplies operational cost.</p>
+
+<div class="callout-blue p-4 rounded mb-6">
+  <strong>Platform vs. Assembly trade-off:</strong> Managed platforms reduce toil by 40-60% for teams under 10 ML engineers. Assembly pays off when you need vendor independence or capabilities no single platform provides.
+</div>
+
+<h3 class="text-xl font-semibold mb-3">Core Platform Components</h3>
+<table class="mb-6">
+  <thead><tr><th>Capability</th><th>Purpose</th><th>DIY alternative</th></tr></thead>
+  <tbody>
+    <tr><td>Workbench / IDE</td><td>Interactive development</td><td>JupyterHub on K8s</td></tr>
+    <tr><td>Training orchestration</td><td>Managed compute jobs</td><td>Kubernetes + Job operator</td></tr>
+    <tr><td>Pipeline engine</td><td>DAG-based ML workflows</td><td>Airflow / Argo Workflows</td></tr>
+    <tr><td>Experiment tracking</td><td>Runs, metrics, artifacts</td><td>MLflow</td></tr>
+    <tr><td>Feature Store</td><td>Shared feature definitions</td><td>Feast + Redis</td></tr>
+    <tr><td>Model Registry</td><td>Versioning, staging, approval</td><td>MLflow Registry</td></tr>
+    <tr><td>Model Serving</td><td>REST/gRPC inference</td><td>KServe / Triton</td></tr>
+    <tr><td>Model Monitoring</td><td>Drift, data quality</td><td>Evidently + Grafana</td></tr>
+  </tbody>
+</table>
+
+<h3 class="text-xl font-semibold mb-3">Platform Capability Map</h3>
+<div class="mermaid mb-6">
+mindmap
+  root((MLOps Platform))
+    Data
+      Feature Store
+      Data Versioning
+      Labeling
+    Develop
+      Workbench/IDE
+      AutoML
+      Custom Training
+      Experiment Tracking
+    Deploy
+      Pipeline Engine
+      Model Registry
+      CI/CD Hooks
+    Serve
+      Real-time Endpoint
+      Batch Transform
+      Async Inference
+      Serverless
+    Govern
+      Model Monitoring
+      Drift Detection
+      Explainability
+      Lineage
+</div>
+
+<h3 class="text-xl font-semibold mb-3">High-Level Platform Comparison</h3>
+<table class="mb-8">
+  <thead><tr><th>Dimension</th><th>Vertex AI (GCP)</th><th>SageMaker (AWS)</th><th>Databricks</th><th>Kubeflow</th></tr></thead>
+  <tbody>
+    <tr><td>Hosting model</td><td>Fully managed</td><td>Fully managed</td><td>Managed / self-host</td><td>Self-hosted on K8s</td></tr>
+    <tr><td>Pipeline engine</td><td>KFP v2 native</td><td>SageMaker Pipelines</td><td>Delta Live Tables / Jobs</td><td>KFP v2 / Tekton</td></tr>
+    <tr><td>AutoML</td><td>Excellent (tables, vision, NLP)</td><td>Autopilot</td><td>AutoML via partner</td><td>None built-in</td></tr>
+    <tr><td>Feature Store</td><td>Vertex Feature Store</td><td>SageMaker Feature Store</td><td>Delta + Unity Catalog</td><td>Feast (add-on)</td></tr>
+    <tr><td>Serving options</td><td>Online, Batch, Dedicated</td><td>Real-time, Async, Serverless, Batch</td><td>Model Serving (Databricks)</td><td>KServe</td></tr>
+    <tr><td>Monitoring</td><td>Model Monitoring v2</td><td>Model Monitor + Clarify</td><td>Lakehouse Monitor</td><td>External</td></tr>
+    <tr><td>Vendor lock-in risk</td><td>Medium</td><td>Medium-High</td><td>Low-Medium</td><td>Low</td></tr>
+    <tr><td>Best for</td><td>GCP-native teams, AutoML</td><td>AWS-native, enterprise</td><td>Spark/data-heavy teams</td><td>K8s shops, OSS-first</td></tr>
+  </tbody>
+</table>
+
+<!-- ============================================================ SECTION 2 -->
+<h2 id="s2" class="section-anchor text-2xl font-bold text-gray-900 mb-4 mt-10">2. Google Vertex AI</h2>
+
+<p class="mb-4 text-gray-700">Vertex AI (launched 2021) unified Google Cloud's AI/ML services under a single API surface. It is built on top of Google's internal Borg/Borg2 infrastructure and exposes KFP v2 as its pipeline standard.</p>
+
+<h3 class="text-xl font-semibold mb-3">Key Services</h3>
+<table class="mb-6">
+  <thead><tr><th>Service</th><th>What it does</th><th>SDK entry point</th></tr></thead>
+  <tbody>
+    <tr><td>Workbench</td><td>Managed JupyterLab (user-managed or managed instances)</td><td>Console / gcloud</td></tr>
+    <tr><td>Custom Training</td><td>Managed training jobs on GPUs/TPUs with custom containers</td><td><code>aiplatform.CustomTrainingJob</code></td></tr>
+    <tr><td>AutoML</td><td>No-code/low-code training for tabular, vision, NLP, video</td><td><code>aiplatform.AutoMLTabularTrainingJob</code></td></tr>
+    <tr><td>Pipelines (KFP v2)</td><td>DAG-based ML pipelines compiled to YAML, run on managed infra</td><td><code>aiplatform.PipelineJob</code></td></tr>
+    <tr><td>Model Registry</td><td>Version, alias, and stage ML models</td><td><code>aiplatform.Model</code></td></tr>
+    <tr><td>Prediction</td><td>Online endpoints (dedicated/shared), batch prediction jobs</td><td><code>aiplatform.Endpoint</code></td></tr>
+    <tr><td>Feature Store</td><td>Centralized feature serving + storage (Bigtable-backed for online)</td><td><code>aiplatform.Featurestore</code></td></tr>
+    <tr><td>Experiments</td><td>Track runs, parameters, metrics, artifacts</td><td><code>aiplatform.Experiment</code></td></tr>
+    <tr><td>Model Monitoring</td><td>Drift detection on live traffic (skew + drift)</td><td><code>aiplatform.ModelMonitoringJob</code></td></tr>
+  </tbody>
+</table>
+
+<h3 class="text-xl font-semibold mb-3">Vertex AI Platform Architecture</h3>
+<div class="mermaid mb-6">
+graph TB
+    subgraph DEV["Development"]
+        WB[Workbench / JupyterLab]
+        EXP[Vertex Experiments]
+    end
+    subgraph TRAIN["Training"]
+        CT[Custom Training Job]
+        AML[AutoML]
+        HP[Hyperparameter Tuning]
+    end
+    subgraph PIPE["Pipelines"]
+        KFP[KFP v2 Pipeline]
+        AR[Artifact Registry]
+    end
+    subgraph REG["Registry & Govern"]
+        MR[Model Registry]
+        FS[Feature Store]
+        META[Vertex Metadata]
+    end
+    subgraph SERVE["Serving"]
+        OE[Online Endpoint]
+        BP[Batch Prediction]
+        MM[Model Monitoring]
+    end
+
+    WB --> EXP
+    WB --> CT
+    CT --> MR
+    AML --> MR
+    KFP --> CT
+    KFP --> MR
+    KFP --> OE
+    FS --> CT
+    MR --> OE
+    MR --> BP
+    OE --> MM
+    AR --> CT
+
+    style DEV fill:#eff6ff,stroke:#2563eb
+    style TRAIN fill:#f0fdf4,stroke:#059669
+    style PIPE fill:#fffbeb,stroke:#d97706
+    style REG fill:#fdf4ff,stroke:#9333ea
+    style SERVE fill:#fef2f2,stroke:#dc2626
+</div>
+
+<h3 class="text-xl font-semibold mb-3">Code: Custom Training Job (Python SDK)</h3>
+<pre><code class="language-python">from google.cloud import aiplatform
+
+aiplatform.init(project="my-gcp-project", location="us-central1")
+
+# Define a custom training job using a pre-built container
+job = aiplatform.CustomTrainingJob(
+    display_name="xgboost-fraud-detection",
+    script_path="trainer/train.py",          # local script, auto-uploaded to GCS
+    container_uri="us-docker.pkg.dev/vertex-ai/training/xgboost-cpu.1-6:latest",
+    requirements=["scikit-learn==1.3.0"],
+    model_serving_container_image_uri=(
+        "us-docker.pkg.dev/vertex-ai/prediction/xgboost-cpu.1-6:latest"
+    ),
+)
+
+model = job.run(
+    dataset=None,                             # pass aiplatform.TabularDataset if needed
+    model_display_name="fraud-detector-v1",
+    args=[
+        "--n-estimators=200",
+        "--max-depth=6",
+        "--learning-rate=0.1",
+    ],
+    replica_count=1,
+    machine_type="n1-standard-4",
+    accelerator_type="NVIDIA_TESLA_T4",
+    accelerator_count=1,
+    base_output_dir="gs://my-bucket/training-output",
+    sync=True,                                # block until job completes
+)
+print(f"Model resource name: {model.resource_name}")
+</code></pre>
+
+<h3 class="text-xl font-semibold mb-3">Code: Vertex AI Pipeline (train + deploy)</h3>
+<pre><code class="language-python">from kfp import dsl
+from kfp.dsl import Output, Model, Metrics, component
+from google.cloud import aiplatform
+from google_cloud_pipeline_components.v1.custom_job import CustomTrainingJobOp
+from google_cloud_pipeline_components.v1.endpoint import (
+    EndpointCreateOp, ModelDeployOp
+)
+
+@component(base_image="python:3.10", packages_to_install=["scikit-learn", "google-cloud-storage"])
+def train_model(
+    gcs_data_path: str,
+    n_estimators: int,
+    model_artifact: Output[Model],
+    metrics: Output[Metrics],
+):
+    import pickle, json
+    from sklearn.ensemble import GradientBoostingClassifier
+    from sklearn.datasets import make_classification
+    from sklearn.model_selection import train_test_split
+    from sklearn.metrics import roc_auc_score
+    import google.cloud.storage as gcs
+
+    X, y = make_classification(n_samples=10000, random_state=42)
+    X_tr, X_te, y_tr, y_te = train_test_split(X, y, test_size=0.2)
+    clf = GradientBoostingClassifier(n_estimators=n_estimators)
+    clf.fit(X_tr, y_tr)
+    auc = roc_auc_score(y_te, clf.predict_proba(X_te)[:, 1])
+
+    # Save artifact
+    import os
+    os.makedirs(model_artifact.path, exist_ok=True)
+    with open(f"{model_artifact.path}/model.pkl", "wb") as f:
+        pickle.dump(clf, f)
+
+    metrics.log_metric("auc", auc)
+    metrics.log_metric("n_estimators", n_estimators)
+
+
+@component(base_image="python:3.10", packages_to_install=["google-cloud-aiplatform"])
+def register_and_deploy(
+    model_artifact: Model,
+    project: str,
+    location: str,
+    endpoint_display_name: str,
+):
+    from google.cloud import aiplatform
+    aiplatform.init(project=project, location=location)
+    model = aiplatform.Model.upload(
+        display_name="fraud-detector",
+        artifact_uri=model_artifact.uri,
+        serving_container_image_uri=(
+            "us-docker.pkg.dev/vertex-ai/prediction/sklearn-cpu.1-0:latest"
+        ),
+    )
+    endpoint = aiplatform.Endpoint.create(display_name=endpoint_display_name)
+    model.deploy(
+        endpoint=endpoint,
+        machine_type="n1-standard-2",
+        min_replica_count=1,
+        max_replica_count=3,
+        traffic_split={"0": 100},
+    )
+
+
+@dsl.pipeline(name="fraud-train-deploy", description="Train and deploy fraud detector")
+def fraud_pipeline(
+    gcs_data_path: str = "gs://my-bucket/data/fraud.csv",
+    n_estimators: int = 150,
+    project: str = "my-gcp-project",
+    location: str = "us-central1",
+):
+    train_task = train_model(gcs_data_path=gcs_data_path, n_estimators=n_estimators)
+    _ = register_and_deploy(
+        model_artifact=train_task.outputs["model_artifact"],
+        project=project,
+        location=location,
+        endpoint_display_name="fraud-endpoint-v1",
+    )
+
+
+# Compile and submit
+from kfp import compiler
+
+compiler.Compiler().compile(fraud_pipeline, "fraud_pipeline.yaml")
+
+aiplatform.init(project="my-gcp-project", location="us-central1")
+pipeline_job = aiplatform.PipelineJob(
+    display_name="fraud-train-deploy-run",
+    template_path="fraud_pipeline.yaml",
+    pipeline_root="gs://my-bucket/pipeline-root",
+)
+pipeline_job.submit()
+</code></pre>
+
+<h3 class="text-xl font-semibold mb-3">Code: Vertex AI Online Prediction</h3>
+<pre><code class="language-python">from google.cloud import aiplatform
+
+aiplatform.init(project="my-gcp-project", location="us-central1")
+
+endpoint = aiplatform.Endpoint("projects/my-gcp-project/locations/us-central1/endpoints/123456")
+
+# Single instance prediction
+response = endpoint.predict(instances=[[0.1, 0.5, 1.2, -0.3, 0.8, 0.2]])
+print(f"Predictions: {response.predictions}")
+print(f"Deployed model id: {response.deployed_model_id}")
+
+# Batch of instances
+instances = [
+    [0.1, 0.5, 1.2, -0.3, 0.8, 0.2],
+    [1.4, -0.2, 0.9,  0.7, 0.1, 1.1],
+]
+response = endpoint.predict(instances=instances)
+for pred, proba in zip(instances, response.predictions):
+    print(f"Input: {pred} -> Fraud probability: {proba[1]:.4f}")
+</code></pre>
+
+<h3 class="text-xl font-semibold mb-3">Pricing &amp; Cost Optimization</h3>
+<table class="mb-4">
+  <thead><tr><th>Resource</th><th>Approximate cost</th><th>Optimization tip</th></tr></thead>
+  <tbody>
+    <tr><td>Custom Training (n1-standard-4)</td><td>$0.19/hr per replica</td><td>Use preemptible/Spot VMs (up to 80% off)</td></tr>
+    <tr><td>Training T4 GPU</td><td>$0.35/hr per GPU</td><td>Pack multiple small jobs; use Reduction Server</td></tr>
+    <tr><td>Online Endpoint (n1-standard-2)</td><td>$0.095/hr per replica</td><td>Enable autoscaling to 0 for dev endpoints</td></tr>
+    <tr><td>Batch Prediction</td><td>Same as training compute</td><td>Prefer batch over online for offline scoring</td></tr>
+    <tr><td>Feature Store (online)</td><td>$0.08/node-hr (Bigtable)</td><td>Share feature store across projects</td></tr>
+    <tr><td>Pipelines</td><td>$0.03/pipeline-run + compute</td><td>Use caching to skip re-runs of unchanged steps</td></tr>
+  </tbody>
+</table>
+
+<div class="callout-green p-4 rounded mb-8">
+  <strong>Cost tips:</strong> Enable <code>enable_caching=True</code> on pipeline steps to avoid redundant compute. Use Spot VMs for training. Scale online endpoints to zero during off-hours using scheduled autoscaling. Consolidate Feature Store nodes — one node serves multiple entity types.
+</div>
+
+<!-- ============================================================ SECTION 3 -->
+<h2 id="s3" class="section-anchor text-2xl font-bold text-gray-900 mb-4 mt-10">3. AWS SageMaker Deep Dive</h2>
+
+<p class="mb-4 text-gray-700">SageMaker is AWS's comprehensive ML platform, with the broadest set of managed services across the ML lifecycle. Studio provides a unified IDE, while dozens of first-party APIs cover every ML workflow pattern.</p>
+
+<h3 class="text-xl font-semibold mb-3">Key Services</h3>
+<table class="mb-6">
+  <thead><tr><th>Service</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td>SageMaker Studio</td><td>Web-based IDE (JupyterLab-based) with integrated ML tools</td></tr>
+    <tr><td>Training (built-in algos)</td><td>XGBoost, Linear Learner, DeepAR, BlazingText — optimized containers</td></tr>
+    <tr><td>Training (custom)</td><td>BYOC (Bring Your Own Container) or script mode with any framework</td></tr>
+    <tr><td>Pipelines</td><td>DAG-based CI/CD for ML with native AWS service integrations</td></tr>
+    <tr><td>Model Registry</td><td>Model groups, versions, approval workflows, cross-account sharing</td></tr>
+    <tr><td>Endpoints (real-time)</td><td>Persistent REST endpoints with auto-scaling</td></tr>
+    <tr><td>Async Inference</td><td>Queue-based inference for large payloads (&gt;1MB) or long runtimes</td></tr>
+    <tr><td>Serverless Inference</td><td>Pay-per-invocation, cold-start &lt;1s for &lt;6GB memory models</td></tr>
+    <tr><td>Batch Transform</td><td>Run batch scoring on S3 data without a persistent endpoint</td></tr>
+    <tr><td>Feature Store</td><td>Online (DynamoDB-backed) + offline (S3/Glue) feature store</td></tr>
+    <tr><td>Clarify</td><td>Bias detection and SHAP explainability for training and inference</td></tr>
+    <tr><td>Model Monitor</td><td>Data quality, model quality, bias drift, feature attribution drift</td></tr>
+  </tbody>
+</table>
+
+<h3 class="text-xl font-semibold mb-3">SageMaker Platform Architecture</h3>
+<div class="mermaid mb-6">
+graph LR
+    subgraph IDE["SageMaker Studio"]
+        NB[Notebooks]
+        EXP[Experiments]
+        DBG[Debugger]
+    end
+    subgraph DATA["Data Layer"]
+        S3[(S3)]
+        FS[Feature Store\nOnline + Offline]
+        DQ[Data Wrangler]
+    end
+    subgraph TRAIN["Training"]
+        TJ[Training Job\nBuilt-in / Custom]
+        HPO[Hyperparameter\nOptimization]
+        HP[HyperPod\nLarge-scale]
+    end
+    subgraph PIPE["Pipelines"]
+        SP[SageMaker\nPipelines DAG]
+        MR[Model Registry]
+        EVT[EventBridge\nTrigger]
+    end
+    subgraph SERVE["Inference"]
+        RT[Real-time\nEndpoint]
+        AS[Async\nEndpoint]
+        SL[Serverless\nEndpoint]
+        BT[Batch\nTransform]
+    end
+    subgraph MON["Monitoring"]
+        MM[Model Monitor]
+        CL[Clarify]
+        CW[CloudWatch\nMetrics]
+    end
+
+    NB --> TJ
+    S3 --> TJ
+    FS --> TJ
+    TJ --> MR
+    HPO --> MR
+    SP --> TJ
+    SP --> MR
+    MR --> RT
+    MR --> AS
+    MR --> SL
+    MR --> BT
+    RT --> MM
+    RT --> CL
+    MM --> CW
+    EVT --> SP
+
+    style IDE fill:#eff6ff,stroke:#2563eb
+    style DATA fill:#f0fdf4,stroke:#059669
+    style TRAIN fill:#fffbeb,stroke:#d97706
+    style PIPE fill:#fdf4ff,stroke:#9333ea
+    style SERVE fill:#fef2f2,stroke:#dc2626
+    style MON fill:#f0f9ff,stroke:#0284c7
+</div>
+
+<h3 class="text-xl font-semibold mb-3">Code: SageMaker Training Job</h3>
+<pre><code class="language-python">import boto3
+import sagemaker
+from sagemaker.xgboost import XGBoost
+from sagemaker.inputs import TrainingInput
+
+session = sagemaker.Session()
+role = sagemaker.get_execution_role()
+bucket = session.default_bucket()
+
+# Configure XGBoost estimator (managed container)
+xgb = XGBoost(
+    entry_point="train.py",
+    source_dir="./src",
+    framework_version="1.7-1",
+    py_version="py3",
+    instance_type="ml.m5.xlarge",
+    instance_count=1,
+    role=role,
+    output_path=f"s3://{bucket}/models/",
+    hyperparameters={
+        "max_depth": 6,
+        "eta": 0.1,
+        "num_round": 200,
+        "subsample": 0.8,
+        "objective": "binary:logistic",
+        "eval_metric": "auc",
+    },
+    enable_sagemaker_metrics=True,
+    metric_definitions=[
+        {"Name": "train:auc",      "Regex": "train-auc:([\d\.]+)"},
+        {"Name": "validation:auc", "Regex": "validation-auc:([\d\.]+)"},
+    ],
+)
+
+train_input = TrainingInput(f"s3://{bucket}/data/train/", content_type="text/csv")
+val_input   = TrainingInput(f"s3://{bucket}/data/val/",   content_type="text/csv")
+
+xgb.fit({"train": train_input, "validation": val_input}, wait=True)
+print(f"Model data: {xgb.model_data}")
+</code></pre>
+
+<h3 class="text-xl font-semibold mb-3">Code: SageMaker Pipeline (preprocess → train → evaluate)</h3>
+<pre><code class="language-python">import boto3
+import sagemaker
+from sagemaker.workflow.pipeline import Pipeline
+from sagemaker.workflow.steps import ProcessingStep, TrainingStep
+from sagemaker.workflow.step_collections import RegisterModel
+from sagemaker.workflow.parameters import ParameterString, ParameterFloat
+from sagemaker.sklearn.processing import SKLearnProcessor
+from sagemaker.processing import ProcessingInput, ProcessingOutput
+from sagemaker.xgboost import XGBoost
+from sagemaker.inputs import TrainingInput
+from sagemaker.workflow.conditions import ConditionGreaterThanOrEqualTo
+from sagemaker.workflow.condition_step import ConditionStep
+from sagemaker.workflow.functions import JsonGet
+
+session = sagemaker.Session()
+role = sagemaker.get_execution_role()
+bucket = session.default_bucket()
+
+# Pipeline parameters
+input_data  = ParameterString(name="InputData",  default_value=f"s3://{bucket}/raw/")
+min_auc     = ParameterFloat(name="MinAUC",       default_value=0.80)
+
+# Step 1: Preprocessing
+sklearn_proc = SKLearnProcessor(
+    framework_version="1.0-1",
+    instance_type="ml.m5.large",
+    instance_count=1,
+    role=role,
+)
+
+preprocess_step = ProcessingStep(
+    name="PreprocessData",
+    processor=sklearn_proc,
+    inputs=[ProcessingInput(source=input_data, destination="/opt/ml/processing/input")],
+    outputs=[
+        ProcessingOutput(output_name="train", source="/opt/ml/processing/train"),
+        ProcessingOutput(output_name="val",   source="/opt/ml/processing/val"),
+    ],
+    code="preprocessing.py",
+)
+
+# Step 2: Training
+xgb = XGBoost(
+    entry_point="train.py",
+    framework_version="1.7-1",
+    py_version="py3",
+    instance_type="ml.m5.xlarge",
+    instance_count=1,
+    role=role,
+    output_path=f"s3://{bucket}/models/",
+    hyperparameters={"max_depth": 6, "eta": 0.1, "num_round": 200, "objective": "binary:logistic"},
+    enable_sagemaker_metrics=True,
+)
+
+train_step = TrainingStep(
+    name="TrainModel",
+    estimator=xgb,
+    inputs={
+        "train": TrainingInput(
+            preprocess_step.properties.ProcessingOutputConfig.Outputs["train"].S3Output.S3Uri,
+            content_type="text/csv",
+        ),
+        "validation": TrainingInput(
+            preprocess_step.properties.ProcessingOutputConfig.Outputs["val"].S3Output.S3Uri,
+            content_type="text/csv",
+        ),
+    },
+)
+
+# Step 3: Evaluate + conditional register
+eval_proc = SKLearnProcessor(framework_version="1.0-1", instance_type="ml.m5.large", instance_count=1, role=role)
+
+eval_step = ProcessingStep(
+    name="EvaluateModel",
+    processor=eval_proc,
+    inputs=[
+        ProcessingInput(source=train_step.properties.ModelArtifacts.S3ModelArtifacts, destination="/opt/ml/processing/model"),
+        ProcessingInput(source=preprocess_step.properties.ProcessingOutputConfig.Outputs["val"].S3Output.S3Uri, destination="/opt/ml/processing/val"),
+    ],
+    outputs=[ProcessingOutput(output_name="evaluation", source="/opt/ml/processing/evaluation")],
+    code="evaluate.py",
+)
+
+# Conditional registration: only if AUC >= MinAUC
+register_step = RegisterModel(
+    name="RegisterModel",
+    estimator=xgb,
+    model_data=train_step.properties.ModelArtifacts.S3ModelArtifacts,
+    content_types=["text/csv"],
+    response_types=["text/csv"],
+    inference_instances=["ml.m5.large"],
+    transform_instances=["ml.m5.large"],
+    model_package_group_name="FraudDetectorGroup",
+    approval_status="PendingManualApproval",
+)
+
+cond_step = ConditionStep(
+    name="AUCGate",
+    conditions=[
+        ConditionGreaterThanOrEqualTo(
+            left=JsonGet(
+                step_name=eval_step.name,
+                property_file=None,
+                json_path="metrics.auc.value",
+            ),
+            right=min_auc,
+        )
+    ],
+    if_steps=[register_step],
+    else_steps=[],
+)
+
+pipeline = Pipeline(
+    name="fraud-detection-pipeline",
+    parameters=[input_data, min_auc],
+    steps=[preprocess_step, train_step, eval_step, cond_step],
+    sagemaker_session=session,
+)
+
+pipeline.upsert(role_arn=role)
+execution = pipeline.start()
+print(f"Pipeline execution ARN: {execution.arn}")
+</code></pre>
+
+<h3 class="text-xl font-semibold mb-3">Code: SageMaker Endpoint Deployment &amp; Invocation</h3>
+<pre><code class="language-python">import boto3
+import json
+from sagemaker.xgboost import XGBoostModel
+from sagemaker.serializers import CSVSerializer
+from sagemaker.deserializers import JSONDeserializer
+
+role = sagemaker.get_execution_role()
+
+# Deploy from trained estimator model data
+model = XGBoostModel(
+    model_data="s3://my-bucket/models/xgboost-job/output/model.tar.gz",
+    role=role,
+    framework_version="1.7-1",
+    py_version="py3",
+)
+
+predictor = model.deploy(
+    initial_instance_count=1,
+    instance_type="ml.m5.large",
+    endpoint_name="fraud-detector-endpoint",
+    serializer=CSVSerializer(),
+    deserializer=JSONDeserializer(),
+)
+
+# Invoke endpoint
+payload = "0.1,0.5,1.2,-0.3,0.8,0.2"
+result = predictor.predict(payload)
+print(f"Prediction: {result}")
+
+# Direct boto3 invocation (for production services)
+runtime = boto3.client("sagemaker-runtime", region_name="us-east-1")
+response = runtime.invoke_endpoint(
+    EndpointName="fraud-detector-endpoint",
+    ContentType="text/csv",
+    Body="0.1,0.5,1.2,-0.3,0.8,0.2",
+)
+prediction = json.loads(response["Body"].read().decode())
+print(f"Fraud score: {prediction}")
+
+# Cleanup
+predictor.delete_endpoint()
+</code></pre>
+
+<h3 class="text-xl font-semibold mb-3">SageMaker HyperPod</h3>
+<div class="callout-blue p-4 rounded mb-8">
+  <strong>SageMaker HyperPod</strong> (GA 2023) is designed for large-scale foundation model training. It provides resilient clusters that automatically detect and recover from node failures mid-training by checkpointing and restarting affected nodes — without human intervention. Key features: persistent clusters (vs. ephemeral training jobs), EFA networking for low-latency AllReduce, native integration with FSDP/Megatron-LM/DeepSpeed, and SageMaker Experiments for run tracking. Use HyperPod when training jobs exceed 1,000 GPU-hours or require hundreds of nodes.
+</div>
+
+<!-- ============================================================ SECTION 4 -->
+<h2 id="s4" class="section-anchor text-2xl font-bold text-gray-900 mb-4 mt-10">4. Vertex AI vs SageMaker Comparison</h2>
+
+<h3 class="text-xl font-semibold mb-3">Service-by-Service Comparison</h3>
+<table class="mb-6">
+  <thead><tr><th>Capability</th><th>Vertex AI</th><th>SageMaker</th></tr></thead>
+  <tbody>
+    <tr><td><strong>IDE</strong></td><td>Workbench (managed JupyterLab, Colab Enterprise)</td><td>Studio (JupyterLab + Canvas + RStudio)</td></tr>
+    <tr><td><strong>Custom training</strong></td><td>CustomTrainingJob, CustomContainerTrainingJob</td><td>Estimator (script mode + BYOC)</td></tr>
+    <tr><td><strong>AutoML</strong></td><td>Strong: tabular, vision, NLP, video, forecasting</td><td>Autopilot: tabular + text, less vision</td></tr>
+    <tr><td><strong>Distributed training</strong></td><td>Reduction Server (AllReduce), TPU pods</td><td>Data parallel (SDP), model parallel (SMP), HyperPod</td></tr>
+    <tr><td><strong>Pipeline DSL</strong></td><td>KFP v2 (Python SDK, YAML)</td><td>SageMaker Pipelines (step-based SDK)</td></tr>
+    <tr><td><strong>Pipeline portability</strong></td><td>High (KFP is open standard)</td><td>Low (AWS-proprietary steps)</td></tr>
+    <tr><td><strong>Model Registry</strong></td><td>Model versions, aliases, labels</td><td>Model packages, model groups, approval workflow</td></tr>
+    <tr><td><strong>Online serving</strong></td><td>Dedicated endpoint, shared endpoint (multi-model)</td><td>Real-time, multi-model, multi-container</td></tr>
+    <tr><td><strong>Async inference</strong></td><td>Not native (use Cloud Run / Pub/Sub pattern)</td><td>Native Async Inference Endpoint</td></tr>
+    <tr><td><strong>Serverless serving</strong></td><td>No (use Cloud Run)</td><td>Serverless Inference (pay-per-invocation)</td></tr>
+    <tr><td><strong>Feature Store</strong></td><td>Vertex Feature Store (Bigtable online, BigQuery offline)</td><td>Online (DynamoDB) + Offline (S3/Glue)</td></tr>
+    <tr><td><strong>Explainability</strong></td><td>Built-in SHAP, Integrated Gradients on endpoints</td><td>SageMaker Clarify (SHAP, bias metrics)</td></tr>
+    <tr><td><strong>Monitoring</strong></td><td>Model Monitoring v2 (scheduled jobs)</td><td>Model Monitor (data, model quality, bias, SHAP)</td></tr>
+    <tr><td><strong>Metadata/lineage</strong></td><td>Vertex Metadata (MLMD), Lineage API</td><td>SageMaker Lineage Tracking</td></tr>
+    <tr><td><strong>Edge deployment</strong></td><td>Limited (via Vertex + IoT Core)</td><td>SageMaker Edge Manager + Neo compilation</td></tr>
+    <tr><td><strong>SDK quality</strong></td><td>google-cloud-aiplatform (clean, typed)</td><td>sagemaker Python SDK (broad, sometimes verbose)</td></tr>
+  </tbody>
+</table>
+
+<h3 class="text-xl font-semibold mb-3">When to Choose Each</h3>
+<table class="mb-6">
+  <thead><tr><th>Scenario</th><th>Recommendation</th><th>Rationale</th></tr></thead>
+  <tbody>
+    <tr><td>Primary cloud is GCP</td><td>Vertex AI</td><td>Native IAM, BigQuery/GCS integration, billing</td></tr>
+    <tr><td>Primary cloud is AWS</td><td>SageMaker</td><td>Native IAM, S3/Glue/Lambda integration</td></tr>
+    <tr><td>Strong AutoML requirement</td><td>Vertex AI</td><td>Better AutoML coverage (vision, video, forecasting)</td></tr>
+    <tr><td>Async / serverless inference</td><td>SageMaker</td><td>Native async and serverless endpoints</td></tr>
+    <tr><td>Edge deployment needed</td><td>SageMaker</td><td>Edge Manager + Neo for hardware optimization</td></tr>
+    <tr><td>Pipeline portability required</td><td>Vertex AI</td><td>KFP v2 is an open standard; pipelines run anywhere</td></tr>
+    <tr><td>Foundation model training at scale</td><td>SageMaker HyperPod</td><td>Resilient distributed training, EFA networking</td></tr>
+    <tr><td>Google ecosystem (BigQuery, Looker)</td><td>Vertex AI</td><td>Zero-copy BigQuery data, built-in BI integration</td></tr>
+    <tr><td>Regulated/multi-account AWS org</td><td>SageMaker</td><td>Cross-account model registry, VPC isolation mature</td></tr>
+  </tbody>
+</table>
+
+<h3 class="text-xl font-semibold mb-3">Lock-in Risk Analysis</h3>
+<div class="callout-amber p-4 rounded mb-4">
+  <strong>Vertex AI lock-in vectors:</strong> Managed Pipelines (KFP v2 is portable but the job submission API is GCP-specific), Feature Store (Bigtable schema), AutoML (no export for some model types), Vertex Metadata.
+</div>
+<div class="callout-amber p-4 rounded mb-6">
+  <strong>SageMaker lock-in vectors:</strong> SageMaker Pipelines DSL (proprietary step types), Processing Jobs (custom but tightly coupled), Model Monitor configuration, Feature Store DynamoDB backend, Async Inference queuing mechanism.
+</div>
+<p class="mb-4 text-gray-700"><strong>Mitigation strategies:</strong> Use open standards where available (KFP YAML, ONNX model format, standard REST invocation APIs). Keep training code container-agnostic. Store artifacts in cloud-neutral formats (Parquet, ONNX, pickle/joblib). Define features in Feast-compatible schema for portability.</p>
+
+<h3 class="text-xl font-semibold mb-3">Cost Comparison (Common Workloads)</h3>
+<table class="mb-8">
+  <thead><tr><th>Workload</th><th>Vertex AI (est.)</th><th>SageMaker (est.)</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td>Single GPU training job (T4, 8h)</td><td>~$2.80</td><td>~$3.20 (ml.g4dn.xlarge)</td><td>Similar; Spot/preemptible ~80% off</td></tr>
+    <tr><td>Online endpoint (n1-std-2, 24/7, 1 replica)</td><td>~$68/mo</td><td>~$72/mo (ml.m5.large)</td><td>Both support autoscaling to reduce cost</td></tr>
+    <tr><td>Batch prediction (1M rows, m5.large, 2h)</td><td>~$0.40</td><td>~$0.38</td><td>Effectively equivalent</td></tr>
+    <tr><td>Feature Store (online, 10M reads/day)</td><td>~$50/mo</td><td>~$45/mo</td><td>DynamoDB vs Bigtable pricing models differ</td></tr>
+    <tr><td>Pipeline orchestration (1000 runs/mo)</td><td>~$30 + compute</td><td>~$0 (no pipeline fee) + compute</td><td>SageMaker Pipelines has no per-run fee</td></tr>
+  </tbody>
+</table>
+
+<!-- ============================================================ SECTION 5 -->
+<h2 id="s5" class="section-anchor text-2xl font-bold text-gray-900 mb-4 mt-10">5. Integration Patterns</h2>
+
+<p class="mb-4 text-gray-700">MLOps platforms reach production value only when integrated into existing CI/CD systems. The patterns below cover triggering managed pipelines from Git events and wiring SageMaker into AWS-native workflows.</p>
+
+<h3 class="text-xl font-semibold mb-3">Production MLOps Integration Architecture</h3>
+<div class="mermaid mb-6">
+sequenceDiagram
+    participant DEV as Developer
+    participant GH as GitHub
+    participant CI as CI/CD (Actions / CodeBuild)
+    participant REG as Container Registry
+    participant PIPE as ML Pipeline (Vertex / SageMaker)
+    participant MR as Model Registry
+    participant CD as CD System
+    participant SERVE as Serving Endpoint
+
+    DEV->>GH: git push (code + config change)
+    GH->>CI: Trigger workflow
+    CI->>CI: Run unit tests
+    CI->>REG: Build & push training container
+    CI->>PIPE: Submit pipeline run (train + eval)
+    PIPE->>PIPE: Preprocess → Train → Evaluate
+    PIPE->>MR: Register model (pending approval)
+    MR-->>CD: Approval webhook / EventBridge
+    CD->>SERVE: Deploy to staging endpoint
+    CD->>CD: Run integration tests
+    CD->>SERVE: Promote to production (traffic shift)
+</div>
+
+<h3 class="text-xl font-semibold mb-3">Code: Trigger Vertex AI Pipeline from GitHub Actions</h3>
+<pre><code class="language-yaml"># .github/workflows/train_pipeline.yml
+name: Train & Deploy Fraud Detector
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/trainer/**'
+      - 'pipelines/**'
+      - 'config/pipeline_params.yaml'
+
+env:
+  GCP_PROJECT: my-gcp-project
+  GCP_REGION: us-central1
+  GCS_PIPELINE_ROOT: gs://my-bucket/pipeline-root
+  AR_REPO: us-central1-docker.pkg.dev/my-gcp-project/ml-repo
+
+jobs:
+  build-and-train:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write        # for Workload Identity Federation
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.GCP_SA_EMAIL }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Build and push training container
+        run: |
+          docker build -t $AR_REPO/trainer:$GITHUB_SHA src/trainer/
+          gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
+          docker push $AR_REPO/trainer:$GITHUB_SHA
+
+      - name: Install Python dependencies
+        run: pip install google-cloud-aiplatform kfp==2.7.0
+
+      - name: Compile pipeline
+        run: |
+          python pipelines/fraud_pipeline.py \
+            --trainer-image $AR_REPO/trainer:$GITHUB_SHA \
+            --output fraud_pipeline.yaml
+
+      - name: Submit Vertex AI pipeline
+        run: |
+          python - <<'EOF'
+          from google.cloud import aiplatform, storage
+          import yaml, os, json
+
+          aiplatform.init(
+              project=os.environ["GCP_PROJECT"],
+              location=os.environ["GCP_REGION"],
+          )
+
+          with open("config/pipeline_params.yaml") as f:
+              params = yaml.safe_load(f)
+
+          job = aiplatform.PipelineJob(
+              display_name=f"fraud-{os.environ['GITHUB_SHA'][:8]}",
+              template_path="fraud_pipeline.yaml",
+              pipeline_root=os.environ["GCS_PIPELINE_ROOT"],
+              parameter_values=params,
+              enable_caching=True,
+          )
+          job.submit()
+          print(f"Pipeline job name: {job.resource_name}")
+          # Write job name for downstream steps
+          with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+              f.write(f"pipeline_job={job.resource_name}\n")
+          EOF
+</code></pre>
+
+<h3 class="text-xl font-semibold mb-3">Code: SageMaker + S3 + Lambda Cross-Service Integration</h3>
+<pre><code class="language-python"># lambda_function.py — triggered by S3 PutObject event on new data arrival
+import boto3
+import json
+import os
+from datetime import datetime
+
+sm_client = boto3.client("sagemaker")
+s3_client = boto3.client("s3")
+
+PIPELINE_NAME = os.environ["PIPELINE_NAME"]      # "fraud-detection-pipeline"
+ROLE_ARN      = os.environ["SAGEMAKER_ROLE_ARN"]
+BUCKET        = os.environ["MODEL_BUCKET"]
+
+
+def lambda_handler(event, context):
+    """
+    Triggered by S3 event when new training data lands in s3://bucket/data/incoming/.
+    Starts a SageMaker Pipeline execution with updated input path.
+    """
+    record = event["Records"][0]
+    s3_key  = record["s3"]["object"]["key"]
+    s3_path = f"s3://{record['s3']['bucket']['name']}/{s3_key}"
+
+    print(f"New data detected: {s3_path}")
+
+    # Start pipeline execution
+    execution = sm_client.start_pipeline_execution(
+        PipelineName=PIPELINE_NAME,
+        PipelineExecutionDisplayName=f"auto-{datetime.utcnow().strftime('%Y%m%dT%H%M%S')}",
+        PipelineParameters=[
+            {"Name": "InputData", "Value": s3_path},
+            {"Name": "MinAUC",    "Value": "0.82"},
+        ],
+        ClientRequestToken=context.aws_request_id,  # idempotency
+    )
+
+    arn = execution["PipelineExecutionArn"]
+    print(f"Started pipeline execution: {arn}")
+
+    # Tag the S3 object so we know it was processed
+    bucket = record["s3"]["bucket"]["name"]
+    s3_client.put_object_tagging(
+        Bucket=bucket,
+        Key=s3_key,
+        Tagging={"TagSet": [
+            {"Key": "pipeline-execution-arn", "Value": arn},
+            {"Key": "processed", "Value": "true"},
+        ]},
+    )
+
+    return {"statusCode": 200, "body": json.dumps({"execution_arn": arn})}
+
+
+# EventBridge rule to monitor pipeline completion and trigger deployment
+# deploy_on_approval.py — runs when model package status changes to "Approved"
+def handle_model_approval(event, context):
+    """
+    Triggered by EventBridge rule on SageMaker ModelPackage state change.
+    Automatically deploys approved models to staging endpoint.
+    """
+    detail = event["detail"]
+    if detail.get("ModelApprovalStatus") != "Approved":
+        return
+
+    model_package_arn = detail["ModelPackageArn"]
+    print(f"Deploying approved model: {model_package_arn}")
+
+    import sagemaker
+    from sagemaker import ModelPackage
+
+    sess = sagemaker.Session(boto_session=boto3.Session())
+    model = ModelPackage(
+        role=ROLE_ARN,
+        model_package_arn=model_package_arn,
+        sagemaker_session=sess,
+    )
+
+    endpoint_name = f"fraud-staging-{datetime.utcnow().strftime('%Y%m%d')}"
+    model.deploy(
+        initial_instance_count=1,
+        instance_type="ml.m5.large",
+        endpoint_name=endpoint_name,
+    )
+    print(f"Deployed to staging endpoint: {endpoint_name}")
+    return {"endpoint": endpoint_name}
+</code></pre>
+
+<div class="callout-green p-4 rounded mb-8">
+  <strong>CI/CD best practices:</strong> Use Workload Identity Federation (GCP) or OIDC (AWS) instead of long-lived credentials in CI. Enable pipeline step caching to skip preprocessing if input data hasn't changed. Store compiled pipeline YAML as a versioned artifact. Gate production deployment behind a human-approval step in your CD system, not just automated metric thresholds.
+</div>
+
+<!-- ============================================================ SUMMARY -->
+<h2 id="summary" class="section-anchor text-2xl font-bold text-gray-900 mb-4 mt-10">Summary &amp; Key Takeaways</h2>
+
+<div class="bg-white border border-gray-200 rounded-xl p-6 mb-6">
+  <h3 class="font-bold text-lg mb-4 text-gray-800">Key Takeaways</h3>
+  <ul class="space-y-3 text-gray-700 text-sm">
+    <li class="flex gap-2"><span class="text-blue-600 font-bold mt-0.5">1.</span><span><strong>Platform vs. assembly:</strong> Managed platforms (Vertex AI, SageMaker) reduce operational toil but introduce lock-in. Use open interfaces (KFP v2 YAML, ONNX, standard REST) to mitigate risk.</span></li>
+    <li class="flex gap-2"><span class="text-blue-600 font-bold mt-0.5">2.</span><span><strong>Vertex AI strengths:</strong> Best-in-class AutoML, KFP v2 pipeline portability, tight BigQuery integration, clean Python SDK. Weak on async/serverless inference.</span></li>
+    <li class="flex gap-2"><span class="text-blue-600 font-bold mt-0.5">3.</span><span><strong>SageMaker strengths:</strong> Broadest inference options (real-time, async, serverless, batch), mature Model Monitor, HyperPod for large-scale training, strong multi-account governance.</span></li>
+    <li class="flex gap-2"><span class="text-blue-600 font-bold mt-0.5">4.</span><span><strong>Pipelines are the backbone:</strong> Defining your ML workflow as a reproducible DAG (KFP or SageMaker Pipelines) enables CI/CD triggering, caching, and auditability. Don't skip this even for simple workflows.</span></li>
+    <li class="flex gap-2"><span class="text-blue-600 font-bold mt-0.5">5.</span><span><strong>Cost optimization:</strong> Spot/preemptible VMs for training (up to 80% savings), autoscale-to-zero for dev endpoints, pipeline step caching, and batch over online prediction where latency allows.</span></li>
+    <li class="flex gap-2"><span class="text-blue-600 font-bold mt-0.5">6.</span><span><strong>CI/CD integration:</strong> Use Workload Identity / OIDC for secure credential-free CI. Trigger pipeline runs on code or data changes. Gate production deploys behind metric thresholds AND human approval.</span></li>
+    <li class="flex gap-2"><span class="text-blue-600 font-bold mt-0.5">7.</span><span><strong>Coming in Ch 9b:</strong> Databricks MLflow + Unity Catalog, Kubeflow on Kubernetes, and a platform selection framework for your organization.</span></li>
+  </ul>
+</div>
+
+<!-- BOTTOM NAVIGATION -->
+<div class="flex justify-between items-center mt-10 pt-6 border-t border-gray-200">
+  <a href="ch08b_model_monitoring.html" class="flex items-center gap-2 text-blue-600 hover:text-blue-800 font-medium">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+    Ch 8b: Model Monitoring
+  </a>
+  <span class="text-gray-400 text-sm">Chapter 9 · Part 1 of 2</span>
+  <a href="ch09b_databricks_kubeflow.html" class="flex items-center gap-2 text-blue-600 hover:text-blue-800 font-medium">
+    Ch 9b: Databricks &amp; Kubeflow
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+  </a>
+</div>
+
+</div><!-- end max-w-4xl -->
+
+<footer class="bg-white border-t border-gray-200 mt-12 py-8 text-center text-sm text-gray-500">
+  Modern MLOps Tutorial &mdash; Chapter 9 Part 1 &mdash; Vertex AI &amp; SageMaker
+</footer>
+
+</body>
+</html>

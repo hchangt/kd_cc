@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 15: Monitoring & Observability - Modern MLOps Tutorial</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script>hljs.highlightAll(); mermaid.initialize({startOnLoad:true, theme:'default'});</script>
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; color: #1f2937; }
+    .chapter-badge { background: #2563eb; color: white; padding: 4px 12px; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
+    .section-anchor { scroll-margin-top: 80px; }
+    .callout-warning { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px; border-radius: 0 8px 8px 0; margin: 16px 0; }
+    .callout-info { background: #eff6ff; border-left: 4px solid #2563eb; padding: 16px; border-radius: 0 8px 8px 0; margin: 16px 0; }
+    .callout-success { background: #f0fdf4; border-left: 4px solid #059669; padding: 16px; border-radius: 0 8px 8px 0; margin: 16px 0; }
+    .callout-danger { background: #fef2f2; border-left: 4px solid #dc2626; padding: 16px; border-radius: 0 8px 8px 0; margin: 16px 0; }
+    pre code.hljs { border-radius: 8px; font-size: 0.85rem; }
+    .mermaid { background: #f8fafc; border-radius: 8px; padding: 16px; margin: 16px 0; overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.9rem; }
+    th { background: #2563eb; color: white; padding: 10px 14px; text-align: left; }
+    td { padding: 9px 14px; border-bottom: 1px solid #e5e7eb; }
+    tr:nth-child(even) td { background: #f9fafb; }
+    tr:hover td { background: #eff6ff; }
+    .toc-link { color: #2563eb; text-decoration: none; }
+    .toc-link:hover { text-decoration: underline; }
+    h2.section-title { color: #1e3a8a; border-bottom: 2px solid #2563eb; padding-bottom: 8px; margin-top: 48px; }
+    h3.subsection-title { color: #1e40af; margin-top: 28px; }
+    .nav-btn { background: #2563eb; color: white; padding: 8px 18px; border-radius: 6px; text-decoration: none; font-size: 0.9rem; }
+    .nav-btn:hover { background: #1d4ed8; }
+    .nav-btn-outline { border: 2px solid #2563eb; color: #2563eb; padding: 8px 18px; border-radius: 6px; text-decoration: none; font-size: 0.9rem; }
+    .nav-btn-outline:hover { background: #eff6ff; }
+    .tag { display: inline-block; background: #e0e7ff; color: #3730a3; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; margin: 2px; }
+    .tag-green { background: #d1fae5; color: #065f46; }
+    .tag-yellow { background: #fef3c7; color: #92400e; }
+    .tag-red { background: #fee2e2; color: #991b1b; }
+  </style>
+</head>
+<body class="bg-white">
+
+<!-- Navbar -->
+<nav class="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
+  <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+    <a href="index.html" class="text-blue-600 font-bold text-lg hover:text-blue-800">Modern MLOps Tutorial</a>
+    <div class="flex gap-4 text-sm">
+      <a href="index.html" class="text-gray-600 hover:text-blue-600">Home</a>
+      <a href="ch14_llm_serving.html" class="text-gray-600 hover:text-blue-600">Ch 14</a>
+      <a href="ch16_llm_ops.html" class="text-gray-600 hover:text-blue-600">Ch 16</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero -->
+<div class="bg-gradient-to-br from-blue-700 to-blue-900 text-white py-14 px-4">
+  <div class="max-w-6xl mx-auto">
+    <div class="flex items-center gap-3 mb-4">
+      <span class="chapter-badge">Chapter 15 — Part 1</span>
+      <span class="bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-semibold">~60 min read</span>
+      <span class="bg-green-600 text-white px-3 py-1 rounded-full text-xs font-semibold">Monitoring & Observability</span>
+    </div>
+    <h1 class="text-4xl font-bold mb-3">ML Monitoring & Observability</h1>
+    <p class="text-blue-200 text-lg max-w-3xl">Prometheus, Grafana, Evidently AI, WhyLogs, drift detection, and structured logging for production ML systems.</p>
+    <p class="text-blue-300 text-sm mt-3">Part 2 (ch15b) covers alerting strategy, SageMaker Monitor, and automated retraining.</p>
+  </div>
+</div>
+
+<!-- TOC -->
+<div class="max-w-6xl mx-auto px-4 py-8">
+  <div class="bg-gray-50 border border-gray-200 rounded-xl p-6 mb-10">
+    <h2 class="font-bold text-gray-700 mb-4 text-lg">Contents</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+      <a href="#s1" class="toc-link">1. Why ML Monitoring is Different</a>
+      <a href="#s2" class="toc-link">2. Observability Pillars for ML</a>
+      <a href="#s3" class="toc-link">3. Prometheus &amp; Grafana Stack</a>
+      <a href="#s4" class="toc-link">4. Data Drift Detection</a>
+      <a href="#s5" class="toc-link">5. Evidently AI</a>
+      <a href="#s6" class="toc-link">6. Model Performance Monitoring</a>
+      <a href="#s7" class="toc-link">7. WhyLogs / WhyLabs</a>
+      <a href="#s8" class="toc-link">8. Log Aggregation for ML</a>
+      <a href="#summary" class="toc-link">Summary &amp; Key Takeaways</a>
+    </div>
+  </div>
+
+  <!-- SECTION 1 -->
+  <h2 class="section-title text-2xl font-bold section-anchor" id="s1">1. Why ML Monitoring is Different</h2>
+  <p class="mt-4 text-gray-700 leading-relaxed">Traditional software monitoring answers: <em>is the service up?</em> ML monitoring must also answer: <em>is the model still correct?</em> A model can serve predictions with 200 OK while silently degrading — no exception is raised when a recommendation engine starts suggesting irrelevant content because user behavior shifted.</p>
+
+  <h3 class="subsection-title font-semibold text-lg">Failure taxonomy</h3>
+  <p class="text-gray-700 leading-relaxed mb-4">Three distinct failure modes drive different detection strategies:</p>
+  <ul class="list-disc ml-6 text-gray-700 space-y-2 mb-6">
+    <li><strong>Data drift</strong> — input feature distribution shifts (X changes, model relationship P(Y|X) stays same)</li>
+    <li><strong>Concept drift</strong> — the underlying relationship changes (P(Y|X) shifts, model is now wrong)</li>
+    <li><strong>Model decay</strong> — compound degradation over time from both sources; often noticed only via business KPI drop</li>
+  </ul>
+
+  <div class="callout-danger">
+    <strong>Silent failures are the real risk.</strong> In a recommendation system, CTR may drop 8% over 6 weeks while all infrastructure health checks stay green. No alarm fires. Revenue erodes quietly until a manual analysis uncovers stale embeddings trained before a major catalog refresh.
+  </div>
+
+  <h3 class="subsection-title font-semibold text-lg">ML Degradation Lifecycle</h3>
+  <div class="mermaid">
+flowchart LR
+    A([Model Deployed]) --> B{Serving Traffic}
+    B --> C[Input Distribution<br/>Shifts]
+    B --> D[World Changes<br/>Labels Shift]
+    C --> E[Data Drift<br/>Detected]
+    D --> F[Concept Drift<br/>Detected]
+    E --> G[Performance<br/>Proxy Degrades]
+    F --> G
+    G --> H{Ground Truth<br/>Available?}
+    H -- yes --> I[Accuracy Drop<br/>Confirmed]
+    H -- no --> J[Proxy Alert<br/>Triggered]
+    I --> K[Retrain / Rollback]
+    J --> K
+    style A fill:#059669,color:#fff
+    style K fill:#dc2626,color:#fff
+    style G fill:#f59e0b,color:#fff
+  </div>
+
+  <h3 class="subsection-title font-semibold text-lg">Types of ML Failures and Their Signatures</h3>
+  <table>
+    <thead><tr><th>Failure Type</th><th>Root Cause</th><th>Observable Signal</th><th>Detection Method</th><th>Time-to-detect</th></tr></thead>
+    <tbody>
+      <tr><td>Data drift</td><td>Upstream pipeline change, seasonality</td><td>PSI &gt; 0.2, KS p &lt; 0.05 on features</td><td>Statistical tests on input windows</td><td>Minutes–hours</td></tr>
+      <tr><td>Concept drift</td><td>World event, user behavior shift</td><td>Prediction confidence drops, label mismatch</td><td>Ground truth comparison (delayed)</td><td>Days–weeks</td></tr>
+      <tr><td>Training-serving skew</td><td>Feature eng mismatch between train and serve</td><td>Feature mean/std differ from training baseline</td><td>Schema validation + distribution check</td><td>Immediate</td></tr>
+      <tr><td>Schema corruption</td><td>Upstream data source schema change</td><td>Null spike, type errors</td><td>Schema enforcement at inference</td><td>Immediate</td></tr>
+      <tr><td>Model staleness</td><td>No retrain while world drifts</td><td>CTR/revenue drop, prediction entropy increase</td><td>Business KPIs, proxy metrics</td><td>Weeks–months</td></tr>
+      <tr><td>Infrastructure regression</td><td>Bad deploy, GPU OOM, serialization bug</td><td>Latency spike, error rate spike</td><td>Standard APM + model-specific checks</td><td>Seconds–minutes</td></tr>
+    </tbody>
+  </table>
+
+  <!-- SECTION 2 -->
+  <h2 class="section-title text-2xl font-bold section-anchor" id="s2">2. Observability Pillars for ML</h2>
+  <p class="mt-4 text-gray-700 leading-relaxed">The classical three pillars (metrics, logs, traces) are necessary but insufficient for ML. A fourth pillar — data and model quality — bridges the infrastructure and statistical worlds.</p>
+
+  <table>
+    <thead><tr><th>Pillar</th><th>What it Captures</th><th>ML-Specific Examples</th><th>Primary Tool</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Metrics</strong></td><td>Numeric time-series aggregates</td><td>Prediction distribution, feature stats, PSI over time</td><td>Prometheus + Grafana</td></tr>
+      <tr><td><strong>Logs</strong></td><td>Discrete events with context</td><td>Per-request feature values, model version, prediction</td><td>structlog → ELK / CloudWatch</td></tr>
+      <tr><td><strong>Traces</strong></td><td>Request path through services</td><td>Feature retrieval latency, model invoke time, postprocess</td><td>OpenTelemetry + Jaeger</td></tr>
+      <tr><td><strong>Data/Model Quality</strong></td><td>Statistical distribution health</td><td>Drift reports, schema violations, performance regression</td><td>Evidently, WhyLogs, Arize</td></tr>
+    </tbody>
+  </table>
+
+  <h3 class="subsection-title font-semibold text-lg">ML-Specific Metrics Hierarchy</h3>
+  <p class="text-gray-700 mb-4">Organize metrics into three tiers so teams can triage quickly:</p>
+  <ul class="list-disc ml-6 text-gray-700 space-y-1 mb-6">
+    <li><strong>Tier 1 — Business:</strong> revenue impact, CTR, conversion rate affected by model</li>
+    <li><strong>Tier 2 — Model quality:</strong> accuracy, AUC, RMSE (when labels available); prediction entropy, distribution shift (proxy)</li>
+    <li><strong>Tier 3 — Infrastructure:</strong> latency p50/p95/p99, error rate, GPU utilization, throughput</li>
+  </ul>
+
+  <h3 class="subsection-title font-semibold text-lg">Observability Stack for ML</h3>
+  <div class="mermaid">
+graph TB
+    subgraph Ingestion
+        A[ML Service<br/>prometheus-client] -->|scrape| B[Prometheus]
+        C[Inference Logs<br/>structlog] -->|ship| D[ELK / OpenSearch]
+        E[OTel SDK] -->|traces| F[Jaeger / Tempo]
+    end
+    subgraph Quality Layer
+        G[Evidently Reports] --> H[Quality Store]
+        I[WhyLogs Profiles] --> H
+    end
+    subgraph Visualization
+        B --> J[Grafana Dashboards]
+        H --> J
+        D --> K[Kibana / OpenSearch Dashboards]
+        F --> L[Trace UI]
+    end
+    subgraph Alerting
+        J --> M[AlertManager]
+        M --> N[PagerDuty / Slack]
+    end
+    style B fill:#e26d00,color:#fff
+    style J fill:#f46800,color:#fff
+    style G fill:#059669,color:#fff
+  </div>
+
+  <!-- SECTION 3 -->
+  <h2 class="section-title text-2xl font-bold section-anchor" id="s3">3. Prometheus &amp; Grafana Stack</h2>
+  <p class="mt-4 text-gray-700 leading-relaxed">Prometheus pulls (scrapes) metrics from HTTP endpoints every N seconds. Each ML service exposes a <code>/metrics</code> endpoint using <code>prometheus-client</code>. Prometheus stores time-series in its TSDB; Grafana queries it via PromQL.</p>
+
+  <h3 class="subsection-title font-semibold text-lg">Custom ML Metrics with prometheus-client</h3>
+<pre><code class="language-python"># ml_metrics.py — custom Prometheus metrics for an inference service
+from prometheus_client import (
+    Counter, Histogram, Gauge, Summary, start_http_server, REGISTRY
+)
+import numpy as np
+import time
+
+# --- Counters ---
+PREDICTION_COUNTER = Counter(
+    "ml_predictions_total",
+    "Total predictions served",
+    ["model_name", "model_version", "outcome_class"]
+)
+
+SCHEMA_VIOLATIONS = Counter(
+    "ml_schema_violations_total",
+    "Input schema validation failures",
+    ["feature_name", "violation_type"]
+)
+
+# --- Histograms (for distributions) ---
+PREDICTION_SCORE = Histogram(
+    "ml_prediction_score",
+    "Distribution of prediction scores / probabilities",
+    ["model_name"],
+    buckets=[0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+)
+
+REQUEST_LATENCY = Histogram(
+    "ml_request_latency_seconds",
+    "End-to-end prediction latency",
+    ["model_name", "endpoint"],
+    buckets=[0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1.0, 2.5]
+)
+
+# --- Gauges (current value) ---
+FEATURE_MEAN = Gauge(
+    "ml_feature_mean",
+    "Rolling mean of input feature (last 1000 requests)",
+    ["model_name", "feature_name"]
+)
+
+FEATURE_STD = Gauge(
+    "ml_feature_std",
+    "Rolling std of input feature (last 1000 requests)",
+    ["model_name", "feature_name"]
+)
+
+DRIFT_SCORE = Gauge(
+    "ml_feature_drift_psi",
+    "Population Stability Index vs training baseline",
+    ["model_name", "feature_name"]
+)
+
+# --- Summary ---
+PREPROCESSING_LATENCY = Summary(
+    "ml_preprocessing_latency_seconds",
+    "Time spent in feature preprocessing",
+    ["model_name"]
+)
+
+
+class MLMetricsCollector:
+    """Collects and exposes ML-specific Prometheus metrics."""
+
+    def __init__(self, model_name: str, model_version: str, window_size: int = 1000):
+        self.model_name = model_name
+        self.model_version = model_version
+        self.window_size = window_size
+        self._feature_buffers: dict[str, list] = {}
+        self._training_baselines: dict[str, np.ndarray] = {}
+
+    def record_prediction(self, score: float, predicted_class: str, latency: float):
+        PREDICTION_COUNTER.labels(
+            model_name=self.model_name,
+            model_version=self.model_version,
+            outcome_class=predicted_class
+        ).inc()
+        PREDICTION_SCORE.labels(model_name=self.model_name).observe(score)
+        REQUEST_LATENCY.labels(
+            model_name=self.model_name, endpoint="/predict"
+        ).observe(latency)
+
+    def record_features(self, features: dict[str, float]):
+        for name, value in features.items():
+            buf = self._feature_buffers.setdefault(name, [])
+            buf.append(value)
+            if len(buf) > self.window_size:
+                buf.pop(0)
+            if len(buf) >= 50:  # enough data
+                arr = np.array(buf)
+                FEATURE_MEAN.labels(
+                    model_name=self.model_name, feature_name=name
+                ).set(float(np.mean(arr)))
+                FEATURE_STD.labels(
+                    model_name=self.model_name, feature_name=name
+                ).set(float(np.std(arr)))
+
+    def load_training_baseline(self, feature_name: str, baseline_values: np.ndarray):
+        self._training_baselines[feature_name] = baseline_values
+
+    def update_drift_scores(self):
+        for name, buf in self._feature_buffers.items():
+            if name in self._training_baselines and len(buf) >= 100:
+                psi = compute_psi(
+                    np.array(self._training_baselines[name]),
+                    np.array(buf)
+                )
+                DRIFT_SCORE.labels(
+                    model_name=self.model_name, feature_name=name
+                ).set(psi)
+</code></pre>
+
+  <h3 class="subsection-title font-semibold text-lg">AlertManager Rules for ML Services</h3>
+<pre><code class="language-yaml"># alerting_rules.yml
+groups:
+  - name: ml_model_health
+    interval: 60s
+    rules:
+
+      - alert: MLHighPredictionLatency
+        expr: |
+          histogram_quantile(0.95,
+            rate(ml_request_latency_seconds_bucket[5m])
+          ) > 0.5
+        for: 3m
+        labels:
+          severity: warning
+          team: mlops
+        annotations:
+          summary: "ML model p95 latency > 500ms ({{ $labels.model_name }})"
+          runbook: "https://wiki/ml-latency-runbook"
+
+      - alert: MLDataDriftDetected
+        expr: ml_feature_drift_psi > 0.2
+        for: 10m
+        labels:
+          severity: warning
+          team: mlops
+        annotations:
+          summary: "Data drift PSI={{ $value | humanize }} on feature {{ $labels.feature_name }}"
+          description: "PSI > 0.2 indicates significant distribution shift requiring investigation"
+
+      - alert: MLCriticalDataDrift
+        expr: ml_feature_drift_psi > 0.25
+        for: 5m
+        labels:
+          severity: critical
+          team: mlops
+        annotations:
+          summary: "Critical drift on {{ $labels.model_name }}/{{ $labels.feature_name }}"
+
+      - alert: MLSchemaViolationSpike
+        expr: |
+          rate(ml_schema_violations_total[5m]) > 0.05
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Schema violations exceeding 5% of traffic"
+
+      - alert: MLPredictionScoreCollapse
+        expr: |
+          histogram_quantile(0.5, rate(ml_prediction_score_bucket[10m])) < 0.1
+          OR
+          histogram_quantile(0.5, rate(ml_prediction_score_bucket[10m])) > 0.9
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Prediction score distribution degenerate — model may be stuck"
+</code></pre>
+
+  <h3 class="subsection-title font-semibold text-lg">Prometheus Scrape Config for ML Services</h3>
+<pre><code class="language-yaml"># prometheus.yml
+global:
+  scrape_interval: 30s
+  evaluation_interval: 30s
+
+rule_files:
+  - /etc/prometheus/alerting_rules.yml
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: ["alertmanager:9093"]
+
+scrape_configs:
+  - job_name: ml_inference_services
+    metrics_path: /metrics
+    scrape_interval: 15s
+    kubernetes_sd_configs:
+      - role: pod
+        namespaces:
+          names: [ml-serving]
+    relabel_configs:
+      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+        action: keep
+        regex: "true"
+      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
+        target_label: __metrics_path__
+        regex: (.+)
+      - source_labels: [__meta_kubernetes_pod_label_model_name]
+        target_label: model_name
+      - source_labels: [__meta_kubernetes_pod_label_model_version]
+        target_label: model_version
+
+  - job_name: ml_batch_jobs
+    metrics_path: /metrics
+    static_configs:
+      - targets:
+          - feature-store-exporter:9101
+          - training-pipeline-exporter:9102
+</code></pre>
+
+  <div class="callout-info">
+    <strong>Key Grafana Dashboards:</strong> Build three baseline dashboards: (1) <em>ML Infrastructure</em> — GPU utilization, memory, request throughput, error rate; (2) <em>Prediction Health</em> — score distribution histogram, class balance over time, prediction entropy; (3) <em>Data Quality</em> — PSI heatmap by feature, null rate trends, schema violation rate.
+  </div>
+
+  <!-- SECTION 4 -->
+  <h2 class="section-title text-2xl font-bold section-anchor" id="s4">4. Data Drift Detection</h2>
+  <p class="mt-4 text-gray-700 leading-relaxed">Detecting drift requires choosing a reference window (training data or a known-good production window) and comparing the current serving window using a statistical test.</p>
+
+  <h3 class="subsection-title font-semibold text-lg">PSI (Population Stability Index)</h3>
+  <p class="text-gray-700 mb-4">PSI is the industry standard for tabular feature drift, especially in finance/risk. It measures the symmetric KL divergence between two distributions.</p>
+  <div class="mb-4 p-4 bg-blue-50 rounded-lg font-mono text-sm">PSI = &sum;(Actual% - Expected%) &times; ln(Actual% / Expected%)</div>
+
+  <table>
+    <thead><tr><th>PSI Value</th><th>Interpretation</th><th>Action</th><th>Visual</th></tr></thead>
+    <tbody>
+      <tr><td>&lt; 0.1</td><td>No significant shift</td><td>Monitor normally</td><td><span class="tag tag-green">GREEN</span></td></tr>
+      <tr><td>0.1 – 0.2</td><td>Moderate shift — investigate</td><td>Review feature source, check upstream pipeline</td><td><span class="tag tag-yellow">YELLOW</span></td></tr>
+      <tr><td>&gt; 0.2</td><td>Significant shift — action required</td><td>Trigger retraining evaluation, alert team</td><td><span class="tag tag-red">RED</span></td></tr>
+      <tr><td>&gt; 0.25</td><td>Critical shift</td><td>Consider model rollback, urgent investigation</td><td><span class="tag tag-red">CRITICAL</span></td></tr>
+    </tbody>
+  </table>
+
+  <h3 class="subsection-title font-semibold text-lg">PSI Calculation from Scratch</h3>
+<pre><code class="language-python"># drift_detection.py
+import numpy as np
+from typing import Optional
+
+def compute_psi(
+    reference: np.ndarray,
+    current: np.ndarray,
+    n_bins: int = 10,
+    epsilon: float = 1e-8
+) -> float:
+    """
+    Compute Population Stability Index between reference and current distributions.
+    Works for continuous and ordinal features.
+    """
+    # Use reference distribution to define bin edges
+    _, bin_edges = np.histogram(reference, bins=n_bins)
+    # Extend edges slightly to include all values
+    bin_edges[0] -= 1e-6
+    bin_edges[-1] += 1e-6
+
+    ref_counts, _ = np.histogram(reference, bins=bin_edges)
+    cur_counts, _ = np.histogram(current, bins=bin_edges)
+
+    # Convert to proportions, add epsilon to avoid log(0)
+    ref_pct = ref_counts / len(reference) + epsilon
+    cur_pct = cur_counts / len(current) + epsilon
+
+    # PSI formula
+    psi_values = (cur_pct - ref_pct) * np.log(cur_pct / ref_pct)
+    return float(np.sum(psi_values))
+
+
+def compute_psi_categorical(
+    reference: np.ndarray,
+    current: np.ndarray,
+    epsilon: float = 1e-8
+) -> float:
+    """PSI for categorical features."""
+    all_categories = set(reference) | set(current)
+    ref_total = len(reference)
+    cur_total = len(current)
+
+    psi = 0.0
+    for cat in all_categories:
+        ref_pct = (np.sum(reference == cat) / ref_total) + epsilon
+        cur_pct = (np.sum(current == cat) / cur_total) + epsilon
+        psi += (cur_pct - ref_pct) * np.log(cur_pct / ref_pct)
+    return psi
+
+
+def interpret_psi(psi: float) -> str:
+    if psi < 0.1:
+        return "stable"
+    elif psi < 0.2:
+        return "moderate_drift"
+    else:
+        return "significant_drift"
+</code></pre>
+
+  <h3 class="subsection-title font-semibold text-lg">KS Test with scipy</h3>
+<pre><code class="language-python"># ks_drift.py
+from scipy import stats
+import numpy as np
+import pandas as pd
+from dataclasses import dataclass
+
+@dataclass
+class DriftResult:
+    feature: str
+    test: str
+    statistic: float
+    p_value: float
+    drifted: bool
+    psi: Optional[float] = None
+
+def ks_drift_detection(
+    reference_df: pd.DataFrame,
+    current_df: pd.DataFrame,
+    numeric_features: list[str],
+    alpha: float = 0.05
+) -> list[DriftResult]:
+    results = []
+    for feat in numeric_features:
+        ref_vals = reference_df[feat].dropna().values
+        cur_vals = current_df[feat].dropna().values
+
+        # Two-sample KS test
+        ks_stat, p_val = stats.ks_2samp(ref_vals, cur_vals)
+
+        # Also compute PSI for interpretability
+        psi_val = compute_psi(ref_vals, cur_vals)
+
+        results.append(DriftResult(
+            feature=feat,
+            test="ks_2samp",
+            statistic=float(ks_stat),
+            p_value=float(p_val),
+            drifted=(p_val < alpha),
+            psi=psi_val
+        ))
+    return results
+
+
+def chi2_drift_categorical(
+    reference_df: pd.DataFrame,
+    current_df: pd.DataFrame,
+    categorical_features: list[str],
+    alpha: float = 0.05
+) -> list[DriftResult]:
+    """Chi-squared test for categorical feature drift."""
+    results = []
+    for feat in categorical_features:
+        all_cats = set(reference_df[feat].unique()) | set(current_df[feat].unique())
+        ref_counts = reference_df[feat].value_counts().reindex(all_cats, fill_value=0)
+        cur_counts = current_df[feat].value_counts().reindex(all_cats, fill_value=0)
+
+        chi2, p_val = stats.chisquare(cur_counts, f_exp=ref_counts * len(current_df) / len(reference_df))
+        results.append(DriftResult(
+            feature=feat, test="chi2",
+            statistic=float(chi2), p_value=float(p_val),
+            drifted=(p_val < alpha)
+        ))
+    return results
+</code></pre>
+
+  <h3 class="subsection-title font-semibold text-lg">Windowing Strategies</h3>
+  <table>
+    <thead><tr><th>Strategy</th><th>Definition</th><th>Best For</th><th>Trade-off</th></tr></thead>
+    <tbody>
+      <tr><td>Tumbling window</td><td>Fixed non-overlapping batches (e.g., hourly)</td><td>Batch scoring pipelines, scheduled reports</td><td>May miss drift that occurs within a window</td></tr>
+      <tr><td>Sliding window</td><td>Fixed size window that moves forward continuously</td><td>Real-time streaming inference</td><td>Higher compute; correlated consecutive windows</td></tr>
+      <tr><td>Landmark window</td><td>Fixed reference (training data) vs expanding current</td><td>Long-term stability vs training baseline</td><td>Recent drift may be diluted by historical data</td></tr>
+      <tr><td>Adaptive window</td><td>ADWIN / Page-Hinkley — auto-adjusts window size</td><td>Unknown drift timing, streaming</td><td>Complex to implement; harder to explain to stakeholders</td></tr>
+    </tbody>
+  </table>
+
+  <h3 class="subsection-title font-semibold text-lg">Drift Detection Statistical Tests Comparison</h3>
+  <table>
+    <thead><tr><th>Test</th><th>Feature Type</th><th>Null Hypothesis</th><th>Sensitivity</th><th>Interpretability</th></tr></thead>
+    <tbody>
+      <tr><td>KS test</td><td>Continuous</td><td>Same distribution</td><td>Medium (tails)</td><td>High (p-value)</td></tr>
+      <tr><td>PSI</td><td>Continuous / ordinal</td><td>—</td><td>High (binned)</td><td>Very high (threshold table)</td></tr>
+      <tr><td>Chi-squared</td><td>Categorical</td><td>Same distribution</td><td>Medium</td><td>High</td></tr>
+      <tr><td>KL Divergence</td><td>Any (binned)</td><td>—</td><td>High</td><td>Medium (no threshold standard)</td></tr>
+      <tr><td>MMD</td><td>Any (kernel)</td><td>Same distribution</td><td>Very high</td><td>Low (requires calibration)</td></tr>
+      <tr><td>CUSUM / ADWIN</td><td>Any (sequential)</td><td>No change point</td><td>Very high (streaming)</td><td>Low</td></tr>
+    </tbody>
+  </table>
+
+  <!-- SECTION 5 -->
+  <h2 class="section-title text-2xl font-bold section-anchor" id="s5">5. Evidently AI</h2>
+  <p class="mt-4 text-gray-700 leading-relaxed">Evidently is an open-source ML observability library for generating data and model quality reports. It works both offline (HTML/JSON reports) and online (integrated into a monitoring service).</p>
+
+  <h3 class="subsection-title font-semibold text-lg">Data Drift Report</h3>
+<pre><code class="language-python"># evidently_reports.py
+import pandas as pd
+from evidently.report import Report
+from evidently.metric_preset import DataDriftPreset, DataQualityPreset
+from evidently.metrics import (
+    DatasetDriftMetric,
+    DataDriftTable,
+    ColumnDriftMetric,
+    ColumnSummaryMetric,
+)
+
+def generate_drift_report(
+    reference_df: pd.DataFrame,
+    current_df: pd.DataFrame,
+    output_path: str = "drift_report.html"
+) -> dict:
+    """Generate and save an Evidently data drift report."""
+    report = Report(metrics=[
+        DataDriftPreset(drift_share=0.3),    # alert if >30% features drift
+        DataQualityPreset(),
+        ColumnDriftMetric(column_name="user_age"),
+        ColumnDriftMetric(column_name="session_duration"),
+        ColumnSummaryMetric(column_name="purchase_amount"),
+    ])
+
+    report.run(reference_data=reference_df, current_data=current_df)
+    report.save_html(output_path)
+
+    # Extract JSON summary for programmatic use
+    result = report.as_dict()
+    drift_metric = result["metrics"][0]["result"]
+    return {
+        "dataset_drift": drift_metric["dataset_drift"],
+        "drift_share": drift_metric["share_of_drifted_columns"],
+        "drifted_columns": drift_metric.get("number_of_drifted_columns", 0),
+    }
+</code></pre>
+
+  <h3 class="subsection-title font-semibold text-lg">Model Quality Report</h3>
+<pre><code class="language-python"># evidently_model_quality.py
+from evidently.report import Report
+from evidently.metric_preset import ClassificationPreset, RegressionPreset
+from evidently.metrics import (
+    ClassificationQualityMetric,
+    ClassificationClassBalance,
+    ClassificationConfusionMatrix,
+)
+
+def generate_classification_report(
+    reference_df: pd.DataFrame,  # must have "target" and "prediction" columns
+    current_df: pd.DataFrame,
+    output_path: str = "model_quality.html"
+):
+    report = Report(metrics=[
+        ClassificationPreset(),
+        ClassificationQualityMetric(),
+        ClassificationClassBalance(),
+        ClassificationConfusionMatrix(),
+    ])
+    report.run(reference_data=reference_df, current_data=current_df)
+    report.save_html(output_path)
+    return report.as_dict()
+</code></pre>
+
+  <h3 class="subsection-title font-semibold text-lg">Evidently Test Suite (Automated Checks)</h3>
+<pre><code class="language-python"># evidently_tests.py
+from evidently.test_suite import TestSuite
+from evidently.test_preset import DataDriftTestPreset, DataQualityTestPreset
+from evidently.tests import (
+    TestNumberOfDriftedColumns,
+    TestShareOfDriftedColumns,
+    TestColumnDrift,
+    TestNumberOfMissingValues,
+    TestHighlyCorrelatedColumns,
+)
+
+def run_quality_gates(
+    reference_df: pd.DataFrame,
+    current_df: pd.DataFrame,
+    critical_features: list[str]
+) -> tuple[bool, dict]:
+    """Returns (passed, details). Use in CI/CD or scheduled checks."""
+    suite = TestSuite(tests=[
+        DataDriftTestPreset(drift_share=0.3),
+        DataQualityTestPreset(),
+        TestNumberOfDriftedColumns(lt=5),       # fail if >5 features drift
+        TestShareOfDriftedColumns(lt=0.3),
+        TestNumberOfMissingValues(lt=1000),
+        *[TestColumnDrift(column_name=f) for f in critical_features],
+    ])
+
+    suite.run(reference_data=reference_df, current_data=current_df)
+    result = suite.as_dict()
+
+    all_passed = all(
+        t["result"]["status"] == "SUCCESS"
+        for t in result["tests"]
+    )
+    return all_passed, result
+
+
+# Example usage in a pipeline gate
+if __name__ == "__main__":
+    import sys
+    passed, details = run_quality_gates(
+        reference_df=pd.read_parquet("s3://bucket/reference.parquet"),
+        current_df=pd.read_parquet("s3://bucket/current_week.parquet"),
+        critical_features=["user_age", "account_tenure", "last_purchase_days"]
+    )
+    if not passed:
+        print("Quality gates FAILED — blocking deployment")
+        sys.exit(1)
+    print("All quality gates passed")
+</code></pre>
+
+  <h3 class="subsection-title font-semibold text-lg">Evidently Monitoring Dashboard (Production Integration)</h3>
+<pre><code class="language-python"># evidently_monitoring_service.py
+"""
+Runs as a sidecar or scheduled job. Generates reports and pushes
+metrics to Prometheus for Grafana visualization.
+"""
+import schedule, time
+import pandas as pd
+from prometheus_client import Gauge, start_http_server
+from evidently.report import Report
+from evidently.metric_preset import DataDriftPreset
+
+EVIDENTLY_DRIFT_SHARE = Gauge(
+    "evidently_drift_share",
+    "Share of drifted columns per Evidently report",
+    ["model_name"]
+)
+EVIDENTLY_DRIFTED_COLS = Gauge(
+    "evidently_drifted_columns_count",
+    "Number of drifted columns",
+    ["model_name"]
+)
+
+def run_evidently_check(model_name: str, reference_path: str, current_path: str):
+    ref = pd.read_parquet(reference_path)
+    cur = pd.read_parquet(current_path)
+
+    report = Report(metrics=[DataDriftPreset()])
+    report.run(reference_data=ref, current_data=cur)
+    result = report.as_dict()["metrics"][0]["result"]
+
+    EVIDENTLY_DRIFT_SHARE.labels(model_name=model_name).set(
+        result["share_of_drifted_columns"]
+    )
+    EVIDENTLY_DRIFTED_COLS.labels(model_name=model_name).set(
+        result.get("number_of_drifted_columns", 0)
+    )
+
+    # Save HTML report to S3
+    report.save_html(f"/tmp/drift_{model_name}_{int(time.time())}.html")
+
+if __name__ == "__main__":
+    start_http_server(9105)
+    schedule.every(1).hours.do(
+        run_evidently_check,
+        model_name="recommender_v3",
+        reference_path="s3://ml-data/reference/",
+        current_path="s3://ml-data/current/"
+    )
+    while True:
+        schedule.run_pending()
+        time.sleep(60)
+</code></pre>
+
+  <!-- SECTION 6 -->
+  <h2 class="section-title text-2xl font-bold section-anchor" id="s6">6. Model Performance Monitoring</h2>
+  <p class="mt-4 text-gray-700 leading-relaxed">The hardest problem in ML monitoring: ground truth labels arrive hours, days, or weeks after prediction. You cannot compute accuracy in real time for most use cases.</p>
+
+  <h3 class="subsection-title font-semibold text-lg">Ground Truth Delay Problem</h3>
+  <div class="mermaid">
+sequenceDiagram
+    participant U as User
+    participant M as ML Service
+    participant S as Prediction Store
+    participant G as Ground Truth System
+    participant E as Evaluator
+
+    U->>M: Request (t=0)
+    M->>S: Store prediction + features (t=0)
+    M->>U: Return prediction
+    Note over G: Days/weeks pass
+    G->>S: Label arrives (t=Δ)
+    S->>E: Join prediction + label
+    E->>E: Compute accuracy metrics
+    E->>M: Update performance gauges
+  </div>
+
+  <h3 class="subsection-title font-semibold text-lg">Proxy Metrics for Accuracy Without Labels</h3>
+  <table>
+    <thead><tr><th>Proxy Metric</th><th>How Computed</th><th>Limitation</th></tr></thead>
+    <tbody>
+      <tr><td>Prediction entropy</td><td>-&sum;p&times;log(p) over output probabilities</td><td>High entropy = uncertainty, but not always wrong</td></tr>
+      <tr><td>Prediction distribution shift</td><td>PSI on prediction score vs baseline</td><td>Distribution shift != accuracy drop</td></tr>
+      <tr><td>Implicit feedback</td><td>CTR, dwell time, purchase rate on recommended items</td><td>Confounded by non-model factors</td></tr>
+      <tr><td>Confidence calibration proxy</td><td>Expected calibration error on windowed batch</td><td>Requires some labels; lagged</td></tr>
+      <tr><td>Outlier score</td><td>Mahalanobis distance of input from training manifold</td><td>Outlier != wrong prediction</td></tr>
+    </tbody>
+  </table>
+
+  <h3 class="subsection-title font-semibold text-lg">Performance Monitoring Service</h3>
+<pre><code class="language-python"># performance_monitor.py
+import numpy as np
+import pandas as pd
+from prometheus_client import Gauge, Histogram
+from dataclasses import dataclass
+from scipy.stats import entropy
+
+PREDICTION_ENTROPY = Gauge(
+    "ml_prediction_entropy_mean",
+    "Mean Shannon entropy of prediction probability vectors",
+    ["model_name"]
+)
+ACCURACY_GAUGE = Gauge(
+    "ml_accuracy_windowed",
+    "Accuracy on most recent labeled window",
+    ["model_name"]
+)
+AUC_GAUGE = Gauge(
+    "ml_auc_windowed",
+    "AUC-ROC on most recent labeled window",
+    ["model_name"]
+)
+
+class PerformanceMonitor:
+    def __init__(self, model_name: str, window_size: int = 5000):
+        self.model_name = model_name
+        self.window_size = window_size
+        self._predictions: list[np.ndarray] = []   # probability vectors
+        self._labeled_buffer: list[dict] = []
+
+    def record_prediction_proba(self, proba: np.ndarray):
+        """Record a probability vector for entropy monitoring."""
+        self._predictions.append(proba)
+        if len(self._predictions) > self.window_size:
+            self._predictions.pop(0)
+
+        if len(self._predictions) % 100 == 0:
+            entropies = [entropy(p + 1e-10) for p in self._predictions[-1000:]]
+            PREDICTION_ENTROPY.labels(model_name=self.model_name).set(
+                float(np.mean(entropies))
+            )
+
+    def record_labeled_outcome(self, prediction_id: str, label: int,
+                               predicted_class: int, score: float):
+        """Store ground truth when it arrives."""
+        self._labeled_buffer.append({
+            "id": prediction_id,
+            "label": label,
+            "predicted": predicted_class,
+            "score": score
+        })
+        if len(self._labeled_buffer) > self.window_size:
+            self._labeled_buffer.pop(0)
+
+        if len(self._labeled_buffer) >= 200:
+            self._update_supervised_metrics()
+
+    def _update_supervised_metrics(self):
+        from sklearn.metrics import accuracy_score, roc_auc_score
+        df = pd.DataFrame(self._labeled_buffer[-2000:])
+        acc = accuracy_score(df["label"], df["predicted"])
+        try:
+            auc = roc_auc_score(df["label"], df["score"])
+        except Exception:
+            auc = 0.0
+        ACCURACY_GAUGE.labels(model_name=self.model_name).set(acc)
+        AUC_GAUGE.labels(model_name=self.model_name).set(auc)
+</code></pre>
+
+  <h3 class="subsection-title font-semibold text-lg">Ground Truth Ingestion + Delayed Evaluation</h3>
+<pre><code class="language-python"># ground_truth_joiner.py
+"""
+Runs as a background job. Joins predictions logged at inference time
+with labels that arrive asynchronously (e.g., user purchases, churn events).
+"""
+import boto3
+import pandas as pd
+from datetime import datetime, timedelta
+
+def join_predictions_with_labels(
+    prediction_store_table: str,  # DynamoDB or Redshift
+    label_source_table: str,
+    evaluation_delay_hours: int = 24,
+    window_hours: int = 1
+) -> pd.DataFrame:
+    """
+    Fetch predictions made [evaluation_delay_hours + window_hours] to
+    [evaluation_delay_hours] ago, then join with labels.
+    """
+    now = datetime.utcnow()
+    window_end = now - timedelta(hours=evaluation_delay_hours)
+    window_start = window_end - timedelta(hours=window_hours)
+
+    # Fetch predictions in window (pseudo-code; adapt to your store)
+    predictions_df = fetch_predictions(prediction_store_table, window_start, window_end)
+    labels_df = fetch_labels(label_source_table, window_start, window_end + timedelta(hours=48))
+
+    # Join on entity_id
+    joined = predictions_df.merge(labels_df, on="entity_id", how="inner")
+    return joined
+
+
+def evaluate_and_push_metrics(joined_df: pd.DataFrame, model_name: str, monitor: PerformanceMonitor):
+    for _, row in joined_df.iterrows():
+        monitor.record_labeled_outcome(
+            prediction_id=row["prediction_id"],
+            label=int(row["actual_label"]),
+            predicted_class=int(row["predicted_class"]),
+            score=float(row["prediction_score"])
+        )
+
+# Placeholder — implement per your storage backend
+def fetch_predictions(table, start, end): return pd.DataFrame()
+def fetch_labels(table, start, end): return pd.DataFrame()
+</code></pre>
+
+  <!-- SECTION 7 -->
+  <h2 class="section-title text-2xl font-bold section-anchor" id="s7">7. WhyLogs / WhyLabs</h2>
+  <p class="mt-4 text-gray-700 leading-relaxed">WhyLogs produces compact statistical sketches ("profiles") of datasets using approximate algorithms (HLL, KLL, frequent items). Profiles are orders of magnitude smaller than raw data and can be merged, differenced, and shipped to WhyLabs for visualization.</p>
+
+  <h3 class="subsection-title font-semibold text-lg">Whylogs Profile Creation</h3>
+<pre><code class="language-python"># whylogs_profiling.py
+import whylogs as why
+import pandas as pd
+from whylogs.core.constraints import ConstraintsBuilder
+from whylogs.core.constraints.factories import (
+    no_missing_values,
+    column_is_in_range,
+)
+
+def profile_batch(df: pd.DataFrame, dataset_name: str) -> why.DatasetProfileView:
+    """Create a whylogs profile for a batch of data."""
+    result = why.log(df)
+    profile_view = result.view()
+    return profile_view
+
+
+def profile_with_constraints(df: pd.DataFrame) -> tuple[why.DatasetProfileView, bool]:
+    """Profile and validate data against defined constraints."""
+    result = why.log(df)
+
+    builder = ConstraintsBuilder(dataset_profile_view=result.view())
+    builder.add_constraint(no_missing_values(column_name="user_id"))
+    builder.add_constraint(column_is_in_range(column_name="age", lower=0, upper=120))
+    builder.add_constraint(column_is_in_range(column_name="score", lower=0.0, upper=1.0))
+
+    constraints = builder.build()
+    report = constraints.generate_constraints_report()
+
+    passed = all(c.passed for c in report)
+    return result.view(), passed
+
+
+def save_profile_locally(profile_view, path: str):
+    profile_view.write(path)
+
+
+def compare_profiles(reference_profile, current_profile) -> dict:
+    """Compute drift metrics by comparing two profiles."""
+    ref_cols = reference_profile.get_columns()
+    cur_cols = current_profile.get_columns()
+    drift_results = {}
+    for col_name in ref_cols:
+        if col_name in cur_cols:
+            ref_dist = ref_cols[col_name].to_summary_dict()
+            cur_dist = cur_cols[col_name].to_summary_dict()
+            drift_results[col_name] = {
+                "ref_mean": ref_dist.get("distribution/mean"),
+                "cur_mean": cur_dist.get("distribution/mean"),
+                "ref_nulls": ref_dist.get("counts/null"),
+                "cur_nulls": cur_dist.get("counts/null"),
+            }
+    return drift_results
+</code></pre>
+
+  <h3 class="subsection-title font-semibold text-lg">WhyLabs Integration</h3>
+<pre><code class="language-python"># whylabs_integration.py
+import os
+import whylogs as why
+import pandas as pd
+from whylogs.api.writer.whylabs import WhyLabsWriter
+from datetime import datetime, timezone
+
+# Set credentials via env vars (never hardcode)
+# WHYLABS_API_KEY, WHYLABS_ORG_ID, WHYLABS_DEFAULT_DATASET_ID
+
+def log_to_whylabs(df: pd.DataFrame, dataset_id: str):
+    """Log a dataframe profile to WhyLabs platform."""
+    writer = WhyLabsWriter()
+    result = why.log(df)
+
+    # WhyLabs uses dataset_timestamp to place data on timeline
+    result.set_dataset_timestamp(datetime.now(timezone.utc))
+    writer.write(file=result.profile(), dataset_id=dataset_id)
+
+
+def log_model_outputs_to_whylabs(
+    features_df: pd.DataFrame,
+    predictions: list[float],
+    actuals: list[float] | None,
+    dataset_id: str
+):
+    """Log features + model outputs together for complete observability."""
+    combined = features_df.copy()
+    combined["prediction"] = predictions
+    if actuals is not None:
+        combined["actual"] = actuals
+
+    writer = WhyLabsWriter()
+    result = why.log(combined)
+    result.set_dataset_timestamp(datetime.now(timezone.utc))
+    writer.write(file=result.profile(), dataset_id=dataset_id)
+
+
+# Run as scheduled job (e.g., every hour via Airflow/Prefect)
+if __name__ == "__main__":
+    serving_log = pd.read_parquet("s3://logs/serving/last_hour.parquet")
+    log_to_whylabs(serving_log, dataset_id=os.environ["WHYLABS_DEFAULT_DATASET_ID"])
+</code></pre>
+
+  <h3 class="subsection-title font-semibold text-lg">ML Observability Platform Comparison</h3>
+  <table>
+    <thead><tr><th>Platform</th><th>Open Source</th><th>Deployment</th><th>Key Strength</th><th>Limitation</th><th>Best For</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Evidently AI</strong></td><td>Yes (core)</td><td>Self-hosted or Cloud</td><td>Rich HTML reports, test suites</td><td>No real-time streaming</td><td>Batch monitoring, CI/CD gates</td></tr>
+      <tr><td><strong>WhyLabs</strong></td><td>whylogs only</td><td>SaaS + self-hosted</td><td>Compact profiles, real-time logging</td><td>Platform is paid SaaS</td><td>High-volume streaming inference</td></tr>
+      <tr><td><strong>Arize AI</strong></td><td>No</td><td>SaaS</td><td>Explainability + drift in one UI</td><td>Expensive at scale</td><td>Enterprise, LLM + CV + tabular</td></tr>
+      <tr><td><strong>Fiddler AI</strong></td><td>No</td><td>SaaS / on-prem</td><td>Explainability (SHAP/LIME built-in)</td><td>Complex setup</td><td>Regulated industries (finance, health)</td></tr>
+      <tr><td><strong>NannyML</strong></td><td>Yes</td><td>Self-hosted</td><td>CBPE — accuracy without labels</td><td>Tabular only</td><td>Teams without label feedback loops</td></tr>
+      <tr><td><strong>Grafana + Prom</strong></td><td>Yes</td><td>Self-hosted</td><td>Full control, integrates everything</td><td>Must build ML metrics yourself</td><td>Infra + custom ML metrics</td></tr>
+    </tbody>
+  </table>
+
+  <!-- SECTION 8 -->
+  <h2 class="section-title text-2xl font-bold section-anchor" id="s8">8. Log Aggregation for ML</h2>
+  <p class="mt-4 text-gray-700 leading-relaxed">Structured logs are the foundation for post-hoc debugging, audit trails, and training data recovery. Every prediction should produce a structured log entry containing the request ID, model version, feature values, and prediction output.</p>
+
+  <h3 class="subsection-title font-semibold text-lg">Structured Logging with structlog</h3>
+<pre><code class="language-python"># ml_logging.py
+import structlog
+import time
+import uuid
+from functools import wraps
+
+# Configure structlog once at app startup
+structlog.configure(
+    processors=[
+        structlog.stdlib.add_log_level,
+        structlog.stdlib.add_logger_name,
+        structlog.processors.TimeStamper(fmt="iso"),
+        structlog.processors.StackInfoRenderer(),
+        structlog.processors.format_exc_info,
+        structlog.processors.JSONRenderer(),  # always emit JSON
+    ],
+    wrapper_class=structlog.make_filtering_bound_logger(20),  # INFO
+    context_class=dict,
+    logger_factory=structlog.PrintLoggerFactory(),
+)
+
+log = structlog.get_logger()
+
+
+def log_prediction(
+    model_name: str,
+    model_version: str,
+    request_id: str,
+    features: dict,
+    prediction: float,
+    predicted_class: str,
+    latency_ms: float,
+    user_id: str | None = None,
+):
+    """Emit a structured JSON log line per prediction."""
+    log.info(
+        "ml.prediction",
+        request_id=request_id,
+        model_name=model_name,
+        model_version=model_version,
+        user_id=user_id,
+        predicted_class=predicted_class,
+        prediction_score=round(prediction, 6),
+        latency_ms=round(latency_ms, 2),
+        # Log feature values — redact PII as needed
+        features={k: round(v, 4) if isinstance(v, float) else v
+                  for k, v in features.items()},
+    )
+
+
+def prediction_instrumented(model_name: str, model_version: str):
+    """Decorator: auto-logs prediction + latency for any predict() function."""
+    def decorator(predict_fn):
+        @wraps(predict_fn)
+        def wrapper(features: dict, **kwargs):
+            request_id = str(uuid.uuid4())
+            t0 = time.perf_counter()
+            try:
+                result = predict_fn(features, **kwargs)
+                latency_ms = (time.perf_counter() - t0) * 1000
+                log_prediction(
+                    model_name=model_name,
+                    model_version=model_version,
+                    request_id=request_id,
+                    features=features,
+                    prediction=result.get("score", 0.0),
+                    predicted_class=result.get("class", "unknown"),
+                    latency_ms=latency_ms,
+                )
+                return result
+            except Exception as exc:
+                log.error(
+                    "ml.prediction_error",
+                    request_id=request_id,
+                    model_name=model_name,
+                    model_version=model_version,
+                    error=str(exc),
+                    exc_info=True,
+                )
+                raise
+        return wrapper
+    return decorator
+</code></pre>
+
+  <div class="callout-info">
+    <strong>ELK / OpenSearch Setup:</strong> Ship logs via Filebeat or Fluentd to Elasticsearch/OpenSearch. Index pattern: <code>ml-predictions-YYYY.MM.DD</code>. Create index templates with mappings for <code>model_name</code>, <code>model_version</code>, <code>prediction_score</code> as keyword/numeric fields so Kibana dashboards work correctly.
+  </div>
+
+  <h3 class="subsection-title font-semibold text-lg">CloudWatch Logs Insights Queries</h3>
+<pre><code class="language-sql">-- Query 1: P95 latency by model version (last 1 hour)
+fields @timestamp, model_name, model_version, latency_ms
+| filter ispresent(latency_ms)
+| stats pct(latency_ms, 95) as p95_latency,
+        pct(latency_ms, 50) as p50_latency,
+        count(*) as request_count
+  by model_name, model_version
+| sort p95_latency desc
+
+-- Query 2: Prediction score distribution bucketed
+fields @timestamp, prediction_score
+| filter ispresent(prediction_score)
+| stats count(*) as cnt
+  by bin(prediction_score, 0.1) as score_bucket
+| sort score_bucket asc
+
+-- Query 3: Error rate by model (last 15 min)
+fields @timestamp, model_name, @message
+| filter @message like /ml.prediction_error/
+| stats count(*) as error_count by model_name
+| sort error_count desc
+
+-- Query 4: Feature null rate (detect upstream data issues)
+fields @timestamp, features.user_age, features.session_duration
+| stats
+    (count_distinct(requestId) - count(features.user_age)) / count_distinct(requestId) * 100
+      as user_age_null_pct,
+    (count_distinct(requestId) - count(features.session_duration)) / count_distinct(requestId) * 100
+      as session_null_pct
+  by bin(5m)
+| sort @timestamp desc
+</code></pre>
+
+  <!-- SUMMARY -->
+  <h2 class="section-title text-2xl font-bold section-anchor" id="summary">Summary &amp; Key Takeaways</h2>
+
+  <div class="bg-blue-50 border border-blue-200 rounded-xl p-6 mt-6">
+    <h3 class="font-bold text-blue-800 text-lg mb-4">Key Takeaways</h3>
+    <ul class="space-y-3 text-gray-800">
+      <li class="flex gap-3"><span class="text-blue-600 font-bold mt-0.5">1.</span><span><strong>ML monitoring extends classical monitoring.</strong> Software health checks are necessary but not sufficient — you must track statistical properties of inputs and outputs, not just service availability.</span></li>
+      <li class="flex gap-3"><span class="text-blue-600 font-bold mt-0.5">2.</span><span><strong>Silent failures are the primary risk.</strong> A degrading model returns HTTP 200. Build proactive drift detection; don't wait for business KPIs to alert you.</span></li>
+      <li class="flex gap-3"><span class="text-blue-600 font-bold mt-0.5">3.</span><span><strong>PSI is the practical drift metric.</strong> Use PSI for tabular features (threshold: 0.1/0.2), KS test for continuous distributions, chi-squared for categorical. Combine with p-values for statistical rigor.</span></li>
+      <li class="flex gap-3"><span class="text-blue-600 font-bold mt-0.5">4.</span><span><strong>Four pillars: metrics, logs, traces, data quality.</strong> Each serves a different debugging scenario. Integrate all four before a production incident forces you to.</span></li>
+      <li class="flex gap-3"><span class="text-blue-600 font-bold mt-0.5">5.</span><span><strong>Ground truth delay is unavoidable — use proxy metrics.</strong> Prediction entropy and distribution shift are imperfect but actionable. Design label feedback loops into your system architecture from day one.</span></li>
+      <li class="flex gap-3"><span class="text-blue-600 font-bold mt-0.5">6.</span><span><strong>Evidently for batch, WhyLogs for streaming.</strong> Evidently excels at scheduled HTML reports and CI/CD quality gates. WhyLogs profiles are memory-efficient for high-throughput online inference.</span></li>
+      <li class="flex gap-3"><span class="text-blue-600 font-bold mt-0.5">7.</span><span><strong>Structured logging is non-negotiable.</strong> Log every prediction as a structured JSON event with request ID, feature snapshot, model version, and prediction. This data powers both debugging and offline drift analysis.</span></li>
+    </ul>
+  </div>
+
+  <div class="callout-info mt-6">
+    <strong>What's next (Chapter 15 Part 2):</strong> <code>ch15b_alerting_retraining.html</code> covers AlertManager routing and escalation policies, SageMaker Model Monitor integration, automated retraining pipelines triggered by drift alerts, and canary deployment strategies for model updates.
+  </div>
+
+  <!-- Bottom nav -->
+  <div class="flex items-center justify-between mt-14 pt-8 border-t border-gray-200">
+    <a href="ch14_llm_serving.html" class="nav-btn-outline">&larr; Chapter 14: LLM Serving</a>
+    <a href="index.html" class="text-gray-500 text-sm hover:text-blue-600">Table of Contents</a>
+    <a href="ch16_llm_ops.html" class="nav-btn">Chapter 16: LLMOps &rarr;</a>
+  </div>
+  <p class="text-center text-gray-400 text-xs mt-6 mb-10">Modern MLOps Tutorial &bull; Chapter 15 Part 1 &bull; ML Monitoring &amp; Observability</p>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,1386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modern MLOps: A Complete Engineering Tutorial</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script>hljs.highlightAll(); mermaid.initialize({startOnLoad:true, theme:'default'});</script>
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; color: #1f2937; }
+    .hero-gradient { background: linear-gradient(135deg, #dbeafe 0%, #eff6ff 40%, #ffffff 100%); }
+    .part-badge { display: inline-block; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.15rem 0.6rem; border-radius: 9999px; }
+    .card-hover { transition: box-shadow 0.2s, transform 0.2s; }
+    .card-hover:hover { box-shadow: 0 8px 24px rgba(37,99,235,0.12); transform: translateY(-2px); }
+    .mermaid { background: #f8fafc; border-radius: 0.75rem; padding: 1.5rem; }
+    table.striped tbody tr:nth-child(even) { background: #f8fafc; }
+    .callout-info { background: #eff6ff; border-left: 4px solid #2563eb; }
+    .callout-tip  { background: #f0fdf4; border-left: 4px solid #059669; }
+    .callout-warn { background: #fffbeb; border-left: 4px solid #d97706; }
+    .skill-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+    @media print { .no-print { display: none; } }
+  </style>
+</head>
+<body class="bg-white">
+
+<!-- ─────────────────────────── NAVBAR ─────────────────────────── -->
+<nav class="no-print sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-14">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/>
+        </svg>
+      </div>
+      <span class="font-bold text-gray-900 text-sm tracking-tight">Modern MLOps Tutorial</span>
+    </div>
+    <div class="hidden md:flex items-center gap-6 text-sm text-gray-600">
+      <a href="#what-is-mlops" class="hover:text-blue-600">What is MLOps?</a>
+      <a href="#how-to-use" class="hover:text-blue-600">How to Use</a>
+      <a href="#toc" class="hover:text-blue-600">Chapters</a>
+      <a href="#skills" class="hover:text-blue-600">Skills</a>
+      <a href="#stack" class="hover:text-blue-600">Stack</a>
+      <a href="#career" class="hover:text-blue-600">Career</a>
+    </div>
+    <span class="text-xs text-gray-400">19 chapters · ~60 hrs</span>
+  </div>
+</nav>
+
+<!-- ─────────────────────────── HERO ─────────────────────────── -->
+<section class="hero-gradient py-20 px-4">
+  <div class="max-w-5xl mx-auto text-center">
+    <div class="inline-flex items-center gap-2 bg-blue-100 text-blue-700 text-xs font-semibold px-3 py-1 rounded-full mb-6">
+      <span class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span>
+      Updated April 2026 · 19 Chapters · Staff-Engineer Level
+    </div>
+    <h1 class="text-4xl md:text-6xl font-extrabold text-gray-900 leading-tight mb-6">
+      Modern MLOps:<br>
+      <span class="text-blue-600">A Complete Engineering Tutorial</span>
+    </h1>
+    <p class="text-xl text-gray-600 max-w-3xl mx-auto mb-10">
+      From first Docker container to designing the infrastructure that trains frontier models —
+      a practitioner-written path from Python developer to MLOps Staff Engineer.
+    </p>
+
+    <!-- Author bio card -->
+    <div class="inline-flex items-start gap-4 bg-white rounded-2xl shadow-md px-6 py-5 text-left max-w-2xl">
+      <div class="w-14 h-14 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex-shrink-0 flex items-center justify-center text-white font-bold text-xl">ML</div>
+      <div>
+        <p class="font-bold text-gray-900 text-sm">Senior MLOps Architect</p>
+        <p class="text-xs text-gray-500 mb-2">ex-Google · ex-AWS · ex-OpenAI · ex-Anthropic</p>
+        <p class="text-sm text-gray-600">
+          Built MLOps functions from zero at both OpenAI and Anthropic. Scaled training infrastructure
+          to thousands of GPUs, led platform teams, and shipped models that serve hundreds of millions of users.
+          This course captures what I wish existed when I started.
+        </p>
+      </div>
+    </div>
+
+    <!-- Audience pills -->
+    <div class="mt-10 flex flex-wrap justify-center gap-3">
+      <div class="callout-info rounded-lg px-4 py-2 text-sm text-blue-800 font-medium">Target: Python devs with basic ML knowledge</div>
+      <div class="callout-tip rounded-lg px-4 py-2 text-sm text-green-800 font-medium">Outcome: Staff Engineer / MLOps Architect</div>
+      <div class="callout-warn rounded-lg px-4 py-2 text-sm text-amber-800 font-medium">Time: ~60 hours across 19 chapters</div>
+    </div>
+
+    <!-- Quick-jump CTA -->
+    <div class="mt-8 flex flex-wrap justify-center gap-4">
+      <a href="ch01_introduction.html" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg text-sm transition-colors shadow">
+        Start Chapter 1 →
+      </a>
+      <a href="#toc" class="bg-white hover:bg-gray-50 text-gray-700 font-semibold px-6 py-3 rounded-lg text-sm transition-colors shadow border border-gray-200">
+        Browse All Chapters
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────────────── WHAT IS MLOPS ─────────────────────────── -->
+<section id="what-is-mlops" class="py-16 px-4 bg-white">
+  <div class="max-w-5xl mx-auto">
+    <h2 class="text-3xl font-bold text-gray-900 mb-2">What is MLOps?</h2>
+    <p class="text-gray-500 mb-10">The discipline, the gap, and why it matters now more than ever</p>
+
+    <div class="grid md:grid-cols-3 gap-6 mb-12">
+      <div class="bg-blue-50 rounded-xl p-6 border border-blue-100">
+        <div class="text-blue-600 font-bold text-lg mb-2">The Definition</div>
+        <p class="text-sm text-gray-700">
+          MLOps (Machine Learning Operations) is the set of practices that <strong>reliably and efficiently</strong>
+          move ML experiments into production and keep them healthy over time. It unifies ML engineering,
+          data engineering, and platform engineering under a single operational discipline.
+        </p>
+      </div>
+      <div class="bg-green-50 rounded-xl p-6 border border-green-100">
+        <div class="text-green-700 font-bold text-lg mb-2">Why It Matters</div>
+        <p class="text-sm text-gray-700">
+          90% of ML models never reach production. Of those that do, most degrade silently within months.
+          MLOps is the engineering layer that collapses the gap between a notebook prototype and a
+          system that serves real users at scale — reliably, safely, and economically.
+        </p>
+      </div>
+      <div class="bg-amber-50 rounded-xl p-6 border border-amber-100">
+        <div class="text-amber-700 font-bold text-lg mb-2">The AI Era Shift</div>
+        <p class="text-sm text-gray-700">
+          Foundation models changed the game. You no longer train from scratch for every task,
+          but you now operate at massive scale — billions of parameters, petabytes of data,
+          distributed clusters, RLHF pipelines, serving latency SLAs under 100 ms at millions of QPS.
+        </p>
+      </div>
+    </div>
+
+    <!-- DevOps vs MLOps comparison -->
+    <h3 class="text-xl font-bold text-gray-800 mb-4">MLOps vs. Traditional DevOps / SoftwareOps</h3>
+    <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm mb-10">
+      <table class="w-full text-sm striped">
+        <thead class="bg-gray-800 text-white">
+          <tr>
+            <th class="px-4 py-3 text-left font-semibold">Dimension</th>
+            <th class="px-4 py-3 text-left font-semibold">Traditional DevOps</th>
+            <th class="px-4 py-3 text-left font-semibold">MLOps</th>
+          </tr>
+        </thead>
+        <tbody class="text-gray-700">
+          <tr><td class="px-4 py-3 font-medium">Artifact</td><td class="px-4 py-3">Code / binary</td><td class="px-4 py-3">Code + data + model weights (all versioned)</td></tr>
+          <tr><td class="px-4 py-3 font-medium">CI/CD target</td><td class="px-4 py-3">App deployment</td><td class="px-4 py-3">Training pipeline + model deployment</td></tr>
+          <tr><td class="px-4 py-3 font-medium">Testing</td><td class="px-4 py-3">Unit / integration tests</td><td class="px-4 py-3">Data validation + model evaluation + shadow deployment</td></tr>
+          <tr><td class="px-4 py-3 font-medium">Failure mode</td><td class="px-4 py-3">Bug / crash</td><td class="px-4 py-3">Silent accuracy degradation, data drift, training instability</td></tr>
+          <tr><td class="px-4 py-3 font-medium">Reproducibility</td><td class="px-4 py-3">Code hash is enough</td><td class="px-4 py-3">Code + data snapshot + hyperparams + random seeds + hardware</td></tr>
+          <tr><td class="px-4 py-3 font-medium">Rollback</td><td class="px-4 py-3">Redeploy previous version</td><td class="px-4 py-3">Retrain or roll back to previous model + data pipeline</td></tr>
+          <tr><td class="px-4 py-3 font-medium">Infrastructure</td><td class="px-4 py-3">CPU servers / containers</td><td class="px-4 py-3">GPU/TPU clusters, high-bandwidth networking, NVMe storage</td></tr>
+          <tr><td class="px-4 py-3 font-medium">Scale</td><td class="px-4 py-3">Requests / sec</td><td class="px-4 py-3">Petabytes of data, thousands of accelerators, millions of tokens/sec</td></tr>
+          <tr><td class="px-4 py-3 font-medium">Monitoring</td><td class="px-4 py-3">Latency, error rate, uptime</td><td class="px-4 py-3">Data drift, concept drift, model quality, bias, fairness</td></tr>
+          <tr><td class="px-4 py-3 font-medium">Key discipline</td><td class="px-4 py-3">Software engineering</td><td class="px-4 py-3">ML + data + platform + distributed systems engineering</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Callout -->
+    <div class="callout-info rounded-xl p-5 text-sm text-blue-900">
+      <strong>Key insight:</strong> MLOps is not "DevOps for ML." It is an entirely new engineering
+      discipline that subsumes DevOps and extends it with data-centric, experiment-centric, and
+      model-centric concerns. A great MLOps engineer is part SRE, part data engineer, part
+      distributed-systems engineer — and fluent in the ML research process.
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────────────── HOW TO USE ─────────────────────────── -->
+<section id="how-to-use" class="py-16 px-4 bg-gray-50">
+  <div class="max-w-5xl mx-auto">
+    <h2 class="text-3xl font-bold text-gray-900 mb-2">How to Use This Course</h2>
+    <p class="text-gray-500 mb-10">Learning paths, prerequisites, and how to get the most out of each chapter</p>
+
+    <!-- Prerequisites -->
+    <h3 class="text-xl font-bold text-gray-800 mb-4">Prerequisites</h3>
+    <div class="grid md:grid-cols-3 gap-4 mb-10">
+      <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+        <div class="text-green-600 font-bold mb-1">Required</div>
+        <ul class="text-sm text-gray-700 space-y-1 list-disc list-inside">
+          <li>Python 3.9+ proficiency</li>
+          <li>Basic ML concepts (supervised/unsupervised)</li>
+          <li>Comfortable with the command line</li>
+          <li>Git fundamentals</li>
+        </ul>
+      </div>
+      <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+        <div class="text-blue-600 font-bold mb-1">Helpful but not required</div>
+        <ul class="text-sm text-gray-700 space-y-1 list-disc list-inside">
+          <li>Docker basics</li>
+          <li>Any cloud console experience</li>
+          <li>PyTorch or TensorFlow familiarity</li>
+          <li>SQL fundamentals</li>
+        </ul>
+      </div>
+      <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+        <div class="text-amber-600 font-bold mb-1">Not required</div>
+        <ul class="text-sm text-gray-700 space-y-1 list-disc list-inside">
+          <li>Deep learning theory</li>
+          <li>Advanced math / statistics</li>
+          <li>Prior cloud certifications</li>
+          <li>Kubernetes experience</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Learning paths -->
+    <h3 class="text-xl font-bold text-gray-800 mb-4">Learning Paths</h3>
+    <div class="grid md:grid-cols-2 gap-6 mb-10">
+      <div class="bg-white rounded-xl border border-blue-200 p-6 shadow-sm">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs font-bold">A</span>
+          <span class="font-bold text-gray-900">Complete Path (~60 hrs)</span>
+        </div>
+        <p class="text-sm text-gray-600 mb-3">Read all 19 chapters in order. Best for engineers who want comprehensive mastery or are interviewing for senior+ MLOps roles.</p>
+        <p class="text-xs text-gray-500">Ch01 → Ch02 → ... → Ch19</p>
+      </div>
+      <div class="bg-white rounded-xl border border-green-200 p-6 shadow-sm">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="w-6 h-6 bg-green-600 text-white rounded-full flex items-center justify-center text-xs font-bold">B</span>
+          <span class="font-bold text-gray-900">Fast Track — ML Engineer (~25 hrs)</span>
+        </div>
+        <p class="text-sm text-gray-600 mb-3">Focus on the ML-centric chapters. Skip deep infrastructure. Good for ML researchers moving into production work.</p>
+        <p class="text-xs text-gray-500">Ch01 → Ch06 → Ch07 → Ch08 → Ch11 → Ch12 → Ch13 → Ch15 → Ch16</p>
+      </div>
+      <div class="bg-white rounded-xl border border-amber-200 p-6 shadow-sm">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="w-6 h-6 bg-amber-500 text-white rounded-full flex items-center justify-center text-xs font-bold">C</span>
+          <span class="font-bold text-gray-900">Platform Track — Infra Engineer (~30 hrs)</span>
+        </div>
+        <p class="text-sm text-gray-600 mb-3">Focus on infrastructure, cloud, and platform chapters. Good for SREs / platform engineers moving into ML.</p>
+        <p class="text-xs text-gray-500">Ch01 → Ch02 → Ch03 → Ch04 → Ch05 → Ch09 → Ch10 → Ch13 → Ch14 → Ch15</p>
+      </div>
+      <div class="bg-white rounded-xl border border-purple-200 p-6 shadow-sm">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="w-6 h-6 bg-purple-600 text-white rounded-full flex items-center justify-center text-xs font-bold">D</span>
+          <span class="font-bold text-gray-900">LLM Track (~20 hrs)</span>
+        </div>
+        <p class="text-sm text-gray-600 mb-3">Jump to the LLM-specific content after foundations. Best for engineers already doing classical MLOps who want to upskill for GenAI.</p>
+        <p class="text-xs text-gray-500">Ch01 → Ch08 → Ch14 → Ch16 → Ch17 → Ch18 → Ch19</p>
+      </div>
+    </div>
+
+    <!-- Chapter format -->
+    <div class="callout-tip rounded-xl p-5 text-sm text-green-900">
+      <strong>Chapter format:</strong> Each chapter follows the same structure — concept overview,
+      architecture diagrams, hands-on code examples, comparison tables of tools, production war stories,
+      and a "key takeaways" section. Estimated reading time is listed per chapter; add 50–100% for
+      hands-on practice.
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────────────── MLOPS LANDSCAPE DIAGRAM ─────────────────────────── -->
+<section class="py-16 px-4 bg-white">
+  <div class="max-w-5xl mx-auto">
+    <h2 class="text-3xl font-bold text-gray-900 mb-2">The MLOps Landscape</h2>
+    <p class="text-gray-500 mb-8">The full stack from raw data to production model — and where each tool lives</p>
+
+    <div class="mermaid">
+graph TB
+    subgraph DATA["Data Layer"]
+        D1[Raw Storage<br/>S3 / GCS / ADLS]
+        D2[Data Catalog<br/>Datahub / Glue]
+        D3[Feature Store<br/>Feast / Tecton / Vertex]
+        D4[Data Validation<br/>Great Expectations / Deequ]
+        D1 --> D2 --> D3
+        D1 --> D4
+    end
+
+    subgraph TRAIN["Training Layer"]
+        T1[Experiment Tracking<br/>MLflow / W&B / Comet]
+        T2[Distributed Training<br/>PyTorch DDP / DeepSpeed / Megatron]
+        T3[Compute<br/>GPU Cluster / TPU Pod / Spot]
+        T4[Orchestration<br/>Airflow / Prefect / Dagster]
+        T5[Model Registry<br/>MLflow / W&B / SageMaker]
+        T3 --> T2 --> T1 --> T5
+        T4 --> T2
+    end
+
+    subgraph PLATFORM["Platform Layer"]
+        P1[Container Registry<br/>ECR / GCR / Docker Hub]
+        P2[Kubernetes<br/>EKS / GKE / AKS]
+        P3[IaC<br/>Terraform / Pulumi / CDK]
+        P4[CI/CD<br/>GitHub Actions / ArgoCD]
+        P3 --> P2
+        P4 --> P1 --> P2
+    end
+
+    subgraph SERVE["Serving Layer"]
+        S1[Model Server<br/>TorchServe / Triton / vLLM]
+        S2[API Gateway<br/>FastAPI / Kong / Envoy]
+        S3[Feature Serving<br/>Redis / DynamoDB]
+        S4[A/B & Canary<br/>Istio / LaunchDarkly]
+        S1 --> S2 --> S4
+        S3 --> S1
+    end
+
+    subgraph OBS["Observability Layer"]
+        O1[Metrics<br/>Prometheus / Datadog]
+        O2[Logging<br/>ELK / Cloud Logging]
+        O3[Drift Detection<br/>Evidently / Arize / Fiddler]
+        O4[Alerting<br/>PagerDuty / OpsGenie]
+        O1 & O2 & O3 --> O4
+    end
+
+    DATA --> TRAIN
+    TRAIN --> PLATFORM
+    PLATFORM --> SERVE
+    SERVE --> OBS
+    OBS -->|retrain trigger| TRAIN
+
+    style DATA fill:#dbeafe,stroke:#2563eb,color:#1e3a8a
+    style TRAIN fill:#dcfce7,stroke:#16a34a,color:#14532d
+    style PLATFORM fill:#fef3c7,stroke:#d97706,color:#78350f
+    style SERVE fill:#fce7f3,stroke:#db2777,color:#831843
+    style OBS fill:#f3e8ff,stroke:#9333ea,color:#4c1d95
+    </div>
+
+    <div class="mt-8 grid md:grid-cols-5 gap-3 text-center text-xs">
+      <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
+        <div class="font-bold text-blue-700 mb-1">Data Layer</div>
+        <div class="text-gray-600">Ch06</div>
+      </div>
+      <div class="bg-green-50 border border-green-200 rounded-lg p-3">
+        <div class="font-bold text-green-700 mb-1">Training Layer</div>
+        <div class="text-gray-600">Ch07, Ch08, Ch09, Ch10, Ch11</div>
+      </div>
+      <div class="bg-amber-50 border border-amber-200 rounded-lg p-3">
+        <div class="font-bold text-amber-700 mb-1">Platform Layer</div>
+        <div class="text-gray-600">Ch02, Ch03, Ch04, Ch05, Ch12</div>
+      </div>
+      <div class="bg-pink-50 border border-pink-200 rounded-lg p-3">
+        <div class="font-bold text-pink-700 mb-1">Serving Layer</div>
+        <div class="text-gray-600">Ch13, Ch14</div>
+      </div>
+      <div class="bg-purple-50 border border-purple-200 rounded-lg p-3">
+        <div class="font-bold text-purple-700 mb-1">Observability</div>
+        <div class="text-gray-600">Ch15</div>
+      </div>
+    </div>
+
+    <!-- Second diagram: LLM-specific pipeline -->
+    <h3 class="text-xl font-bold text-gray-800 mt-14 mb-4">LLM-Specific MLOps Pipeline</h3>
+    <div class="mermaid">
+sequenceDiagram
+    participant R as Research
+    participant D as Data Pipeline
+    participant T as Pre-training Cluster
+    participant F as Fine-tuning / RLHF
+    participant E as Eval Suite
+    participant S as Serving (vLLM/TGI)
+    participant M as Monitoring
+
+    R->>D: Define data mix & filters
+    D->>D: Dedup, quality filter, tokenize
+    D->>T: Stream to training cluster
+    T->>T: Distributed pre-training (DDP/FSDP/Megatron)
+    T->>F: Base checkpoint
+    F->>F: SFT → Reward Model → PPO/DPO
+    F->>E: Fine-tuned checkpoint
+    E->>E: MMLU, HumanEval, internal evals
+    E-->>F: Fails eval — retrain
+    E->>S: Passes — deploy canary
+    S->>M: Serve production traffic
+    M-->>R: Drift / quality signal → new research cycle
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────────────── TABLE OF CONTENTS ─────────────────────────── -->
+<section id="toc" class="py-16 px-4 bg-gray-50">
+  <div class="max-w-5xl mx-auto">
+    <h2 class="text-3xl font-bold text-gray-900 mb-2">Full Table of Contents</h2>
+    <p class="text-gray-500 mb-10">19 chapters across 5 parts — from foundations to frontier LLM systems</p>
+
+    <!-- ── PART 1 ── -->
+    <div class="mb-12">
+      <div class="flex items-center gap-3 mb-5">
+        <span class="part-badge bg-blue-600 text-white">Part 1</span>
+        <h3 class="text-xl font-bold text-gray-800">Foundations & Infrastructure</h3>
+        <span class="text-sm text-gray-400 ml-auto">Ch01 – Ch05 · ~18 hrs</span>
+      </div>
+      <div class="space-y-3">
+
+        <a href="ch01_introduction.html" class="card-hover block bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+          <div class="flex items-start justify-between gap-4">
+            <div class="flex items-start gap-4">
+              <span class="w-10 h-10 bg-blue-100 text-blue-700 rounded-lg flex items-center justify-center font-bold text-sm flex-shrink-0">01</span>
+              <div>
+                <div class="font-semibold text-gray-900">Introduction to Modern MLOps</div>
+                <div class="text-sm text-gray-500 mt-1">The ML lifecycle end-to-end. Why experiments fail to reach production. MLOps maturity model (Level 0 → Level 3). The roles on an MLOps team and how they interact. Setting up your local development environment.</div>
+                <div class="flex gap-2 mt-2">
+                  <span class="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded">Foundation</span>
+                  <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">Conceptual</span>
+                </div>
+              </div>
+            </div>
+            <span class="text-xs text-gray-400 flex-shrink-0">~2 hrs</span>
+          </div>
+        </a>
+
+        <a href="ch02_cloud_aws_gcp.html" class="card-hover block bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+          <div class="flex items-start justify-between gap-4">
+            <div class="flex items-start gap-4">
+              <span class="w-10 h-10 bg-blue-100 text-blue-700 rounded-lg flex items-center justify-center font-bold text-sm flex-shrink-0">02</span>
+              <div>
+                <div class="font-semibold text-gray-900">Cloud Infrastructure for ML (AWS & GCP)</div>
+                <div class="text-sm text-gray-500 mt-1">Core cloud primitives for ML workloads. S3/GCS storage architecture, IAM, VPCs. EC2 instance types for ML (p4d, g5, A100 vs H100). Spot vs. reserved vs. on-demand strategy. GCP TPUs and TPU pods. Cost optimization at scale.</div>
+                <div class="flex gap-2 mt-2">
+                  <span class="text-xs bg-orange-50 text-orange-700 px-2 py-0.5 rounded">Cloud</span>
+                  <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">AWS · GCP</span>
+                </div>
+              </div>
+            </div>
+            <span class="text-xs text-gray-400 flex-shrink-0">~3 hrs</span>
+          </div>
+        </a>
+
+        <a href="ch03_iac.html" class="card-hover block bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+          <div class="flex items-start justify-between gap-4">
+            <div class="flex items-start gap-4">
+              <span class="w-10 h-10 bg-blue-100 text-blue-700 rounded-lg flex items-center justify-center font-bold text-sm flex-shrink-0">03</span>
+              <div>
+                <div class="font-semibold text-gray-900">Infrastructure as Code (Terraform, Pulumi, CDK)</div>
+                <div class="text-sm text-gray-500 mt-1">Why IaC is non-negotiable for ML infrastructure. Terraform state management, modules, and workspaces. Pulumi for Python-native IaC. AWS CDK patterns for SageMaker and EKS. GitOps workflows for infrastructure. Drift detection and remediation.</div>
+                <div class="flex gap-2 mt-2">
+                  <span class="text-xs bg-orange-50 text-orange-700 px-2 py-0.5 rounded">Infrastructure</span>
+                  <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">Terraform · Pulumi</span>
+                </div>
+              </div>
+            </div>
+            <span class="text-xs text-gray-400 flex-shrink-0">~3 hrs</span>
+          </div>
+        </a>
+
+        <a href="ch04_containers_kubernetes.html" class="card-hover block bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+          <div class="flex items-start justify-between gap-4">
+            <div class="flex items-start gap-4">
+              <span class="w-10 h-10 bg-blue-100 text-blue-700 rounded-lg flex items-center justify-center font-bold text-sm flex-shrink-0">04</span>
+              <div>
+                <div class="font-semibold text-gray-900">Containers & Kubernetes for ML</div>
+                <div class="text-sm text-gray-500 mt-1">Docker best practices for ML images (multi-stage, layer caching, base images). Kubernetes architecture — pods, deployments, services. GPU scheduling with device plugins. Helm charts for ML workloads. Kubeflow overview. Multi-tenant cluster design.</div>
+                <div class="flex gap-2 mt-2">
+                  <span class="text-xs bg-orange-50 text-orange-700 px-2 py-0.5 rounded">Infrastructure</span>
+                  <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">Docker · K8s</span>
+                </div>
+              </div>
+            </div>
+            <span class="text-xs text-gray-400 flex-shrink-0">~4 hrs</span>
+          </div>
+        </a>
+
+        <a href="ch05_gpu_hpc.html" class="card-hover block bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+          <div class="flex items-start justify-between gap-4">
+            <div class="flex items-start gap-4">
+              <span class="w-10 h-10 bg-blue-100 text-blue-700 rounded-lg flex items-center justify-center font-bold text-sm flex-shrink-0">05</span>
+              <div>
+                <div class="font-semibold text-gray-900">GPU Infrastructure & HPC Clusters</div>
+                <div class="text-sm text-gray-500 mt-1">GPU taxonomy (A100, H100, H200, B200). CUDA, NCCL, NVLink, InfiniBand fundamentals. Slurm cluster design for ML. EFA networking on AWS. GPU memory management, MIG, and multi-instance GPU. Profiling with nsight and PyTorch profiler. Power and thermal management at scale.</div>
+                <div class="flex gap-2 mt-2">
+                  <span class="text-xs bg-red-50 text-red-700 px-2 py-0.5 rounded">Hardware</span>
+                  <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">GPU · HPC · Slurm</span>
+                </div>
+              </div>
+            </div>
+            <span class="text-xs text-gray-400 flex-shrink-0">~4 hrs</span>
+          </div>
+        </a>
+
+      </div>
+    </div>
+
+    <!-- ── PART 2 ── -->
+    <div class="mb-12">
+      <div class="flex items-center gap-3 mb-5">
+        <span class="part-badge bg-green-600 text-white">Part 2</span>
+        <h3 class="text-xl font-bold text-gray-800">Data, Experiments & Training</h3>
+        <span class="text-sm text-gray-400 ml-auto">Ch06 – Ch10 · ~18 hrs</span>
+      </div>
+      <div class="space-y-3">
+
+        <a href="ch06_data_engineering.html" class="card-hover block bg-white rounded-xl border border-green-100 p-5 shadow-sm">
+          <div class="flex items-start justify-between gap-4">
+            <div class="flex items-start gap-4">
+              <span class="w-10 h-10 bg-green-100 text-green-700 rounded-lg flex items-center justify-center font-bold text-sm flex-shrink-0">06</span>
+              <div>
+                <div class="font-semibold text-gray-900">Data Engineering & Feature Stores</div>
+                <div class="text-sm text-gray-500 mt-1">ML data pipelines: ingestion, validation, transformation, versioning. Data lineage and cataloging. Feature stores — offline vs. online, point-in-time correctness. Feast, Tecton, Vertex Feature Store compared. Data versioning with DVC and Delta Lake. Large-scale data processing with Spark and Dask.</div>
+                <div class="flex gap-2 mt-2">
+                  <span class="text-xs bg-green-50 text-green-700 px-2 py-0.5 rounded">Data</span>
+                  <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">Feast · DVC · Spark</span>
+                </div>
+              </div>
+            </div>
+            <span class="text-xs text-gray-400 flex-shrink-0">~4 hrs</span>
+          </div>
+        </a>
+
+        <a href="ch07_experiment_tracking.html" class="card-hover block bg-white rounded-xl border border-green-100 p-5 shadow-sm">
+          <div class="flex items-start justify-between gap-4">
+            <div class="flex items-start gap-4">
+              <span class="w-10 h-10 bg-green-100 text-green-700 rounded-lg flex items-center justify-center font-bold text-sm flex-shrink-0">07</span>
+              <div>
+                <div class="font-semibold text-gray-900">Experiment Tracking & Model Registry</div>
+                <div class="text-sm text-gray-500 mt-1">Why experiment tracking is the foundation of reproducible ML. MLflow deep dive — tracking, projects, models, registry. Weights & Biases for teams. Comet ML. Model versioning strategies, promotion workflows (Staging → Production), and governance. Metadata management at scale.</div>
+                <div class="flex gap-2 mt-2">
+                  <span class="text-xs bg-green-50 text-green-700 px-2 py-0.5 rounded">Experiments</span>
+                  <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">MLflow · W&B</span>
+                </div>
+              </div>
+            </div>
+            <span class="text-xs text-gray-400 flex-shrink-0">~3 hrs</span>
+          </div>
+        </a>
+
+        <a href="ch08_distributed_training.html" class="card-hover block bg-white rounded-xl border border-green-100 p-5 shadow-sm">
+          <div class="flex items-start justify-between gap-4">
+            <div class="flex items-start gap-4">
+              <span class="w-10 h-10 bg-green-100 text-green-700 rounded-lg flex items-center justify-center font-bold text-sm flex-shrink-0">08</span>
+              <div>
+                <div class="font-semibold text-gray-900">Distributed Training at Scale</div>
+                <div class="text-sm text-gray-500 mt-1">Data parallelism, model parallelism, tensor parallelism, pipeline parallelism — when and how. PyTorch DDP, FSDP, and ZeRO optimizer stages. DeepSpeed and Megatron-LM for LLM training. Gradient checkpointing, mixed precision, and flash attention. Fault tolerance and checkpointing strategies. Scaling laws and compute-optimal training.</div>
+                <div class="flex gap-2 mt-2">
+                  <span class="text-xs bg-green-50 text-green-700 px-2 py-0.5 rounded">Training</span>
+                  <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">DeepSpeed · Megatron · FSDP</span>
+                </div>
+              </div>
+            </div>
+            <span class="text-xs text-gray-400 flex-shrink-0">~5 hrs</span>
+          </div>
+        </a>
+
+        <a href="ch09_mlops_platforms.html" class="card-hover block bg-white rounded-xl border border-green-100 p-5 shadow-sm">
+          <div class="flex items-start justify-between gap-4">
+            <div class="flex items-start gap-4">
+              <span class="w-10 h-10 bg-green-100 text-green-700 rounded-lg flex items-center justify-center font-bold text-sm flex-shrink-0">09</span>
+              <div>
+                <div class="font-semibold text-gray-900">MLOps Platforms (Vertex AI, SageMaker, Databricks)</div>
+                <div class="text-sm text-gray-500 mt-1">Managed MLOps platform trade-offs. AWS SageMaker: Pipelines, Feature Store, Endpoints, Model Monitor. Google Vertex AI: Datasets, Training, Prediction, Feature Store, Pipelines. Databricks MLflow + Delta Lake + Mosaic AI. When to build vs. buy. Platform migration strategies.</div>
+                <div class="flex gap-2 mt-2">
+                  <span class="text-xs bg-green-50 text-green-700 px-2 py-0.5 rounded">Platforms</span>
+                  <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">SageMaker · Vertex · Databricks</span>
+                </div>
+              </div>
+            </div>
+            <span class="text-xs text-gray-400 flex-shrink-0">~3 hrs</span>
+          </div>
+        </a>
+
+        <a href="ch10_ray_ecosystem.html" class="card-hover block bg-white rounded-xl border border-green-100 p-5 shadow-sm">
+          <div class="flex items-start justify-between gap-4">
+            <div class="flex items-start gap-4">
+              <span class="w-10 h-10 bg-green-100 text-green-700 rounded-lg flex items-center justify-center font-bold text-sm flex-shrink-0">10</span>
+              <div>
+                <div class="font-semibold text-gray-900">The Ray Ecosystem</div>
+                <div class="text-sm text-gray-500 mt-1">Ray Core: actors, tasks, object store, cluster. Ray Train for distributed ML. Ray Tune for hyperparameter optimization. Ray Data for scalable data preprocessing. Ray Serve for model serving. Anyscale managed Ray. Integrating Ray with Kubernetes. When Ray beats Spark.</div>
+                <div class="flex gap-2 mt-2">
+                  <span class="text-xs bg-green-50 text-green-700 px-2 py-0.5 rounded">Compute</span>
+                  <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">Ray · Anyscale</span>
+                </div>
+              </div>
+            </div>
+            <span class="text-xs text-gray-400 flex-shrink-0">~3 hrs</span>
+          </div>
+        </a>
+
+      </div>
+    </div>
+
+    <!-- ── PART 3 ── -->
+    <div class="mb-12">
+      <div class="flex items-center gap-3 mb-5">
+        <span class="part-badge bg-amber-500 text-white">Part 3</span>
+        <h3 class="text-xl font-bold text-gray-800">Pipelines, CI/CD & Serving</h3>
+        <span class="text-sm text-gray-400 ml-auto">Ch11 – Ch14 · ~15 hrs</span>
+      </div>
+      <div class="space-y-3">
+
+        <a href="ch11_orchestration.html" class="card-hover block bg-white rounded-xl border border-amber-100 p-5 shadow-sm">
+          <div class="flex items-start justify-between gap-4">
+            <div class="flex items-start gap-4">
+              <span class="w-10 h-10 bg-amber-100 text-amber-700 rounded-lg flex items-center justify-center font-bold text-sm flex-shrink-0">11</span>
+              <div>
+                <div class="font-semibold text-gray-900">Workflow Orchestration (Airflow, Prefect, Dagster)</div>
+                <div class="text-sm text-gray-500 mt-1">Why orchestration matters for ML. Apache Airflow: DAGs, operators, sensors, XComs, dynamic DAGs. Prefect 2.0: flows, tasks, deployments, work pools. Dagster: assets, ops, jobs, schedules, sensors. Choosing the right orchestrator. Backfilling, retries, and SLA monitoring.</div>
+                <div class="flex gap-2 mt-2">
+                  <span class="text-xs bg-amber-50 text-amber-700 px-2 py-0.5 rounded">Orchestration</span>
+                  <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">Airflow · Prefect · Dagster</span>
+                </div>
+              </div>
+            </div>
+            <span class="text-xs text-gray-400 flex-shrink-0">~3 hrs</span>
+          </div>
+        </a>
+
+        <a href="ch12_ml_pipelines_cicd.html" class="card-hover block bg-white rounded-xl border border-amber-100 p-5 shadow-sm">
+          <div class="flex items-start justify-between gap-4">
+            <div class="flex items-start gap-4">
+              <span class="w-10 h-10 bg-amber-100 text-amber-700 rounded-lg flex items-center justify-center font-bold text-sm flex-shrink-0">12</span>
+              <div>
+                <div class="font-semibold text-gray-900">ML Pipelines & CI/CD for ML</div>
+                <div class="text-sm text-gray-500 mt-1">Continuous integration for ML: data tests, model tests, training smoke tests. GitHub Actions for ML pipelines. ArgoCD and GitOps for model deployment. Kubeflow Pipelines and KFP SDK. Continuous training (CT) triggers. Model gates and automated evaluation. Blue-green and canary deployments for models.</div>
+                <div class="flex gap-2 mt-2">
+                  <span class="text-xs bg-amber-50 text-amber-700 px-2 py-0.5 rounded">CI/CD</span>
+                  <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">GitHub Actions · ArgoCD · KFP</span>
+                </div>
+              </div>
+            </div>
+            <span class="text-xs text-gray-400 flex-shrink-0">~4 hrs</span>
+          </div>
+        </a>
+
+        <a href="ch13_model_serving.html" class="card-hover block bg-white rounded-xl border border-amber-100 p-5 shadow-sm">
+          <div class="flex items-start justify-between gap-4">
+            <div class="flex items-start gap-4">
+              <span class="w-10 h-10 bg-amber-100 text-amber-700 rounded-lg flex items-center justify-center font-bold text-sm flex-shrink-0">13</span>
+              <div>
+                <div class="font-semibold text-gray-900">Model Serving & Deployment</div>
+                <div class="text-sm text-gray-500 mt-1">Online vs. batch vs. streaming inference. TorchServe, TF Serving, NVIDIA Triton Inference Server. Model optimization: quantization (INT8, FP16, BF16), pruning, ONNX, TensorRT. FastAPI serving patterns. Autoscaling, load balancing, and SLA management. Multi-model serving and model ensembles. Shadow mode and champion-challenger.</div>
+                <div class="flex gap-2 mt-2">
+                  <span class="text-xs bg-pink-50 text-pink-700 px-2 py-0.5 rounded">Serving</span>
+                  <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">Triton · TorchServe · FastAPI</span>
+                </div>
+              </div>
+            </div>
+            <span class="text-xs text-gray-400 flex-shrink-0">~4 hrs</span>
+          </div>
+        </a>
+
+        <a href="ch14_llm_serving.html" class="card-hover block bg-white rounded-xl border border-amber-100 p-5 shadow-sm">
+          <div class="flex items-start justify-between gap-4">
+            <div class="flex items-start gap-4">
+              <span class="w-10 h-10 bg-amber-100 text-amber-700 rounded-lg flex items-center justify-center font-bold text-sm flex-shrink-0">14</span>
+              <div>
+                <div class="font-semibold text-gray-900">LLM Serving & Inference Optimization</div>
+                <div class="text-sm text-gray-500 mt-1">LLM serving challenges: KV cache, prefill vs. decode, batching strategies. Continuous batching and PagedAttention (vLLM). Text Generation Inference (TGI). Speculative decoding, tensor parallelism for inference. Quantization for LLMs: GPTQ, AWQ, GGUF. Throughput vs. latency trade-offs. Serving cost economics.</div>
+                <div class="flex gap-2 mt-2">
+                  <span class="text-xs bg-pink-50 text-pink-700 px-2 py-0.5 rounded">LLM Serving</span>
+                  <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">vLLM · TGI · TensorRT-LLM</span>
+                </div>
+              </div>
+            </div>
+            <span class="text-xs text-gray-400 flex-shrink-0">~4 hrs</span>
+          </div>
+        </a>
+
+      </div>
+    </div>
+
+    <!-- ── PART 4 ── -->
+    <div class="mb-12">
+      <div class="flex items-center gap-3 mb-5">
+        <span class="part-badge bg-purple-600 text-white">Part 4</span>
+        <h3 class="text-xl font-bold text-gray-800">Observability & LLM Ops</h3>
+        <span class="text-sm text-gray-400 ml-auto">Ch15 – Ch16 · ~7 hrs</span>
+      </div>
+      <div class="space-y-3">
+
+        <a href="ch15_monitoring.html" class="card-hover block bg-white rounded-xl border border-purple-100 p-5 shadow-sm">
+          <div class="flex items-start justify-between gap-4">
+            <div class="flex items-start gap-4">
+              <span class="w-10 h-10 bg-purple-100 text-purple-700 rounded-lg flex items-center justify-center font-bold text-sm flex-shrink-0">15</span>
+              <div>
+                <div class="font-semibold text-gray-900">Monitoring, Observability & Drift Detection</div>
+                <div class="text-sm text-gray-500 mt-1">The four pillars of ML observability: data quality, data drift, model performance, operational metrics. Statistical drift tests: PSI, KS, Jensen-Shannon divergence. Evidently AI, Arize, Fiddler, WhyLabs compared. Prometheus and Grafana for ML metrics. Alerting strategies, runbooks, and incident response for ML systems.</div>
+                <div class="flex gap-2 mt-2">
+                  <span class="text-xs bg-purple-50 text-purple-700 px-2 py-0.5 rounded">Monitoring</span>
+                  <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">Evidently · Arize · Prometheus</span>
+                </div>
+              </div>
+            </div>
+            <span class="text-xs text-gray-400 flex-shrink-0">~3 hrs</span>
+          </div>
+        </a>
+
+        <a href="ch16_llm_ops.html" class="card-hover block bg-white rounded-xl border border-purple-100 p-5 shadow-sm">
+          <div class="flex items-start justify-between gap-4">
+            <div class="flex items-start gap-4">
+              <span class="w-10 h-10 bg-purple-100 text-purple-700 rounded-lg flex items-center justify-center font-bold text-sm flex-shrink-0">16</span>
+              <div>
+                <div class="font-semibold text-gray-900">LLM Ops: Fine-tuning, RLHF & Evaluation</div>
+                <div class="text-sm text-gray-500 mt-1">Supervised fine-tuning (SFT) pipelines. Parameter-efficient fine-tuning: LoRA, QLoRA, adapters. RLHF: reward modeling, PPO, DPO, GRPO. Constitutional AI and RLAIF. LLM evaluation frameworks: HELM, LM-Eval Harness, MT-Bench. LLMOps platforms: Weights & Biases Prompts, LangSmith, Braintrust. Prompt versioning and management.</div>
+                <div class="flex gap-2 mt-2">
+                  <span class="text-xs bg-purple-50 text-purple-700 px-2 py-0.5 rounded">LLM Ops</span>
+                  <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">LoRA · RLHF · DPO</span>
+                </div>
+              </div>
+            </div>
+            <span class="text-xs text-gray-400 flex-shrink-0">~4 hrs</span>
+          </div>
+        </a>
+
+      </div>
+    </div>
+
+    <!-- ── PART 5 ── -->
+    <div class="mb-4">
+      <div class="flex items-center gap-3 mb-5">
+        <span class="part-badge bg-rose-600 text-white">Part 5</span>
+        <h3 class="text-xl font-bold text-gray-800">Case Studies: Production AI Systems</h3>
+        <span class="text-sm text-gray-400 ml-auto">Ch17 – Ch19 · ~9 hrs</span>
+      </div>
+      <div class="space-y-3">
+
+        <a href="ch17_case_chatgpt.html" class="card-hover block bg-white rounded-xl border border-rose-100 p-5 shadow-sm">
+          <div class="flex items-start justify-between gap-4">
+            <div class="flex items-start gap-4">
+              <span class="w-10 h-10 bg-rose-100 text-rose-700 rounded-lg flex items-center justify-center font-bold text-sm flex-shrink-0">17</span>
+              <div>
+                <div class="font-semibold text-gray-900">Case Study: ChatGPT & GPT-4 Architecture</div>
+                <div class="text-sm text-gray-500 mt-1">Reconstructing the MLOps stack behind GPT-3/4 from public information and first-principles reasoning. Pre-training at 10,000+ GPU scale. The InstructGPT pipeline. Azure partnership and infrastructure. ChatGPT's serving architecture under viral load. Lessons for your own LLM stack.</div>
+                <div class="flex gap-2 mt-2">
+                  <span class="text-xs bg-rose-50 text-rose-700 px-2 py-0.5 rounded">Case Study</span>
+                  <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">OpenAI · GPT-4</span>
+                </div>
+              </div>
+            </div>
+            <span class="text-xs text-gray-400 flex-shrink-0">~3 hrs</span>
+          </div>
+        </a>
+
+        <a href="ch18_case_deepseek.html" class="card-hover block bg-white rounded-xl border border-rose-100 p-5 shadow-sm">
+          <div class="flex items-start justify-between gap-4">
+            <div class="flex items-start gap-4">
+              <span class="w-10 h-10 bg-rose-100 text-rose-700 rounded-lg flex items-center justify-center font-bold text-sm flex-shrink-0">18</span>
+              <div>
+                <div class="font-semibold text-gray-900">Case Study: DeepSeek Training Pipeline</div>
+                <div class="text-sm text-gray-500 mt-1">DeepSeek's compute-efficient training innovations. MoE architecture and routing. Multi-head latent attention (MLA). FP8 mixed-precision training. DualPipe pipeline parallelism. Training 671B parameters on H800 clusters. GRPO for reinforcement learning. Cost breakdown: $6M vs. $100M+ comparable runs.</div>
+                <div class="flex gap-2 mt-2">
+                  <span class="text-xs bg-rose-50 text-rose-700 px-2 py-0.5 rounded">Case Study</span>
+                  <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">DeepSeek · MoE · FP8</span>
+                </div>
+              </div>
+            </div>
+            <span class="text-xs text-gray-400 flex-shrink-0">~3 hrs</span>
+          </div>
+        </a>
+
+        <a href="ch19_case_rag_agents.html" class="card-hover block bg-white rounded-xl border border-rose-100 p-5 shadow-sm">
+          <div class="flex items-start justify-between gap-4">
+            <div class="flex items-start gap-4">
+              <span class="w-10 h-10 bg-rose-100 text-rose-700 rounded-lg flex items-center justify-center font-bold text-sm flex-shrink-0">19</span>
+              <div>
+                <div class="font-semibold text-gray-900">Case Study: Production RAG & Agent Systems</div>
+                <div class="text-sm text-gray-500 mt-1">Production RAG pipeline architecture: chunking, embedding, retrieval, reranking, generation. Vector database selection (Pinecone, Weaviate, pgvector). Agent orchestration with LangGraph and AutoGen. Evaluating RAG systems (RAGAS). Agent observability and tracing with LangSmith. Multi-agent system reliability patterns.</div>
+                <div class="flex gap-2 mt-2">
+                  <span class="text-xs bg-rose-50 text-rose-700 px-2 py-0.5 rounded">Case Study</span>
+                  <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">RAG · Agents · LangGraph</span>
+                </div>
+              </div>
+            </div>
+            <span class="text-xs text-gray-400 flex-shrink-0">~3 hrs</span>
+          </div>
+        </a>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────────────── SKILLS TABLE ─────────────────────────── -->
+<section id="skills" class="py-16 px-4 bg-white">
+  <div class="max-w-5xl mx-auto">
+    <h2 class="text-3xl font-bold text-gray-900 mb-2">Skills You'll Gain</h2>
+    <p class="text-gray-500 mb-8">Skill coverage by chapter across six MLOps competency domains</p>
+
+    <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm">
+      <table class="w-full text-xs striped">
+        <thead class="bg-gray-800 text-white">
+          <tr>
+            <th class="px-3 py-3 text-left font-semibold w-36">Chapter</th>
+            <th class="px-3 py-3 text-center font-semibold">Infrastructure</th>
+            <th class="px-3 py-3 text-center font-semibold">Data Eng.</th>
+            <th class="px-3 py-3 text-center font-semibold">Training</th>
+            <th class="px-3 py-3 text-center font-semibold">Serving</th>
+            <th class="px-3 py-3 text-center font-semibold">Monitoring</th>
+            <th class="px-3 py-3 text-center font-semibold">LLM Ops</th>
+          </tr>
+        </thead>
+        <tbody class="text-gray-700">
+          <tr>
+            <td class="px-3 py-2 font-medium">Ch01 Introduction</td>
+            <td class="px-3 py-2 text-center"><span class="skill-dot bg-blue-400"></span></td>
+            <td class="px-3 py-2 text-center"><span class="skill-dot bg-blue-400"></span></td>
+            <td class="px-3 py-2 text-center"><span class="skill-dot bg-blue-400"></span></td>
+            <td class="px-3 py-2 text-center"><span class="skill-dot bg-blue-400"></span></td>
+            <td class="px-3 py-2 text-center"><span class="skill-dot bg-blue-400"></span></td>
+            <td class="px-3 py-2 text-center"><span class="skill-dot bg-blue-400"></span></td>
+          </tr>
+          <tr>
+            <td class="px-3 py-2 font-medium">Ch02 Cloud</td>
+            <td class="px-3 py-2 text-center"><span class="skill-dot bg-blue-600"></span><span class="skill-dot bg-blue-600 ml-0.5"></span><span class="skill-dot bg-blue-600 ml-0.5"></span></td>
+            <td class="px-3 py-2 text-center"><span class="skill-dot bg-blue-400"></span></td>
+            <td class="px-3 py-2 text-center">—</td>
+            <td class="px-3 py-2 text-center"><span class="skill-dot bg-blue-400"></span></td>
+            <td class="px-3 py-2 text-center">—</td>
+            <td class="px-3 py-2 text-center">—</td>
+          </tr>
+          <tr>
+            <td class="px-3 py-2 font-medium">Ch03 IaC</td>
+            <td class="px-3 py-2 text-center"><span class="skill-dot bg-blue-600"></span><span class="skill-dot bg-blue-600 ml-0.5"></span><span class="skill-dot bg-blue-600 ml-0.5"></span></td>
+            <td class="px-3 py-2 text-center">—</td>
+            <td class="px-3 py-2 text-center">—</td>
+            <td class="px-3 py-2 text-center">—</td>
+            <td class="px-3 py-2 text-center">—</td>
+            <td class="px-3 py-2 text-center">—</td>
+          </tr>
+          <tr>
+            <td class="px-3 py-2 font-medium">Ch04 Containers / K8s</td>
+            <td class="px-3 py-2 text-center"><span class="skill-dot bg-blue-600"></span><span class="skill-dot bg-blue-600 ml-0.5"></span><span class="skill-dot bg-blue-600 ml-0.5"></span></td>
+            <td class="px-3 py-2 text-center">—</td>
+            <td class="px-3 py-2 text-center"><span class="skill-dot bg-blue-400"></span></td>
+            <td class="px-3 py-2 text-center"><span class="skill-dot bg-blue-600"></span><span class="skill-dot bg-blue-600 ml-0.5"></span></td>
+            <td class="px-3 py-2 text-center">—</td>
+            <td class="px-3 py-2 text-center">—</td>
+          </tr>
+          <tr>
+            <td class="px-3 py-2 font-medium">Ch05 GPU / HPC</td>
+            <td class="px-3 py-2 text-center"><span class="skill-dot bg-blue-600"></span><span class="skill-dot bg-blue-600 ml-0.5"></span><span class="skill-dot bg-blue-600 ml-0.5"></span></td>
+            <td class="px-3 py-2 text-center">—</td>
+            <td class="px-3 py-2 text-center"><span class="skill-dot bg-blue-600"></span><span class="skill-dot bg-blue-600 ml-0.5"></span><span class="skill-dot bg-blue-600 ml-0.5"></span></td>
+            <td class="px-3 py-2 text-center">—</td>
+            <td class="px-3 py-2 text-center">—</td>
+            <td class="px-3 py-2 text-center">—</td>
+          </tr>
+          <tr>
+            <td class="px-3 py-2 font-medium">Ch06 Data Eng.</td>
+            <td class="px-3 py-2 text-center">—</td>
+            <td class="px-3 py-2 text-center"><span class="skill-dot bg-green-600"></span><span class="skill-dot bg-green-600 ml-0.5"></span><span class="skill-dot bg-green-600 ml-0.5"></span></td>
+            <td class="px-3 py-2 text-center"><span class="skill-dot bg-green-400"></span></td>
+            <td class="px-3 py-2 text-center">—</td>
+            <td class="px-3 py-2 text-center"><span class="skill-dot bg-green-400"></span></td>
+            <td class="px-3 py-2 text-center">—</td>
+          </tr>
+          <tr>
+            <td class="px-3 py-2 font-medium">Ch07 Exp. Tracking</td>
+            <td class="px-3 py-2 text-center">—</td>
+            <td class="px-3 py-2 text-center">—</td>
+            <td class="px-3 py-2 text-center"><span class="skill-dot bg-green-600"></span><span class="skill-dot bg-green-600 ml-0.5"></span><span class="skill-dot bg-green-600 ml-0.5"></span></td>
+            <td class="px-3 py-2 text-center">—</td>
+            <td class="px-3 py-2 text-center"><span class="skill-dot bg-green-400"></span></td>
+            <td class="px-3 py-2 text-center">—</td>
+          </tr>
+          <tr>
+            <td class="px-3 py-2 font-medium">Ch08 Dist. Training</td>
+            <td class="px-3 py-2 text-center"><span class="skill-dot bg-green-400"></span></td>
+            <td class="px-3 py-2 text-center">—</td>
+            <td class="px-3 py-2 text-center"><span class="skill-dot bg-green-600"></span><span class="skill-dot bg-green-600 ml-0.5"></span><span class="skill-dot bg-green-600 ml-0.5"></span></td>
+            <td class="px-3 py-2 text-center">—</td>
+            <td class="px-3 py-2 text-center">—</td>
+            <td class="px-3 py-2 text-center"><span class="skill-dot bg-green-600"></span><span class="skill-dot bg-green-600 ml-0.5"></span></td>
+          </tr>
+          <tr>
+            <td class="px-3 py-2 font-medium">Ch09 Platforms</td>
+            <td class="px-3 py-2 text-center"><span class="skill-dot bg-green-400"></span></td>
+            <td class="px-3 py-2 text-center"><span class="skill-dot bg-green-400"></span></td>
+            <td class="px-3 py-2 text-center"><span class="skill-dot bg-green-400"></span></td>
+            <td class="px-3 py-2 text-center"><span class="skill-dot bg-green-400"></span></td>
+            <td class="px-3 py-2 text-center"><span class="skill-dot bg-green-400"></span></td>
+            <td class="px-3 py-2 text-center">—</td>
+          </tr>
+          <tr>
+            <td class="px-3 py-2 font-medium">Ch10 Ray</td>
+            <td class="px-3 py-2 text-center"><span class="skill-dot bg-green-400"></span></td>
+            <td class="px-3 py-2 text-center"><span class="skill-dot bg-green-600"></span><span class="skill-dot bg-green-600 ml-0.5"></span></td>
+            <td class="px-3 py-2 text-center"><span class="skill-dot bg-green-600"></span><span class="skill-dot bg-green-600 ml-0.5"></span><span class="skill-dot bg-green-600 ml-0.5"></span></td>
+            <td class="px-3 py-2 text-center"><span class="skill-dot bg-green-600"></span><span class="skill-dot bg-green-600 ml-0.5"></span></td>
+            <td class="px-3 py-2 text-center">—</td>
+            <td class="px-3 py-2 text-center">—</td>
+          </tr>
+          <tr>
+            <td class="px-3 py-2 font-medium">Ch11 Orchestration</td>
+            <td class="px-3 py-2 text-center">—</td>
+            <td class="px-3 py-2 text-center"><span class="skill-dot bg-amber-500"></span><span class="skill-dot bg-amber-500 ml-0.5"></span></td>
+            <td class="px-3 py-2 text-center"><span class="skill-dot bg-amber-500"></span><span class="skill-dot bg-amber-500 ml-0.5"></span></td>
+            <td class="px-3 py-2 text-center">—</td>
+            <td class="px-3 py-2 text-center">—</td>
+            <td class="px-3 py-2 text-center">—</td>
+          </tr>
+          <tr>
+            <td class="px-3 py-2 font-medium">Ch12 CI/CD</td>
+            <td class="px-3 py-2 text-center"><span class="skill-dot bg-amber-500"></span><span class="skill-dot bg-amber-500 ml-0.5"></span></td>
+            <td class="px-3 py-2 text-center">—</td>
+            <td class="px-3 py-2 text-center"><span class="skill-dot bg-amber-500"></span></td>
+            <td class="px-3 py-2 text-center"><span class="skill-dot bg-amber-500"></span><span class="skill-dot bg-amber-500 ml-0.5"></span></td>
+            <td class="px-3 py-2 text-center">—</td>
+            <td class="px-3 py-2 text-center">—</td>
+          </tr>
+          <tr>
+            <td class="px-3 py-2 font-medium">Ch13 Serving</td>
+            <td class="px-3 py-2 text-center">—</td>
+            <td class="px-3 py-2 text-center">—</td>
+            <td class="px-3 py-2 text-center">—</td>
+            <td class="px-3 py-2 text-center"><span class="skill-dot bg-amber-500"></span><span class="skill-dot bg-amber-500 ml-0.5"></span><span class="skill-dot bg-amber-500 ml-0.5"></span></td>
+            <td class="px-3 py-2 text-center"><span class="skill-dot bg-amber-500"></span></td>
+            <td class="px-3 py-2 text-center">—</td>
+          </tr>
+          <tr>
+            <td class="px-3 py-2 font-medium">Ch14 LLM Serving</td>
+            <td class="px-3 py-2 text-center">—</td>
+            <td class="px-3 py-2 text-center">—</td>
+            <td class="px-3 py-2 text-center">—</td>
+            <td class="px-3 py-2 text-center"><span class="skill-dot bg-amber-500"></span><span class="skill-dot bg-amber-500 ml-0.5"></span><span class="skill-dot bg-amber-500 ml-0.5"></span></td>
+            <td class="px-3 py-2 text-center">—</td>
+            <td class="px-3 py-2 text-center"><span class="skill-dot bg-amber-500"></span><span class="skill-dot bg-amber-500 ml-0.5"></span><span class="skill-dot bg-amber-500 ml-0.5"></span></td>
+          </tr>
+          <tr>
+            <td class="px-3 py-2 font-medium">Ch15 Monitoring</td>
+            <td class="px-3 py-2 text-center">—</td>
+            <td class="px-3 py-2 text-center"><span class="skill-dot bg-purple-400"></span></td>
+            <td class="px-3 py-2 text-center">—</td>
+            <td class="px-3 py-2 text-center">—</td>
+            <td class="px-3 py-2 text-center"><span class="skill-dot bg-purple-600"></span><span class="skill-dot bg-purple-600 ml-0.5"></span><span class="skill-dot bg-purple-600 ml-0.5"></span></td>
+            <td class="px-3 py-2 text-center">—</td>
+          </tr>
+          <tr>
+            <td class="px-3 py-2 font-medium">Ch16 LLM Ops</td>
+            <td class="px-3 py-2 text-center">—</td>
+            <td class="px-3 py-2 text-center">—</td>
+            <td class="px-3 py-2 text-center"><span class="skill-dot bg-purple-600"></span><span class="skill-dot bg-purple-600 ml-0.5"></span></td>
+            <td class="px-3 py-2 text-center">—</td>
+            <td class="px-3 py-2 text-center">—</td>
+            <td class="px-3 py-2 text-center"><span class="skill-dot bg-purple-600"></span><span class="skill-dot bg-purple-600 ml-0.5"></span><span class="skill-dot bg-purple-600 ml-0.5"></span></td>
+          </tr>
+          <tr>
+            <td class="px-3 py-2 font-medium">Ch17–19 Case Studies</td>
+            <td class="px-3 py-2 text-center"><span class="skill-dot bg-rose-400"></span></td>
+            <td class="px-3 py-2 text-center"><span class="skill-dot bg-rose-400"></span></td>
+            <td class="px-3 py-2 text-center"><span class="skill-dot bg-rose-400"></span></td>
+            <td class="px-3 py-2 text-center"><span class="skill-dot bg-rose-400"></span></td>
+            <td class="px-3 py-2 text-center"><span class="skill-dot bg-rose-400"></span></td>
+            <td class="px-3 py-2 text-center"><span class="skill-dot bg-rose-400"></span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="mt-4 flex flex-wrap gap-4 text-xs text-gray-500">
+      <span><span class="skill-dot bg-gray-400 mr-1"></span> Intro coverage</span>
+      <span><span class="skill-dot bg-blue-400 mr-1"></span><span class="skill-dot bg-blue-400 mr-0.5"></span> Moderate (Part 1)</span>
+      <span><span class="skill-dot bg-green-600 mr-1"></span><span class="skill-dot bg-green-600 mr-0.5"></span><span class="skill-dot bg-green-600 mr-1"></span> Deep coverage</span>
+      <span>— = Not covered in that chapter</span>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────────────── MODERN MLOPS STACK ─────────────────────────── -->
+<section id="stack" class="py-16 px-4 bg-gray-50">
+  <div class="max-w-5xl mx-auto">
+    <h2 class="text-3xl font-bold text-gray-900 mb-2">The Modern MLOps Stack</h2>
+    <p class="text-gray-500 mb-8">Comprehensive tool comparison by category — as of early 2026</p>
+
+    <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm mb-8">
+      <table class="w-full text-sm striped">
+        <thead class="bg-gray-800 text-white">
+          <tr>
+            <th class="px-4 py-3 text-left font-semibold">Category</th>
+            <th class="px-4 py-3 text-left font-semibold">OSS Options</th>
+            <th class="px-4 py-3 text-left font-semibold">Managed / Cloud</th>
+            <th class="px-4 py-3 text-left font-semibold">Best for</th>
+            <th class="px-4 py-3 text-left font-semibold">Chapter</th>
+          </tr>
+        </thead>
+        <tbody class="text-gray-700">
+          <tr>
+            <td class="px-4 py-3 font-semibold text-blue-700">Cloud Compute</td>
+            <td class="px-4 py-3">Slurm, OpenPBS</td>
+            <td class="px-4 py-3">AWS EC2 (p4d/p5), GCP TPUs, Azure NDv4</td>
+            <td class="px-4 py-3">Large-scale training, flexible burst</td>
+            <td class="px-4 py-3 text-center"><a href="ch02_cloud_aws_gcp.html" class="text-blue-600 hover:underline">02</a></td>
+          </tr>
+          <tr>
+            <td class="px-4 py-3 font-semibold text-blue-700">IaC</td>
+            <td class="px-4 py-3">Terraform, Pulumi, Ansible</td>
+            <td class="px-4 py-3">AWS CDK, GCP Deployment Manager</td>
+            <td class="px-4 py-3">Reproducible infra, GitOps</td>
+            <td class="px-4 py-3 text-center"><a href="ch03_iac.html" class="text-blue-600 hover:underline">03</a></td>
+          </tr>
+          <tr>
+            <td class="px-4 py-3 font-semibold text-blue-700">Containers</td>
+            <td class="px-4 py-3">Docker, containerd, Buildah</td>
+            <td class="px-4 py-3">ECR, GCR, Docker Hub</td>
+            <td class="px-4 py-3">Environment reproducibility</td>
+            <td class="px-4 py-3 text-center"><a href="ch04_containers_kubernetes.html" class="text-blue-600 hover:underline">04</a></td>
+          </tr>
+          <tr>
+            <td class="px-4 py-3 font-semibold text-blue-700">Container Orchestration</td>
+            <td class="px-4 py-3">Kubernetes, Nomad</td>
+            <td class="px-4 py-3">EKS, GKE, AKS</td>
+            <td class="px-4 py-3">Heterogeneous workloads, serving</td>
+            <td class="px-4 py-3 text-center"><a href="ch04_containers_kubernetes.html" class="text-blue-600 hover:underline">04</a></td>
+          </tr>
+          <tr>
+            <td class="px-4 py-3 font-semibold text-green-700">Data Storage</td>
+            <td class="px-4 py-3">MinIO, Delta Lake, Apache Iceberg</td>
+            <td class="px-4 py-3">S3, GCS, ADLS Gen2</td>
+            <td class="px-4 py-3">Large-scale ML datasets</td>
+            <td class="px-4 py-3 text-center"><a href="ch06_data_engineering.html" class="text-blue-600 hover:underline">06</a></td>
+          </tr>
+          <tr>
+            <td class="px-4 py-3 font-semibold text-green-700">Feature Store</td>
+            <td class="px-4 py-3">Feast, Hopsworks</td>
+            <td class="px-4 py-3">Tecton, Vertex Feature Store, SageMaker FS</td>
+            <td class="px-4 py-3">Online/offline feature consistency</td>
+            <td class="px-4 py-3 text-center"><a href="ch06_data_engineering.html" class="text-blue-600 hover:underline">06</a></td>
+          </tr>
+          <tr>
+            <td class="px-4 py-3 font-semibold text-green-700">Data Validation</td>
+            <td class="px-4 py-3">Great Expectations, Pandera, Deequ</td>
+            <td class="px-4 py-3">Monte Carlo, Bigeye</td>
+            <td class="px-4 py-3">Pipeline data quality gates</td>
+            <td class="px-4 py-3 text-center"><a href="ch06_data_engineering.html" class="text-blue-600 hover:underline">06</a></td>
+          </tr>
+          <tr>
+            <td class="px-4 py-3 font-semibold text-green-700">Experiment Tracking</td>
+            <td class="px-4 py-3">MLflow, DVC</td>
+            <td class="px-4 py-3">Weights & Biases, Comet ML, Neptune</td>
+            <td class="px-4 py-3">Reproducibility, team collaboration</td>
+            <td class="px-4 py-3 text-center"><a href="ch07_experiment_tracking.html" class="text-blue-600 hover:underline">07</a></td>
+          </tr>
+          <tr>
+            <td class="px-4 py-3 font-semibold text-green-700">Model Registry</td>
+            <td class="px-4 py-3">MLflow Model Registry</td>
+            <td class="px-4 py-3">W&B Artifacts, SageMaker Model Registry, Vertex</td>
+            <td class="px-4 py-3">Model lineage, governance, promotion</td>
+            <td class="px-4 py-3 text-center"><a href="ch07_experiment_tracking.html" class="text-blue-600 hover:underline">07</a></td>
+          </tr>
+          <tr>
+            <td class="px-4 py-3 font-semibold text-green-700">Distributed Training</td>
+            <td class="px-4 py-3">PyTorch DDP/FSDP, DeepSpeed, Megatron-LM</td>
+            <td class="px-4 py-3">SageMaker Training, Vertex AI Training</td>
+            <td class="px-4 py-3">Large model training</td>
+            <td class="px-4 py-3 text-center"><a href="ch08_distributed_training.html" class="text-blue-600 hover:underline">08</a></td>
+          </tr>
+          <tr>
+            <td class="px-4 py-3 font-semibold text-green-700">Distributed Compute</td>
+            <td class="px-4 py-3">Ray, Spark, Dask</td>
+            <td class="px-4 py-3">Anyscale, Databricks, EMR</td>
+            <td class="px-4 py-3">Data processing, HPO, serving</td>
+            <td class="px-4 py-3 text-center"><a href="ch10_ray_ecosystem.html" class="text-blue-600 hover:underline">10</a></td>
+          </tr>
+          <tr>
+            <td class="px-4 py-3 font-semibold text-amber-700">Orchestration</td>
+            <td class="px-4 py-3">Apache Airflow, Prefect, Dagster, Luigi</td>
+            <td class="px-4 py-3">MWAA, Vertex Pipelines, AWS Step Functions</td>
+            <td class="px-4 py-3">ML pipeline scheduling, lineage</td>
+            <td class="px-4 py-3 text-center"><a href="ch11_orchestration.html" class="text-blue-600 hover:underline">11</a></td>
+          </tr>
+          <tr>
+            <td class="px-4 py-3 font-semibold text-amber-700">ML Pipelines</td>
+            <td class="px-4 py-3">Kubeflow Pipelines (KFP), ZenML, Kedro</td>
+            <td class="px-4 py-3">SageMaker Pipelines, Vertex AI Pipelines</td>
+            <td class="px-4 py-3">End-to-end ML workflow automation</td>
+            <td class="px-4 py-3 text-center"><a href="ch12_ml_pipelines_cicd.html" class="text-blue-600 hover:underline">12</a></td>
+          </tr>
+          <tr>
+            <td class="px-4 py-3 font-semibold text-amber-700">CI/CD</td>
+            <td class="px-4 py-3">GitHub Actions, GitLab CI, ArgoCD</td>
+            <td class="px-4 py-3">AWS CodePipeline, Cloud Build</td>
+            <td class="px-4 py-3">Automated testing and deployment</td>
+            <td class="px-4 py-3 text-center"><a href="ch12_ml_pipelines_cicd.html" class="text-blue-600 hover:underline">12</a></td>
+          </tr>
+          <tr>
+            <td class="px-4 py-3 font-semibold text-pink-700">Model Serving</td>
+            <td class="px-4 py-3">TorchServe, TF Serving, Triton, BentoML</td>
+            <td class="px-4 py-3">SageMaker Endpoints, Vertex Prediction</td>
+            <td class="px-4 py-3">Real-time inference, batch scoring</td>
+            <td class="px-4 py-3 text-center"><a href="ch13_model_serving.html" class="text-blue-600 hover:underline">13</a></td>
+          </tr>
+          <tr>
+            <td class="px-4 py-3 font-semibold text-pink-700">LLM Serving</td>
+            <td class="px-4 py-3">vLLM, TGI (Hugging Face), llama.cpp</td>
+            <td class="px-4 py-3">AWS Bedrock, Vertex AI, Together AI</td>
+            <td class="px-4 py-3">High-throughput token generation</td>
+            <td class="px-4 py-3 text-center"><a href="ch14_llm_serving.html" class="text-blue-600 hover:underline">14</a></td>
+          </tr>
+          <tr>
+            <td class="px-4 py-3 font-semibold text-pink-700">API Gateway / Service Mesh</td>
+            <td class="px-4 py-3">Envoy, Istio, Kong</td>
+            <td class="px-4 py-3">AWS API Gateway, GCP Apigee</td>
+            <td class="px-4 py-3">Traffic management, A/B testing</td>
+            <td class="px-4 py-3 text-center"><a href="ch13_model_serving.html" class="text-blue-600 hover:underline">13</a></td>
+          </tr>
+          <tr>
+            <td class="px-4 py-3 font-semibold text-purple-700">Metrics / Monitoring</td>
+            <td class="px-4 py-3">Prometheus, Grafana, OpenTelemetry</td>
+            <td class="px-4 py-3">Datadog, New Relic, Cloud Monitoring</td>
+            <td class="px-4 py-3">Infra and serving metrics</td>
+            <td class="px-4 py-3 text-center"><a href="ch15_monitoring.html" class="text-blue-600 hover:underline">15</a></td>
+          </tr>
+          <tr>
+            <td class="px-4 py-3 font-semibold text-purple-700">ML Observability / Drift</td>
+            <td class="px-4 py-3">Evidently AI, Alibi Detect, nannyml</td>
+            <td class="px-4 py-3">Arize, Fiddler, WhyLabs, Arthur</td>
+            <td class="px-4 py-3">Data and model drift detection</td>
+            <td class="px-4 py-3 text-center"><a href="ch15_monitoring.html" class="text-blue-600 hover:underline">15</a></td>
+          </tr>
+          <tr>
+            <td class="px-4 py-3 font-semibold text-purple-700">LLM Eval / Tracing</td>
+            <td class="px-4 py-3">LM-Eval Harness, RAGAS, Phoenix</td>
+            <td class="px-4 py-3">LangSmith, Braintrust, W&B Prompts</td>
+            <td class="px-4 py-3">LLM quality evaluation and tracing</td>
+            <td class="px-4 py-3 text-center"><a href="ch16_llm_ops.html" class="text-blue-600 hover:underline">16</a></td>
+          </tr>
+          <tr>
+            <td class="px-4 py-3 font-semibold text-purple-700">Vector Databases</td>
+            <td class="px-4 py-3">Weaviate, Chroma, pgvector, Qdrant</td>
+            <td class="px-4 py-3">Pinecone, MongoDB Atlas Vector</td>
+            <td class="px-4 py-3">RAG retrieval, semantic search</td>
+            <td class="px-4 py-3 text-center"><a href="ch19_case_rag_agents.html" class="text-blue-600 hover:underline">19</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout-warn rounded-xl p-5 text-sm text-amber-900">
+      <strong>Tool selection principle:</strong> The "right" tool is always context-dependent.
+      This course teaches you the underlying concepts so you can evaluate any tool intelligently,
+      not just operate a specific toolchain. Every chapter includes an explicit trade-off analysis.
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────────────── CAREER PROGRESSION ─────────────────────────── -->
+<section id="career" class="py-16 px-4 bg-white">
+  <div class="max-w-5xl mx-auto">
+    <h2 class="text-3xl font-bold text-gray-900 mb-2">Career Progression</h2>
+    <p class="text-gray-500 mb-10">What seniority level you'll operate at after completing each part</p>
+
+    <div class="relative">
+      <!-- Timeline line -->
+      <div class="absolute left-6 top-0 bottom-0 w-0.5 bg-gray-200 hidden md:block"></div>
+
+      <div class="space-y-8">
+
+        <!-- Before -->
+        <div class="flex items-start gap-6">
+          <div class="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center font-bold text-gray-500 text-sm flex-shrink-0 z-10">L3</div>
+          <div class="flex-1 bg-gray-50 rounded-xl p-5 border border-gray-200">
+            <div class="font-bold text-gray-700 mb-1">Before the course — Junior / Mid SWE</div>
+            <p class="text-sm text-gray-600">You can write Python, train a model in a notebook, deploy a Flask app. MLOps is a black box. You've heard of Kubernetes but never operated it. You know cloud costs exist but not how to control them.</p>
+          </div>
+        </div>
+
+        <!-- After Part 1 -->
+        <div class="flex items-start gap-6">
+          <div class="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center font-bold text-white text-sm flex-shrink-0 z-10">L4</div>
+          <div class="flex-1 bg-blue-50 rounded-xl p-5 border border-blue-200">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="font-bold text-blue-800">After Part 1 (Ch01–05) — ML Infrastructure Engineer</span>
+              <span class="part-badge bg-blue-600 text-white">Part 1</span>
+            </div>
+            <p class="text-sm text-gray-700 mb-2">You can provision cloud infrastructure with Terraform, containerize ML workloads, deploy Kubernetes clusters, and understand GPU/networking requirements. You can own the infrastructure layer for a small ML team.</p>
+            <div class="flex flex-wrap gap-2 text-xs">
+              <span class="bg-blue-100 text-blue-700 px-2 py-0.5 rounded">Cloud architecture</span>
+              <span class="bg-blue-100 text-blue-700 px-2 py-0.5 rounded">IaC (Terraform)</span>
+              <span class="bg-blue-100 text-blue-700 px-2 py-0.5 rounded">Kubernetes</span>
+              <span class="bg-blue-100 text-blue-700 px-2 py-0.5 rounded">GPU infrastructure</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- After Part 2 -->
+        <div class="flex items-start gap-6">
+          <div class="w-12 h-12 rounded-full bg-green-600 flex items-center justify-center font-bold text-white text-sm flex-shrink-0 z-10">L5</div>
+          <div class="flex-1 bg-green-50 rounded-xl p-5 border border-green-200">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="font-bold text-green-800">After Part 2 (Ch06–10) — Senior ML Engineer</span>
+              <span class="part-badge bg-green-600 text-white">Part 2</span>
+            </div>
+            <p class="text-sm text-gray-700 mb-2">You can design and operate data pipelines, feature stores, and distributed training jobs. You can scale training from 1 GPU to hundreds with proper parallelism strategies. You evaluate and choose MLOps platforms appropriately. This is a competitive senior ML engineer.</p>
+            <div class="flex flex-wrap gap-2 text-xs">
+              <span class="bg-green-100 text-green-700 px-2 py-0.5 rounded">Data pipelines</span>
+              <span class="bg-green-100 text-green-700 px-2 py-0.5 rounded">Feature stores</span>
+              <span class="bg-green-100 text-green-700 px-2 py-0.5 rounded">Distributed training</span>
+              <span class="bg-green-100 text-green-700 px-2 py-0.5 rounded">Experiment tracking</span>
+              <span class="bg-green-100 text-green-700 px-2 py-0.5 rounded">Ray / Spark</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- After Part 3 -->
+        <div class="flex items-start gap-6">
+          <div class="w-12 h-12 rounded-full bg-amber-500 flex items-center justify-center font-bold text-white text-sm flex-shrink-0 z-10">L5+</div>
+          <div class="flex-1 bg-amber-50 rounded-xl p-5 border border-amber-200">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="font-bold text-amber-800">After Part 3 (Ch11–14) — Senior MLOps Engineer</span>
+              <span class="part-badge bg-amber-500 text-white">Part 3</span>
+            </div>
+            <p class="text-sm text-gray-700 mb-2">You can build end-to-end ML pipelines with CI/CD automation, orchestrate complex workflows, and design high-performance model serving systems including LLM inference. You can lead the production readiness of an ML system independently.</p>
+            <div class="flex flex-wrap gap-2 text-xs">
+              <span class="bg-amber-100 text-amber-700 px-2 py-0.5 rounded">ML pipelines</span>
+              <span class="bg-amber-100 text-amber-700 px-2 py-0.5 rounded">CI/CD for ML</span>
+              <span class="bg-amber-100 text-amber-700 px-2 py-0.5 rounded">Model serving (Triton/vLLM)</span>
+              <span class="bg-amber-100 text-amber-700 px-2 py-0.5 rounded">Workflow orchestration</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- After Part 4 -->
+        <div class="flex items-start gap-6">
+          <div class="w-12 h-12 rounded-full bg-purple-600 flex items-center justify-center font-bold text-white text-sm flex-shrink-0 z-10">L6</div>
+          <div class="flex-1 bg-purple-50 rounded-xl p-5 border border-purple-200">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="font-bold text-purple-800">After Part 4 (Ch15–16) — Staff MLOps Engineer</span>
+              <span class="part-badge bg-purple-600 text-white">Part 4</span>
+            </div>
+            <p class="text-sm text-gray-700 mb-2">You can design comprehensive ML observability systems, detect and respond to model degradation, and operate LLM fine-tuning and RLHF pipelines. You can lead a team and define the MLOps strategy for an organization. This is competitive staff-level at most companies.</p>
+            <div class="flex flex-wrap gap-2 text-xs">
+              <span class="bg-purple-100 text-purple-700 px-2 py-0.5 rounded">ML observability</span>
+              <span class="bg-purple-100 text-purple-700 px-2 py-0.5 rounded">Drift detection</span>
+              <span class="bg-purple-100 text-purple-700 px-2 py-0.5 rounded">RLHF pipelines</span>
+              <span class="bg-purple-100 text-purple-700 px-2 py-0.5 rounded">LLM fine-tuning</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- After Part 5 -->
+        <div class="flex items-start gap-6">
+          <div class="w-12 h-12 rounded-full bg-rose-600 flex items-center justify-center font-bold text-white text-sm flex-shrink-0 z-10">L7</div>
+          <div class="flex-1 bg-rose-50 rounded-xl p-5 border border-rose-200">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="font-bold text-rose-800">After Part 5 (Ch17–19) — Principal / MLOps Architect</span>
+              <span class="part-badge bg-rose-600 text-white">Part 5</span>
+            </div>
+            <p class="text-sm text-gray-700 mb-2">You can reason about frontier AI infrastructure — from training clusters at the scale of GPT-4 and DeepSeek to production RAG and agent systems. You can make architectural decisions that balance cost, reliability, and capability at scale. You can architect MLOps systems for any organization from startup to hyperscaler.</p>
+            <div class="flex flex-wrap gap-2 text-xs">
+              <span class="bg-rose-100 text-rose-700 px-2 py-0.5 rounded">Frontier model infra</span>
+              <span class="bg-rose-100 text-rose-700 px-2 py-0.5 rounded">LLM system design</span>
+              <span class="bg-rose-100 text-rose-700 px-2 py-0.5 rounded">RAG production systems</span>
+              <span class="bg-rose-100 text-rose-700 px-2 py-0.5 rounded">Agent architecture</span>
+              <span class="bg-rose-100 text-rose-700 px-2 py-0.5 rounded">Cost optimization at scale</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Final callout -->
+    <div class="mt-12 callout-info rounded-xl p-6 text-blue-900">
+      <div class="font-bold text-lg mb-2">A note on timelines</div>
+      <p class="text-sm">
+        Reading alone won't get you there — you need to operate real systems. Pair this course with
+        hands-on projects: set up a personal cluster, deploy a real model, debug a real failure.
+        Engineers who combine this curriculum with production experience typically reach staff-level
+        MLOps competency in 12–18 months. Those who are already working in adjacent roles (SRE,
+        data engineering, ML research) often achieve this in 6–9 months.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────────────── QUICK REFERENCE ─────────────────────────── -->
+<section class="py-16 px-4 bg-gray-50">
+  <div class="max-w-5xl mx-auto">
+    <h2 class="text-3xl font-bold text-gray-900 mb-2">Quick Reference</h2>
+    <p class="text-gray-500 mb-8">All 19 chapters at a glance</p>
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
+      <a href="ch01_introduction.html" class="card-hover bg-white rounded-lg border border-gray-200 p-4 flex items-center gap-3">
+        <span class="w-8 h-8 bg-blue-100 text-blue-700 rounded-md flex items-center justify-center font-bold text-xs flex-shrink-0">01</span>
+        <span class="text-sm font-medium text-gray-800">Introduction to Modern MLOps</span>
+      </a>
+      <a href="ch02_cloud_aws_gcp.html" class="card-hover bg-white rounded-lg border border-gray-200 p-4 flex items-center gap-3">
+        <span class="w-8 h-8 bg-blue-100 text-blue-700 rounded-md flex items-center justify-center font-bold text-xs flex-shrink-0">02</span>
+        <span class="text-sm font-medium text-gray-800">Cloud Infrastructure (AWS & GCP)</span>
+      </a>
+      <a href="ch03_iac.html" class="card-hover bg-white rounded-lg border border-gray-200 p-4 flex items-center gap-3">
+        <span class="w-8 h-8 bg-blue-100 text-blue-700 rounded-md flex items-center justify-center font-bold text-xs flex-shrink-0">03</span>
+        <span class="text-sm font-medium text-gray-800">Infrastructure as Code</span>
+      </a>
+      <a href="ch04_containers_kubernetes.html" class="card-hover bg-white rounded-lg border border-gray-200 p-4 flex items-center gap-3">
+        <span class="w-8 h-8 bg-blue-100 text-blue-700 rounded-md flex items-center justify-center font-bold text-xs flex-shrink-0">04</span>
+        <span class="text-sm font-medium text-gray-800">Containers & Kubernetes</span>
+      </a>
+      <a href="ch05_gpu_hpc.html" class="card-hover bg-white rounded-lg border border-gray-200 p-4 flex items-center gap-3">
+        <span class="w-8 h-8 bg-blue-100 text-blue-700 rounded-md flex items-center justify-center font-bold text-xs flex-shrink-0">05</span>
+        <span class="text-sm font-medium text-gray-800">GPU Infrastructure & HPC</span>
+      </a>
+      <a href="ch06_data_engineering.html" class="card-hover bg-white rounded-lg border border-gray-200 p-4 flex items-center gap-3">
+        <span class="w-8 h-8 bg-green-100 text-green-700 rounded-md flex items-center justify-center font-bold text-xs flex-shrink-0">06</span>
+        <span class="text-sm font-medium text-gray-800">Data Engineering & Feature Stores</span>
+      </a>
+      <a href="ch07_experiment_tracking.html" class="card-hover bg-white rounded-lg border border-gray-200 p-4 flex items-center gap-3">
+        <span class="w-8 h-8 bg-green-100 text-green-700 rounded-md flex items-center justify-center font-bold text-xs flex-shrink-0">07</span>
+        <span class="text-sm font-medium text-gray-800">Experiment Tracking & Model Registry</span>
+      </a>
+      <a href="ch08_distributed_training.html" class="card-hover bg-white rounded-lg border border-gray-200 p-4 flex items-center gap-3">
+        <span class="w-8 h-8 bg-green-100 text-green-700 rounded-md flex items-center justify-center font-bold text-xs flex-shrink-0">08</span>
+        <span class="text-sm font-medium text-gray-800">Distributed Training at Scale</span>
+      </a>
+      <a href="ch09_mlops_platforms.html" class="card-hover bg-white rounded-lg border border-gray-200 p-4 flex items-center gap-3">
+        <span class="w-8 h-8 bg-green-100 text-green-700 rounded-md flex items-center justify-center font-bold text-xs flex-shrink-0">09</span>
+        <span class="text-sm font-medium text-gray-800">MLOps Platforms</span>
+      </a>
+      <a href="ch10_ray_ecosystem.html" class="card-hover bg-white rounded-lg border border-gray-200 p-4 flex items-center gap-3">
+        <span class="w-8 h-8 bg-green-100 text-green-700 rounded-md flex items-center justify-center font-bold text-xs flex-shrink-0">10</span>
+        <span class="text-sm font-medium text-gray-800">The Ray Ecosystem</span>
+      </a>
+      <a href="ch11_orchestration.html" class="card-hover bg-white rounded-lg border border-gray-200 p-4 flex items-center gap-3">
+        <span class="w-8 h-8 bg-amber-100 text-amber-700 rounded-md flex items-center justify-center font-bold text-xs flex-shrink-0">11</span>
+        <span class="text-sm font-medium text-gray-800">Workflow Orchestration</span>
+      </a>
+      <a href="ch12_ml_pipelines_cicd.html" class="card-hover bg-white rounded-lg border border-gray-200 p-4 flex items-center gap-3">
+        <span class="w-8 h-8 bg-amber-100 text-amber-700 rounded-md flex items-center justify-center font-bold text-xs flex-shrink-0">12</span>
+        <span class="text-sm font-medium text-gray-800">ML Pipelines & CI/CD</span>
+      </a>
+      <a href="ch13_model_serving.html" class="card-hover bg-white rounded-lg border border-gray-200 p-4 flex items-center gap-3">
+        <span class="w-8 h-8 bg-amber-100 text-amber-700 rounded-md flex items-center justify-center font-bold text-xs flex-shrink-0">13</span>
+        <span class="text-sm font-medium text-gray-800">Model Serving & Deployment</span>
+      </a>
+      <a href="ch14_llm_serving.html" class="card-hover bg-white rounded-lg border border-gray-200 p-4 flex items-center gap-3">
+        <span class="w-8 h-8 bg-amber-100 text-amber-700 rounded-md flex items-center justify-center font-bold text-xs flex-shrink-0">14</span>
+        <span class="text-sm font-medium text-gray-800">LLM Serving & Inference Optimization</span>
+      </a>
+      <a href="ch15_monitoring.html" class="card-hover bg-white rounded-lg border border-gray-200 p-4 flex items-center gap-3">
+        <span class="w-8 h-8 bg-purple-100 text-purple-700 rounded-md flex items-center justify-center font-bold text-xs flex-shrink-0">15</span>
+        <span class="text-sm font-medium text-gray-800">Monitoring & Drift Detection</span>
+      </a>
+      <a href="ch16_llm_ops.html" class="card-hover bg-white rounded-lg border border-gray-200 p-4 flex items-center gap-3">
+        <span class="w-8 h-8 bg-purple-100 text-purple-700 rounded-md flex items-center justify-center font-bold text-xs flex-shrink-0">16</span>
+        <span class="text-sm font-medium text-gray-800">LLM Ops: Fine-tuning & RLHF</span>
+      </a>
+      <a href="ch17_case_chatgpt.html" class="card-hover bg-white rounded-lg border border-gray-200 p-4 flex items-center gap-3">
+        <span class="w-8 h-8 bg-rose-100 text-rose-700 rounded-md flex items-center justify-center font-bold text-xs flex-shrink-0">17</span>
+        <span class="text-sm font-medium text-gray-800">Case Study: ChatGPT & GPT-4</span>
+      </a>
+      <a href="ch18_case_deepseek.html" class="card-hover bg-white rounded-lg border border-gray-200 p-4 flex items-center gap-3">
+        <span class="w-8 h-8 bg-rose-100 text-rose-700 rounded-md flex items-center justify-center font-bold text-xs flex-shrink-0">18</span>
+        <span class="text-sm font-medium text-gray-800">Case Study: DeepSeek Pipeline</span>
+      </a>
+      <a href="ch19_case_rag_agents.html" class="card-hover bg-white rounded-lg border border-gray-200 p-4 flex items-center gap-3">
+        <span class="w-8 h-8 bg-rose-100 text-rose-700 rounded-md flex items-center justify-center font-bold text-xs flex-shrink-0">19</span>
+        <span class="text-sm font-medium text-gray-800">Case Study: Production RAG & Agents</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────────────── FOOTER ─────────────────────────── -->
+<footer class="bg-gray-900 text-gray-400 py-12 px-4">
+  <div class="max-w-5xl mx-auto">
+    <div class="grid md:grid-cols-3 gap-8 mb-8">
+      <div>
+        <div class="flex items-center gap-2 mb-3">
+          <div class="w-7 h-7 bg-blue-600 rounded-md flex items-center justify-center">
+            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/>
+            </svg>
+          </div>
+          <span class="text-white font-bold text-sm">Modern MLOps Tutorial</span>
+        </div>
+        <p class="text-xs leading-relaxed">A practitioner-written tutorial series for engineers who want to build and operate production ML systems at scale. From first container to frontier LLM infrastructure.</p>
+      </div>
+      <div>
+        <div class="font-semibold text-white text-sm mb-3">Course Parts</div>
+        <ul class="space-y-1 text-xs">
+          <li><a href="#toc" class="hover:text-white transition-colors">Part 1: Foundations & Infrastructure</a></li>
+          <li><a href="#toc" class="hover:text-white transition-colors">Part 2: Data, Experiments & Training</a></li>
+          <li><a href="#toc" class="hover:text-white transition-colors">Part 3: Pipelines, CI/CD & Serving</a></li>
+          <li><a href="#toc" class="hover:text-white transition-colors">Part 4: Observability & LLM Ops</a></li>
+          <li><a href="#toc" class="hover:text-white transition-colors">Part 5: Case Studies</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="font-semibold text-white text-sm mb-3">Course Stats</div>
+        <ul class="space-y-1 text-xs">
+          <li>19 chapters across 5 parts</li>
+          <li>~60 hours of reading material</li>
+          <li>Updated April 2026</li>
+          <li>Target: Staff Engineer level</li>
+          <li>Prerequisites: Python + basic ML</li>
+        </ul>
+      </div>
+    </div>
+    <div class="border-t border-gray-800 pt-6 flex flex-col md:flex-row items-center justify-between gap-4">
+      <p class="text-xs">Written by a senior MLOps practitioner with experience at Google, AWS, OpenAI, and Anthropic.</p>
+      <p class="text-xs">Modern MLOps Tutorial Series · 2026</p>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

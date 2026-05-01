@@ -1,0 +1,1901 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 13: Model Serving & Deployment - Modern MLOps Tutorial</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script>
+    hljs.highlightAll();
+    mermaid.initialize({startOnLoad: true, theme: 'default'});
+  </script>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --secondary: #059669;
+      --text: #1f2937;
+    }
+    body { color: var(--text); font-family: 'Inter', system-ui, sans-serif; }
+    .chapter-badge { background: var(--primary); }
+    .callout-perf { border-left: 4px solid #f59e0b; background: #fffbeb; }
+    .callout-tip  { border-left: 4px solid var(--secondary); background: #ecfdf5; }
+    .callout-warn { border-left: 4px solid #ef4444; background: #fef2f2; }
+    .callout-info { border-left: 4px solid var(--primary); background: #eff6ff; }
+    pre code.hljs { border-radius: 0.5rem; font-size: 0.85rem; }
+    .mermaid { overflow-x: auto; }
+    table { border-collapse: collapse; width: 100%; }
+    th { background: #f3f4f6; }
+    th, td { border: 1px solid #e5e7eb; padding: 0.6rem 0.9rem; }
+    tr:nth-child(even) { background: #f9fafb; }
+    .toc-link { color: var(--primary); text-decoration: none; }
+    .toc-link:hover { text-decoration: underline; }
+    .section-num { color: var(--primary); font-weight: 700; }
+    h2 { border-bottom: 2px solid #e5e7eb; padding-bottom: 0.4rem; margin-top: 2.5rem; }
+    h3 { color: #374151; margin-top: 1.8rem; }
+  </style>
+</head>
+<body class="bg-white min-h-screen">
+
+<!-- ========== NAVBAR ========== -->
+<nav class="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-14">
+      <a href="index.html" class="flex items-center gap-2 text-blue-600 font-semibold hover:text-blue-800">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+        </svg>
+        Modern MLOps Tutorial
+      </a>
+      <div class="flex items-center gap-4 text-sm text-gray-600">
+        <span class="hidden sm:inline">Chapter 13 of 20</span>
+        <span class="bg-blue-100 text-blue-700 px-2 py-0.5 rounded font-medium">Model Serving</span>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ========== HERO ========== -->
+<header class="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-16">
+  <div class="max-w-5xl mx-auto px-6">
+    <div class="flex items-center gap-3 mb-4">
+      <span class="chapter-badge text-white text-sm font-bold px-3 py-1 rounded-full">Chapter 13</span>
+      <span class="text-blue-200 text-sm">Reading time: ~90 min</span>
+    </div>
+    <h1 class="text-4xl font-bold mb-4">Model Serving &amp; Deployment</h1>
+    <p class="text-blue-100 text-lg max-w-3xl">
+      From a trained model artifact to a production system handling billions of requests per day.
+      This chapter covers the complete spectrum — Triton, TorchServe, ONNX, FastAPI, BentoML,
+      Seldon, KServe, batch inference, edge deployment, and the infrastructure patterns that
+      keep serving reliable at scale.
+    </p>
+    <div class="mt-6 flex flex-wrap gap-3 text-sm">
+      <span class="bg-blue-500 bg-opacity-40 px-3 py-1 rounded-full">NVIDIA Triton</span>
+      <span class="bg-blue-500 bg-opacity-40 px-3 py-1 rounded-full">TorchServe</span>
+      <span class="bg-blue-500 bg-opacity-40 px-3 py-1 rounded-full">ONNX / TensorRT</span>
+      <span class="bg-blue-500 bg-opacity-40 px-3 py-1 rounded-full">FastAPI</span>
+      <span class="bg-blue-500 bg-opacity-40 px-3 py-1 rounded-full">BentoML</span>
+      <span class="bg-blue-500 bg-opacity-40 px-3 py-1 rounded-full">Seldon / KServe</span>
+      <span class="bg-blue-500 bg-opacity-40 px-3 py-1 rounded-full">Batch &amp; Edge</span>
+    </div>
+  </div>
+</header>
+
+<!-- ========== TABLE OF CONTENTS ========== -->
+<div class="max-w-5xl mx-auto px-6 py-8">
+  <div class="bg-gray-50 border border-gray-200 rounded-xl p-6">
+    <h2 class="text-lg font-bold text-gray-800 mb-4 mt-0 border-0">Table of Contents</h2>
+    <div class="grid md:grid-cols-2 gap-1 text-sm">
+      <div><a href="#s1" class="toc-link">1. Model Serving Fundamentals</a></div>
+      <div><a href="#s2" class="toc-link">2. NVIDIA Triton Inference Server</a></div>
+      <div><a href="#s3" class="toc-link">3. TorchServe</a></div>
+      <div><a href="#s4" class="toc-link">4. ONNX and Model Optimization</a></div>
+      <div><a href="#s5" class="toc-link">5. FastAPI for ML APIs</a></div>
+      <div><a href="#s6" class="toc-link">6. BentoML</a></div>
+      <div><a href="#s7" class="toc-link">7. Seldon Core</a></div>
+      <div><a href="#s8" class="toc-link">8. KServe (formerly KFServing)</a></div>
+      <div><a href="#s9" class="toc-link">9. Batch Inference at Scale</a></div>
+      <div><a href="#s10" class="toc-link">10. Edge and Mobile Deployment</a></div>
+      <div><a href="#s11" class="toc-link">11. API Design for ML Services</a></div>
+      <div><a href="#s12" class="toc-link">12. Serving Infrastructure Patterns</a></div>
+      <div><a href="#summary" class="toc-link">Summary &amp; Key Takeaways</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== MAIN CONTENT ========== -->
+<main class="max-w-5xl mx-auto px-6 pb-20">
+
+<!-- ===== SECTION 1 ===== -->
+<section id="s1">
+  <h2 class="text-2xl font-bold text-gray-900"><span class="section-num">1.</span> Model Serving Fundamentals</h2>
+
+  <h3>Online vs Offline (Batch) Inference</h3>
+  <p>
+    The fundamental design choice in every serving system is whether predictions are generated
+    synchronously (online) or asynchronously in bulk (offline / batch).
+  </p>
+  <table class="my-4 text-sm">
+    <thead><tr><th>Dimension</th><th>Online Inference</th><th>Batch / Offline Inference</th></tr></thead>
+    <tbody>
+      <tr><td>Latency target</td><td>1–200 ms (P99)</td><td>Minutes to hours</td></tr>
+      <tr><td>Throughput goal</td><td>Moderate QPS, low tail latency</td><td>Maximum throughput</td></tr>
+      <tr><td>Trigger</td><td>User request / API call</td><td>Scheduled job, new data arrival</td></tr>
+      <tr><td>Resource utilization</td><td>Spiky; must handle bursts</td><td>Steady; fully utilizes GPUs</td></tr>
+      <tr><td>Example</td><td>Search ranking, fraud detection</td><td>Content recommendation precompute</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Latency vs Throughput Tradeoff</h3>
+  <p>
+    These two metrics are inversely related in most serving architectures. Batching increases
+    throughput by amortizing kernel launch overhead across multiple samples, but adds queuing
+    latency. The optimal batch size is the largest value that keeps P99 latency within the SLA.
+  </p>
+
+  <div class="callout-perf rounded-lg p-4 my-4">
+    <strong>Performance insight:</strong> On A100 GPUs, a ResNet-50 reaches peak throughput at
+    batch=256 (~4,000 images/sec) but P99 latency balloons to 120 ms. At batch=8, P99 stays
+    under 8 ms while throughput is only ~1,200 images/sec. Always characterize the
+    latency/throughput Pareto curve before choosing a batch size for your SLA.
+  </div>
+
+  <h3>SLA Requirements: P50 / P95 / P99</h3>
+  <p>
+    Percentile latencies are the language of production SLAs. P50 is the median experience.
+    P99 is the worst 1% of requests — these are the ones causing user-visible slowness and
+    cascade failures. P99.9 matters when you're serving 1M+ RPM because that is 1,000+
+    slow requests per minute.
+  </p>
+  <ul class="list-disc ml-6 space-y-1 text-sm">
+    <li><strong>P50 (median):</strong> Indicates typical request cost. Easy to optimize.</li>
+    <li><strong>P95:</strong> Real-world user experience benchmark; target for API SLAs.</li>
+    <li><strong>P99:</strong> Drives infrastructure sizing. Outliers caused by GC, memory pressure, cold paths.</li>
+    <li><strong>P99.9:</strong> Required for financial / safety-critical systems.</li>
+  </ul>
+
+  <h3>Model Serving Components</h3>
+  <p>Every production serving system has these layers regardless of the framework used:</p>
+
+  <div class="mermaid my-6">
+graph LR
+    C([Client]) -->|HTTP/gRPC| LB[Load Balancer]
+    LB --> Srv[Serving Engine]
+    Srv --> Pre[Pre-processing\nTokenization / Resize]
+    Pre --> FL[Feature Lookup\nRedis / Feature Store]
+    FL --> M[Model Inference\nGPU / CPU]
+    M --> Post[Post-processing\nSoftmax / NMS / Decode]
+    Post -->|Response| C
+
+    style M fill:#2563eb,color:#fff
+    style LB fill:#059669,color:#fff
+    style FL fill:#7c3aed,color:#fff
+  </div>
+
+  <h3>Key Serving Metrics</h3>
+  <table class="text-sm my-4">
+    <thead><tr><th>Metric</th><th>Formula / Unit</th><th>Target (typical)</th><th>Tool</th></tr></thead>
+    <tbody>
+      <tr><td>Latency P99</td><td>ms (server-side)</td><td>&lt;100 ms online</td><td>Prometheus histogram</td></tr>
+      <tr><td>Throughput</td><td>requests per second (RPS)</td><td>Maximize</td><td>Prometheus counter</td></tr>
+      <tr><td>Error rate</td><td>5xx / total × 100%</td><td>&lt;0.1%</td><td>Grafana alert</td></tr>
+      <tr><td>GPU utilization</td><td>SM active %</td><td>&gt;80%</td><td>dcgm-exporter</td></tr>
+      <tr><td>GPU memory utilization</td><td>used / total %</td><td>&gt;70%</td><td>nvidia-smi / dcgm</td></tr>
+      <tr><td>Queue depth</td><td>pending requests</td><td>Near 0</td><td>Triton / BentoML metrics</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ===== SECTION 2 ===== -->
+<section id="s2">
+  <h2 class="text-2xl font-bold text-gray-900"><span class="section-num">2.</span> NVIDIA Triton Inference Server</h2>
+
+  <p>
+    Triton is NVIDIA's open-source, production-grade inference server. At OpenAI and major
+    hyperscalers it runs tens of thousands of GPU-hours daily. It abstracts away framework
+    differences and gives you a uniform HTTP/gRPC API regardless of whether your model is a
+    TensorRT engine, PyTorch script, or a custom C++ backend.
+  </p>
+
+  <h3>Triton Architecture</h3>
+
+  <div class="mermaid my-6">
+graph TB
+    Client([Client HTTP/gRPC]) --> FE[Triton Frontend\nHTTP :8000 | gRPC :8001 | Metrics :8002]
+    FE --> SR[Scheduler\nDynamic Batching\nSequence Batching]
+    SR --> BE1[TensorRT\nBackend]
+    SR --> BE2[PyTorch\nTorchScript Backend]
+    SR --> BE3[ONNX Runtime\nBackend]
+    SR --> BE4[TF SavedModel\nBackend]
+    SR --> BE5[Python\nBackend]
+    BE1 & BE2 & BE3 & BE4 & BE5 --> GPU[NVIDIA GPU]
+    MR[Model Repository\nLocal FS / S3 / GCS] --> FE
+
+    style FE fill:#2563eb,color:#fff
+    style SR fill:#7c3aed,color:#fff
+    style GPU fill:#059669,color:#fff
+    style MR fill:#f59e0b,color:#fff
+  </div>
+
+  <h3>Model Repository Structure</h3>
+  <p>
+    Triton discovers and loads models from a model repository — a directory tree where each
+    subdirectory is a model with versioned subdirectories containing the actual artifact.
+  </p>
+
+  <pre><code class="language-bash"># Triton model repository layout
+model_repository/
+├── resnet50/
+│   ├── config.pbtxt          # model configuration
+│   ├── 1/                    # version 1
+│   │   └── model.plan        # TensorRT engine
+│   └── 2/                    # version 2
+│       └── model.plan
+├── bert_tokenizer/
+│   ├── config.pbtxt
+│   └── 1/
+│       ├── model.py          # Python backend handler
+│       └── model.json        # tokenizer config
+├── bert_inference/
+│   ├── config.pbtxt
+│   └── 1/
+│       └── model.onnx        # ONNX model
+└── bert_pipeline/
+    ├── config.pbtxt          # ensemble config
+    └── 1/                    # empty dir for ensemble
+        └── .keep</code></pre>
+
+  <h3>Triton config.pbtxt Model Configuration</h3>
+
+  <pre><code class="language-protobuf"># model_repository/resnet50/config.pbtxt
+name: "resnet50"
+platform: "tensorrt_plan"        # backend selector
+max_batch_size: 64               # 0 = disable batching
+
+input [
+  {
+    name: "input"
+    data_type: TYPE_FP32
+    format: FORMAT_NCHW
+    dims: [ 3, 224, 224 ]        # per-sample dims (no batch dim)
+  }
+]
+
+output [
+  {
+    name: "output"
+    data_type: TYPE_FP32
+    dims: [ 1000 ]
+  }
+]
+
+# Dynamic batching: accumulate requests up to max_queue_delay_microseconds
+dynamic_batching {
+  preferred_batch_size: [ 4, 8, 16, 32 ]
+  max_queue_delay_microseconds: 5000     # 5 ms max wait
+}
+
+# Two model instances — one per GPU
+instance_group [
+  {
+    count: 2
+    kind: KIND_GPU
+    gpus: [ 0, 1 ]
+  }
+]
+
+# Version policy: serve latest 2 versions
+version_policy {
+  latest { num_versions: 2 }
+}
+
+# Warm-up request to eliminate first-request cold start
+model_warmup [
+  {
+    name: "warmup_batch1"
+    batch_size: 1
+    inputs {
+      key: "input"
+      value {
+        data_type: TYPE_FP32
+        dims: [ 3, 224, 224 ]
+        zero_data: true
+      }
+    }
+  }
+]</code></pre>
+
+  <h3>Python Client for Triton</h3>
+
+  <pre><code class="language-python">"""tritonclient — synchronous and async inference examples."""
+import numpy as np
+import tritonclient.http as httpclient
+import tritonclient.grpc as grpcclient
+from tritonclient.utils import InferenceServerException
+
+# --- HTTP client ---
+def triton_http_infer(server_url: str, model_name: str, image: np.ndarray) -> np.ndarray:
+    client = httpclient.InferenceServerClient(url=server_url, verbose=False)
+
+    # Health check
+    assert client.is_server_live(), "Triton server is not live"
+    assert client.is_model_ready(model_name), f"Model {model_name} is not ready"
+
+    # Prepare input tensor (NCHW float32)
+    inp = httpclient.InferInput("input", image.shape, datatype="FP32")
+    inp.set_data_from_numpy(image, binary_data=True)
+
+    # Prepare output placeholder
+    out = httpclient.InferRequestedOutput("output", binary_data=True)
+
+    # Infer
+    response = client.infer(model_name=model_name, inputs=[inp], outputs=[out])
+    return response.as_numpy("output")
+
+
+# --- gRPC client (lower overhead for high QPS) ---
+def triton_grpc_infer(server_url: str, model_name: str, image: np.ndarray) -> np.ndarray:
+    client = grpcclient.InferenceServerClient(url=server_url)
+
+    inp = grpcclient.InferInput("input", image.shape, datatype="FP32")
+    inp.set_data_from_numpy(image)
+
+    out = grpcclient.InferRequestedOutput("output")
+    result = client.infer(model_name=model_name, inputs=[inp], outputs=[out])
+    return result.as_numpy("output")
+
+
+# --- Async streaming client for high-throughput pipelines ---
+import tritonclient.grpc.aio as grpc_aio
+import asyncio
+
+async def triton_async_batch(server_url: str, model_name: str, batch: list[np.ndarray]):
+    async with grpc_aio.InferenceServerClient(url=server_url) as client:
+        tasks = []
+        for img in batch:
+            inp = grpc_aio.InferInput("input", img.shape, "FP32")
+            inp.set_data_from_numpy(img)
+            out = grpc_aio.InferRequestedOutput("output")
+            tasks.append(client.infer(model_name=model_name, inputs=[inp], outputs=[out]))
+        results = await asyncio.gather(*tasks)
+    return [r.as_numpy("output") for r in results]
+
+
+# Example usage
+if __name__ == "__main__":
+    img = np.random.randn(1, 3, 224, 224).astype(np.float32)
+    logits = triton_http_infer("localhost:8000", "resnet50", img)
+    print(f"Top-1 class: {logits.argmax()}, confidence: {logits.max():.4f}")</code></pre>
+
+  <h3>Model Ensembles (Pipeline of Models)</h3>
+  <p>
+    Triton ensembles wire multiple models together in a DAG without any round-trip to the client.
+    This is critical for pre-processing + inference + post-processing pipelines.
+  </p>
+
+  <pre><code class="language-protobuf"># model_repository/bert_pipeline/config.pbtxt — ensemble configuration
+name: "bert_pipeline"
+platform: "ensemble"
+max_batch_size: 32
+
+input [
+  { name: "TEXT", data_type: TYPE_STRING, dims: [ -1 ] }
+]
+output [
+  { name: "EMBEDDINGS", data_type: TYPE_FP32, dims: [ 768 ] }
+]
+
+ensemble_scheduling {
+  step [
+    # Step 1: Python tokenizer backend
+    {
+      model_name: "bert_tokenizer"
+      model_version: -1
+      input_map  { key: "TEXT"         value: "raw_text" }
+      output_map { key: "INPUT_IDS"    value: "token_ids" }
+      output_map { key: "ATTENTION_MASK" value: "attn_mask" }
+    },
+    # Step 2: ONNX BERT inference
+    {
+      model_name: "bert_inference"
+      model_version: -1
+      input_map  { key: "input_ids"      value: "token_ids" }
+      input_map  { key: "attention_mask" value: "attn_mask" }
+      output_map { key: "last_hidden_state" value: "EMBEDDINGS" }
+    }
+  ]
+}</code></pre>
+
+  <div class="callout-tip rounded-lg p-4 my-4">
+    <strong>Tip — Concurrent model execution:</strong> Set <code>instance_group count</code> to
+    match the number of GPU SMs you want to dedicate per model. For small models on A100/H100,
+    running 4 instances on one GPU (MIG or time-sliced) can triple throughput over a single
+    instance while staying under your latency budget.
+  </div>
+
+  <h3>Triton Backend Comparison</h3>
+  <table class="text-sm my-4">
+    <thead>
+      <tr><th>Backend</th><th>Platform string</th><th>Best for</th><th>Max performance</th><th>Notes</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>TensorRT</td><td>tensorrt_plan</td><td>CV, small transformers</td><td>Highest</td><td>NVIDIA GPU only; build-time optimization</td></tr>
+      <tr><td>ONNX Runtime</td><td>onnxruntime_onnx</td><td>General models, portability</td><td>High</td><td>TensorRT EP available inside ORT</td></tr>
+      <tr><td>TorchScript</td><td>pytorch_libtorch</td><td>PyTorch models</td><td>High</td><td>No Python overhead; eager not supported</td></tr>
+      <tr><td>TensorFlow SavedModel</td><td>tensorflow_savedmodel</td><td>TF ecosystem</td><td>Medium-high</td><td>XLA JIT available</td></tr>
+      <tr><td>Python</td><td>python</td><td>Custom pre/post-processing</td><td>Low-medium</td><td>Full Python flexibility; GIL applies</td></tr>
+      <tr><td>OpenVINO</td><td>openvino</td><td>Intel CPU / iGPU</td><td>High (Intel HW)</td><td>Ideal for edge / Xeon inference</td></tr>
+      <tr><td>FIL (Forest Inference)</td><td>fil</td><td>Tree ensembles (XGBoost/RF)</td><td>Highest for trees</td><td>cuML-based; GPU accelerated</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ===== SECTION 3 ===== -->
+<section id="s3">
+  <h2 class="text-2xl font-bold text-gray-900"><span class="section-num">3.</span> TorchServe</h2>
+
+  <p>
+    TorchServe is PyTorch's official model serving library — simpler than Triton, no YAML
+    protobufs, pure Python handlers. It's ideal for teams that are all-in on PyTorch and want
+    a straightforward path from <code>torch.save</code> to a REST API.
+  </p>
+
+  <h3>Creating Model Archives (.mar files)</h3>
+
+  <pre><code class="language-bash"># Install TorchServe
+pip install torchserve torch-model-archiver torch-workflow-archiver
+
+# Export a traced model
+python -c "
+import torch
+from torchvision.models import resnet50, ResNet50_Weights
+m = resnet50(weights=ResNet50_Weights.DEFAULT).eval()
+traced = torch.jit.trace(m, torch.randn(1, 3, 224, 224))
+torch.jit.save(traced, 'resnet50_traced.pt')
+"
+
+# Build the .mar archive
+torch-model-archiver \
+  --model-name resnet50 \
+  --version 1.0 \
+  --serialized-file resnet50_traced.pt \
+  --handler image_classifier \
+  --extra-files index_to_name.json \
+  --export-path model_store
+
+# Start TorchServe
+mkdir -p model_store logs
+torchserve \
+  --start \
+  --ncs \
+  --model-store model_store \
+  --models resnet50=resnet50.mar \
+  --ts-config config.properties</code></pre>
+
+  <h3>Custom Handler for TorchServe</h3>
+
+  <pre><code class="language-python">"""custom_handler.py — production TorchServe handler with pre/post-processing."""
+import io
+import json
+import logging
+import os
+from typing import Any
+
+import torch
+import torchvision.transforms as T
+from PIL import Image
+from ts.torch_handler.base_handler import BaseHandler
+
+logger = logging.getLogger(__name__)
+
+
+class ImageClassifierHandler(BaseHandler):
+    """
+    Custom handler: accepts raw JPEG bytes, returns top-5 class probabilities.
+    """
+
+    TRANSFORM = T.Compose([
+        T.Resize(256),
+        T.CenterCrop(224),
+        T.ToTensor(),
+        T.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+    ])
+
+    def initialize(self, context):
+        """Load model and class index on worker startup."""
+        super().initialize(context)  # sets self.model, self.device
+
+        # Load label map
+        props = context.system_properties
+        model_dir = props.get("model_dir")
+        with open(os.path.join(model_dir, "index_to_name.json")) as f:
+            self.label_map: dict[str, str] = json.load(f)
+
+        self.model.eval()
+        logger.info("ImageClassifierHandler initialized on %s", self.device)
+
+    def preprocess(self, data: list[dict]) -> torch.Tensor:
+        """Convert raw request bytes to a batched float32 tensor."""
+        tensors = []
+        for item in data:
+            body = item.get("body") or item.get("data")
+            if isinstance(body, (bytes, bytearray)):
+                image = Image.open(io.BytesIO(body)).convert("RGB")
+            else:
+                raise ValueError("Expected raw image bytes")
+            tensors.append(self.TRANSFORM(image))
+        return torch.stack(tensors).to(self.device)
+
+    def inference(self, inputs: torch.Tensor) -> torch.Tensor:
+        """Run forward pass without gradient computation."""
+        with torch.no_grad():
+            return self.model(inputs)
+
+    def postprocess(self, logits: torch.Tensor) -> list[dict[str, Any]]:
+        """Return top-5 class names and probabilities per sample."""
+        probs = torch.softmax(logits, dim=-1)
+        top5_probs, top5_idxs = probs.topk(5, dim=-1)
+
+        results = []
+        for sample_probs, sample_idxs in zip(top5_probs, top5_idxs):
+            results.append([
+                {
+                    "class": self.label_map.get(str(idx.item()), str(idx.item())),
+                    "probability": round(p.item(), 6),
+                }
+                for p, idx in zip(sample_probs, sample_idxs)
+            ])
+        return results</code></pre>
+
+  <h3>REST API Inference</h3>
+
+  <pre><code class="language-bash"># Inference request
+curl -X POST http://localhost:8080/predictions/resnet50 \
+  -H "Content-Type: application/octet-stream" \
+  --data-binary @cat.jpg
+
+# Management API — register a new model version
+curl -X POST "http://localhost:8081/models?url=resnet50_v2.mar&model_name=resnet50&version=2.0&initial_workers=2"
+
+# Scale workers
+curl -X PUT "http://localhost:8081/models/resnet50/2.0?min_worker=4&max_worker=8"
+
+# Check model status
+curl http://localhost:8081/models/resnet50</code></pre>
+
+  <h3>TorchServe Kubernetes Deployment</h3>
+
+  <pre><code class="language-yaml"># torchserve-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: torchserve
+  namespace: ml-serving
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: torchserve
+  template:
+    metadata:
+      labels:
+        app: torchserve
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8082"
+    spec:
+      containers:
+      - name: torchserve
+        image: pytorch/torchserve:0.9.0-gpu
+        ports:
+        - containerPort: 8080   # inference
+        - containerPort: 8081   # management
+        - containerPort: 8082   # metrics
+        env:
+        - name: TS_NUMBER_OF_NETTY_THREADS
+          value: "32"
+        - name: TS_JOB_QUEUE_SIZE
+          value: "1000"
+        resources:
+          limits:
+            nvidia.com/gpu: "1"
+            memory: "16Gi"
+          requests:
+            nvidia.com/gpu: "1"
+            memory: "8Gi"
+        volumeMounts:
+        - name: model-store
+          mountPath: /home/model-server/model-store
+        - name: config
+          mountPath: /home/model-server/config.properties
+          subPath: config.properties
+        readinessProbe:
+          httpGet:
+            path: /ping
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /ping
+            port: 8080
+          initialDelaySeconds: 60
+          periodSeconds: 30
+      volumes:
+      - name: model-store
+        persistentVolumeClaim:
+          claimName: model-store-pvc
+      - name: config
+        configMap:
+          name: torchserve-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: torchserve-svc
+  namespace: ml-serving
+spec:
+  selector:
+    app: torchserve
+  ports:
+  - name: inference
+    port: 8080
+    targetPort: 8080
+  - name: management
+    port: 8081
+    targetPort: 8081
+  type: ClusterIP
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: torchserve-hpa
+  namespace: ml-serving
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: torchserve
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - type: Pods
+    pods:
+      metric:
+        name: ts_queue_depth
+      target:
+        type: AverageValue
+        averageValue: "10"</code></pre>
+</section>
+
+<!-- ===== SECTION 4 ===== -->
+<section id="s4">
+  <h2 class="text-2xl font-bold text-gray-900"><span class="section-num">4.</span> ONNX and Model Optimization</h2>
+
+  <p>
+    ONNX (Open Neural Network Exchange) is the common IR (intermediate representation) that lets
+    you train in PyTorch, export to ONNX, and run on any runtime — CPU, GPU, edge SoC. Combined
+    with TensorRT, it is the highest-performance path on NVIDIA hardware.
+  </p>
+
+  <h3>Exporting PyTorch Model to ONNX</h3>
+
+  <pre><code class="language-python">"""export_onnx.py — export, verify, and optimize a PyTorch model to ONNX."""
+import torch
+import onnx
+import onnxruntime as ort
+import numpy as np
+from torchvision.models import resnet50, ResNet50_Weights
+
+# 1. Load and prepare model
+model = resnet50(weights=ResNet50_Weights.DEFAULT).eval()
+dummy_input = torch.randn(1, 3, 224, 224)
+
+# 2. Export with dynamic axes so batch size is flexible at runtime
+torch.onnx.export(
+    model,
+    dummy_input,
+    "resnet50.onnx",
+    export_params=True,
+    opset_version=17,              # use latest stable opset
+    do_constant_folding=True,      # fold constants for speedup
+    input_names=["input"],
+    output_names=["output"],
+    dynamic_axes={
+        "input":  {0: "batch_size"},
+        "output": {0: "batch_size"},
+    },
+    verbose=False,
+)
+
+# 3. Verify the exported graph
+model_onnx = onnx.load("resnet50.onnx")
+onnx.checker.check_model(model_onnx)
+print(f"ONNX model opset: {model_onnx.opset_import[0].version}")
+
+# 4. Optional: simplify with onnx-simplifier (pip install onnxsim)
+try:
+    from onnxsim import simplify
+    model_simplified, ok = simplify(model_onnx)
+    if ok:
+        onnx.save(model_simplified, "resnet50_simplified.onnx")
+        print("Simplified ONNX model saved")
+except ImportError:
+    pass
+
+# 5. Quick correctness check: compare PyTorch vs ONNX Runtime outputs
+sess = ort.InferenceSession("resnet50.onnx", providers=["CUDAExecutionProvider", "CPUExecutionProvider"])
+x_np = dummy_input.numpy()
+ort_output = sess.run(None, {"input": x_np})[0]
+
+with torch.no_grad():
+    torch_output = model(dummy_input).numpy()
+
+np.testing.assert_allclose(torch_output, ort_output, rtol=1e-3, atol=1e-5)
+print("Outputs match between PyTorch and ONNX Runtime")</code></pre>
+
+  <h3>ONNX Runtime Inference Server</h3>
+
+  <pre><code class="language-python">"""onnx_server.py — production-grade ONNX Runtime inference wrapper."""
+import asyncio
+import time
+from contextlib import asynccontextmanager
+from typing import Any
+
+import numpy as np
+import onnxruntime as ort
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+
+# ---- ORT session singleton with optimal session options ----
+class ONNXInferenceEngine:
+    def __init__(self, model_path: str, device: str = "cuda"):
+        opts = ort.SessionOptions()
+        opts.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_ALL
+        opts.intra_op_num_threads = 4
+        opts.inter_op_num_threads = 2
+        opts.enable_mem_pattern = True
+        opts.enable_cpu_mem_arena = True
+
+        providers = (
+            [("CUDAExecutionProvider", {"device_id": 0, "arena_extend_strategy": "kSameAsRequested"}),
+             "CPUExecutionProvider"]
+            if device == "cuda"
+            else ["CPUExecutionProvider"]
+        )
+
+        self.session = ort.InferenceSession(model_path, sess_options=opts, providers=providers)
+        self.input_names  = [inp.name for inp in self.session.get_inputs()]
+        self.output_names = [out.name for out in self.session.get_outputs()]
+        print(f"Loaded {model_path} | providers: {self.session.get_providers()}")
+
+    def predict(self, inputs: dict[str, np.ndarray]) -> dict[str, np.ndarray]:
+        t0 = time.perf_counter()
+        outputs = self.session.run(self.output_names, inputs)
+        latency_ms = (time.perf_counter() - t0) * 1000
+        return {
+            "outputs": dict(zip(self.output_names, outputs)),
+            "latency_ms": round(latency_ms, 3),
+        }
+
+
+# ---- FastAPI app wiring (see Section 5 for full FastAPI details) ----
+engine: ONNXInferenceEngine | None = None
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    global engine
+    engine = ONNXInferenceEngine("resnet50_simplified.onnx", device="cuda")
+    yield
+    engine = None
+
+app = FastAPI(title="ONNX Inference Server", lifespan=lifespan)
+
+class InferenceRequest(BaseModel):
+    data: list[list[list[list[float]]]]   # [N, C, H, W]
+
+@app.post("/predict")
+async def predict(req: InferenceRequest):
+    if engine is None:
+        raise HTTPException(503, "Engine not ready")
+    x = np.array(req.data, dtype=np.float32)
+    result = engine.predict({"input": x})
+    logits = result["outputs"]["output"]
+    return {
+        "predictions": logits.argmax(axis=-1).tolist(),
+        "latency_ms": result["latency_ms"],
+    }</code></pre>
+
+  <h3>TensorRT Engine Creation from ONNX</h3>
+
+  <pre><code class="language-python">"""build_tensorrt.py — build a TensorRT FP16 engine from an ONNX model."""
+import tensorrt as trt
+import numpy as np
+
+TRT_LOGGER = trt.Logger(trt.Logger.WARNING)
+
+
+def build_engine(
+    onnx_path: str,
+    engine_path: str,
+    fp16: bool = True,
+    max_batch: int = 32,
+    workspace_gb: int = 4,
+) -> None:
+    builder = trt.Builder(TRT_LOGGER)
+    network_flags = 1 << int(trt.NetworkDefinitionCreationFlag.EXPLICIT_BATCH)
+    network = builder.create_network(network_flags)
+    parser  = trt.OnnxParser(network, TRT_LOGGER)
+
+    with open(onnx_path, "rb") as f:
+        if not parser.parse(f.read()):
+            for i in range(parser.num_errors):
+                print(f"TRT ONNX parse error: {parser.get_error(i)}")
+            raise RuntimeError("Failed to parse ONNX")
+
+    config = builder.create_builder_config()
+    config.set_memory_pool_limit(trt.MemoryPoolType.WORKSPACE, workspace_gb * (1 << 30))
+
+    if fp16 and builder.platform_has_fast_fp16:
+        config.set_flag(trt.BuilderFlag.FP16)
+        print("FP16 mode enabled")
+
+    # Dynamic shapes profile
+    profile = builder.create_optimization_profile()
+    profile.set_shape(
+        "input",
+        min=(1,  3, 224, 224),
+        opt=(16, 3, 224, 224),
+        max=(max_batch, 3, 224, 224),
+    )
+    config.add_optimization_profile(profile)
+
+    print("Building TensorRT engine (this may take minutes) ...")
+    serialized = builder.build_serialized_network(network, config)
+    if serialized is None:
+        raise RuntimeError("TensorRT engine build failed")
+
+    with open(engine_path, "wb") as f:
+        f.write(serialized)
+    print(f"Engine saved to {engine_path}")
+
+
+def load_and_infer(engine_path: str, x: np.ndarray) -> np.ndarray:
+    """Load a serialized TRT engine and run inference."""
+    runtime = trt.Runtime(TRT_LOGGER)
+    with open(engine_path, "rb") as f:
+        engine = runtime.deserialize_cuda_engine(f.read())
+
+    import cuda
+    context = engine.create_execution_context()
+    context.set_input_shape("input", x.shape)
+
+    # Allocate CUDA memory and run
+    import pycuda.driver as cuda_drv
+    import pycuda.autoinit  # noqa: F401
+
+    d_input  = cuda_drv.mem_alloc(x.nbytes)
+    output_shape = (x.shape[0], 1000)
+    output = np.empty(output_shape, dtype=np.float32)
+    d_output = cuda_drv.mem_alloc(output.nbytes)
+
+    cuda_drv.memcpy_htod(d_input, x)
+    context.execute_v2([int(d_input), int(d_output)])
+    cuda_drv.memcpy_dtoh(output, d_output)
+    return output
+
+
+if __name__ == "__main__":
+    build_engine("resnet50_simplified.onnx", "resnet50_fp16.trt", fp16=True)
+    dummy = np.random.randn(1, 3, 224, 224).astype(np.float32)
+    logits = load_and_infer("resnet50_fp16.trt", dummy)
+    print(f"TRT inference top-1: {logits.argmax()}")</code></pre>
+
+  <div class="callout-perf rounded-lg p-4 my-4">
+    <strong>Performance table — Optimization techniques on ResNet-50 (A100 80GB):</strong>
+  </div>
+
+  <table class="text-sm my-4">
+    <thead>
+      <tr><th>Technique</th><th>Speedup vs FP32 baseline</th><th>Accuracy impact</th><th>Hardware req.</th><th>Notes</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Baseline FP32 (PyTorch)</td><td>1×</td><td>None</td><td>Any GPU</td><td>Reference point</td></tr>
+      <tr><td>TorchScript compile</td><td>1.1–1.3×</td><td>None</td><td>Any GPU</td><td>Removes Python overhead</td></tr>
+      <tr><td>ONNX Runtime (CUDA EP)</td><td>1.3–1.6×</td><td>None</td><td>NVIDIA GPU</td><td>Graph-level fusions</td></tr>
+      <tr><td>TensorRT FP32</td><td>2–3×</td><td>None</td><td>NVIDIA GPU</td><td>Layer fusion + kernel auto-tuning</td></tr>
+      <tr><td>TensorRT FP16</td><td>3–5×</td><td>&lt;0.1% drop</td><td>Ampere+ (A100/H100)</td><td>Tensor cores; best bang-for-buck</td></tr>
+      <tr><td>TensorRT INT8 (PTQ)</td><td>5–8×</td><td>0.1–0.5% drop</td><td>Turing+ (T4, A100)</td><td>Requires calibration dataset</td></tr>
+      <tr><td>INT8 + knowledge distillation</td><td>5–8×</td><td>&lt;0.1% drop</td><td>Turing+</td><td>Best quality/speed for INT8</td></tr>
+      <tr><td>Structured pruning + TRT FP16</td><td>8–15×</td><td>0.5–2% drop</td><td>Ampere+</td><td>Reduces model size too</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ===== SECTION 5 ===== -->
+<section id="s5">
+  <h2 class="text-2xl font-bold text-gray-900"><span class="section-num">5.</span> FastAPI for ML APIs</h2>
+
+  <p>
+    FastAPI is the de-facto standard for writing ML microservices in Python. Its async-first design
+    fits the GPU-bound concurrency model perfectly: the event loop dispatches requests while the
+    GPU is computing. Pydantic v2 gives you zero-cost request validation.
+  </p>
+
+  <h3>Complete FastAPI ML Service</h3>
+
+  <pre><code class="language-python">"""ml_service.py — production-quality FastAPI ML service with metrics, health, async inference."""
+import asyncio
+import logging
+import time
+from collections import defaultdict
+from contextlib import asynccontextmanager
+from typing import Any
+
+import numpy as np
+import torch
+import torch.nn.functional as F
+from fastapi import FastAPI, HTTPException, Request, status
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel, Field
+from prometheus_client import (
+    Counter, Histogram, Gauge,
+    generate_latest, CONTENT_TYPE_LATEST,
+)
+from starlette.responses import Response
+
+# ---- Logging ----
+logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s — %(message)s")
+logger = logging.getLogger("ml_service")
+
+# ---- Prometheus metrics ----
+REQUEST_COUNT   = Counter("ml_requests_total",   "Total inference requests",    ["model", "status"])
+REQUEST_LATENCY = Histogram("ml_latency_seconds", "Inference latency",           ["model"],
+                             buckets=[.005, .01, .025, .05, .1, .25, .5, 1, 2.5, 5])
+QUEUE_DEPTH     = Gauge("ml_queue_depth",          "Pending inference requests", ["model"])
+GPU_UTIL        = Gauge("ml_gpu_utilization",      "GPU utilization %",          ["device"])
+
+# ---- Request / Response schemas ----
+class PredictRequest(BaseModel):
+    instances: list[list[float]] = Field(..., min_length=1, max_length=256,
+                                          description="List of feature vectors")
+    model_version: str = Field("latest", description="Model version tag")
+
+class PredictionResult(BaseModel):
+    predictions: list[int]
+    probabilities: list[list[float]]
+    model_version: str
+    latency_ms: float
+
+class HealthResponse(BaseModel):
+    status: str
+    model_loaded: bool
+    device: str
+    uptime_seconds: float
+
+# ---- Model registry ----
+class ModelRegistry:
+    def __init__(self):
+        self._models: dict[str, Any]  = {}
+        self._start_time = time.time()
+
+    def load(self, name: str, model: Any, device: str = "cpu"):
+        model = model.to(device).eval()
+        self._models[name] = {"model": model, "device": device, "loaded_at": time.time()}
+        logger.info("Model '%s' loaded on %s", name, device)
+
+    def get(self, name: str = "latest"):
+        if name == "latest":
+            name = max(self._models.keys())
+        if name not in self._models:
+            raise KeyError(f"Model '{name}' not found")
+        return self._models[name]
+
+    @property
+    def uptime(self) -> float:
+        return time.time() - self._start_time
+
+registry = ModelRegistry()
+
+# ---- Application lifecycle ----
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup: load model
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    logger.info("Starting ML service on device: %s", device)
+
+    from torchvision.models import resnet18, ResNet18_Weights
+    model = resnet18(weights=ResNet18_Weights.DEFAULT)
+    registry.load("v1.0", model, device=device)
+    registry.load("latest", model, device=device)   # alias
+
+    # Background task: periodically poll GPU utilization
+    async def poll_gpu():
+        while True:
+            try:
+                import pynvml
+                pynvml.nvmlInit()
+                h = pynvml.nvmlDeviceGetHandleByIndex(0)
+                util = pynvml.nvmlDeviceGetUtilizationRates(h)
+                GPU_UTIL.labels(device="gpu:0").set(util.gpu)
+            except Exception:
+                pass
+            await asyncio.sleep(5)
+
+    task = asyncio.create_task(poll_gpu())
+    yield
+    task.cancel()
+
+# ---- App factory ----
+app = FastAPI(
+    title="ML Inference Service",
+    version="1.0.0",
+    description="Production FastAPI ML serving with metrics and async batching",
+    lifespan=lifespan,
+)
+app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["POST", "GET"])
+
+# ---- Endpoints ----
+@app.get("/health", response_model=HealthResponse)
+async def health():
+    try:
+        entry = registry.get("latest")
+        loaded = True
+        device = entry["device"]
+    except Exception:
+        loaded = False
+        device = "unknown"
+    return HealthResponse(
+        status="healthy" if loaded else "degraded",
+        model_loaded=loaded,
+        device=device,
+        uptime_seconds=registry.uptime,
+    )
+
+@app.post("/v1/predict", response_model=PredictionResult)
+async def predict(req: PredictRequest, request: Request):
+    model_name = req.model_version
+    QUEUE_DEPTH.labels(model=model_name).inc()
+    t0 = time.perf_counter()
+    try:
+        entry = registry.get(model_name)
+        model: torch.nn.Module = entry["model"]
+        device: str = entry["device"]
+
+        # Prepare input — run CPU tensor ops in a thread pool to avoid blocking the loop
+        x = await asyncio.get_event_loop().run_in_executor(
+            None,
+            lambda: torch.tensor(req.instances, dtype=torch.float32).to(device)
+        )
+
+        # GPU inference
+        with torch.inference_mode():
+            logits = await asyncio.get_event_loop().run_in_executor(None, lambda: model(x))
+            probs  = F.softmax(logits, dim=-1)
+            preds  = probs.argmax(dim=-1)
+
+        latency_ms = (time.perf_counter() - t0) * 1000
+        REQUEST_COUNT.labels(model=model_name, status="ok").inc()
+        REQUEST_LATENCY.labels(model=model_name).observe(time.perf_counter() - t0)
+
+        return PredictionResult(
+            predictions=preds.cpu().tolist(),
+            probabilities=probs.cpu().tolist(),
+            model_version=model_name,
+            latency_ms=round(latency_ms, 3),
+        )
+    except KeyError as e:
+        REQUEST_COUNT.labels(model=model_name, status="not_found").inc()
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        REQUEST_COUNT.labels(model=model_name, status="error").inc()
+        logger.exception("Inference failed: %s", e)
+        raise HTTPException(status_code=500, detail="Inference failed")
+    finally:
+        QUEUE_DEPTH.labels(model=model_name).dec()
+
+@app.get("/metrics")
+async def metrics():
+    """Prometheus scrape endpoint."""
+    return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)</code></pre>
+
+  <h3>FastAPI with Background Inference and Callback</h3>
+
+  <pre><code class="language-python">"""async_inference.py — fire-and-forget inference with webhook callback."""
+import asyncio
+import uuid
+from enum import Enum
+
+import httpx
+from fastapi import BackgroundTasks, FastAPI
+from pydantic import BaseModel, HttpUrl
+
+app = FastAPI()
+JOB_STORE: dict[str, dict] = {}   # in production use Redis
+
+class JobStatus(str, Enum):
+    PENDING   = "pending"
+    RUNNING   = "running"
+    COMPLETED = "completed"
+    FAILED    = "failed"
+
+class AsyncRequest(BaseModel):
+    instances: list[list[float]]
+    callback_url: HttpUrl | None = None   # optional webhook
+
+class JobResponse(BaseModel):
+    job_id: str
+    status: JobStatus
+    result: dict | None = None
+
+async def _run_inference(job_id: str, instances: list, callback_url: str | None):
+    JOB_STORE[job_id]["status"] = JobStatus.RUNNING
+    try:
+        # Simulate heavy GPU work
+        await asyncio.sleep(0.5)
+        result = {"predictions": [0] * len(instances)}
+        JOB_STORE[job_id].update({"status": JobStatus.COMPLETED, "result": result})
+
+        # Optionally notify caller
+        if callback_url:
+            async with httpx.AsyncClient(timeout=10) as client:
+                await client.post(callback_url, json={"job_id": job_id, **result})
+    except Exception as exc:
+        JOB_STORE[job_id].update({"status": JobStatus.FAILED, "error": str(exc)})
+
+@app.post("/v1/predict/async", response_model=JobResponse, status_code=202)
+async def predict_async(req: AsyncRequest, background_tasks: BackgroundTasks):
+    job_id = str(uuid.uuid4())
+    JOB_STORE[job_id] = {"status": JobStatus.PENDING, "result": None}
+    background_tasks.add_task(_run_inference, job_id, req.instances, str(req.callback_url) if req.callback_url else None)
+    return JobResponse(job_id=job_id, status=JobStatus.PENDING)
+
+@app.get("/v1/jobs/{job_id}", response_model=JobResponse)
+async def get_job(job_id: str):
+    if job_id not in JOB_STORE:
+        from fastapi import HTTPException
+        raise HTTPException(404, "Job not found")
+    j = JOB_STORE[job_id]
+    return JobResponse(job_id=job_id, status=j["status"], result=j.get("result"))</code></pre>
+
+  <div class="callout-tip rounded-lg p-4 my-4">
+    <strong>Request batching with asyncio:</strong> For throughput-critical services, accumulate
+    requests in an <code>asyncio.Queue</code> and flush on a timer (e.g., every 10 ms) or when
+    the queue reaches the max batch size. This implements dynamic batching in pure Python —
+    useful when you can't use Triton's built-in dynamic batcher.
+  </div>
+</section>
+
+<!-- ===== SECTION 6 ===== -->
+<section id="s6">
+  <h2 class="text-2xl font-bold text-gray-900"><span class="section-num">6.</span> BentoML</h2>
+
+  <p>
+    BentoML bridges the gap between data science and production deployment. A <em>Service</em>
+    is the unit of deployment; <em>Runners</em> abstract model execution with built-in
+    adaptive batching and resource isolation.
+  </p>
+
+  <h3>BentoML Service Definition</h3>
+
+  <pre><code class="language-python">"""service.py — BentoML service with adaptive batching runner."""
+import numpy as np
+import bentoml
+from bentoml.io import NumpyNdarray, JSON
+
+# 1. Save a model to BentoML model store
+# bentoml.pytorch.save_model("resnet50", model, signatures={"__call__": {"batchable": True}})
+
+# 2. Create a runner — BentoML manages concurrency and batching
+resnet_runner = bentoml.pytorch.get("resnet50:latest").to_runner()
+
+# 3. Define the service
+svc = bentoml.Service("image_classifier", runners=[resnet_runner])
+
+@svc.api(input=NumpyNdarray(dtype="float32", shape=(-1, 3, 224, 224)),
+         output=NumpyNdarray(dtype="float32"))
+async def classify(input_data: np.ndarray) -> np.ndarray:
+    """Async endpoint — runs on BentoML's async runner."""
+    return await resnet_runner.async_run(input_data)</code></pre>
+
+  <h3>BentoML Runner with Adaptive Batching</h3>
+
+  <pre><code class="language-python">"""runner_batching.py — BentoML runner with adaptive batch config."""
+import bentoml
+from bentoml.io import JSON, NumpyNdarray
+from pydantic import BaseModel
+import numpy as np
+
+class ClassifyRequest(BaseModel):
+    image_b64: str
+    top_k: int = 5
+
+# Custom runner configuration
+runner = bentoml.pytorch.get("resnet50:latest").to_runner(
+    name="resnet_runner",
+    max_batch_size=64,           # maximum batch size for adaptive batching
+    max_latency_ms=100,          # flush batch at this latency even if not full
+)
+
+svc = bentoml.Service("classifier_svc", runners=[runner])
+
+@svc.api(input=JSON(pydantic_model=ClassifyRequest), output=JSON())
+async def predict(req: ClassifyRequest) -> dict:
+    import base64, io
+    from PIL import Image
+    import torchvision.transforms as T
+
+    img_bytes = base64.b64decode(req.image_b64)
+    img = Image.open(io.BytesIO(img_bytes)).convert("RGB")
+
+    transform = T.Compose([T.Resize(256), T.CenterCrop(224), T.ToTensor(),
+                            T.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])])
+    tensor = transform(img).unsqueeze(0).numpy()
+
+    # Runner handles batching automatically across concurrent requests
+    logits = await runner.async_run(tensor)
+    probs = np.exp(logits) / np.exp(logits).sum()
+    top_k_idx = probs.argsort()[-req.top_k:][::-1]
+    return {"top_k_classes": top_k_idx.tolist(), "probabilities": probs[top_k_idx].tolist()}
+
+
+# Build and serve commands:
+# bentoml build        — packages model + code into a Bento
+# bentoml serve service:svc --port 3000 --workers 4
+# bentoml containerize image_classifier:latest   — builds Docker image
+# bentoml push image_classifier:latest           — push to BentoCloud</code></pre>
+
+  <div class="callout-info rounded-lg p-4 my-4">
+    <strong>BentoCloud:</strong> BentoML's managed platform auto-scales Bentos on Kubernetes,
+    handles model versioning, and provides a deployment UI. For self-hosted deployment, use
+    <code>bentoml containerize</code> to produce a Docker image and deploy it anywhere.
+  </div>
+</section>
+
+<!-- ===== SECTION 7 ===== -->
+<section id="s7">
+  <h2 class="text-2xl font-bold text-gray-900"><span class="section-num">7.</span> Seldon Core</h2>
+
+  <p>
+    Seldon Core runs on Kubernetes and provides a rich feature set for enterprise ML serving:
+    canary deployments, A/B tests, shadow traffic, explainability via Alibi, and an inference
+    graph (pre-processor → model → post-processor).
+  </p>
+
+  <h3>SeldonDeployment YAML</h3>
+
+  <pre><code class="language-yaml"># seldon-deployment.yaml
+apiVersion: machinelearning.seldon.io/v1
+kind: SeldonDeployment
+metadata:
+  name: resnet50-classifier
+  namespace: ml-serving
+spec:
+  name: resnet50
+  predictors:
+  # ---- Production traffic: 90% ----
+  - name: production
+    replicas: 3
+    traffic: 90
+    graph:
+      name: preprocessor
+      type: TRANSFORMER
+      endpoint:
+        type: REST
+      children:
+      - name: resnet50-model
+        type: MODEL
+        endpoint:
+          type: REST
+        children:
+        - name: postprocessor
+          type: OUTPUT_TRANSFORMER
+          endpoint:
+            type: REST
+    componentSpecs:
+    - spec:
+        containers:
+        - name: preprocessor
+          image: myrepo/image-preprocessor:1.0
+          resources:
+            requests: {cpu: "500m", memory: "512Mi"}
+        - name: resnet50-model
+          image: myrepo/resnet50-server:1.0
+          resources:
+            limits:
+              nvidia.com/gpu: "1"
+            requests:
+              nvidia.com/gpu: "1"
+              memory: "4Gi"
+        - name: postprocessor
+          image: myrepo/result-formatter:1.0
+          resources:
+            requests: {cpu: "200m", memory: "256Mi"}
+
+  # ---- Canary: 10% — new model version ----
+  - name: canary
+    replicas: 1
+    traffic: 10
+    graph:
+      name: resnet50-v2
+      type: MODEL
+      endpoint:
+        type: REST
+    componentSpecs:
+    - spec:
+        containers:
+        - name: resnet50-v2
+          image: myrepo/resnet50-server:2.0
+          resources:
+            limits:
+              nvidia.com/gpu: "1"
+
+---
+# Shadow deployment: copy traffic to new model without affecting users
+apiVersion: machinelearning.seldon.io/v1
+kind: SeldonDeployment
+metadata:
+  name: resnet50-shadow
+  namespace: ml-serving
+spec:
+  predictors:
+  - name: main
+    replicas: 2
+    traffic: 100
+    graph:
+      name: resnet50-prod
+      type: MODEL
+      children:
+      - name: resnet50-shadow-model
+        type: MODEL
+        endpoint:
+          type: REST
+    componentSpecs:
+    - spec:
+        containers:
+        - name: resnet50-prod
+          image: myrepo/resnet50-server:1.0
+        - name: resnet50-shadow-model
+          image: myrepo/resnet50-server:2.0</code></pre>
+
+  <div class="callout-tip rounded-lg p-4 my-4">
+    <strong>Seldon Alibi Explain:</strong> Attach an <code>EXPLAINER</code> component to any
+    SeldonDeployment to get SHAP or Anchor explanations via the same REST/gRPC endpoint. Add
+    <code>type: EXPLAINER</code> with an <code>alibiExplain</code> block pointing to your stored
+    explainer artifact.
+  </div>
+</section>
+
+<!-- ===== SECTION 8 ===== -->
+<section id="s8">
+  <h2 class="text-2xl font-bold text-gray-900"><span class="section-num">8.</span> KServe (formerly KFServing)</h2>
+
+  <p>
+    KServe is the CNCF / Kubeflow-native inference platform. Its killer feature is serverless
+    scaling via Knative — pods scale to zero when idle and scale up on demand, making it cost-
+    efficient for sporadic workloads.
+  </p>
+
+  <h3>InferenceService YAML</h3>
+
+  <pre><code class="language-yaml"># kserve-inferenceservice.yaml
+apiVersion: "serving.kserve.io/v1beta1"
+kind: InferenceService
+metadata:
+  name: bert-classifier
+  namespace: kserve-inference
+  annotations:
+    serving.kserve.io/enable-prometheus-scraping: "true"
+spec:
+  predictor:
+    # Pre-packaged Triton server
+    triton:
+      storageUri: "s3://my-model-bucket/bert-triton-repo"
+      resources:
+        limits:
+          nvidia.com/gpu: "1"
+          memory: "8Gi"
+        requests:
+          nvidia.com/gpu: "1"
+          memory: "4Gi"
+      runtimeVersion: "23.10-py3"
+    minReplicas: 1
+    maxReplicas: 10
+    scaleTarget: 100              # scale up when avg concurrency > 100 RPS
+    scaleMetric: rps
+
+  # Optional transformer: pre/post-processing sidecar
+  transformer:
+    containers:
+    - name: bert-tokenizer
+      image: myrepo/bert-tokenizer:1.0
+      env:
+      - name: STORAGE_URI
+        value: "s3://my-model-bucket/tokenizer"
+      resources:
+        requests:
+          cpu: "500m"
+          memory: "1Gi"
+
+  # Optional explainer
+  explainer:
+    alibi:
+      type: AnchorText
+      storageUri: "s3://my-model-bucket/explainer"
+      resources:
+        requests:
+          cpu: "500m"
+          memory: "1Gi"</code></pre>
+
+  <h3>Platform Comparison: KServe vs Seldon vs Triton</h3>
+  <table class="text-sm my-4">
+    <thead>
+      <tr><th>Feature</th><th>KServe</th><th>Seldon Core</th><th>Triton (standalone)</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Kubernetes-native CRD</td><td>Yes (InferenceService)</td><td>Yes (SeldonDeployment)</td><td>No (Deployment YAML)</td></tr>
+      <tr><td>Serverless / scale-to-zero</td><td>Yes (Knative)</td><td>No</td><td>No</td></tr>
+      <tr><td>Multi-framework support</td><td>Yes (pre-packaged servers)</td><td>Yes</td><td>Yes (native backends)</td></tr>
+      <tr><td>Dynamic batching</td><td>Triton backend</td><td>Partial</td><td>Yes (built-in)</td></tr>
+      <tr><td>A/B / canary / shadow</td><td>Via Istio</td><td>Built-in, first-class</td><td>Manual</td></tr>
+      <tr><td>Explainability</td><td>Alibi integration</td><td>Alibi built-in</td><td>None</td></tr>
+      <tr><td>ModelMesh (multi-model)</td><td>Yes (first-class)</td><td>No</td><td>No</td></tr>
+      <tr><td>Best for</td><td>Kubernetes, serverless, multi-model density</td><td>Enterprise, inference graphs</td><td>Raw GPU performance, Triton features</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Multi-Model Serving with ModelMesh</h3>
+  <p>
+    ModelMesh (part of KServe) multiplexes thousands of models onto a shared fleet of serving
+    pods. Each model is loaded on-demand and cached in GPU memory. When a model isn't accessed
+    frequently, it is evicted. This reduces the cost of serving a long tail of infrequent models.
+  </p>
+</section>
+
+<!-- ===== SECTION 9 ===== -->
+<section id="s9">
+  <h2 class="text-2xl font-bold text-gray-900"><span class="section-num">9.</span> Batch Inference at Scale</h2>
+
+  <p>
+    Batch inference is the right tool when predictions can be precomputed (recommendation systems,
+    risk scoring, nightly re-ranking) or when processing data pipelines where strict latency
+    requirements don't apply.
+  </p>
+
+  <h3>AWS SageMaker Batch Transform</h3>
+
+  <pre><code class="language-python">"""sagemaker_batch_transform.py — trigger a SageMaker Batch Transform job."""
+import boto3
+import sagemaker
+from sagemaker.transformer import Transformer
+
+session   = sagemaker.Session()
+role      = sagemaker.get_execution_role()
+sm_client = boto3.client("sagemaker")
+
+# Create transformer from an existing SageMaker model
+transformer = Transformer(
+    model_name="resnet50-prod-v1",
+    instance_count=4,
+    instance_type="ml.p3.2xlarge",      # V100 GPU instance
+    strategy="MultiRecord",              # pack multiple records per request
+    assemble_with="Line",
+    output_path="s3://my-bucket/batch-output/",
+    max_payload=6,                        # MB per request
+    max_concurrent_transforms=100,
+    sagemaker_session=session,
+    volume_kms_key=None,
+    env={
+        "SAGEMAKER_MODEL_SERVER_TIMEOUT": "120",
+        "OMP_NUM_THREADS": "4",
+    },
+)
+
+# Launch the job
+transformer.transform(
+    data="s3://my-bucket/batch-input/",
+    data_type="S3Prefix",
+    content_type="application/x-npy",
+    split_type="Line",
+    compression_type="None",
+    job_name="resnet50-batch-20240430",
+    wait=False,    # async: poll or use EventBridge
+)
+
+# Monitor
+job = sm_client.describe_transform_job(TransformJobName="resnet50-batch-20240430")
+print(f"Status: {job['TransformJobStatus']}")</code></pre>
+
+  <h3>PySpark for Distributed Batch Inference</h3>
+
+  <pre><code class="language-python">"""spark_batch_inference.py — broadcast model weights across Spark workers."""
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import pandas_udf
+from pyspark.sql.types import ArrayType, FloatType
+import pandas as pd
+import numpy as np
+import torch
+import io
+
+spark = SparkSession.builder \
+    .appName("BatchInference") \
+    .config("spark.sql.execution.arrow.pyspark.enabled", "true") \
+    .config("spark.executor.memory", "16g") \
+    .getOrCreate()
+
+# Serialize model to bytes and broadcast to all workers
+import torchvision.models as models
+model = models.resnet50(pretrained=True).eval()
+buf = io.BytesIO()
+torch.save(model.state_dict(), buf)
+model_broadcast = spark.sparkContext.broadcast(buf.getvalue())
+
+@pandas_udf(returnType=ArrayType(FloatType()))
+def predict_udf(pixel_series: pd.Series) -> pd.Series:
+    """Runs on each Spark partition — loads model once per JVM process."""
+    import torch, io
+    from torchvision.models import resnet50
+
+    # Load model from broadcast — only once per executor
+    if not hasattr(predict_udf, "_model"):
+        m = resnet50()
+        state = torch.load(io.BytesIO(model_broadcast.value), map_location="cpu")
+        m.load_state_dict(state)
+        m.eval()
+        predict_udf._model = m
+
+    results = []
+    for pixel_bytes in pixel_series:
+        x = torch.frombuffer(pixel_bytes, dtype=torch.float32).reshape(1, 3, 224, 224)
+        with torch.no_grad():
+            logits = predict_udf._model(x)
+        results.append(logits.squeeze().tolist())
+    return pd.Series(results)
+
+# Apply to a DataFrame with an 'image_pixels' binary column
+df = spark.read.parquet("s3a://data-lake/images/")
+predictions_df = df.withColumn("logits", predict_udf("image_pixels"))
+predictions_df.write.mode("overwrite").parquet("s3a://data-lake/predictions/")</code></pre>
+
+  <h3>Batch Inference Solution Comparison</h3>
+  <table class="text-sm my-4">
+    <thead>
+      <tr><th>Solution</th><th>Scale</th><th>GPU support</th><th>Ease of use</th><th>Cost model</th><th>Best for</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>SageMaker Batch Transform</td><td>TB/day</td><td>Excellent</td><td>High (managed)</td><td>Per-instance-hour</td><td>AWS-native, managed</td></tr>
+      <tr><td>AWS Batch + ECS</td><td>TB/day</td><td>Good</td><td>Medium</td><td>Spot + on-demand</td><td>Custom containers, cost savings</td></tr>
+      <tr><td>PySpark + EMR</td><td>PB/day</td><td>Limited (via RAPIDS)</td><td>Medium</td><td>EMR cluster cost</td><td>CPU-heavy, data-heavy pipelines</td></tr>
+      <tr><td>Ray + Anyscale</td><td>TB/day</td><td>Excellent</td><td>High</td><td>Ray cluster cost</td><td>Python-first, heterogeneous HW</td></tr>
+      <tr><td>Kubeflow Pipelines + KServe</td><td>TB/day</td><td>Excellent</td><td>Medium</td><td>Kubernetes infra</td><td>Kubernetes shops, ML pipelines</td></tr>
+      <tr><td>Databricks (MLflow integration)</td><td>PB/day</td><td>Good</td><td>High</td><td>DBU compute</td><td>Lakehouse architecture</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ===== SECTION 10 ===== -->
+<section id="s10">
+  <h2 class="text-2xl font-bold text-gray-900"><span class="section-num">10.</span> Edge and Mobile Deployment</h2>
+
+  <p>
+    Edge deployment moves inference from the cloud to the device — smartphones, IoT sensors,
+    autonomous vehicles, factory floors. The primary constraints are memory (&lt;4 GB RAM), power
+    (&lt;15 W), and latency (no network round-trip).
+  </p>
+
+  <h3>TensorFlow Lite for Mobile/Edge</h3>
+  <p>
+    TFLite is the standard path for Android and iOS. The conversion pipeline is
+    <code>SavedModel → TFLite Converter → .tflite</code> with optional INT8 quantization.
+  </p>
+
+  <h3>NVIDIA Jetson for Edge GPU Inference</h3>
+  <p>
+    Jetson Orin (64 TOPS AI performance) runs a full Triton Inference Server or DeepStream
+    pipeline. TensorRT and cuDNN are pre-installed in JetPack. The workflow is identical to
+    data-center deployment — build a TRT engine on the target Jetson, deploy with Triton.
+  </p>
+
+  <div class="callout-perf rounded-lg p-4 my-4">
+    <strong>Edge optimization checklist:</strong>
+    <ol class="list-decimal ml-5 mt-2 space-y-1 text-sm">
+      <li>Apply structured pruning (50–80% sparsity) before quantization</li>
+      <li>Use INT8 or FP16 quantization with calibration data</li>
+      <li>Knowledge distillation: train a smaller student model from a large teacher</li>
+      <li>Use ONNX → TFLite for cross-runtime portability</li>
+      <li>Profile with device-native tools (Snapdragon Profiler, Apple Instruments, Jetson Power GUI)</li>
+    </ol>
+  </div>
+
+  <h3>Edge Deployment Options Comparison</h3>
+  <table class="text-sm my-4">
+    <thead>
+      <tr><th>Platform</th><th>Runtime</th><th>Target HW</th><th>Peak perf</th><th>Power</th><th>Model format</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>TensorFlow Lite</td><td>TFLite</td><td>Android / iOS / ARM</td><td>5–50 TOPS</td><td>0.5–3 W</td><td>.tflite</td></tr>
+      <tr><td>Core ML</td><td>Core ML</td><td>Apple Silicon (iOS/macOS)</td><td>11–35 TOPS</td><td>0.5–5 W</td><td>.mlmodel</td></tr>
+      <tr><td>ONNX Runtime Mobile</td><td>ORT Mobile</td><td>Any ARM / x86</td><td>Device-dependent</td><td>Device-dependent</td><td>.onnx</td></tr>
+      <tr><td>NVIDIA Jetson Orin</td><td>TensorRT / Triton</td><td>Jetson Orin NX/AGX</td><td>64–275 TOPS</td><td>10–60 W</td><td>.trt / .onnx</td></tr>
+      <tr><td>Intel OpenVINO</td><td>OpenVINO RT</td><td>Intel CPU / iGPU / VPU</td><td>10–400 TOPS</td><td>5–250 W</td><td>.xml/.bin</td></tr>
+      <tr><td>Qualcomm QNN</td><td>QNN SDK</td><td>Snapdragon SoC</td><td>10–73 TOPS</td><td>0.5–5 W</td><td>.bin</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ===== SECTION 11 ===== -->
+<section id="s11">
+  <h2 class="text-2xl font-bold text-gray-900"><span class="section-num">11.</span> API Design for ML Services</h2>
+
+  <h3>RESTful vs gRPC for ML Serving</h3>
+  <table class="text-sm my-4">
+    <thead>
+      <tr><th>Dimension</th><th>REST/HTTP JSON</th><th>gRPC/HTTP2 Protobuf</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Serialization overhead</td><td>High (JSON text)</td><td>Low (binary protobuf)</td></tr>
+      <tr><td>Latency</td><td>+5–15% vs gRPC</td><td>Baseline</td></tr>
+      <tr><td>Streaming</td><td>SSE / chunked</td><td>Native bidirectional</td></tr>
+      <tr><td>Client SDK</td><td>Any HTTP client</td><td>Generated stubs</td></tr>
+      <tr><td>Large tensors (&gt;1 MB)</td><td>Base64 bloat</td><td>Direct bytes, efficient</td></tr>
+      <tr><td>Browser compatibility</td><td>Native</td><td>grpc-web proxy needed</td></tr>
+      <tr><td>Use case</td><td>External APIs, web clients</td><td>Internal microservices, high-QPS</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Async Inference with SQS and Worker</h3>
+
+  <pre><code class="language-python">"""sqs_worker.py — async inference worker: SQS → model → S3 result."""
+import json
+import os
+import time
+import uuid
+
+import boto3
+import numpy as np
+
+sqs     = boto3.client("sqs", region_name="us-east-1")
+s3      = boto3.client("s3")
+QUEUE   = os.environ["INFERENCE_QUEUE_URL"]
+BUCKET  = os.environ["RESULTS_BUCKET"]
+
+def load_model():
+    """Load model once at worker startup."""
+    import onnxruntime as ort
+    sess = ort.InferenceSession("model.onnx", providers=["CUDAExecutionProvider"])
+    return sess
+
+def process_message(session, message: dict) -> dict:
+    body   = json.loads(message["Body"])
+    job_id = body["job_id"]
+    s3_key = body["input_s3_key"]
+
+    # Download input from S3
+    obj = s3.get_object(Bucket=BUCKET, Key=s3_key)
+    x   = np.frombuffer(obj["Body"].read(), dtype=np.float32).reshape(body["shape"])
+
+    # Infer
+    t0     = time.perf_counter()
+    output = session.run(None, {"input": x})[0]
+    ms     = (time.perf_counter() - t0) * 1000
+
+    # Upload result to S3
+    result_key = f"results/{job_id}.npy"
+    s3.put_object(Bucket=BUCKET, Key=result_key, Body=output.tobytes())
+
+    return {"job_id": job_id, "result_key": result_key, "latency_ms": round(ms, 2)}
+
+def main():
+    session = load_model()
+    print("Worker ready, polling SQS ...")
+    while True:
+        resp = sqs.receive_message(
+            QueueUrl=QUEUE,
+            MaxNumberOfMessages=10,
+            WaitTimeSeconds=20,       # long polling
+        )
+        for msg in resp.get("Messages", []):
+            try:
+                result = process_message(session, msg)
+                print(f"Processed {result['job_id']} in {result['latency_ms']} ms")
+                sqs.delete_message(QueueUrl=QUEUE, ReceiptHandle=msg["ReceiptHandle"])
+            except Exception as e:
+                print(f"Failed to process message: {e}")
+                # Leave in queue for retry / DLQ
+
+if __name__ == "__main__":
+    main()</code></pre>
+
+  <h3>Async Inference Architecture</h3>
+
+  <div class="mermaid my-6">
+sequenceDiagram
+    participant Client
+    participant API as FastAPI Gateway
+    participant SQS as AWS SQS
+    participant Worker as Inference Worker
+    participant S3 as AWS S3
+    participant CB as Callback / Webhook
+
+    Client->>API: POST /predict/async {input_s3_key, callback_url}
+    API->>SQS: Enqueue job message
+    API-->>Client: 202 Accepted {job_id}
+
+    Worker->>SQS: Poll (long-polling)
+    SQS-->>Worker: job message
+    Worker->>S3: GET input data
+    S3-->>Worker: input tensor bytes
+    Worker->>Worker: GPU inference
+    Worker->>S3: PUT result.npy
+    Worker->>SQS: Delete message
+    Worker->>CB: POST /callback {job_id, result_s3_key}
+    CB-->>Client: Notify result ready
+  </div>
+</section>
+
+<!-- ===== SECTION 12 ===== -->
+<section id="s12">
+  <h2 class="text-2xl font-bold text-gray-900"><span class="section-num">12.</span> Serving Infrastructure Patterns</h2>
+
+  <h3>Production Serving Infrastructure</h3>
+
+  <div class="mermaid my-6">
+graph TB
+    Internet([Internet Traffic]) --> WAF[AWS WAF / Cloudflare]
+    WAF --> ALB[Application Load Balancer\nSSL Termination]
+    ALB --> AGW[API Gateway\nRate Limiting / Auth]
+    AGW --> Cache[Redis Response Cache\nIdentical-request deduplication]
+    Cache -->|cache miss| FS[Feature Store\nOnline: Redis / DynamoDB]
+    FS --> Router[Traffic Router\nBlue/Green / A-B / Canary]
+    Router -->|90% blue| Blue[Blue Cluster\nTriton / TorchServe\nGPU nodes]
+    Router -->|10% green| Green[Green Cluster\nNew model version]
+    Blue & Green --> Monitor[Prometheus + Grafana\nLatency / Error / GPU util]
+    Monitor --> Alert[PagerDuty / OpsGenie\nAuto-rollback trigger]
+
+    style Blue fill:#2563eb,color:#fff
+    style Green fill:#059669,color:#fff
+    style Cache fill:#f59e0b,color:#fff
+    style Monitor fill:#7c3aed,color:#fff
+  </div>
+
+  <h3>Multi-Model Endpoints (Cost Optimization)</h3>
+  <p>
+    On SageMaker, a <em>Multi-Model Endpoint</em> (MME) deploys thousands of models behind one
+    endpoint. Models are loaded on-demand and cached in GPU memory. A LRU policy evicts
+    infrequently accessed models. This is 90%+ cheaper than one endpoint per model for a long
+    tail of low-traffic models.
+  </p>
+
+  <h3>Model Caching Strategies</h3>
+  <ul class="list-disc ml-6 space-y-1 text-sm">
+    <li><strong>Response cache (Redis):</strong> Cache identical input → output pairs. Effective when input space is small (e.g., trending queries).</li>
+    <li><strong>Feature cache:</strong> Cache expensive feature lookups (embeddings, entity features) by entity ID.</li>
+    <li><strong>Model weight cache:</strong> Pin model weights in GPU VRAM; use LRU for MME eviction policy.</li>
+    <li><strong>KV cache (LLMs):</strong> Cache key/value attention states for prefix-shared prompts. Critical for serving LLMs efficiently.</li>
+  </ul>
+
+  <h3>Warm-up to Avoid Cold Start</h3>
+  <p>
+    First-request latency can be 10–100× higher than steady-state due to CUDA context
+    initialization, JIT compilation, and memory allocation. Mitigate with:
+  </p>
+  <ul class="list-disc ml-6 space-y-1 text-sm">
+    <li>Triton <code>model_warmup</code> block in config.pbtxt (shown in Section 2)</li>
+    <li>Kubernetes <code>readinessProbe</code> that fires synthetic requests before routing traffic</li>
+    <li>Pre-warming Lambda functions by scheduling keep-alive pings</li>
+    <li>TorchScript / TRT engines eliminate JIT compilation on first request</li>
+  </ul>
+
+  <h3>Blue/Green Model Deployments</h3>
+  <p>
+    Blue/green is the safest model rollout strategy. Key implementation:
+  </p>
+  <ol class="list-decimal ml-6 space-y-1 text-sm">
+    <li>Deploy new model version to green cluster (zero traffic)</li>
+    <li>Run shadow traffic: copy production requests to green and compare outputs</li>
+    <li>Shift 5% → 10% → 25% → 50% → 100% traffic using weighted routing</li>
+    <li>Monitor accuracy metrics, latency P99, error rates at each step</li>
+    <li>Automated rollback: if error rate spikes &gt;1% in 5-minute window, route 100% back to blue</li>
+  </ol>
+
+  <div class="callout-warn rounded-lg p-4 my-4">
+    <strong>Rollback readiness requirement:</strong> Never decommission the blue cluster until
+    the green cluster has served 72+ hours of production traffic without regressions. Store
+    previous model artifacts in S3 with a minimum 30-day retention policy. SageMaker model
+    registry <code>Approved</code> vs <code>PendingManualApproval</code> states enforce this gate.
+  </div>
+</section>
+
+<!-- ===== SUMMARY ===== -->
+<section id="summary">
+  <h2 class="text-2xl font-bold text-gray-900">Summary &amp; Key Takeaways</h2>
+
+  <div class="grid md:grid-cols-2 gap-4 my-6">
+    <div class="bg-blue-50 border border-blue-200 rounded-xl p-5">
+      <h3 class="text-blue-800 font-bold mt-0">Performance Engineering</h3>
+      <ul class="list-disc ml-4 space-y-1 text-sm text-blue-900">
+        <li>Always profile the latency/throughput Pareto curve before choosing batch size</li>
+        <li>TensorRT FP16 is the best first optimization on NVIDIA GPUs — 3–5× speedup with negligible accuracy loss</li>
+        <li>Dynamic batching (Triton built-in) improves GPU utilization without client changes</li>
+        <li>Warm-up requests eliminate cold-start latency spikes in production</li>
+        <li>gRPC outperforms REST for internal high-QPS services by 10–20%</li>
+      </ul>
+    </div>
+    <div class="bg-green-50 border border-green-200 rounded-xl p-5">
+      <h3 class="text-green-800 font-bold mt-0">Framework Selection</h3>
+      <ul class="list-disc ml-4 space-y-1 text-sm text-green-900">
+        <li><strong>Triton:</strong> When you need maximum GPU performance, multi-backend, or complex model pipelines</li>
+        <li><strong>TorchServe:</strong> Pure-PyTorch shops wanting a simple REST API with managed lifecycle</li>
+        <li><strong>FastAPI + ONNX Runtime:</strong> Custom logic, rapid prototyping, non-standard preprocessing</li>
+        <li><strong>BentoML:</strong> Data-science-friendly serving with automatic adaptive batching</li>
+        <li><strong>Seldon / KServe:</strong> Enterprise Kubernetes, A/B testing, inference graphs, explainability</li>
+      </ul>
+    </div>
+    <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-5">
+      <h3 class="text-yellow-800 font-bold mt-0">Reliability Patterns</h3>
+      <ul class="list-disc ml-4 space-y-1 text-sm text-yellow-900">
+        <li>Blue/green + shadow traffic is the only safe model rollout strategy at scale</li>
+        <li>Automated rollback triggered by error rate / P99 thresholds is non-negotiable</li>
+        <li>Multi-model endpoints (SageMaker MME, KServe ModelMesh) cut per-model costs by 90%+</li>
+        <li>Response caching removes GPU load for repeated identical requests</li>
+        <li>SLA targets: P99 &lt;100 ms for online, measure P99.9 for safety-critical</li>
+      </ul>
+    </div>
+    <div class="bg-purple-50 border border-purple-200 rounded-xl p-5">
+      <h3 class="text-purple-800 font-bold mt-0">Optimization Hierarchy</h3>
+      <ul class="list-disc ml-4 space-y-1 text-sm text-purple-900">
+        <li>Step 1: Profile — find the bottleneck (CPU pre-processing? memory bandwidth? compute?)</li>
+        <li>Step 2: TorchScript / trace → ONNX to remove Python overhead</li>
+        <li>Step 3: TensorRT FP16 or ONNX Runtime CUDA EP</li>
+        <li>Step 4: INT8 quantization with calibration data</li>
+        <li>Step 5: Pruning + knowledge distillation for 5–10× end-to-end speedup</li>
+        <li>Step 6: Architectural changes (smaller model, MobileNet, DistilBERT)</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3 class="text-xl font-bold">Chapter Checklist</h3>
+  <ul class="list-none space-y-1 text-sm ml-2">
+    <li>✅ You can deploy any PyTorch/TF/ONNX model to Triton with proper config.pbtxt</li>
+    <li>✅ You understand dynamic batching and can tune it for your SLA</li>
+    <li>✅ You can export a PyTorch model to ONNX, simplify it, and build a TensorRT engine</li>
+    <li>✅ You can write a production FastAPI service with health check, metrics, async inference</li>
+    <li>✅ You can deploy a Seldon canary and understand blue/green rollout mechanics</li>
+    <li>✅ You know when to use batch vs online inference and the right tool for each</li>
+    <li>✅ You understand the serving infrastructure patterns required for billions of requests/day</li>
+  </ul>
+</section>
+
+</main>
+
+<!-- ========== BOTTOM NAV ========== -->
+<div class="border-t border-gray-200 bg-gray-50 py-8">
+  <div class="max-w-5xl mx-auto px-6 flex items-center justify-between">
+    <a href="ch12_experiment_tracking.html"
+       class="flex items-center gap-2 text-blue-600 hover:text-blue-800 font-medium">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+      </svg>
+      Previous: Chapter 12 — Experiment Tracking
+    </a>
+    <span class="text-gray-400 text-sm">Chapter 13 of 20</span>
+    <a href="ch14_llm_serving.html"
+       class="flex items-center gap-2 text-blue-600 hover:text-blue-800 font-medium">
+      Next: Chapter 14 — LLM Serving at Scale
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+      </svg>
+    </a>
+  </div>
+</div>
+
+<footer class="bg-gray-900 text-gray-400 text-center py-6 text-xs">
+  Modern MLOps Tutorial — Chapter 13: Model Serving &amp; Deployment
+  | Written by the ML Infrastructure Expert Committee
+  | Content current as of April 2026
+</footer>
+
+</body>
+</html>

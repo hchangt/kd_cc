@@ -1,0 +1,2201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 6: Data Engineering &amp; Feature Stores - Modern MLOps Tutorial</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script>hljs.highlightAll(); mermaid.initialize({startOnLoad:true, theme:'default'});</script>
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; color: #1f2937; }
+    .section-header { border-left: 4px solid #2563eb; }
+    .callout-warning { background: #fef3c7; border-left: 4px solid #f59e0b; }
+    .callout-info    { background: #eff6ff; border-left: 4px solid #2563eb; }
+    .callout-success { background: #ecfdf5; border-left: 4px solid #059669; }
+    .callout-danger  { background: #fef2f2; border-left: 4px solid #dc2626; }
+    pre { margin: 0 !important; }
+    .mermaid { background: white; }
+    table { border-collapse: collapse; width: 100%; }
+    th { background: #2563eb; color: white; }
+    tr:nth-child(even) { background: #f8fafc; }
+    .nav-link { color: #2563eb; text-decoration: none; }
+    .nav-link:hover { text-decoration: underline; }
+  </style>
+</head>
+<body class="bg-gray-50">
+
+<!-- TOP NAVBAR -->
+<nav class="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center h-14">
+      <a href="index.html" class="font-bold text-lg text-blue-600 hover:text-blue-800">Modern MLOps Tutorial</a>
+      <div class="flex items-center gap-6 text-sm">
+        <a href="ch05_model_training.html" class="nav-link">&larr; Ch 5: Model Training</a>
+        <span class="text-gray-400">|</span>
+        <span class="font-semibold text-blue-600">Ch 6: Data Engineering</span>
+        <span class="text-gray-400">|</span>
+        <a href="ch07_model_serving.html" class="nav-link">Ch 7: Model Serving &rarr;</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- CHAPTER HEADER -->
+<header class="bg-gradient-to-br from-blue-700 via-blue-600 to-emerald-600 text-white py-16">
+  <div class="max-w-5xl mx-auto px-6">
+    <div class="flex items-center gap-3 mb-4">
+      <span class="bg-blue-800 bg-opacity-80 px-3 py-1 rounded-full text-sm font-bold tracking-wide">CHAPTER 6</span>
+      <span class="text-blue-200 text-sm">~90 min read</span>
+    </div>
+    <h1 class="text-4xl font-bold mb-3">Data Engineering &amp; Feature Stores</h1>
+    <p class="text-blue-100 text-lg max-w-3xl">A practitioner's guide to building production data pipelines for ML — from raw ingestion through feature serving. Covers Spark, Delta Lake, Iceberg, Feast, DVC, Great Expectations, and lessons from Meta's feature store at scale.</p>
+    <div class="mt-6 flex flex-wrap gap-3 text-sm">
+      <span class="bg-blue-800 bg-opacity-60 px-3 py-1 rounded-full">Apache Spark / PySpark</span>
+      <span class="bg-blue-800 bg-opacity-60 px-3 py-1 rounded-full">Delta Lake / Iceberg / Hudi</span>
+      <span class="bg-blue-800 bg-opacity-60 px-3 py-1 rounded-full">Feast Feature Store</span>
+      <span class="bg-blue-800 bg-opacity-60 px-3 py-1 rounded-full">DVC Data Versioning</span>
+      <span class="bg-blue-800 bg-opacity-60 px-3 py-1 rounded-full">Great Expectations / dbt</span>
+    </div>
+  </div>
+</header>
+
+<!-- TABLE OF CONTENTS -->
+<div class="max-w-5xl mx-auto px-6 py-8">
+  <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+    <h2 class="font-bold text-lg mb-4 text-gray-800">Table of Contents</h2>
+    <ol class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+      <li><a href="#s1"  class="nav-link">1. Data Engineering for ML — Overview</a></li>
+      <li><a href="#s2"  class="nav-link">2. Data Ingestion Patterns</a></li>
+      <li><a href="#s3"  class="nav-link">3. Data Processing at Scale</a></li>
+      <li><a href="#s4"  class="nav-link">4. Data Storage Formats for ML</a></li>
+      <li><a href="#s5"  class="nav-link">5. Data Lakes and Lakehouses</a></li>
+      <li><a href="#s6"  class="nav-link">6. Feature Engineering</a></li>
+      <li><a href="#s7"  class="nav-link">7. Feature Stores — Concepts</a></li>
+      <li><a href="#s8"  class="nav-link">8. Feast (Open-Source Feature Store)</a></li>
+      <li><a href="#s9"  class="nav-link">9. Tecton (Enterprise Feature Store)</a></li>
+      <li><a href="#s10" class="nav-link">10. Vertex AI &amp; SageMaker Feature Stores</a></li>
+      <li><a href="#s11" class="nav-link">11. Data Quality and Validation</a></li>
+      <li><a href="#s12" class="nav-link">12. Data Versioning with DVC</a></li>
+      <li><a href="#s13" class="nav-link">13. Data Labeling and Annotation</a></li>
+      <li><a href="#summary" class="nav-link">Summary &amp; Key Takeaways</a></li>
+    </ol>
+  </div>
+</div>
+
+<main class="max-w-5xl mx-auto px-6 pb-16 space-y-16">
+
+<!-- SECTION 1 -->
+<section id="s1">
+  <h2 class="text-2xl font-bold mb-2 section-header pl-4">1. Data Engineering for ML — Overview</h2>
+  <p class="text-gray-500 text-sm mb-6">Why data pipelines are the foundation of every production ML system</p>
+  <p class="mb-4 leading-relaxed">The uncomfortable truth about production machine learning: model code is typically under 5% of the total codebase. The remaining 95% is data infrastructure — pipelines, validation, storage, versioning, serving, and monitoring. Andrew Ng's framing of "data-centric AI" names this directly: improving data quality and consistency produces better model outcomes than architecture search or hyperparameter tuning, especially once you're past research-quality baselines.</p>
+  <p class="mb-6 leading-relaxed">At Meta, the ranking models serving billions of feed impressions per day consumed hundreds of thousands of features. The bottleneck was never the model — it was reliably computing, storing, and serving fresh features at low latency. That operational reality shapes everything in this chapter.</p>
+
+  <h3 class="text-xl font-semibold mt-8 mb-3">Why Data Is the Hardest Part</h3>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+    <div class="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
+      <h4 class="font-semibold mb-1 text-blue-700">Data Quality</h4>
+      <p class="text-sm text-gray-600">Missing values, schema drift, upstream outages, distribution shift — all invisible until your model degrades silently in production.</p>
+    </div>
+    <div class="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
+      <h4 class="font-semibold mb-1 text-blue-700">Labeling Cost</h4>
+      <p class="text-sm text-gray-600">Human annotation is expensive, slow, and inconsistent. Label errors are the primary source of irreducible error in many supervised systems.</p>
+    </div>
+    <div class="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
+      <h4 class="font-semibold mb-1 text-blue-700">Versioning &amp; Lineage</h4>
+      <p class="text-sm text-gray-600">Models trained on different data slices are fundamentally different artifacts. Without data versioning, reproducibility is impossible.</p>
+    </div>
+  </div>
+
+  <h3 class="text-xl font-semibold mt-8 mb-4">The Data Pipeline Lifecycle</h3>
+  <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm mb-6">
+    <div class="mermaid">
+flowchart LR
+  subgraph ING["Ingestion"]
+    A1[Operational DBs]
+    A2[Kafka / Kinesis]
+    A3[External APIs]
+  end
+  subgraph PROC["Processing"]
+    B1[Batch ETL\nSpark / dbt]
+    B2[Stream Processing\nFlink / Structured Streaming]
+  end
+  subgraph STORE["Storage"]
+    C1[Raw Zone\nS3 / GCS]
+    C2[Curated Zone\nDelta Lake / Iceberg]
+    C3[Feature Store\nOffline + Online]
+  end
+  subgraph SERVE["Serving"]
+    D1[Training Datasets]
+    D2[Online Inference]
+  end
+  subgraph MON["Monitoring"]
+    E1[Great Expectations]
+    E2[Drift Detection]
+  end
+  A1 --> B1
+  A2 --> B2
+  A3 --> B1
+  B1 --> C1
+  B2 --> C1
+  C1 --> C2
+  C2 --> C3
+  C3 --> D1
+  C3 --> D2
+  D1 --> E1
+  D2 --> E2
+    </div>
+  </div>
+
+  <h3 class="text-xl font-semibold mt-8 mb-3">Data Types for ML</h3>
+  <div class="overflow-x-auto rounded-lg border border-gray-200 shadow-sm mb-6">
+    <table>
+      <thead><tr><th class="px-4 py-3 text-left">Type</th><th class="px-4 py-3 text-left">Examples</th><th class="px-4 py-3 text-left">Storage</th><th class="px-4 py-3 text-left">ML Use Cases</th></tr></thead>
+      <tbody>
+        <tr><td class="px-4 py-3">Structured / Tabular</td><td class="px-4 py-3">User profiles, transactions</td><td class="px-4 py-3">Parquet, Delta Lake</td><td class="px-4 py-3">Click prediction, fraud</td></tr>
+        <tr><td class="px-4 py-3">Unstructured — Text</td><td class="px-4 py-3">Reviews, documents</td><td class="px-4 py-3">JSON, Parquet + embeddings</td><td class="px-4 py-3">NLP, LLM fine-tuning</td></tr>
+        <tr><td class="px-4 py-3">Unstructured — Images</td><td class="px-4 py-3">Product photos, scans</td><td class="px-4 py-3">TFRecord, WebDataset</td><td class="px-4 py-3">Computer vision</td></tr>
+        <tr><td class="px-4 py-3">Time-Series</td><td class="px-4 py-3">Metrics, IoT sensors</td><td class="px-4 py-3">Parquet time-partitioned</td><td class="px-4 py-3">Forecasting, anomaly detection</td></tr>
+        <tr><td class="px-4 py-3">Streaming / Events</td><td class="px-4 py-3">Clickstream, user events</td><td class="px-4 py-3">Kafka, Delta streaming</td><td class="px-4 py-3">Real-time features</td></tr>
+        <tr><td class="px-4 py-3">Graph</td><td class="px-4 py-3">Social graphs, co-purchases</td><td class="px-4 py-3">Edge lists, adjacency</td><td class="px-4 py-3">Recommendation, fraud</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout-info rounded-lg p-4 mb-4">
+    <p class="font-semibold mb-1">Data-Centric AI in Practice</p>
+    <p class="text-sm">Fix the data, not the model. At Meta, the ranking team saw larger gains from improving feature freshness (minutes vs. hours staleness) than from comparable model architecture changes. Invest in systematic label quality audits, consistent preprocessing, and fast iteration loops on data slices before reaching for a bigger model.</p>
+  </div>
+</section>
+
+<!-- SECTION 2 -->
+<section id="s2">
+  <h2 class="text-2xl font-bold mb-2 section-header pl-4">2. Data Ingestion Patterns</h2>
+  <p class="text-gray-500 text-sm mb-6">Batch, streaming, and CDC — choosing the right ingestion strategy</p>
+
+  <p class="mb-4 leading-relaxed">Batch ingestion processes data in chunks on a schedule (hourly, daily). It is simpler to build, easier to backfill, and cheaper to operate. Streaming ingestion processes records as they arrive, enabling sub-minute feature freshness — critical for fraud detection and real-time personalization. Most production systems use both: streaming for latency-sensitive features, batch for complex aggregations where exactness matters more than speed.</p>
+
+  <h3 class="text-xl font-semibold mt-6 mb-3">ETL vs ELT</h3>
+  <p class="mb-4 leading-relaxed">Traditional ETL (Extract → Transform → Load) transforms data before storage. Modern ELT (Extract → Load → Transform) loads raw data into the warehouse first and transforms in-place. ELT won because cloud warehouses (Snowflake, BigQuery, Redshift) have compute collocated with storage — the raw data is always available for reprocessing and schema-on-read avoids upfront decisions.</p>
+
+  <h3 class="text-xl font-semibold mt-6 mb-3">Change Data Capture (CDC)</h3>
+  <p class="mb-4 leading-relaxed">CDC reads database write-ahead logs (WAL) to capture inserts, updates, and deletes in real time without polling. Debezium is the dominant open-source CDC tool. It publishes change events to Kafka, which downstream ML pipelines consume. This is the canonical pattern for keeping feature stores synchronized with operational databases.</p>
+
+  <h3 class="text-xl font-semibold mt-8 mb-3">Code: Kafka Consumer for Streaming ML Features</h3>
+  <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-6">
+    <div class="bg-gray-100 px-4 py-2 border-b border-gray-200 text-sm font-mono text-gray-600">kafka_ml_consumer.py</div>
+    <pre><code class="language-python">"""
+Kafka consumer: processes user activity events and writes
+real-time features to Redis for online feature serving.
+"""
+import json
+import logging
+from dataclasses import dataclass
+from typing import Dict, Any, Optional
+from confluent_kafka import Consumer, KafkaError, KafkaException
+import redis
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+
+@dataclass
+class UserActivityEvent:
+    user_id: str
+    event_type: str       # "click", "purchase", "view", "search"
+    item_id: Optional[str]
+    session_id: str
+    timestamp: float
+    metadata: Dict[str, Any]
+
+
+class StreamingFeatureProcessor:
+    def __init__(self, kafka_config: Dict, redis_host: str = "localhost"):
+        self.consumer = Consumer({
+            **kafka_config,
+            "group.id": "ml-feature-processor",
+            "auto.offset.reset": "earliest",
+            "enable.auto.commit": False,   # manual commit for exactly-once semantics
+            "max.poll.interval.ms": 300_000,
+        })
+        self.redis = redis.Redis(host=redis_host, port=6379, decode_responses=True)
+        self.feature_ttl = 3600  # 1-hour rolling window TTL
+
+    def parse_event(self, raw: bytes) -> Optional[UserActivityEvent]:
+        try:
+            d = json.loads(raw)
+            return UserActivityEvent(
+                user_id=d["user_id"], event_type=d["event_type"],
+                item_id=d.get("item_id"), session_id=d["session_id"],
+                timestamp=d["timestamp"], metadata=d.get("metadata", {}),
+            )
+        except (KeyError, json.JSONDecodeError) as e:
+            logger.warning(f"Parse error: {e}")
+            return None
+
+    def update_features(self, event: UserActivityEvent) -> None:
+        """
+        Maintain sliding-window feature counts in Redis sorted sets.
+        Key pattern: feat:user:{uid}:{feature_name}
+        Value: sorted set of (timestamp, event_id) pairs.
+        """
+        uid = event.user_id
+        ts  = event.timestamp
+        cutoff_1h = ts - 3600
+
+        pipe = self.redis.pipeline(transaction=True)
+
+        # --- clicks_1h: rolling 1-hour click count ---
+        click_key = f"feat:user:{uid}:clicks_1h"
+        pipe.zadd(click_key, {f"{ts}:{event.item_id or ''}": ts})
+        pipe.zremrangebyscore(click_key, 0, cutoff_1h)
+        pipe.expire(click_key, self.feature_ttl * 2)
+
+        # --- purchases_1h ---
+        if event.event_type == "purchase":
+            pkey = f"feat:user:{uid}:purchases_1h"
+            pipe.zadd(pkey, {str(ts): ts})
+            pipe.zremrangebyscore(pkey, 0, cutoff_1h)
+            pipe.expire(pkey, self.feature_ttl * 2)
+
+        # --- last seen category ---
+        if category := event.metadata.get("category"):
+            pipe.set(f"feat:user:{uid}:last_category", category, ex=86400)
+
+        # --- last event timestamp ---
+        pipe.set(f"feat:user:{uid}:last_event_ts", ts, ex=86400)
+
+        pipe.execute()
+
+    def run(self, topics: list):
+        self.consumer.subscribe(topics)
+        logger.info(f"Subscribed to: {topics}")
+        processed = 0
+        try:
+            while True:
+                msg = self.consumer.poll(timeout=1.0)
+                if msg is None:
+                    continue
+                if msg.error():
+                    if msg.error().code() == KafkaError._PARTITION_EOF:
+                        continue
+                    raise KafkaException(msg.error())
+
+                event = self.parse_event(msg.value())
+                if event:
+                    self.update_features(event)
+                    processed += 1
+                    if processed % 1000 == 0:
+                        logger.info(f"Processed {processed:,} events")
+
+                # Commit only after successful write to Redis
+                self.consumer.commit(message=msg)
+        except KeyboardInterrupt:
+            logger.info("Shutting down...")
+        finally:
+            self.consumer.close()
+
+
+if __name__ == "__main__":
+    processor = StreamingFeatureProcessor(
+        kafka_config={
+            "bootstrap.servers": "kafka-1:9092,kafka-2:9092",
+            "security.protocol": "SASL_SSL",
+            "sasl.mechanism": "PLAIN",
+            "sasl.username": "ml-service",
+            "sasl.password": "secret",
+        },
+        redis_host="redis-cluster",
+    )
+    processor.run(["user-activity-events", "purchase-events"])
+</code></pre>
+  </div>
+
+  <h3 class="text-xl font-semibold mt-8 mb-3">Code: Batch Ingestion with PySpark (PostgreSQL → Delta Lake)</h3>
+  <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-6">
+    <div class="bg-gray-100 px-4 py-2 border-b border-gray-200 text-sm font-mono text-gray-600">batch_ingestion_spark.py</div>
+    <pre><code class="language-python">"""
+Daily batch ingestion: PostgreSQL → Delta Lake (raw zone).
+Uses high-watermark on updated_at for incremental loads.
+Runs via Airflow PySpark operator on EMR / Databricks.
+"""
+from pyspark.sql import SparkSession
+from pyspark.sql import functions as F
+from pyspark.sql.types import TimestampType
+from delta.tables import DeltaTable
+from delta import configure_spark_with_delta_pip
+import logging
+from datetime import datetime
+
+logger = logging.getLogger(__name__)
+DATA_LAKE = "s3a://ml-data-lake"
+
+
+def build_spark() -> SparkSession:
+    builder = (
+        SparkSession.builder.appName("batch-ingestion")
+        .config("spark.sql.extensions",
+                "io.delta.sql.DeltaSparkSessionExtension")
+        .config("spark.sql.catalog.spark_catalog",
+                "org.apache.spark.sql.delta.catalog.DeltaCatalog")
+        .config("spark.sql.adaptive.enabled", "true")
+        .config("spark.sql.adaptive.coalescePartitions.enabled", "true")
+        .config("spark.hadoop.fs.s3a.impl",
+                "org.apache.hadoop.fs.s3a.S3AFileSystem")
+        .config("spark.hadoop.fs.s3a.aws.credentials.provider",
+                "com.amazonaws.auth.InstanceProfileCredentialsProvider")
+    )
+    return configure_spark_with_delta_pip(builder).getOrCreate()
+
+
+def get_watermark(spark: SparkSession, path: str, col: str) -> datetime:
+    """Return max(col) from existing Delta table, or epoch if table absent."""
+    try:
+        df = spark.read.format("delta").load(path)
+        val = df.agg(F.max(col)).collect()[0][0]
+        return val or datetime(2020, 1, 1)
+    except Exception:
+        return datetime(2020, 1, 1)
+
+
+def ingest_table(
+    spark: SparkSession,
+    jdbc_url: str,
+    jdbc_props: dict,
+    source_table: str,
+    select_cols: str,
+    partition_id_col: str,
+    target_path: str,
+    merge_key: str,
+    watermark_col: str = "updated_at",
+    run_date: datetime = None,
+) -> None:
+    run_date = run_date or datetime.utcnow()
+    wm = get_watermark(spark, target_path, watermark_col)
+    logger.info(f"[{source_table}] Loading rows after {wm}")
+
+    df = (
+        spark.read.format("jdbc")
+        .option("url", jdbc_url)
+        .option("dbtable", f"""
+            (SELECT {select_cols}
+               FROM {source_table}
+              WHERE {watermark_col} > '{wm.isoformat()}'
+                AND {watermark_col} <= '{run_date.isoformat()}'
+            ) AS inc
+        """)
+        .option("numPartitions", 20)
+        .option("partitionColumn", partition_id_col)
+        .option("lowerBound", "0")
+        .option("upperBound", "2000000000")
+        .options(**jdbc_props)
+        .load()
+        .withColumn(watermark_col, F.col(watermark_col).cast(TimestampType()))
+        .withColumn("ingested_at", F.lit(run_date).cast(TimestampType()))
+        .withColumn("_year",  F.year(watermark_col))
+        .withColumn("_month", F.month(watermark_col))
+    )
+
+    n = df.count()
+    logger.info(f"[{source_table}] Loaded {n:,} incremental rows")
+    if n == 0:
+        return
+
+    if DeltaTable.isDeltaTable(spark, target_path):
+        tgt = DeltaTable.forPath(spark, target_path)
+        (
+            tgt.alias("t")
+            .merge(df.alias("s"), f"t.{merge_key} = s.{merge_key}")
+            .whenMatchedUpdateAll()
+            .whenNotMatchedInsertAll()
+            .execute()
+        )
+    else:
+        (
+            df.write.format("delta")
+            .partitionBy("_year", "_month")
+            .mode("overwrite")
+            .option("overwriteSchema", "true")
+            .save(target_path)
+        )
+    logger.info(f"[{source_table}] Done -> {target_path}")
+
+
+if __name__ == "__main__":
+    spark = build_spark()
+    JDBC_URL  = "jdbc:postgresql://prod-db.internal:5432/app_db"
+    JDBC_PROPS = {"user": "spark_reader", "password": "secret",
+                  "driver": "org.postgresql.Driver", "fetchsize": "10000"}
+
+    ingest_table(
+        spark, JDBC_URL, JDBC_PROPS,
+        source_table="users",
+        select_cols="user_id, email_hash, country_code, age_bucket, subscription_tier, updated_at",
+        partition_id_col="user_id",
+        target_path=f"{DATA_LAKE}/raw/users",
+        merge_key="user_id",
+    )
+    spark.stop()
+</code></pre>
+  </div>
+
+  <h3 class="text-xl font-semibold mt-8 mb-3">Ingestion Tool Comparison</h3>
+  <div class="overflow-x-auto rounded-lg border border-gray-200 shadow-sm mb-6">
+    <table>
+      <thead><tr>
+        <th class="px-4 py-3 text-left">Tool</th>
+        <th class="px-4 py-3 text-left">Type</th>
+        <th class="px-4 py-3 text-left">Connectors</th>
+        <th class="px-4 py-3 text-left">Managed</th>
+        <th class="px-4 py-3 text-left">Best For</th>
+      </tr></thead>
+      <tbody>
+        <tr><td class="px-4 py-3 font-medium">Fivetran</td><td class="px-4 py-3">SaaS ETL</td><td class="px-4 py-3">300+</td><td class="px-4 py-3">Fully</td><td class="px-4 py-3">Quick setup, enterprise SaaS sources</td></tr>
+        <tr><td class="px-4 py-3 font-medium">Airbyte</td><td class="px-4 py-3">Open-source ELT</td><td class="px-4 py-3">300+</td><td class="px-4 py-3">Self-hosted or Cloud</td><td class="px-4 py-3">Cost control, custom connectors</td></tr>
+        <tr><td class="px-4 py-3 font-medium">Debezium</td><td class="px-4 py-3">CDC</td><td class="px-4 py-3">Postgres, MySQL, MongoDB</td><td class="px-4 py-3">No (Kafka Connect)</td><td class="px-4 py-3">Real-time DB replication to Kafka</td></tr>
+        <tr><td class="px-4 py-3 font-medium">Striim</td><td class="px-4 py-3">Enterprise CDC</td><td class="px-4 py-3">50+</td><td class="px-4 py-3">Yes</td><td class="px-4 py-3">Enterprise CDC with transformations</td></tr>
+        <tr><td class="px-4 py-3 font-medium">Apache NiFi</td><td class="px-4 py-3">Data flow</td><td class="px-4 py-3">Extensible</td><td class="px-4 py-3">Self-hosted</td><td class="px-4 py-3">Complex routing, edge ingestion</td></tr>
+        <tr><td class="px-4 py-3 font-medium">AWS Glue</td><td class="px-4 py-3">Managed Spark ETL</td><td class="px-4 py-3">JDBC, S3, DynamoDB</td><td class="px-4 py-3">Serverless</td><td class="px-4 py-3">AWS-native pipelines</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- SECTION 3 -->
+<section id="s3">
+  <h2 class="text-2xl font-bold mb-2 section-header pl-4">3. Data Processing at Scale</h2>
+  <p class="text-gray-500 text-sm mb-6">Spark, Dask, and Ray Data — when to use each</p>
+  <p class="mb-4 leading-relaxed">For ML data processing you need a distributed compute framework that handles data sizes beyond a single machine's memory. The three dominant options differ in programming model, deployment complexity, and sweet spots.</p>
+
+  <h3 class="text-xl font-semibold mt-6 mb-3">Code: Complete PySpark Feature Engineering Pipeline</h3>
+  <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-6">
+    <div class="bg-gray-100 px-4 py-2 border-b border-gray-200 text-sm font-mono text-gray-600">spark_feature_pipeline.py</div>
+    <pre><code class="language-python">"""
+PySpark feature engineering pipeline.
+Input:  raw user events + user profiles (Delta Lake)
+Output: feature table for model training (Delta Lake, partitioned by country)
+"""
+from pyspark.sql import SparkSession, Window
+from pyspark.sql import functions as F
+from pyspark.sql.types import FloatType
+import logging
+
+logger = logging.getLogger(__name__)
+DATA_LAKE = "s3a://ml-data-lake"
+
+
+def build_spark() -> SparkSession:
+    return (
+        SparkSession.builder.appName("feature-engineering")
+        .config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension")
+        .config("spark.sql.catalog.spark_catalog",
+                "org.apache.spark.sql.delta.catalog.DeltaCatalog")
+        .config("spark.sql.adaptive.enabled", "true")
+        .config("spark.sql.shuffle.partitions", "400")
+        .getOrCreate()
+    )
+
+
+def compute_activity_features(events):
+    """7-day and 30-day aggregations per user."""
+    ref_ts = events.agg(F.max("event_ts")).collect()[0][0]
+    recent = events.withColumn(
+        "days_ago",
+        F.datediff(F.lit(ref_ts), F.col("event_ts").cast("date"))
+    )
+
+    feats_7d = (
+        recent.filter(F.col("days_ago") <= 7)
+        .groupBy("user_id")
+        .agg(
+            F.count("*").alias("events_7d"),
+            F.countDistinct("session_id").alias("sessions_7d"),
+            F.countDistinct("item_id").alias("unique_items_7d"),
+            F.sum(F.when(F.col("event_type") == "purchase", 1).otherwise(0)).alias("purchases_7d"),
+            F.sum(F.when(F.col("event_type") == "click",    1).otherwise(0)).alias("clicks_7d"),
+            F.mean("dwell_seconds").alias("avg_dwell_7d"),
+        )
+    )
+    feats_30d = (
+        recent.filter(F.col("days_ago") <= 30)
+        .groupBy("user_id")
+        .agg(
+            F.count("*").alias("events_30d"),
+            F.sum(F.when(F.col("event_type") == "purchase", 1).otherwise(0)).alias("purchases_30d"),
+            F.sum("purchase_amount").alias("total_spend_30d"),
+            F.countDistinct("category").alias("category_diversity_30d"),
+        )
+    )
+
+    # Top category last 30 days
+    w = Window.partitionBy("user_id").orderBy(F.desc("cat_cnt"))
+    top_cat = (
+        recent.filter(F.col("days_ago") <= 30)
+        .groupBy("user_id", "category").agg(F.count("*").alias("cat_cnt"))
+        .withColumn("rnk", F.rank().over(w)).filter(F.col("rnk") == 1)
+        .select("user_id", F.col("category").alias("top_category_30d"))
+    )
+
+    return feats_7d.join(feats_30d, "user_id", "outer").join(top_cat, "user_id", "left")
+
+
+def compute_purchase_rate(events):
+    """Click-to-purchase rate with Laplace smoothing (avoids zero division)."""
+    return (
+        events.filter(F.col("event_type").isin("click", "purchase"))
+        .groupBy("user_id")
+        .agg(
+            F.sum(F.when(F.col("event_type") == "click",    1).otherwise(0)).alias("clicks"),
+            F.sum(F.when(F.col("event_type") == "purchase", 1).otherwise(0)).alias("purchases"),
+        )
+        .withColumn("purchase_rate",
+                    (F.col("purchases") + 1.0) / (F.col("clicks") + 2.0))
+        .select("user_id", "purchase_rate")
+    )
+
+
+def run():
+    spark = build_spark()
+    users  = spark.read.format("delta").load(f"{DATA_LAKE}/curated/users")
+    events = spark.read.format("delta").load(f"{DATA_LAKE}/curated/events")
+
+    activity = compute_activity_features(events)
+    purchase_rate = compute_purchase_rate(events)
+
+    feature_df = (
+        users.select("user_id", "country_code", "age_bucket",
+                     "subscription_tier", "account_age_days")
+        .join(activity,      "user_id", "left")
+        .join(purchase_rate, "user_id", "left")
+        .fillna({
+            "events_7d": 0, "sessions_7d": 0, "purchases_7d": 0, "clicks_7d": 0,
+            "avg_dwell_7d": 0.0, "events_30d": 0, "purchases_30d": 0,
+            "total_spend_30d": 0.0, "purchase_rate": 0.5,
+        })
+    )
+
+    output = f"{DATA_LAKE}/features/user_features"
+    (
+        feature_df.write.format("delta")
+        .mode("overwrite").option("overwriteSchema", "true")
+        .partitionBy("country_code")
+        .save(output)
+    )
+    logger.info(f"Wrote {feature_df.count():,} feature rows to {output}")
+    spark.stop()
+
+
+if __name__ == "__main__":
+    run()
+</code></pre>
+  </div>
+
+  <h3 class="text-xl font-semibold mt-8 mb-3">Code: Dask DataFrame Preprocessing for ML</h3>
+  <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-6">
+    <div class="bg-gray-100 px-4 py-2 border-b border-gray-200 text-sm font-mono text-gray-600">dask_preprocessing.py</div>
+    <pre><code class="language-python">"""
+Dask preprocessing pipeline — Python-native, pandas-compatible.
+Best when: data fits in cluster RAM, you want sklearn compatibility,
+or you need iterative exploration without JVM overhead.
+"""
+import dask.dataframe as dd
+import pandas as pd
+from dask.distributed import Client, progress
+from typing import List, Tuple
+
+
+def start_cluster(n_workers: int = 8) -> Client:
+    client = Client(n_workers=n_workers, threads_per_worker=2, memory_limit="16GB")
+    print(f"Dask dashboard: {client.dashboard_link}")
+    return client
+
+
+def preprocess(
+    path: str,
+    cat_cols: List[str],
+    num_cols: List[str],
+    label_col: str,
+) -> Tuple[dd.DataFrame, dd.Series]:
+    ddf = dd.read_parquet(path, engine="pyarrow", columns=cat_cols + num_cols + [label_col])
+
+    # Impute
+    ddf[num_cols] = ddf[num_cols].fillna(ddf[num_cols].mean())
+    ddf[cat_cols] = ddf[cat_cols].fillna("__unknown__")
+
+    # Z-score normalization — compute stats once, broadcast
+    stats = ddf[num_cols].describe().compute()
+    for col in num_cols:
+        mu, sigma = stats[col]["mean"], max(stats[col]["std"], 1e-9)
+        ddf[col] = (ddf[col] - mu) / sigma
+
+    # Cap low-frequency categories
+    for col in cat_cols:
+        freq = ddf[col].value_counts().compute()
+        rare  = set(freq[freq < 100].index.tolist())
+        ddf[col] = ddf[col].where(~ddf[col].isin(rare), "__rare__")
+
+    # Integer-encode categoricals
+    for col in cat_cols:
+        uniq = sorted(ddf[col].unique().compute().tolist())
+        enc  = {v: i for i, v in enumerate(uniq)}
+        ddf[col] = ddf[col].map(enc, meta=(col, "int32"))
+
+    return ddf[cat_cols + num_cols], ddf[label_col]
+
+
+def rolling_window_features(
+    ddf: dd.DataFrame,
+    group_col: str,
+    value_cols: List[str],
+    windows: List[int] = [7, 30],
+) -> dd.DataFrame:
+    """Rolling stats within each partition group (intra-partition windows)."""
+    def _apply(pdf: pd.DataFrame) -> pd.DataFrame:
+        pdf = pdf.sort_values(group_col)
+        for col in value_cols:
+            for w in windows:
+                grp = pdf.groupby(group_col)[col]
+                pdf[f"{col}_mean_{w}d"] = grp.transform(lambda x: x.rolling(w, min_periods=1).mean())
+                pdf[f"{col}_sum_{w}d"]  = grp.transform(lambda x: x.rolling(w, min_periods=1).sum())
+                pdf[f"{col}_std_{w}d"]  = grp.transform(lambda x: x.rolling(w, min_periods=1).std().fillna(0))
+        return pdf
+
+    meta = ddf._meta.copy()
+    for col in value_cols:
+        for w in windows:
+            for agg in ["mean", "sum", "std"]:
+                meta[f"{col}_{agg}_{w}d"] = pd.Series(dtype="float64")
+
+    return ddf.map_partitions(_apply, meta=meta)
+
+
+if __name__ == "__main__":
+    client = start_cluster()
+    X, y = preprocess(
+        "s3://ml-data-lake/curated/training_data/",
+        cat_cols=["country_code", "device_type", "subscription_tier"],
+        num_cols=["account_age_days", "clicks_7d", "total_spend_30d", "purchase_rate"],
+        label_col="converted",
+    )
+    X = X.persist()
+    y = y.persist()
+    progress(X)
+    print("Features:", X.shape[0].compute(), "x", len(X.columns))
+    client.close()
+</code></pre>
+  </div>
+
+  <h3 class="text-xl font-semibold mt-8 mb-3">Spark vs Dask vs Ray Data</h3>
+  <div class="overflow-x-auto rounded-lg border border-gray-200 shadow-sm mb-6">
+    <table>
+      <thead><tr>
+        <th class="px-4 py-3 text-left">Dimension</th>
+        <th class="px-4 py-3 text-left">Apache Spark</th>
+        <th class="px-4 py-3 text-left">Dask</th>
+        <th class="px-4 py-3 text-left">Ray Data</th>
+      </tr></thead>
+      <tbody>
+        <tr><td class="px-4 py-3 font-medium">Language</td><td class="px-4 py-3">Scala / Python / SQL</td><td class="px-4 py-3">Pure Python</td><td class="px-4 py-3">Python</td></tr>
+        <tr><td class="px-4 py-3 font-medium">Scale ceiling</td><td class="px-4 py-3">Petabytes</td><td class="px-4 py-3">Terabytes</td><td class="px-4 py-3">Terabytes</td></tr>
+        <tr><td class="px-4 py-3 font-medium">API familiarity</td><td class="px-4 py-3">Spark SQL / DataFrames</td><td class="px-4 py-3">pandas-like</td><td class="px-4 py-3">Dataset / Arrow</td></tr>
+        <tr><td class="px-4 py-3 font-medium">Streaming</td><td class="px-4 py-3">Structured Streaming (mature)</td><td class="px-4 py-3">Limited</td><td class="px-4 py-3">Limited</td></tr>
+        <tr><td class="px-4 py-3 font-medium">ML integration</td><td class="px-4 py-3">Spark ML, MLflow</td><td class="px-4 py-3">scikit-learn, XGBoost</td><td class="px-4 py-3">Native (Ray Train/Tune)</td></tr>
+        <tr><td class="px-4 py-3 font-medium">GPU support</td><td class="px-4 py-3">RAPIDS cuDF plugin</td><td class="px-4 py-3">cuDF backend</td><td class="px-4 py-3">Native GPU scheduling</td></tr>
+        <tr><td class="px-4 py-3 font-medium">Setup complexity</td><td class="px-4 py-3">High (JVM dependency)</td><td class="px-4 py-3">Low (pip install dask)</td><td class="px-4 py-3">Medium</td></tr>
+        <tr><td class="px-4 py-3 font-medium">Best for</td><td class="px-4 py-3">Large-scale batch ETL, SQL</td><td class="px-4 py-3">Python-heavy preprocessing</td><td class="px-4 py-3">End-to-end ML workloads</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout-success rounded-lg p-4">
+    <p class="font-semibold mb-1">Rule of thumb</p>
+    <p class="text-sm">Use Spark when your data exceeds cluster RAM or you need SQL compatibility / streaming. Use Dask when your team lives in pandas and data fits in cluster memory. Use Ray Data when you're already using Ray for training and want a unified abstraction.</p>
+  </div>
+</section>
+
+<!-- SECTION 4 -->
+<section id="s4">
+  <h2 class="text-2xl font-bold mb-2 section-header pl-4">4. Data Storage Formats for ML</h2>
+  <p class="text-gray-500 text-sm mb-6">Parquet, Delta Lake, Iceberg, and Hudi — the open table format landscape</p>
+  <p class="mb-4 leading-relaxed">Raw object storage (S3, GCS) is cheap and durable, but offers no ACID guarantees, no schema enforcement, and no efficient time travel. Open table formats bolt these capabilities on top of Parquet files, making data lakes practical for production ML systems that require reproducible training data and point-in-time correctness.</p>
+
+  <h3 class="text-xl font-semibold mt-6 mb-3">Parquet: The Foundation</h3>
+  <p class="mb-4 leading-relaxed">Apache Parquet is a columnar binary format. For ML, columnar storage means reading only the feature columns you need, skipping others entirely. Parquet stores column-level min/max statistics and bloom filters in row group footers, enabling predicate pushdown — entire row groups are skipped without I/O. Snappy compression achieves 3–5x on typical tabular data. Every open table format in this section stores actual data as Parquet files, layering metadata on top.</p>
+
+  <h3 class="text-xl font-semibold mt-6 mb-3">Code: Delta Lake Operations</h3>
+  <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-6">
+    <div class="bg-gray-100 px-4 py-2 border-b border-gray-200 text-sm font-mono text-gray-600">delta_lake_operations.py</div>
+    <pre><code class="language-python">"""
+Delta Lake: create, merge/upsert, schema evolution, time travel,
+optimize + z-order, vacuum, and Change Data Feed (CDF).
+Delta stores data as Parquet + transaction log (_delta_log/).
+"""
+from pyspark.sql import SparkSession
+from pyspark.sql import functions as F
+from delta.tables import DeltaTable
+
+spark = (
+    SparkSession.builder.appName("delta-ops")
+    .config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension")
+    .config("spark.sql.catalog.spark_catalog",
+            "org.apache.spark.sql.delta.catalog.DeltaCatalog")
+    .getOrCreate()
+)
+TABLE = "s3a://ml-data-lake/features/user_features"
+
+# ── 1. CREATE ─────────────────────────────────────────────────────────
+data = [("u001","US","premium",1250.50,42),
+        ("u002","UK","free",     85.00, 8),
+        ("u003","DE","premium", 320.00,19)]
+df = spark.createDataFrame(data, ["user_id","country","tier","total_spend","purchases"])
+(df.write.format("delta").mode("overwrite")
+   .option("overwriteSchema","true")
+   .partitionBy("country").save(TABLE))
+print("Created — version 0")
+
+# ── 2. UPSERT / MERGE ─────────────────────────────────────────────────
+updates = spark.createDataFrame([
+    ("u001","US","premium",1350.00,45),   # update
+    ("u004","FR","free",      0.00, 0),   # insert
+], ["user_id","country","tier","total_spend","purchases"])
+
+tgt = DeltaTable.forPath(spark, TABLE)
+(tgt.alias("t")
+    .merge(updates.alias("s"), "t.user_id = s.user_id")
+    .whenMatchedUpdate(set={"total_spend":"s.total_spend","purchases":"s.purchases"})
+    .whenNotMatchedInsertAll()
+    .execute())
+print("Merged — version 1")
+
+# ── 3. SCHEMA EVOLUTION ───────────────────────────────────────────────
+spark.sql(f"ALTER TABLE delta.`{TABLE}` ADD COLUMN last_login_date DATE")
+print("Schema evolved — version 2")
+
+# ── 4. TIME TRAVEL ────────────────────────────────────────────────────
+df_v0 = (spark.read.format("delta").option("versionAsOf", 0).load(TABLE))
+df_v0.show()
+
+# By timestamp
+df_ts = (spark.read.format("delta")
+         .option("timestampAsOf", "2024-06-01 00:00:00")
+         .load(TABLE))
+
+# View history
+DeltaTable.forPath(spark, TABLE).history()\
+    .select("version","timestamp","operation","operationMetrics").show()
+
+# ── 5. OPTIMIZE + Z-ORDER ─────────────────────────────────────────────
+# Compact small files; co-locate rows by query predicates
+spark.sql(f"OPTIMIZE delta.`{TABLE}` ZORDER BY (user_id, country)")
+
+# ── 6. VACUUM ─────────────────────────────────────────────────────────
+spark.sql(f"VACUUM delta.`{TABLE}` RETAIN 168 HOURS")
+
+# ── 7. CHANGE DATA FEED (incremental sync to feature store) ───────────
+spark.sql(f"""
+    ALTER TABLE delta.`{TABLE}`
+    SET TBLPROPERTIES (delta.enableChangeDataFeed = true)
+""")
+
+changes = (spark.read.format("delta")
+           .option("readChangeFeed","true")
+           .option("startingVersion", 1)
+           .load(TABLE))
+changes.filter(F.col("_change_type") == "update_postimage").show()
+</code></pre>
+  </div>
+
+  <h3 class="text-xl font-semibold mt-8 mb-3">Code: Apache Iceberg Table Operations</h3>
+  <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-6">
+    <div class="bg-gray-100 px-4 py-2 border-b border-gray-200 text-sm font-mono text-gray-600">iceberg_operations.py</div>
+    <pre><code class="language-python">"""
+Apache Iceberg: create table, upsert, hidden partitioning,
+time travel, and incremental reads via Spark.
+Iceberg has superior partition evolution and multi-engine support.
+"""
+from pyspark.sql import SparkSession
+from pyspark.sql import functions as F
+
+spark = (
+    SparkSession.builder.appName("iceberg-ops")
+    # Iceberg Spark runtime (choose version matching spark)
+    .config("spark.jars.packages",
+            "org.apache.iceberg:iceberg-spark-runtime-3.4_2.12:1.4.2")
+    .config("spark.sql.extensions",
+            "org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions")
+    # REST catalog (Nessie, AWS Glue, Polaris, etc.)
+    .config("spark.sql.catalog.glue",     "org.apache.iceberg.spark.SparkCatalog")
+    .config("spark.sql.catalog.glue.warehouse", "s3://ml-data-lake/iceberg/")
+    .config("spark.sql.catalog.glue.catalog-impl",
+            "org.apache.iceberg.aws.glue.GlueCatalog")
+    .config("spark.sql.catalog.glue.io-impl",
+            "org.apache.iceberg.aws.s3.S3FileIO")
+    .getOrCreate()
+)
+
+# ── 1. CREATE TABLE with hidden partitioning ──────────────────────────
+spark.sql("""
+    CREATE TABLE IF NOT EXISTS glue.ml.user_features (
+        user_id        STRING  NOT NULL,
+        country_code   STRING,
+        total_spend    DOUBLE,
+        purchases_30d  INT,
+        updated_at     TIMESTAMP
+    )
+    USING iceberg
+    PARTITIONED BY (days(updated_at), country_code)
+    TBLPROPERTIES (
+        'write.format.default'       = 'parquet',
+        'write.parquet.compression-codec' = 'snappy',
+        'history.expire.max-snapshot-age-ms' = '604800000'  -- 7 days
+    )
+""")
+
+# ── 2. INSERT / UPSERT via MERGE INTO ────────────────────────────────
+updates_df = spark.createDataFrame([
+    ("u001","US",1350.0,45,"2024-07-15 10:00:00"),
+    ("u005","JP",  200.0, 3,"2024-07-15 10:00:00"),
+], ["user_id","country_code","total_spend","purchases_30d","updated_at"])
+updates_df.createOrReplaceTempView("updates")
+
+spark.sql("""
+    MERGE INTO glue.ml.user_features t
+    USING updates s ON t.user_id = s.user_id
+    WHEN MATCHED THEN UPDATE SET
+        t.total_spend = s.total_spend,
+        t.purchases_30d = s.purchases_30d,
+        t.updated_at = CAST(s.updated_at AS TIMESTAMP)
+    WHEN NOT MATCHED THEN INSERT *
+""")
+
+# ── 3. TIME TRAVEL ───────────────────────────────────────────────────
+# By snapshot ID
+snapshots = spark.sql("SELECT snapshot_id FROM glue.ml.user_features.snapshots ORDER BY committed_at")
+oldest_snapshot = snapshots.collect()[0]["snapshot_id"]
+df_snap = spark.read.option("snapshot-id", str(oldest_snapshot))\
+    .table("glue.ml.user_features")
+
+# By timestamp
+df_ts = spark.read.option("as-of-timestamp",
+    str(int(pd.Timestamp("2024-07-01").timestamp() * 1000)))\
+    .table("glue.ml.user_features")
+
+# ── 4. INCREMENTAL READ (new records since snapshot) ─────────────────
+incremental = (
+    spark.read
+    .option("start-snapshot-id", str(oldest_snapshot))
+    .format("iceberg")
+    .load("glue.ml.user_features")
+)
+incremental.show(5)
+
+# ── 5. PARTITION EVOLUTION (no full rewrite needed) ──────────────────
+spark.sql("""
+    ALTER TABLE glue.ml.user_features
+    REPLACE PARTITION FIELD days(updated_at) WITH hours(updated_at)
+""")
+
+# ── 6. EXPIRE OLD SNAPSHOTS ──────────────────────────────────────────
+spark.sql("""
+    CALL glue.system.expire_snapshots(
+        table => 'ml.user_features',
+        older_than => TIMESTAMP '2024-01-01 00:00:00',
+        retain_last => 10
+    )
+""")
+
+# ── 7. REWRITE DATA FILES (equivalent to OPTIMIZE) ───────────────────
+spark.sql("""
+    CALL glue.system.rewrite_data_files(
+        table => 'ml.user_features',
+        strategy => 'sort',
+        sort_order => 'user_id ASC NULLS LAST'
+    )
+""")
+print("Iceberg operations complete.")
+</code></pre>
+  </div>
+
+  <h3 class="text-xl font-semibold mt-8 mb-3">Delta Lake vs Iceberg vs Hudi</h3>
+  <div class="overflow-x-auto rounded-lg border border-gray-200 shadow-sm mb-8">
+    <table>
+      <thead><tr>
+        <th class="px-4 py-3 text-left">Feature</th>
+        <th class="px-4 py-3 text-left">Delta Lake</th>
+        <th class="px-4 py-3 text-left">Apache Iceberg</th>
+        <th class="px-4 py-3 text-left">Apache Hudi</th>
+      </tr></thead>
+      <tbody>
+        <tr><td class="px-4 py-3 font-medium">Origin</td><td class="px-4 py-3">Databricks (2019)</td><td class="px-4 py-3">Netflix / Apple (2018)</td><td class="px-4 py-3">Uber (2019)</td></tr>
+        <tr><td class="px-4 py-3 font-medium">ACID transactions</td><td class="px-4 py-3">Yes</td><td class="px-4 py-3">Yes</td><td class="px-4 py-3">Yes</td></tr>
+        <tr><td class="px-4 py-3 font-medium">Time travel</td><td class="px-4 py-3">Version + timestamp</td><td class="px-4 py-3">Snapshot + timestamp</td><td class="px-4 py-3">Timestamp (savepoints)</td></tr>
+        <tr><td class="px-4 py-3 font-medium">Partition evolution</td><td class="px-4 py-3">Requires rewrite</td><td class="px-4 py-3">In-place (no rewrite)</td><td class="px-4 py-3">Limited</td></tr>
+        <tr><td class="px-4 py-3 font-medium">Schema evolution</td><td class="px-4 py-3">Full (ALTER TABLE)</td><td class="px-4 py-3">Full</td><td class="px-4 py-3">Full</td></tr>
+        <tr><td class="px-4 py-3 font-medium">Multi-engine reads</td><td class="px-4 py-3">Spark + Trino (via UniForm)</td><td class="px-4 py-3">Spark, Trino, Flink, Dremio</td><td class="px-4 py-3">Spark, Flink, Presto</td></tr>
+        <tr><td class="px-4 py-3 font-medium">CDC / upsert</td><td class="px-4 py-3">MERGE + CDF</td><td class="px-4 py-3">MERGE INTO</td><td class="px-4 py-3">Native (MOR/COW tables)</td></tr>
+        <tr><td class="px-4 py-3 font-medium">Managed cloud support</td><td class="px-4 py-3">Databricks, AWS, Azure</td><td class="px-4 py-3">AWS Glue, Snowflake, BigLake</td><td class="px-4 py-3">AWS EMR</td></tr>
+        <tr><td class="px-4 py-3 font-medium">Best for</td><td class="px-4 py-3">Databricks shops, streaming</td><td class="px-4 py-3">Multi-engine, open governance</td><td class="px-4 py-3">High-freq CDC ingestion</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout-info rounded-lg p-4 mb-4">
+    <p class="font-semibold mb-1">Which format to choose in 2025</p>
+    <p class="text-sm">If you're on Databricks, Delta Lake is the obvious choice — deep engine integration, managed compaction, liquid clustering. For multi-engine environments (Spark + Trino + Flink), Iceberg's open catalog support (Polaris, Unity, AWS Glue) and partition evolution make it the preferred choice for greenfield data lakes. Hudi is worth considering only if CDC ingestion rates are very high and you need Copy-on-Write vs Merge-on-Read table type control.</p>
+  </div>
+</section>
+
+<!-- SECTION 5 -->
+<section id="s5">
+  <h2 class="text-2xl font-bold mb-2 section-header pl-4">5. Data Lakes and Lakehouses</h2>
+  <p class="text-gray-500 text-sm mb-6">How the lakehouse pattern unifies data engineering and ML</p>
+  <p class="mb-4 leading-relaxed">A data lake stores raw data cheaply in object storage (S3/GCS/ADLS) without imposing schema. This flexibility is valuable early in a project but degrades into a "data swamp" without governance. The <strong>lakehouse</strong> pattern adds ACID transactions, schema enforcement, and query optimization to the data lake via open table formats — giving you warehouse-grade reliability at lake-grade cost.</p>
+
+  <h3 class="text-xl font-semibold mt-6 mb-3">Lakehouse Architecture</h3>
+  <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm mb-6">
+    <div class="mermaid">
+flowchart TB
+  subgraph Sources["Data Sources"]
+    S1[Operational DBs\nPostgres / MySQL]
+    S2[Event Streams\nKafka]
+    S3[SaaS APIs\nSalesforce / Stripe]
+    S4[ML Model Outputs\nPredictions]
+  end
+  subgraph Lake["Object Storage — S3 / GCS / ADLS"]
+    L1["Raw Zone\n(append-only, schema-on-read)"]
+    L2["Staged Zone\n(validated, cleaned)"]
+    L3["Curated Zone\n(business entities, Delta/Iceberg)"]
+    L4["Feature Zone\n(ML features, point-in-time correct)"]
+  end
+  subgraph Catalog["Metadata Catalog"]
+    CAT1[AWS Glue / Databricks Unity\nSchema, lineage, access control]
+  end
+  subgraph Compute["Query Engines"]
+    Q1[Spark / Databricks]
+    Q2[Trino / Athena]
+    Q3[dbt transforms]
+  end
+  subgraph Consumers["Consumers"]
+    C1[BI / Dashboards]
+    C2[ML Training Jobs]
+    C3[Feature Store]
+  end
+  S1 --> L1
+  S2 --> L1
+  S3 --> L1
+  S4 --> L4
+  L1 --> L2
+  L2 --> L3
+  L3 --> L4
+  L1 --- CAT1
+  L2 --- CAT1
+  L3 --- CAT1
+  L4 --- CAT1
+  L3 --> Q1
+  L3 --> Q2
+  L3 --> Q3
+  Q1 --> C2
+  Q2 --> C1
+  L4 --> C3
+    </div>
+  </div>
+
+  <h3 class="text-xl font-semibold mt-6 mb-3">Zone Layout for ML</h3>
+  <div class="overflow-x-auto rounded-lg border border-gray-200 shadow-sm mb-6">
+    <table>
+      <thead><tr><th class="px-4 py-3 text-left">Zone</th><th class="px-4 py-3 text-left">Contents</th><th class="px-4 py-3 text-left">Format</th><th class="px-4 py-3 text-left">Retention</th><th class="px-4 py-3 text-left">Access</th></tr></thead>
+      <tbody>
+        <tr><td class="px-4 py-3 font-medium">Raw</td><td class="px-4 py-3">Exact copy of source, no transforms</td><td class="px-4 py-3">JSON / Avro / CSV as-is</td><td class="px-4 py-3">7 years (compliance)</td><td class="px-4 py-3">Data engineers only</td></tr>
+        <tr><td class="px-4 py-3 font-medium">Staged</td><td class="px-4 py-3">Validated, deduplicated, typed</td><td class="px-4 py-3">Parquet</td><td class="px-4 py-3">1 year</td><td class="px-4 py-3">Data engineers</td></tr>
+        <tr><td class="px-4 py-3 font-medium">Curated</td><td class="px-4 py-3">Business entities, enriched, joined</td><td class="px-4 py-3">Delta Lake / Iceberg</td><td class="px-4 py-3">Indefinite</td><td class="px-4 py-3">All teams</td></tr>
+        <tr><td class="px-4 py-3 font-medium">Features</td><td class="px-4 py-3">Point-in-time correct ML features</td><td class="px-4 py-3">Delta Lake (offline store)</td><td class="px-4 py-3">Indefinite + versions</td><td class="px-4 py-3">ML teams, feature store</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 class="text-xl font-semibold mt-6 mb-3">AWS Glue Data Catalog vs Databricks Unity Catalog</h3>
+  <p class="mb-4 leading-relaxed">The data catalog is the governance layer of your lakehouse. It tracks table schemas, locations, partitions, access controls, and lineage. <strong>AWS Glue Data Catalog</strong> is the de-facto standard for AWS-native data lakes — Athena, EMR, and Glue jobs all reference it natively. <strong>Databricks Unity Catalog</strong> provides three-level namespace (catalog.schema.table), fine-grained column-level access control, data lineage, and works across Delta, Parquet, and external formats. For organizations heavily invested in Databricks, Unity Catalog is the clear choice; otherwise Glue (or Apache Polaris for open governance) suffices.</p>
+</section>
+
+<!-- SECTION 6 -->
+<section id="s6">
+  <h2 class="text-2xl font-bold mb-2 section-header pl-4">6. Feature Engineering</h2>
+  <p class="text-gray-500 text-sm mb-6">Transforming raw data into predictive signals — correctly</p>
+  <p class="mb-4 leading-relaxed">Feature engineering is the process of transforming raw data into numerical representations that models can learn from. It is simultaneously the highest-leverage and most error-prone part of the ML pipeline. The most dangerous mistake — data leakage — occurs when information from the future leaks into the training set, producing optimistic offline metrics that collapse in production.</p>
+
+  <div class="callout-danger rounded-lg p-4 mb-6">
+    <p class="font-semibold mb-1">Point-in-Time Correctness — The #1 Source of Leakage</p>
+    <p class="text-sm">When creating training data, each example must only use features that were available at the time of the label event. If you compute a 7-day purchase count for user U on label_date D using events from D+1 to D+7, you have leaked future information. Feature stores solve this with point-in-time joins: for each (entity, timestamp) pair in your label set, they retrieve the feature values that were active at exactly that timestamp.</p>
+  </div>
+
+  <h3 class="text-xl font-semibold mt-6 mb-3">Feature Types</h3>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+    <div class="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
+      <h4 class="font-semibold mb-2 text-blue-700">Numerical</h4>
+      <ul class="text-sm text-gray-600 list-disc list-inside space-y-1">
+        <li>Z-score normalization, min-max scaling</li>
+        <li>Log transform for heavy-tailed distributions</li>
+        <li>Bucketization / quantile binning</li>
+        <li>Interaction terms (col_a * col_b)</li>
+      </ul>
+    </div>
+    <div class="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
+      <h4 class="font-semibold mb-2 text-blue-700">Categorical</h4>
+      <ul class="text-sm text-gray-600 list-disc list-inside space-y-1">
+        <li>One-hot encoding (low cardinality)</li>
+        <li>Target / mean encoding (high cardinality)</li>
+        <li>Embedding lookup (learned, e.g. entity embeddings)</li>
+        <li>Frequency encoding</li>
+      </ul>
+    </div>
+    <div class="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
+      <h4 class="font-semibold mb-2 text-blue-700">Temporal</h4>
+      <ul class="text-sm text-gray-600 list-disc list-inside space-y-1">
+        <li>Lag features (value at t-1, t-7, t-30)</li>
+        <li>Rolling window stats (mean, std, min, max)</li>
+        <li>Cyclic encoding (sin/cos for hour-of-day)</li>
+        <li>Time since last event (recency)</li>
+      </ul>
+    </div>
+    <div class="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
+      <h4 class="font-semibold mb-2 text-blue-700">Embeddings / Dense</h4>
+      <ul class="text-sm text-gray-600 list-disc list-inside space-y-1">
+        <li>Item2Vec / Word2Vec embeddings</li>
+        <li>BERT / sentence embeddings for text</li>
+        <li>User behavior sequence embeddings</li>
+        <li>Graph embeddings (Node2Vec)</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3 class="text-xl font-semibold mt-6 mb-3">Code: Rolling Window Features with PySpark</h3>
+  <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-6">
+    <div class="bg-gray-100 px-4 py-2 border-b border-gray-200 text-sm font-mono text-gray-600">rolling_window_features.py</div>
+    <pre><code class="language-python">"""
+Rolling window feature computation with PySpark.
+Handles multiple window sizes (1d, 7d, 30d) in a single pass.
+Uses Spark window functions — avoids expensive joins.
+
+NOTE: All aggregations use events UP TO (not including) the label_ts
+to guarantee point-in-time correctness.
+"""
+from pyspark.sql import SparkSession, Window
+from pyspark.sql import functions as F
+from pyspark.sql.types import LongType
+from datetime import timedelta
+
+spark = (
+    SparkSession.builder.appName("rolling-features")
+    .config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension")
+    .config("spark.sql.catalog.spark_catalog",
+            "org.apache.spark.sql.delta.catalog.DeltaCatalog")
+    .getOrCreate()
+)
+
+# ── Load data ────────────────────────────────────────────────────────
+events = spark.read.format("delta").load("s3a://ml-data-lake/curated/events")
+labels = spark.read.format("delta").load("s3a://ml-data-lake/curated/labels")
+
+# Convert event_ts to epoch seconds for window arithmetic
+events = events.withColumn("ts_sec", F.unix_timestamp("event_ts"))
+
+WINDOWS = {
+    "1d":  86_400,
+    "7d":  86_400 * 7,
+    "30d": 86_400 * 30,
+}
+
+# ── Point-in-time rolling aggregations via range windows ─────────────
+# Range window: rows where ts_sec is within [current_ts - N, current_ts - 1]
+# The -1 ensures we exclude the current event (strict past-only view).
+feature_dfs = []
+for name, seconds in WINDOWS.items():
+    w = (
+        Window.partitionBy("user_id")
+              .orderBy("ts_sec")
+              .rangeBetween(-seconds, -1)
+    )
+    feat = (
+        events.select("user_id", "ts_sec", "event_type", "purchase_amount", "category")
+        .withColumn(f"clicks_{name}",
+                    F.sum(F.when(F.col("event_type") == "click", 1).otherwise(0)).over(w))
+        .withColumn(f"purchases_{name}",
+                    F.sum(F.when(F.col("event_type") == "purchase", 1).otherwise(0)).over(w))
+        .withColumn(f"spend_{name}",
+                    F.sum(F.coalesce("purchase_amount", F.lit(0.0))).over(w))
+        .withColumn(f"unique_categories_{name}",
+                    F.approx_count_distinct("category").over(w))
+    )
+    feature_dfs.append(feat.select(
+        "user_id", "ts_sec",
+        f"clicks_{name}", f"purchases_{name}", f"spend_{name}", f"unique_categories_{name}"
+    ))
+
+# ── Combine all window features ───────────────────────────────────────
+from functools import reduce
+from pyspark.sql import DataFrame
+
+all_feats = reduce(
+    lambda a, b: a.join(b, ["user_id", "ts_sec"], "inner"),
+    feature_dfs
+)
+
+# ── Lag features (value at t-1 period) ───────────────────────────────
+user_window = Window.partitionBy("user_id").orderBy("ts_sec")
+all_feats = (
+    all_feats
+    .withColumn("clicks_7d_lag_7d",   F.lag("clicks_7d",   7).over(user_window))
+    .withColumn("spend_30d_lag_30d",  F.lag("spend_30d",  30).over(user_window))
+    .withColumn("purchases_trend",    # positive if purchases increased vs prior week
+                F.col("purchases_7d") - F.lag("purchases_7d", 7).over(user_window))
+)
+
+# ── Recency feature ───────────────────────────────────────────────────
+last_event_window = Window.partitionBy("user_id").orderBy(F.desc("ts_sec"))
+recency = (
+    events.withColumn("rnk", F.rank().over(last_event_window))
+          .filter(F.col("rnk") == 1)
+          .select("user_id", F.col("ts_sec").alias("last_event_ts"))
+)
+
+# ── Point-in-time join with labels ───────────────────────────────────
+# For each label (user_id, label_ts), get the feature snapshot
+# at exactly label_ts — no future leakage.
+label_events = (
+    labels
+    .withColumn("label_sec", F.unix_timestamp("label_ts"))
+    .join(all_feats.alias("f"),
+          (F.col("labels.user_id") == F.col("f.user_id")) &
+          (F.col("labels.label_sec") == F.col("f.ts_sec")),
+          "left")
+    .drop("f.user_id", "ts_sec")
+)
+
+# ── Save training dataset ─────────────────────────────────────────────
+(
+    label_events.fillna(0.0)
+    .write.format("delta")
+    .mode("overwrite").option("overwriteSchema","true")
+    .save("s3a://ml-data-lake/features/training_dataset_v2")
+)
+print("Training dataset written.")
+spark.stop()
+</code></pre>
+  </div>
+</section>
+
+<!-- SECTION 7 -->
+<section id="s7">
+  <h2 class="text-2xl font-bold mb-2 section-header pl-4">7. Feature Stores — Concepts</h2>
+  <p class="text-gray-500 text-sm mb-6">The infrastructure layer that connects data engineering and model serving</p>
+  <p class="mb-4 leading-relaxed">A feature store is a centralized system for creating, storing, sharing, and serving features. It exists to solve three problems that appear once you have more than a handful of models in production:</p>
+  <ol class="list-decimal list-inside space-y-2 mb-6 text-gray-700">
+    <li><strong>Training-serving skew:</strong> Features computed offline (for training) differ from features computed online (for inference) due to different code paths. Feature stores enforce a single feature definition used in both contexts.</li>
+    <li><strong>Feature duplication:</strong> Without a registry, every team reimplements the same features (user activity counts, item popularity) independently, inconsistently, and expensively.</li>
+    <li><strong>Point-in-time correctness:</strong> Constructing training datasets requires joining labels to feature snapshots at the exact label timestamp — not current values. Feature stores make this a first-class operation.</li>
+  </ol>
+
+  <h3 class="text-xl font-semibold mt-6 mb-3">Feature Store Architecture</h3>
+  <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm mb-6">
+    <div class="mermaid">
+flowchart TB
+  subgraph Sources["Data Sources"]
+    SRC1[Batch Data\nDelta Lake / S3]
+    SRC2[Stream Data\nKafka / Kinesis]
+  end
+  subgraph FeatureStore["Feature Store"]
+    subgraph Registry["Feature Registry"]
+      REG[Feature Definitions\nEntities, FeatureViews\nMetadata, Lineage]
+    end
+    subgraph Transform["Feature Pipelines"]
+      T1[Batch Materialization\nSpark / dbt]
+      T2[Stream Computation\nFlink / Spark Streaming]
+    end
+    subgraph Storage["Dual Storage"]
+      OFF[Offline Store\nS3 + Delta Lake\nHistorical features\nfor training]
+      ON[Online Store\nRedis / DynamoDB\nLatest features\nfor inference]
+    end
+    subgraph Serving["Serving Layer"]
+      SV1[Training API\nPoint-in-time join]
+      SV2[Online Serving API\nSub-10ms p99]
+    end
+  end
+  SRC1 --> T1
+  SRC2 --> T2
+  REG  --> T1
+  REG  --> T2
+  T1 --> OFF
+  T2 --> ON
+  T1 --> ON
+  OFF --> SV1
+  ON  --> SV2
+  SV1 --> ML_TRAIN[Model Training]
+  SV2 --> ML_INFER[Model Inference]
+    </div>
+  </div>
+
+  <div class="callout-warning rounded-lg p-4 mb-6">
+    <p class="font-semibold mb-1">Training-Serving Skew: A Silent Killer</p>
+    <p class="text-sm">At Airbnb, training-serving skew was the single most common cause of model performance degradation in production. It arises when: (1) training uses a different feature computation than serving, (2) null/missing values are handled differently, (3) categorical encodings differ. A feature store enforces a single Python/SQL definition that is executed at both training and serving time, making skew impossible by construction.</p>
+  </div>
+</section>
+
+<!-- SECTION 8 -->
+<section id="s8">
+  <h2 class="text-2xl font-bold mb-2 section-header pl-4">8. Feast — Open-Source Feature Store</h2>
+  <p class="text-gray-500 text-sm mb-6">The most widely adopted open-source feature store</p>
+  <p class="mb-4 leading-relaxed">Feast (Feature Store) is a standalone, open-source feature store originally built at Gojek. It supports batch and streaming feature pipelines, point-in-time joins for training, and low-latency online serving. It integrates with BigQuery, Snowflake, Redis, DynamoDB, Spark, and most ML frameworks.</p>
+
+  <h3 class="text-xl font-semibold mt-6 mb-3">Code: Feast Feature Definitions</h3>
+  <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-6">
+    <div class="bg-gray-100 px-4 py-2 border-b border-gray-200 text-sm font-mono text-gray-600">feature_repo/features.py</div>
+    <pre><code class="language-python">"""
+Feast feature repository: entity + feature view definitions.
+Running `feast apply` registers these with the feature store.
+Running `feast materialize` computes and stores features.
+"""
+from datetime import timedelta
+from feast import (
+    Entity, FeatureView, Feature, FileSource, RedisOnlineStore,
+    ValueType, FeatureStore, RepoConfig,
+)
+from feast.infra.offline_stores.file import FileOfflineStoreConfig
+from feast.types import Float64, Int64, String, Bool
+import pandas as pd
+
+# ── ENTITY DEFINITIONS ────────────────────────────────────────────────
+# Entities are the "keys" — what you look up features by.
+user = Entity(
+    name="user_id",
+    join_keys=["user_id"],
+    description="Platform user identifier",
+)
+
+item = Entity(
+    name="item_id",
+    join_keys=["item_id"],
+    description="Product / content item identifier",
+)
+
+# ── DATA SOURCES ──────────────────────────────────────────────────────
+user_features_source = FileSource(
+    path="s3://ml-data-lake/features/user_features/",
+    event_timestamp_column="feature_timestamp",
+    file_format="parquet",
+)
+
+item_features_source = FileSource(
+    path="s3://ml-data-lake/features/item_features/",
+    event_timestamp_column="feature_timestamp",
+    file_format="parquet",
+)
+
+# ── FEATURE VIEWS ─────────────────────────────────────────────────────
+user_activity_view = FeatureView(
+    name="user_activity",
+    entities=[user],
+    ttl=timedelta(days=7),        # features older than 7 days treated as missing
+    schema=[
+        Feature(name="clicks_7d",            dtype=Int64),
+        Feature(name="purchases_7d",          dtype=Int64),
+        Feature(name="total_spend_30d",       dtype=Float64),
+        Feature(name="purchase_rate",         dtype=Float64),
+        Feature(name="sessions_7d",           dtype=Int64),
+        Feature(name="unique_categories_30d", dtype=Int64),
+        Feature(name="top_category_30d",      dtype=String),
+        Feature(name="avg_dwell_7d",          dtype=Float64),
+    ],
+    online=True,
+    source=user_features_source,
+    tags={"team": "ml-platform", "owner": "alice@company.com"},
+)
+
+item_stats_view = FeatureView(
+    name="item_stats",
+    entities=[item],
+    ttl=timedelta(days=1),        # item stats refresh daily
+    schema=[
+        Feature(name="view_count_7d",      dtype=Int64),
+        Feature(name="purchase_count_7d",  dtype=Int64),
+        Feature(name="avg_rating",         dtype=Float64),
+        Feature(name="review_count",       dtype=Int64),
+        Feature(name="is_trending",        dtype=Bool),
+        Feature(name="price_bucket",       dtype=String),
+    ],
+    online=True,
+    source=item_features_source,
+    tags={"team": "catalog", "owner": "bob@company.com"},
+)
+</code></pre>
+  </div>
+
+  <h3 class="text-xl font-semibold mt-8 mb-3">Code: Materializing Features &amp; Training Data</h3>
+  <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-6">
+    <div class="bg-gray-100 px-4 py-2 border-b border-gray-200 text-sm font-mono text-gray-600">feast_training.py</div>
+    <pre><code class="language-python">"""
+Feast: materialize features to online store and
+retrieve historical features for model training.
+"""
+from feast import FeatureStore
+from datetime import datetime, timedelta
+import pandas as pd
+
+store = FeatureStore(repo_path="feature_repo/")  # reads feature_store.yaml
+
+# ── 1. MATERIALIZE to online store (Redis / DynamoDB) ─────────────────
+# Loads latest feature values from offline store → online store.
+# Run this on a schedule (Airflow hourly) to keep online store fresh.
+store.materialize_incremental(end_date=datetime.utcnow())
+print("Online store materialized.")
+
+# For full refresh (e.g., after schema changes):
+store.materialize(
+    start_date=datetime.utcnow() - timedelta(days=7),
+    end_date=datetime.utcnow(),
+    feature_views=["user_activity", "item_stats"],
+)
+
+# ── 2. POINT-IN-TIME JOIN for training data ───────────────────────────
+# Entity dataframe: (entity_id, event_timestamp, label)
+# Feast joins features as they existed AT event_timestamp — no leakage.
+entity_df = pd.DataFrame({
+    "user_id":         ["u001","u002","u003","u004","u001"],
+    "item_id":         ["i10","i20","i10","i30","i20"],
+    "event_timestamp": pd.to_datetime([
+        "2024-07-01 14:00:00",
+        "2024-07-02 09:30:00",
+        "2024-07-03 18:15:00",
+        "2024-07-04 11:00:00",
+        "2024-07-05 16:45:00",
+    ]),
+    "label_purchased": [1, 0, 1, 0, 1],
+})
+
+training_df = store.get_historical_features(
+    entity_df=entity_df,
+    features=[
+        "user_activity:clicks_7d",
+        "user_activity:purchases_7d",
+        "user_activity:total_spend_30d",
+        "user_activity:purchase_rate",
+        "user_activity:top_category_30d",
+        "item_stats:view_count_7d",
+        "item_stats:avg_rating",
+        "item_stats:is_trending",
+        "item_stats:price_bucket",
+    ],
+).to_df()
+
+print(f"Training dataset: {training_df.shape}")
+print(training_df.head())
+
+# Save as parquet for training job
+training_df.to_parquet("s3://ml-artifacts/training_data/v20240705.parquet", index=False)
+</code></pre>
+  </div>
+
+  <h3 class="text-xl font-semibold mt-8 mb-3">Code: Online Feature Serving at Inference Time</h3>
+  <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-6">
+    <div class="bg-gray-100 px-4 py-2 border-b border-gray-200 text-sm font-mono text-gray-600">feast_online_serving.py</div>
+    <pre><code class="language-python">"""
+Feast online feature retrieval at inference time.
+Fetches pre-materialized features from Redis in < 5ms p99.
+Called from the model serving microservice on each request.
+"""
+from feast import FeatureStore
+from typing import Dict, Any
+import numpy as np
+
+store = FeatureStore(repo_path="feature_repo/")
+
+FEATURE_REFS = [
+    "user_activity:clicks_7d",
+    "user_activity:purchases_7d",
+    "user_activity:total_spend_30d",
+    "user_activity:purchase_rate",
+    "user_activity:top_category_30d",
+    "item_stats:view_count_7d",
+    "item_stats:avg_rating",
+    "item_stats:is_trending",
+    "item_stats:price_bucket",
+]
+
+# Category → integer mapping (must match training encoding)
+CATEGORY_MAP = {"electronics": 0, "clothing": 1, "books": 2, "home": 3, "__unknown__": 4}
+PRICE_MAP    = {"budget": 0, "mid": 1, "premium": 2, "luxury": 3}
+
+
+def get_features_for_request(user_id: str, item_id: str) -> Dict[str, Any]:
+    """Retrieve features for a single (user, item) inference request."""
+    response = store.get_online_features(
+        features=FEATURE_REFS,
+        entity_rows=[{"user_id": user_id, "item_id": item_id}],
+    ).to_dict()
+
+    # Handle nulls (TTL expired or new user/item — use safe defaults)
+    feats = {k: (v[0] if v[0] is not None else 0) for k, v in response.items()}
+    feats["user_activity__top_category_30d"] = CATEGORY_MAP.get(
+        feats.get("user_activity__top_category_30d", "__unknown__"), 4
+    )
+    feats["item_stats__price_bucket"] = PRICE_MAP.get(
+        feats.get("item_stats__price_bucket", "mid"), 1
+    )
+    return feats
+
+
+def build_feature_vector(feats: Dict[str, Any]) -> np.ndarray:
+    """Convert feature dict to numpy array in training-consistent order."""
+    return np.array([
+        feats["user_activity__clicks_7d"],
+        feats["user_activity__purchases_7d"],
+        feats["user_activity__total_spend_30d"],
+        feats["user_activity__purchase_rate"],
+        feats["user_activity__top_category_30d"],
+        feats["item_stats__view_count_7d"],
+        feats["item_stats__avg_rating"],
+        int(feats["item_stats__is_trending"] or 0),
+        feats["item_stats__price_bucket"],
+    ], dtype=np.float32)
+
+
+# Example: serving path (called per request by FastAPI handler)
+if __name__ == "__main__":
+    feats = get_features_for_request("u001", "i42")
+    vector = build_feature_vector(feats)
+    print("Feature vector:", vector)
+    # model.predict([vector])  -> pass to loaded model
+</code></pre>
+  </div>
+</section>
+
+
+<!-- SECTION 9 -->
+<section id="s9">
+  <h2 class="text-2xl font-bold mb-2 section-header pl-4">9. Tecton — Enterprise Feature Store</h2>
+  <p class="text-gray-500 text-sm mb-6">Managed feature pipelines for large-scale production ML</p>
+  <p class="mb-4 leading-relaxed">Tecton is a fully managed enterprise feature store founded by engineers from Uber (where they built Michelangelo). Unlike Feast, Tecton manages the compute infrastructure for feature pipelines — you define transformations in Python, Tecton executes and schedules them on Spark/Flink automatically. This removes significant operational burden for teams that don't want to manage their own orchestration.</p>
+
+  <h3 class="text-xl font-semibold mt-6 mb-3">Tecton vs Feast Architecture</h3>
+  <p class="mb-4 leading-relaxed">Feast is a feature serving layer — it reads from your existing data lake and serves features. It does not manage the upstream computation pipeline. Tecton is a full-stack platform: it owns the transformation engine, scheduling, backfills, monitoring, and serving. Feast requires more operational ownership; Tecton trades that for cost and lock-in.</p>
+
+  <h3 class="text-xl font-semibold mt-6 mb-3">Feature Store Platform Comparison</h3>
+  <div class="overflow-x-auto rounded-lg border border-gray-200 shadow-sm mb-8">
+    <table>
+      <thead><tr>
+        <th class="px-4 py-3 text-left">Dimension</th>
+        <th class="px-4 py-3 text-left">Feast</th>
+        <th class="px-4 py-3 text-left">Tecton</th>
+        <th class="px-4 py-3 text-left">Vertex AI Feature Store</th>
+        <th class="px-4 py-3 text-left">SageMaker Feature Store</th>
+      </tr></thead>
+      <tbody>
+        <tr><td class="px-4 py-3 font-medium">Type</td><td class="px-4 py-3">Open-source</td><td class="px-4 py-3">Enterprise SaaS</td><td class="px-4 py-3">Managed (GCP)</td><td class="px-4 py-3">Managed (AWS)</td></tr>
+        <tr><td class="px-4 py-3 font-medium">Feature pipelines</td><td class="px-4 py-3">You manage (dbt / Spark)</td><td class="px-4 py-3">Managed by Tecton</td><td class="px-4 py-3">Bring your own</td><td class="px-4 py-3">Bring your own</td></tr>
+        <tr><td class="px-4 py-3 font-medium">Streaming features</td><td class="px-4 py-3">Yes (Flink / Spark)</td><td class="px-4 py-3">Yes (first-class)</td><td class="px-4 py-3">Limited</td><td class="px-4 py-3">Yes (via Kinesis)</td></tr>
+        <tr><td class="px-4 py-3 font-medium">Online store</td><td class="px-4 py-3">Redis, DynamoDB, Bigtable</td><td class="px-4 py-3">Managed Redis</td><td class="px-4 py-3">Bigtable-backed</td><td class="px-4 py-3">DynamoDB-backed</td></tr>
+        <tr><td class="px-4 py-3 font-medium">Point-in-time join</td><td class="px-4 py-3">Yes</td><td class="px-4 py-3">Yes</td><td class="px-4 py-3">Yes (batch)</td><td class="px-4 py-3">Yes</td></tr>
+        <tr><td class="px-4 py-3 font-medium">Monitoring</td><td class="px-4 py-3">Manual integration</td><td class="px-4 py-3">Built-in</td><td class="px-4 py-3">Vertex Monitoring</td><td class="px-4 py-3">CloudWatch</td></tr>
+        <tr><td class="px-4 py-3 font-medium">Cost model</td><td class="px-4 py-3">Free + your infra</td><td class="px-4 py-3">Enterprise pricing</td><td class="px-4 py-3">Pay-per-node/storage</td><td class="px-4 py-3">Pay-per-record/storage</td></tr>
+        <tr><td class="px-4 py-3 font-medium">Best for</td><td class="px-4 py-3">Cost-sensitive, own infra</td><td class="px-4 py-3">Large teams, managed infra</td><td class="px-4 py-3">GCP-native ML workflows</td><td class="px-4 py-3">AWS-native ML workflows</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- SECTION 10 -->
+<section id="s10">
+  <h2 class="text-2xl font-bold mb-2 section-header pl-4">10. Vertex AI &amp; SageMaker Feature Stores</h2>
+  <p class="text-gray-500 text-sm mb-6">Cloud-managed feature stores — when managed wins over open-source</p>
+
+  <h3 class="text-xl font-semibold mb-3">Google Vertex AI Feature Store</h3>
+  <p class="mb-4 leading-relaxed">Vertex AI Feature Store v2 (Bigtable-backed) is deeply integrated with BigQuery for offline storage and Bigtable for online serving. It handles automatic synchronization between offline (BigQuery) and online (Bigtable) stores with configurable freshness. The main advantage is zero infrastructure management; the tradeoff is GCP lock-in and higher cost per feature retrieval vs self-managed Redis.</p>
+
+  <h3 class="text-xl font-semibold mt-6 mb-3">Code: SageMaker Feature Store</h3>
+  <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-6">
+    <div class="bg-gray-100 px-4 py-2 border-b border-gray-200 text-sm font-mono text-gray-600">sagemaker_feature_store.py</div>
+    <pre><code class="language-python">"""
+AWS SageMaker Feature Store: create feature group, ingest features,
+retrieve for training, and serve online.
+
+SageMaker FS uses two storage layers:
+- Online store: low-latency DynamoDB (< 10ms)
+- Offline store: S3 + Glue Catalog (historical, queryable via Athena)
+"""
+import boto3
+import sagemaker
+from sagemaker.feature_store.feature_group import FeatureGroup
+from sagemaker.feature_store.feature_definition import (
+    FeatureDefinition, FeatureTypeEnum
+)
+from sagemaker.session import Session
+import pandas as pd
+import time
+
+session = sagemaker.Session()
+region  = session.boto_region_name
+role    = sagemaker.get_execution_role()
+s3_bucket = "ml-feature-store-bucket"
+
+feature_store_session = Session(
+    boto_session=boto3.Session(region_name=region),
+    sagemaker_client=boto3.client("sagemaker", region_name=region),
+    sagemaker_featurestore_runtime_client=boto3.client(
+        "sagemaker-featurestore-runtime", region_name=region
+    ),
+)
+
+# ── 1. CREATE FEATURE GROUP ───────────────────────────────────────────
+feature_group = FeatureGroup(
+    name="user-activity-features",
+    sagemaker_session=feature_store_session,
+)
+
+feature_group.load_feature_definitions(
+    data_frame=pd.DataFrame({
+        "user_id":         [""],
+        "clicks_7d":       [0],
+        "purchases_7d":    [0],
+        "total_spend_30d": [0.0],
+        "purchase_rate":   [0.0],
+        "top_category":    [""],
+        "feature_timestamp": [""],   # required event_time column
+    })
+)
+
+feature_group.create(
+    s3_uri=f"s3://{s3_bucket}/feature-store/user-activity/",
+    record_identifier_name="user_id",
+    event_time_feature_name="feature_timestamp",
+    role_arn=role,
+    enable_online_store=True,
+    online_store_config={
+        "EnableOnlineStore": True,
+        "TtlDuration": {"Unit": "Days", "Value": 7},   # auto-expire after 7 days
+    },
+    offline_store_config={
+        "S3StorageConfig": {"S3Uri": f"s3://{s3_bucket}/feature-store/offline/"},
+        "DisableGlueTableCreation": False,              # auto-register in Glue
+    },
+)
+
+# Wait for feature group to become active
+status = feature_group.describe()["FeatureGroupStatus"]
+while status == "Creating":
+    time.sleep(5)
+    status = feature_group.describe()["FeatureGroupStatus"]
+print(f"Feature group status: {status}")
+
+# ── 2. INGEST FEATURES ────────────────────────────────────────────────
+features_df = pd.DataFrame({
+    "user_id":           ["u001", "u002", "u003"],
+    "clicks_7d":         [42, 8, 125],
+    "purchases_7d":      [2, 0, 7],
+    "total_spend_30d":   [1250.50, 85.00, 3200.00],
+    "purchase_rate":     [0.62, 0.10, 0.81],
+    "top_category":      ["electronics", "books", "clothing"],
+    "feature_timestamp": ["2024-07-15T10:00:00Z"] * 3,
+})
+
+feature_group.ingest(
+    data_frame=features_df,
+    max_workers=4,
+    wait=True,
+)
+print("Ingestion complete.")
+
+# ── 3. ONLINE RETRIEVAL (< 10ms) ──────────────────────────────────────
+runtime = boto3.client("sagemaker-featurestore-runtime", region_name=region)
+
+response = runtime.get_record(
+    FeatureGroupName="user-activity-features",
+    RecordIdentifierValueAsString="u001",
+    FeatureNames=["clicks_7d", "purchases_7d", "total_spend_30d", "purchase_rate"],
+)
+record = {f["FeatureName"]: f["ValueAsString"] for f in response["Record"]}
+print("Online features for u001:", record)
+
+# Batch online retrieval (up to 100 records per call)
+batch_response = runtime.batch_get_record(
+    Identifiers=[{
+        "FeatureGroupName": "user-activity-features",
+        "RecordIdentifiersValueAsString": ["u001", "u002", "u003"],
+    }]
+)
+print(f"Batch records: {len(batch_response['Records'])}")
+
+# ── 4. OFFLINE / TRAINING DATA (Athena query) ─────────────────────────
+training_query = feature_group.athena_query()
+training_query.run(
+    query_string="""
+        SELECT user_id, clicks_7d, purchases_7d, total_spend_30d, purchase_rate
+        FROM "user-activity-features"
+        WHERE feature_timestamp BETWEEN
+              TIMESTAMP '2024-07-01 00:00:00' AND
+              TIMESTAMP '2024-07-15 00:00:00'
+    """,
+    output_location=f"s3://{s3_bucket}/athena-results/",
+)
+training_query.wait()
+training_df = training_query.as_dataframe()
+print(f"Training data shape: {training_df.shape}")
+</code></pre>
+  </div>
+
+  <div class="callout-info rounded-lg p-4 mb-4">
+    <p class="font-semibold mb-1">Managed vs Open-Source Feature Store Decision Guide</p>
+    <p class="text-sm">Use a managed feature store (SageMaker, Vertex) when: you're already committed to that cloud provider, your team lacks infrastructure expertise, or you have strict compliance requirements satisfied by the cloud provider's tooling. Use Feast (self-hosted) when: you want multi-cloud portability, you need full cost control, or you already operate your own Redis and data lake. Use Tecton when: you need managed streaming feature pipelines and have budget for enterprise tooling.</p>
+  </div>
+</section>
+
+<!-- SECTION 11 -->
+<section id="s11">
+  <h2 class="text-2xl font-bold mb-2 section-header pl-4">11. Data Quality and Validation</h2>
+  <p class="text-gray-500 text-sm mb-6">Great Expectations, dbt, and Pandera — catching bad data before it reaches your model</p>
+  <p class="mb-4 leading-relaxed">Data quality failures are the most common cause of silent model degradation. Schema changes upstream, null values where none were expected, or distribution shifts in a key feature can all cause model behavior to degrade without raising any explicit error. Data quality tools create automated checks that catch these issues at the pipeline level, before bad data reaches training or serving.</p>
+
+  <h3 class="text-xl font-semibold mt-6 mb-3">Code: Great Expectations Suite</h3>
+  <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-6">
+    <div class="bg-gray-100 px-4 py-2 border-b border-gray-200 text-sm font-mono text-gray-600">gx_validation_suite.py</div>
+    <pre><code class="language-python">"""
+Great Expectations v1.x: define, save, and run a validation suite
+on a Delta Lake table. Fails the pipeline if expectations are violated.
+"""
+import great_expectations as gx
+from great_expectations.checkpoint import Checkpoint
+import pandas as pd
+
+context = gx.get_context(mode="file", project_root_dir="gx_project/")
+
+# ── 1. Define a data source ───────────────────────────────────────────
+datasource = context.sources.add_spark(name="delta_lake_source")
+asset = datasource.add_dataframe_asset(name="user_features_asset")
+batch_request = asset.build_batch_request(dataframe=pd.read_parquet(
+    "s3://ml-data-lake/features/user_features/"
+))
+
+# ── 2. Build expectation suite ────────────────────────────────────────
+suite = context.add_or_update_expectation_suite("user_features_suite")
+
+validator = context.get_validator(
+    batch_request=batch_request,
+    expectation_suite_name="user_features_suite",
+)
+
+# Schema checks
+validator.expect_column_to_exist("user_id")
+validator.expect_column_to_exist("clicks_7d")
+validator.expect_column_to_exist("total_spend_30d")
+validator.expect_column_to_exist("purchase_rate")
+validator.expect_column_to_exist("top_category_30d")
+
+# Null checks — critical features must never be null
+validator.expect_column_values_to_not_be_null("user_id")
+validator.expect_column_values_to_not_be_null("clicks_7d")
+
+# Type checks
+validator.expect_column_values_to_be_of_type("user_id", "StringType")
+validator.expect_column_values_to_be_of_type("clicks_7d", "LongType")
+validator.expect_column_values_to_be_of_type("purchase_rate", "DoubleType")
+
+# Range checks — catch data pipeline bugs
+validator.expect_column_values_to_be_between("clicks_7d", min_value=0, max_value=10_000)
+validator.expect_column_values_to_be_between("total_spend_30d", min_value=0.0)
+validator.expect_column_values_to_be_between("purchase_rate", min_value=0.0, max_value=1.0)
+
+# Uniqueness
+validator.expect_column_values_to_be_unique("user_id")
+
+# Set membership — validate categorical values
+VALID_TIERS = ["free", "basic", "premium", "enterprise"]
+validator.expect_column_values_to_be_in_set("subscription_tier", VALID_TIERS)
+
+# Statistical distribution checks (catch sudden upstream changes)
+# These thresholds come from baseline statistics computed on training data
+validator.expect_column_mean_to_be_between("clicks_7d", min_value=5.0, max_value=80.0)
+validator.expect_column_quantile_values_to_be_between(
+    "total_spend_30d",
+    quantile_ranges={"quantiles": [0.5, 0.95], "value_ranges": [[0, 500], [0, 5000]]},
+)
+
+# Row count (catch truncated pipelines)
+validator.expect_table_row_count_to_be_between(min_value=100_000, max_value=50_000_000)
+
+# Freshness: feature_timestamp must be within last 48 hours
+validator.expect_column_max_to_be_between(
+    "feature_timestamp",
+    min_value="2024-07-14T00:00:00",  # parametrize this dynamically in production
+    max_value="2024-07-16T00:00:00",
+)
+
+validator.save_expectation_suite(discard_failed_expectations=False)
+print("Expectation suite saved.")
+
+# ── 3. Run validation via Checkpoint ─────────────────────────────────
+checkpoint = Checkpoint(
+    name="user_features_checkpoint",
+    data_context=context,
+    validations=[{
+        "batch_request": batch_request,
+        "expectation_suite_name": "user_features_suite",
+    }],
+    action_list=[
+        {
+            "name": "store_validation_result",
+            "action": {"class_name": "StoreValidationResultAction"},
+        },
+        {
+            "name": "update_data_docs",
+            "action": {"class_name": "UpdateDataDocsAction"},
+        },
+        {
+            "name": "alert_on_failure",
+            "action": {
+                "class_name": "SlackNotificationAction",
+                "slack_webhook": "https://hooks.slack.com/services/xxx",
+                "notify_on": "failure",
+            },
+        },
+    ],
+)
+context.add_or_update_checkpoint(checkpoint=checkpoint)
+result = context.run_checkpoint(checkpoint_name="user_features_checkpoint")
+
+if not result.success:
+    failed = [
+        r.expectation_config.expectation_type
+        for r in result.run_results.values()
+        for r in r["validation_result"]["results"]
+        if not r.success
+    ]
+    raise ValueError(f"Data quality check FAILED. Violations: {failed}")
+
+print("All data quality checks passed.")
+</code></pre>
+  </div>
+
+  <h3 class="text-xl font-semibold mt-8 mb-3">Code: dbt Model with Tests</h3>
+  <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-6">
+    <div class="bg-gray-100 px-4 py-2 border-b border-gray-200 text-sm font-mono text-gray-600">models/user_features.sql + schema.yml</div>
+    <pre><code class="language-sql">-- models/user_features.sql
+-- dbt model: computes user-level features from raw events.
+-- Run with: dbt run --models user_features
+-- Test with: dbt test --models user_features
+
+{{ config(
+    materialized='incremental',
+    unique_key='user_id',
+    on_schema_change='append_new_columns',
+    tags=['ml-features', 'user'],
+    meta={'owner': 'ml-platform', 'sla': '02:00'},
+) }}
+
+WITH events AS (
+    SELECT *
+    FROM {{ ref('stg_events') }}
+    WHERE event_ts >= DATEADD(day, -30, CURRENT_TIMESTAMP())
+    {% if is_incremental() %}
+      AND event_ts > (SELECT MAX(feature_timestamp) FROM {{ this }})
+    {% endif %}
+),
+
+activity_7d AS (
+    SELECT
+        user_id,
+        COUNT(*)                                                    AS events_7d,
+        COUNT_IF(event_type = 'click')                              AS clicks_7d,
+        COUNT_IF(event_type = 'purchase')                           AS purchases_7d,
+        SUM(COALESCE(purchase_amount, 0))                           AS spend_7d,
+        COUNT(DISTINCT session_id)                                  AS sessions_7d,
+        AVG(COALESCE(dwell_seconds, 0))                             AS avg_dwell_7d
+    FROM events
+    WHERE event_ts >= DATEADD(day, -7, CURRENT_TIMESTAMP())
+    GROUP BY 1
+),
+
+activity_30d AS (
+    SELECT
+        user_id,
+        COUNT(*)                               AS events_30d,
+        COUNT_IF(event_type = 'purchase')      AS purchases_30d,
+        SUM(COALESCE(purchase_amount, 0))      AS total_spend_30d,
+        COUNT(DISTINCT category)               AS category_diversity_30d
+    FROM events
+    GROUP BY 1
+),
+
+purchase_rate AS (
+    SELECT
+        user_id,
+        -- Laplace-smoothed click-to-purchase rate
+        (COUNT_IF(event_type = 'purchase') + 1.0)
+            / NULLIFZERO(COUNT_IF(event_type = 'click') + 2.0) AS purchase_rate
+    FROM events
+    GROUP BY 1
+)
+
+SELECT
+    u.user_id,
+    u.country_code,
+    u.subscription_tier,
+    u.account_age_days,
+    COALESCE(a7.events_7d,    0) AS events_7d,
+    COALESCE(a7.clicks_7d,    0) AS clicks_7d,
+    COALESCE(a7.purchases_7d, 0) AS purchases_7d,
+    COALESCE(a7.spend_7d,   0.0) AS spend_7d,
+    COALESCE(a7.sessions_7d,  0) AS sessions_7d,
+    COALESCE(a7.avg_dwell_7d,0.0)AS avg_dwell_7d,
+    COALESCE(a30.events_30d,  0) AS events_30d,
+    COALESCE(a30.purchases_30d,0) AS purchases_30d,
+    COALESCE(a30.total_spend_30d,0.0) AS total_spend_30d,
+    COALESCE(a30.category_diversity_30d,0) AS category_diversity_30d,
+    COALESCE(pr.purchase_rate, 0.5)  AS purchase_rate,
+    CURRENT_TIMESTAMP() AS feature_timestamp
+FROM {{ ref('stg_users') }} u
+LEFT JOIN activity_7d   a7  ON u.user_id = a7.user_id
+LEFT JOIN activity_30d  a30 ON u.user_id = a30.user_id
+LEFT JOIN purchase_rate pr  ON u.user_id = pr.user_id
+</code></pre>
+    <pre><code class="language-yaml"># models/schema.yml — dbt test definitions
+version: 2
+models:
+  - name: user_features
+    description: "User-level ML feature table, refreshed hourly."
+    meta:
+      owner: ml-platform
+    columns:
+      - name: user_id
+        description: "Unique user identifier"
+        tests:
+          - unique
+          - not_null
+      - name: purchase_rate
+        description: "Laplace-smoothed CTR"
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 1
+      - name: clicks_7d
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+      - name: subscription_tier
+        tests:
+          - accepted_values:
+              values: ['free', 'basic', 'premium', 'enterprise']
+    tests:
+      - dbt_utils.equal_rowcount:
+          compare_model: ref('stg_users')
+          # feature table must have same row count as user table
+</code></pre>
+  </div>
+
+  <h3 class="text-xl font-semibold mt-8 mb-3">Data Quality Pipeline Integration</h3>
+  <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm mb-6">
+    <div class="mermaid">
+flowchart LR
+  RAW[Raw Data\nDelta Lake] --> DBT[dbt Transform\n+ dbt tests]
+  DBT -->|pass| GX[Great Expectations\nValidation Suite]
+  DBT -->|fail| ALERT1[Alert: Slack\n+ PagerDuty\nBlock pipeline]
+  GX  -->|pass| FEAT[Feature Store\nMaterialize]
+  GX  -->|fail| ALERT2[Alert: Slack\nBlock pipeline]
+  FEAT --> TRAIN[ML Training Job]
+  TRAIN --> PAN[Pandera Schema\nValidation on batch]
+  PAN -->|pass| DONE[Training Dataset\nConfirmed Clean]
+  PAN -->|fail| ALERT3[Alert: Data\nSchema Mismatch]
+    </div>
+  </div>
+
+  <h3 class="text-xl font-semibold mt-6 mb-3">Data Quality Tool Comparison</h3>
+  <div class="overflow-x-auto rounded-lg border border-gray-200 shadow-sm mb-6">
+    <table>
+      <thead><tr>
+        <th class="px-4 py-3 text-left">Tool</th>
+        <th class="px-4 py-3 text-left">Paradigm</th>
+        <th class="px-4 py-3 text-left">When to Use</th>
+        <th class="px-4 py-3 text-left">ML-Specific</th>
+        <th class="px-4 py-3 text-left">Output</th>
+      </tr></thead>
+      <tbody>
+        <tr><td class="px-4 py-3 font-medium">Great Expectations</td><td class="px-4 py-3">Expectation suites</td><td class="px-4 py-3">Batch pipeline validation</td><td class="px-4 py-3">Distribution checks</td><td class="px-4 py-3">HTML data docs, JSON results</td></tr>
+        <tr><td class="px-4 py-3 font-medium">dbt tests</td><td class="px-4 py-3">SQL-based assertions</td><td class="px-4 py-3">Warehouse transforms</td><td class="px-4 py-3">Schema + referential integrity</td><td class="px-4 py-3">Pass/fail per model column</td></tr>
+        <tr><td class="px-4 py-3 font-medium">Pandera</td><td class="px-4 py-3">Python schema validation</td><td class="px-4 py-3">pandas/Spark DataFrames in code</td><td class="px-4 py-3">Type annotations for DataFrames</td><td class="px-4 py-3">Exceptions with column detail</td></tr>
+        <tr><td class="px-4 py-3 font-medium">Soda Core</td><td class="px-4 py-3">YAML checks</td><td class="px-4 py-3">Multi-warehouse validation</td><td class="px-4 py-3">Anomaly detection (Soda Cloud)</td><td class="px-4 py-3">JSON scan results</td></tr>
+        <tr><td class="px-4 py-3 font-medium">Monte Carlo</td><td class="px-4 py-3">ML-based observability</td><td class="px-4 py-3">Automated anomaly detection</td><td class="px-4 py-3">Yes (lineage impact)</td><td class="px-4 py-3">Incidents + root cause</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- SECTION 12 -->
+<section id="s12">
+  <h2 class="text-2xl font-bold mb-2 section-header pl-4">12. Data Versioning with DVC</h2>
+  <p class="text-gray-500 text-sm mb-6">Git for data and ML pipelines</p>
+  <p class="mb-4 leading-relaxed">DVC (Data Version Control) extends Git to track large files and ML pipelines. It stores data content in remote storage (S3, GCS, Azure Blob) and commits lightweight pointer files (<code>.dvc</code>) to Git. This gives you full reproducibility: <code>git checkout v1.2</code> followed by <code>dvc pull</code> restores the exact data snapshot used to train that model version.</p>
+
+  <h3 class="text-xl font-semibold mt-6 mb-3">Code: DVC Setup and Data Tracking</h3>
+  <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-6">
+    <div class="bg-gray-100 px-4 py-2 border-b border-gray-200 text-sm font-mono text-gray-600">dvc_setup.sh</div>
+    <pre><code class="language-bash">#!/bin/bash
+# DVC: initialize, configure remote storage, and track data files.
+
+# ── 1. Initialize DVC alongside Git ───────────────────────────────────
+git init ml-project && cd ml-project
+dvc init
+git add .dvc/ .dvcignore
+git commit -m "Initialize DVC"
+
+# ── 2. Configure S3 remote storage ────────────────────────────────────
+dvc remote add -d s3remote s3://ml-artifacts/dvc-cache
+dvc remote modify s3remote region us-east-1
+dvc remote modify s3remote sse aws:kms   # server-side encryption
+git add .dvc/config
+git commit -m "Configure S3 DVC remote"
+
+# ── 3. Track a dataset ────────────────────────────────────────────────
+mkdir -p data/raw data/processed
+# Download / place raw data
+aws s3 cp s3://ml-data-lake/features/training_dataset_v2/ data/raw/ --recursive
+
+dvc add data/raw/                    # creates data/raw.dvc
+git add data/raw.dvc .gitignore
+git commit -m "Add raw training dataset v1 (DVC tracked)"
+dvc push                             # upload to S3 remote
+
+# ── 4. Tag this dataset version ───────────────────────────────────────
+git tag -a data-v1.0 -m "Initial training dataset, 2M rows, July 2024"
+
+# ── 5. Update dataset (new version) ───────────────────────────────────
+# Overwrite with new data and recommit
+aws s3 sync s3://ml-data-lake/features/training_dataset_v3/ data/raw/
+
+dvc add data/raw/                    # updates data/raw.dvc with new hash
+git add data/raw.dvc
+git commit -m "Update training dataset to v3 (added 500k rows)"
+git tag -a data-v2.0 -m "Updated dataset v2, 2.5M rows, August 2024"
+dvc push
+
+# ── 6. Reproduce exact dataset for model v1 ───────────────────────────
+git checkout data-v1.0
+dvc pull                             # restores v1 data from S3 cache
+echo "Dataset restored to v1 — train model with identical data"
+</code></pre>
+  </div>
+
+  <h3 class="text-xl font-semibold mt-8 mb-3">Code: DVC Pipeline Definition</h3>
+  <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-6">
+    <div class="bg-gray-100 px-4 py-2 border-b border-gray-200 text-sm font-mono text-gray-600">dvc.yaml</div>
+    <pre><code class="language-yaml"># DVC pipeline: defines stages, dependencies, and outputs.
+# Run with: dvc repro
+# DVC caches outputs and skips stages where deps/params haven't changed.
+
+stages:
+  preprocess:
+    cmd: python src/preprocess.py
+    deps:
+      - src/preprocess.py
+      - data/raw/
+    params:
+      - params.yaml:
+          - preprocess.test_split
+          - preprocess.random_seed
+          - preprocess.min_events_threshold
+    outs:
+      - data/processed/train.parquet
+      - data/processed/val.parquet
+      - data/processed/test.parquet
+    metrics:
+      - data/processed/preprocessing_stats.json:
+          cache: false   # track in Git, not DVC
+
+  train:
+    cmd: python src/train.py
+    deps:
+      - src/train.py
+      - data/processed/train.parquet
+      - data/processed/val.parquet
+    params:
+      - params.yaml:
+          - model.n_estimators
+          - model.max_depth
+          - model.learning_rate
+          - model.subsample
+    outs:
+      - models/model.pkl
+      - models/feature_importances.json
+    metrics:
+      - metrics/train_metrics.json:
+          cache: false
+
+  evaluate:
+    cmd: python src/evaluate.py
+    deps:
+      - src/evaluate.py
+      - models/model.pkl
+      - data/processed/test.parquet
+    outs:
+      - reports/evaluation_plots/
+    metrics:
+      - metrics/eval_metrics.json:
+          cache: false
+    plots:
+      - reports/roc_curve.csv:
+          x: fpr
+          y: tpr
+      - reports/pr_curve.csv:
+          x: recall
+          y: precision
+</code></pre>
+  </div>
+
+  <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-6">
+    <div class="bg-gray-100 px-4 py-2 border-b border-gray-200 text-sm font-mono text-gray-600">params.yaml</div>
+    <pre><code class="language-yaml">preprocess:
+  test_split: 0.15
+  val_split: 0.15
+  random_seed: 42
+  min_events_threshold: 5
+
+model:
+  n_estimators: 500
+  max_depth: 8
+  learning_rate: 0.05
+  subsample: 0.8
+  min_child_weight: 10
+  scale_pos_weight: 3.5   # class imbalance correction
+</code></pre>
+  </div>
+
+  <div class="callout-success rounded-lg p-4 mb-4">
+    <p class="font-semibold mb-1">DVC + MLflow: Complete ML Reproducibility</p>
+    <p class="text-sm">DVC tracks data and pipeline stages; MLflow tracks experiment metrics, parameters, and model artifacts. Together they give you complete reproducibility: given any MLflow run ID, you can recover the exact code (Git commit), data (DVC tag), and parameters (MLflow params) that produced it. This is the gold standard for regulated industries where model audits are required.</p>
+  </div>
+</section>
+
+<!-- SECTION 13 -->
+<section id="s13">
+  <h2 class="text-2xl font-bold mb-2 section-header pl-4">13. Data Labeling and Annotation</h2>
+  <p class="text-gray-500 text-sm mb-6">Scaling human judgment for supervised learning</p>
+  <p class="mb-4 leading-relaxed">Supervised ML is fundamentally bottlenecked by labeled data quality and quantity. Labeling is often the largest cost in a practical ML project — not compute, not engineering. Understanding the tradeoffs between labeling strategies is essential for shipping models on time and budget.</p>
+
+  <h3 class="text-xl font-semibold mt-6 mb-3">Labeling Strategies</h3>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+    <div class="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
+      <h4 class="font-semibold mb-2 text-blue-700">Crowdsourcing</h4>
+      <p class="text-sm text-gray-600 mb-2">Platforms: Mechanical Turk, Scale AI, Labelbox, Surge AI. Fast and cheap for high-volume general tasks (image classification, text sentiment). Requires consensus mechanisms (majority vote, inter-annotator agreement) to manage quality.</p>
+      <p class="text-xs text-gray-500">Best for: image/text classification, NLU tasks with clear guidelines</p>
+    </div>
+    <div class="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
+      <h4 class="font-semibold mb-2 text-blue-700">Expert Labeling</h4>
+      <p class="text-sm text-gray-600 mb-2">Medical imaging, legal document classification, financial fraud — require domain experts. 10–100x more expensive than crowdsourcing but essential for nuanced decisions where guidelines cannot be written simply.</p>
+      <p class="text-xs text-gray-500">Best for: medical, legal, scientific, specialized fraud detection</p>
+    </div>
+    <div class="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
+      <h4 class="font-semibold mb-2 text-blue-700">Programmatic / Synthetic</h4>
+      <p class="text-sm text-gray-600 mb-2">Snorkel (weak supervision via labeling functions), LLM-generated labels, heuristic rules, or simulation. No human annotation required but introduces label noise that must be explicitly modeled.</p>
+      <p class="text-xs text-gray-500">Best for: bootstrapping, low-budget, LLM-assisted annotation</p>
+    </div>
+  </div>
+
+  <h3 class="text-xl font-semibold mt-6 mb-3">Active Learning to Reduce Labeling Cost</h3>
+  <p class="mb-4 leading-relaxed">Active learning selects the most informative unlabeled examples for annotation, rather than randomly sampling. Common strategies: uncertainty sampling (label examples the model is least confident about), query by committee (label examples where an ensemble disagrees most), and core-set selection (label geometrically representative samples). In practice, active learning can reduce labeling cost by 60–80% for the same model performance, at the cost of implementation complexity.</p>
+
+  <h3 class="text-xl font-semibold mt-6 mb-3">Labeling Platform Comparison</h3>
+  <div class="overflow-x-auto rounded-lg border border-gray-200 shadow-sm mb-6">
+    <table>
+      <thead><tr>
+        <th class="px-4 py-3 text-left">Platform</th>
+        <th class="px-4 py-3 text-left">Type</th>
+        <th class="px-4 py-3 text-left">Data Types</th>
+        <th class="px-4 py-3 text-left">Managed Workforce</th>
+        <th class="px-4 py-3 text-left">Best For</th>
+      </tr></thead>
+      <tbody>
+        <tr><td class="px-4 py-3 font-medium">Label Studio</td><td class="px-4 py-3">Open-source</td><td class="px-4 py-3">Text, image, audio, video, NLP</td><td class="px-4 py-3">No (BYOW)</td><td class="px-4 py-3">Self-hosted, full control</td></tr>
+        <tr><td class="px-4 py-3 font-medium">Scale AI</td><td class="px-4 py-3">Enterprise SaaS</td><td class="px-4 py-3">Image, lidar, video, text</td><td class="px-4 py-3">Yes (Taskers)</td><td class="px-4 py-3">High-quality, high-volume annotation</td></tr>
+        <tr><td class="px-4 py-3 font-medium">Labelbox</td><td class="px-4 py-3">SaaS + API</td><td class="px-4 py-3">Image, video, text, geospatial</td><td class="px-4 py-3">Yes (Boost)</td><td class="px-4 py-3">Enterprise teams, active learning</td></tr>
+        <tr><td class="px-4 py-3 font-medium">Snorkel Flow</td><td class="px-4 py-3">Programmatic</td><td class="px-4 py-3">Text, tabular</td><td class="px-4 py-3">No</td><td class="px-4 py-3">Weak supervision, LF authoring</td></tr>
+        <tr><td class="px-4 py-3 font-medium">AWS Ground Truth</td><td class="px-4 py-3">Managed service</td><td class="px-4 py-3">Image, text, 3D point cloud</td><td class="px-4 py-3">Yes (Mechanical Turk)</td><td class="px-4 py-3">AWS-native pipelines</td></tr>
+        <tr><td class="px-4 py-3 font-medium">Prodigy</td><td class="px-4 py-3">Tool (spaCy)</td><td class="px-4 py-3">NLP, NER, classification</td><td class="px-4 py-3">No</td><td class="px-4 py-3">NLP expert annotation + active learning</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 class="text-xl font-semibold mt-6 mb-3">Human-in-the-Loop for LLMs</h3>
+  <p class="mb-4 leading-relaxed">With LLMs, labeling takes a new form: Reinforcement Learning from Human Feedback (RLHF) and Constitutional AI require preference annotation (which response is better?) rather than ground-truth labeling. Tools like Argilla and Scale's RLHF platform are purpose-built for this. The key insight is that relative preference judgments are faster and more consistent than absolute quality ratings — a human can reliably say "response A is better than B" even when they can't articulate an absolute score for either.</p>
+</section>
+
+<!-- SUMMARY -->
+<section id="summary">
+  <h2 class="text-2xl font-bold mb-6 section-header pl-4">Summary &amp; Key Takeaways</h2>
+  <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
+        <h3 class="font-bold text-lg mb-3 text-blue-700">Data Infrastructure</h3>
+        <ul class="space-y-2 text-sm text-gray-700">
+          <li class="flex items-start gap-2"><span class="text-emerald-500 mt-0.5">&#10003;</span><span>Data pipelines are 95% of production ML. Invest in them proportionally.</span></li>
+          <li class="flex items-start gap-2"><span class="text-emerald-500 mt-0.5">&#10003;</span><span>Use streaming ingestion (Kafka + Debezium) for latency-sensitive features; batch (Spark) for complex aggregations.</span></li>
+          <li class="flex items-start gap-2"><span class="text-emerald-500 mt-0.5">&#10003;</span><span>Delta Lake or Iceberg on S3 gives you ACID, time travel, and schema evolution at object storage cost.</span></li>
+          <li class="flex items-start gap-2"><span class="text-emerald-500 mt-0.5">&#10003;</span><span>Organize your data lake into raw → staged → curated → features zones with clear ownership and access controls.</span></li>
+        </ul>
+      </div>
+      <div>
+        <h3 class="font-bold text-lg mb-3 text-blue-700">Feature Stores</h3>
+        <ul class="space-y-2 text-sm text-gray-700">
+          <li class="flex items-start gap-2"><span class="text-emerald-500 mt-0.5">&#10003;</span><span>Point-in-time correctness is non-negotiable. Feature stores enforce it by construction.</span></li>
+          <li class="flex items-start gap-2"><span class="text-emerald-500 mt-0.5">&#10003;</span><span>Training-serving skew is the most common silent failure mode. A shared feature definition eliminates it.</span></li>
+          <li class="flex items-start gap-2"><span class="text-emerald-500 mt-0.5">&#10003;</span><span>Feast for self-hosted open-source; Tecton for managed streaming; SageMaker/Vertex for cloud-native.</span></li>
+          <li class="flex items-start gap-2"><span class="text-emerald-500 mt-0.5">&#10003;</span><span>Online store (Redis) serves &lt;5ms p99; offline store (Delta Lake) serves historical training data.</span></li>
+        </ul>
+      </div>
+      <div>
+        <h3 class="font-bold text-lg mb-3 text-blue-700">Data Quality &amp; Versioning</h3>
+        <ul class="space-y-2 text-sm text-gray-700">
+          <li class="flex items-start gap-2"><span class="text-emerald-500 mt-0.5">&#10003;</span><span>Great Expectations for batch validation; dbt tests for warehouse transforms; Pandera for in-code DataFrame schemas.</span></li>
+          <li class="flex items-start gap-2"><span class="text-emerald-500 mt-0.5">&#10003;</span><span>DVC + Git gives complete data reproducibility. Every model version can be re-traced to its exact data.</span></li>
+          <li class="flex items-start gap-2"><span class="text-emerald-500 mt-0.5">&#10003;</span><span>Define statistical distribution expectations (not just null checks) to catch upstream drift early.</span></li>
+        </ul>
+      </div>
+      <div>
+        <h3 class="font-bold text-lg mb-3 text-blue-700">Feature Engineering</h3>
+        <ul class="space-y-2 text-sm text-gray-700">
+          <li class="flex items-start gap-2"><span class="text-emerald-500 mt-0.5">&#10003;</span><span>Rolling window features (7d, 30d) via Spark range windows are the backbone of behavioral ML.</span></li>
+          <li class="flex items-start gap-2"><span class="text-emerald-500 mt-0.5">&#10003;</span><span>Data leakage kills production models. Every feature in training must have been available at the label timestamp.</span></li>
+          <li class="flex items-start gap-2"><span class="text-emerald-500 mt-0.5">&#10003;</span><span>Laplace smoothing on rate features avoids zero-division and reduces variance on sparse users.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout-info rounded-lg p-5 mb-8">
+    <p class="font-bold text-base mb-2">From the Field: What Actually Matters</p>
+    <p class="text-sm leading-relaxed">After building feature stores at Meta serving 500k features to ranking models at 2M QPS, the lessons that matter most: (1) Feature freshness has a direct ROI — measure it and invest in streaming pipelines for your highest-value features. (2) The feature registry is the most valuable component — when 200 models share features, discoverability and ownership metadata prevent duplication and data debt. (3) Monitoring the offline-to-online sync lag is as important as monitoring your models — a stale online store is invisible until your model metrics drop. (4) Start simple: a well-organized Delta Lake plus pandas offline joins will take you far before you need a full feature store.</p>
+  </div>
+</section>
+
+</main>
+
+<!-- BOTTOM NAVIGATION -->
+<footer class="border-t border-gray-200 bg-white mt-16">
+  <div class="max-w-5xl mx-auto px-6 py-8 flex justify-between items-center">
+    <a href="ch05_model_training.html" class="flex items-center gap-2 text-blue-600 hover:text-blue-800 font-medium">
+      <span>&larr;</span>
+      <div>
+        <div class="text-xs text-gray-500">Previous</div>
+        <div>Chapter 5: Model Training</div>
+      </div>
+    </a>
+    <a href="index.html" class="text-sm text-gray-500 hover:text-blue-600">Table of Contents</a>
+    <a href="ch07_model_serving.html" class="flex items-center gap-2 text-blue-600 hover:text-blue-800 font-medium">
+      <div class="text-right">
+        <div class="text-xs text-gray-500">Next</div>
+        <div>Chapter 7: Model Serving</div>
+      </div>
+      <span>&rarr;</span>
+    </a>
+  </div>
+</footer>
+
+</body>
+</html>

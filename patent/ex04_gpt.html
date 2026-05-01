@@ -1,0 +1,1663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Case Study 4: GPT and Large Language Models — Patenting the Intelligence Engine. Patent Law for Technologists." />
+  <title>Case Study 4: GPT and Large Language Models — Patent Law for Technologists</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .rlhf-loop-svg { width: 100%; max-width: 780px; height: auto; display: block; margin: 0 auto; }
+    .pipeline-svg  { width: 100%; max-width: 820px; height: auto; display: block; margin: 0 auto; }
+    .landscape-table td:nth-child(3) { font-variant-numeric: tabular-nums; text-align: center; }
+    .claim-analysis { background: var(--gray-50); border-left: 4px solid var(--navy-light); padding: .875rem 1.25rem; margin: .75rem 0; border-radius: 0 var(--radius) var(--radius) 0; font-size: .9rem; }
+    .claim-analysis strong { color: var(--navy); }
+    .innovation-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem; margin: 2rem 0; }
+    .innovation-card { background: var(--white); border: 1px solid var(--gray-200); border-radius: var(--radius-lg); padding: 1.5rem; box-shadow: var(--shadow-sm); border-top: 4px solid var(--navy); }
+    .innovation-card.gold-top { border-top-color: var(--gold); }
+    .innovation-card.green-top { border-top-color: var(--success); }
+    .innovation-card.red-top { border-top-color: var(--danger); }
+    .innovation-card.info-top { border-top-color: var(--info); }
+    .innovation-card h4 { margin-top: 0; font-size: 1rem; }
+    .innovation-card p { margin-bottom: 0; font-size: .9rem; color: var(--text-light); }
+    .innovation-label { font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--gold); margin-bottom: .375rem; }
+    .ref-numeral { display: inline-flex; align-items: center; justify-content: center; width: 1.5rem; height: 1.5rem; background: var(--navy); color: white; border-radius: 50%; font-size: .65rem; font-weight: 700; flex-shrink: 0; margin-right: .375rem; vertical-align: middle; }
+    .patent-tag { display: inline-block; background: #d6eaf8; color: #1a5276; font-size: .72rem; font-weight: 600; padding: .2rem .5rem; border-radius: 4px; margin: .1rem; }
+    .patent-tag.green { background: #d4efdf; color: #1e6b3a; }
+    .patent-tag.orange { background: #fdebd0; color: #a04000; }
+    .patent-tag.red { background: #fdedec; color: #922b21; }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════
+     TOP NAVIGATION
+══════════════════════════════════════════════════ -->
+<nav class="top-nav">
+  <div class="nav-container">
+    <a href="index.html" class="nav-logo">Patent Law <span>for Technologists</span></a>
+    <div class="nav-links">
+      <a href="ex01_transformer.html">Ex.1</a>
+      <a href="ex02_lora.html">Ex.2</a>
+      <a href="ex03_crispr.html">Ex.3</a>
+      <a href="ex04_gpt.html" class="active">Ex.4</a>
+      <a href="ex05_alphafold.html">Ex.5</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════════════════
+     CHAPTER HERO
+══════════════════════════════════════════════════ -->
+<header class="chapter-hero">
+  <div class="chapter-hero-content">
+    <span class="chapter-badge">Case Study 4</span>
+    <h1>GPT and Large Language Models:<br>Patenting the Intelligence Engine</h1>
+    <p class="subtitle">
+      From GPT-1's autoregressive pre-training to GPT-4's multimodal reasoning, the large language model
+      revolution poses profound questions for the patent system — and unprecedented strategic opportunities
+      for the companies that know how to navigate them.
+    </p>
+    <div class="chapter-meta">
+      <span>Prof. Ryan Calo &bull; University of Washington School of Law</span>
+      <span>Patent Law for Technologists, Case Study 4</span>
+      <span>First Edition 2025</span>
+    </div>
+  </div>
+</header>
+
+<!-- ══════════════════════════════════════════════════
+     PAGE LAYOUT
+══════════════════════════════════════════════════ -->
+<div class="page-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <nav class="toc">
+      <h3>Contents</h3>
+      <ol>
+        <li><a href="#s1">The Race to Patent General Intelligence</a></li>
+        <li><a href="#s2">Key Technical Innovations in LLMs</a></li>
+        <li><a href="#s3">The §101 Landscape for LLMs</a></li>
+        <li><a href="#s4">OpenAI's Patent Strategy</a></li>
+        <li><a href="#s5">Competing Patent Landscapes</a></li>
+        <li><a href="#s6">RLHF Patent Claims Analysis</a></li>
+        <li><a href="#s7">The Prompting Patent Frontier</a></li>
+        <li><a href="#s8">RAG Patents</a></li>
+        <li><a href="#s9">The Open-Source LLM Challenge</a></li>
+        <li><a href="#s10">Emergent Capabilities and the Patent Problem</a></li>
+        <li><a href="#s11">Practical Patent Strategy for LLM Researchers</a></li>
+        <li><a href="#s12">Future Frontiers</a></li>
+        <li><a href="#s13">Key Takeaways</a></li>
+      </ol>
+    </nav>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="chapter-content">
+
+    <!-- ═══════════════════════════════════════════
+         SECTION 1 — THE RACE TO PATENT GENERAL INTELLIGENCE
+    ════════════════════════════════════════════ -->
+    <section id="s1" class="section-anchor">
+      <h2>1. The Race to Patent General Intelligence</h2>
+
+      <p>
+        In June 2018, OpenAI published a technical report describing GPT-1 — a 117-million-parameter
+        language model trained on a corpus of approximately 7,000 books. The model introduced what would
+        become the defining paradigm of the next half-decade: <span class="key-term">autoregressive pre-training</span>
+        on massive unlabeled text, followed by task-specific fine-tuning. At the time, few observers
+        recognized the moment as the opening move in what would become the most consequential patent
+        race in the history of computing.
+      </p>
+
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-date">June 2018</div>
+          <h4>GPT-1: Proof of Concept</h4>
+          <p>117M parameters. Generative pre-training on BooksCorpus. Demonstrates that a single
+          pre-trained model, fine-tuned on downstream tasks, outperforms task-specific architectures.
+          OpenAI publishes openly; no patent application filed on the core architecture.</p>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-date">February 2019</div>
+          <h4>GPT-2: The Staged Release</h4>
+          <p>1.5B parameters. OpenAI controversially staged the release, citing concerns about
+          misuse. The model demonstrated coherent multi-paragraph text generation. No core
+          architecture patent filed. Early signals of OpenAI's ambivalent patent posture.</p>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-date">May 2020</div>
+          <h4>GPT-3: The Emergent Revolution</h4>
+          <p>175B parameters. Brown et al., "Language Models are Few-Shot Learners." Few-shot
+          in-context learning — a capability not explicitly trained for — emerges from scale.
+          OpenAI licenses the model via API rather than publishing weights. Commercial strategy
+          begins to diverge from research-first posture.</p>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-date">January 2022</div>
+          <h4>InstructGPT / RLHF: The Alignment Breakthrough</h4>
+          <p>Ouyang et al. introduce Reinforcement Learning from Human Feedback (RLHF) to align
+          GPT-3 with human intent. This is the first genuinely novel algorithmic contribution of
+          the GPT lineage that sits cleanly within patent eligibility doctrine — a specific,
+          trained reward model guiding a specific RL procedure.</p>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-date">March 2023</div>
+          <h4>GPT-4: Multimodal at Scale</h4>
+          <p>GPT-4 is released without a technical report disclosing architecture details — a
+          deliberate departure from OpenAI's open-research origins. Multimodal inputs. Reported
+          to use a mixture-of-experts architecture. The commercial stakes now justify significant
+          investment in IP protection. OpenAI begins filing more aggressively.</p>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-date">2024–2025</div>
+          <h4>The Patent Arms Race Accelerates</h4>
+          <p>GPT-4o, o1, o3, and the inference-time scaling paradigm. Competitors including
+          Google (Gemini), Anthropic (Claude), Meta (LLaMA), and Mistral file aggressively
+          across training efficiency, alignment, and inference optimization. The LLM patent
+          landscape becomes genuinely contested for the first time.</p>
+        </div>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-item">
+          <div class="stat-number">~3,400</div>
+          <div class="stat-label">LLM-related U.S. patent applications filed in 2023 alone (USPTO estimate)</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">&lt;40</div>
+          <div class="stat-label">OpenAI U.S. patents as of early 2024 — strikingly low for a company of its scale</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">2,100s</div>
+          <div class="stat-label">USPTO art unit series handling AI/ML patent applications (Computer Architecture)</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">18–36 mo</div>
+          <div class="stat-label">Typical prosecution timeline for LLM patents in Art Unit 2100 series</div>
+        </div>
+      </div>
+
+      <h3>The Paradigm Shift and its Patent Implications</h3>
+      <p>
+        Before GPT, most commercial AI patents claimed narrow, task-specific architectures:
+        an image classifier, a fraud detection system, a recommendation engine. The inventive
+        step was the specific architectural configuration or training procedure applied to a
+        defined problem. GPT upended this model by demonstrating that a single general-purpose
+        model — trained on the same basic objective — could perform hundreds of tasks without
+        any task-specific modification.
+      </p>
+      <p>
+        This creates a genuine patent puzzle. If a model is general-purpose by design, how
+        do you claim it with sufficient specificity to survive a §101 abstract-idea rejection?
+        If its most valuable capability (few-shot learning) emerges from scale rather than
+        explicit design, does the written description requirement demand that you demonstrate
+        the capability or merely that you describe the architecture? And if the training
+        procedure is the real invention — not the weights themselves — how do you claim a
+        training method without foreclosing the basic mathematical operations of gradient descent?
+      </p>
+      <p>
+        These questions define the frontier of LLM patent doctrine, and this case study works
+        through each of them systematically.
+      </p>
+
+      <div class="callout callout-info">
+        <div class="callout-icon">&#8505;</div>
+        <div class="callout-body">
+          <div class="callout-title">Author's Note on Scope</div>
+          <p>This case study focuses on the patentability of LLM <em>training and alignment methods</em>,
+          not on downstream applications (document processing, code generation, etc.), which generally
+          present an easier path to eligibility. The hard questions — and the strategically most
+          valuable patents — lie in the core technical innovations discussed here.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════
+         SECTION 2 — KEY TECHNICAL INNOVATIONS
+    ════════════════════════════════════════════ -->
+    <section id="s2" class="section-anchor">
+      <h2>2. Key Technical Innovations in LLMs</h2>
+
+      <p>
+        Before analyzing patent eligibility, a precise technical map of what is actually novel
+        in GPT-style models is essential. Patent claims must correspond to specific technical
+        contributions; "we trained a big transformer" describes no patentable invention.
+        The innovations that matter for patent purposes fall into five distinct categories.
+      </p>
+
+      <div class="innovation-grid">
+        <div class="innovation-card">
+          <div class="innovation-label">Innovation A</div>
+          <h4>Autoregressive Pre-training</h4>
+          <p>Training a language model to predict the next token in a sequence across a massive, diverse
+          corpus — without task-specific supervision. The key contribution is the transfer: a model
+          trained this way develops general representations applicable across tasks.</p>
+        </div>
+        <div class="innovation-card gold-top">
+          <div class="innovation-label">Innovation B</div>
+          <h4>Few-Shot In-Context Learning</h4>
+          <p>At sufficient scale, GPT-3 demonstrated that a model could perform new tasks given only
+          a few examples in the input prompt — no gradient updates. This capability was emergent,
+          not designed, making it a unique patent disclosure challenge.</p>
+        </div>
+        <div class="innovation-card green-top">
+          <div class="innovation-label">Innovation C</div>
+          <h4>RLHF (InstructGPT)</h4>
+          <p>A three-stage pipeline: supervised fine-tuning on demonstrations, training a reward model
+          on human preference comparisons, then fine-tuning the language model using PPO with the
+          reward model as the reward signal. The most patent-eligible innovation in the GPT lineage.</p>
+        </div>
+        <div class="innovation-card red-top">
+          <div class="innovation-label">Innovation D</div>
+          <h4>Chain-of-Thought Prompting</h4>
+          <p>Wei et al. (2022) discovered that prompting a model with intermediate reasoning steps
+          dramatically improves performance on complex tasks. Borderline patent eligibility — is it
+          a method claim tied to a specific model architecture, or merely an abstract instruction?</p>
+        </div>
+        <div class="innovation-card info-top">
+          <div class="innovation-label">Innovation E</div>
+          <h4>Constitutional AI / RLAIF</h4>
+          <p>Anthropic's technique of using an AI model's own outputs to generate preference data,
+          replacing human annotators in the RLHF loop. A genuine algorithmic advance that avoids
+          some of the obviousness issues of straightforward RLHF variants.</p>
+        </div>
+      </div>
+
+      <!-- SVG: GPT PRE-TRAINING + RLHF PIPELINE -->
+      <div class="figure">
+        <div class="figure-content" style="width:100%; padding: 1.5rem;">
+          <svg class="pipeline-svg" viewBox="0 0 820 440" xmlns="http://www.w3.org/2000/svg" aria-label="GPT Pre-training and RLHF Pipeline Diagram">
+            <defs>
+              <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                <polygon points="0 0, 10 3.5, 0 7" fill="#6c757d" />
+              </marker>
+              <marker id="arrowhead-gold" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                <polygon points="0 0, 10 3.5, 0 7" fill="#c8942a" />
+              </marker>
+              <marker id="arrowhead-green" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                <polygon points="0 0, 10 3.5, 0 7" fill="#1e8449" />
+              </marker>
+            </defs>
+
+            <!-- STAGE LABELS -->
+            <rect x="10" y="10" width="240" height="200" rx="10" fill="#f8f9fa" stroke="#dee2e6" stroke-width="1.5"/>
+            <text x="130" y="34" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" font-weight="700" fill="#1a2744" letter-spacing="1">STAGE 1: PRE-TRAINING</text>
+
+            <!-- Stage 1 nodes -->
+            <rect x="30" y="50" width="200" height="40" rx="6" fill="#1a2744"/>
+            <text x="130" y="65" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="white" font-weight="600">Raw Text Corpus</text>
+            <text x="130" y="79" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="rgba(255,255,255,.7)">(trillion tokens, web + books)</text>
+
+            <line x1="130" y1="90" x2="130" y2="108" stroke="#6c757d" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+
+            <rect x="30" y="110" width="200" height="40" rx="6" fill="#2d3f6b"/>
+            <text x="130" y="125" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="white" font-weight="600">Transformer (GPT)</text>
+            <text x="130" y="139" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="rgba(255,255,255,.7)">autoregressive next-token prediction</text>
+
+            <line x1="130" y1="150" x2="130" y2="168" stroke="#6c757d" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+
+            <rect x="30" y="170" width="200" height="32" rx="6" fill="#1a6b8a"/>
+            <text x="130" y="183" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="white" font-weight="600">Base LM (GPT-N weights)</text>
+            <text x="130" y="196" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="rgba(255,255,255,.7)">&#9312; pre-trained model</text>
+
+            <!-- Arrow Stage 1 → Stage 2 -->
+            <line x1="250" y1="186" x2="298" y2="186" stroke="#c8942a" stroke-width="2" marker-end="url(#arrowhead-gold)"/>
+
+            <!-- STAGE 2 -->
+            <rect x="300" y="10" width="220" height="200" rx="10" fill="#fef9e7" stroke="#d4a017" stroke-width="1.5"/>
+            <text x="410" y="34" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" font-weight="700" fill="#b7770d" letter-spacing="1">STAGE 2: SFT + REWARD MODEL</text>
+
+            <rect x="320" y="50" width="180" height="40" rx="6" fill="#b7770d"/>
+            <text x="410" y="65" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="white" font-weight="600">Human Demonstrations</text>
+            <text x="410" y="79" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="rgba(255,255,255,.85)">(prompt, ideal response) pairs</text>
+
+            <line x1="410" y1="90" x2="410" y2="108" stroke="#b7770d" stroke-width="1.5" marker-end="url(#arrowhead-gold)"/>
+
+            <rect x="320" y="110" width="180" height="36" rx="6" fill="#c8942a"/>
+            <text x="410" y="126" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="white" font-weight="600">Supervised Fine-Tuning (SFT)</text>
+            <text x="410" y="140" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="rgba(255,255,255,.85)">&#9313; SFT model</text>
+
+            <line x1="410" y1="146" x2="410" y2="164" stroke="#b7770d" stroke-width="1.5" marker-end="url(#arrowhead-gold)"/>
+
+            <rect x="320" y="166" width="180" height="36" rx="6" fill="#e8b84b"/>
+            <text x="410" y="181" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="#1a2744" font-weight="600">Human Preference Labels</text>
+            <text x="410" y="195" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#2d3f6b">rank pairwise responses A &gt; B</text>
+
+            <!-- REWARD MODEL BOX -->
+            <rect x="300" y="230" width="220" height="50" rx="10" fill="#fdedec" stroke="#922b21" stroke-width="1.5"/>
+            <text x="410" y="252" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" font-weight="700" fill="#922b21">Reward Model r&#x03B8;</text>
+            <text x="410" y="270" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#922b21">&#9314; trained on preference data — outputs scalar reward</text>
+
+            <line x1="410" y1="202" x2="410" y2="230" stroke="#922b21" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+
+            <!-- Arrow Stage 2 → Stage 3 -->
+            <line x1="520" y1="255" x2="568" y2="255" stroke="#1e8449" stroke-width="2" marker-end="url(#arrowhead-green)"/>
+
+            <!-- STAGE 3 -->
+            <rect x="570" y="220" width="230" height="200" rx="10" fill="#e8f8f5" stroke="#1e8449" stroke-width="1.5"/>
+            <text x="685" y="244" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" font-weight="700" fill="#1e6b3a" letter-spacing="1">STAGE 3: RL FINE-TUNING</text>
+
+            <rect x="590" y="256" width="190" height="40" rx="6" fill="#1e8449"/>
+            <text x="685" y="271" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="white" font-weight="600">PPO Optimization Loop</text>
+            <text x="685" y="285" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="rgba(255,255,255,.85)">LM generates response, RM scores it</text>
+
+            <line x1="685" y1="296" x2="685" y2="314" stroke="#1e8449" stroke-width="1.5" marker-end="url(#arrowhead-green)"/>
+
+            <rect x="590" y="316" width="190" height="36" rx="6" fill="#1a6b4b"/>
+            <text x="685" y="331" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="white" font-weight="600">KL Penalty Constraint</text>
+            <text x="685" y="345" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="rgba(255,255,255,.85)">prevents divergence from SFT model</text>
+
+            <line x1="685" y1="352" x2="685" y2="370" stroke="#1e8449" stroke-width="1.5" marker-end="url(#arrowhead-green)"/>
+
+            <rect x="590" y="372" width="190" height="36" rx="6" fill="#0f5132"/>
+            <text x="685" y="388" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="white" font-weight="700">Aligned LM (InstructGPT)</text>
+            <text x="685" y="402" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="rgba(255,255,255,.7)">&#9315; final RLHF-tuned model</text>
+
+            <!-- Reference numerals legend -->
+            <rect x="10" y="290" width="260" height="140" rx="8" fill="#f8f9fa" stroke="#dee2e6" stroke-width="1"/>
+            <text x="25" y="312" font-family="Inter,sans-serif" font-size="10" font-weight="700" fill="#1a2744">Reference Numerals</text>
+            <text x="25" y="332" font-family="Inter,sans-serif" font-size="9.5" fill="#495057">&#9312; — Pre-trained base language model</text>
+            <text x="25" y="350" font-family="Inter,sans-serif" font-size="9.5" fill="#495057">&#9313; — Supervised fine-tuned (SFT) model</text>
+            <text x="25" y="368" font-family="Inter,sans-serif" font-size="9.5" fill="#495057">&#9314; — Trained reward model r&#x03B8;(x, y)</text>
+            <text x="25" y="386" font-family="Inter,sans-serif" font-size="9.5" fill="#495057">&#9315; — RLHF policy &#x03C0;&#x03B8; (aligned model)</text>
+            <text x="25" y="404" font-family="Inter,sans-serif" font-size="9.5" fill="#b7770d">&#9316; — Human preference labels (pairwise)</text>
+            <text x="25" y="422" font-family="Inter,sans-serif" font-size="9.5" fill="#922b21">&#9317; — PPO policy gradient update step</text>
+          </svg>
+        </div>
+        <p class="figure-caption">
+          <strong>Figure 1.</strong> GPT Pre-training and RLHF Pipeline with patent reference numerals.
+          Stage 1 (pre-training) is the least patent-defensible. Stage 3 (RL fine-tuning with reward model)
+          contains the most patent-eligible innovations. Reference numerals correspond to claimable elements.
+        </p>
+      </div>
+
+      <h3>2(a). Autoregressive Pre-training</h3>
+      <p>
+        The core GPT pre-training objective — maximize the likelihood of the next token given all
+        preceding tokens — is a mathematical formulation with roots in Shannon (1948) and Jelinek's
+        statistical language modeling work of the 1970s. The objective function itself is not novel.
+        What is novel, in each successive GPT generation, is a cluster of specific implementation
+        decisions: the particular tokenization strategy (byte-pair encoding at a specific vocabulary
+        size), the specific model architecture (number of layers, attention heads, hidden dimension
+        ratio), the data curation pipeline, and the specific learning rate schedule and warmup procedure.
+      </p>
+      <p>
+        Each of these elements is potentially patentable — but only when claimed with sufficient
+        specificity, tied to a measurable improvement, and supported by enabling disclosure. Claims
+        that merely recite "training a language model by predicting the next token" will fail §101
+        at step 2A.
+      </p>
+
+      <h3>2(b). Few-Shot In-Context Learning</h3>
+      <p>
+        GPT-3's few-shot learning capability was genuinely surprising: the model was never trained
+        to perform in-context learning. It emerged from the combination of scale and the diversity of
+        pre-training data. This creates a profound patent disclosure problem, addressed in Section 10.
+        The phenomenon itself — that certain prompting formats elicit consistent behavioral changes
+        without gradient updates — is now well-documented, and patents claiming specific in-context
+        learning protocols tied to particular model architectures are being filed and examined.
+      </p>
+
+      <h3>2(c). RLHF — InstructGPT</h3>
+      <p>
+        Reinforcement Learning from Human Feedback is the clearest patent opportunity in the GPT
+        lineage. The Ouyang et al. (2022) paper describes a three-stage pipeline with specific,
+        concrete components: a supervised fine-tuning step on human demonstrations; a reward model
+        trained on pairwise human preference comparisons; and a proximal policy optimization (PPO)
+        step that fine-tunes the language model using the reward model's scalar output as the reward
+        signal, with a KL-divergence penalty that prevents the RL policy from diverging too far from
+        the SFT model. Each of these elements is specific, technically described, and tied to
+        measurable improvements in human-evaluated response quality.
+      </p>
+
+      <h3>2(d). Chain-of-Thought Prompting</h3>
+      <p>
+        Wei et al. (2022) demonstrated that including intermediate reasoning steps in few-shot
+        examples dramatically improves LLM performance on arithmetic and commonsense reasoning tasks.
+        The patentability question is whether a <em>prompting technique</em> — a specific format
+        for structuring input to a pre-existing model — constitutes a patent-eligible method. The
+        answer is nuanced: a prompting technique claimed in the abstract ("provide intermediate
+        reasoning steps") is likely abstract under Alice. A prompting technique claimed as a specific
+        computational method, tied to a specific model architecture's activation patterns or to a
+        specific training procedure, presents a stronger case. Section 7 analyzes this in depth.
+      </p>
+
+      <h3>2(e). Constitutional AI and RLAIF</h3>
+      <p>
+        Anthropic's Constitutional AI (CAI) approach uses an AI model itself — rather than human
+        annotators — to critique and revise its own outputs according to a set of principles (the
+        "constitution"). The resulting self-critique data is then used to train a reward model in
+        place of human preference labels. This <span class="key-term">Reinforcement Learning from
+        AI Feedback (RLAIF)</span> approach has genuine technical novelty: the specific mechanism
+        of self-critique generation, the structure of the constitutional prompts, the method of
+        converting AI critiques to preference data, and the training objective modifications
+        required when AI-generated rather than human-generated preference data is used.
+      </p>
+    </section>
+
+    <!-- ═══════════════════════════════════════════
+         SECTION 3 — §101 LANDSCAPE
+    ════════════════════════════════════════════ -->
+    <section id="s3" class="section-anchor">
+      <h2>3. The §101 Landscape for LLMs</h2>
+
+      <p>
+        The central §101 challenge for LLM patents is this: at bottom, an LLM is a function that
+        maps an input token sequence to a probability distribution over the next token — or, after
+        fine-tuning, to a distribution over full output sequences. Is that a mathematical function,
+        and thus an abstract idea? The answer under current doctrine is: <em>it depends entirely on
+        how the claim is written</em>.
+      </p>
+
+      <p>
+        The Alice/Mayo two-step framework, as refined by the USPTO's 2019 Revised Guidance
+        and the Federal Circuit's subsequent decisions in <em>Enfish</em>, <em>McRO</em>, and
+        <em>SAP America v. InComm Holdings</em>, requires courts and examiners to ask:
+      </p>
+
+      <h3>Step 1: Is the Claim Directed to an Abstract Idea?</h3>
+      <p>
+        A claim reciting "a method comprising: receiving text input; processing the text input using
+        a neural network; generating an output sequence" is almost certainly directed to a mathematical
+        process under Step 2A, Prong 1 of the USPTO Guidance. The neural network operation is a
+        mathematical transformation. The output is a mathematical object (a token sequence). No
+        particular machine or transformation is integrated into the claim.
+      </p>
+      <p>
+        But consider a claim reciting "a method comprising: receiving a prompt; generating, by a
+        language model fine-tuned using reinforcement learning from human feedback and comprising
+        a reward model trained on pairwise preference labels, a response; wherein the reward model
+        comprises a transformer architecture with [specific configuration], trained on at least
+        [N] human-labeled comparison pairs." This claim still involves mathematical operations, but
+        it integrates specific technical elements that the examiner must evaluate holistically.
+      </p>
+
+      <h3>Step 2A: Practical Application Integration</h3>
+      <p>
+        The practical applications that help LLM claims survive Step 2A include:
+      </p>
+      <ul>
+        <li><strong>Document summarization with quality metrics:</strong> Tying the model output to a downstream evaluation criterion that can be measured and improved.</li>
+        <li><strong>Code generation with compilation verification:</strong> Integrating the model into a specific software development pipeline with a specific technical output.</li>
+        <li><strong>Question answering with retrieval integration:</strong> The RAG architecture ties the abstract language model to a specific database retrieval mechanism (see Section 8).</li>
+        <li><strong>Alignment through RLHF:</strong> The specific training pipeline — with its reward model, PPO loop, and KL constraint — integrates the abstract mathematical process into a particular machine configuration with a demonstrable technical improvement (reduced harmful outputs, measured by specific benchmarks).</li>
+      </ul>
+
+      <h3>Step 2B: "Significantly More"</h3>
+      <p>
+        When a claim is directed to an abstract idea and lacks sufficient practical application
+        integration, it must recite "significantly more" than the abstract idea itself.
+        For LLM claims, candidate "significantly more" elements include:
+      </p>
+      <ul>
+        <li>A specific reward model architecture with defined layers, activation functions, and training objectives.</li>
+        <li>A KL-divergence penalty with a specific clipping parameter (&#x03B5; in PPO-clip).</li>
+        <li>A specific sparse attention pattern (e.g., sliding window + global attention as in Longformer).</li>
+        <li>A specific mixture-of-experts routing algorithm with defined gating function.</li>
+        <li>A specific inference-time speculative decoding procedure using a defined draft model.</li>
+      </ul>
+
+      <!-- FLOWCHART §101 ANALYSIS -->
+      <h3>§101 Flowchart: Analyzing an LLM Claim</h3>
+      <p>Consider this representative claim: <em>"A method for training a language model using human feedback comprising: generating candidate responses; collecting human preference labels; training a reward model; fine-tuning a language model with the reward model as reward signal."</em></p>
+
+      <div class="flowchart">
+        <div class="flow-node">Claim: RLHF Training Method</div>
+        <div class="flow-arrow"></div>
+        <div class="flow-node decision">Step 2A Prong 1: Abstract idea?</div>
+        <div class="flow-arrow"></div>
+        <div class="flow-node warning">YES — mathematical process: training RL policy using reward signal</div>
+        <div class="flow-arrow"></div>
+        <div class="flow-node decision">Step 2A Prong 2: Practical application?</div>
+        <div class="flow-row" style="margin: .5rem 0;">
+          <div style="display:flex; flex-direction:column; align-items:center; gap:.5rem;">
+            <div class="flow-node success" style="min-width:200px; font-size:.85rem;">YES if: specific reward model architecture + measurable output quality improvement</div>
+          </div>
+          <div class="flow-arrow-h" style="margin-top:1.5rem;"></div>
+          <div style="display:flex; flex-direction:column; align-items:center; gap:.5rem;">
+            <div class="flow-node warning" style="min-width:180px; font-size:.85rem;">NO if: generic language model + reward signal without specifics</div>
+          </div>
+        </div>
+        <div class="flow-arrow"></div>
+        <div class="flow-node decision">If no practical application: Step 2B — Significantly more?</div>
+        <div class="flow-row" style="margin: .5rem 0;">
+          <div style="display:flex; flex-direction:column; align-items:center; gap:.5rem;">
+            <div class="flow-node success" style="min-width:180px; font-size:.85rem;">YES → Eligible. Add PPO clipping, KL constraint, specific architecture</div>
+          </div>
+          <div class="flow-arrow-h" style="margin-top:1.5rem;"></div>
+          <div style="display:flex; flex-direction:column; align-items:center; gap:.5rem;">
+            <div class="flow-node" style="min-width:180px; font-size:.85rem; background: var(--danger);">NO → §101 Rejection. Amend claims.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout callout-warning">
+        <div class="callout-icon">&#9888;</div>
+        <div class="callout-body">
+          <div class="callout-title">Art Unit 2100 Series Practice Note</div>
+          <p>USPTO examiners in the 2100 series are issued specific guidance on AI/ML claims under
+          the 2019 Revised Guidance and subsequent Subject Matter Eligibility Examples (particularly
+          Examples 39 and 42). In practice, LLM training method claims receive §101 rejections at a
+          high rate on first office action; the key is having specific, technically detailed claim
+          language ready for amendment, ideally as dependent claims that can be incorporated into
+          the independent claim during prosecution.</p>
+        </div>
+      </div>
+
+      <h3>Recent Examiner Practice Trends</h3>
+      <p>
+        Based on published office actions and interviews with USPTO practitioners, several patterns
+        have emerged in LLM patent prosecution. First, examiners are increasingly willing to allow
+        claims that tie the training procedure to a <em>specific hardware configuration</em> — for
+        example, a claim specifying training on a defined number of GPUs using pipeline parallelism
+        with specific gradient accumulation steps. Second, claims that recite specific numerical
+        thresholds (minimum parameter counts, specific vocabulary sizes, specific training dataset
+        sizes) are receiving more favorable treatment than purely functional claims, though this
+        practice introduces prior art risk if the threshold is already met by existing models.
+        Third, inference-optimization claims — speculative decoding, KV cache quantization,
+        continuous batching — are passing §101 more readily than pure training-method claims,
+        because they more clearly improve the operation of a specific computer system.
+      </p>
+    </section>
+
+    <!-- ═══════════════════════════════════════════
+         SECTION 4 — OPENAI'S PATENT STRATEGY
+    ════════════════════════════════════════════ -->
+    <section id="s4" class="section-anchor">
+      <h2>4. OpenAI's Patent Strategy</h2>
+
+      <p>
+        OpenAI's patent posture is, from a strategic IP perspective, one of the most fascinating
+        case studies in technology company behavior. Founded with a mission to develop AI for the
+        benefit of humanity — and initially structured as a nonprofit — OpenAI spent its first
+        several years publishing research openly and filing virtually no patents. This changed
+        substantially as the company transitioned to a "capped-profit" structure, took on Microsoft's
+        investment, and began building commercial products.
+      </p>
+
+      <div class="callout callout-example">
+        <div class="callout-icon">&#128161;</div>
+        <div class="callout-body">
+          <div class="callout-title">The Strategic Pivot</div>
+          <p>OpenAI's disclosed patent portfolio remained under 40 U.S. patents through early 2024 —
+          extraordinarily small for a company valued at over $80 billion. Google, by comparison, holds
+          tens of thousands of AI-related patents. Microsoft's AI patent portfolio numbers in the
+          thousands. This creates both opportunity (OpenAI's core techniques may be available for use
+          by competitors) and risk (OpenAI cannot assert those techniques offensively or defensively).</p>
+        </div>
+      </div>
+
+      <h3>Categories of OpenAI Patent Filings</h3>
+      <p>As OpenAI's filing rate increased through 2023 and 2024, five categories dominated:</p>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Category</th>
+              <th>Key Technical Focus</th>
+              <th>Patent Eligibility Assessment</th>
+              <th>Strategic Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Training Efficiency</td>
+              <td>Sparse attention patterns, mixture-of-experts routing, gradient checkpointing</td>
+              <td><span class="patent-tag green">Strong</span> — specific architectural choices tied to compute reduction</td>
+              <td>High — controls cost of training future models</td>
+            </tr>
+            <tr>
+              <td>RLHF and Reward Modeling</td>
+              <td>Preference data collection, reward model architecture, PPO hyperparameter schedule</td>
+              <td><span class="patent-tag green">Strong</span> — specific multi-step process with measurable output quality improvement</td>
+              <td>Very High — core alignment technology</td>
+            </tr>
+            <tr>
+              <td>Model Alignment Techniques</td>
+              <td>Constitutional constraints, refusal training, safety classifiers integrated into generation</td>
+              <td><span class="patent-tag">Moderate</span> — practical application evident; some claims may fail on specificity</td>
+              <td>High — regulatory environment will reward demonstrable safety measures</td>
+            </tr>
+            <tr>
+              <td>Inference Optimization</td>
+              <td>Speculative decoding, KV cache quantization, continuous batching, tensor parallelism</td>
+              <td><span class="patent-tag green">Strong</span> — clearly improves computer system operation; strong "significantly more"</td>
+              <td>High — controls cost of serving at scale (billions of daily queries)</td>
+            </tr>
+            <tr>
+              <td>Fine-Tuning Methods</td>
+              <td>Parameter-efficient fine-tuning variants, adapter architectures, instruction tuning datasets</td>
+              <td><span class="patent-tag">Moderate</span> — obvious over LoRA, adapter papers unless significant departure</td>
+              <td>Medium — significant prior art landscape; incremental improvements harder to protect</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="table-caption">Table 1. OpenAI patent filing categories with eligibility and strategic assessments.</p>
+
+      <h3>What a Sophisticated GPT-4-Level Patent Strategy Would Look Like</h3>
+      <p>
+        If OpenAI had filed aggressively from the beginning — as a company like IBM or Qualcomm
+        would have — what would the portfolio look like today? A sophisticated strategy for
+        GPT-4-level technology would include the following elements:
+      </p>
+
+      <h4>Layer 1: Core Architecture Patents</h4>
+      <p>
+        Claims on the specific sparse attention architecture used at scale, the particular
+        mixture-of-experts routing function, the exact positional encoding scheme. These are
+        the foundational patents that create the widest exclusionary scope — but also face
+        the greatest prior art risk from published academic literature.
+      </p>
+
+      <h4>Layer 2: Training Pipeline Patents</h4>
+      <p>
+        The RLHF pipeline (discussed in Section 6), the specific data curation and deduplication
+        procedures, the curriculum learning approach (pre-training data mixture by source category),
+        and the specific optimizer configuration (AdamW with specific decay parameters). These are
+        process patents — harder to design around than architecture patents because they describe
+        the <em>how</em> of training, not just the <em>what</em>.
+      </p>
+
+      <h4>Layer 3: Evaluation and Benchmark Patents</h4>
+      <p>
+        Specific automated evaluation procedures (LLM-as-judge techniques, preference prediction
+        benchmarks) that are tied to the training pipeline and demonstrate measurable quality
+        improvement. These create a defensive moat: competitors must either design around the
+        evaluation method or disclose their own methodology.
+      </p>
+
+      <h4>Layer 4: Application Method Patents</h4>
+      <p>
+        Method claims for using the model in specific, commercially valuable applications:
+        code review, contract analysis, medical diagnosis assistance. These are the most
+        commercially licensable patents, though they face higher §101 risk because they are
+        further abstracted from the specific technical implementation.
+      </p>
+
+      <h4>Layer 5: Inference and Serving Patents</h4>
+      <p>
+        Speculative decoding with specific draft model architectures, KV cache management in
+        multi-tenant serving systems, batching strategies for variable-length inputs. These
+        are among the most valuable patents in the portfolio because they directly control
+        the cost of commercial deployment.
+      </p>
+
+      <div class="callout callout-tip">
+        <div class="callout-icon">&#9998;</div>
+        <div class="callout-body">
+          <div class="callout-title">Prosecution Note: The arXiv Bar Problem</div>
+          <p>OpenAI's culture of open publication — posting papers to arXiv before filing patents —
+          created significant §102 prior art bars for many of its own innovations. Under 35 U.S.C.
+          § 102(b)(1), an inventor's own publication creates a one-year grace period. But many of
+          OpenAI's key papers were published more than one year before any corresponding patent
+          application. The InstructGPT paper appeared on arXiv in January 2022; the one-year grace
+          period expired in January 2023. If OpenAI did not file a patent application on the specific
+          RLHF pipeline before that date, those specific techniques are now in the prior art.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════
+         SECTION 5 — COMPETING PATENT LANDSCAPES
+    ════════════════════════════════════════════ -->
+    <section id="s5" class="section-anchor">
+      <h2>5. Competing Patent Landscapes</h2>
+
+      <p>
+        While OpenAI's patent portfolio remained thin relative to its commercial significance, the
+        broader LLM patent landscape is intensely contested. The following table maps the major
+        patent filers, their strategic focus areas, and representative patent examples as of 2025.
+      </p>
+
+      <div class="table-wrapper">
+        <table class="landscape-table">
+          <thead>
+            <tr>
+              <th>Company / Lab</th>
+              <th>Key LLM Models</th>
+              <th>Est. AI Patents (2024)</th>
+              <th>Primary Patent Focus Areas</th>
+              <th>Representative Patent Categories</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Google / DeepMind</strong></td>
+              <td>PaLM, Gemini, Bard, T5</td>
+              <td style="text-align:center;">15,000+</td>
+              <td>Sparse MoE, efficient transformers, multi-modal alignment, TPU co-design</td>
+              <td>
+                <span class="patent-tag">Sparse MoE routing</span>
+                <span class="patent-tag">Flash attention variants</span>
+                <span class="patent-tag">Gemini multimodal</span>
+                <span class="patent-tag">TPU architecture</span>
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Microsoft / OpenAI</strong></td>
+              <td>Copilot, Azure OpenAI, Phi models</td>
+              <td style="text-align:center;">8,000+</td>
+              <td>Copilot integration, RLHF infrastructure, enterprise AI safety, IDE integration</td>
+              <td>
+                <span class="patent-tag">Copilot code suggestion</span>
+                <span class="patent-tag">RLHF at scale</span>
+                <span class="patent-tag">Prompt caching</span>
+                <span class="patent-tag">Model routing</span>
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Meta AI</strong></td>
+              <td>LLaMA 1/2/3, OPT, FLAN variants</td>
+              <td style="text-align:center;">5,000+</td>
+              <td>Open-weight model architecture, efficient inference, instruction tuning, PEFT methods</td>
+              <td>
+                <span class="patent-tag">LLaMA architecture</span>
+                <span class="patent-tag">Group query attention</span>
+                <span class="patent-tag">RoPE positional encoding</span>
+                <span class="patent-tag">RLHF preference optimization</span>
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Anthropic</strong></td>
+              <td>Claude 1/2/3, Constitutional AI</td>
+              <td style="text-align:center;">~200</td>
+              <td>Constitutional AI, interpretability methods, safety evaluation, RLAIF</td>
+              <td>
+                <span class="patent-tag">Constitutional AI</span>
+                <span class="patent-tag">Activation steering</span>
+                <span class="patent-tag">AI self-critique</span>
+                <span class="patent-tag">Safety classifiers</span>
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Amazon (AWS / Bedrock)</strong></td>
+              <td>Titan, Bedrock, Alexa LLM</td>
+              <td style="text-align:center;">3,000+</td>
+              <td>Inference optimization, RAG infrastructure, model serving, enterprise deployment</td>
+              <td>
+                <span class="patent-tag">Continuous batching</span>
+                <span class="patent-tag">KV cache management</span>
+                <span class="patent-tag">RAG retrieval</span>
+                <span class="patent-tag">Model quantization</span>
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Baidu</strong></td>
+              <td>ERNIE, Wenxin Yiyan</td>
+              <td style="text-align:center;">6,000+</td>
+              <td>Chinese-language LLMs, knowledge graph integration, multilingual alignment</td>
+              <td>
+                <span class="patent-tag">Knowledge-enhanced LM</span>
+                <span class="patent-tag">Chinese tokenization</span>
+                <span class="patent-tag">Entity linking</span>
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Alibaba DAMO</strong></td>
+              <td>Tongyi Qianwen, BELLE</td>
+              <td style="text-align:center;">4,500+</td>
+              <td>E-commerce LLM applications, multimodal retail AI, efficient inference for edge</td>
+              <td>
+                <span class="patent-tag">Retail AI integration</span>
+                <span class="patent-tag">Edge inference</span>
+                <span class="patent-tag">Multimodal product search</span>
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Tencent</strong></td>
+              <td>Hunyuan, WeLM</td>
+              <td style="text-align:center;">3,800+</td>
+              <td>Social media LLM integration, gaming AI, medical LLM applications</td>
+              <td>
+                <span class="patent-tag">Dialogue system patents</span>
+                <span class="patent-tag">Game AI integration</span>
+                <span class="patent-tag">Medical NLP</span>
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Mistral AI</strong></td>
+              <td>Mistral 7B, Mixtral, Mistral Large</td>
+              <td style="text-align:center;">&lt;50</td>
+              <td>Sparse MoE efficiency, sliding window attention, open-weight deployment</td>
+              <td>
+                <span class="patent-tag">Sliding window attention</span>
+                <span class="patent-tag">Mixtral MoE</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="table-caption">
+        Table 2. LLM Patent Landscape by Company. Patent estimates are approximate and based on
+        public USPTO, CNIPA, and EPO filings through early 2025. Includes both granted patents
+        and published applications.
+      </p>
+
+      <h3>Key Observations on the Competitive Landscape</h3>
+
+      <p>
+        <strong>The Google Advantage:</strong> Google's dominance in LLM-related patents is not
+        simply a function of its LLM research output. It reflects a decades-long institutional
+        commitment to patent filing, a large in-house patent team, and the strategic integration
+        of patent filing with publication decisions. When Google published the original Transformer
+        paper in 2017, a patent application (US10452978B2) was filed concurrently. OpenAI has
+        not consistently matched this discipline.
+      </p>
+      <p>
+        <strong>The Chinese Filing Pattern:</strong> Baidu, Alibaba, and Tencent file primarily
+        at CNIPA and secondarily through PCT. Their patent strategies are oriented toward protecting
+        Chinese market share and creating cross-licensing leverage with Western companies. The
+        technical scope of Chinese LLM patents tends to be narrower — Chinese patent examination
+        practice requires specific, implementable disclosure more rigorously — but the volume
+        compensates for scope.
+      </p>
+      <p>
+        <strong>Anthropic's Deliberate Restraint:</strong> Like early OpenAI, Anthropic has filed
+        very few patents relative to its technical output. This may reflect a philosophical
+        alignment between the company's safety mission and a desire not to restrict research
+        access to alignment techniques. It also creates a gap: Constitutional AI and mechanistic
+        interpretability techniques developed by Anthropic are potentially available for unrestricted
+        use by competitors if no patent applications are pending.
+      </p>
+    </section>
+
+    <!-- ═══════════════════════════════════════════
+         SECTION 6 — RLHF PATENT CLAIMS ANALYSIS
+    ════════════════════════════════════════════ -->
+    <section id="s6" class="section-anchor">
+      <h2>6. RLHF Patent Claims Analysis</h2>
+
+      <p>
+        Reinforcement Learning from Human Feedback is the most patent-eligible innovation in the
+        GPT lineage. Unlike autoregressive pre-training (which is essentially a mathematical
+        optimization over a well-understood objective) or in-context learning (which emerged
+        unexpectedly from scale), RLHF is a specific, novel, multi-step procedure with clearly
+        defined technical components and measurable output quality improvements. Below is a
+        complete claim set drafted for a hypothetical RLHF patent application.
+      </p>
+
+      <!-- RLHF CLAIMS -->
+      <div class="claim-box">
+        <div class="claim-header">Representative Patent Claims — RLHF Language Model Training</div>
+
+        <p><span class="claim-number">Claim 1 (Independent Method Claim):</span></p>
+        <p>A computer-implemented method for training a language model to generate responses aligned
+        with human preferences, the method comprising:</p>
+        <div class="claim-indent">
+          <span class="claim-element">generating, by a pre-trained language model, a plurality of candidate responses to each of a plurality of prompts;</span>
+          <span class="claim-element">receiving, via a user interface, human preference labels indicating a preferred response for each of a plurality of pairs of candidate responses from the plurality of candidate responses;</span>
+          <span class="claim-element">training a reward model on the human preference labels, wherein the reward model is a neural network configured to output a scalar reward value representing the predicted human preference for a given prompt-response pair;</span>
+          <span class="claim-element">fine-tuning the pre-trained language model using the reward model as a reward signal in a reinforcement learning procedure, wherein the reinforcement learning procedure applies a proximal policy optimization algorithm to update the language model's parameters so as to maximize the expected scalar reward value output by the reward model; and</span>
+          <span class="claim-element">applying, during the reinforcement learning procedure, a Kullback-Leibler divergence penalty to penalize deviation of the fine-tuned language model from the pre-trained language model by more than a threshold amount, thereby constraining the reinforcement learning procedure.</span>
+        </div>
+
+        <p style="margin-top:1.25rem;"><span class="claim-number">Claim 2 (Dependent — PPO clipping):</span></p>
+        <p>The method of claim 1, wherein the proximal policy optimization algorithm comprises a
+        clipped surrogate objective function configured to limit policy updates to within a ratio
+        range [1-&#x03B5;, 1+&#x03B5;], wherein &#x03B5; is a clipping hyperparameter having a value
+        between 0.1 and 0.3.</p>
+
+        <p style="margin-top:1.25rem;"><span class="claim-number">Claim 3 (Dependent — reward model architecture):</span></p>
+        <p>The method of claim 1, wherein the reward model comprises a transformer-based encoder
+        configured to receive a concatenation of the prompt and the candidate response as input,
+        and a linear projection layer applied to the encoder's final hidden state to produce the
+        scalar reward value; and wherein the reward model is initialized from the pre-trained
+        language model's weights prior to training on the human preference labels.</p>
+
+        <p style="margin-top:1.25rem;"><span class="claim-number">Claim 4 (Dependent — preference label collection):</span></p>
+        <p>The method of claim 1, wherein receiving human preference labels comprises:</p>
+        <div class="claim-indent">
+          <span class="claim-element">presenting each pair of candidate responses to a human annotator together with the corresponding prompt;</span>
+          <span class="claim-element">receiving, from the human annotator, a selection indicating which candidate response is preferred; and</span>
+          <span class="claim-element">storing the selection as a binary preference label associated with the pair of candidate responses and the corresponding prompt.</span>
+        </div>
+
+        <p style="margin-top:1.25rem;"><span class="claim-number">Claim 5 (System Claim):</span></p>
+        <p>A system for training a language model to generate responses aligned with human preferences,
+        the system comprising:</p>
+        <div class="claim-indent">
+          <span class="claim-element">one or more processors;</span>
+          <span class="claim-element">a memory storing instructions that, when executed by the one or more processors, cause the system to perform operations comprising:</span>
+          <span class="claim-element" style="padding-left:4.5rem; text-indent:-1rem;">generating a plurality of candidate responses to each of a plurality of prompts using a pre-trained language model;</span>
+          <span class="claim-element" style="padding-left:4.5rem; text-indent:-1rem;">receiving human preference labels indicating preferred responses among pairs of candidate responses;</span>
+          <span class="claim-element" style="padding-left:4.5rem; text-indent:-1rem;">training a reward model on the human preference labels, the reward model configured to output a scalar reward value for a given prompt-response pair;</span>
+          <span class="claim-element" style="padding-left:4.5rem; text-indent:-1rem;">fine-tuning the pre-trained language model using proximal policy optimization with the scalar reward value as the reward signal; and</span>
+          <span class="claim-element" style="padding-left:4.5rem; text-indent:-1rem;">constraining the fine-tuning using a Kullback-Leibler divergence penalty computed between the fine-tuned language model and the pre-trained language model.</span>
+        </div>
+
+        <p style="margin-top:1.25rem;"><span class="claim-number">Claim 6 (Computer-Readable Medium Claim):</span></p>
+        <p>A non-transitory computer-readable medium storing instructions that, when executed by one
+        or more processors, cause the one or more processors to perform a method for training a
+        language model, the method comprising the operations of claim 1.</p>
+      </div>
+
+      <h3>Claim-by-Claim Analysis</h3>
+
+      <div class="claim-analysis">
+        <strong>Claim 1 — Method.</strong> Eligibility: the integration of a human-in-the-loop preference
+        labeling process with a specific RL training procedure (PPO with KL constraint) is likely
+        sufficient for practical application integration under Step 2A, Prong 2. The claim combines
+        a data collection process, a specific model training method, and a specific constraint mechanism
+        — not merely an abstract mathematical optimization. Novelty: as of the InstructGPT paper (Jan. 2022),
+        this combination was novel. Prior RL fine-tuning work (e.g., Ziegler et al. 2019) lacked
+        the full pipeline. Obviousness risk: if a court finds that the specific combination was obvious
+        over Ziegler et al. combined with PPO literature, the claim may fall under §103.
+      </div>
+
+      <div class="claim-analysis">
+        <strong>Claim 2 — PPO Clipping.</strong> Dependent on Claim 1. The specific &#x03B5; range
+        (0.1–0.3) is numerically grounded in the PPO paper (Schulman et al., 2017) and the InstructGPT
+        implementation. This claim adds a specific technical parameter. Non-obviousness argument:
+        applying PPO with specific clipping to LLM fine-tuning, as opposed to Atari game playing,
+        requires specific insights about policy stability in language generation contexts.
+      </div>
+
+      <div class="claim-analysis">
+        <strong>Claim 3 — Reward Model Architecture.</strong> Initialization of the reward model from
+        the pre-trained LM's weights is a specific, technically justified design choice (it ensures
+        the reward model has relevant language understanding before fine-tuning on preference data).
+        This is patentable as a specific improvement over initializing from random weights.
+      </div>
+
+      <div class="claim-analysis">
+        <strong>Claims 5 and 6 — System and CRM.</strong> Standard practice is to file all three
+        claim forms (method, system, CRM) to ensure coverage across different infringement scenarios.
+        System claims are valuable when the infringer builds and deploys the trained model. CRM claims
+        are valuable when the infringer distributes software implementing the training procedure. Method
+        claims cover the act of training. All three should be filed in every LLM training patent.
+      </div>
+
+      <!-- RLHF LOOP SVG -->
+      <div class="figure">
+        <div class="figure-content" style="width:100%; padding:1.5rem;">
+          <svg class="rlhf-loop-svg" viewBox="0 0 780 360" xmlns="http://www.w3.org/2000/svg" aria-label="RLHF Training Loop Diagram">
+            <defs>
+              <marker id="arr2" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                <polygon points="0 0, 10 3.5, 0 7" fill="#1a2744" />
+              </marker>
+            </defs>
+
+            <!-- Central title -->
+            <text x="390" y="30" text-anchor="middle" font-family="Inter,sans-serif" font-size="13" font-weight="700" fill="#1a2744">RLHF Training Loop — Claimable Components</text>
+
+            <!-- Node: Pre-trained LM -->
+            <rect x="290" y="50" width="200" height="50" rx="8" fill="#1a2744"/>
+            <text x="390" y="70" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" font-weight="600" fill="white">Pre-trained Language Model</text>
+            <text x="390" y="88" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="rgba(255,255,255,.75)">(base GPT — parameters &#x03B8;&#x2080;)</text>
+
+            <!-- Node: Human Labeler -->
+            <rect x="30" y="160" width="170" height="50" rx="8" fill="#b7770d"/>
+            <text x="115" y="180" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" font-weight="600" fill="white">Human Annotators</text>
+            <text x="115" y="196" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="rgba(255,255,255,.85)">pairwise response preference</text>
+
+            <!-- Node: Reward Model -->
+            <rect x="30" y="280" width="170" height="50" rx="8" fill="#922b21"/>
+            <text x="115" y="300" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" font-weight="600" fill="white">Reward Model r&#x03B8;</text>
+            <text x="115" y="316" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="rgba(255,255,255,.85)">scalar reward for (x, y) pairs</text>
+
+            <!-- Node: PPO Optimizer -->
+            <rect x="290" y="240" width="200" height="50" rx="8" fill="#1e8449"/>
+            <text x="390" y="260" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" font-weight="600" fill="white">PPO Optimizer</text>
+            <text x="390" y="276" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="rgba(255,255,255,.85)">clip(r&#x03C0;/r&#x03C0;&#x2080;, 1-&#x03B5;, 1+&#x03B5;) — KL penalty</text>
+
+            <!-- Node: Aligned LM -->
+            <rect x="570" y="160" width="180" height="50" rx="8" fill="#0f5132"/>
+            <text x="660" y="180" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" font-weight="600" fill="white">Aligned LM &#x03C0;&#x03B8;</text>
+            <text x="660" y="196" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="rgba(255,255,255,.75)">final RLHF policy model</text>
+
+            <!-- Node: Generated Responses -->
+            <rect x="570" y="50" width="180" height="50" rx="8" fill="#2d3f6b"/>
+            <text x="660" y="70" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" font-weight="600" fill="white">Candidate Responses</text>
+            <text x="660" y="86" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="rgba(255,255,255,.75)">y₁, y₂ ... yₙ for each prompt x</text>
+
+            <!-- Arrows -->
+            <!-- LM → Responses -->
+            <line x1="490" y1="75" x2="568" y2="75" stroke="#1a2744" stroke-width="1.5" marker-end="url(#arr2)"/>
+            <!-- Responses → Human -->
+            <line x1="660" y1="100" x2="660" y2="145" stroke="#1a2744" stroke-width="1.5"/>
+            <line x1="660" y1="145" x2="210" y2="175" stroke="#1a2744" stroke-width="1.5" marker-end="url(#arr2)"/>
+            <!-- Human → Reward Model -->
+            <line x1="115" y1="210" x2="115" y2="278" stroke="#b7770d" stroke-width="1.5" marker-end="url(#arr2)"/>
+            <!-- Reward Model → PPO -->
+            <line x1="200" y1="305" x2="288" y2="270" stroke="#922b21" stroke-width="1.5" marker-end="url(#arr2)"/>
+            <!-- PPO → Aligned LM -->
+            <line x1="490" y1="265" x2="568" y2="195" stroke="#1e8449" stroke-width="1.5" marker-end="url(#arr2)"/>
+            <!-- Aligned LM → (loop back) -->
+            <line x1="660" y1="160" x2="660" y2="110" stroke="#0f5132" stroke-width="1" stroke-dasharray="4,3"/>
+            <!-- KL constraint annotation -->
+            <rect x="310" y="305" width="160" height="30" rx="5" fill="#fef9e7" stroke="#d4a017" stroke-width="1"/>
+            <text x="390" y="316" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#b7770d" font-weight="600">KL(&#x03C0;&#x03B8; || &#x03C0;&#x2080;) ≤ &#x03B4; — Claim 1 element</text>
+            <text x="390" y="328" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#b7770d">prevents reward hacking / mode collapse</text>
+
+            <!-- Claim reference badges -->
+            <circle cx="490" cy="75" r="10" fill="#c8942a"/>
+            <text x="490" y="79" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="white">C1</text>
+            <circle cx="115" cy="250" r="10" fill="#c8942a"/>
+            <text x="115" y="254" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="white">C3</text>
+            <circle cx="390" cy="255" r="10" fill="#c8942a"/>
+            <text x="390" y="259" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="white">C2</text>
+          </svg>
+        </div>
+        <p class="figure-caption">
+          <strong>Figure 2.</strong> RLHF Training Loop with claim-element labels. Gold badges (C1, C2, C3)
+          mark the components specifically recited in the claim set above. The KL penalty annotation
+          corresponds to Claim 1's constraining step.
+        </p>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════
+         SECTION 7 — PROMPTING PATENT FRONTIER
+    ════════════════════════════════════════════ -->
+    <section id="s7" class="section-anchor">
+      <h2>7. The Prompting Patent Frontier</h2>
+
+      <p>
+        The emergence of chain-of-thought prompting (Wei et al., 2022), tree-of-thoughts (Yao et al.,
+        2023), ReAct (Yao et al., 2022), and self-consistency (Wang et al., 2022) has created a new
+        category of potential patent claims: <span class="key-term">prompt engineering methods</span>.
+        These techniques describe specific ways of structuring natural language input to elicit
+        improved outputs from large language models. Whether they are patentable is one of the
+        most contested doctrinal questions in current AI patent practice.
+      </p>
+
+      <h3>The Core Legal Question</h3>
+      <p>
+        Are prompting techniques "instructions to a computer" (potentially patent-eligible as method
+        claims) or "abstract ideas" (instructions for performing mental steps)? The answer hinges on
+        how the claim is structured. Consider the difference between these two formulations:
+      </p>
+
+      <blockquote>
+        <strong>Formulation A (likely ineligible):</strong> "A method comprising: presenting a question
+        to a language model; providing intermediate reasoning steps as examples before the question;
+        receiving an answer from the language model."
+        <cite>Analysis: This is indistinguishable from a human writing a memo with worked examples.
+        No specific computer structure is recited. The "language model" could be a human. Fails §101.</cite>
+      </blockquote>
+
+      <blockquote>
+        <strong>Formulation B (potentially eligible):</strong> "A computer-implemented method comprising:
+        constructing a prompt for a language model having at least N billion parameters, the prompt
+        comprising a task description, k few-shot examples each including an intermediate reasoning
+        chain comprising at least m reasoning steps, and a query; providing the prompt to the language
+        model via an API call; receiving from the language model a generated text comprising a reasoning
+        chain followed by a final answer; and extracting the final answer by parsing the generated text
+        after a predefined delimiter string."
+        <cite>Analysis: Specific elements — parameter count threshold, defined few-shot structure,
+        API call, parsing operation — tie this to a specific technical implementation. More likely
+        to survive §101, though novelty and obviousness remain significant hurdles.</cite>
+      </blockquote>
+
+      <h3>Patentable vs. Questionable Prompting Claims</h3>
+
+      <div class="comparison-grid">
+        <div class="comparison-item good">
+          <h4>Stronger Eligibility</h4>
+          <ul>
+            <li><strong>Chain-of-thought with automatic verification:</strong> Method for prompting a language model to generate step-by-step solutions, then automatically verifying each step against a formal grammar or symbolic solver before presenting the final answer.</li>
+            <li><strong>Self-consistency with specific aggregation:</strong> Generating multiple chain-of-thought responses via temperature sampling and aggregating the final answers using a specific majority-vote mechanism with defined confidence thresholds.</li>
+            <li><strong>ReAct with tool use:</strong> A prompting and execution protocol in which the model interleaves reasoning and action steps, and action steps invoke specific external APIs with defined input/output schemas.</li>
+            <li><strong>Constitutional AI self-critique:</strong> Multi-turn prompting procedure where the model generates a response, then critiques the response against each item in a defined principle list, then revises the response based on the critiques — tied to a specific revision loop architecture.</li>
+          </ul>
+        </div>
+        <div class="comparison-item bad">
+          <h4>Weaker Eligibility</h4>
+          <ul>
+            <li><strong>Generic chain-of-thought:</strong> "Provide intermediate reasoning steps before giving an answer." This is the abstract idea itself, not a specific implementation.</li>
+            <li><strong>Role-play prompting:</strong> "Instruct the model to respond as if it were [persona]." No specific technical structure; could be performed by a human.</li>
+            <li><strong>Simple few-shot prompting:</strong> Providing examples before a query. Well-known prior art; no novel technical element; purely mathematical/linguistic operation.</li>
+            <li><strong>Temperature adjustment as a "prompting method":</strong> Controlling output diversity through a sampling parameter is not a prompting method — it is a mathematical operation on the output distribution, claimed in a way that does not integrate any specific technical structure.</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>Emerging "Prompt Engineering" Patent Landscape</h3>
+      <p>
+        Patent applications in the prompt engineering space began appearing in earnest in 2023.
+        Microsoft, Google, and several startups have filed claims covering specific prompting
+        protocols for code generation, medical diagnosis, and legal analysis. The most defensible
+        of these claims share a common structure: they tie the prompting technique to (a) a specific
+        model architecture or capability threshold, (b) a specific downstream application with
+        measurable quality improvement, and (c) a specific parsing or post-processing step that
+        integrates the language model into a larger technical system.
+      </p>
+      <p>
+        A pure prompting technique — divorced from any specific model or application — faces long
+        odds on §101 grounds and is also vulnerable to obviousness rejections, since the prior
+        art in prompting techniques (much of it on arXiv) is extensive and grows daily.
+      </p>
+    </section>
+
+    <!-- ═══════════════════════════════════════════
+         SECTION 8 — RAG PATENTS
+    ════════════════════════════════════════════ -->
+    <section id="s8" class="section-anchor">
+      <h2>8. RAG (Retrieval-Augmented Generation) Patents</h2>
+
+      <p>
+        Retrieval-Augmented Generation — combining a language model generator with a learned
+        retrieval mechanism that pulls relevant documents from a large corpus at inference time —
+        was formally introduced by Lewis et al. (Meta AI, 2020) and REALM (Guu et al., Google, 2020).
+        RAG systems have become one of the most commercially important architectures in applied LLM
+        deployment, and they present a substantially stronger patent-eligibility profile than pure
+        language model patents.
+      </p>
+
+      <h3>Why RAG Claims Are More Patent-Eligible</h3>
+      <p>
+        RAG architecture integrates a language model (the abstract mathematical component) with
+        a specific information retrieval system that operates on a defined corpus. This integration
+        provides the practical application that many pure LLM claims lack:
+      </p>
+      <ul>
+        <li>The retriever component — typically a dense retrieval system using approximate nearest-neighbor search over document embeddings — is a specific computational mechanism with well-defined inputs and outputs.</li>
+        <li>The fusion mechanism — how retrieved documents are incorporated into the generator's input (concatenated, cross-attended, or merged via a fusion-in-decoder architecture) — is a specific architectural choice with measurable quality impact.</li>
+        <li>The end-to-end training objective — jointly training the retriever and generator — is a specific optimization procedure not present in prior retrieval or generation systems.</li>
+      </ul>
+
+      <h3>Representative RAG Method Claim</h3>
+
+      <div class="claim-box">
+        <div class="claim-header">Representative Patent Claim — Retrieval-Augmented Generation</div>
+
+        <p><span class="claim-number">Claim 1 (Independent Method Claim):</span></p>
+        <p>A computer-implemented method for generating a text response to an input query using
+        retrieval-augmented generation, the method comprising:</p>
+        <div class="claim-indent">
+          <span class="claim-element">encoding, by a retriever neural network, the input query into a query embedding vector in a shared embedding space;</span>
+          <span class="claim-element">computing, by an approximate nearest-neighbor search algorithm, a ranked list of document segments from a pre-computed document index, the document index comprising embedding vectors of document segments from a corpus, wherein each document segment embedding vector was computed using the retriever neural network;</span>
+          <span class="claim-element">selecting a top-k set of document segments from the ranked list based on the similarity between each document segment embedding vector and the query embedding vector, wherein k is a positive integer;</span>
+          <span class="claim-element">constructing, for each document segment in the top-k set, an augmented input comprising the input query concatenated with the document segment;</span>
+          <span class="claim-element">generating, by a generative language model, a candidate response conditioned on each augmented input; and</span>
+          <span class="claim-element">marginalizing over the top-k document segments to produce a final response, wherein marginalizing comprises combining the probability distributions over candidate responses conditioned on each augmented input using retrieval probability scores output by the retriever neural network for each document segment.</span>
+        </div>
+
+        <p style="margin-top:1.25rem;"><span class="claim-number">Claim 2 (Dependent — joint training):</span></p>
+        <p>The method of claim 1, further comprising jointly training the retriever neural network
+        and the generative language model by: computing a loss function that measures the negative
+        log-likelihood of a target text given the marginalized output; and backpropagating gradients
+        through the generative language model and through the retriever neural network's query encoder,
+        without updating the document index embeddings during training.</p>
+
+        <p style="margin-top:1.25rem;"><span class="claim-number">Claim 3 (Dependent — fusion in decoder):</span></p>
+        <p>The method of claim 1, wherein constructing the augmented input comprises encoding each
+        of the top-k document segments and the input query separately using an encoder, and wherein
+        generating the candidate response comprises applying cross-attention in a decoder across the
+        encoded representations of all top-k document segments simultaneously, thereby fusing the
+        retrieved information in the decoder.</p>
+      </div>
+
+      <div class="claim-analysis">
+        <strong>Eligibility Analysis for RAG Claims.</strong> The RAG method claim integrates abstract
+        language model generation with a specific retrieval mechanism (approximate nearest-neighbor
+        search over a pre-computed embedding index) and a specific fusion mechanism (marginalization
+        over retrieval probability scores). This integration — tying the mathematical language model
+        to a specific database query operation with specific probability-weighted fusion — is a strong
+        practical application under Step 2A, Prong 2. USPTO examiners are increasingly allowing
+        RAG-style claims, particularly when the retrieval mechanism is specified in technical detail.
+      </div>
+
+      <div class="callout callout-warning">
+        <div class="callout-icon">&#9888;</div>
+        <div class="callout-body">
+          <div class="callout-title">Prior Art Caution</div>
+          <p>RAG was not created ex nihilo. The Lewis et al. paper builds on dense passage retrieval
+          (DPR), which builds on bi-encoder retrieval, which traces to information retrieval literature
+          from the 1990s. The REALM paper pre-dates RAG and uses a similar joint training approach.
+          Any RAG patent application must carefully distinguish the specific claimed combination from
+          these prior art references. The novelty lies in the specific marginalization approach,
+          the specific joint training objective, and the specific fusion architecture — not in
+          the general concept of combining retrieval with generation.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════
+         SECTION 9 — OPEN-SOURCE LLM CHALLENGE
+    ════════════════════════════════════════════ -->
+    <section id="s9" class="section-anchor">
+      <h2>9. The Open-Source LLM Challenge</h2>
+
+      <p>
+        Meta's decision to release LLaMA model weights — first under a restrictive research license
+        in February 2023, then with broader commercial permissions in LLaMA 2 (July 2023) and
+        LLaMA 3 (April 2024) — created a new set of IP questions that the patent community is still
+        working through. Mistral AI, Falcon, and a host of other labs followed with open-weight
+        releases. The question this raises for patent strategy is fundamental: <em>can you patent
+        something you have already given away?</em>
+      </p>
+
+      <h3>Can You Patent a Model You've Released Openly?</h3>
+      <p>
+        The answer is yes — with important qualifications. A patent protects the <em>method</em>
+        of making and using an invention, as well as specific apparatus or system claims. Releasing
+        model weights (the trained parameters of a neural network) is not the same as publishing
+        the training procedure. The distinction matters enormously:
+      </p>
+      <ul>
+        <li><strong>Releasing model weights:</strong> Third parties can use, fine-tune, and redistribute the model. They can potentially reverse-engineer the architecture from the weights. But they do not necessarily receive the specific training procedure, the data curation pipeline, the RLHF protocol, or the evaluation methodology — which may all be separately patentable.</li>
+        <li><strong>Publishing the training procedure (e.g., in a paper):</strong> This is what triggers the §102(b)(1) one-year grace period clock. If Meta published a paper describing its LLaMA 2 training procedure in July 2023, it had one year to file a patent application on that procedure before the paper constituted prior art against Meta itself.</li>
+      </ul>
+
+      <h3>Does Releasing Model Weights Constitute a §102 Bar?</h3>
+      <p>
+        The release of model weights may constitute "public disclosure" under 35 U.S.C. § 102(a)(1) —
+        which provides that an invention is not patentable if it was "in public use, on sale, or
+        otherwise available to the public before the effective filing date." The critical question
+        is whether releasing model weights makes the <em>invention</em> available to the public.
+      </p>
+      <p>
+        If the invention claimed is the trained model itself (as in a system claim claiming specific
+        weight values or ranges — an unusual but not unheard-of approach), then releasing the weights
+        would clearly trigger §102(a)(1), absent a timely filing. But if the invention claimed is
+        the <em>method of training the model</em>, the analysis is different: releasing the model
+        does not necessarily disclose the training method, unless the training method is fully
+        deterministic and the weights allow reconstruction of every training step.
+      </p>
+
+      <div class="highlight-box">
+        <h4>The Critical Distinction for Open-Source AI Labs</h4>
+        <p>Open-source AI companies should maintain a clear separation between what they release
+        publicly (model weights, inference code, benchmark results) and what they patent (training
+        procedures, data curation methods, alignment techniques, inference optimizations). Releasing
+        weights does not necessarily preclude patent protection for the training pipeline. But any
+        paper, blog post, or technical report that describes the training procedure with sufficient
+        detail to enable a skilled practitioner to reproduce it will start the §102(b)(1) one-year
+        clock running. Engage patent counsel before any such publication.</p>
+      </div>
+
+      <h3>Patent Strategy for Open-Source LLM Labs</h3>
+      <p>
+        A pragmatic patent strategy for an open-source LLM lab — one that wants to maintain
+        open access to its model weights while protecting its technical innovations — would
+        prioritize: (1) filing patent applications on training procedures, RLHF protocols,
+        and data curation methods simultaneously with or slightly before any public disclosure;
+        (2) using open-weight releases to generate community adoption and goodwill while
+        retaining licensing leverage over commercial deployments of the training pipeline;
+        (3) distinguishing between the model (released freely) and the training infrastructure
+        (separately maintained and patented); and (4) considering defensive publication for
+        innovations where the cost of patent prosecution exceeds the expected licensing value,
+        to establish prior art against potential trolls.
+      </p>
+    </section>
+
+    <!-- ═══════════════════════════════════════════
+         SECTION 10 — EMERGENT CAPABILITIES
+    ════════════════════════════════════════════ -->
+    <section id="s10" class="section-anchor">
+      <h2>10. Emergent Capabilities and the Patent Problem</h2>
+
+      <p>
+        Perhaps the most philosophically interesting patent problem raised by the GPT lineage is the
+        challenge of emergent capabilities. GPT-3's few-shot learning ability was not designed —
+        it was discovered after training. The model was not optimized to perform in-context learning;
+        the capability arose from the combination of model scale, training data diversity, and
+        autoregressive training objective. When a capability emerges from a system rather than
+        being engineered into it, a set of foundational patent requirements become deeply
+        problematic.
+      </p>
+
+      <h3>The Written Description Requirement for Emergent Capabilities</h3>
+      <p>
+        35 U.S.C. § 112(a) requires that the patent specification contain "a written description of
+        the invention." For emergent capabilities, the inventive step is the discovery and demonstration
+        of the capability, not the design of a mechanism to produce it. Can a patent specification
+        adequately describe an invention that the inventor did not design?
+      </p>
+      <p>
+        The Federal Circuit's written description jurisprudence, developed primarily in the biotech
+        context (Ariad v. Eli Lilly, 598 F.3d 1336 (Fed. Cir. 2010)), requires that the specification
+        "reasonably convey[] to those skilled in the art that the inventor had possession of the
+        claimed subject matter as of the filing date." For emergent capabilities, this requires
+        demonstrating: (a) what the capability is; (b) that the applicant's specific system exhibits
+        the capability; and (c) why the system exhibits it (at least to the extent necessary to
+        distinguish from a mere description of the output).
+      </p>
+
+      <h3>Can You Patent a Capability You Didn't Know Would Exist?</h3>
+      <p>
+        The answer is probably yes — if you can describe it adequately after you discover it. The
+        written description requirement does not demand that the inventor understand the mechanism;
+        it demands that the inventor describe the invention. If OpenAI had filed a patent on
+        "a method for performing few-shot in-context learning using a language model pre-trained
+        with an autoregressive objective on at least 100 billion tokens," citing specific examples
+        and benchmark results, the written description requirement would likely be satisfied —
+        even if the inventors did not understand why the capability existed.
+      </p>
+      <p>
+        The harder question is enablement. 35 U.S.C. § 112(a) also requires the specification to
+        enable "any person skilled in the art to make and use the [invention]." If the claim is
+        broad enough to encompass any model capable of few-shot learning, but the only enabling
+        disclosure is a model of at least 175 billion parameters, then narrower or more efficient
+        architectures that happen to exhibit few-shot learning are not enabled — and a broad claim
+        will fail. Post-<em>Amgen v. Sanofi</em> (2023), courts are applying enablement scrutiny
+        with increasing rigor, and LLM claims with broad functional scope face real enablement risk.
+      </p>
+
+      <div class="callout callout-danger">
+        <div class="callout-icon">&#9888;</div>
+        <div class="callout-body">
+          <div class="callout-title">Post-Amgen Warning for Broad LLM Claims</div>
+          <p>The Supreme Court's 2023 decision in <em>Amgen Inc. v. Sanofi</em> reinforced that
+          genus claims covering "the full scope of the invention" must be enabled. In the LLM context,
+          a claim broadly covering "a language model capable of few-shot in-context learning" encompasses
+          an enormous range of possible architectures, training approaches, and parameter configurations.
+          Without specific enabling disclosure across that range — or a principle that explains how
+          to make any model in the claimed genus exhibit few-shot learning — the claim faces serious
+          enablement risk. Draft claims to cover the specific system and its close variants, not
+          the functional result in the abstract.</p>
+        </div>
+      </div>
+
+      <h3>Prophetic Claims and Disclosure Sufficiency</h3>
+      <p>
+        In pharmaceutical patents, prophetic claims describe experiments not yet performed, using
+        present tense to describe expected (rather than actual) results. In AI patent practice, an
+        analogous issue arises when an applicant claims capabilities that the current model version
+        does not fully exhibit but that are expected to emerge at larger scale. This practice is
+        legally risky: if the claimed capability is not demonstrated in the filing, and the
+        specification contains no enabling working example, the claim faces both written description
+        and enablement rejections that may be difficult to overcome without introducing new matter.
+        The better practice is to file on what you have demonstrated — and then file continuation
+        applications as new capabilities are discovered.
+      </p>
+    </section>
+
+    <!-- ═══════════════════════════════════════════
+         SECTION 11 — PRACTICAL PATENT STRATEGY
+    ════════════════════════════════════════════ -->
+    <section id="s11" class="section-anchor">
+      <h2>11. Practical Patent Strategy for LLM Researchers</h2>
+
+      <p>
+        If you have developed a novel LLM training technique, inference optimization, or alignment
+        method, here is a concrete process for evaluating and pursuing patent protection.
+      </p>
+
+      <ol class="process-steps">
+        <li>
+          <div class="step-content">
+            <h4>Identify the Specific Technical Contribution</h4>
+            <p>
+              "I trained a large language model" is not a patentable invention. "I modified the
+              RLHF reward model to include an auxiliary objective that penalizes factually incorrect
+              statements, using a fact-verification module tied to a curated knowledge base, and
+              demonstrated a 23% reduction in hallucination rate on a standardized benchmark" — that
+              is a patentable invention. The specificity of your technical contribution is the
+              foundation of every subsequent step. Ask: what specifically did I do differently, and
+              what specifically was the result?
+            </p>
+          </div>
+        </li>
+        <li>
+          <div class="step-content">
+            <h4>Quantify the Improvement</h4>
+            <p>
+              Patent claims that tie the invention to a measurable improvement are more likely to
+              survive §101 (demonstrating practical application) and §103 (demonstrating non-obvious
+              results). Measure your improvement on multiple dimensions if possible: accuracy, latency,
+              memory footprint, compute cost, human evaluation score. Express improvements in
+              percentage terms over a specific baseline (e.g., "23% improvement over standard RLHF
+              training on the TruthfulQA benchmark"). These numbers belong in the specification and,
+              where appropriate, in the claims.
+            </p>
+          </div>
+        </li>
+        <li>
+          <div class="step-content">
+            <h4>Describe the Specific Mechanism</h4>
+            <p>
+              The specification must describe not just what your invention does, but how it does it
+              with enough detail that a person of ordinary skill can reproduce it. For an LLM training
+              method, this means: model architecture specifications (number of layers, attention heads,
+              hidden dimension, context length), training data description (domain composition, size,
+              preprocessing steps), optimization procedure (optimizer, learning rate schedule, batch
+              size, gradient clipping), and any novel algorithmic components (reward model architecture,
+              PPO hyperparameters, KL coefficient schedule). Do not rely on arXiv references alone —
+              the specification must be self-enabling.
+            </p>
+          </div>
+        </li>
+        <li>
+          <div class="step-content">
+            <h4>File Before Posting to arXiv</h4>
+            <p>
+              This is the single most important practical advice in this entire section. Under 35
+              U.S.C. § 102(b)(1)(A), your own publications trigger a one-year grace period before
+              they become prior art against you — but only in the United States. The European Patent
+              Convention has no inventor grace period at all: your arXiv paper is prior art against
+              your own European application from the moment of publication. File at least a U.S.
+              provisional application — which requires only a written description and costs a small
+              government filing fee — before posting any paper that describes the invention in
+              detail. You then have 12 months to file the full non-provisional application.
+            </p>
+          </div>
+        </li>
+        <li>
+          <div class="step-content">
+            <h4>Claim the Method, the System, the Trained Model, and the CRM</h4>
+            <p>
+              Every LLM training or inference patent should include four claim types: (1) a method
+              claim covering the training or inference procedure itself; (2) a system claim covering
+              the hardware-plus-software configuration used to implement the procedure; (3) a
+              computer-readable medium (CRM) claim covering software for implementing the procedure;
+              and (4) if feasible, a claim covering the trained model itself — either as a "product
+              by process" claim or as a claim to the model characterized by specific architectural
+              features or weight statistics. The fourth claim type is novel and legally contested
+              in AI, but worth attempting.
+            </p>
+          </div>
+        </li>
+        <li>
+          <div class="step-content">
+            <h4>File Internationally — Especially in China and the EU</h4>
+            <p>
+              LLM technology has global commercial relevance. File a PCT application within 12 months
+              of the provisional (or simultaneously with the non-provisional) to preserve the right
+              to pursue national phase entry in China (CNIPA), Europe (EPO), and other key markets
+              within 30 months of your priority date. China deserves special attention: Baidu, Alibaba,
+              and Tencent file aggressively at CNIPA, and having Chinese patents in your portfolio
+              creates cross-licensing leverage in negotiations with Chinese AI companies. The EPO
+              presents a harder path for AI method claims (Article 52(2) EPC excludes "programs for
+              computers" as such), but specific technical implementations of LLM training can qualify
+              under EPO's "technical character" requirement.
+            </p>
+          </div>
+        </li>
+      </ol>
+
+      <div class="callout callout-tip">
+        <div class="callout-icon">&#10003;</div>
+        <div class="callout-body">
+          <div class="callout-title">Practical Tip: The Inventor Disclosure Form</div>
+          <p>Most research institutions and companies require inventors to file an Invention Disclosure
+          Form (IDF) before a patent attorney can evaluate and file on an innovation. Train your
+          research team to fill out IDFs proactively — ideally at the time a paper is submitted for
+          internal review, not when it is accepted. The IDF should capture: (1) the specific novel
+          contribution; (2) the benchmark improvement; (3) the date of first reduction to practice;
+          (4) any publications or presentations; and (5) any known prior art. Attorneys cannot help
+          inventors who don't reach out until after publication.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════
+         SECTION 12 — FUTURE FRONTIERS
+    ════════════════════════════════════════════ -->
+    <section id="s12" class="section-anchor">
+      <h2>12. Future Frontiers</h2>
+
+      <p>
+        The current LLM patent landscape is only the beginning. Several emerging technical directions
+        will create the next generation of AI patent disputes, and sophisticated IP practitioners
+        are already positioning their clients to own these spaces.
+      </p>
+
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-icon">&#128444;</div>
+          <h3>(a) Multimodal Vision-Language Models</h3>
+          <p>GPT-4V, Gemini Ultra, Claude 3, and similar models combine text, image, and increasingly
+          video understanding. The patent questions here involve the specific cross-modal attention
+          architectures, the multimodal training data curation procedures, and the specific alignment
+          techniques for vision-language preference. Early movers are filing aggressively, and the
+          art unit is still developing expertise in evaluating these claims.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">&#129302;</div>
+          <h3>(b) Agent Systems and Tool Use</h3>
+          <p>LLM-based agents — models that call external tools, plan multi-step actions, and operate
+          with extended memory — represent the next commercial frontier. The specific architectures
+          for tool calling (function schemas, structured outputs, API integration), memory management
+          (episodic, semantic, working), and multi-agent coordination are all patentable at the
+          implementation level. AutoGPT, LangChain, and similar systems have already generated
+          patent applications.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">&#129309;</div>
+          <h3>(c) Model Merging Techniques</h3>
+          <p>Spherical linear interpolation (SLERP), model arithmetic, and task-vector-based model
+          merging — techniques for combining the capabilities of separately fine-tuned models without
+          retraining — are a rapidly evolving area with clear patent opportunities. The specific
+          merging algorithms, the coefficient optimization procedures, and the specific applications
+          (multi-task model construction, privacy-preserving federated learning) are all actively
+          being claimed.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">&#129504;</div>
+          <h3>(d) Inference-Time Compute Scaling</h3>
+          <p>OpenAI's o1 and o3 models, and the broader inference-time scaling paradigm, represent
+          a fundamental architectural shift: rather than scaling training compute, scale inference
+          compute by allowing the model to generate extended internal reasoning before producing
+          an output. The specific procedures for generating, evaluating, and selecting among internal
+          reasoning chains — whether via best-of-N sampling, Monte Carlo tree search, or learned
+          process reward models — are the core patent opportunities of 2025 and beyond.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">&#128187;</div>
+          <h3>(e) AI Hardware Co-Design</h3>
+          <p>The co-design of LLM architectures with specific hardware (custom attention hardware
+          units, near-memory compute for KV cache, photonic matrix multiplication) creates patent
+          opportunities that span software, firmware, and semiconductor design. These hardware-software
+          co-design patents are among the strongest in the portfolio — they are specific, tied to
+          physical apparatus, and extremely difficult to design around without replicating the
+          specific hardware configuration.</p>
+        </div>
+      </div>
+
+      <div class="callout callout-info">
+        <div class="callout-icon">&#128302;</div>
+        <div class="callout-body">
+          <div class="callout-title">Watch: Process Reward Models</div>
+          <p>One of the most significant emerging patent battlegrounds is the <strong>process reward
+          model (PRM)</strong> — a reward model trained to evaluate not just the final output of a
+          language model, but each intermediate reasoning step. PRMs enable the inference-time compute
+          scaling paradigm underlying o1/o3 and are essential for formal mathematical reasoning.
+          The specific training procedures for PRMs (including the human annotation protocols for
+          step-level reward labels), the specific architectural choices (step-aggregation mechanisms,
+          tree structure encoding), and the specific inference-time search algorithms (beam search
+          guided by PRM scores) are all actively being filed. This is the hottest AI patent
+          area of 2025.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════
+         SECTION 13 — KEY TAKEAWAYS
+    ════════════════════════════════════════════ -->
+    <section id="s13" class="section-anchor">
+      <h2>13. Key Takeaways</h2>
+
+      <p>
+        The LLM patent landscape is young, contested, and rapidly evolving. These fifteen lessons
+        distill the core doctrinal and strategic insights from this case study.
+      </p>
+
+      <ul class="checklist">
+        <li>Autoregressive pre-training is largely unpatentable as a general concept — it is a mathematical optimization over a well-known objective. The patentable innovations lie in specific implementation details: architecture choices, data curation, optimization schedules.</li>
+        <li>RLHF is the most patent-eligible innovation in the GPT lineage — it is a specific, multi-step procedure with concrete technical components (reward model, PPO, KL constraint) and demonstrable quality improvements.</li>
+        <li>The §101 analysis for LLM claims turns on claim drafting specificity. Generic "train a model with human feedback" claims fail. Specific "train a reward model on pairwise preference labels, then apply PPO with clipping parameter ε ∈ [0.1, 0.3] and KL penalty" claims are substantially more defensible.</li>
+        <li>OpenAI's thin patent portfolio is a strategic liability that competitors have exploited by replicating RLHF and related techniques without licensing concerns — a cautionary tale for any AI company that prioritizes open publication over IP protection.</li>
+        <li>Google's massive AI patent portfolio represents a key defensive and offensive asset that will shape LLM licensing negotiations for years. The Google-Microsoft-OpenAI relationship creates unusual cross-licensing dynamics.</li>
+        <li>Chinese AI companies (Baidu, Alibaba, Tencent) are filing aggressively at CNIPA and building portfolios that create cross-licensing leverage in international negotiations. Ignoring this dimension of the LLM patent landscape is a strategic error.</li>
+        <li>Releasing model weights does not preclude patent protection for the training procedure. Open-source AI companies should maintain a clear separation between what they publish and what they patent.</li>
+        <li>The one-year grace period under § 102(b)(1)(A) applies only in the United States. For European and international protection, patent applications must be filed before any public disclosure.</li>
+        <li>Emergent capabilities like few-shot learning can be patented — but claims must be supported by specific enabling disclosure demonstrating the capability in a specific system, not just a functional description of what the capability does.</li>
+        <li>Post-Amgen v. Sanofi (2023), broad functional claims covering "any LLM capable of [emergent capability]" face serious enablement risk. Claims should be scoped to the specific systems and close variants the inventor can actually enable.</li>
+        <li>Prompting techniques are patentable only when tied to a specific model architecture, a specific downstream application with measurable improvement, and a specific technical implementation. Generic prompting methods fail §101.</li>
+        <li>RAG systems present stronger patent eligibility than pure language model systems because the integration of a specific retrieval mechanism with a specific generation model provides clear practical application integration under Step 2A, Prong 2.</li>
+        <li>Inference optimization patents (speculative decoding, KV cache management, continuous batching) are among the most commercially valuable in the LLM space because they directly control the cost of serving at scale.</li>
+        <li>Process reward models and inference-time compute scaling (o1/o3 paradigm) are the hottest patent areas of 2025 — file now, before the field consolidates around specific techniques.</li>
+        <li>Every LLM training patent should include all four claim types: method, system, CRM, and (where feasible) a claim to the trained model itself. File before arXiv. File internationally. Engage patent counsel at the time of the invention disclosure, not at the time of the paper submission.</li>
+      </ul>
+
+      <div class="highlight-box">
+        <h4>A Final Note on AI Patent Policy</h4>
+        <p>
+          The LLM patent landscape raises questions that go beyond individual company strategy.
+          If the most powerful AI systems of our era are patented broadly, the patent holder gains
+          leverage over the entire downstream AI ecosystem — over the companies building products
+          on these systems, over the researchers studying them, over the governments deploying them.
+          This is a genuinely novel concentration of private power, facilitated by a patent system
+          designed for a different era of invention.
+        </p>
+        <p>
+          The patent system has managed analogous concerns before — in the early semiconductor era,
+          in the PCR patent wars, in the foundational software patent disputes of the 1990s. In each
+          case, the resolution involved some combination of compulsory licensing, patent pools,
+          open-source countermeasures, and regulatory intervention. It would be surprising if the
+          LLM patent landscape did not produce analogous institutional responses over the next decade.
+          The patent attorney's job, in the meantime, is to serve the client's interests within the
+          existing system — while keeping one eye on the policy horizon.
+        </p>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════
+         CHAPTER NAV FOOTER
+    ════════════════════════════════════════════ -->
+    <nav class="chapter-nav">
+      <a href="ex03_crispr.html" class="chapter-nav-btn">
+        <span class="nav-label">&#8592; Previous Case Study</span>
+        <span class="nav-title">Case Study 3: CRISPR</span>
+      </a>
+      <a href="ex05_alphafold.html" class="chapter-nav-btn nav-next">
+        <span class="nav-label">Next Case Study &#8594;</span>
+        <span class="nav-title">Case Study 5: AlphaFold</span>
+      </a>
+    </nav>
+
+  </main>
+</div><!-- /page-layout -->
+
+<!-- ══════════════════════════════════════════════════
+     FOOTER
+══════════════════════════════════════════════════ -->
+<footer>
+  <div class="footer-content">
+    <p style="font-size:1rem; font-weight:600; color:white; margin-bottom:.625rem;">
+      Patent Law for Technologists: A Practical Guide for AI, ML, and Biotech Innovators
+    </p>
+    <p>Case Study 4: GPT and Large Language Models &bull; Prof. Ryan Calo, University of Washington School of Law</p>
+    <p>First Edition &bull; &copy; 2025 Fish &amp; Richardson P.C. &bull; Stanford Law School &bull; All rights reserved.</p>
+    <p style="margin-top:1.25rem;">
+      <a href="ex01_transformer.html">Transformer Case Study</a> &nbsp;&bull;&nbsp;
+      <a href="ex02_lora.html">LoRA Case Study</a> &nbsp;&bull;&nbsp;
+      <a href="ex03_crispr.html">CRISPR Case Study</a> &nbsp;&bull;&nbsp;
+      <a href="ex04_gpt.html">GPT Case Study</a> &nbsp;&bull;&nbsp;
+      <a href="ex05_alphafold.html">AlphaFold Case Study</a>
+    </p>
+    <p style="margin-top:1rem; font-size:.775rem; color:rgba(255,255,255,.4);">
+      This guide is for educational purposes only and does not constitute legal advice. Consult
+      qualified patent counsel before making filing, prosecution, or enforcement decisions.
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>

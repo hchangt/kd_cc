@@ -1,0 +1,1623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chapter 8: Modules, Package Management &amp; Monorepos — TypeScript for the AI Era</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/json.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/yaml.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --indigo: #4F46E5;
+      --indigo-light: #6366F1;
+      --indigo-dark: #3730A3;
+      --indigo-bg: #EEF2FF;
+      --gray-50: #F9FAFB;
+      --gray-100: #F3F4F6;
+      --gray-200: #E5E7EB;
+      --gray-300: #D1D5DB;
+      --gray-400: #9CA3AF;
+      --gray-500: #6B7280;
+      --gray-600: #4B5563;
+      --gray-700: #374151;
+      --gray-800: #1F2937;
+      --gray-900: #111827;
+      --green-50: #F0FDF4;
+      --green-200: #BBF7D0;
+      --green-700: #15803D;
+      --green-800: #166534;
+      --blue-50: #EFF6FF;
+      --blue-200: #BFDBFE;
+      --blue-700: #1D4ED8;
+      --blue-800: #1E40AF;
+      --amber-50: #FFFBEB;
+      --amber-200: #FDE68A;
+      --amber-700: #B45309;
+      --amber-800: #92400E;
+      --purple-50: #FAF5FF;
+      --purple-200: #E9D5FF;
+      --purple-700: #7E22CE;
+      --purple-800: #6B21A8;
+      --pink-50: #FDF2F8;
+      --pink-200: #FBCFE8;
+      --pink-700: #BE185D;
+      --pink-800: #9D174D;
+      --nav-h: 52px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: var(--gray-800);
+      background: #fff;
+      font-size: 16px;
+      line-height: 1.7;
+    }
+
+    /* ── Top Nav ── */
+    .top-nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: var(--nav-h);
+      background: #fff;
+      border-bottom: 1px solid var(--gray-200);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      z-index: 100;
+      box-shadow: 0 1px 3px rgba(0,0,0,.06);
+    }
+    .top-nav .book-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--gray-500);
+      letter-spacing: .02em;
+    }
+    .top-nav .nav-links {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+    .top-nav a {
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--indigo);
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--indigo-bg);
+      background: var(--indigo-bg);
+      transition: background .15s, border-color .15s;
+    }
+    .top-nav a:hover {
+      background: #E0E7FF;
+      border-color: #C7D2FE;
+    }
+    .progress-badge {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--gray-500);
+      background: var(--gray-100);
+      border: 1px solid var(--gray-200);
+      border-radius: 12px;
+      padding: 3px 10px;
+    }
+
+    /* ── Layout ── */
+    .layout {
+      display: flex;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding-top: var(--nav-h);
+    }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      width: 240px;
+      flex-shrink: 0;
+      position: sticky;
+      top: var(--nav-h);
+      height: calc(100vh - var(--nav-h));
+      overflow-y: auto;
+      padding: 28px 16px 40px 0;
+      border-right: 1px solid var(--gray-200);
+    }
+    .sidebar-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--gray-400);
+      margin-bottom: 10px;
+      padding-left: 12px;
+    }
+    .toc-list {
+      list-style: none;
+    }
+    .toc-list li a {
+      display: block;
+      font-size: 13px;
+      color: var(--gray-600);
+      text-decoration: none;
+      padding: 5px 12px;
+      border-radius: 6px;
+      transition: background .12s, color .12s;
+      line-height: 1.4;
+    }
+    .toc-list li a:hover {
+      background: var(--indigo-bg);
+      color: var(--indigo);
+    }
+    .toc-list li a.active {
+      background: var(--indigo-bg);
+      color: var(--indigo);
+      font-weight: 600;
+    }
+    .toc-list .toc-sub {
+      padding-left: 12px;
+    }
+    .toc-list .toc-sub a {
+      font-size: 12px;
+      color: var(--gray-500);
+      padding: 3px 12px;
+    }
+
+    /* ── Main Content ── */
+    .main {
+      flex: 1;
+      min-width: 0;
+      padding: 40px 48px 80px 48px;
+    }
+
+    .chapter-eyebrow {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--indigo);
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    h1.chapter-title {
+      font-size: 2.25rem;
+      font-weight: 800;
+      color: var(--gray-900);
+      line-height: 1.2;
+      margin-bottom: 8px;
+    }
+    .author-line {
+      font-size: 14px;
+      color: var(--gray-500);
+      margin-bottom: 32px;
+    }
+    .author-line strong { color: var(--gray-700); }
+    .chapter-intro {
+      font-size: 1.05rem;
+      color: var(--gray-700);
+      border-left: 3px solid var(--indigo);
+      padding: 16px 20px;
+      background: var(--indigo-bg);
+      border-radius: 0 8px 8px 0;
+      margin-bottom: 48px;
+      line-height: 1.7;
+    }
+
+    h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--gray-900);
+      margin: 52px 0 16px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--gray-200);
+      scroll-margin-top: calc(var(--nav-h) + 16px);
+    }
+    h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--gray-800);
+      margin: 32px 0 12px;
+      scroll-margin-top: calc(var(--nav-h) + 16px);
+    }
+    h4 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--gray-700);
+      margin: 24px 0 8px;
+    }
+    p { margin-bottom: 16px; }
+    ul, ol {
+      margin: 12px 0 16px 24px;
+    }
+    li { margin-bottom: 6px; }
+
+    a { color: var(--indigo); }
+
+    /* ── Code ── */
+    code {
+      font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+      font-size: 0.85em;
+      background: var(--gray-100);
+      border: 1px solid var(--gray-200);
+      border-radius: 4px;
+      padding: 1px 5px;
+    }
+    pre {
+      margin: 20px 0;
+      border-radius: 10px;
+      overflow-x: auto;
+      border: 1px solid var(--gray-200);
+      box-shadow: 0 1px 4px rgba(0,0,0,.06);
+    }
+    pre code {
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+      font-size: 0.82rem;
+      background: none;
+      border: none;
+      padding: 0;
+      border-radius: 0;
+    }
+    .hljs { background: var(--gray-50); padding: 20px 22px; }
+
+    .code-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--gray-500);
+      background: var(--gray-100);
+      border: 1px solid var(--gray-200);
+      border-bottom: none;
+      padding: 5px 14px;
+      border-radius: 8px 8px 0 0;
+      display: inline-block;
+      margin-bottom: -1px;
+    }
+
+    /* ── Callout Boxes ── */
+    .callout {
+      border-radius: 10px;
+      padding: 18px 20px;
+      margin: 24px 0;
+      border-left: 4px solid;
+    }
+    .callout .callout-title {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .callout p:last-child { margin-bottom: 0; }
+    .callout ul:last-child, .callout ol:last-child { margin-bottom: 0; }
+
+    .callout-tip    { background: var(--green-50);  border-color: var(--green-700);  }
+    .callout-tip    .callout-title { color: var(--green-800); }
+    .callout-info   { background: var(--blue-50);   border-color: var(--blue-700);   }
+    .callout-info   .callout-title { color: var(--blue-800); }
+    .callout-warning{ background: var(--amber-50);  border-color: var(--amber-700);  }
+    .callout-warning .callout-title { color: var(--amber-800); }
+    .callout-python { background: var(--purple-50); border-color: var(--purple-700); }
+    .callout-python .callout-title { color: var(--purple-800); }
+    .callout-ai     { background: var(--pink-50);   border-color: var(--pink-700);   }
+    .callout-ai     .callout-title { color: var(--pink-800); }
+    .callout-history{ background: var(--gray-50);   border-color: var(--gray-500);   }
+    .callout-history .callout-title { color: var(--gray-600); }
+
+    /* ── Tables ── */
+    .table-wrap { overflow-x: auto; margin: 24px 0; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+    thead th {
+      background: var(--indigo);
+      color: #fff;
+      font-weight: 600;
+      text-align: left;
+      padding: 10px 14px;
+      font-size: 13px;
+    }
+    thead th:first-child { border-radius: 8px 0 0 0; }
+    thead th:last-child { border-radius: 0 8px 0 0; }
+    tbody tr { border-bottom: 1px solid var(--gray-200); }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:nth-child(even) { background: var(--gray-50); }
+    tbody td { padding: 9px 14px; vertical-align: top; line-height: 1.5; }
+    tbody td code { font-size: 0.8em; }
+
+    /* ── Timeline SVG ── */
+    .timeline-wrap {
+      margin: 32px 0;
+      overflow-x: auto;
+    }
+    .timeline-svg {
+      min-width: 700px;
+      width: 100%;
+      display: block;
+    }
+
+    /* ── Monorepo Diagram ── */
+    .monorepo-diagram {
+      background: var(--gray-50);
+      border: 1px solid var(--gray-200);
+      border-radius: 10px;
+      padding: 24px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+      line-height: 1.6;
+      color: var(--gray-800);
+      overflow-x: auto;
+      margin: 24px 0;
+    }
+    .monorepo-diagram .dir  { color: var(--indigo); font-weight: 600; }
+    .monorepo-diagram .file { color: var(--gray-600); }
+    .monorepo-diagram .comment { color: var(--gray-400); }
+
+    /* ── Section Divider ── */
+    .section-divider {
+      border: none;
+      border-top: 2px solid var(--gray-200);
+      margin: 60px 0;
+    }
+
+    /* ── Footer ── */
+    .chapter-footer {
+      margin-top: 80px;
+      border-top: 2px solid var(--gray-200);
+      padding-top: 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+    .footer-nav-btn {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      text-decoration: none;
+      border: 1px solid var(--gray-200);
+      border-radius: 10px;
+      padding: 14px 20px;
+      transition: border-color .15s, box-shadow .15s;
+      min-width: 180px;
+    }
+    .footer-nav-btn:hover {
+      border-color: var(--indigo);
+      box-shadow: 0 0 0 3px var(--indigo-bg);
+    }
+    .footer-nav-btn .nav-dir {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--gray-400);
+    }
+    .footer-nav-btn .nav-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--indigo);
+    }
+    .footer-nav-btn.next { text-align: right; }
+
+    /* ── Highlight ── */
+    .highlight-text { background: #FEF3C7; border-radius: 3px; padding: 1px 3px; }
+
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .main { padding: 24px 20px 60px; }
+      h1.chapter-title { font-size: 1.75rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Top Navigation -->
+<nav class="top-nav">
+  <span class="book-title">TypeScript for the AI Era</span>
+  <div class="nav-links">
+    <a href="chapter-07-type-level.html">← Ch 7 Type-Level</a>
+    <span class="progress-badge">Chapter 8 of 24</span>
+    <a href="chapter-09-build-tools.html">Ch 9 Build Tools →</a>
+  </div>
+</nav>
+
+<!-- Layout -->
+<div class="layout">
+
+  <!-- Sidebar TOC -->
+  <aside class="sidebar">
+    <p class="sidebar-title">On This Page</p>
+    <ul class="toc-list">
+      <li><a href="#history">1. JavaScript Module History</a></li>
+      <li class="toc-sub"><a href="#history-chaos">The Chaos</a></li>
+      <li class="toc-sub"><a href="#history-esm">ES Modules Arrive</a></li>
+      <li><a href="#esm-typescript">2. ES Modules in TypeScript</a></li>
+      <li class="toc-sub"><a href="#esm-syntax">Import / Export Syntax</a></li>
+      <li class="toc-sub"><a href="#esm-dynamic">Dynamic Imports</a></li>
+      <li class="toc-sub"><a href="#esm-type-imports">import type</a></li>
+      <li><a href="#tsconfig">3. TypeScript Module Config</a></li>
+      <li class="toc-sub"><a href="#tsconfig-module">module Setting</a></li>
+      <li class="toc-sub"><a href="#tsconfig-resolution">moduleResolution</a></li>
+      <li class="toc-sub"><a href="#tsconfig-paths">Path Aliases</a></li>
+      <li><a href="#third-party">4. Third-Party Types</a></li>
+      <li class="toc-sub"><a href="#third-party-types">@types/ Packages</a></li>
+      <li class="toc-sub"><a href="#third-party-augment">Module Augmentation</a></li>
+      <li><a href="#npm">5. npm Package Ecosystem</a></li>
+      <li class="toc-sub"><a href="#npm-anatomy">package.json Anatomy</a></li>
+      <li class="toc-sub"><a href="#npm-semver">Semver &amp; Types</a></li>
+      <li><a href="#monorepos">6. Monorepos</a></li>
+      <li class="toc-sub"><a href="#monorepos-tools">Tools</a></li>
+      <li class="toc-sub"><a href="#monorepos-tsconfig">Shared tsconfig</a></li>
+      <li class="toc-sub"><a href="#monorepos-refs">Project References</a></li>
+      <li><a href="#publishing">7. Publishing Packages</a></li>
+      <li class="toc-sub"><a href="#publishing-tsup">tsup</a></li>
+      <li class="toc-sub"><a href="#publishing-exports">exports Field</a></li>
+      <li><a href="#python">8. Python → npm Mental Model</a></li>
+    </ul>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main">
+
+    <p class="chapter-eyebrow">Chapter 8</p>
+    <h1 class="chapter-title">Modules, Package Management &amp; Monorepos</h1>
+    <p class="author-line">By <strong>Orta Therox</strong>, TypeScript Team @ Microsoft</p>
+
+    <div class="chapter-intro">
+      JavaScript's module story is a slow-motion train wreck that eventually became one of the great success stories of the web platform. To work effectively with TypeScript — especially in 2024 and beyond — you need to understand why that history exists, how TypeScript maps onto it, and how modern teams structure large codebases using monorepos and careful package boundaries. This chapter covers all of it, from the ancient days of global scripts to shipping a dual CJS+ESM TypeScript package to npm.
+    </div>
+
+    <!-- ================================================================ -->
+    <h2 id="history">1. JavaScript Module History</h2>
+
+    <h3 id="history-chaos">The Chaos: From Nothing to Everything</h3>
+
+    <p>For most of JavaScript's early life, there were no modules. Scripts were concatenated by hand, loaded via multiple <code>&lt;script&gt;</code> tags, and shared state through global variables. The <code>window</code> object was the universal module registry, and name collisions were a fact of life.</p>
+
+    <p>As applications grew, the community improvised. Several competing standards emerged in the late 2000s and early 2010s:</p>
+
+    <div class="callout callout-history">
+      <div class="callout-title">Historical Note — The Module Format Wars</div>
+      <ul>
+        <li><strong>AMD (Asynchronous Module Definition)</strong> — RequireJS popularized this around 2010. Designed for browsers, it supported async loading. Verbose and largely abandoned today.</li>
+        <li><strong>CommonJS (CJS)</strong> — Node.js adopted this in 2009. Synchronous <code>require()</code> calls, <code>module.exports</code> assignments. Still dominant in the Node.js ecosystem in 2024.</li>
+        <li><strong>UMD (Universal Module Definition)</strong> — An unholy union of AMD and CJS with an IIFE wrapper. Intended to work everywhere, readable by no one.</li>
+        <li><strong>SystemJS / ES Module Shims</strong> — Polyfill layers that appeared as ES Modules were being standardized.</li>
+      </ul>
+    </div>
+
+    <div class="timeline-wrap">
+      <svg class="timeline-svg" viewBox="0 0 800 200" xmlns="http://www.w3.org/2000/svg" font-family="system-ui,sans-serif" font-size="12">
+        <!-- Baseline -->
+        <line x1="40" y1="110" x2="770" y2="110" stroke="#D1D5DB" stroke-width="2"/>
+        <!-- Arrow -->
+        <polygon points="770,106 780,110 770,114" fill="#D1D5DB"/>
+
+        <!-- 2009 Node/CJS -->
+        <circle cx="100" cy="110" r="7" fill="#4F46E5"/>
+        <line x1="100" y1="103" x2="100" y2="60" stroke="#4F46E5" stroke-width="1.5" stroke-dasharray="3,2"/>
+        <rect x="50" y="30" width="100" height="28" rx="5" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1"/>
+        <text x="100" y="48" text-anchor="middle" fill="#3730A3" font-weight="600">Node.js CJS</text>
+        <text x="100" y="130" text-anchor="middle" fill="#6B7280">2009</text>
+
+        <!-- 2011 AMD -->
+        <circle cx="220" cy="110" r="7" fill="#6366F1"/>
+        <line x1="220" y1="117" x2="220" y2="160" stroke="#6366F1" stroke-width="1.5" stroke-dasharray="3,2"/>
+        <rect x="168" y="160" width="104" height="28" rx="5" fill="#F3F4F6" stroke="#6366F1" stroke-width="1"/>
+        <text x="220" y="178" text-anchor="middle" fill="#4B5563" font-weight="600">AMD / RequireJS</text>
+        <text x="220" y="130" text-anchor="middle" fill="#6B7280">2011</text>
+
+        <!-- 2013 UMD -->
+        <circle cx="330" cy="110" r="7" fill="#9CA3AF"/>
+        <line x1="330" y1="103" x2="330" y2="60" stroke="#9CA3AF" stroke-width="1.5" stroke-dasharray="3,2"/>
+        <rect x="283" y="30" width="94" height="28" rx="5" fill="#F9FAFB" stroke="#9CA3AF" stroke-width="1"/>
+        <text x="330" y="48" text-anchor="middle" fill="#4B5563" font-weight="600">UMD Pattern</text>
+        <text x="330" y="130" text-anchor="middle" fill="#6B7280">2013</text>
+
+        <!-- 2015 ES Modules spec -->
+        <circle cx="460" cy="110" r="9" fill="#059669"/>
+        <line x1="460" y1="101" x2="460" y2="60" stroke="#059669" stroke-width="1.5" stroke-dasharray="3,2"/>
+        <rect x="395" y="30" width="130" height="28" rx="5" fill="#F0FDF4" stroke="#059669" stroke-width="1"/>
+        <text x="460" y="48" text-anchor="middle" fill="#166534" font-weight="600">ES Modules (ES2015)</text>
+        <text x="460" y="130" text-anchor="middle" fill="#6B7280">2015</text>
+
+        <!-- 2020 Node ESM -->
+        <circle cx="590" cy="110" r="8" fill="#4F46E5"/>
+        <line x1="590" y1="117" x2="590" y2="160" stroke="#4F46E5" stroke-width="1.5" stroke-dasharray="3,2"/>
+        <rect x="532" y="160" width="116" height="28" rx="5" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1"/>
+        <text x="590" y="178" text-anchor="middle" fill="#3730A3" font-weight="600">Node ESM stable</text>
+        <text x="590" y="130" text-anchor="middle" fill="#6B7280">2020</text>
+
+        <!-- 2024 -->
+        <circle cx="720" cy="110" r="8" fill="#EC4899"/>
+        <line x1="720" y1="103" x2="720" y2="60" stroke="#EC4899" stroke-width="1.5" stroke-dasharray="3,2"/>
+        <rect x="664" y="30" width="110" height="28" rx="5" fill="#FDF2F8" stroke="#EC4899" stroke-width="1"/>
+        <text x="719" y="48" text-anchor="middle" fill="#9D174D" font-weight="600">ESM everywhere</text>
+        <text x="720" y="130" text-anchor="middle" fill="#6B7280">2024+</text>
+      </svg>
+    </div>
+
+    <h3 id="history-esm">ES Modules: The Standard That Won</h3>
+
+    <p>ES Modules (ESM) were standardized in ES2015 (ES6). They introduced static <code>import</code> and <code>export</code> syntax that compilers and bundlers could analyze at build time. Browsers shipped native ESM support starting around 2017–2018. Node.js finalized stable ESM support in v12 (2020).</p>
+
+    <p>The trouble: Node's entire ecosystem was built on CommonJS. Hundreds of thousands of packages used <code>require()</code> and <code>module.exports</code>. ESM and CJS are <strong>not natively interoperable</strong> — CJS can require ESM (with caveats), but ESM cannot statically import CJS in all situations. This created the "great schism" that the Node.js community is still navigating.</p>
+
+    <div class="callout callout-warning">
+      <div class="callout-title">Warning — The CJS/ESM Interop Problem</div>
+      <p>An ESM file (<code>.mjs</code> or <code>.js</code> with <code>"type":"module"</code> in package.json) cannot synchronously <code>require()</code> a CJS module — but it can <code>import</code> one. A CJS file cannot <code>require()</code> an ESM-only package at all. It must use dynamic <code>import()</code>.</p>
+      <p>This asymmetry is why many popular packages still ship dual CJS+ESM builds. Tools like Vite, esbuild, and tsup make producing dual builds easy, but the underlying tension won't fully resolve until the CJS-only ecosystem finishes migrating.</p>
+    </div>
+
+    <div class="callout callout-ai">
+      <div class="callout-title">AI Era Note</div>
+      <p>Modern AI coding assistants are well-trained on ESM patterns. However, they frequently generate incorrect interop code when mixing CJS and ESM — for example, defaulting to <code>require()</code> inside an ESM project. Always check the <code>"type"</code> field in your package.json and the <code>module</code> setting in your tsconfig before accepting AI-generated import statements.</p>
+    </div>
+
+    <!-- ================================================================ -->
+    <h2 id="esm-typescript">2. ES Modules in TypeScript</h2>
+
+    <h3 id="esm-syntax">Import and Export Syntax</h3>
+
+    <p>TypeScript uses ES Module syntax natively. The compiler then transpiles it to whatever output format you configure.</p>
+
+    <div class="code-label">Named exports (preferred)</div>
+    <pre><code class="language-typescript">// math.ts — named exports
+export function add(a: number, b: number): number {
+  return a + b;
+}
+
+export function subtract(a: number, b: number): number {
+  return a - b;
+}
+
+export const PI = 3.14159265;
+
+// Named imports at the call site
+import { add, PI } from './math';
+import { add as sum } from './math'; // rename during import</code></pre>
+
+    <div class="code-label">Default exports (use sparingly)</div>
+    <pre><code class="language-typescript">// logger.ts — default export
+export default class Logger {
+  log(msg: string): void {
+    console.log(`[LOG] ${msg}`);
+  }
+}
+
+// Default import — name is chosen by the importer
+import Logger from './logger';
+import MyLogger from './logger'; // also valid, same thing</code></pre>
+
+    <div class="callout callout-tip">
+      <div class="callout-title">Tip — Named vs Default Exports</div>
+      <p>The TypeScript and JavaScript communities have largely converged on preferring named exports. They are refactoring-friendly (rename tools work correctly), support better tree-shaking, and avoid the "what do I call this?" problem at import sites. Default exports are still fine for framework components (React components, Next.js pages) where the convention is established. For utility libraries, prefer named exports.</p>
+    </div>
+
+    <h3>Re-exports and Barrel Files</h3>
+
+    <div class="code-label">Re-exporting from an index file</div>
+    <pre><code class="language-typescript">// src/utils/index.ts — re-export everything
+export { formatDate, parseDate } from './date';
+export { slugify, truncate } from './string';
+export type { DateOptions } from './date'; // type-only re-export
+
+// Wildcard re-export (use cautiously — defeats tree-shaking)
+export * from './validators';</code></pre>
+
+    <h3>Namespace Imports</h3>
+
+    <div class="code-label">import * as — namespace import</div>
+    <pre><code class="language-typescript">import * as utils from './utils';
+
+utils.formatDate(new Date());
+utils.slugify('Hello World');</code></pre>
+
+    <div class="callout callout-warning">
+      <div class="callout-title">Warning — Namespace Imports and Tree-Shaking</div>
+      <p>Namespace imports (<code>import * as X</code>) prevent most bundlers from tree-shaking effectively because the bundler must assume any export might be used. Prefer named imports when bundle size matters. Namespace imports are useful for grouping related utilities when you use many of them, or when writing scripts that won't be bundled.</p>
+    </div>
+
+    <h3 id="esm-dynamic">Dynamic Imports</h3>
+
+    <p>Dynamic imports load a module at runtime, returning a Promise. They are essential for code-splitting — deferring heavy modules until they are needed.</p>
+
+    <div class="code-label">Dynamic import with await</div>
+    <pre><code class="language-typescript">async function processMarkdown(input: string): Promise<string> {
+  // 'marked' is only loaded when this function is called
+  const { marked } = await import('marked');
+  return marked(input);
+}
+
+// Conditional dynamic import
+async function loadChartLibrary(type: 'bar' | 'line') {
+  if (type === 'bar') {
+    const { BarChart } = await import('./charts/bar');
+    return new BarChart();
+  } else {
+    const { LineChart } = await import('./charts/line');
+    return new LineChart();
+  }
+}
+
+// With error handling
+let heavy: typeof import('./heavy-module') | null = null;
+async function getHeavy() {
+  heavy ??= await import('./heavy-module');
+  return heavy;
+}</code></pre>
+
+    <h3 id="esm-type-imports"><code>import type</code> and <code>export type</code></h3>
+
+    <p>Type-only imports and exports are one of TypeScript's most important features for correctness and performance. They are <em>erased entirely</em> at compile time — they never appear in the JavaScript output.</p>
+
+    <div class="code-label">import type — type-only import</div>
+    <pre><code class="language-typescript">// These are erased at compile time — zero runtime cost
+import type { User } from './models/user';
+import type { RequestHandler } from 'express';
+
+// Inline type modifier on named imports
+import { createUser, type UserCreateOptions } from './user-service';
+
+// When to use:
+// - Importing interfaces and type aliases (always use import type)
+// - Importing classes used only as type annotations, not as values
+// - Any import that would cause circular dependency at runtime
+
+function getUser(id: string): Promise<User> {
+  return fetch(`/api/users/${id}`).then(r => r.json());
+}</code></pre>
+
+    <div class="callout callout-tip">
+      <div class="callout-title">Tip — verbatimModuleSyntax</div>
+      <p>TypeScript 5.0 introduced <code>"verbatimModuleSyntax": true</code> in tsconfig. When enabled, TypeScript <em>requires</em> you to use <code>import type</code> for any import that is type-only, and will error if you forget. This is the recommended setting for modern TypeScript projects — it prevents accidentally importing modules that have side effects when you only need the types.</p>
+    </div>
+
+    <div class="callout callout-info">
+      <div class="callout-title">Info — Why This Matters for Tree-Shaking</div>
+      <p>Many bundlers (Webpack, Rollup, esbuild) rely on module imports to determine what code to include. A regular <code>import { Foo } from './foo'</code> tells the bundler that <code>foo.ts</code> may have side effects and should be evaluated. An <code>import type { Foo } from './foo'</code> is eliminated before the bundler even sees it — no unnecessary module evaluation, smaller bundles.</p>
+    </div>
+
+    <h3>Module Resolution Strategies</h3>
+
+    <p>TypeScript resolves module specifiers according to a configurable algorithm. The important thing to understand: <code>import './foo'</code> means "find <code>foo.ts</code>, <code>foo.tsx</code>, <code>foo/index.ts</code>..." according to the active strategy. ESM-strict environments (Node ESM, Deno) require explicit file extensions in imports.</p>
+
+    <div class="code-label">Extension requirements in Node ESM</div>
+    <pre><code class="language-typescript">// With moduleResolution: "NodeNext" or "bundler"
+// TypeScript requires .js extensions in imports, even for .ts files
+// (because the emitted JS will have .js extensions)
+
+import { add } from './math.js'; // ✅ correct — TypeScript resolves this to math.ts
+import { add } from './math';    // ❌ error with NodeNext — missing extension
+import { add } from './math.ts'; // ❌ error — cannot use .ts extension</code></pre>
+
+    <!-- ================================================================ -->
+    <h2 id="tsconfig">3. TypeScript Module Configuration</h2>
+
+    <h3 id="tsconfig-module">The <code>module</code> Setting</h3>
+
+    <p>The <code>module</code> compiler option controls what module format TypeScript emits. This is separate from what syntax you write.</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>module value</th>
+            <th>Output format</th>
+            <th>When to use</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>CommonJS</code></td>
+            <td>CJS <code>require()</code></td>
+            <td>Node.js apps, older toolchains, compatibility</td>
+          </tr>
+          <tr>
+            <td><code>ESNext</code></td>
+            <td>ESM <code>import/export</code></td>
+            <td>Modern bundlers (Vite, Webpack 5, Rollup)</td>
+          </tr>
+          <tr>
+            <td><code>Node16</code></td>
+            <td>CJS or ESM depending on package.json <code>"type"</code></td>
+            <td>Node.js 16+ apps with mixed CJS/ESM</td>
+          </tr>
+          <tr>
+            <td><code>NodeNext</code></td>
+            <td>Same as Node16 but tracks latest Node behavior</td>
+            <td>Node.js apps targeting current/next LTS</td>
+          </tr>
+          <tr>
+            <td><code>Preserve</code></td>
+            <td>Keeps input syntax unchanged</td>
+            <td>TypeScript 5.4+; when a bundler handles transforms</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 id="tsconfig-resolution">The <code>moduleResolution</code> Setting</h3>
+
+    <p>Module resolution is <em>separate</em> from module output format. It controls how TypeScript <em>finds</em> modules when type-checking.</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>moduleResolution</th>
+            <th>Behavior</th>
+            <th>Use with</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>node</code> (legacy)</td>
+            <td>Classic Node.js CJS algorithm — no <code>exports</code> field support</td>
+            <td>Old projects only; avoid for new work</td>
+          </tr>
+          <tr>
+            <td><code>node16</code></td>
+            <td>Supports <code>exports</code> field, requires <code>.js</code> extensions in imports</td>
+            <td><code>module: "Node16"</code></td>
+          </tr>
+          <tr>
+            <td><code>nodenext</code></td>
+            <td>Latest Node algorithm, tracks spec changes</td>
+            <td><code>module: "NodeNext"</code></td>
+          </tr>
+          <tr>
+            <td><code>bundler</code></td>
+            <td>Supports <code>exports</code> field, allows extension-less imports, relaxed</td>
+            <td>Vite, esbuild, Webpack — most common for apps</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout callout-tip">
+      <div class="callout-title">Tip — Default Recommendation</div>
+      <p>For most frontend apps built with Vite or similar bundlers: use <code>module: "ESNext"</code> and <code>moduleResolution: "bundler"</code>. For Node.js services or CLI tools: use <code>module: "NodeNext"</code> and <code>moduleResolution: "nodenext"</code>. Avoid the legacy <code>node</code> resolution unless maintaining old code.</p>
+    </div>
+
+    <div class="code-label">tsconfig.json — recommended app config</div>
+    <pre><code class="language-json">{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "verbatimModuleSyntax": true,
+    "strict": true,
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}</code></pre>
+
+    <h3 id="tsconfig-paths">Path Aliases</h3>
+
+    <p>Path aliases let you write <code>import { Button } from '@/components/Button'</code> instead of <code>import { Button } from '../../../components/Button'</code>. They are configured in tsconfig and require matching configuration in your bundler.</p>
+
+    <div class="code-label">tsconfig.json — path aliases</div>
+    <pre><code class="language-json">{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@components/*": ["./src/components/*"],
+      "@lib/*": ["./src/lib/*"],
+      "@types/*": ["./src/types/*"]
+    }
+  }
+}</code></pre>
+
+    <div class="code-label">vite.config.ts — matching alias config</div>
+    <pre><code class="language-typescript">import { defineConfig } from 'vite';
+import { resolve } from 'path';
+
+export default defineConfig({
+  resolve: {
+    alias: {
+      '@': resolve(__dirname, 'src'),
+      '@components': resolve(__dirname, 'src/components'),
+      '@lib': resolve(__dirname, 'src/lib'),
+    }
+  }
+});</code></pre>
+
+    <div class="callout callout-warning">
+      <div class="callout-title">Warning — Paths Are TypeScript-Only</div>
+      <p>TypeScript's <code>paths</code> configuration is purely for type-checking. It does <em>not</em> affect the emitted JavaScript. You must configure the same aliases in your bundler (Vite, Webpack, esbuild) or use a tool like <code>tsc-alias</code> if you're running <code>tsc</code> directly without a bundler.</p>
+    </div>
+
+    <h3>The <code>exports</code> Field in package.json</h3>
+
+    <p>The <code>exports</code> field is the modern replacement for <code>main</code>. It gives packages full control over what is accessible and how, supporting conditional exports for different environments.</p>
+
+    <div class="code-label">package.json — exports field</div>
+    <pre><code class="language-json">{
+  "name": "@myapp/utils",
+  "version": "1.0.0",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./string": {
+      "types": "./dist/string.d.ts",
+      "import": "./dist/string.js",
+      "require": "./dist/string.cjs"
+    }
+  },
+  "files": ["dist"]
+}</code></pre>
+
+    <!-- ================================================================ -->
+    <h2 id="third-party">4. Declaring Types for Third-Party Libraries</h2>
+
+    <h3 id="third-party-types">@types/ Packages and DefinitelyTyped</h3>
+
+    <p>Not every npm package ships TypeScript type definitions. For those that don't, the <a href="https://github.com/DefinitelyTyped/DefinitelyTyped">DefinitelyTyped</a> project maintains community-written type declarations published as <code>@types/</code> scoped packages.</p>
+
+    <div class="code-label">Installing type definitions</div>
+    <pre><code class="language-bash"># @types packages are always devDependencies
+npm install -D @types/node
+npm install -D @types/lodash
+npm install -D @types/express
+
+# Check if a package has built-in types
+# (look for "types" or "typings" field in its package.json)
+npm info react types       # → undefined (before @types/react)
+npm info zod types         # → ./dist/types/index.d.ts (built-in!)</code></pre>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Scenario</th>
+            <th>Types location</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Package ships <code>.d.ts</code> files</td>
+            <td>Inside the package itself</td>
+            <td>Nothing — types are automatic</td>
+          </tr>
+          <tr>
+            <td>Community types exist</td>
+            <td>DefinitelyTyped</td>
+            <td><code>npm install -D @types/package-name</code></td>
+          </tr>
+          <tr>
+            <td>No types anywhere</td>
+            <td>You write them</td>
+            <td>Create a <code>.d.ts</code> file or use <code>declare module</code></td>
+          </tr>
+          <tr>
+            <td>Types are wrong/incomplete</td>
+            <td>Anywhere</td>
+            <td>Module augmentation (see below)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Writing Your Own Declaration Files</h3>
+
+    <div class="code-label">src/types/some-untyped-library.d.ts</div>
+    <pre><code class="language-typescript">// Quick stub for an untyped package
+declare module 'some-untyped-library' {
+  export function process(input: string): string;
+  export function transform(data: unknown): Record<string, unknown>;
+
+  interface Options {
+    verbose?: boolean;
+    timeout?: number;
+  }
+
+  export function configure(options: Options): void;
+}</code></pre>
+
+    <div class="code-label">Declaring a module for non-JS imports (e.g., CSS, SVG)</div>
+    <pre><code class="language-typescript">// src/types/assets.d.ts
+declare module '*.svg' {
+  const src: string;
+  export default src;
+}
+
+declare module '*.css' {
+  const styles: Record<string, string>;
+  export default styles;
+}
+
+declare module '*.png' {
+  const src: string;
+  export default src;
+}</code></pre>
+
+    <h3 id="third-party-augment">Module Augmentation</h3>
+
+    <p>Module augmentation lets you extend existing types from third-party libraries — without forking them. This is the correct way to add custom properties to Express's <code>Request</code> type, extend the global <code>Window</code> interface, or add methods to a library's classes.</p>
+
+    <div class="code-label">Augmenting Express Request with a custom user property</div>
+    <pre><code class="language-typescript">// src/types/express.d.ts
+import 'express';
+
+declare module 'express' {
+  interface Request {
+    // TypeScript now knows req.user exists
+    user?: {
+      id: string;
+      email: string;
+      roles: string[];
+    };
+    correlationId: string;
+  }
+}
+
+// Usage in route handlers — fully typed
+app.get('/profile', (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  res.json({ email: req.user.email }); // ✅ typed
+});</code></pre>
+
+    <div class="code-label">Augmenting Window for custom global properties</div>
+    <pre><code class="language-typescript">// src/types/global.d.ts
+declare global {
+  interface Window {
+    analytics: {
+      track(event: string, properties?: Record<string, unknown>): void;
+    };
+    __APP_VERSION__: string;
+  }
+}
+
+// This file must have at least one import or export
+// to be a module (otherwise it's a script, not a module)
+export {};</code></pre>
+
+    <div class="callout callout-info">
+      <div class="callout-title">Info — Ambient Declarations</div>
+      <p>Ambient declarations use the <code>declare</code> keyword to tell TypeScript about something that exists at runtime but wasn't declared in TypeScript. <code>declare const __DEV__: boolean</code> tells TypeScript that a <code>__DEV__</code> global exists (injected by your bundler). <code>declare module '...'</code> tells TypeScript about an entire module's API. These declarations have no runtime presence — they are purely for the type checker.</p>
+    </div>
+
+    <!-- ================================================================ -->
+    <h2 id="npm">5. npm Package Ecosystem</h2>
+
+    <h3>Finding and Evaluating Packages</h3>
+
+    <p>The npm registry hosts over 2 million packages. Three tools help you make informed choices:</p>
+
+    <ul>
+      <li><strong>npmjs.com</strong> — package search, README, version history, download stats</li>
+      <li><strong>bundlephobia.com</strong> — install/bundle size, tree-shaking support, composition analysis</li>
+      <li><strong>packagephobia.com</strong> — install size (including dependencies), useful for CLI tools</li>
+    </ul>
+
+    <p>When evaluating a package for a TypeScript project, check:</p>
+    <ul>
+      <li>Does it ship types? (look for <code>"types"</code> in package.json or check npmjs.com for the "DT" badge)</li>
+      <li>Is it actively maintained? (last publish date, open issues)</li>
+      <li>What is the bundle size? (use bundlephobia)</li>
+      <li>Are there known security vulnerabilities? (<code>npm audit</code>)</li>
+    </ul>
+
+    <h3 id="npm-anatomy">package.json Anatomy Deep Dive</h3>
+
+    <div class="code-label">package.json — complete field reference</div>
+    <pre><code class="language-json">{
+  "name": "@myapp/utils",
+  "version": "1.2.3",
+  "description": "Shared utilities for myapp",
+
+  // Entry points — legacy fields (still needed for old tools)
+  "main": "./dist/index.cjs",        // CJS entry
+  "module": "./dist/index.js",       // ESM entry (non-standard but widely supported)
+
+  // Modern entry points — takes precedence over main/module in Node 12+
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",  // TypeScript types — must come FIRST
+      "import": "./dist/index.js",   // ESM
+      "require": "./dist/index.cjs"  // CJS
+    }
+  },
+
+  // Types location (for older tools that don't read "exports")
+  "types": "./dist/index.d.ts",
+
+  // Tree-shaking hint — tells bundlers this package has no side effects
+  // Set false only if ALL files are side-effect-free
+  // Can be an array of files that DO have side effects
+  "sideEffects": false,
+
+  // Node.js version constraint
+  "engines": {
+    "node": ">=18.0.0"
+  },
+
+  // What gets included when published (keep it small)
+  "files": ["dist", "README.md"],
+
+  // Packages the consumer must install
+  "peerDependencies": {
+    "react": "^18.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react": { "optional": true }  // mark as optional
+  },
+
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^5.4.0",
+    "tsup": "^8.0.0"
+  }
+}</code></pre>
+
+    <div class="callout callout-warning">
+      <div class="callout-title">Warning — <code>types</code> Must Be First in <code>exports</code></div>
+      <p>When listing conditions in the <code>exports</code> field, <code>"types"</code> must come <em>before</em> <code>"import"</code> and <code>"require"</code>. TypeScript reads conditions in order and stops at the first match. If <code>"import"</code> comes before <code>"types"</code>, TypeScript in older configurations may not find the type declarations.</p>
+    </div>
+
+    <h3 id="npm-semver">Semantic Versioning and TypeScript: A Warning</h3>
+
+    <p>Standard semver says patch releases (<code>1.0.0 → 1.0.1</code>) are backwards-compatible bug fixes. For JavaScript packages, this works. For TypeScript packages, <em>it's not that simple</em>.</p>
+
+    <p>A patch release that fixes a type error in the library's own types may expose previously hidden type errors in your code that were relying on incorrect types. A minor TypeScript compiler upgrade in the package's build can change inference in subtle ways. This is why:</p>
+
+    <ul>
+      <li>Libraries often mark type improvements as minor or even patch</li>
+      <li>You should check changelogs before updating any package with TypeScript types</li>
+      <li>Lock files (<code>package-lock.json</code>, <code>pnpm-lock.yaml</code>) are essential for reproducible builds</li>
+    </ul>
+
+    <div class="callout callout-info">
+      <div class="callout-title">Info — Lock Files Comparison</div>
+      <ul>
+        <li><strong>package-lock.json</strong> — npm's lock file. Committed to source control. Ensures everyone installs identical versions.</li>
+        <li><strong>pnpm-lock.yaml</strong> — pnpm's lock file. Human-readable YAML. More detailed dependency graph.</li>
+        <li><strong>bun.lockb</strong> — Bun's binary lock file. Fastest install, but binary format means no readable diffs.</li>
+        <li><strong>yarn.lock</strong> — Yarn's lock file. Both Yarn 1 (Classic) and Yarn Berry use this format.</li>
+      </ul>
+      <p>Commit your lock file. Always. The only exception is for libraries published to npm — they typically <code>.gitignore</code> the lock file so consumers get flexible version resolution.</p>
+    </div>
+
+    <!-- ================================================================ -->
+    <h2 id="monorepos">6. Monorepos</h2>
+
+    <p>A monorepo (monolithic repository) is a single git repository that contains multiple related packages or applications. Instead of having separate repos for your frontend, backend, shared UI library, and utilities — they all live together.</p>
+
+    <h3>Why Use a Monorepo?</h3>
+
+    <ul>
+      <li><strong>Atomic commits</strong> — change a shared utility and the apps that use it in a single commit</li>
+      <li><strong>Single version of truth</strong> — no more "which version of @myapp/utils does this service use?"</li>
+      <li><strong>Refactoring across boundaries</strong> — rename a function and update all call sites in one IDE operation</li>
+      <li><strong>Shared tooling</strong> — one ESLint config, one TypeScript base config, one CI pipeline</li>
+      <li><strong>Easier dependency management</strong> — internal packages are always at HEAD, not versioned</li>
+    </ul>
+
+    <h3 id="monorepos-tools">Monorepo Tools in 2024</h3>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Tool</th>
+            <th>Role</th>
+            <th>Notable feature</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>npm workspaces</strong></td>
+            <td>Package linking</td>
+            <td>Built into npm 7+, minimal config</td>
+          </tr>
+          <tr>
+            <td><strong>pnpm workspaces</strong></td>
+            <td>Package linking</td>
+            <td>Fastest installs, strict by default, disk-efficient</td>
+          </tr>
+          <tr>
+            <td><strong>Yarn workspaces</strong></td>
+            <td>Package linking</td>
+            <td>Established; Yarn Berry adds PnP mode</td>
+          </tr>
+          <tr>
+            <td><strong>Turborepo</strong></td>
+            <td>Build orchestration</td>
+            <td>Incremental builds, remote caching, pipeline definition</td>
+          </tr>
+          <tr>
+            <td><strong>Nx</strong></td>
+            <td>Full monorepo platform</td>
+            <td>Code generation, affected-graph commands, plugins</td>
+          </tr>
+          <tr>
+            <td><strong>Lerna</strong></td>
+            <td>Package publishing</td>
+            <td>Versioning and publishing automation; often combined with Nx</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>pnpm Workspaces Setup</h3>
+
+    <div class="code-label">pnpm-workspace.yaml</div>
+    <pre><code class="language-yaml">packages:
+  - 'packages/*'   # shared libraries: @myapp/ui, @myapp/utils
+  - 'apps/*'       # applications: web, mobile, api</code></pre>
+
+    <p>A typical monorepo structure looks like this:</p>
+
+    <div class="monorepo-diagram">
+<span class="dir">my-monorepo/</span>
+├── <span class="file">package.json</span>          <span class="comment"># root package.json (private: true)</span>
+├── <span class="file">pnpm-workspace.yaml</span>   <span class="comment"># workspace definition</span>
+├── <span class="file">turbo.json</span>            <span class="comment"># Turborepo pipeline config</span>
+├── <span class="file">tsconfig.base.json</span>    <span class="comment"># shared TypeScript config</span>
+├── <span class="dir">apps/</span>
+│   ├── <span class="dir">web/</span>               <span class="comment"># Next.js frontend</span>
+│   │   ├── <span class="file">package.json</span>
+│   │   └── <span class="file">tsconfig.json</span>  <span class="comment"># extends ../../tsconfig.base.json</span>
+│   └── <span class="dir">api/</span>               <span class="comment"># Node.js backend</span>
+│       ├── <span class="file">package.json</span>
+│       └── <span class="file">tsconfig.json</span>
+└── <span class="dir">packages/</span>
+    ├── <span class="dir">ui/</span>                <span class="comment"># @myapp/ui — shared React components</span>
+    │   ├── <span class="file">package.json</span>
+    │   ├── <span class="file">tsconfig.json</span>
+    │   └── <span class="dir">src/</span>
+    └── <span class="dir">utils/</span>             <span class="comment"># @myapp/utils — shared utilities</span>
+        ├── <span class="file">package.json</span>
+        ├── <span class="file">tsconfig.json</span>
+        └── <span class="dir">src/</span>
+    </div>
+
+    <h3 id="monorepos-tsconfig">Shared TypeScript Config</h3>
+
+    <div class="code-label">tsconfig.base.json — root shared config</div>
+    <pre><code class="language-json">{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "verbatimModuleSyntax": true,
+    "strict": true,
+    "exactOptionalPropertyTypes": true,
+    "noUncheckedIndexedAccess": true,
+    "skipLibCheck": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true
+  }
+}</code></pre>
+
+    <div class="code-label">packages/utils/tsconfig.json — extends base</div>
+    <pre><code class="language-json">{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src"
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}</code></pre>
+
+    <h3>Internal Package References</h3>
+
+    <p>With workspaces, internal packages reference each other like npm packages, but pnpm symlinks them to the local source:</p>
+
+    <div class="code-label">apps/web/package.json — referencing internal packages</div>
+    <pre><code class="language-json">{
+  "name": "web",
+  "private": true,
+  "dependencies": {
+    "@myapp/ui": "workspace:*",
+    "@myapp/utils": "workspace:*"
+  }
+}</code></pre>
+
+    <div class="code-label">Usage in the web app</div>
+    <pre><code class="language-typescript">import { Button, Card } from '@myapp/ui';
+import { formatDate, slugify } from '@myapp/utils';
+
+// These resolve to packages/ui/src and packages/utils/src
+// fully typed, live code — no publish step needed during development</code></pre>
+
+    <h3 id="monorepos-refs">TypeScript Project References</h3>
+
+    <p>Project references (<code>"references"</code> in tsconfig) tell TypeScript about inter-project dependencies. This enables:</p>
+    <ul>
+      <li>Incremental builds — only rebuild what changed</li>
+      <li>Correct build ordering — TypeScript knows to build <code>utils</code> before <code>web</code></li>
+      <li>Single <code>tsc -b</code> command builds the entire repo in the right order</li>
+    </ul>
+
+    <div class="code-label">apps/web/tsconfig.json — with project references</div>
+    <pre><code class="language-json">{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src"
+  },
+  "references": [
+    { "path": "../../packages/ui" },
+    { "path": "../../packages/utils" }
+  ]
+}</code></pre>
+
+    <div class="code-label">Root tsconfig.json — solution file</div>
+    <pre><code class="language-json">{
+  "files": [],
+  "references": [
+    { "path": "packages/utils" },
+    { "path": "packages/ui" },
+    { "path": "apps/api" },
+    { "path": "apps/web" }
+  ]
+}</code></pre>
+
+    <div class="code-label">Build the entire monorepo</div>
+    <pre><code class="language-bash"># Build all projects in dependency order
+tsc -b
+
+# Or with Turborepo (parallelized, cached)
+turbo run build</code></pre>
+
+    <h3>Build Orchestration with Turborepo</h3>
+
+    <div class="code-label">turbo.json — pipeline configuration</div>
+    <pre><code class="language-json">{
+  "$schema": "https://turbo.build/schema.json",
+  "pipeline": {
+    "build": {
+      "dependsOn": ["^build"],   // build dependencies first (^)
+      "outputs": ["dist/**"]
+    },
+    "test": {
+      "dependsOn": ["build"],
+      "outputs": []
+    },
+    "lint": {
+      "outputs": []
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    }
+  }
+}</code></pre>
+
+    <div class="callout callout-tip">
+      <div class="callout-title">Tip — Remote Caching</div>
+      <p>Turborepo's killer feature is remote caching. Once CI builds a package, the result is cached in the cloud. Subsequent CI runs for unrelated changes skip the build entirely and restore from cache. On large monorepos this can cut CI times from 20 minutes to under 2 minutes. Set it up with <code>npx turbo login</code> and <code>npx turbo link</code>.</p>
+    </div>
+
+    <!-- ================================================================ -->
+    <h2 id="publishing">7. Publishing TypeScript Packages</h2>
+
+    <h3>Compiled JS or TypeScript Source?</h3>
+
+    <p>Always publish compiled JavaScript with declaration files (<code>.d.ts</code>). Reasons:</p>
+    <ul>
+      <li>Consumers may use different TypeScript versions — shipping source requires them to compile with your settings</li>
+      <li>Faster installs — no compilation step for consumers</li>
+      <li>Works with JavaScript consumers who don't use TypeScript</li>
+      <li>You can ship optimized, minified output</li>
+    </ul>
+
+    <p>The exception: monorepo-internal packages. For packages that are never published to npm, you can often skip the build step and have consumers import TypeScript directly (if your build tool supports it).</p>
+
+    <h3 id="publishing-tsup">tsup — The Go-To Build Tool</h3>
+
+    <p><code>tsup</code> is purpose-built for publishing TypeScript packages. It wraps esbuild for speed and handles the dual CJS+ESM output that most consumers need.</p>
+
+    <div class="code-label">Install tsup</div>
+    <pre><code class="language-bash">npm install -D tsup</code></pre>
+
+    <div class="code-label">tsup.config.ts — dual CJS+ESM output</div>
+    <pre><code class="language-typescript">import { defineConfig } from 'tsup';
+
+export default defineConfig({
+  entry: ['src/index.ts'],
+  format: ['cjs', 'esm'],       // output both formats
+  dts: true,                    // generate .d.ts files
+  sourcemap: true,              // source maps for debugging
+  clean: true,                  // clean dist/ before build
+  splitting: false,             // disable code splitting for libraries
+  treeshake: true,              // remove unused code
+
+  // Multiple entry points (for selective imports)
+  entry: {
+    index: 'src/index.ts',
+    string: 'src/string.ts',
+    date: 'src/date.ts',
+  },
+});</code></pre>
+
+    <div class="code-label">Output structure after tsup build</div>
+    <pre><code class="language-bash">dist/
+├── index.js        # ESM output
+├── index.cjs       # CJS output
+├── index.d.ts      # Type declarations
+├── index.d.ts.map  # Declaration source maps
+├── index.js.map    # JS source maps
+├── string.js
+├── string.cjs
+├── string.d.ts
+├── date.js
+├── date.cjs
+└── date.d.ts</code></pre>
+
+    <h3 id="publishing-exports">The Complete exports Field</h3>
+
+    <div class="code-label">package.json — production-ready exports</div>
+    <pre><code class="language-json">{
+  "name": "@myapp/utils",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./string": {
+      "types": "./dist/string.d.ts",
+      "import": "./dist/string.js",
+      "require": "./dist/string.cjs"
+    },
+    "./date": {
+      "types": "./dist/date.d.ts",
+      "import": "./dist/date.js",
+      "require": "./dist/date.cjs"
+    }
+  },
+  "sideEffects": false,
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsup",
+    "prepublishOnly": "npm run build"
+  }
+}</code></pre>
+
+    <div class="callout callout-info">
+      <div class="callout-title">Info — Declaration Maps</div>
+      <p>Setting <code>"declarationMap": true</code> generates <code>.d.ts.map</code> files alongside your declaration files. These map from the <code>.d.ts</code> back to the original <code>.ts</code> source. When consumers "Go to Definition" in their IDE on something from your package, they land in the original TypeScript source rather than the generated declaration file. This is an excellent developer experience improvement that costs almost nothing.</p>
+    </div>
+
+    <h3>Publishing to npm</h3>
+
+    <div class="code-label">Publishing workflow</div>
+    <pre><code class="language-bash"># Verify what will be published (dry run)
+npm publish --dry-run
+
+# Check the package contents
+npm pack --dry-run
+
+# Publish with public access (required for scoped packages)
+npm publish --access public
+
+# Publish a beta version
+npm version prerelease --preid=beta   # 1.0.0-beta.0
+npm publish --tag beta                # consumers: npm install pkg@beta</code></pre>
+
+    <!-- ================================================================ -->
+    <h2 id="python">8. Python pip → npm Mental Model</h2>
+
+    <p>If you're coming from Python, the Node.js ecosystem has clear parallels — but also important differences. The most significant: <strong>Node.js has no global "virtual environment."</strong> Each project installs its dependencies locally into <code>node_modules</code>.</p>
+
+    <div class="callout callout-python">
+      <div class="callout-title">Python Comparison — Dependency Management</div>
+      <p>Python's <code>pip</code> installs packages globally by default unless you activate a virtual environment. This mismatch between developers led to the <code>venv</code> workflow. Node.js avoided this problem from the start: <code>npm install</code> always installs into the local project's <code>node_modules</code>.</p>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Python / pip</th>
+            <th>Node.js / npm</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>requirements.txt</code></td>
+            <td><code>package.json</code></td>
+            <td>Also contains metadata, scripts, exports config</td>
+          </tr>
+          <tr>
+            <td><code>pip install requests</code></td>
+            <td><code>npm install axios</code></td>
+            <td>Installs to local <code>node_modules/</code></td>
+          </tr>
+          <tr>
+            <td><code>pip install -r requirements.txt</code></td>
+            <td><code>npm install</code></td>
+            <td>Installs all deps from package.json</td>
+          </tr>
+          <tr>
+            <td><code>pip install -e .</code></td>
+            <td><code>npm link</code> / workspace refs</td>
+            <td>Editable / symlinked install for local development</td>
+          </tr>
+          <tr>
+            <td><code>python -m venv .venv</code></td>
+            <td><em>No equivalent needed</em></td>
+            <td>node_modules is already project-local</td>
+          </tr>
+          <tr>
+            <td><code>pip freeze > requirements.txt</code></td>
+            <td><code>npm list</code></td>
+            <td>Shows installed packages; lock file is the frozen state</td>
+          </tr>
+          <tr>
+            <td><code>requirements.txt</code> + <code>pip freeze</code></td>
+            <td><code>package-lock.json</code></td>
+            <td>Lock file auto-generated, pinned versions</td>
+          </tr>
+          <tr>
+            <td><code>pip install -U package</code></td>
+            <td><code>npm update package</code></td>
+            <td>Update to latest within semver range</td>
+          </tr>
+          <tr>
+            <td><code>pip uninstall package</code></td>
+            <td><code>npm uninstall package</code></td>
+            <td>Remove and update package.json</td>
+          </tr>
+          <tr>
+            <td><code>pip show package</code></td>
+            <td><code>npm info package</code></td>
+            <td>Package metadata</td>
+          </tr>
+          <tr>
+            <td>PyPI (pypi.org)</td>
+            <td>npm registry (npmjs.com)</td>
+            <td>Default public package registries</td>
+          </tr>
+          <tr>
+            <td>Private PyPI (devpi, Nexus)</td>
+            <td>Private npm registry (Verdaccio, Artifactory)</td>
+            <td>Enterprise private package hosting</td>
+          </tr>
+          <tr>
+            <td><code>setup.py</code> / <code>pyproject.toml</code></td>
+            <td><code>package.json</code></td>
+            <td>Project metadata and build config</td>
+          </tr>
+          <tr>
+            <td><code>__init__.py</code></td>
+            <td><code>index.ts</code> / <code>index.js</code></td>
+            <td>Package entry point convention</td>
+          </tr>
+          <tr>
+            <td><code>python setup.py build</code></td>
+            <td><code>npm run build</code></td>
+            <td>Run the build script defined in package.json</td>
+          </tr>
+          <tr>
+            <td><code>twine upload</code></td>
+            <td><code>npm publish</code></td>
+            <td>Publish to the public registry</td>
+          </tr>
+          <tr>
+            <td>Type stubs (<code>.pyi</code> files)</td>
+            <td><code>.d.ts</code> declaration files</td>
+            <td>Both provide type information without implementation</td>
+          </tr>
+          <tr>
+            <td>typeshed</td>
+            <td>DefinitelyTyped (@types/)</td>
+            <td>Community-maintained type definitions for untyped packages</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout callout-python">
+      <div class="callout-title">Python Comparison — Development vs Production Dependencies</div>
+      <p>Python's <code>requirements.txt</code> is typically a single flat file. Some projects split into <code>requirements.txt</code> and <code>requirements-dev.txt</code>. npm formalizes this split in package.json: <code>dependencies</code> are runtime requirements; <code>devDependencies</code> are only needed during development (TypeScript itself, test frameworks, linters, build tools). When you <code>npm install --production</code>, devDependencies are skipped — crucial for keeping Docker images small.</p>
+    </div>
+
+    <div class="callout callout-python">
+      <div class="callout-title">Python Comparison — The node_modules Folder</div>
+      <p>If you're used to Python virtual environments living in a <code>.venv</code> folder, <code>node_modules</code> will feel familiar — except it can be shockingly large. A fresh Next.js project might have 300+ MB in node_modules from transitive dependencies. This is a known pain point; tools like pnpm address it by using a global content-addressed store with symlinks, meaning packages are only stored once on disk regardless of how many projects use them.</p>
+    </div>
+
+    <div class="callout callout-ai">
+      <div class="callout-title">AI Era Note — Package Research</div>
+      <p>Modern LLMs know the npm ecosystem well, but their training data has a cutoff. When asking an AI assistant to recommend packages, always verify the recommendation is still maintained and hasn't been deprecated or superseded. The JavaScript ecosystem moves fast — packages that were best-in-class 18 months ago may have been replaced by faster, lighter alternatives. Use bundlephobia and npmjs.com to verify current health.</p>
+    </div>
+
+    <hr class="section-divider" />
+
+    <div class="callout callout-info">
+      <div class="callout-title">Info — Chapter Summary</div>
+      <p>You've covered the full arc of JavaScript modules — from the chaotic pre-module era through the CJS/ESM schism to the modern ESM-first world. You understand how TypeScript's <code>module</code> and <code>moduleResolution</code> settings map onto this landscape, how to augment third-party types, how to structure large codebases as monorepos with project references and build caching, and how to publish a properly configured dual-format TypeScript package.</p>
+      <p>Key takeaways: prefer named exports, use <code>import type</code> for type-only imports, configure <code>moduleResolution: "bundler"</code> for app projects, use pnpm workspaces + Turborepo for monorepos, and ship dual CJS+ESM builds with <code>tsup</code> for published packages.</p>
+    </div>
+
+    <!-- Footer Navigation -->
+    <footer class="chapter-footer">
+      <a href="chapter-07-type-level.html" class="footer-nav-btn prev">
+        <span class="nav-dir">← Previous</span>
+        <span class="nav-label">Ch 7: Type-Level TypeScript</span>
+      </a>
+      <a href="chapter-09-build-tools.html" class="footer-nav-btn next">
+        <span class="nav-dir">Next →</span>
+        <span class="nav-label">Ch 9: Build Tools &amp; Bundlers</span>
+      </a>
+    </footer>
+
+  </main>
+</div>
+
+<script>
+  // Initialize highlight.js
+  document.addEventListener('DOMContentLoaded', () => {
+    hljs.highlightAll();
+  });
+
+  // Sidebar active link on scroll
+  (function () {
+    const headings = document.querySelectorAll('h2[id], h3[id]');
+    const tocLinks = document.querySelectorAll('.toc-list a');
+    const navH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--nav-h'));
+
+    function getActive() {
+      let active = null;
+      const scrollY = window.scrollY + navH + 32;
+      for (const h of headings) {
+        if (h.offsetTop <= scrollY) active = h.id;
+      }
+      return active;
+    }
+
+    function update() {
+      const id = getActive();
+      tocLinks.forEach(link => {
+        const href = link.getAttribute('href').slice(1);
+        link.classList.toggle('active', href === id);
+      });
+    }
+
+    window.addEventListener('scroll', update, { passive: true });
+    update();
+  })();
+</script>
+
+</body>
+</html>

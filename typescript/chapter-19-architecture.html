@@ -1,0 +1,2413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chapter 19: Design Patterns & Architecture in TypeScript — TypeScript for the AI Era</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: 16px; line-height: 1.7; color: #111827; background: #fff;
+    }
+    .top-nav {
+      position: fixed; top: 0; left: 0; right: 0; height: 52px;
+      background: #fff; border-bottom: 1px solid #E5E7EB;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 24px; z-index: 100; box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+    .top-nav .series-title { font-weight: 600; font-size: 14px; color: #4F46E5; letter-spacing: 0.01em; }
+    .top-nav .chapter-nav { display: flex; gap: 8px; align-items: center; font-size: 13px; }
+    .top-nav .chapter-nav a {
+      color: #6B7280; text-decoration: none; padding: 4px 10px;
+      border-radius: 6px; border: 1px solid #E5E7EB; transition: all 0.15s;
+    }
+    .top-nav .chapter-nav a:hover { background: #EEF2FF; color: #4F46E5; border-color: #C7D2FE; }
+    .top-nav .progress-badge { font-size: 12px; color: #9CA3AF; font-weight: 500; }
+    .layout {
+      display: grid; grid-template-columns: 240px 1fr;
+      max-width: 1100px; margin: 0 auto; padding-top: 52px; min-height: 100vh;
+    }
+    .sidebar {
+      position: sticky; top: 52px; height: calc(100vh - 52px);
+      overflow-y: auto; padding: 28px 16px 28px 24px;
+      border-right: 1px solid #E5E7EB; background: #F9FAFB;
+    }
+    .sidebar h3 {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.08em; color: #9CA3AF; margin-bottom: 12px;
+    }
+    .sidebar ol { list-style: none; counter-reset: toc; }
+    .sidebar ol li { counter-increment: toc; margin-bottom: 2px; }
+    .sidebar ol li a {
+      display: flex; gap: 8px; align-items: flex-start; font-size: 12.5px;
+      color: #374151; text-decoration: none; padding: 5px 8px;
+      border-radius: 6px; line-height: 1.4; transition: all 0.15s;
+    }
+    .sidebar ol li a::before {
+      content: counter(toc) "."; color: #9CA3AF; font-size: 12px;
+      min-width: 18px; flex-shrink: 0; padding-top: 1px;
+    }
+    .sidebar ol li a:hover { background: #EEF2FF; color: #4F46E5; }
+    .sidebar .author-box {
+      margin-top: 28px; padding: 12px; background: #fff;
+      border: 1px solid #E5E7EB; border-radius: 10px;
+    }
+    .sidebar .author-box .author-name { font-size: 13px; font-weight: 600; color: #111827; }
+    .sidebar .author-box .author-title { font-size: 11px; color: #6B7280; margin-top: 2px; }
+    .main { padding: 40px 48px 80px; min-width: 0; }
+    .chapter-header { margin-bottom: 40px; padding-bottom: 32px; border-bottom: 1px solid #E5E7EB; }
+    .chapter-label {
+      font-size: 12px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.08em; color: #4F46E5; margin-bottom: 8px;
+    }
+    h1 { font-size: 36px; font-weight: 800; line-height: 1.15; color: #111827; margin-bottom: 16px; }
+    .chapter-intro { font-size: 17px; color: #4B5563; line-height: 1.75; max-width: 720px; }
+    h2 { font-size: 24px; font-weight: 700; color: #111827; margin: 48px 0 16px; padding-top: 8px; }
+    h2::before { display: block; height: 64px; margin-top: -64px; content: ""; visibility: hidden; }
+    h3 { font-size: 18px; font-weight: 600; color: #1F2937; margin: 32px 0 12px; }
+    h4 { font-size: 15px; font-weight: 600; color: #374151; margin: 24px 0 8px; }
+    p { margin-bottom: 16px; color: #374151; }
+    ul, ol { padding-left: 24px; margin-bottom: 16px; color: #374151; }
+    li { margin-bottom: 6px; }
+    strong { color: #111827; }
+    p code, li code, td code, h3 code, h4 code {
+      font-family: "JetBrains Mono", "Fira Code", Consolas, monospace;
+      font-size: 13px; background: #EEF2FF; color: #4F46E5;
+      padding: 1px 5px; border-radius: 4px;
+    }
+    .code-block { margin: 20px 0; border: 1px solid #E5E7EB; border-radius: 10px; overflow: hidden; }
+    .code-block .code-label {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 14px; background: #F6F8FA; border-bottom: 1px solid #E5E7EB;
+      font-size: 12px; font-weight: 600; color: #57606A; font-family: system-ui, sans-serif;
+    }
+    .code-block .lang-badge {
+      background: #E5E7EB; color: #374151; padding: 2px 8px;
+      border-radius: 4px; font-size: 11px; font-weight: 700;
+      letter-spacing: 0.04em; text-transform: uppercase;
+    }
+    .code-block pre { margin: 0; border-radius: 0; background: #F6F8FA !important; }
+    .code-block pre code {
+      font-family: "JetBrains Mono", "Fira Code", Consolas, monospace;
+      font-size: 13.5px; line-height: 1.65; background: #F6F8FA !important;
+    }
+    .before-after { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 24px 0; }
+    .before-after .ba-block { border-radius: 10px; overflow: hidden; border: 1px solid #E5E7EB; }
+    .before-after .ba-header { padding: 7px 14px; font-size: 12px; font-weight: 700; letter-spacing: 0.04em; }
+    .before-after .ba-header.bad { background: #FEE2E2; color: #B91C1C; }
+    .before-after .ba-header.good { background: #DCFCE7; color: #15803D; }
+    .before-after pre { margin: 0; border-radius: 0; background: #F6F8FA !important; }
+    .before-after pre code {
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 12.5px; line-height: 1.65; background: #F6F8FA !important;
+    }
+    .callout { margin: 24px 0; padding: 16px 20px; border-radius: 10px; border-left: 4px solid; }
+    .callout-title {
+      font-size: 13px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.06em; margin-bottom: 6px;
+      display: flex; align-items: center; gap: 7px;
+    }
+    .callout p:last-child { margin-bottom: 0; }
+    .callout-tip { background: #F0FDF4; border-color: #10B981; }
+    .callout-tip .callout-title { color: #059669; }
+    .callout-info { background: #EFF6FF; border-color: #3B82F6; }
+    .callout-info .callout-title { color: #2563EB; }
+    .callout-warning { background: #FFFBEB; border-color: #F59E0B; }
+    .callout-warning .callout-title { color: #D97706; }
+    .callout-ai { background: #FDF2F8; border-color: #EC4899; }
+    .callout-ai .callout-title { color: #DB2777; }
+    .callout-anti { background: #FEF2F2; border-color: #EF4444; }
+    .callout-anti .callout-title { color: #DC2626; }
+    .callout-pattern { background: #F0FDFA; border-color: #14B8A6; }
+    .callout-pattern .callout-title { color: #0D9488; }
+    .callout-solid { background: #EEF2FF; border-color: #4F46E5; }
+    .callout-solid .callout-title { color: #4338CA; }
+    .diagram-wrap {
+      margin: 28px 0; padding: 28px; background: #F9FAFB;
+      border: 1px solid #E5E7EB; border-radius: 12px; text-align: center;
+    }
+    .diagram-wrap .diagram-caption { font-size: 13px; color: #6B7280; margin-top: 14px; font-style: italic; }
+    .table-wrap { overflow-x: auto; margin: 24px 0; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th { background: #EEF2FF; color: #3730A3; font-weight: 700; text-align: left; padding: 10px 14px; border: 1px solid #C7D2FE; }
+    td { padding: 9px 14px; border: 1px solid #E5E7EB; vertical-align: top; }
+    tr:nth-child(even) td { background: #F9FAFB; }
+    .footer-nav {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-top: 64px; padding-top: 32px; border-top: 1px solid #E5E7EB;
+    }
+    .footer-nav a {
+      display: flex; flex-direction: column; gap: 4px; text-decoration: none;
+      padding: 14px 18px; border: 1px solid #E5E7EB; border-radius: 10px;
+      max-width: 220px; transition: all 0.15s;
+    }
+    .footer-nav a:hover { border-color: #C7D2FE; background: #EEF2FF; }
+    .footer-nav .nav-label { font-size: 11px; font-weight: 600; color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.06em; }
+    .footer-nav .nav-title { font-size: 14px; font-weight: 600; color: #4F46E5; }
+    .footer-nav .nav-prev .nav-label::before { content: "← "; }
+    .footer-nav .nav-next { text-align: right; }
+    .footer-nav .nav-next .nav-label::after { content: " →"; }
+    .footer-author { text-align: center; padding: 24px; font-size: 13px; color: #9CA3AF; margin-top: 8px; }
+    .solid-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 24px 0; }
+    .solid-card {
+      border: 1px solid #C7D2FE; border-radius: 10px; overflow: hidden;
+      border-left: 4px solid #4F46E5;
+    }
+    .solid-card-header { background: #EEF2FF; padding: 10px 14px; }
+    .solid-card-header .solid-letter { font-size: 22px; font-weight: 900; color: #4F46E5; }
+    .solid-card-header .solid-name { font-size: 13px; font-weight: 600; color: #3730A3; }
+    .solid-card-body { padding: 12px 14px; font-size: 13.5px; color: #374151; }
+    .pattern-header {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 0; margin-bottom: 8px;
+    }
+    .pattern-badge {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.06em; padding: 3px 10px; border-radius: 20px;
+    }
+    .badge-creational { background: #DCFCE7; color: #15803D; }
+    .badge-structural { background: #DBEAFE; color: #1D4ED8; }
+    .badge-behavioral { background: #F3E8FF; color: #7C3AED; }
+    .badge-functional { background: #FEF3C7; color: #92400E; }
+    .section-divider {
+      height: 1px; background: linear-gradient(90deg, #E5E7EB 0%, #C7D2FE 50%, #E5E7EB 100%);
+      margin: 40px 0;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Top Nav -->
+<nav class="top-nav">
+  <span class="series-title">TypeScript for the AI Era</span>
+  <div class="chapter-nav">
+    <a href="chapter-18-state.html">← Ch 18 State</a>
+    <span class="progress-badge">Chapter 19 of 24</span>
+    <a href="chapter-20-ai-apps.html">Ch 20 AI Apps →</a>
+  </div>
+</nav>
+
+<div class="layout">
+  <!-- Sidebar TOC -->
+  <aside class="sidebar">
+    <h3>Contents</h3>
+    <ol>
+      <li><a href="#solid">SOLID Principles</a></li>
+      <li><a href="#design-patterns">Design Patterns</a></li>
+      <li><a href="#functional">Functional Patterns</a></li>
+      <li><a href="#ddd">Domain-Driven Design</a></li>
+      <li><a href="#repository">Repository Pattern</a></li>
+      <li><a href="#di">Dependency Injection</a></li>
+      <li><a href="#event-driven">Event-Driven Architecture</a></li>
+      <li><a href="#layered">Layered Architecture</a></li>
+      <li><a href="#microservices">Microservices vs Monolith</a></li>
+      <li><a href="#error-arch">Error Handling Architecture</a></li>
+    </ol>
+    <div class="author-box">
+      <div class="author-name">Senior Staff Engineer</div>
+      <div class="author-title">Google · Microsoft · Meta · Anthropic</div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main">
+    <div class="chapter-header">
+      <div class="chapter-label">Chapter 19 · Architecture</div>
+      <h1>Design Patterns &amp; Architecture in TypeScript</h1>
+      <p class="chapter-intro">
+        Fifteen years of production codebases taught me one thing: the language you write in matters far less than the architecture you build with it. TypeScript's type system — interfaces, generics, discriminated unions — makes many classical patterns <em>better</em> than in the languages they were invented for. This chapter shows you how.
+      </p>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- SECTION 1: SOLID -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <h2 id="solid">1. SOLID Principles in TypeScript</h2>
+    <p>SOLID is a set of five design principles that make software easier to maintain and extend. TypeScript's structural typing makes several of them feel natural — almost inevitable.</p>
+
+    <div class="solid-grid">
+      <div class="solid-card">
+        <div class="solid-card-header"><div class="solid-letter">S</div><div class="solid-name">Single Responsibility</div></div>
+        <div class="solid-card-body">A class should have one reason to change.</div>
+      </div>
+      <div class="solid-card">
+        <div class="solid-card-header"><div class="solid-letter">O</div><div class="solid-name">Open/Closed</div></div>
+        <div class="solid-card-body">Open for extension, closed for modification.</div>
+      </div>
+      <div class="solid-card">
+        <div class="solid-card-header"><div class="solid-letter">L</div><div class="solid-name">Liskov Substitution</div></div>
+        <div class="solid-card-body">Subtypes must be substitutable for their base types.</div>
+      </div>
+      <div class="solid-card">
+        <div class="solid-card-header"><div class="solid-letter">I</div><div class="solid-name">Interface Segregation</div></div>
+        <div class="solid-card-body">Clients shouldn't depend on methods they don't use.</div>
+      </div>
+    </div>
+    <div class="solid-card" style="margin-bottom:24px;border-left-color:#4F46E5">
+      <div class="solid-card-header" style="background:#EEF2FF"><div class="solid-letter">D</div><div class="solid-name">Dependency Inversion — most important for TypeScript</div></div>
+      <div class="solid-card-body">High-level modules should not depend on low-level modules. Both should depend on abstractions.</div>
+    </div>
+
+    <h3>Single Responsibility Principle (SRP)</h3>
+    <p>A common violation: the "God class" that handles HTTP parsing, business logic, and database writes all at once. Split it.</p>
+    <div class="before-after">
+      <div class="ba-block">
+        <div class="ba-header bad">Anti-Pattern — God Class</div>
+        <pre><code class="language-typescript">class UserService {
+  // HTTP concern
+  parseRequest(req: Request): UserDTO { ... }
+  // Business logic concern
+  validateAge(age: number): boolean { ... }
+  hashPassword(pw: string): string { ... }
+  // Database concern
+  saveToDatabase(user: User): void { ... }
+  sendWelcomeEmail(email: string): void { ... }
+  generatePDFReport(): Buffer { ... }
+}</code></pre>
+      </div>
+      <div class="ba-block">
+        <div class="ba-header good">SRP — One Reason to Change</div>
+        <pre><code class="language-typescript">class UserParser {
+  parse(req: Request): UserDTO { ... }
+}
+
+class UserDomainService {
+  validate(dto: UserDTO): Result&lt;User, string&gt; { ... }
+}
+
+class UserRepository {
+  save(user: User): Promise&lt;void&gt; { ... }
+}
+
+class EmailService {
+  sendWelcome(email: string): Promise&lt;void&gt; { ... }
+}</code></pre>
+      </div>
+    </div>
+
+    <h3>Open/Closed Principle (OCP)</h3>
+    <p>Add new behavior by adding new code, not by modifying existing code. TypeScript interfaces make this clean.</p>
+    <div class="before-after">
+      <div class="ba-block">
+        <div class="ba-header bad">Anti-Pattern — Open/Closed Violation</div>
+        <pre><code class="language-typescript">function calculateDiscount(
+  user: User,
+  type: 'premium' | 'student' | 'employee'
+): number {
+  if (type === 'premium') return 0.20
+  if (type === 'student') return 0.15
+  if (type === 'employee') return 0.30
+  // Adding VIP requires modifying this function
+  return 0
+}</code></pre>
+      </div>
+      <div class="ba-block">
+        <div class="ba-header good">OCP — Extend via Interface</div>
+        <pre><code class="language-typescript">interface DiscountStrategy {
+  calculate(user: User): number
+}
+
+class PremiumDiscount implements DiscountStrategy {
+  calculate(user: User) { return 0.20 }
+}
+
+class StudentDiscount implements DiscountStrategy {
+  calculate(user: User) { return 0.15 }
+}
+
+// Adding VIP: new class, zero modification
+class VIPDiscount implements DiscountStrategy {
+  calculate(user: User) { return 0.40 }
+}</code></pre>
+      </div>
+    </div>
+
+    <h3>Liskov Substitution Principle (LSP)</h3>
+    <p>If <code>S</code> extends <code>T</code>, anywhere you use <code>T</code> you should be able to use <code>S</code> without breaking the program. TypeScript's structural typing catches many LSP violations at compile time.</p>
+    <div class="before-after">
+      <div class="ba-block">
+        <div class="ba-header bad">Anti-Pattern — LSP Violation</div>
+        <pre><code class="language-typescript">class Rectangle {
+  setWidth(w: number): void { this.width = w }
+  setHeight(h: number): void { this.height = h }
+  area(): number { return this.width * this.height }
+}
+
+class Square extends Rectangle {
+  // Violates LSP: setWidth changes both dimensions
+  setWidth(w: number): void {
+    this.width = w
+    this.height = w  // ← breaks callers of Rectangle
+  }
+}</code></pre>
+      </div>
+      <div class="ba-block">
+        <div class="ba-header good">LSP — Prefer Composition</div>
+        <pre><code class="language-typescript">interface Shape {
+  area(): number
+}
+
+class Rectangle implements Shape {
+  constructor(
+    private readonly width: number,
+    private readonly height: number
+  ) {}
+  area() { return this.width * this.height }
+}
+
+class Square implements Shape {
+  constructor(private readonly side: number) {}
+  area() { return this.side ** 2 }
+}</code></pre>
+      </div>
+    </div>
+
+    <h3>Interface Segregation Principle (ISP)</h3>
+    <p>Split fat interfaces into small, focused ones. Clients only implement what they actually need.</p>
+    <div class="before-after">
+      <div class="ba-block">
+        <div class="ba-header bad">Anti-Pattern — Fat Interface</div>
+        <pre><code class="language-typescript">interface Worker {
+  work(): void
+  eat(): void
+  sleep(): void
+  attendMeeting(): void
+}
+
+// Robot must implement eat() and sleep()
+// even though it never eats or sleeps
+class Robot implements Worker {
+  work(): void { ... }
+  eat(): void { throw new Error('Robots do not eat') }
+  sleep(): void { throw new Error('Robots do not sleep') }
+  attendMeeting(): void { ... }
+}</code></pre>
+      </div>
+      <div class="ba-block">
+        <div class="ba-header good">ISP — Segregated Interfaces</div>
+        <pre><code class="language-typescript">interface Workable { work(): void }
+interface Feedable { eat(): void }
+interface Restable { sleep(): void }
+interface Meetable { attendMeeting(): void }
+
+class Human implements
+  Workable, Feedable, Restable, Meetable { ... }
+
+// Robot only implements what it needs
+class Robot implements Workable, Meetable {
+  work(): void { ... }
+  attendMeeting(): void { ... }
+}</code></pre>
+      </div>
+    </div>
+
+    <h3>Dependency Inversion Principle (DIP)</h3>
+    <p>This is the most powerful principle in TypeScript. High-level policy should not know about low-level details. Both depend on an interface. TypeScript interfaces are zero-cost at runtime — they exist purely to enforce the contract at compile time.</p>
+    <div class="before-after">
+      <div class="ba-block">
+        <div class="ba-header bad">Anti-Pattern — Depends on Concrete</div>
+        <pre><code class="language-typescript">import { PrismaClient } from '@prisma/client'
+
+class OrderService {
+  private db = new PrismaClient()  // ← concrete!
+
+  async getOrder(id: string) {
+    return this.db.order.findUnique({ where: { id } })
+  }
+}
+// Cannot test without a real database
+// Cannot swap to DynamoDB without editing this class</code></pre>
+      </div>
+      <div class="ba-block">
+        <div class="ba-header good">DIP — Depends on Abstraction</div>
+        <pre><code class="language-typescript">interface OrderRepository {
+  findById(id: string): Promise&lt;Order | null&gt;
+}
+
+class OrderService {
+  constructor(private readonly repo: OrderRepository) {}
+
+  async getOrder(id: string) {
+    return this.repo.findById(id)
+  }
+}
+
+// Swap freely: Prisma, DynamoDB, in-memory...
+const svc = new OrderService(new PrismaOrderRepository())
+const testSvc = new OrderService(new InMemoryOrderRepo())</code></pre>
+      </div>
+    </div>
+
+    <div class="callout callout-solid">
+      <div class="callout-title">SOLID Principle — The DI Insight</div>
+      <p>TypeScript interfaces are <em>erased at runtime</em> — they compile to nothing. This means your abstractions are purely a TypeScript construct with zero overhead. There is no better language for Dependency Inversion.</p>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- SECTION 2: DESIGN PATTERNS -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <h2 id="design-patterns">2. Design Patterns in TypeScript</h2>
+    <p>The Gang of Four patterns were written for statically-typed OO languages. TypeScript inherits all of them — and improves several with generics and discriminated unions.</p>
+
+    <!-- ─── CREATIONAL ────────────────────────────────────────── -->
+    <h3>Creational Patterns</h3>
+
+    <div class="pattern-header">
+      <span class="pattern-badge badge-creational">Creational</span>
+      <strong>Factory Pattern</strong>
+    </div>
+    <p><strong>Problem:</strong> Callers shouldn't need to know which concrete class to instantiate — they should ask a factory for the right object based on a key or config.</p>
+
+    <div class="diagram-wrap">
+      <svg width="560" height="180" viewBox="0 0 560 180" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#6B7280"/>
+          </marker>
+        </defs>
+        <!-- Factory box -->
+        <rect x="180" y="20" width="200" height="50" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+        <text x="280" y="41" text-anchor="middle" font-size="11" font-weight="700" fill="#4F46E5" font-family="system-ui">«interface»</text>
+        <text x="280" y="58" text-anchor="middle" font-size="13" font-weight="600" fill="#1F2937" font-family="system-ui">NotifierFactory</text>
+        <!-- Concrete boxes -->
+        <rect x="40" y="120" width="160" height="44" rx="8" fill="#F0FDF4" stroke="#10B981" stroke-width="1.5"/>
+        <text x="120" y="142" text-anchor="middle" font-size="12" font-weight="600" fill="#065F46" font-family="system-ui">EmailNotifier</text>
+        <text x="120" y="158" text-anchor="middle" font-size="10" fill="#6B7280" font-family="system-ui">send(msg)</text>
+        <rect x="220" y="120" width="160" height="44" rx="8" fill="#F0FDF4" stroke="#10B981" stroke-width="1.5"/>
+        <text x="300" y="142" text-anchor="middle" font-size="12" font-weight="600" fill="#065F46" font-family="system-ui">SlackNotifier</text>
+        <text x="300" y="158" text-anchor="middle" font-size="10" fill="#6B7280" font-family="system-ui">send(msg)</text>
+        <rect x="400" y="120" width="160" height="44" rx="8" fill="#F0FDF4" stroke="#10B981" stroke-width="1.5"/>
+        <text x="480" y="142" text-anchor="middle" font-size="12" font-weight="600" fill="#065F46" font-family="system-ui">SMSNotifier</text>
+        <text x="480" y="158" text-anchor="middle" font-size="10" fill="#6B7280" font-family="system-ui">send(msg)</text>
+        <!-- Arrows -->
+        <line x1="120" y1="120" x2="240" y2="72" stroke="#6B7280" stroke-width="1.5" marker-end="url(#arrow)" stroke-dasharray="4,3"/>
+        <line x1="300" y1="120" x2="290" y2="72" stroke="#6B7280" stroke-width="1.5" marker-end="url(#arrow)" stroke-dasharray="4,3"/>
+        <line x1="480" y1="120" x2="330" y2="72" stroke="#6B7280" stroke-width="1.5" marker-end="url(#arrow)" stroke-dasharray="4,3"/>
+      </svg>
+      <div class="diagram-caption">Factory pattern: concrete types implement a shared interface; the factory returns the right one.</div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-label">Factory Pattern<span class="lang-badge">TypeScript</span></div>
+      <pre><code class="language-typescript">interface Notifier {
+  send(message: string): Promise&lt;void&gt;
+}
+
+class EmailNotifier implements Notifier {
+  async send(message: string) { /* smtp */ }
+}
+
+class SlackNotifier implements Notifier {
+  async send(message: string) { /* webhook */ }
+}
+
+// Simple factory function (preferred over factory class)
+type Channel = 'email' | 'slack' | 'sms'
+
+function createNotifier(channel: Channel): Notifier {
+  switch (channel) {
+    case 'email': return new EmailNotifier()
+    case 'slack': return new SlackNotifier()
+    case 'sms':   return new SMSNotifier()
+    default:      channel satisfies never  // exhaustiveness check!
+  }
+}
+
+// Abstract Factory: family of related objects
+interface UIFactory {
+  createButton(): Button
+  createInput(): Input
+  createModal(): Modal
+}
+
+class WebUIFactory implements UIFactory { ... }
+class MobileUIFactory implements UIFactory { ... }</code></pre>
+    </div>
+
+    <div class="pattern-header">
+      <span class="pattern-badge badge-creational">Creational</span>
+      <strong>Builder Pattern</strong>
+    </div>
+    <p><strong>Problem:</strong> Constructing complex objects step by step without a constructor with 12 parameters. TypeScript generics make the builder type-safe — incomplete builders can be typed to prevent premature use.</p>
+
+    <div class="code-block">
+      <div class="code-label">Builder Pattern with Method Chaining<span class="lang-badge">TypeScript</span></div>
+      <pre><code class="language-typescript">class QueryBuilder&lt;T&gt; {
+  private table = ''
+  private conditions: string[] = []
+  private limitVal?: number
+  private orderByCol?: string
+
+  from(table: string): this {
+    this.table = table
+    return this
+  }
+
+  where(condition: string): this {
+    this.conditions.push(condition)
+    return this
+  }
+
+  limit(n: number): this {
+    this.limitVal = n
+    return this
+  }
+
+  orderBy(col: string): this {
+    this.orderByCol = col
+    return this
+  }
+
+  build(): string {
+    let sql = `SELECT * FROM ${this.table}`
+    if (this.conditions.length)
+      sql += ` WHERE ${this.conditions.join(' AND ')}`
+    if (this.orderByCol)
+      sql += ` ORDER BY ${this.orderByCol}`
+    if (this.limitVal !== undefined)
+      sql += ` LIMIT ${this.limitVal}`
+    return sql
+  }
+}
+
+const query = new QueryBuilder&lt;User&gt;()
+  .from('users')
+  .where('age > 18')
+  .where('active = true')
+  .orderBy('created_at')
+  .limit(50)
+  .build()
+// → SELECT * FROM users WHERE age > 18 AND active = true ORDER BY created_at LIMIT 50</code></pre>
+    </div>
+
+    <div class="pattern-header">
+      <span class="pattern-badge badge-creational">Creational</span>
+      <strong>Singleton — and Why to Avoid It</strong>
+    </div>
+
+    <div class="callout callout-anti">
+      <div class="callout-title">Anti-Pattern — Singleton</div>
+      <p>Singletons are global mutable state with a fancy name. They make testing hard (you can't swap the instance), create hidden dependencies, and cause subtle bugs in serverless/multi-thread environments. Use Dependency Injection instead. The only legitimate use: a module-level <code>const</code>.</p>
+    </div>
+
+    <div class="before-after">
+      <div class="ba-block">
+        <div class="ba-header bad">Avoid — Classic Singleton</div>
+        <pre><code class="language-typescript">class DatabaseConnection {
+  private static instance: DatabaseConnection
+
+  static getInstance(): DatabaseConnection {
+    if (!this.instance)
+      this.instance = new DatabaseConnection()
+    return this.instance
+  }
+  // Impossible to mock in tests
+  query(sql: string) { ... }
+}</code></pre>
+      </div>
+      <div class="ba-block">
+        <div class="ba-header good">Prefer — Module Singleton</div>
+        <pre><code class="language-typescript">// db.ts — module is naturally a singleton
+import { Pool } from 'pg'
+
+export const db = new Pool({
+  connectionString: process.env.DATABASE_URL,
+})
+
+// In tests, mock the module:
+// jest.mock('./db', () => ({ db: mockPool }))
+// Or better: use DI and pass db as a parameter</code></pre>
+      </div>
+    </div>
+
+    <div class="pattern-header">
+      <span class="pattern-badge badge-creational">Creational</span>
+      <strong>Dependency Injection (Manual vs Container)</strong>
+    </div>
+
+    <div class="code-block">
+      <div class="code-label">Manual DI — Simple and Explicit<span class="lang-badge">TypeScript</span></div>
+      <pre><code class="language-typescript">// Define interfaces
+interface Logger { info(msg: string): void }
+interface Cache { get(key: string): Promise&lt;string | null&gt; }
+
+// Concrete implementations
+class PinoLogger implements Logger {
+  info(msg: string) { console.log(JSON.stringify({ msg, time: Date.now() })) }
+}
+
+class RedisCache implements Cache {
+  async get(key: string) { /* redis.get(key) */ return null }
+}
+
+// High-level service receives dependencies via constructor
+class UserService {
+  constructor(
+    private readonly repo: UserRepository,
+    private readonly cache: Cache,
+    private readonly logger: Logger
+  ) {}
+
+  async findUser(id: string): Promise&lt;User | null&gt; {
+    const cached = await this.cache.get(`user:${id}`)
+    if (cached) return JSON.parse(cached)
+    this.logger.info(`Cache miss for user ${id}`)
+    return this.repo.findById(id)
+  }
+}
+
+// Composition root (one place wires everything)
+const userService = new UserService(
+  new PrismaUserRepository(db),
+  new RedisCache(redis),
+  new PinoLogger()
+)
+
+// Tests become trivial
+const testService = new UserService(
+  new InMemoryUserRepository(),
+  new NoopCache(),
+  new NoopLogger()
+)</code></pre>
+    </div>
+
+    <div class="callout callout-tip">
+      <div class="callout-title">Tip — When to Use a DI Container</div>
+      <p>Manual DI works for apps with fewer than ~30 services. Beyond that, wiring becomes tedious. Use <code>inversify</code>, <code>tsyringe</code>, or <code>awilix</code> when you need automatic wiring, scoped lifetimes (singleton vs request-scoped), or lazy instantiation.</p>
+    </div>
+
+    <!-- ─── STRUCTURAL ────────────────────────────────────────── -->
+    <h3>Structural Patterns</h3>
+
+    <div class="pattern-header">
+      <span class="pattern-badge badge-structural">Structural</span>
+      <strong>Adapter Pattern — Wrapping Third-Party Libraries</strong>
+    </div>
+    <p><strong>Problem:</strong> You're depending on a third-party SDK directly. When the SDK changes or you want to swap it, you touch every caller. Wrap it in an interface you own.</p>
+
+    <div class="diagram-wrap">
+      <svg width="560" height="130" viewBox="0 0 560 130" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="arr2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#6B7280"/>
+          </marker>
+        </defs>
+        <rect x="10" y="40" width="130" height="50" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+        <text x="75" y="62" text-anchor="middle" font-size="11" font-weight="700" fill="#4F46E5" font-family="system-ui">Your Code</text>
+        <text x="75" y="78" text-anchor="middle" font-size="10" fill="#6B7280" font-family="system-ui">EmailSender interface</text>
+        <rect x="200" y="40" width="150" height="50" rx="8" fill="#F0FDFA" stroke="#14B8A6" stroke-width="1.5"/>
+        <text x="275" y="62" text-anchor="middle" font-size="11" font-weight="700" fill="#0D9488" font-family="system-ui">SendGridAdapter</text>
+        <text x="275" y="78" text-anchor="middle" font-size="10" fill="#6B7280" font-family="system-ui">implements EmailSender</text>
+        <rect x="410" y="40" width="140" height="50" rx="8" fill="#FEF3C7" stroke="#F59E0B" stroke-width="1.5"/>
+        <text x="480" y="62" text-anchor="middle" font-size="11" font-weight="700" fill="#92400E" font-family="system-ui">SendGrid SDK</text>
+        <text x="480" y="78" text-anchor="middle" font-size="10" fill="#6B7280" font-family="system-ui">Third-party</text>
+        <line x1="140" y1="65" x2="198" y2="65" stroke="#6B7280" stroke-width="1.5" marker-end="url(#arr2)"/>
+        <line x1="350" y1="65" x2="408" y2="65" stroke="#6B7280" stroke-width="1.5" marker-end="url(#arr2)"/>
+        <text x="169" y="58" text-anchor="middle" font-size="10" fill="#6B7280" font-family="system-ui">uses</text>
+        <text x="379" y="58" text-anchor="middle" font-size="10" fill="#6B7280" font-family="system-ui">wraps</text>
+      </svg>
+      <div class="diagram-caption">Adapter insulates your code from third-party SDKs. Swap SendGrid for SES by swapping one class.</div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-label">Adapter Pattern<span class="lang-badge">TypeScript</span></div>
+      <pre><code class="language-typescript">// Interface YOU own
+interface EmailSender {
+  send(to: string, subject: string, body: string): Promise&lt;void&gt;
+}
+
+// Adapter wraps the third-party SDK
+class SendGridAdapter implements EmailSender {
+  private client: SendGridClient
+
+  constructor(apiKey: string) {
+    this.client = new SendGridClient(apiKey)
+  }
+
+  async send(to: string, subject: string, body: string) {
+    await this.client.sendEmail({
+      to,
+      from: 'noreply@myapp.com',
+      subject,
+      html: body,
+    })
+  }
+}
+
+// Swap to SES: zero changes to callers
+class SESAdapter implements EmailSender {
+  async send(to: string, subject: string, body: string) {
+    /* AWS SES implementation */
+  }
+}
+
+// Test double
+class NoopEmailSender implements EmailSender {
+  readonly sent: Array&lt;{to: string; subject: string}&gt; = []
+  async send(to: string, subject: string) {
+    this.sent.push({ to, subject })
+  }
+}</code></pre>
+    </div>
+
+    <div class="pattern-header">
+      <span class="pattern-badge badge-structural">Structural</span>
+      <strong>Decorator Pattern</strong>
+    </div>
+    <p><strong>Problem:</strong> Add behavior to an object without subclassing. TypeScript has built-in decorator syntax (Stage 3), but the pattern also works without it using class wrapping.</p>
+
+    <div class="code-block">
+      <div class="code-label">Decorator Pattern — Both Styles<span class="lang-badge">TypeScript</span></div>
+      <pre><code class="language-typescript">// ─── Pattern-based Decorator (no @decorator syntax) ───────────
+interface Service {
+  execute(input: string): Promise&lt;string&gt;
+}
+
+class LoggingDecorator implements Service {
+  constructor(
+    private readonly inner: Service,
+    private readonly logger: Logger
+  ) {}
+
+  async execute(input: string): Promise&lt;string&gt; {
+    this.logger.info(`Calling execute with: ${input}`)
+    const start = Date.now()
+    const result = await this.inner.execute(input)
+    this.logger.info(`execute took ${Date.now() - start}ms`)
+    return result
+  }
+}
+
+class CachingDecorator implements Service {
+  private cache = new Map&lt;string, string&gt;()
+  constructor(private readonly inner: Service) {}
+
+  async execute(input: string): Promise&lt;string&gt; {
+    if (this.cache.has(input)) return this.cache.get(input)!
+    const result = await this.inner.execute(input)
+    this.cache.set(input, result)
+    return result
+  }
+}
+
+// Stack decorators: Logging → Caching → RealService
+const service = new LoggingDecorator(
+  new CachingDecorator(new RealService()),
+  logger
+)
+
+// ─── TypeScript @decorator syntax (tsconfig: experimentalDecorators) ─
+function Log(target: any, key: string, descriptor: PropertyDescriptor) {
+  const original = descriptor.value
+  descriptor.value = async function (...args: any[]) {
+    console.log(`${key} called with`, args)
+    return original.apply(this, args)
+  }
+  return descriptor
+}
+
+class PaymentService {
+  @Log
+  async charge(amount: number, card: string): Promise&lt;void&gt; { ... }
+}</code></pre>
+    </div>
+
+    <div class="pattern-header">
+      <span class="pattern-badge badge-structural">Structural</span>
+      <strong>Proxy Pattern</strong>
+    </div>
+
+    <div class="code-block">
+      <div class="code-label">Proxy Pattern — Lazy Loading &amp; Access Control<span class="lang-badge">TypeScript</span></div>
+      <pre><code class="language-typescript">interface ImageLoader {
+  display(): void
+}
+
+// Real object (expensive to create)
+class RealImage implements ImageLoader {
+  constructor(private readonly filename: string) {
+    this.loadFromDisk()  // expensive!
+  }
+  private loadFromDisk() { console.log(`Loading ${this.filename}`) }
+  display() { console.log(`Displaying ${this.filename}`) }
+}
+
+// Proxy: lazy-loads only when display() is called
+class ImageProxy implements ImageLoader {
+  private real?: RealImage
+  constructor(private readonly filename: string) {}
+
+  display() {
+    if (!this.real) this.real = new RealImage(this.filename)
+    this.real.display()
+  }
+}
+
+// TypeScript Proxy (ES6) for meta-programming
+const handler: ProxyHandler&lt;Record&lt;string, any&gt;&gt; = {
+  get(target, key) {
+    console.log(`Getting property: ${String(key)}`)
+    return Reflect.get(target, key)
+  },
+  set(target, key, value) {
+    console.log(`Setting ${String(key)} = ${value}`)
+    return Reflect.set(target, key, value)
+  },
+}
+
+const observed = new Proxy&lt;Record&lt;string, any&gt;&gt;({}, handler)</code></pre>
+    </div>
+
+    <div class="pattern-header">
+      <span class="pattern-badge badge-structural">Structural</span>
+      <strong>Facade Pattern</strong>
+    </div>
+    <p><strong>Problem:</strong> A complex subsystem (video encoding, payment processing, shipping) has many moving parts. A facade provides a simple interface.</p>
+
+    <div class="code-block">
+      <div class="code-label">Facade Pattern<span class="lang-badge">TypeScript</span></div>
+      <pre><code class="language-typescript">// Complex subsystems
+class InventoryService { reserve(productId: string, qty: number) {} }
+class PaymentGateway  { charge(card: Card, amount: number) {} }
+class ShippingService { createLabel(order: Order) {} }
+class EmailService    { sendConfirmation(email: string) {} }
+
+// Facade hides all the complexity
+class CheckoutFacade {
+  constructor(
+    private inventory: InventoryService,
+    private payment: PaymentGateway,
+    private shipping: ShippingService,
+    private email: EmailService,
+  ) {}
+
+  async checkout(cart: Cart, card: Card, user: User): Promise&lt;OrderResult&gt; {
+    await this.inventory.reserve(cart.productId, cart.qty)
+    const charge = await this.payment.charge(card, cart.total)
+    const order = new Order(cart, charge)
+    await this.shipping.createLabel(order)
+    await this.email.sendConfirmation(user.email)
+    return { orderId: order.id, status: 'success' }
+  }
+}
+
+// Callers only see one method
+const facade = new CheckoutFacade(inv, pay, ship, mail)
+await facade.checkout(cart, card, user)</code></pre>
+    </div>
+
+    <!-- ─── BEHAVIORAL ────────────────────────────────────────── -->
+    <h3>Behavioral Patterns</h3>
+
+    <div class="pattern-header">
+      <span class="pattern-badge badge-behavioral">Behavioral</span>
+      <strong>Observer / EventEmitter Pattern</strong>
+    </div>
+
+    <div class="diagram-wrap">
+      <svg width="520" height="160" viewBox="0 0 520 160" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="arr3" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#6B7280"/>
+          </marker>
+        </defs>
+        <rect x="185" y="10" width="150" height="50" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+        <text x="260" y="32" text-anchor="middle" font-size="12" font-weight="700" fill="#4F46E5" font-family="system-ui">EventEmitter</text>
+        <text x="260" y="48" text-anchor="middle" font-size="10" fill="#6B7280" font-family="system-ui">emit(event, data)</text>
+        <rect x="10" y="100" width="130" height="44" rx="8" fill="#F3E8FF" stroke="#7C3AED" stroke-width="1.5"/>
+        <text x="75" y="124" text-anchor="middle" font-size="11" font-weight="600" fill="#5B21B6" font-family="system-ui">EmailObserver</text>
+        <text x="75" y="138" text-anchor="middle" font-size="10" fill="#6B7280" font-family="system-ui">onUserCreated</text>
+        <rect x="195" y="100" width="130" height="44" rx="8" fill="#F3E8FF" stroke="#7C3AED" stroke-width="1.5"/>
+        <text x="260" y="124" text-anchor="middle" font-size="11" font-weight="600" fill="#5B21B6" font-family="system-ui">SlackObserver</text>
+        <text x="260" y="138" text-anchor="middle" font-size="10" fill="#6B7280" font-family="system-ui">onUserCreated</text>
+        <rect x="380" y="100" width="130" height="44" rx="8" fill="#F3E8FF" stroke="#7C3AED" stroke-width="1.5"/>
+        <text x="445" y="124" text-anchor="middle" font-size="11" font-weight="600" fill="#5B21B6" font-family="system-ui">AuditObserver</text>
+        <text x="445" y="138" text-anchor="middle" font-size="10" fill="#6B7280" font-family="system-ui">onUserCreated</text>
+        <line x1="220" y1="60" x2="100" y2="100" stroke="#6B7280" stroke-width="1.5" marker-end="url(#arr3)"/>
+        <line x1="250" y1="60" x2="255" y2="100" stroke="#6B7280" stroke-width="1.5" marker-end="url(#arr3)"/>
+        <line x1="290" y1="60" x2="420" y2="100" stroke="#6B7280" stroke-width="1.5" marker-end="url(#arr3)"/>
+        <text x="260" y="88" text-anchor="middle" font-size="10" fill="#9CA3AF" font-family="system-ui">notify all subscribers</text>
+      </svg>
+      <div class="diagram-caption">Observer: one event, many handlers — all decoupled from each other.</div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-label">Type-safe EventEmitter<span class="lang-badge">TypeScript</span></div>
+      <pre><code class="language-typescript">// Typed event map
+type AppEvents = {
+  'user.created': { userId: string; email: string }
+  'order.placed': { orderId: string; total: number }
+  'payment.failed': { orderId: string; reason: string }
+}
+
+class TypedEventEmitter&lt;Events extends Record&lt;string, any&gt;&gt; {
+  private listeners = new Map&lt;string, Array&lt;(data: any) =&gt; void&gt;&gt;()
+
+  on&lt;K extends keyof Events&gt;(
+    event: K,
+    listener: (data: Events[K]) =&gt; void
+  ): void {
+    const key = String(event)
+    const existing = this.listeners.get(key) ?? []
+    this.listeners.set(key, [...existing, listener])
+  }
+
+  emit&lt;K extends keyof Events&gt;(event: K, data: Events[K]): void {
+    this.listeners.get(String(event))?.forEach(fn =&gt; fn(data))
+  }
+
+  off&lt;K extends keyof Events&gt;(event: K, listener: Function): void {
+    const key = String(event)
+    this.listeners.set(
+      key,
+      (this.listeners.get(key) ?? []).filter(fn =&gt; fn !== listener)
+    )
+  }
+}
+
+const emitter = new TypedEventEmitter&lt;AppEvents&gt;()
+
+emitter.on('user.created', ({ userId, email }) =&gt; {
+  // TypeScript knows the shape — fully typed!
+  sendWelcomeEmail(email)
+})
+
+emitter.emit('user.created', { userId: '123', email: 'a@b.com' })</code></pre>
+    </div>
+
+    <div class="pattern-header">
+      <span class="pattern-badge badge-behavioral">Behavioral</span>
+      <strong>Strategy Pattern</strong>
+    </div>
+    <p><strong>Problem:</strong> You need to switch algorithms at runtime. TypeScript interfaces make strategy objects naturally composable.</p>
+
+    <div class="diagram-wrap">
+      <svg width="500" height="170" viewBox="0 0 500 170" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="arr4" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#6B7280"/>
+          </marker>
+        </defs>
+        <!-- Context -->
+        <rect x="170" y="10" width="160" height="60" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+        <text x="250" y="32" text-anchor="middle" font-size="12" font-weight="700" fill="#4F46E5" font-family="system-ui">Sorter (Context)</text>
+        <text x="250" y="48" text-anchor="middle" font-size="10" fill="#6B7280" font-family="system-ui">strategy: SortStrategy</text>
+        <text x="250" y="62" text-anchor="middle" font-size="10" fill="#6B7280" font-family="system-ui">sort(data[]): data[]</text>
+        <!-- Strategy interface -->
+        <rect x="170" y="90" width="160" height="44" rx="8" fill="#F0FDFA" stroke="#14B8A6" stroke-width="1.5"/>
+        <text x="250" y="107" text-anchor="middle" font-size="10" font-weight="700" fill="#14B8A6" font-family="system-ui">«interface»</text>
+        <text x="250" y="122" text-anchor="middle" font-size="12" font-weight="600" fill="#0F766E" font-family="system-ui">SortStrategy</text>
+        <!-- Concrete strategies -->
+        <rect x="10" y="148" width="100" height="16" rx="4" fill="#F0FDF4" stroke="#10B981" stroke-width="1"/>
+        <text x="60" y="160" text-anchor="middle" font-size="10" font-weight="600" fill="#065F46" font-family="system-ui">QuickSort</text>
+        <rect x="125" y="148" width="100" height="16" rx="4" fill="#F0FDF4" stroke="#10B981" stroke-width="1"/>
+        <text x="175" y="160" text-anchor="middle" font-size="10" font-weight="600" fill="#065F46" font-family="system-ui">MergeSort</text>
+        <rect x="240" y="148" width="100" height="16" rx="4" fill="#F0FDF4" stroke="#10B981" stroke-width="1"/>
+        <text x="290" y="160" text-anchor="middle" font-size="10" font-weight="600" fill="#065F46" font-family="system-ui">BubbleSort</text>
+        <rect x="355" y="148" width="110" height="16" rx="4" fill="#F0FDF4" stroke="#10B981" stroke-width="1"/>
+        <text x="410" y="160" text-anchor="middle" font-size="10" font-weight="600" fill="#065F46" font-family="system-ui">RadixSort</text>
+        <line x1="250" y1="70" x2="250" y2="89" stroke="#4F46E5" stroke-width="1.5" marker-end="url(#arr4)"/>
+        <line x1="60"  y1="148" x2="195" y2="136" stroke="#6B7280" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arr4)"/>
+        <line x1="175" y1="148" x2="225" y2="136" stroke="#6B7280" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arr4)"/>
+        <line x1="290" y1="148" x2="265" y2="136" stroke="#6B7280" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arr4)"/>
+        <line x1="410" y1="148" x2="305" y2="136" stroke="#6B7280" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arr4)"/>
+      </svg>
+      <div class="diagram-caption">Strategy: swap algorithms at runtime by swapping the strategy object.</div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-label">Strategy Pattern<span class="lang-badge">TypeScript</span></div>
+      <pre><code class="language-typescript">interface PricingStrategy {
+  calculate(basePrice: number, user: User): number
+}
+
+class RegularPricing implements PricingStrategy {
+  calculate(basePrice: number, _user: User) { return basePrice }
+}
+
+class MemberPricing implements PricingStrategy {
+  calculate(basePrice: number, _user: User) { return basePrice * 0.85 }
+}
+
+class PeakHourPricing implements PricingStrategy {
+  calculate(basePrice: number, _user: User) {
+    const hour = new Date().getHours()
+    return hour >= 17 && hour &lt;= 20 ? basePrice * 1.3 : basePrice
+  }
+}
+
+class PriceCalculator {
+  constructor(private strategy: PricingStrategy) {}
+
+  setStrategy(strategy: PricingStrategy) { this.strategy = strategy }
+
+  getPrice(basePrice: number, user: User): number {
+    return this.strategy.calculate(basePrice, user)
+  }
+}
+
+// Switch at runtime
+const calc = new PriceCalculator(new RegularPricing())
+calc.getPrice(100, user)  // 100
+
+if (user.isMember) calc.setStrategy(new MemberPricing())
+calc.getPrice(100, user)  // 85</code></pre>
+    </div>
+
+    <div class="pattern-header">
+      <span class="pattern-badge badge-behavioral">Behavioral</span>
+      <strong>Command Pattern — with Discriminated Unions!</strong>
+    </div>
+    <p><strong>Problem:</strong> Encapsulate requests as objects for undo/redo, queuing, logging. TypeScript discriminated unions make command types exhaustive and self-documenting.</p>
+
+    <div class="code-block">
+      <div class="code-label">Command Pattern with Discriminated Unions<span class="lang-badge">TypeScript</span></div>
+      <pre><code class="language-typescript">// Commands as discriminated union — exhaustive by nature
+type EditorCommand =
+  | { type: 'INSERT_TEXT'; position: number; text: string }
+  | { type: 'DELETE_TEXT'; start: number; end: number }
+  | { type: 'BOLD'; start: number; end: number }
+  | { type: 'SET_FONT'; size: number; family: string }
+
+interface CommandHandler {
+  execute(cmd: EditorCommand): void
+  undo(): void
+}
+
+class EditorCommandProcessor {
+  private history: EditorCommand[] = []
+
+  execute(cmd: EditorCommand, doc: Document): void {
+    switch (cmd.type) {
+      case 'INSERT_TEXT':
+        doc.insert(cmd.position, cmd.text)
+        break
+      case 'DELETE_TEXT':
+        doc.delete(cmd.start, cmd.end)
+        break
+      case 'BOLD':
+        doc.setBold(cmd.start, cmd.end)
+        break
+      case 'SET_FONT':
+        doc.setFont(cmd.size, cmd.family)
+        break
+      default:
+        cmd satisfies never  // TypeScript ensures exhaustiveness
+    }
+    this.history.push(cmd)
+  }
+
+  undo(doc: Document): void {
+    const last = this.history.pop()
+    if (!last) return
+    // Reverse the command
+    if (last.type === 'INSERT_TEXT')
+      doc.delete(last.position, last.position + last.text.length)
+  }
+}</code></pre>
+    </div>
+
+    <div class="pattern-header">
+      <span class="pattern-badge badge-behavioral">Behavioral</span>
+      <strong>Iterator Pattern — Generators in TypeScript</strong>
+    </div>
+
+    <div class="code-block">
+      <div class="code-label">Iterator with Generators<span class="lang-badge">TypeScript</span></div>
+      <pre><code class="language-typescript">// TypeScript generators implement the iterator protocol natively
+function* range(start: number, end: number, step = 1): Generator&lt;number&gt; {
+  for (let i = start; i &lt; end; i += step) yield i
+}
+
+function* take&lt;T&gt;(n: number, iter: Iterable&lt;T&gt;): Generator&lt;T&gt; {
+  let count = 0
+  for (const item of iter) {
+    if (count++ &gt;= n) return
+    yield item
+  }
+}
+
+// Paginated DB cursor as async generator
+async function* paginateUsers(pageSize = 100): AsyncGenerator&lt;User&gt; {
+  let cursor: string | undefined
+  while (true) {
+    const { users, nextCursor } = await fetchUsers({ cursor, pageSize })
+    for (const user of users) yield user
+    if (!nextCursor) return
+    cursor = nextCursor
+  }
+}
+
+// Consumer — lazy, memory-efficient
+for await (const user of paginateUsers()) {
+  await processUser(user)
+  // Only one page in memory at a time
+}</code></pre>
+    </div>
+
+    <div class="pattern-header">
+      <span class="pattern-badge badge-behavioral">Behavioral</span>
+      <strong>State Machine Pattern</strong>
+    </div>
+
+    <div class="code-block">
+      <div class="code-label">Finite State Machine with Discriminated Unions<span class="lang-badge">TypeScript</span></div>
+      <pre><code class="language-typescript">type OrderStatus = 'pending' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled'
+
+type OrderState =
+  | { status: 'pending' }
+  | { status: 'confirmed'; confirmedAt: Date }
+  | { status: 'shipped'; trackingId: string; shippedAt: Date }
+  | { status: 'delivered'; deliveredAt: Date }
+  | { status: 'cancelled'; reason: string }
+
+type OrderEvent =
+  | { type: 'CONFIRM' }
+  | { type: 'SHIP'; trackingId: string }
+  | { type: 'DELIVER' }
+  | { type: 'CANCEL'; reason: string }
+
+function transition(state: OrderState, event: OrderEvent): OrderState {
+  switch (state.status) {
+    case 'pending':
+      if (event.type === 'CONFIRM')
+        return { status: 'confirmed', confirmedAt: new Date() }
+      if (event.type === 'CANCEL')
+        return { status: 'cancelled', reason: event.reason }
+      break
+    case 'confirmed':
+      if (event.type === 'SHIP')
+        return { status: 'shipped', trackingId: event.trackingId, shippedAt: new Date() }
+      if (event.type === 'CANCEL')
+        return { status: 'cancelled', reason: event.reason }
+      break
+    case 'shipped':
+      if (event.type === 'DELIVER')
+        return { status: 'delivered', deliveredAt: new Date() }
+      break
+  }
+  return state  // Invalid transitions are no-ops
+}
+
+// Usage
+let order: OrderState = { status: 'pending' }
+order = transition(order, { type: 'CONFIRM' })
+order = transition(order, { type: 'SHIP', trackingId: 'UPS-123' })
+// TypeScript knows order.trackingId exists here</code></pre>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- SECTION 3: FUNCTIONAL PATTERNS -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <h2 id="functional">3. Functional Programming Patterns</h2>
+
+    <div class="pattern-header">
+      <span class="pattern-badge badge-functional">Functional</span>
+      <strong>Pure Functions &amp; Immutability</strong>
+    </div>
+
+    <div class="code-block">
+      <div class="code-label">Immutability Patterns<span class="lang-badge">TypeScript</span></div>
+      <pre><code class="language-typescript">// Prefer readonly everywhere
+interface User {
+  readonly id: string
+  readonly email: string
+  readonly name: string
+}
+
+// Deep readonly for nested objects
+type DeepReadonly&lt;T&gt; = {
+  readonly [K in keyof T]: T[K] extends object ? DeepReadonly&lt;T[K]&gt; : T[K]
+}
+
+// Update immutably with spread
+function updateEmail(user: User, email: string): User {
+  return { ...user, email }  // returns new object, original untouched
+}
+
+// Immutable array operations
+const users: readonly User[] = [...]
+const withNew = [...users, newUser]       // append
+const without = users.filter(u =&gt; u.id !== '123')  // remove
+const updated = users.map(u =&gt; u.id === '123' ? { ...u, email } : u)</code></pre>
+    </div>
+
+    <div class="pattern-header">
+      <span class="pattern-badge badge-functional">Functional</span>
+      <strong>Function Composition</strong>
+    </div>
+
+    <div class="code-block">
+      <div class="code-label">Compose and Pipe<span class="lang-badge">TypeScript</span></div>
+      <pre><code class="language-typescript">// pipe: left to right (most readable)
+const pipe = &lt;T&gt;(...fns: Array&lt;(x: T) =&gt; T&gt;) =&gt;
+  (x: T): T =&gt; fns.reduce((v, f) =&gt; f(v), x)
+
+// compose: right to left (math convention)
+const compose = &lt;T&gt;(...fns: Array&lt;(x: T) =&gt; T&gt;) =&gt;
+  (x: T): T =&gt; fns.reduceRight((v, f) =&gt; f(v), x)
+
+// Usage
+const processUser = pipe(
+  (user: User) =&gt; ({ ...user, name: user.name.trim() }),
+  (user: User) =&gt; ({ ...user, email: user.email.toLowerCase() }),
+  (user: User) =&gt; ({ ...user, createdAt: new Date() }),
+)
+
+const result = processUser(rawUser)</code></pre>
+    </div>
+
+    <div class="pattern-header">
+      <span class="pattern-badge badge-functional">Functional</span>
+      <strong>Result Type — Railway-Oriented Programming</strong>
+    </div>
+    <p>The <code>Result</code> type (also called <code>Either</code>) is the single most valuable pattern from FP for production TypeScript. It makes error handling <em>composable</em> and forces callers to handle failure cases.</p>
+
+    <div class="diagram-wrap">
+      <svg width="560" height="120" viewBox="0 0 560 120" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="arr5" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#10B981"/>
+          </marker>
+          <marker id="arr5r" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#EF4444"/>
+          </marker>
+        </defs>
+        <!-- Happy path (top) -->
+        <rect x="10" y="20" width="90" height="32" rx="6" fill="#DCFCE7" stroke="#10B981" stroke-width="1.5"/>
+        <text x="55" y="40" text-anchor="middle" font-size="11" font-weight="600" fill="#065F46" font-family="system-ui">Input</text>
+        <line x1="100" y1="36" x2="155" y2="36" stroke="#10B981" stroke-width="2" marker-end="url(#arr5)"/>
+        <rect x="155" y="20" width="100" height="32" rx="6" fill="#DCFCE7" stroke="#10B981" stroke-width="1.5"/>
+        <text x="205" y="40" text-anchor="middle" font-size="10" font-weight="600" fill="#065F46" font-family="system-ui">validate()</text>
+        <line x1="255" y1="36" x2="305" y2="36" stroke="#10B981" stroke-width="2" marker-end="url(#arr5)"/>
+        <rect x="305" y="20" width="100" height="32" rx="6" fill="#DCFCE7" stroke="#10B981" stroke-width="1.5"/>
+        <text x="355" y="40" text-anchor="middle" font-size="10" font-weight="600" fill="#065F46" font-family="system-ui">transform()</text>
+        <line x1="405" y1="36" x2="455" y2="36" stroke="#10B981" stroke-width="2" marker-end="url(#arr5)"/>
+        <rect x="455" y="20" width="95" height="32" rx="6" fill="#DCFCE7" stroke="#10B981" stroke-width="1.5"/>
+        <text x="502" y="40" text-anchor="middle" font-size="10" font-weight="600" fill="#065F46" font-family="system-ui">Ok(result)</text>
+        <!-- Error path (bottom) -->
+        <rect x="155" y="78" width="100" height="32" rx="6" fill="#FEE2E2" stroke="#EF4444" stroke-width="1.5"/>
+        <text x="205" y="98" text-anchor="middle" font-size="10" font-weight="600" fill="#991B1B" font-family="system-ui">Error path</text>
+        <line x1="205" y1="52" x2="205" y2="78" stroke="#EF4444" stroke-width="2" stroke-dasharray="4,3" marker-end="url(#arr5r)"/>
+        <line x1="255" y1="94" x2="455" y2="94" stroke="#EF4444" stroke-width="2" marker-end="url(#arr5r)"/>
+        <rect x="455" y="78" width="95" height="32" rx="6" fill="#FEE2E2" stroke="#EF4444" stroke-width="1.5"/>
+        <text x="502" y="98" text-anchor="middle" font-size="10" font-weight="600" fill="#991B1B" font-family="system-ui">Err(error)</text>
+        <text x="55" y="112" text-anchor="middle" font-size="9" fill="#9CA3AF" font-family="system-ui">Railway</text>
+        <text x="55" y="124" text-anchor="middle" font-size="9" fill="#9CA3AF" font-family="system-ui">diverges here</text>
+      </svg>
+      <div class="diagram-caption">Railway-oriented programming: success flows on the top rail, errors fall to the bottom — no exceptions thrown.</div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-label">Complete Result&lt;T, E&gt; Implementation<span class="lang-badge">TypeScript</span></div>
+      <pre><code class="language-typescript">// ─── Core Result Type ──────────────────────────────────────────
+type Result&lt;T, E = string&gt; =
+  | { success: true;  data: T }
+  | { success: false; error: E }
+
+// Constructors
+const Ok  = &lt;T, E = never&gt;(data: T): Result&lt;T, E&gt; =&gt; ({ success: true, data })
+const Err = &lt;T = never, E = string&gt;(error: E): Result&lt;T, E&gt; =&gt; ({ success: false, error })
+
+// Combinators
+function map&lt;T, U, E&gt;(result: Result&lt;T, E&gt;, fn: (v: T) =&gt; U): Result&lt;U, E&gt; {
+  return result.success ? Ok(fn(result.data)) : result
+}
+
+function flatMap&lt;T, U, E&gt;(
+  result: Result&lt;T, E&gt;,
+  fn: (v: T) =&gt; Result&lt;U, E&gt;
+): Result&lt;U, E&gt; {
+  return result.success ? fn(result.data) : result
+}
+
+function mapError&lt;T, E, F&gt;(result: Result&lt;T, E&gt;, fn: (e: E) =&gt; F): Result&lt;T, F&gt; {
+  return result.success ? result : Err(fn(result.error))
+}
+
+// ─── Real Usage ────────────────────────────────────────────────
+function divide(a: number, b: number): Result&lt;number, string&gt; {
+  if (b === 0) return Err('Division by zero')
+  return Ok(a / b)
+}
+
+function sqrt(n: number): Result&lt;number, string&gt; {
+  if (n &lt; 0) return Err('Cannot sqrt negative number')
+  return Ok(Math.sqrt(n))
+}
+
+// Chain operations on the happy path
+const result = flatMap(divide(100, 4), sqrt)
+if (result.success) {
+  console.log(result.data)  // 5
+} else {
+  console.error(result.error)
+}
+
+// ─── Validation with Result ────────────────────────────────────
+interface SignupData { email: string; age: number; password: string }
+type ValidationError = { field: string; message: string }
+
+function validateEmail(email: string): Result&lt;string, ValidationError&gt; {
+  if (!email.includes('@'))
+    return Err({ field: 'email', message: 'Invalid email format' })
+  return Ok(email.toLowerCase())
+}
+
+function validateAge(age: number): Result&lt;number, ValidationError&gt; {
+  if (age &lt; 18)
+    return Err({ field: 'age', message: 'Must be 18 or older' })
+  return Ok(age)
+}
+
+function validateSignup(data: SignupData): Result&lt;SignupData, ValidationError&gt; {
+  const emailResult = validateEmail(data.email)
+  if (!emailResult.success) return emailResult
+
+  const ageResult = validateAge(data.age)
+  if (!ageResult.success) return ageResult
+
+  return Ok({ ...data, email: emailResult.data })
+}</code></pre>
+    </div>
+
+    <div class="pattern-header">
+      <span class="pattern-badge badge-functional">Functional</span>
+      <strong>Option/Maybe Type</strong>
+    </div>
+
+    <div class="code-block">
+      <div class="code-label">Option&lt;T&gt; — Safe Null Handling<span class="lang-badge">TypeScript</span></div>
+      <pre><code class="language-typescript">type Option&lt;T&gt; = { some: true; value: T } | { some: false }
+
+const Some = &lt;T&gt;(value: T): Option&lt;T&gt; =&gt; ({ some: true, value })
+const None = &lt;T = never&gt;(): Option&lt;T&gt; =&gt; ({ some: false })
+
+function mapOption&lt;T, U&gt;(opt: Option&lt;T&gt;, fn: (v: T) =&gt; U): Option&lt;U&gt; {
+  return opt.some ? Some(fn(opt.value)) : None()
+}
+
+function getOrElse&lt;T&gt;(opt: Option&lt;T&gt;, defaultVal: T): T {
+  return opt.some ? opt.value : defaultVal
+}
+
+// Usage: replaces nullable types
+function findUser(id: string): Option&lt;User&gt; {
+  const user = db.get(id)
+  return user ? Some(user) : None()
+}
+
+const username = getOrElse(
+  mapOption(findUser('123'), u =&gt; u.name),
+  'Anonymous'
+)</code></pre>
+    </div>
+
+    <div class="callout callout-info">
+      <div class="callout-title">Info — fp-ts Library</div>
+      <p><code>fp-ts</code> provides battle-tested implementations of <code>Option</code>, <code>Either</code> (same as Result), <code>IO</code>, <code>Task</code>, and dozens of combinators. For teams committed to functional style, it's excellent. For teams new to FP, the manual implementations above are a gentler on-ramp.</p>
+    </div>
+
+    <h3>When FP vs OOP in TypeScript?</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Situation</th><th>Prefer FP</th><th>Prefer OOP</th></tr></thead>
+        <tbody>
+          <tr><td>Data transformations</td><td>Yes — pipe, map, filter</td><td>Overkill</td></tr>
+          <tr><td>Business domain with state</td><td>Awkward</td><td>Yes — entities, aggregates</td></tr>
+          <tr><td>Error handling</td><td>Yes — Result type</td><td>Exceptions are fine for exceptional cases</td></tr>
+          <tr><td>Configuration/composition</td><td>Yes — function composition</td><td>Builder pattern works too</td></tr>
+          <tr><td>Infrastructure (DB, HTTP)</td><td>Neutral</td><td>Yes — classes model connections well</td></tr>
+          <tr><td>React components</td><td>Yes — hooks, pure functions</td><td>Class components are deprecated</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- SECTION 4: DDD -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <h2 id="ddd">4. Domain-Driven Design (DDD) in TypeScript</h2>
+    <p>DDD is not a pattern — it's a philosophy. Model your code around the business domain, not around the database schema or HTTP API. TypeScript is uniquely well-suited for DDD because interfaces and classes map directly to DDD building blocks.</p>
+
+    <h3>Bounded Contexts</h3>
+    <div class="diagram-wrap">
+      <svg width="560" height="200" viewBox="0 0 560 200" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="arr6" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#6B7280"/>
+          </marker>
+        </defs>
+        <!-- Bounded context boxes -->
+        <rect x="10" y="20" width="155" height="160" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2"/>
+        <text x="87" y="42" text-anchor="middle" font-size="11" font-weight="700" fill="#4F46E5" font-family="system-ui">Orders Context</text>
+        <rect x="25" y="55" width="125" height="30" rx="6" fill="#fff" stroke="#C7D2FE" stroke-width="1"/>
+        <text x="87" y="74" text-anchor="middle" font-size="10" fill="#374151" font-family="system-ui">Order (Aggregate)</text>
+        <rect x="25" y="93" width="125" height="30" rx="6" fill="#fff" stroke="#C7D2FE" stroke-width="1"/>
+        <text x="87" y="112" text-anchor="middle" font-size="10" fill="#374151" font-family="system-ui">OrderItem (Entity)</text>
+        <rect x="25" y="131" width="125" height="30" rx="6" fill="#fff" stroke="#C7D2FE" stroke-width="1"/>
+        <text x="87" y="150" text-anchor="middle" font-size="10" fill="#374151" font-family="system-ui">Money (Value Object)</text>
+
+        <rect x="200" y="20" width="155" height="160" rx="10" fill="#F0FDF4" stroke="#10B981" stroke-width="2"/>
+        <text x="277" y="42" text-anchor="middle" font-size="11" font-weight="700" fill="#065F46" font-family="system-ui">Inventory Context</text>
+        <rect x="215" y="55" width="125" height="30" rx="6" fill="#fff" stroke="#BBF7D0" stroke-width="1"/>
+        <text x="277" y="74" text-anchor="middle" font-size="10" fill="#374151" font-family="system-ui">Product (Aggregate)</text>
+        <rect x="215" y="93" width="125" height="30" rx="6" fill="#fff" stroke="#BBF7D0" stroke-width="1"/>
+        <text x="277" y="112" text-anchor="middle" font-size="10" fill="#374151" font-family="system-ui">StockLevel (Value)</text>
+        <rect x="215" y="131" width="125" height="30" rx="6" fill="#fff" stroke="#BBF7D0" stroke-width="1"/>
+        <text x="277" y="150" text-anchor="middle" font-size="10" fill="#374151" font-family="system-ui">Warehouse (Entity)</text>
+
+        <rect x="390" y="20" width="155" height="160" rx="10" fill="#FDF2F8" stroke="#EC4899" stroke-width="2"/>
+        <text x="467" y="42" text-anchor="middle" font-size="11" font-weight="700" fill="#9D174D" font-family="system-ui">Payments Context</text>
+        <rect x="405" y="55" width="125" height="30" rx="6" fill="#fff" stroke="#FBCFE8" stroke-width="1"/>
+        <text x="467" y="74" text-anchor="middle" font-size="10" fill="#374151" font-family="system-ui">Payment (Aggregate)</text>
+        <rect x="405" y="93" width="125" height="30" rx="6" fill="#fff" stroke="#FBCFE8" stroke-width="1"/>
+        <text x="467" y="112" text-anchor="middle" font-size="10" fill="#374151" font-family="system-ui">Card (Value Object)</text>
+        <rect x="405" y="131" width="125" height="30" rx="6" fill="#fff" stroke="#FBCFE8" stroke-width="1"/>
+        <text x="467" y="150" text-anchor="middle" font-size="10" fill="#374151" font-family="system-ui">Refund (Entity)</text>
+
+        <!-- Integration arrows -->
+        <line x1="165" y1="100" x2="198" y2="100" stroke="#6B7280" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arr6)"/>
+        <line x1="355" y1="100" x2="388" y2="100" stroke="#6B7280" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arr6)"/>
+        <text x="182" y="94" text-anchor="middle" font-size="9" fill="#9CA3AF" font-family="system-ui">events</text>
+        <text x="371" y="94" text-anchor="middle" font-size="9" fill="#9CA3AF" font-family="system-ui">events</text>
+      </svg>
+      <div class="diagram-caption">Bounded contexts: each context owns its model. "Product" in Orders means something different than "Product" in Inventory. They communicate via domain events.</div>
+    </div>
+
+    <h3>Value Objects</h3>
+    <p>Value objects are immutable, equality is by value not identity. TypeScript's private constructors enforce the invariant that invalid value objects cannot be constructed.</p>
+
+    <div class="code-block">
+      <div class="code-label">Value Object Pattern<span class="lang-badge">TypeScript</span></div>
+      <pre><code class="language-typescript">// Value Object: equality by value, immutable, self-validating
+class EmailAddress {
+  private constructor(readonly value: string) {}
+
+  static create(email: string): Result&lt;EmailAddress, string&gt; {
+    if (!email.includes('@'))
+      return { success: false, error: 'Invalid email address' }
+    if (email.length > 254)
+      return { success: false, error: 'Email too long' }
+    return { success: true, data: new EmailAddress(email.toLowerCase()) }
+  }
+
+  equals(other: EmailAddress): boolean {
+    return this.value === other.value
+  }
+
+  toString(): string { return this.value }
+}
+
+class Money {
+  private constructor(
+    readonly amount: number,   // in cents to avoid float issues
+    readonly currency: string
+  ) {}
+
+  static of(amount: number, currency: string): Result&lt;Money, string&gt; {
+    if (amount &lt; 0) return { success: false, error: 'Amount cannot be negative' }
+    if (!['USD', 'EUR', 'GBP'].includes(currency))
+      return { success: false, error: `Unknown currency: ${currency}` }
+    return { success: true, data: new Money(amount, currency) }
+  }
+
+  add(other: Money): Result&lt;Money, string&gt; {
+    if (this.currency !== other.currency)
+      return { success: false, error: 'Currency mismatch' }
+    return Money.of(this.amount + other.amount, this.currency)
+  }
+
+  equals(other: Money): boolean {
+    return this.amount === other.amount && this.currency === other.currency
+  }
+}</code></pre>
+    </div>
+
+    <h3>Entities &amp; Aggregates</h3>
+
+    <div class="code-block">
+      <div class="code-label">Entity and Aggregate Root<span class="lang-badge">TypeScript</span></div>
+      <pre><code class="language-typescript">// Entity: identity-based equality
+abstract class Entity&lt;TId&gt; {
+  constructor(readonly id: TId) {}
+  equals(other: Entity&lt;TId&gt;): boolean { return this.id === other.id }
+}
+
+// Domain event
+interface DomainEvent {
+  readonly occurredAt: Date
+  readonly eventType: string
+}
+
+interface OrderPlacedEvent extends DomainEvent {
+  readonly eventType: 'ORDER_PLACED'
+  readonly orderId: string
+  readonly totalAmount: number
+}
+
+// Aggregate Root: consistency boundary
+class Order extends Entity&lt;string&gt; {
+  private _items: OrderItem[] = []
+  private _status: 'draft' | 'placed' | 'cancelled' = 'draft'
+  private _events: DomainEvent[] = []
+
+  private constructor(id: string, readonly customerId: string) {
+    super(id)
+  }
+
+  static create(customerId: string): Order {
+    return new Order(crypto.randomUUID(), customerId)
+  }
+
+  addItem(productId: string, qty: number, price: Money): Result&lt;void, string&gt; {
+    if (this._status !== 'draft')
+      return { success: false, error: 'Cannot modify a placed order' }
+    this._items.push(new OrderItem(productId, qty, price))
+    return { success: true, data: undefined }
+  }
+
+  place(): Result&lt;void, string&gt; {
+    if (this._items.length === 0)
+      return { success: false, error: 'Order has no items' }
+    this._status = 'placed'
+    this._events.push({
+      eventType: 'ORDER_PLACED',
+      occurredAt: new Date(),
+      orderId: this.id,
+      totalAmount: this.total().amount,
+    } as OrderPlacedEvent)
+    return { success: true, data: undefined }
+  }
+
+  total(): Money {
+    // reduce all item prices
+    return this._items.reduce(
+      (sum, item) =&gt; sum.add(item.lineTotal()).data ?? sum,
+      Money.of(0, 'USD').data!
+    )
+  }
+
+  // Repository pulls events out and publishes them
+  pullEvents(): DomainEvent[] {
+    const events = [...this._events]
+    this._events = []
+    return events
+  }
+}</code></pre>
+    </div>
+
+    <h3>Application Services</h3>
+
+    <div class="code-block">
+      <div class="code-label">Application Service — Orchestration Layer<span class="lang-badge">TypeScript</span></div>
+      <pre><code class="language-typescript">// Application service: orchestrates domain objects, no business logic here
+class PlaceOrderCommand {
+  constructor(
+    readonly customerId: string,
+    readonly items: Array&lt;{ productId: string; qty: number }&gt;
+  ) {}
+}
+
+class PlaceOrderHandler {
+  constructor(
+    private readonly orders: OrderRepository,
+    private readonly products: ProductRepository,
+    private readonly events: EventPublisher,
+  ) {}
+
+  async handle(cmd: PlaceOrderCommand): Promise&lt;Result&lt;string, string&gt;&gt; {
+    const order = Order.create(cmd.customerId)
+
+    for (const item of cmd.items) {
+      const product = await this.products.findById(item.productId)
+      if (!product)
+        return { success: false, error: `Product ${item.productId} not found` }
+
+      const addResult = order.addItem(item.productId, item.qty, product.price)
+      if (!addResult.success) return addResult
+    }
+
+    const placeResult = order.place()
+    if (!placeResult.success) return placeResult
+
+    await this.orders.save(order)
+
+    // Publish domain events
+    const domainEvents = order.pullEvents()
+    await this.events.publishAll(domainEvents)
+
+    return { success: true, data: order.id }
+  }
+}</code></pre>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- SECTION 5: REPOSITORY PATTERN -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <h2 id="repository">5. Repository Pattern</h2>
+    <p>The Repository pattern abstracts the data layer so that your domain code never sees SQL, Prisma, or DynamoDB. You work with domain objects; the repository handles persistence.</p>
+
+    <div class="diagram-wrap">
+      <svg width="540" height="170" viewBox="0 0 540 170" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="arr7" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#6B7280"/>
+          </marker>
+        </defs>
+        <!-- Domain Layer -->
+        <rect x="10" y="10" width="150" height="150" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+        <text x="85" y="32" text-anchor="middle" font-size="11" font-weight="700" fill="#4F46E5" font-family="system-ui">Domain Layer</text>
+        <rect x="22" y="45" width="126" height="28" rx="5" fill="#fff" stroke="#C7D2FE" stroke-width="1"/>
+        <text x="85" y="63" text-anchor="middle" font-size="10" font-weight="600" fill="#374151" font-family="system-ui">OrderService</text>
+        <rect x="22" y="83" width="126" height="28" rx="5" fill="#C7D2FE" stroke="#4F46E5" stroke-width="1"/>
+        <text x="85" y="97" text-anchor="middle" font-size="9" font-weight="700" fill="#3730A3" font-family="system-ui">«interface»</text>
+        <text x="85" y="108" text-anchor="middle" font-size="10" font-weight="600" fill="#3730A3" font-family="system-ui">OrderRepository</text>
+        <!-- Infrastructure Layer -->
+        <rect x="360" y="10" width="170" height="150" rx="10" fill="#F0FDF4" stroke="#10B981" stroke-width="1.5"/>
+        <text x="445" y="32" text-anchor="middle" font-size="11" font-weight="700" fill="#065F46" font-family="system-ui">Infrastructure</text>
+        <rect x="372" y="45" width="146" height="28" rx="5" fill="#fff" stroke="#BBF7D0" stroke-width="1"/>
+        <text x="445" y="63" text-anchor="middle" font-size="10" font-weight="600" fill="#374151" font-family="system-ui">PrismaOrderRepo</text>
+        <rect x="372" y="83" width="146" height="28" rx="5" fill="#fff" stroke="#BBF7D0" stroke-width="1"/>
+        <text x="445" y="101" text-anchor="middle" font-size="10" font-weight="600" fill="#374151" font-family="system-ui">InMemoryOrderRepo</text>
+        <rect x="372" y="121" width="146" height="28" rx="5" fill="#fff" stroke="#BBF7D0" stroke-width="1"/>
+        <text x="445" y="139" text-anchor="middle" font-size="10" font-weight="600" fill="#374151" font-family="system-ui">DynamoOrderRepo</text>
+        <!-- Arrow -->
+        <line x1="160" y1="95" x2="358" y2="59" stroke="#6B7280" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr7)"/>
+        <line x1="160" y1="100" x2="358" y2="97" stroke="#6B7280" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr7)"/>
+        <line x1="160" y1="105" x2="358" y2="135" stroke="#6B7280" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr7)"/>
+        <text x="260" y="80" text-anchor="middle" font-size="9" fill="#9CA3AF" font-family="system-ui">implements</text>
+      </svg>
+      <div class="diagram-caption">Repository pattern: the domain owns the interface, infrastructure provides implementations.</div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-label">Repository Interface &amp; Implementations<span class="lang-badge">TypeScript</span></div>
+      <pre><code class="language-typescript">// ─── Interface (lives in domain layer) ────────────────────────
+interface UserRepository {
+  findById(id: string): Promise&lt;User | null&gt;
+  findByEmail(email: string): Promise&lt;User | null&gt;
+  save(user: User): Promise&lt;void&gt;
+  delete(id: string): Promise&lt;void&gt;
+}
+
+// ─── Prisma Implementation (infrastructure layer) ─────────────
+class PrismaUserRepository implements UserRepository {
+  constructor(private readonly prisma: PrismaClient) {}
+
+  async findById(id: string): Promise&lt;User | null&gt; {
+    const row = await this.prisma.user.findUnique({ where: { id } })
+    return row ? this.toDomain(row) : null
+  }
+
+  async findByEmail(email: string): Promise&lt;User | null&gt; {
+    const row = await this.prisma.user.findUnique({ where: { email } })
+    return row ? this.toDomain(row) : null
+  }
+
+  async save(user: User): Promise&lt;void&gt; {
+    await this.prisma.user.upsert({
+      where: { id: user.id },
+      create: this.toRow(user),
+      update: this.toRow(user),
+    })
+  }
+
+  async delete(id: string): Promise&lt;void&gt; {
+    await this.prisma.user.delete({ where: { id } })
+  }
+
+  private toDomain(row: PrismaUser): User {
+    // Map from DB shape to domain shape
+    return new User(row.id, EmailAddress.create(row.email).data!)
+  }
+
+  private toRow(user: User): PrismaUser {
+    return { id: user.id, email: user.email.value, createdAt: new Date() }
+  }
+}
+
+// ─── In-Memory Implementation (for tests) ─────────────────────
+class InMemoryUserRepository implements UserRepository {
+  private store = new Map&lt;string, User&gt;()
+
+  async findById(id: string): Promise&lt;User | null&gt; {
+    return this.store.get(id) ?? null
+  }
+
+  async findByEmail(email: string): Promise&lt;User | null&gt; {
+    return [...this.store.values()].find(u =&gt; u.email.value === email) ?? null
+  }
+
+  async save(user: User): Promise&lt;void&gt; {
+    this.store.set(user.id, user)
+  }
+
+  async delete(id: string): Promise&lt;void&gt; {
+    this.store.delete(id)
+  }
+
+  // Test helper
+  all(): User[] { return [...this.store.values()] }
+}
+
+// ─── Test ──────────────────────────────────────────────────────
+describe('UserService', () =&gt; {
+  it('finds user by email', async () =&gt; {
+    const repo = new InMemoryUserRepository()
+    await repo.save(testUser)
+
+    const svc = new UserService(repo)
+    const found = await svc.findByEmail(testUser.email.value)
+    expect(found?.id).toBe(testUser.id)
+  })
+})</code></pre>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- SECTION 6: DEPENDENCY INJECTION -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <h2 id="di">6. Dependency Injection</h2>
+    <p>DI is Dependency Inversion made concrete: wire your dependencies at startup, not inline. There are three approaches in TypeScript, from simplest to most powerful.</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Approach</th><th>Complexity</th><th>Best For</th><th>Libraries</th></tr></thead>
+        <tbody>
+          <tr><td>Manual DI</td><td>Low</td><td>Apps with &lt;30 services</td><td>None</td></tr>
+          <tr><td>DI Container</td><td>Medium</td><td>Large apps, automatic wiring</td><td><code>inversify</code>, <code>tsyringe</code>, <code>awilix</code></td></tr>
+          <tr><td>Framework DI</td><td>High</td><td>Full-stack frameworks</td><td>NestJS, Angular</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="code-block">
+      <div class="code-label">Manual DI — Composition Root<span class="lang-badge">TypeScript</span></div>
+      <pre><code class="language-typescript">// composition-root.ts — ONE file wires everything
+import { PrismaClient } from '@prisma/client'
+import Redis from 'ioredis'
+import pino from 'pino'
+
+const logger = pino()
+const prisma = new PrismaClient()
+const redis = new Redis(process.env.REDIS_URL)
+
+// Infrastructure
+const userRepo = new PrismaUserRepository(prisma)
+const cache    = new RedisCache(redis)
+const mailer   = new SendGridAdapter(process.env.SENDGRID_KEY)
+
+// Domain services
+const userService  = new UserService(userRepo, cache, logger)
+const orderService = new OrderService(
+  new PrismaOrderRepository(prisma),
+  userService,
+  new SendGridAdapter(process.env.SENDGRID_KEY),
+  logger,
+)
+
+// HTTP handlers (Express/Fastify)
+const userHandler  = new UserHandler(userService)
+const orderHandler = new OrderHandler(orderService)
+
+export { userHandler, orderHandler }</code></pre>
+    </div>
+
+    <div class="code-block">
+      <div class="code-label">DI Container with tsyringe<span class="lang-badge">TypeScript</span></div>
+      <pre><code class="language-typescript">import 'reflect-metadata'
+import { injectable, inject, container } from 'tsyringe'
+
+@injectable()
+class PrismaUserRepository implements UserRepository {
+  async findById(id: string) { ... }
+  async save(user: User)     { ... }
+}
+
+@injectable()
+class UserService {
+  constructor(
+    @inject('UserRepository') private repo: UserRepository,
+    @inject('Logger')         private logger: Logger
+  ) {}
+
+  async getUser(id: string) { ... }
+}
+
+// Registration (once at startup)
+container.register('UserRepository', { useClass: PrismaUserRepository })
+container.register('Logger', { useValue: pino() })
+
+// Resolution — automatic wiring
+const userService = container.resolve(UserService)</code></pre>
+    </div>
+
+    <div class="callout callout-warning">
+      <div class="callout-title">Warning — DI Containers Are Often Overkill</div>
+      <p>DI containers add complexity, decorator boilerplate (<code>reflect-metadata</code>, <code>experimentalDecorators</code>), and make stack traces harder to read. Start with manual DI. Add a container only when the composition root becomes unmanageable (typically 50+ services).</p>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- SECTION 7: EVENT-DRIVEN ARCHITECTURE -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <h2 id="event-driven">7. Event-Driven Architecture</h2>
+    <p>Events decouple producers from consumers. When an order is placed, the Orders service publishes an event — it doesn't know or care that Inventory, Payments, and Email are listening.</p>
+
+    <h3>CQRS — Command Query Responsibility Segregation</h3>
+
+    <div class="diagram-wrap">
+      <svg width="540" height="200" viewBox="0 0 540 200" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="arr8" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#6B7280"/>
+          </marker>
+        </defs>
+        <!-- Client -->
+        <rect x="215" y="10" width="110" height="40" rx="8" fill="#F3F4F6" stroke="#9CA3AF" stroke-width="1.5"/>
+        <text x="270" y="35" text-anchor="middle" font-size="12" font-weight="600" fill="#374151" font-family="system-ui">Client</text>
+        <!-- Command side -->
+        <rect x="20" y="90" width="120" height="40" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+        <text x="80" y="114" text-anchor="middle" font-size="11" font-weight="600" fill="#4F46E5" font-family="system-ui">Command Handler</text>
+        <rect x="20" y="155" width="120" height="35" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+        <text x="80" y="177" text-anchor="middle" font-size="10" fill="#374151" font-family="system-ui">Write DB (Postgres)</text>
+        <!-- Query side -->
+        <rect x="400" y="90" width="120" height="40" rx="8" fill="#F0FDF4" stroke="#10B981" stroke-width="1.5"/>
+        <text x="460" y="114" text-anchor="middle" font-size="11" font-weight="600" fill="#065F46" font-family="system-ui">Query Handler</text>
+        <rect x="400" y="155" width="120" height="35" rx="8" fill="#F0FDF4" stroke="#10B981" stroke-width="1.5"/>
+        <text x="460" y="177" text-anchor="middle" font-size="10" fill="#374151" font-family="system-ui">Read DB (Redis/ES)</text>
+        <!-- Event bus -->
+        <rect x="195" y="90" width="150" height="40" rx="8" fill="#FEF3C7" stroke="#F59E0B" stroke-width="1.5"/>
+        <text x="270" y="110" text-anchor="middle" font-size="11" font-weight="600" fill="#92400E" font-family="system-ui">Event Bus</text>
+        <text x="270" y="124" text-anchor="middle" font-size="9" fill="#6B7280" font-family="system-ui">OrderPlaced, etc.</text>
+        <!-- Arrows -->
+        <line x1="240" y1="50" x2="140" y2="90" stroke="#4F46E5" stroke-width="1.5" marker-end="url(#arr8)"/>
+        <line x1="300" y1="50" x2="380" y2="90" stroke="#10B981" stroke-width="1.5" marker-end="url(#arr8)"/>
+        <text x="175" y="76" text-anchor="middle" font-size="9" fill="#4F46E5" font-family="system-ui">Commands</text>
+        <text x="365" y="76" text-anchor="middle" font-size="9" fill="#10B981" font-family="system-ui">Queries</text>
+        <line x1="140" y1="110" x2="193" y2="110" stroke="#6B7280" stroke-width="1.5" marker-end="url(#arr8)"/>
+        <line x1="345" y1="110" x2="398" y2="110" stroke="#6B7280" stroke-width="1.5" marker-end="url(#arr8)"/>
+        <line x1="80" y1="130" x2="80" y2="155" stroke="#4F46E5" stroke-width="1.5" marker-end="url(#arr8)"/>
+        <line x1="460" y1="130" x2="460" y2="155" stroke="#10B981" stroke-width="1.5" marker-end="url(#arr8)"/>
+      </svg>
+      <div class="diagram-caption">CQRS: write path (Commands) and read path (Queries) are separated. Read models can be optimized independently.</div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-label">CQRS Implementation<span class="lang-badge">TypeScript</span></div>
+      <pre><code class="language-typescript">// Commands — intent to change state
+type Command =
+  | { type: 'CREATE_USER'; email: string; name: string }
+  | { type: 'DELETE_USER'; userId: string }
+  | { type: 'UPDATE_EMAIL'; userId: string; email: string }
+
+// Queries — read only
+type Query =
+  | { type: 'GET_USER'; userId: string }
+  | { type: 'LIST_USERS'; page: number; pageSize: number }
+  | { type: 'SEARCH_USERS'; query: string }
+
+// Command bus
+class CommandBus {
+  private handlers = new Map&lt;string, (cmd: any) =&gt; Promise&lt;Result&lt;any, any&gt;&gt;&gt;()
+
+  register&lt;T extends Command&gt;(
+    type: T['type'],
+    handler: (cmd: T) =&gt; Promise&lt;Result&lt;any, any&gt;&gt;
+  ): void {
+    this.handlers.set(type, handler as any)
+  }
+
+  async dispatch&lt;T extends Command&gt;(cmd: T): Promise&lt;Result&lt;any, any&gt;&gt; {
+    const handler = this.handlers.get(cmd.type)
+    if (!handler) return Err(`No handler for command: ${cmd.type}`)
+    return handler(cmd)
+  }
+}
+
+// Registration
+const bus = new CommandBus()
+bus.register('CREATE_USER', async (cmd) =&gt; {
+  const user = await createUser(cmd.email, cmd.name)
+  return Ok(user.id)
+})
+
+// Usage
+const result = await bus.dispatch({ type: 'CREATE_USER', email: 'a@b.com', name: 'Alice' })</code></pre>
+    </div>
+
+    <h3>Event Sourcing Basics</h3>
+
+    <div class="code-block">
+      <div class="code-label">Event Sourcing — State from Events<span class="lang-badge">TypeScript</span></div>
+      <pre><code class="language-typescript">// Events are the source of truth — never update records, only append events
+type BankAccountEvent =
+  | { type: 'ACCOUNT_OPENED'; accountId: string; initialBalance: number; at: Date }
+  | { type: 'DEPOSIT';        accountId: string; amount: number; at: Date }
+  | { type: 'WITHDRAWAL';     accountId: string; amount: number; at: Date }
+  | { type: 'ACCOUNT_CLOSED'; accountId: string; at: Date }
+
+interface BankAccountState {
+  accountId: string
+  balance: number
+  isOpen: boolean
+}
+
+// Reconstruct state by replaying events (reduce is perfect here)
+function reconstruct(events: BankAccountEvent[]): BankAccountState {
+  return events.reduce&lt;BankAccountState&gt;((state, event) =&gt; {
+    switch (event.type) {
+      case 'ACCOUNT_OPENED':
+        return { accountId: event.accountId, balance: event.initialBalance, isOpen: true }
+      case 'DEPOSIT':
+        return { ...state, balance: state.balance + event.amount }
+      case 'WITHDRAWAL':
+        return { ...state, balance: state.balance - event.amount }
+      case 'ACCOUNT_CLOSED':
+        return { ...state, isOpen: false }
+      default:
+        return state
+    }
+  }, { accountId: '', balance: 0, isOpen: false })
+}
+
+// Full audit trail for free; time-travel debugging; replay to fix bugs</code></pre>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- SECTION 8: LAYERED ARCHITECTURE -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <h2 id="layered">8. Layered Architecture</h2>
+
+    <h3>Clean Architecture — Concentric Circles</h3>
+
+    <div class="diagram-wrap">
+      <svg width="380" height="380" viewBox="0 0 380 380" xmlns="http://www.w3.org/2000/svg">
+        <!-- Infrastructure (outermost) -->
+        <circle cx="190" cy="190" r="178" fill="#FEF3C7" stroke="#F59E0B" stroke-width="2"/>
+        <text x="190" y="50" text-anchor="middle" font-size="12" font-weight="700" fill="#92400E" font-family="system-ui">Infrastructure</text>
+        <text x="190" y="66" text-anchor="middle" font-size="10" fill="#92400E" font-family="system-ui">DB, HTTP, Email, Queue</text>
+        <!-- Application layer -->
+        <circle cx="190" cy="190" r="138" fill="#DCFCE7" stroke="#10B981" stroke-width="2"/>
+        <text x="190" y="88" text-anchor="middle" font-size="12" font-weight="700" fill="#065F46" font-family="system-ui">Application</text>
+        <text x="190" y="104" text-anchor="middle" font-size="10" fill="#065F46" font-family="system-ui">Use Cases, Commands</text>
+        <!-- Domain layer -->
+        <circle cx="190" cy="190" r="98" fill="#DBEAFE" stroke="#3B82F6" stroke-width="2"/>
+        <text x="190" y="124" text-anchor="middle" font-size="12" font-weight="700" fill="#1D4ED8" font-family="system-ui">Domain</text>
+        <text x="190" y="140" text-anchor="middle" font-size="10" fill="#1D4ED8" font-family="system-ui">Entities, Value Objects</text>
+        <text x="190" y="155" text-anchor="middle" font-size="10" fill="#1D4ED8" font-family="system-ui">Domain Services</text>
+        <!-- Core Entities (innermost) -->
+        <circle cx="190" cy="190" r="58" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2"/>
+        <text x="190" y="184" text-anchor="middle" font-size="12" font-weight="700" fill="#4F46E5" font-family="system-ui">Entities</text>
+        <text x="190" y="200" text-anchor="middle" font-size="10" fill="#4338CA" font-family="system-ui">Pure Business</text>
+        <text x="190" y="214" text-anchor="middle" font-size="10" fill="#4338CA" font-family="system-ui">Rules</text>
+        <!-- Dependency arrows (pointing inward) -->
+        <text x="190" y="345" text-anchor="middle" font-size="10" fill="#6B7280" font-family="system-ui">Dependencies point INWARD only</text>
+        <text x="190" y="360" text-anchor="middle" font-size="10" fill="#6B7280" font-family="system-ui">Inner layers know nothing about outer layers</text>
+      </svg>
+      <div class="diagram-caption">Clean Architecture: dependencies only flow inward. The domain layer has zero imports from infrastructure.</div>
+    </div>
+
+    <h3>Hexagonal Architecture (Ports &amp; Adapters)</h3>
+    <p>Hexagonal is similar to Clean Architecture but uses the metaphor of <em>ports</em> (interfaces) and <em>adapters</em> (implementations). Your application core defines the ports; adapters implement them. This maps perfectly to TypeScript interfaces.</p>
+
+    <div class="code-block">
+      <div class="code-label">Ports and Adapters<span class="lang-badge">TypeScript</span></div>
+      <pre><code class="language-typescript">// ─── Ports (application core defines these) ───────────────────
+// Driving port (called BY external actors → app core)
+interface PlaceOrderUseCase {
+  execute(cmd: PlaceOrderCommand): Promise&lt;Result&lt;string, string&gt;&gt;
+}
+
+// Driven ports (called BY app core → external systems)
+interface OrderRepository {
+  save(order: Order): Promise&lt;void&gt;
+  findById(id: string): Promise&lt;Order | null&gt;
+}
+
+interface PaymentGateway {
+  charge(amount: Money, card: Card): Promise&lt;Result&lt;string, string&gt;&gt;
+}
+
+interface EmailPort {
+  sendOrderConfirmation(order: Order): Promise&lt;void&gt;
+}
+
+// ─── Core Application (no infrastructure imports!) ────────────
+class PlaceOrderService implements PlaceOrderUseCase {
+  constructor(
+    private readonly orders: OrderRepository,    // driven port
+    private readonly payments: PaymentGateway,   // driven port
+    private readonly email: EmailPort,           // driven port
+  ) {}
+
+  async execute(cmd: PlaceOrderCommand): Promise&lt;Result&lt;string, string&gt;&gt; {
+    // Pure business logic — no Prisma, no Stripe, no SendGrid
+    const order = Order.create(cmd.customerId)
+    // ...
+    return Ok(order.id)
+  }
+}
+
+// ─── Adapters (infrastructure implements the ports) ───────────
+class StripePaymentAdapter implements PaymentGateway {
+  async charge(amount: Money, card: Card) { /* Stripe API */ }
+}
+
+class SendGridEmailAdapter implements EmailPort {
+  async sendOrderConfirmation(order: Order) { /* SendGrid */ }
+}
+
+// ─── Adapter for HTTP (driving side) ─────────────────────────
+class ExpressOrderAdapter {
+  constructor(private readonly useCase: PlaceOrderUseCase) {}
+
+  async handleRequest(req: Request, res: Response) {
+    const result = await this.useCase.execute(req.body)
+    result.success ? res.json({ id: result.data }) : res.status(400).json({ error: result.error })
+  }
+}</code></pre>
+    </div>
+
+    <h3>Practical Folder Structure</h3>
+
+    <div class="code-block">
+      <div class="code-label">Large TypeScript Project Structure<span class="lang-badge">Shell</span></div>
+      <pre><code class="language-bash">src/
+├── domain/                    # Pure business logic — NO external deps
+│   ├── user/
+│   │   ├── User.ts            # Entity / Aggregate Root
+│   │   ├── EmailAddress.ts    # Value Object
+│   │   ├── UserRepository.ts  # Repository interface (port)
+│   │   └── UserDomainService.ts
+│   └── order/
+│       ├── Order.ts
+│       ├── OrderItem.ts
+│       └── OrderRepository.ts
+│
+├── application/               # Use cases, orchestration
+│   ├── user/
+│   │   ├── CreateUserHandler.ts
+│   │   └── GetUserHandler.ts
+│   └── order/
+│       └── PlaceOrderHandler.ts
+│
+├── infrastructure/            # External: DB, HTTP, Email
+│   ├── db/
+│   │   ├── PrismaUserRepository.ts
+│   │   └── PrismaOrderRepository.ts
+│   ├── email/
+│   │   └── SendGridAdapter.ts
+│   └── cache/
+│       └── RedisCache.ts
+│
+├── presentation/              # HTTP layer
+│   ├── routes/
+│   │   ├── user.routes.ts
+│   │   └── order.routes.ts
+│   └── middleware/
+│       ├── auth.ts
+│       └── errorHandler.ts
+│
+├── composition-root.ts        # Wire everything together
+└── main.ts                    # Start server</code></pre>
+    </div>
+
+    <div class="callout callout-tip">
+      <div class="callout-title">Tip — Where TypeScript Interfaces Live</div>
+      <p>Interfaces belong to the <em>layer that depends on them</em>, not the layer that implements them. <code>UserRepository</code> belongs in <code>domain/user/</code> even though <code>PrismaUserRepository</code> lives in <code>infrastructure/db/</code>. This is the key insight of ports and adapters.</p>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- SECTION 9: MICROSERVICES VS MONOLITH -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <h2 id="microservices">9. Microservices vs Monolith</h2>
+
+    <div class="callout callout-warning">
+      <div class="callout-title">Warning — Start with a Monolith</div>
+      <p>Every successful microservices architecture I've seen started as a monolith. Microservices add distributed systems complexity (latency, partial failure, eventual consistency, deployments) that you should only pay for when a monolith's scaling or team-size costs outweigh them.</p>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Factor</th><th>Monolith</th><th>Microservices</th></tr></thead>
+        <tbody>
+          <tr><td>Team size</td><td>&lt;15 engineers</td><td>15+ engineers, multiple teams</td></tr>
+          <tr><td>Deploy frequency</td><td>Once per release</td><td>Independent deploys per service</td></tr>
+          <tr><td>Scaling needs</td><td>Scale whole app</td><td>Scale hotspots independently</td></tr>
+          <tr><td>Data consistency</td><td>ACID transactions</td><td>Eventual consistency</td></tr>
+          <tr><td>Debugging</td><td>Single stack trace</td><td>Distributed tracing required</td></tr>
+          <tr><td>TypeScript types</td><td>Shared naturally</td><td>Shared via npm package or schema</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Shared TypeScript Types Between Services</h3>
+
+    <div class="code-block">
+      <div class="code-label">Shared Types Package Strategy<span class="lang-badge">TypeScript</span></div>
+      <pre><code class="language-typescript">// @mycompany/shared-types (internal npm package)
+// Published from: packages/shared-types/
+
+export interface UserCreatedEvent {
+  version: '1.0'
+  type: 'user.created'
+  userId: string
+  email: string
+  occurredAt: string  // ISO 8601
+}
+
+export interface OrderPlacedEvent {
+  version: '1.0'
+  type: 'order.placed'
+  orderId: string
+  customerId: string
+  totalCents: number
+  currency: string
+  occurredAt: string
+}
+
+// Contract types for REST APIs
+export interface CreateUserRequest {
+  email: string
+  name: string
+}
+
+export interface CreateUserResponse {
+  userId: string
+  createdAt: string
+}
+
+// ─── Usage in Order Service ────────────────────────────────────
+import { UserCreatedEvent } from '@mycompany/shared-types'
+
+queue.subscribe('user.created', async (msg: UserCreatedEvent) =&gt; {
+  // TypeScript catches schema drift at compile time
+  await createCustomerRecord(msg.userId, msg.email)
+})</code></pre>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- SECTION 10: ERROR HANDLING ARCHITECTURE -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <h2 id="error-arch">10. Error Handling Architecture</h2>
+    <p>Error handling is an architectural concern. Most teams treat it as an afterthought — handling errors at the point they occur, throwing raw <code>Error</code> objects, and hoping something catches them. This scales poorly.</p>
+
+    <h3>Typed Error Hierarchy</h3>
+
+    <div class="code-block">
+      <div class="code-label">Typed Errors — Never Throw Raw Error<span class="lang-badge">TypeScript</span></div>
+      <pre><code class="language-typescript">// ─── Base domain error ────────────────────────────────────────
+abstract class DomainError extends Error {
+  abstract readonly code: string
+  abstract readonly httpStatus: number
+
+  constructor(
+    message: string,
+    readonly context?: Record&lt;string, unknown&gt;
+  ) {
+    super(message)
+    this.name = this.constructor.name
+  }
+}
+
+// ─── Specific error types ─────────────────────────────────────
+class NotFoundError extends DomainError {
+  readonly code = 'NOT_FOUND'
+  readonly httpStatus = 404
+}
+
+class ValidationError extends DomainError {
+  readonly code = 'VALIDATION_ERROR'
+  readonly httpStatus = 400
+  constructor(message: string, readonly field: string) {
+    super(message, { field })
+  }
+}
+
+class UnauthorizedError extends DomainError {
+  readonly code = 'UNAUTHORIZED'
+  readonly httpStatus = 401
+}
+
+class ConflictError extends DomainError {
+  readonly code = 'CONFLICT'
+  readonly httpStatus = 409
+}
+
+// ─── Infrastructure error wrapping ────────────────────────────
+class DatabaseError extends DomainError {
+  readonly code = 'DATABASE_ERROR'
+  readonly httpStatus = 500
+}
+
+// ─── Result-typed service methods ────────────────────────────
+type AppError = NotFoundError | ValidationError | UnauthorizedError | ConflictError | DatabaseError
+
+async function getUser(id: string): Promise&lt;Result&lt;User, AppError&gt;&gt; {
+  try {
+    const user = await userRepo.findById(id)
+    if (!user) return Err(new NotFoundError(`User ${id} not found`))
+    return Ok(user)
+  } catch (e) {
+    return Err(new DatabaseError('DB read failed', { cause: String(e) }))
+  }
+}</code></pre>
+    </div>
+
+    <h3>Centralized Error Handling in APIs</h3>
+
+    <div class="code-block">
+      <div class="code-label">Express Error Handler Middleware<span class="lang-badge">TypeScript</span></div>
+      <pre><code class="language-typescript">import pino from 'pino'
+const logger = pino()
+
+// Express error handler (4 args = error handler)
+function errorHandler(
+  err: unknown,
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void {
+  // Typed domain errors
+  if (err instanceof DomainError) {
+    logger.warn({
+      code: err.code,
+      message: err.message,
+      context: err.context,
+      path: req.path,
+    })
+    res.status(err.httpStatus).json({
+      error: { code: err.code, message: err.message }
+    })
+    return
+  }
+
+  // Zod validation errors
+  if (err instanceof ZodError) {
+    logger.warn({ issues: err.issues, path: req.path })
+    res.status(400).json({
+      error: { code: 'VALIDATION_ERROR', issues: err.issues }
+    })
+    return
+  }
+
+  // Unexpected errors — log full details, hide from client
+  logger.error({ err, path: req.path }, 'Unhandled error')
+  res.status(500).json({
+    error: { code: 'INTERNAL_ERROR', message: 'An unexpected error occurred' }
+  })
+}
+
+// ─── Route handler pattern ────────────────────────────────────
+// Wrap async handlers to catch promise rejections
+function asyncHandler(fn: (req: Request, res: Response, next: NextFunction) =&gt; Promise&lt;void&gt;) {
+  return (req: Request, res: Response, next: NextFunction) =&gt; {
+    fn(req, res, next).catch(next)
+  }
+}
+
+router.get('/users/:id', asyncHandler(async (req, res) =&gt; {
+  const result = await userService.getUser(req.params.id)
+  if (!result.success) throw result.error  // will be caught by errorHandler
+  res.json(result.data)
+}))</code></pre>
+    </div>
+
+    <h3>Logging Architecture with Pino</h3>
+
+    <div class="code-block">
+      <div class="code-label">Structured Logging with pino<span class="lang-badge">TypeScript</span></div>
+      <pre><code class="language-typescript">import pino, { Logger } from 'pino'
+
+// Logger interface (port) — testable
+interface AppLogger {
+  info(obj: object, msg?: string): void
+  warn(obj: object, msg?: string): void
+  error(obj: object, msg?: string): void
+  child(bindings: object): AppLogger
+}
+
+// Production: pino with structured JSON output
+const rootLogger: AppLogger = pino({
+  level: process.env.LOG_LEVEL ?? 'info',
+  // Pretty print in development only
+  transport: process.env.NODE_ENV === 'development'
+    ? { target: 'pino-pretty' }
+    : undefined,
+})
+
+// Per-request logger with correlation ID
+function createRequestLogger(requestId: string): AppLogger {
+  return rootLogger.child({ requestId })
+}
+
+// Usage in middleware
+app.use((req, res, next) =&gt; {
+  const requestId = req.headers['x-request-id'] ?? crypto.randomUUID()
+  req.logger = createRequestLogger(String(requestId))
+  req.logger.info({ method: req.method, path: req.path }, 'Request started')
+  next()
+})
+
+// Inject logger into services via DI
+class UserService {
+  constructor(
+    private readonly repo: UserRepository,
+    private readonly logger: AppLogger
+  ) {}
+
+  async findUser(id: string): Promise&lt;Result&lt;User, AppError&gt;&gt; {
+    this.logger.info({ userId: id }, 'Finding user')
+    const user = await this.repo.findById(id)
+    if (!user) {
+      this.logger.warn({ userId: id }, 'User not found')
+      return Err(new NotFoundError(`User ${id} not found`))
+    }
+    return Ok(user)
+  }
+}</code></pre>
+    </div>
+
+    <div class="callout callout-ai">
+      <div class="callout-title">AI Era — Architecture for AI-Augmented Systems</div>
+      <p>When building TypeScript systems that incorporate LLMs, apply the same patterns. LLM calls are infrastructure — wrap them behind an interface (<code>AIProvider</code>). Use the Result type for all LLM responses (they can fail, time out, or return malformed JSON). Apply the Repository pattern to vector databases. The AI layer should be a thin adapter, not a load-bearing pillar.</p>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <h3>Chapter Summary</h3>
+    <ul>
+      <li><strong>SOLID</strong> — five principles; Dependency Inversion matters most in TypeScript because interfaces are zero-cost.</li>
+      <li><strong>Design Patterns</strong> — Factory, Builder, Adapter, Decorator, Observer, Strategy, Command (discriminated unions!), State Machine.</li>
+      <li><strong>Functional Patterns</strong> — Result&lt;T, E&gt; for railway-oriented programming; Option&lt;T&gt; for safe nulls; compose/pipe for transformation pipelines.</li>
+      <li><strong>DDD</strong> — Value Objects with private constructors and <code>Result</code>-returning factories; Aggregates as consistency boundaries; domain events for loose coupling.</li>
+      <li><strong>Repository Pattern</strong> — interface in domain, implementation in infrastructure; in-memory implementation for free testability.</li>
+      <li><strong>DI</strong> — start with manual; add a container only when the composition root grows beyond 50 services.</li>
+      <li><strong>Clean/Hexagonal Architecture</strong> — dependencies point inward; interfaces belong to the layer that consumes them.</li>
+      <li><strong>Error Handling</strong> — typed error hierarchy, Result types, centralized middleware, structured logging with pino.</li>
+    </ul>
+
+    <!-- Footer Nav -->
+    <div class="footer-nav">
+      <a href="chapter-18-state.html" class="nav-prev">
+        <span class="nav-label">Previous</span>
+        <span class="nav-title">Ch 18: State Management</span>
+      </a>
+      <a href="chapter-20-ai-apps.html" class="nav-next">
+        <span class="nav-label">Next</span>
+        <span class="nav-title">Ch 20: Building AI Apps</span>
+      </a>
+    </div>
+
+    <div class="footer-author">
+      Chapter 19 of 24 · TypeScript for the AI Era · Senior Staff Engineer (Google, Microsoft, Meta, Anthropic)
+    </div>
+  </main>
+</div>
+
+</body>
+</html>

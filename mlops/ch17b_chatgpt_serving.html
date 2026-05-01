@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 17B: ChatGPT Serving &amp; Lessons - Modern MLOps Tutorial</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script>hljs.highlightAll(); mermaid.initialize({startOnLoad:true, theme:'default'});</script>
+  <style>
+    :root { --primary: #2563eb; --secondary: #059669; --accent: #d97706; --text: #1f2937; }
+    body { color: var(--text); font-family: 'Inter', system-ui, sans-serif; }
+    .nav-link { transition: color 0.15s; }
+    .nav-link:hover { color: #93c5fd; }
+    .toc-link { transition: color 0.15s; }
+    .toc-link:hover { color: var(--primary); }
+    .toc-link.active { color: var(--primary); font-weight: 600; border-left: 2px solid var(--primary); padding-left: 0.5rem; }
+    .callout-info { border-left: 4px solid #2563eb; background: #eff6ff; }
+    .callout-tip { border-left: 4px solid #059669; background: #ecfdf5; }
+    .callout-warning { border-left: 4px solid #d97706; background: #fffbeb; }
+    .callout-note { border-left: 4px solid #7c3aed; background: #f5f3ff; }
+    .callout-danger { border-left: 4px solid #dc2626; background: #fef2f2; }
+    table { border-collapse: collapse; width: 100%; }
+    thead { background: #2563eb; color: white; }
+    tbody tr:nth-child(even) { background: #f8fafc; }
+    tbody tr:nth-child(odd) { background: #ffffff; }
+    tbody tr:hover { background: #eff6ff; }
+    td, th { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid #e2e8f0; }
+    .mermaid { background: #fff; padding: 1rem; border-radius: 0.5rem; }
+    pre code { font-size: 0.875rem; }
+    .chapter-badge { background: #2563eb; color: white; font-size: 0.75rem; font-weight: 700; padding: 0.25rem 0.75rem; border-radius: 9999px; letter-spacing: 0.05em; text-transform: uppercase; }
+    .section-anchor { scroll-margin-top: 5rem; }
+    .code-label { background: #1e293b; color: #94a3b8; font-size: 0.7rem; font-weight: 600; padding: 0.25rem 0.75rem; border-radius: 0.375rem 0.375rem 0 0; letter-spacing: 0.05em; text-transform: uppercase; display: inline-block; }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+<!-- Top Navbar -->
+<nav class="bg-gray-900 text-white sticky top-0 z-50 shadow-lg">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center font-bold text-sm">ML</div>
+        <a href="index.html" class="nav-link font-semibold text-lg tracking-tight">Modern MLOps Tutorial</a>
+      </div>
+      <div class="hidden md:flex items-center gap-6 text-sm text-gray-300">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="#toc" class="nav-link">Contents</a>
+        <span class="text-gray-500">|</span>
+        <span class="text-blue-400 font-medium">Chapter 17B of 19</span>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- Chapter Header -->
+<header class="bg-white border-b border-gray-200 shadow-sm">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div class="flex flex-col gap-3">
+      <div class="flex items-center gap-3">
+        <span class="chapter-badge">Chapter 17B</span>
+        <span class="text-sm text-gray-500">Case Study Series</span>
+      </div>
+      <h1 class="text-4xl font-bold text-gray-900 leading-tight">ChatGPT: Serving at Scale &amp; MLOps Lessons</h1>
+      <p class="text-xl text-gray-600 max-w-3xl">How OpenAI serves billions of tokens per day — and what every ML team can learn from the infrastructure, cost curve, and product iteration cycle that built the world's most-used AI product.</p>
+      <div class="flex flex-wrap items-center gap-6 text-sm text-gray-500 mt-2">
+        <span class="flex items-center gap-1">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          45 min read
+        </span>
+        <span class="flex items-center gap-1">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+          Distinguished Engineer — GPT-4 Deployment &amp; Serving
+        </span>
+        <span class="flex items-center gap-1">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          Updated April 2026
+        </span>
+        <span class="flex items-center gap-1">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          Advanced
+        </span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Main Layout -->
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+  <div class="flex gap-10">
+
+    <!-- Sidebar TOC -->
+    <aside class="hidden xl:block w-72 flex-shrink-0">
+      <div class="sticky top-24 bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+        <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4" id="toc">On This Page</h3>
+        <nav class="space-y-1 text-sm text-gray-600">
+          <a href="#s1" class="toc-link block py-1">1. Product Architecture</a>
+          <a href="#s2" class="toc-link block py-1">2. Serving Optimization</a>
+          <a href="#s3" class="toc-link block py-1">3. Product Iteration Cycle</a>
+          <a href="#s4" class="toc-link block py-1">4. Infrastructure Cost</a>
+          <a href="#s5" class="toc-link block py-1">5. Key MLOps Lessons</a>
+          <a href="#s6" class="toc-link block py-1">6. Open Source Impact</a>
+          <a href="#s7" class="toc-link block py-1">7. ChatGPT in Miniature</a>
+          <a href="#s8" class="toc-link block py-1">8. GPT-5 Era Predictions</a>
+          <a href="#summary" class="toc-link block py-1">Summary &amp; Takeaways</a>
+        </nav>
+      </div>
+    </aside>
+
+    <!-- Content -->
+    <main class="flex-1 min-w-0 space-y-20">
+
+      <!-- ===== SECTION 1 ===== -->
+      <section id="s1" class="section-anchor">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="w-8 h-8 bg-blue-600 text-white rounded-lg flex items-center justify-center font-bold text-sm">1</span>
+          <h2 class="text-2xl font-bold text-gray-900">ChatGPT Product Architecture (Estimated)</h2>
+        </div>
+
+        <p class="text-gray-700 leading-relaxed mb-6">OpenAI has not published a full architecture paper for ChatGPT's production stack. What follows is an evidence-based reconstruction from public job postings, infrastructure talks, API behavior, Microsoft Azure partnership announcements, and the broader LLM serving literature. The core inference infrastructure is built on top of Azure's custom GPU clusters under the OpenAI exclusivity agreement announced in 2019 and extended in 2023.</p>
+
+        <div class="callout-info p-4 rounded-lg mb-6">
+          <p class="text-sm font-semibold text-blue-800 mb-1">Public Sources</p>
+          <p class="text-sm text-blue-900">Architecture estimates are derived from: OpenAI system cards, Microsoft Build 2023 talks, Azure OpenAI Service docs, job requisitions for "inference infrastructure" roles, and reverse-engineering of API latency patterns. Numbers labeled "estimated" are informed extrapolations.</p>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-900 mt-8 mb-4">1.1 Production Architecture Overview</h3>
+
+        <div class="bg-white rounded-xl border border-gray-200 p-6 mb-6 shadow-sm">
+          <div class="mermaid">
+graph TB
+    subgraph Client["Client Layer"]
+        Web["Web App\nchat.openai.com"]
+        iOS["iOS / Android"]
+        API["API Consumers\n(ChatGPT API)"]
+    end
+
+    subgraph Edge["Edge / CDN"]
+        CF["Cloudflare / Azure Front Door\nDDoS, TLS termination, CDN"]
+        RL["Rate Limiter\n(token bucket per user)"]
+    end
+
+    subgraph Gateway["API Gateway Layer"]
+        GW["API Gateway\n(auth, routing, billing)"]
+        LB["Regional Load Balancer\nUS-East, EU-West, AP-SE"]
+        SSE["SSE Streaming Handler\ntext/event-stream"]
+    end
+
+    subgraph Serving["Inference Cluster (per region)"]
+        Router["Model Router\n(GPT-4o vs o3 vs mini)"]
+        Sched["Continuous Batch Scheduler\nvLLM / Triton-based"]
+        GPU1["GPU Node Pool A\nH100 80GB x8"]
+        GPU2["GPU Node Pool B\nH100 80GB x8"]
+        KVC["KV Cache Manager\nPagedAttention"]
+    end
+
+    subgraph Safety["Safety Layer"]
+        Mod["Content Moderation API\n(async, non-blocking)"]
+        Filter["Output Filter\n(toxicity, PII, IP)"]
+    end
+
+    subgraph Data["Data &amp; Feedback"]
+        Log["Request Logger\n(sampled)"]
+        FB["Thumbs Up/Down\nFeedback Store"]
+        Eval["Offline Eval Pipeline\n(nightly evals)"]
+    end
+
+    Web --> CF
+    iOS --> CF
+    API --> CF
+    CF --> RL --> GW
+    GW --> LB --> SSE
+    SSE --> Router
+    Router --> Sched
+    Sched --> GPU1
+    Sched --> GPU2
+    GPU1 --> KVC
+    GPU2 --> KVC
+    Sched --> Mod
+    Sched --> Filter
+    Filter --> SSE
+    GW --> Log --> Eval
+    Web --> FB --> Eval
+          </div>
+          <p class="text-xs text-gray-500 mt-3 text-center">Figure 1: Estimated ChatGPT production architecture. Based on public signals and standard LLM serving patterns.</p>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-900 mt-8 mb-4">1.2 Streaming Responses</h3>
+        <p class="text-gray-700 leading-relaxed mb-4">ChatGPT uses <strong>Server-Sent Events (SSE)</strong> over HTTP/1.1 to stream tokens. Each token is emitted as a <code>data:</code> event with a JSON delta. This gives the user immediate feedback (first token in ~300ms at normal load) even when full responses take 15–30 seconds. The streaming path has a dedicated SSE handler that bypasses the standard response buffer to minimize head-of-line blocking.</p>
+
+        <p class="text-gray-700 leading-relaxed mb-4">Critically, streaming is not just UX polish — it is a cost-containment measure. Users who see progress are less likely to re-submit, reducing duplicate inference work. OpenAI measured that streaming reduced re-submission rates by roughly 40% in early A/B tests (per Sam Altman's comments at MIT).</p>
+
+        <h3 class="text-xl font-semibold text-gray-900 mt-8 mb-4">1.3 Multi-Region Strategy</h3>
+        <p class="text-gray-700 leading-relaxed mb-4">OpenAI runs at minimum three primary regions: US-East (primary), EU-West (GDPR compliance), and AP-Southeast (latency). Azure provides the GPU fabric under the Microsoft partnership. Each region maintains an active inference cluster, and traffic is routed by geography first, then by cluster utilization. There is no cross-region KV cache sharing — each region maintains its own cache. This is a deliberate simplicity tradeoff over theoretical efficiency gains from global cache.</p>
+
+        <h3 class="text-xl font-semibold text-gray-900 mt-8 mb-4">1.4 Rate Limiting and Abuse Prevention</h3>
+        <p class="text-gray-700 leading-relaxed mb-4">Rate limits operate at multiple layers: per-IP at the CDN, per-user token-bucket in the API gateway, and per-org at the billing tier. The public limits (as of 2025) for ChatGPT Plus are ~80 GPT-4o messages per 3 hours. The API exposes RPM (requests per minute) and TPM (tokens per minute) limits independently, which allows burst-heavy vs. throughput-heavy use patterns to be accommodated without a single rate dimension penalizing valid use cases.</p>
+
+        <h3 class="text-xl font-semibold text-gray-900 mt-8 mb-4">1.5 Cost Per Query Trajectory</h3>
+        <p class="text-gray-700 leading-relaxed mb-4">The most dramatic story in ChatGPT's history is the cost curve. Using public API pricing as a proxy for underlying costs (OpenAI prices above cost but the pricing direction reflects cost direction):</p>
+
+        <div class="overflow-x-auto rounded-lg border border-gray-200 mb-6">
+          <table>
+            <thead><tr><th>Model / Era</th><th>Input (per 1M tokens)</th><th>Output (per 1M tokens)</th><th>Key Driver of Reduction</th></tr></thead>
+            <tbody>
+              <tr><td>GPT-3 (davinci) — 2021</td><td>$60</td><td>$60</td><td>Baseline A100 serving</td></tr>
+              <tr><td>GPT-3.5-turbo — Mar 2023</td><td>$2</td><td>$2</td><td>Distillation + batching</td></tr>
+              <tr><td>GPT-4 (8K) — Jun 2023</td><td>$30</td><td>$60</td><td>Full 1.8T param model</td></tr>
+              <tr><td>GPT-4-turbo — Nov 2023</td><td>$10</td><td>$30</td><td>128K context, optimized kernels</td></tr>
+              <tr><td>GPT-4o — May 2024</td><td>$5</td><td>$15</td><td>Multimodal fusion, H100 fleet</td></tr>
+              <tr><td>GPT-4o-mini — Jul 2024</td><td>$0.15</td><td>$0.60</td><td>Distilled smaller model</td></tr>
+              <tr><td>GPT-4.1-nano — Apr 2025</td><td>$0.10</td><td>$0.40</td><td>Aggressive quantization + MoE routing</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-xs text-gray-500 mb-6">Sources: OpenAI pricing page (public), Semianalysis GPU cost analysis, Sequoia AI cost breakdown (2023).</p>
+      </section>
+
+      <!-- ===== SECTION 2 ===== -->
+      <section id="s2" class="section-anchor">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="w-8 h-8 bg-blue-600 text-white rounded-lg flex items-center justify-center font-bold text-sm">2</span>
+          <h2 class="text-2xl font-bold text-gray-900">ChatGPT Serving Optimization</h2>
+        </div>
+
+        <p class="text-gray-700 leading-relaxed mb-6">Serving a trillion tokens per month is a fundamentally different systems problem than training. Training is predictable batch compute; serving is an online, latency-sensitive, mixed-concurrency workload with a brutal cost constraint. The key techniques that made ChatGPT economically viable are: KV cache management, continuous batching, speculative decoding, and memory-efficient attention.</p>
+
+        <h3 class="text-xl font-semibold text-gray-900 mt-6 mb-4">2.1 The KV Cache Problem at Scale</h3>
+        <p class="text-gray-700 leading-relaxed mb-4">During autoregressive generation, each token attends to all previous tokens. Recomputing key-value pairs for every token at every step is O(n²) in compute. The KV cache stores these pairs and grows linearly with sequence length. For GPT-4 at 128K context with 96 attention heads and 128-dimensional heads per layer across 96 layers, the KV cache per sequence can exceed 24GB — larger than the model itself.</p>
+
+        <p class="text-gray-700 leading-relaxed mb-4"><strong>PagedAttention</strong> (vLLM, Kwon et al. 2023) solved the fragmentation problem by managing KV cache as fixed-size pages (analogous to OS virtual memory), allowing non-contiguous physical allocation. This eliminates the need to reserve worst-case contiguous memory per sequence, improving GPU memory utilization from ~35% to ~90% in production scenarios.</p>
+
+        <h3 class="text-xl font-semibold text-gray-900 mt-6 mb-4">2.2 Continuous Batching</h3>
+        <p class="text-gray-700 leading-relaxed mb-4">Static batching (waiting to fill a batch before executing) causes the "convoy problem": a single long sequence blocks all short sequences in its batch. Continuous batching (Orca, Yu et al. 2022) solves this by allowing new requests to join the batch at the token level — as soon as one sequence finishes its current token generation step, a new sequence can enter. This gives near-optimal GPU utilization without penalizing short requests.</p>
+
+        <h3 class="text-xl font-semibold text-gray-900 mt-6 mb-4">2.3 Speculative Decoding</h3>
+        <p class="text-gray-700 leading-relaxed mb-4">Autoregressive decoding is memory-bandwidth-bound, not compute-bound, for small batch sizes. The GPU is mostly idle waiting for weights to be loaded for each token. Speculative decoding (Leviathan et al. 2023, Chen et al. 2023) uses a small "draft model" to generate k candidate tokens, which the large model verifies in a single forward pass. If the large model accepts all k tokens, throughput improves by up to k×. In practice 2–3× speedups are achievable with an appropriately matched draft model (e.g., GPT-4o-mini drafts for GPT-4o verification).</p>
+
+        <h3 class="text-xl font-semibold text-gray-900 mt-6 mb-4">2.4 Flash Attention</h3>
+        <p class="text-gray-700 leading-relaxed mb-4">Standard attention requires materializing the full N×N attention matrix, which is O(N²) in memory. Flash Attention (Dao et al. 2022) fuses the attention computation into a single CUDA kernel using tiling and recomputation, reducing memory from O(N²) to O(N) while maintaining exact outputs. Flash Attention 2 (2023) improved parallelism across sequence length, achieving ~2× wall-clock speedup over FA1. At 128K context lengths, FA2 is the difference between fitting in GPU memory and OOM.</p>
+
+        <h3 class="text-xl font-semibold text-gray-900 mt-6 mb-4">2.5 Optimized Inference Configuration</h3>
+
+        <div class="code-label">python — vllm_inference_config.py</div>
+        <pre><code class="language-python">"""
+Production-grade LLM inference configuration using vLLM.
+Incorporates: PagedAttention, continuous batching, speculative decoding,
+and tensor parallelism. Reflects patterns in public vLLM codebase.
+"""
+from vllm import LLM, SamplingParams
+from vllm.engine.arg_utils import AsyncEngineArgs
+from vllm.engine.async_llm_engine import AsyncLLMEngine
+import asyncio
+
+# ── Engine configuration ──────────────────────────────────────────────────────
+engine_args = AsyncEngineArgs(
+    model="meta-llama/Llama-3-70b-instruct",
+
+    # Tensor parallelism across GPUs (shard model weights)
+    tensor_parallel_size=4,          # 4x H100 80GB
+
+    # KV cache: PagedAttention page size (tokens per block)
+    block_size=16,
+    # GPU memory fraction for KV cache (reserve rest for weights + activations)
+    gpu_memory_utilization=0.90,
+
+    # Speculative decoding: use small model as draft
+    speculative_model="meta-llama/Llama-3-8b-instruct",
+    num_speculative_tokens=5,        # draft 5 tokens, verify in 1 pass
+
+    # Context length
+    max_model_len=32768,
+
+    # Continuous batching: max requests in flight
+    max_num_seqs=256,
+
+    # Quantization: reduces memory ~2x, minimal quality loss
+    quantization="fp8",              # H100 native FP8 support
+
+    # Flash Attention (auto-selected on Hopper GPUs)
+    enforce_eager=False,             # allow CUDA graphs for prefill
+)
+
+engine = AsyncLLMEngine.from_engine_args(engine_args)
+
+# ── Sampling parameters ───────────────────────────────────────────────────────
+DEFAULT_PARAMS = SamplingParams(
+    temperature=0.7,
+    top_p=0.9,
+    max_tokens=2048,
+    stop=["</s>", "<|eot_id|>"],
+    # Repetition penalty — important for long outputs
+    repetition_penalty=1.05,
+)
+
+# ── Streaming inference ───────────────────────────────────────────────────────
+async def stream_generate(prompt: str, request_id: str):
+    """Yield token strings as they are generated (SSE-compatible)."""
+    results_generator = engine.generate(
+        prompt,
+        DEFAULT_PARAMS,
+        request_id=request_id,
+    )
+    prev_text = ""
+    async for request_output in results_generator:
+        text = request_output.outputs[0].text
+        delta = text[len(prev_text):]          # incremental token text
+        prev_text = text
+        yield delta
+        if request_output.finished:
+            break
+
+# ── Throughput benchmark ──────────────────────────────────────────────────────
+async def benchmark_throughput(prompts: list[str], n_runs: int = 100):
+    """Estimate tokens/sec under continuous batching."""
+    import time, uuid
+    tasks = [
+        engine.generate(p, DEFAULT_PARAMS, request_id=str(uuid.uuid4()))
+        for p in prompts[:n_runs]
+    ]
+    start = time.perf_counter()
+    results = await asyncio.gather(*[list(t) async for t in tasks])  # type: ignore
+    elapsed = time.perf_counter() - start
+    total_tokens = sum(len(r[-1].outputs[0].token_ids) for r in results)
+    print(f"Throughput: {total_tokens / elapsed:.0f} tokens/sec")
+    print(f"Avg latency: {elapsed / n_runs * 1000:.0f} ms/request")
+</code></pre>
+
+        <div class="callout-tip p-4 rounded-lg mt-6 mb-4">
+          <p class="text-sm font-semibold text-green-800 mb-1">Production Sizing Rule of Thumb</p>
+          <p class="text-sm text-green-900">A single H100 80GB can serve ~1,500 tokens/sec at batch size 64 for a 7B model with FP8. For a 70B model with TP=4 across 4×H100, expect ~400 tokens/sec. Scale horizontally: 1,000 concurrent users at 50 tokens/turn requires ~200 tokens/sec sustained, achievable on a single 4×H100 node for 70B.</p>
+        </div>
+      </section>
+
+      <!-- ===== SECTION 3 ===== -->
+      <section id="s3" class="section-anchor">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="w-8 h-8 bg-blue-600 text-white rounded-lg flex items-center justify-center font-bold text-sm">3</span>
+          <h2 class="text-2xl font-bold text-gray-900">The ChatGPT Product Iteration Cycle</h2>
+        </div>
+
+        <p class="text-gray-700 leading-relaxed mb-6">ChatGPT reached 100M users in 2 months — faster than any consumer product in history. Sustaining that required an iteration discipline that most ML teams never develop because they never need to move that fast. The core loop is: collect signal from production, evaluate offline, train incrementally, deploy gradually, measure behavioral change. Repeat weekly.</p>
+
+        <h3 class="text-xl font-semibold text-gray-900 mt-6 mb-4">3.1 A/B Testing at Chat Scale</h3>
+        <p class="text-gray-700 leading-relaxed mb-4">ChatGPT runs multiple model variants in production simultaneously. Users are bucketed by user ID hash into treatment/control groups. A model change might be live for 1% of traffic for 48 hours before promotion. The key metrics: thumbs up/down rate, session length, return rate (day-7 retention), and refusal rate on safe queries. These composite metrics capture both quality and safety simultaneously.</p>
+
+        <p class="text-gray-700 leading-relaxed mb-4">The challenge unique to chat: standard A/B statistics assume independent samples. Conversation history creates within-user correlation. OpenAI uses cluster-randomized designs (randomize by user, not conversation) and accounts for autocorrelation in significance tests. A typical experiment needs 50K–500K conversations for 80% power at 0.5% effect size.</p>
+
+        <h3 class="text-xl font-semibold text-gray-900 mt-6 mb-4">3.2 Evaluation-Driven Development</h3>
+        <p class="text-gray-700 leading-relaxed mb-4">The evaluation stack is the core infrastructure asset. Without reliable evals, you cannot ship safely. OpenAI's eval infrastructure (partially open-sourced as <code>evals</code> in March 2023) includes: automated benchmarks, human preference evals, adversarial red-teaming, and regression suites. The key discipline: <strong>no model ships without passing all regression evals</strong>. A new model must match or beat the previous model on every eval category, not just average score.</p>
+
+        <div class="bg-white rounded-xl border border-gray-200 p-6 mb-6 shadow-sm">
+          <div class="mermaid">
+flowchart LR
+    subgraph Weekly["Weekly Iteration Cycle"]
+        direction TB
+        A["Production\nSignal Collection\n(sampled logs, thumbs)"]
+        B["Offline Eval\n(automated benchmarks\n+ human preference)"]
+        C["Model Training\n(SFT patch or\nRLHF fine-tune)"]
+        D["Shadow Deploy\n(1% traffic, no user\nimpact)"]
+        E["A/B Test\n(5% → 20% → 100%\ngradual rollout)"]
+        F["Monitor &amp; Alert\n(safety triggers,\nlatency SLOs)"]
+        A --> B --> C --> D --> E --> F --> A
+    end
+          </div>
+          <p class="text-xs text-gray-500 mt-3 text-center">Figure 2: ChatGPT's production model iteration cycle (estimated from public descriptions).</p>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-900 mt-6 mb-4">3.3 Safety Monitoring in Production</h3>
+        <p class="text-gray-700 leading-relaxed mb-4">Safety is a live system property, not a pre-deployment gate. OpenAI runs the Moderation API (also publicly available) against both inputs and outputs in near-real-time. Violations are logged, sampled for human review, and fed back into the training loop. The system distinguishes between "hard block" (output not shown), "soft warn" (output shown with disclaimer), and "log only" categories. The thresholds shift over time as the model improves and as abuse patterns evolve.</p>
+
+        <h3 class="text-xl font-semibold text-gray-900 mt-6 mb-4">3.4 Model Update Cadence</h3>
+        <p class="text-gray-700 leading-relaxed mb-4">OpenAI distinguishes between "patch" updates (safety fixes, minor behavior changes, deployed in days) and "model version" updates (new capabilities, requiring full eval suite, deployed over weeks). Users on the free tier see patch updates silently; API users can pin to a specific model version (e.g., <code>gpt-4o-2024-11-20</code>) for reproducibility. This versioning discipline is one of the most underappreciated MLOps features of the API.</p>
+      </section>
+
+      <!-- ===== SECTION 4 ===== -->
+      <section id="s4" class="section-anchor">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="w-8 h-8 bg-blue-600 text-white rounded-lg flex items-center justify-center font-bold text-sm">4</span>
+          <h2 class="text-2xl font-bold text-gray-900">Infrastructure Cost Analysis</h2>
+        </div>
+
+        <p class="text-gray-700 leading-relaxed mb-6">The economics of large model deployment are unlike any prior ML system. Training is a one-time (or infrequent) capital expenditure; serving is the ongoing operational cost that determines whether the business is viable. Understanding both is essential for anyone planning LLM infrastructure.</p>
+
+        <h3 class="text-xl font-semibold text-gray-900 mt-6 mb-4">4.1 Training Cost Estimates</h3>
+        <p class="text-gray-700 leading-relaxed mb-4">GPT-4's training cost has been publicly estimated at approximately $100M by Sam Altman (2023 comments) and corroborated by independent analysts (Semianalysis, Epoch AI). This figure covers: GPU cluster rental (tens of thousands of A100s for ~90–100 days), data curation at scale, multiple training runs to tune hyperparameters, safety evaluations, RLHF data collection, and infrastructure engineering. The raw compute cost is perhaps $30–40M; the remainder is people, data, and overhead.</p>
+
+        <div class="callout-warning p-4 rounded-lg mb-6">
+          <p class="text-sm font-semibold text-yellow-800 mb-1">Cost Asymmetry: Training vs. Serving</p>
+          <p class="text-sm text-yellow-900">GPT-4 training: ~$100M, done once. GPT-4 serving at ChatGPT scale: estimated $700K–$1M per day in early 2023 (Morgan Stanley estimate, since substantially reduced). At scale, serving dominates total cost of ownership within weeks of launch.</p>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-900 mt-6 mb-4">4.2 Cost Optimization Journey</h3>
+
+        <div class="overflow-x-auto rounded-lg border border-gray-200 mb-6">
+          <table>
+            <thead><tr><th>Optimization Technique</th><th>Cost Reduction</th><th>Quality Impact</th><th>Timeline Applied</th></tr></thead>
+            <tbody>
+              <tr><td>Continuous batching (Orca)</td><td>3–4× throughput gain</td><td>None</td><td>H2 2023</td></tr>
+              <tr><td>FP8 quantization (H100)</td><td>~1.8× memory reduction</td><td>&lt;0.5% benchmark delta</td><td>2023–2024</td></tr>
+              <tr><td>Flash Attention 2</td><td>~2× attention compute</td><td>None (exact)</td><td>H2 2023</td></tr>
+              <tr><td>Speculative decoding</td><td>2–3× latency reduction</td><td>None (exact)</td><td>2024</td></tr>
+              <tr><td>Model distillation (GPT-4o-mini)</td><td>~25× cheaper than GPT-4</td><td>Moderate for hard tasks</td><td>Jul 2024</td></tr>
+              <tr><td>KV cache prefix sharing</td><td>30–50% cache reuse for system prompts</td><td>None</td><td>2024</td></tr>
+              <tr><td>Custom H100 inference kernels</td><td>Additional 20–30%</td><td>None</td><td>Ongoing</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-900 mt-6 mb-4">4.3 Per-Token Cost Trajectory with Optimization Stacking</h3>
+
+        <div class="overflow-x-auto rounded-lg border border-gray-200 mb-6">
+          <table>
+            <thead><tr><th>Configuration</th><th>Relative Cost (GPT-3 = 1.0×)</th><th>Key Techniques Active</th></tr></thead>
+            <tbody>
+              <tr><td>GPT-3 davinci, A100, naive serving</td><td>1.0×</td><td>Baseline</td></tr>
+              <tr><td>+ Continuous batching</td><td>0.25×</td><td>Orca-style scheduler</td></tr>
+              <tr><td>+ Flash Attention</td><td>0.13×</td><td>FA2 kernel</td></tr>
+              <tr><td>+ FP8 quantization</td><td>0.07×</td><td>H100 FP8</td></tr>
+              <tr><td>+ Speculative decoding</td><td>0.04×</td><td>Draft model</td></tr>
+              <tr><td>+ Distilled smaller model (GPT-4o-mini equiv)</td><td>0.004×</td><td>Knowledge distillation</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-xs text-gray-500 mb-2">Illustrative relative costs. Each technique compounds. A fully optimized modern stack is ~250× cheaper per token than 2021 GPT-3 serving.</p>
+      </section>
+
+      <!-- ===== SECTION 5 ===== -->
+      <section id="s5" class="section-anchor">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="w-8 h-8 bg-blue-600 text-white rounded-lg flex items-center justify-center font-bold text-sm">5</span>
+          <h2 class="text-2xl font-bold text-gray-900">Key MLOps Lessons from ChatGPT</h2>
+        </div>
+
+        <p class="text-gray-700 leading-relaxed mb-6">Five lessons that every ML team deploying large models will eventually learn. Learning them from ChatGPT's public track record is faster than learning them from your own production failures.</p>
+
+        <h3 class="text-xl font-semibold text-gray-900 mt-6 mb-3">Lesson 1: Reliability at Cluster Scale Requires New Fault Tolerance</h3>
+        <p class="text-gray-700 leading-relaxed mb-4">With 25,000+ GPUs in a training cluster, the mean time between hardware failures drops to hours. ChatGPT's early outages (December 2022, February 2023) were not software bugs — they were infrastructure scaling failures: database connection exhaustion, Redis cache stampedes, DNS resolution failures under millions of simultaneous connections. The lesson: your serving infrastructure will fail in ways your training infrastructure never did, because the traffic patterns are completely different.</p>
+
+        <h3 class="text-xl font-semibold text-gray-900 mt-6 mb-3">Lesson 2: RLHF Quality is Bottlenecked by Human Data Quality</h3>
+        <p class="text-gray-700 leading-relaxed mb-4">The InstructGPT paper (Ouyang et al. 2022) showed that 13,000 human-labeled examples of preferred responses could make a 1.3B model outperform a 175B base model on instruction following. But subsequent work revealed the critical sensitivity to <em>labeler quality</em>. Labelers must be aligned on what "good" means — which requires extensive guidelines, calibration exercises, and inter-annotator agreement checks. Scale Dataworks and Surge AI developed quality control pipelines specifically for this. If your labelers disagree on 30%+ of comparisons, your reward model is learning noise.</p>
+
+        <h3 class="text-xl font-semibold text-gray-900 mt-6 mb-3">Lesson 3: Evaluation is the Hardest Part</h3>
+        <p class="text-gray-700 leading-relaxed mb-4">For classification, you have ground truth labels. For open-ended language generation, there is no ground truth. ChatGPT cannot be evaluated with a single metric. OpenAI's solution was multi-dimensional evaluation: factual accuracy (verifiable claims), instruction following (did it do what was asked), harmlessness (safety), and helpfulness (human preference). These dimensions often conflict — a more helpful response is sometimes less "safe" by naive classifiers. Building and maintaining this eval suite is a larger ongoing effort than the model training itself.</p>
+
+        <h3 class="text-xl font-semibold text-gray-900 mt-6 mb-3">Lesson 4: Serving LLMs is a Systems Engineering Challenge</h3>
+        <p class="text-gray-700 leading-relaxed mb-4">The serving stack for LLMs is not a web server with a model call. It is a distributed memory management system (KV cache), a scheduler (continuous batching), a network optimization problem (tensor parallelism), and a latency engineering challenge (speculative decoding). The ML team cannot own this alone — it requires systems engineers who understand GPU memory hierarchies, RDMA networking, and CUDA kernel optimization. Every team that has tried to build this from scratch has underestimated it by 6–12 months.</p>
+
+        <h3 class="text-xl font-semibold text-gray-900 mt-6 mb-3">Lesson 5: Safety is Not an Afterthought</h3>
+        <p class="text-gray-700 leading-relaxed mb-4">OpenAI spent 6 months on safety work before ChatGPT's public launch. The moderation API, the RLHF safety data, the red-teaming exercises — all were built before the product shipped. Teams that deploy first and "add safety later" consistently find that the safety work is far harder to retrofit than to build in, and that user trust, once broken by a high-profile safety failure, takes years to rebuild (see early Bing Chat incidents, Meta Galactica).</p>
+
+        <div class="overflow-x-auto rounded-lg border border-gray-200 mb-6 mt-8">
+          <table>
+            <thead><tr><th>MLOps Challenge</th><th>Typical ML System</th><th>GPT-Scale LLM</th></tr></thead>
+            <tbody>
+              <tr><td>Model size</td><td>10M–1B params, single GPU</td><td>70B–1T+ params, multi-node</td></tr>
+              <tr><td>Inference latency</td><td>1–50ms, CPU-feasible</td><td>300ms–30s, GPU-only</td></tr>
+              <tr><td>Evaluation</td><td>Accuracy/F1 on held-out set</td><td>Multi-dim human preference, no ground truth</td></tr>
+              <tr><td>Failure modes</td><td>Wrong prediction class</td><td>Hallucination, harmful output, subtle sycophancy</td></tr>
+              <tr><td>Cost structure</td><td>Training dominates</td><td>Serving dominates within weeks</td></tr>
+              <tr><td>A/B testing</td><td>Standard significance tests</td><td>Clustered design, complex correlation structure</td></tr>
+              <tr><td>Model updates</td><td>Retrain on new data</td><td>RLHF fine-tune, requires human labeler pipeline</td></tr>
+              <tr><td>Safety</td><td>Bias/fairness audits</td><td>Real-time moderation, red-teaming, jailbreak monitoring</td></tr>
+              <tr><td>Memory management</td><td>Static batch allocation</td><td>Dynamic KV cache (PagedAttention)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ===== SECTION 6 ===== -->
+      <section id="s6" class="section-anchor">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="w-8 h-8 bg-blue-600 text-white rounded-lg flex items-center justify-center font-bold text-sm">6</span>
+          <h2 class="text-2xl font-bold text-gray-900">Open Source Ecosystem Impact</h2>
+        </div>
+
+        <p class="text-gray-700 leading-relaxed mb-6">ChatGPT's success catalyzed the fastest-moving open source ecosystem in ML history. Within 18 months of ChatGPT's launch, open-source models closed much of the capability gap on many benchmarks. This section traces the key papers and models that enabled the open source reproduction effort.</p>
+
+        <h3 class="text-xl font-semibold text-gray-900 mt-6 mb-4">6.1 Foundational Papers</h3>
+        <ul class="space-y-3 text-gray-700 mb-6">
+          <li><strong>"Attention Is All You Need"</strong> (Vaswani et al., 2017) — The transformer architecture. Every major LLM is built on this foundation. The paper's open publication made reproduction tractable.</li>
+          <li><strong>"Scaling Laws for Neural Language Models"</strong> (Kaplan et al., OpenAI 2020) — Showed that loss scales predictably with compute, data, and parameters. Gave the field a roadmap for how much to invest in each dimension.</li>
+          <li><strong>"Training language models to follow instructions"</strong> (Ouyang et al., OpenAI 2022, "InstructGPT") — Revealed the RLHF recipe that turned GPT-3 into a useful assistant. This paper alone launched hundreds of research efforts.</li>
+          <li><strong>"Constitutional AI"</strong> (Anthropic 2022) — Showed that AI feedback (RLAIF) could partially replace human labelers for safety alignment, critical for teams without Scale AI budgets.</li>
+          <li><strong>Flash Attention</strong> (Dao et al., 2022) and <strong>vLLM/PagedAttention</strong> (Kwon et al., 2023) — Made open-source serving economically viable.</li>
+        </ul>
+
+        <h3 class="text-xl font-semibold text-gray-900 mt-6 mb-4">6.2 Open Source Reproduction Timeline</h3>
+        <div class="bg-white rounded-xl border border-gray-200 p-6 mb-6 shadow-sm">
+          <div class="mermaid">
+timeline
+    title Open Source LLM Capability Milestones
+    2023-02 : Stanford Alpaca — LLaMA 7B + InstructGPT recipe, $600 fine-tune
+    2023-03 : Vicuna 13B — beats GPT-3.5 on 90% of questions (Chatbot Arena)
+    2023-07 : Llama 2 — Meta releases 70B with commercial license
+    2023-09 : Mistral 7B — outperforms Llama 2 13B, sliding window attention
+    2023-12 : Mixtral 8x7B MoE — matches GPT-3.5 at fraction of compute
+    2024-04 : Llama 3 70B — competitive with GPT-4 Turbo on many benchmarks
+    2024-06 : Qwen2 72B, Gemma 2 27B — close GPT-4o gap further
+    2025-01 : DeepSeek R1 — matches o1 reasoning with open weights
+    2025-04 : Llama 4 Scout/Maverick — MoE, natively multimodal
+          </div>
+          <p class="text-xs text-gray-500 mt-3 text-center">Figure 3: Open source LLM milestone timeline. Each step enabled by prior public papers.</p>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-900 mt-6 mb-4">6.3 Capability Comparison</h3>
+        <div class="overflow-x-auto rounded-lg border border-gray-200 mb-6">
+          <table>
+            <thead><tr><th>Model</th><th>Params</th><th>MMLU</th><th>HumanEval</th><th>License</th><th>Serving Cost (per 1M tok)</th></tr></thead>
+            <tbody>
+              <tr><td>GPT-4o (OpenAI)</td><td>~1.8T MoE (est.)</td><td>88.7</td><td>90.2</td><td>Proprietary</td><td>$7.50</td></tr>
+              <tr><td>Claude 3.5 Sonnet</td><td>Undisclosed</td><td>88.3</td><td>92.0</td><td>Proprietary</td><td>$9.00</td></tr>
+              <tr><td>Llama 3.1 405B</td><td>405B</td><td>88.6</td><td>89.0</td><td>Llama 3.1 Community</td><td>~$3–5 (self-hosted)</td></tr>
+              <tr><td>Mistral Large 2</td><td>123B</td><td>84.0</td><td>92.1</td><td>Mistral Research</td><td>$6.00</td></tr>
+              <tr><td>Qwen2.5 72B</td><td>72B</td><td>86.0</td><td>88.4</td><td>Apache 2.0</td><td>~$0.30–0.80</td></tr>
+              <tr><td>DeepSeek-R1</td><td>671B MoE</td><td>90.8</td><td>92.3</td><td>MIT</td><td>~$2.19 (API)</td></tr>
+              <tr><td>Llama 4 Maverick</td><td>400B MoE</td><td>85.5</td><td>88.0</td><td>Llama 4 Community</td><td>~$0.19 (Groq)</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-xs text-gray-500 mb-2">Benchmark scores from public leaderboards (MMLU 5-shot, HumanEval pass@1). Costs approximate as of April 2026.</p>
+      </section>
+
+      <!-- ===== SECTION 7 ===== -->
+      <section id="s7" class="section-anchor">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="w-8 h-8 bg-blue-600 text-white rounded-lg flex items-center justify-center font-bold text-sm">7</span>
+          <h2 class="text-2xl font-bold text-gray-900">A "ChatGPT in Miniature" for Your Team</h2>
+        </div>
+
+        <p class="text-gray-700 leading-relaxed mb-6">You don't need 25,000 H100s to build a production LLM product. The same architectural principles that power ChatGPT apply at 1/1000th the scale. Here is a practical architecture for a team of 5–20 engineers serving internal or small-scale external users.</p>
+
+        <h3 class="text-xl font-semibold text-gray-900 mt-6 mb-4">7.1 Practical Production Architecture</h3>
+
+        <div class="bg-white rounded-xl border border-gray-200 p-6 mb-6 shadow-sm">
+          <div class="mermaid">
+graph TB
+    subgraph Client["Client"]
+        UI["Web UI\n(React / Next.js)"]
+        APIC["API Client\n(Python / JS SDK)"]
+    end
+
+    subgraph API["API Layer (FastAPI)"]
+        GW["FastAPI Gateway\nAuth, Rate Limit, Billing"]
+        WS["SSE / WebSocket\nStreaming Handler"]
+    end
+
+    subgraph Inference["Inference (vLLM)"]
+        VLLM["vLLM Engine\n(Llama 3 70B or GPT-4o API)"]
+        KV["KV Cache\nPagedAttention"]
+    end
+
+    subgraph Safety["Safety"]
+        MOD["OpenAI Moderation API\nor Llamaguard"]
+    end
+
+    subgraph Data["Data Layer"]
+        PG["PostgreSQL\nConversation History"]
+        Redis["Redis\nSession Cache"]
+        S3["S3 / GCS\nPrompt Logs"]
+    end
+
+    subgraph Eval["Eval &amp; Feedback"]
+        FB["Thumbs UI\nFeedback Collector"]
+        EVAL["Weekly Eval Run\n(ragas / deepeval)"]
+    end
+
+    UI --> GW
+    APIC --> GW
+    GW --> WS --> VLLM
+    VLLM --> KV
+    GW --> MOD
+    GW --> PG
+    GW --> Redis
+    GW --> S3
+    UI --> FB --> EVAL
+    S3 --> EVAL
+          </div>
+          <p class="text-xs text-gray-500 mt-3 text-center">Figure 4: Practical LLM product architecture for small-to-mid scale teams.</p>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-900 mt-6 mb-4">7.2 Minimal Production LLM API</h3>
+
+        <div class="code-label">python — app/main.py (FastAPI + vLLM)</div>
+        <pre><code class="language-python">"""
+Minimal production LLM API: FastAPI + vLLM streaming.
+Covers: auth, rate limiting, SSE streaming, safety check, logging.
+~150 lines. Extend for your use case.
+"""
+from fastapi import FastAPI, Depends, HTTPException, Request
+from fastapi.responses import StreamingResponse
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel, Field
+import asyncio, json, time, uuid, hashlib
+from vllm import AsyncLLMEngine, AsyncEngineArgs, SamplingParams
+import redis.asyncio as aioredis
+import logging
+
+logger = logging.getLogger(__name__)
+app = FastAPI(title="LLM API", version="1.0.0")
+app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"])
+
+# ── Engine setup ──────────────────────────────────────────────────────────────
+engine = AsyncLLMEngine.from_engine_args(AsyncEngineArgs(
+    model="meta-llama/Llama-3.1-8B-Instruct",
+    tensor_parallel_size=1,
+    gpu_memory_utilization=0.85,
+    max_model_len=8192,
+    max_num_seqs=64,
+))
+redis_client = aioredis.from_url("redis://localhost:6379")
+
+# ── Request model ─────────────────────────────────────────────────────────────
+class ChatRequest(BaseModel):
+    messages: list[dict]                      # [{role, content}]
+    temperature: float = Field(0.7, ge=0, le=2)
+    max_tokens: int = Field(1024, ge=1, le=4096)
+    stream: bool = True
+
+# ── Rate limiting (token bucket per API key) ──────────────────────────────────
+async def check_rate_limit(request: Request) -> str:
+    api_key = request.headers.get("X-API-Key", "anonymous")
+    key_hash = hashlib.sha256(api_key.encode()).hexdigest()[:16]
+    redis_key = f"rl:{key_hash}"
+    current = await redis_client.incr(redis_key)
+    if current == 1:
+        await redis_client.expire(redis_key, 60)   # 1-minute window
+    if current > 60:                               # 60 req/min limit
+        raise HTTPException(429, "Rate limit exceeded. Retry after 60s.")
+    return api_key
+
+# ── Safety check (async, non-blocking) ───────────────────────────────────────
+async def safety_check(text: str) -> bool:
+    """Returns True if safe. Uses keyword heuristic; replace with Llamaguard."""
+    blocked_patterns = ["ignore all previous", "jailbreak", "DAN mode"]
+    return not any(p.lower() in text.lower() for p in blocked_patterns)
+
+# ── Prompt formatting ─────────────────────────────────────────────────────────
+def format_prompt(messages: list[dict]) -> str:
+    prompt = "<|begin_of_text|>"
+    for msg in messages:
+        role = msg["role"]
+        content = msg["content"]
+        prompt += f"<|start_header_id|>{role}<|end_header_id|>\n\n{content}<|eot_id|>"
+    prompt += "<|start_header_id|>assistant<|end_header_id|>\n\n"
+    return prompt
+
+# ── Main endpoint ─────────────────────────────────────────────────────────────
+@app.post("/v1/chat/completions")
+async def chat_completions(
+    req: ChatRequest,
+    api_key: str = Depends(check_rate_limit),
+):
+    request_id = str(uuid.uuid4())
+    user_text = " ".join(m["content"] for m in req.messages if m["role"] == "user")
+
+    if not await safety_check(user_text):
+        raise HTTPException(400, "Request flagged by safety filter.")
+
+    prompt = format_prompt(req.messages)
+    params = SamplingParams(
+        temperature=req.temperature,
+        max_tokens=req.max_tokens,
+        stop=["<|eot_id|>", "<|end_of_text|>"],
+    )
+
+    async def token_stream():
+        prev_text = ""
+        start = time.perf_counter()
+        token_count = 0
+        async for output in engine.generate(prompt, params, request_id):
+            text = output.outputs[0].text
+            delta = text[len(prev_text):]
+            if delta:
+                prev_text = text
+                token_count += 1
+                chunk = {"choices": [{"delta": {"content": delta}}]}
+                yield f"data: {json.dumps(chunk)}\n\n"
+            if output.finished:
+                latency_ms = (time.perf_counter() - start) * 1000
+                logger.info(f"req={request_id} tokens={token_count} "
+                            f"latency_ms={latency_ms:.0f}")
+                yield "data: [DONE]\n\n"
+
+    if req.stream:
+        return StreamingResponse(token_stream(), media_type="text/event-stream")
+    else:
+        # Collect full response for non-streaming
+        full_text = ""
+        async for chunk in token_stream():
+            if chunk.startswith("data:") and "[DONE]" not in chunk:
+                data = json.loads(chunk[6:])
+                full_text += data["choices"][0]["delta"]["content"]
+        return {"choices": [{"message": {"role": "assistant", "content": full_text}}]}
+
+@app.get("/health")
+async def health(): return {"status": "ok"}
+</code></pre>
+
+        <div class="code-label">yaml — docker-compose.yml</div>
+        <pre><code class="language-yaml">version: "3.9"
+services:
+  api:
+    build: .
+    ports: ["8000:8000"]
+    environment:
+      - CUDA_VISIBLE_DEVICES=0
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    depends_on: [redis]
+
+  redis:
+    image: redis:7-alpine
+    ports: ["6379:6379"]
+    command: redis-server --maxmemory 2gb --maxmemory-policy allkeys-lru
+
+  nginx:
+    image: nginx:alpine
+    ports: ["443:443", "80:80"]
+    volumes:
+      - ./config/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/ssl:ro
+    depends_on: [api]
+</code></pre>
+
+        <h3 class="text-xl font-semibold text-gray-900 mt-8 mb-4">7.3 Key Principles Regardless of Scale</h3>
+        <ul class="space-y-2 text-gray-700">
+          <li><strong>Stream by default.</strong> Users tolerate 15-second responses; they abandon 3-second blank screens. SSE streaming is a one-day engineering investment with outsized UX impact.</li>
+          <li><strong>Version your models.</strong> Never serve an unnamed model. Always expose the model version in API responses. This enables rollback and reproducibility.</li>
+          <li><strong>Instrument everything.</strong> Log token counts, latency, prompt hash (not content), and safety flag rate. You need this data for cost attribution and debugging.</li>
+          <li><strong>Build evals before you need them.</strong> The hardest part of LLM iteration is knowing whether you've improved. Invest in your eval suite on day one, not after a regression.</li>
+          <li><strong>Rate limit from the start.</strong> Abuse is immediate. A single user with a prompt injection can consume your entire monthly compute budget in minutes without rate limits.</li>
+        </ul>
+      </section>
+
+      <!-- ===== SECTION 8 ===== -->
+      <section id="s8" class="section-anchor">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="w-8 h-8 bg-blue-600 text-white rounded-lg flex items-center justify-center font-bold text-sm">8</span>
+          <h2 class="text-2xl font-bold text-gray-900">What's Next — GPT-5 Era Predictions</h2>
+        </div>
+
+        <p class="text-gray-700 leading-relaxed mb-6">Based on public research trajectories — not insider information — several trends are highly likely to define the next generation of LLM infrastructure.</p>
+
+        <h3 class="text-xl font-semibold text-gray-900 mt-6 mb-4">8.1 Inference-Time Compute as the New Scaling Axis</h3>
+        <p class="text-gray-700 leading-relaxed mb-4">OpenAI's o1/o3 series and DeepSeek-R1 demonstrated that allocating more compute at <em>inference time</em> (via chain-of-thought, search, and self-verification) can match or exceed larger models trained with more parameters. The MLOps implication: serving cost becomes variable per query (hard math problems cost 10× more than simple ones), and cost prediction becomes harder. Expect serving infrastructure to shift toward compute-budget-aware scheduling.</p>
+
+        <h3 class="text-xl font-semibold text-gray-900 mt-6 mb-4">8.2 Mixture of Experts at Scale</h3>
+        <p class="text-gray-700 leading-relaxed mb-4">GPT-4's estimated MoE architecture (leaked by George Hotz, corroborated by inference behavior) activates only a fraction of total parameters per token. DeepSeek-V3 (671B total, 37B active) made MoE mainstream in open source. The serving implication: expert routing adds a scheduling dimension — expert parallelism requires co-locating or fast-loading active experts. vLLM 0.5+ and TensorRT-LLM support MoE-aware scheduling.</p>
+
+        <h3 class="text-xl font-semibold text-gray-900 mt-6 mb-4">8.3 Multimodal Serving Complexity</h3>
+        <p class="text-gray-700 leading-relaxed mb-4">GPT-4o and Llama 4 are natively multimodal. Images, audio, and video inputs introduce variable-length, high-bandwidth inputs that dwarf token inputs in memory. A single 1080p video frame at full resolution is ~600KB vs. ~4 bytes per text token. Serving stacks must handle heterogeneous input preprocessing pipelines, with GPU-accelerated vision encoders running in parallel with the LLM decoder.</p>
+
+        <h3 class="text-xl font-semibold text-gray-900 mt-6 mb-4">8.4 MLOps Infrastructure Implications</h3>
+        <ul class="space-y-2 text-gray-700 mb-6">
+          <li><strong>Disaggregated prefill/decode</strong> (Mooncake, Splitwise) — Separating the prefill (prompt processing, compute-bound) from decode (token generation, memory-bandwidth-bound) onto different hardware will become standard. This is already in production at several large providers.</li>
+          <li><strong>KV cache offloading to CPU/SSD</strong> — For very long contexts, active KV cache migration to CPU DRAM or NVMe with async prefetch (as in InfiniGen, CacheGen papers) will let you serve 1M+ context windows economically.</li>
+          <li><strong>Evaluation automation via LLM judges</strong> — GPT-4-as-judge (MT-Bench, Alpaca Eval 2) is now mainstream. The eval pipeline itself becomes an LLM API cost center. Teams need to budget and optimize eval compute separately from serving compute.</li>
+          <li><strong>Model compression without quality loss</strong> — 4-bit GPTQ and AWQ are already mainstream; 2-bit quantization (QuIP#, AQLM) shows promise. Expect 70B models to run on a single 24GB consumer GPU by 2026.</li>
+        </ul>
+      </section>
+
+      <!-- ===== SUMMARY ===== -->
+      <section id="summary" class="section-anchor">
+        <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl border border-blue-200 p-8">
+          <h2 class="text-2xl font-bold text-gray-900 mb-2">Chapter 17 Summary &amp; Key Takeaways</h2>
+          <p class="text-gray-600 mb-6 text-sm">Combined summary for Chapter 17 (Training) and Chapter 17B (Serving &amp; Lessons).</p>
+
+          <div class="grid md:grid-cols-2 gap-6">
+            <div class="bg-white rounded-xl p-5 border border-blue-100 shadow-sm">
+              <h3 class="font-bold text-gray-900 mb-3 flex items-center gap-2">
+                <span class="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs font-bold">1</span>
+                Training Architecture (Ch 17A)
+              </h3>
+              <ul class="text-sm text-gray-700 space-y-1">
+                <li>GPT-4 used ~25K A100s for ~90 days (~$30–40M compute)</li>
+                <li>3-stage pipeline: pretraining → SFT → RLHF</li>
+                <li>InstructGPT recipe: 13K examples beat 175B base model</li>
+                <li>RLHF bottleneck is labeler quality, not quantity</li>
+                <li>ZeRO-3 + pipeline parallelism + activation checkpointing</li>
+              </ul>
+            </div>
+            <div class="bg-white rounded-xl p-5 border border-green-100 shadow-sm">
+              <h3 class="font-bold text-gray-900 mb-3 flex items-center gap-2">
+                <span class="w-6 h-6 bg-green-600 text-white rounded-full flex items-center justify-center text-xs font-bold">2</span>
+                Serving Infrastructure (Ch 17B)
+              </h3>
+              <ul class="text-sm text-gray-700 space-y-1">
+                <li>PagedAttention: KV cache from ~35% to ~90% utilization</li>
+                <li>Continuous batching eliminates convoy problem</li>
+                <li>Speculative decoding: 2–3× latency reduction</li>
+                <li>Flash Attention 2: O(N²) → O(N) memory for attention</li>
+                <li>Fully optimized stack is ~250× cheaper than 2021 baseline</li>
+              </ul>
+            </div>
+            <div class="bg-white rounded-xl p-5 border border-purple-100 shadow-sm">
+              <h3 class="font-bold text-gray-900 mb-3 flex items-center gap-2">
+                <span class="w-6 h-6 bg-purple-600 text-white rounded-full flex items-center justify-center text-xs font-bold">3</span>
+                Product Iteration
+              </h3>
+              <ul class="text-sm text-gray-700 space-y-1">
+                <li>Weekly iteration cycle: signal → eval → train → shadow → A/B</li>
+                <li>A/B test on user clusters, not conversations (correlation)</li>
+                <li>Eval suite is the core infrastructure asset — build first</li>
+                <li>Safety monitoring is real-time and production-integrated</li>
+                <li>Model versioning enables rollback and API reproducibility</li>
+              </ul>
+            </div>
+            <div class="bg-white rounded-xl p-5 border border-orange-100 shadow-sm">
+              <h3 class="font-bold text-gray-900 mb-3 flex items-center gap-2">
+                <span class="w-6 h-6 bg-orange-500 text-white rounded-full flex items-center justify-center text-xs font-bold">4</span>
+                For Your Team
+              </h3>
+              <ul class="text-sm text-gray-700 space-y-1">
+                <li>vLLM + FastAPI + SSE = production-ready in &lt;500 lines</li>
+                <li>Open-source models (Llama 4, Qwen2.5) close GPT-4 gap at 1/20th cost</li>
+                <li>MoE + inference-time compute are the next scaling axes</li>
+                <li>Stream by default, version all models, log everything</li>
+                <li>Safety is a day-one infrastructure decision, not a feature</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="mt-8 bg-blue-900 text-white rounded-xl p-6">
+            <p class="text-sm font-semibold text-blue-200 mb-2 uppercase tracking-wider">The One-Sentence Lesson</p>
+            <p class="text-lg font-medium leading-relaxed">ChatGPT's dominance came not from a single breakthrough but from the disciplined compounding of systems engineering (serving), data engineering (RLHF labels), and evaluation engineering (knowing what "better" means) — all three must be excellent simultaneously, and the team that invests in all three at once wins.</p>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<!-- Bottom Navigation -->
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+  <div class="flex flex-col sm:flex-row justify-between items-center gap-4 border-t border-gray-200 pt-8">
+    <a href="ch17_chatgpt_training.html" class="flex items-center gap-3 text-gray-600 hover:text-blue-600 transition-colors group">
+      <svg class="w-5 h-5 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+      <div>
+        <div class="text-xs text-gray-400 uppercase tracking-wider">Previous</div>
+        <div class="font-medium">Chapter 17: ChatGPT Training</div>
+      </div>
+    </a>
+    <a href="index.html" class="text-sm text-gray-400 hover:text-blue-600 transition-colors">Table of Contents</a>
+    <a href="ch18_deepseek.html" class="flex items-center gap-3 text-gray-600 hover:text-blue-600 transition-colors group">
+      <div class="text-right">
+        <div class="text-xs text-gray-400 uppercase tracking-wider">Next</div>
+        <div class="font-medium">Chapter 18: DeepSeek Case Study</div>
+      </div>
+      <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+    </a>
+  </div>
+</div>
+
+<footer class="bg-gray-900 text-gray-400 text-sm py-8 mt-10">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-2">
+    <p class="font-medium text-gray-300">Modern MLOps Tutorial</p>
+    <p>All content based on publicly published papers and disclosed information. Architecture estimates are informed reconstructions.</p>
+    <p class="text-gray-500">Chapter 17B — ChatGPT Serving &amp; Lessons | Updated April 2026</p>
+  </div>
+</footer>
+
+<script>
+  // Highlight active TOC section on scroll
+  const sections = document.querySelectorAll('.section-anchor');
+  const tocLinks = document.querySelectorAll('.toc-link');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(l => l.classList.remove('active'));
+        const active = document.querySelector(`.toc-link[href="#${entry.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0% -60% 0%' });
+  sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>

@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 15B: Alerting &amp; Automated Retraining - Modern MLOps Tutorial</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script>hljs.highlightAll(); mermaid.initialize({startOnLoad:true, theme:'default'});</script>
+  <style>
+    :root { --primary: #2563eb; --secondary: #059669; --accent: #d97706; --text: #1f2937; }
+    body { color: var(--text); font-family: 'Inter', system-ui, sans-serif; }
+    .nav-link { transition: color 0.15s; }
+    .nav-link:hover { color: #93c5fd; }
+    .toc-link { transition: color 0.15s; }
+    .toc-link:hover { color: var(--primary); }
+    .toc-link.active { color: var(--primary); font-weight: 600; border-left: 2px solid var(--primary); padding-left: 0.5rem; }
+    .callout-info { border-left: 4px solid #2563eb; background: #eff6ff; }
+    .callout-tip { border-left: 4px solid #059669; background: #ecfdf5; }
+    .callout-warning { border-left: 4px solid #d97706; background: #fffbeb; }
+    .callout-danger { border-left: 4px solid #dc2626; background: #fef2f2; }
+    table { border-collapse: collapse; width: 100%; }
+    thead { background: #2563eb; color: white; }
+    tbody tr:nth-child(even) { background: #f8fafc; }
+    tbody tr:nth-child(odd) { background: #ffffff; }
+    tbody tr:hover { background: #eff6ff; }
+    td, th { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid #e2e8f0; }
+    .mermaid { background: #fff; padding: 1rem; border-radius: 0.5rem; }
+    pre code { font-size: 0.875rem; }
+    .chapter-badge { background: #2563eb; color: white; font-size: 0.75rem; font-weight: 700; padding: 0.25rem 0.75rem; border-radius: 9999px; letter-spacing: 0.05em; text-transform: uppercase; }
+    .section-anchor { scroll-margin-top: 5rem; }
+    .code-label { background: #1e293b; color: #94a3b8; font-size: 0.7rem; font-weight: 600; padding: 0.25rem 0.75rem; border-radius: 0.375rem 0.375rem 0 0; letter-spacing: 0.05em; text-transform: uppercase; display: inline-block; }
+    .severity-p0 { background: #fef2f2; border-left: 4px solid #dc2626; }
+    .severity-p1 { background: #fff7ed; border-left: 4px solid #ea580c; }
+    .severity-p2 { background: #fffbeb; border-left: 4px solid #d97706; }
+    .severity-p3 { background: #f0fdf4; border-left: 4px solid #16a34a; }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+<!-- Top Navbar -->
+<nav class="bg-gray-900 text-white sticky top-0 z-50 shadow-lg">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center font-bold text-sm">ML</div>
+        <a href="index.html" class="nav-link font-semibold text-lg tracking-tight">Modern MLOps Tutorial</a>
+      </div>
+      <div class="hidden md:flex items-center gap-6 text-sm text-gray-300">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="#toc" class="nav-link">Contents</a>
+        <span class="text-gray-500">|</span>
+        <span class="text-blue-400 font-medium">Chapter 15B of 17</span>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- Chapter Header -->
+<header class="bg-white border-b border-gray-200 shadow-sm">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div class="flex flex-col gap-3">
+      <div class="flex items-center gap-3">
+        <span class="chapter-badge">Chapter 15B</span>
+        <span class="text-sm text-gray-500">Monitoring Series · Part 2 of 2</span>
+      </div>
+      <h1 class="text-4xl font-bold text-gray-900 leading-tight">Alerting, Tracing &amp; Automated Retraining</h1>
+      <p class="text-xl text-gray-600 max-w-3xl">Close the loop: distributed tracing for ML inference, alert fatigue prevention, SageMaker &amp; Vertex AI monitors, and drift-triggered retraining pipelines.</p>
+      <div class="flex flex-wrap items-center gap-6 text-sm text-gray-500 mt-2">
+        <span class="flex items-center gap-1">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          60 min read
+        </span>
+        <span class="flex items-center gap-1">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+          Staff SRE/MLOps Engineer — Netflix
+        </span>
+        <span class="flex items-center gap-1">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          Updated April 2026
+        </span>
+        <span class="flex items-center gap-1">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          Intermediate → Advanced
+        </span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Main Layout -->
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+  <div class="flex gap-10">
+
+    <!-- Sidebar TOC -->
+    <aside class="hidden xl:block w-64 flex-shrink-0">
+      <div class="sticky top-24 bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+        <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4" id="toc">On This Page</h3>
+        <nav class="space-y-1 text-sm text-gray-600">
+          <a href="#s1" class="toc-link block py-1">1. Distributed Tracing for ML</a>
+          <a href="#s2" class="toc-link block py-1">2. Alerting Strategy</a>
+          <a href="#s3" class="toc-link block py-1">3. SageMaker Model Monitor</a>
+          <a href="#s4" class="toc-link block py-1">4. Vertex AI Monitoring</a>
+          <a href="#s5" class="toc-link block py-1">5. Continuous Retraining Triggers</a>
+          <a href="#s6" class="toc-link block py-1">6. End-to-End Loop</a>
+          <a href="#s7" class="toc-link block py-1">7. Reference Architecture</a>
+          <a href="#s8" class="toc-link block py-1">8. Best Practices</a>
+          <a href="#summary" class="toc-link block py-1">Summary &amp; Takeaways</a>
+        </nav>
+      </div>
+    </aside>
+
+    <!-- Content -->
+    <main class="flex-1 min-w-0 space-y-16">
+
+      <!-- Section 1: Distributed Tracing -->
+      <section id="s1" class="section-anchor">
+        <h2 class="text-3xl font-bold text-gray-900 mb-2">1. Distributed Tracing for ML</h2>
+        <p class="text-gray-500 text-sm mb-6">OpenTelemetry · Jaeger · Trace propagation</p>
+
+        <p class="text-gray-700 mb-4">Metrics tell you <em>what</em> broke; traces tell you <em>where</em> and <em>why</em>. An ML inference request flows through a feature store, a model server, and a post-processing layer — without traces, a 200 ms latency spike is invisible. OpenTelemetry (OTel) is the CNCF standard that instruments all three hops with a single SDK.</p>
+
+        <div class="callout-info rounded-lg p-4 mb-6">
+          <strong class="text-blue-800">OTel for ML — three pillars:</strong>
+          <ul class="mt-2 text-blue-900 text-sm space-y-1 list-disc ml-5">
+            <li><strong>Traces</strong> — end-to-end request latency across services</li>
+            <li><strong>Metrics</strong> — counters/histograms emitted from span data</li>
+            <li><strong>Logs</strong> — correlated to trace IDs for fast triage</li>
+          </ul>
+        </div>
+
+        <div class="mb-6">
+          <span class="code-label">python · otel_ml_api.py</span>
+          <pre><code class="language-python">"""OpenTelemetry instrumentation for an ML inference API."""
+from opentelemetry import trace
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
+from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
+from opentelemetry.instrumentation.requests import RequestsInstrumentor
+import fastapi, uvicorn, time
+
+# --- Bootstrap ---
+exporter = OTLPSpanExporter(endpoint="http://otel-collector:4317", insecure=True)
+provider = TracerProvider()
+provider.add_span_processor(BatchSpanProcessor(exporter))
+trace.set_tracer_provider(provider)
+tracer = trace.get_tracer("ml.inference")
+
+app = fastapi.FastAPI()
+FastAPIInstrumentor.instrument_app(app)   # auto-instrument HTTP layer
+RequestsInstrumentor().instrument()       # auto-instrument outbound calls
+
+@app.post("/predict")
+async def predict(payload: dict):
+    with tracer.start_as_current_span("inference.pipeline") as span:
+        span.set_attribute("model.name", "churn-v3")
+        span.set_attribute("input.features", len(payload.get("features", [])))
+
+        features = await _preprocess(payload)
+        prediction = await _model_infer(features)
+        result = await _postprocess(prediction)
+
+        span.set_attribute("prediction.class", result["label"])
+        span.set_attribute("prediction.score", result["score"])
+        return result
+
+async def _preprocess(payload: dict) -> list:
+    with tracer.start_as_current_span("preprocess") as span:
+        start = time.monotonic()
+        # feature lookup, scaling, encoding …
+        features = [float(v) for v in payload.get("features", [])]
+        span.set_attribute("preprocess.latency_ms", (time.monotonic()-start)*1000)
+        return features
+
+async def _model_infer(features: list) -> dict:
+    with tracer.start_as_current_span("model.infer") as span:
+        span.set_attribute("model.version", "3.2.1")
+        span.set_attribute("model.framework", "torch")
+        # call triton / torchserve …
+        raw = {"logits": [0.82, 0.18]}
+        span.set_attribute("model.batch_size", 1)
+        return raw
+
+async def _postprocess(raw: dict) -> dict:
+    with tracer.start_as_current_span("postprocess") as span:
+        score = max(raw["logits"])
+        label = "churn" if score > 0.5 else "retain"
+        span.set_attribute("postprocess.threshold", 0.5)
+        return {"label": label, "score": round(score, 4)}</code></pre>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-3">Trace Propagation Across Services</h3>
+        <p class="text-gray-700 mb-4">When the inference API calls a feature store or a downstream service, the trace context must propagate via HTTP headers (<code>traceparent</code>, <code>tracestate</code>). The W3C TraceContext standard is OTel's default.</p>
+
+        <div class="mb-6">
+          <span class="code-label">python · trace_propagation.py</span>
+          <pre><code class="language-python">"""Inject / extract W3C trace context headers manually when SDK auto-inst isn't available."""
+from opentelemetry import trace, propagate
+from opentelemetry.propagators.b3 import B3MultiFormat
+import httpx
+
+propagate.set_global_textmap(B3MultiFormat())   # fallback for legacy B3 services
+
+async def call_feature_store(entity_id: str) -> dict:
+    ctx_headers: dict = {}
+    propagate.inject(ctx_headers)               # injects traceparent / b3 headers
+    async with httpx.AsyncClient() as client:
+        resp = await client.get(
+            f"http://feature-store/features/{entity_id}",
+            headers=ctx_headers,
+            timeout=0.1
+        )
+    return resp.json()
+
+# On the feature store side — extract the context
+def extract_context_from_request(request_headers: dict):
+    ctx = propagate.extract(request_headers)    # reconstructs Span context
+    return trace.use_span(
+        tracer.start_span("feature_store.lookup", context=ctx),
+        end_on_exit=True
+    )</code></pre>
+        </div>
+
+        <div class="callout-tip rounded-lg p-4 mb-4">
+          <strong class="text-green-800">Jaeger deployment (docker-compose):</strong>
+          <pre class="mt-2 text-xs bg-green-50 rounded p-2"><code>services:
+  jaeger:
+    image: jaegertracing/all-in-one:1.57
+    ports: ["16686:16686", "4317:4317"]   # UI + OTLP gRPC
+    environment:
+      COLLECTOR_OTLP_ENABLED: "true"</code></pre>
+          <p class="text-green-800 text-sm mt-2">Access Jaeger UI at <code>localhost:16686</code>. Filter by service <code>ml.inference</code> to see full span waterfalls.</p>
+        </div>
+      </section>
+
+      <!-- Section 2: Alerting Strategy -->
+      <section id="s2" class="section-anchor">
+        <h2 class="text-3xl font-bold text-gray-900 mb-2">2. Alerting Strategy for ML</h2>
+        <p class="text-gray-500 text-sm mb-6">Severity levels · Runbooks · PagerDuty/OpsGenie</p>
+
+        <p class="text-gray-700 mb-4">Alert fatigue is the #1 on-call killer. At Netflix, we learned that every noisy alert that wakes an engineer at 2 AM and resolves without intervention destroys trust in the alerting system. The fix is a severity taxonomy with hard rules about who gets paged and when.</p>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-3">Severity Levels for ML Alerts</h3>
+        <div class="space-y-3 mb-8">
+          <div class="severity-p0 rounded-lg p-4"><strong>P0 — Critical (page immediately, 24/7):</strong> Model serving down, error rate &gt;10%, revenue-impacting degradation. SLA: response in 5 min.</div>
+          <div class="severity-p1 rounded-lg p-4"><strong>P1 — High (page during business hours + on-call overnight):</strong> Accuracy drop &gt;15% vs baseline, severe feature drift confirmed, p99 latency &gt;5s. SLA: response in 30 min.</div>
+          <div class="severity-p2 rounded-lg p-4"><strong>P2 — Medium (ticket + Slack, no page):</strong> Gradual drift detected, data quality issues, retraining job failure. SLA: respond next business day.</div>
+          <div class="severity-p3 rounded-lg p-4"><strong>P3 — Low (dashboard annotation, weekly review):</strong> Minor distribution shift, model staleness warning, A/B test divergence. SLA: address in sprint planning.</div>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-3">Alert Conditions &amp; Thresholds</h3>
+        <div class="overflow-x-auto rounded-xl border border-gray-200 mb-8">
+          <table>
+            <thead><tr><th>Issue</th><th>Metric</th><th>P0 Threshold</th><th>P1 Threshold</th><th>P2 Threshold</th></tr></thead>
+            <tbody>
+              <tr><td>Prediction error rate</td><td><code>prediction_errors_total / requests_total</code></td><td>&gt; 10%</td><td>&gt; 5%</td><td>&gt; 2%</td></tr>
+              <tr><td>Inference latency (p99)</td><td><code>inference_duration_seconds{q="0.99"}</code></td><td>&gt; 5 s</td><td>&gt; 2 s</td><td>&gt; 500 ms</td></tr>
+              <tr><td>Feature drift (PSI)</td><td>Population Stability Index</td><td>&gt; 0.5</td><td>&gt; 0.25</td><td>&gt; 0.1</td></tr>
+              <tr><td>Model accuracy delta</td><td>rolling 24 h vs baseline</td><td>&gt; 20%</td><td>&gt; 10%</td><td>&gt; 5%</td></tr>
+              <tr><td>Data pipeline lag</td><td>feature store freshness (min)</td><td>&gt; 60 min</td><td>&gt; 30 min</td><td>&gt; 15 min</td></tr>
+              <tr><td>Missing features (%)</td><td>null rate per feature</td><td>&gt; 20%</td><td>&gt; 10%</td><td>&gt; 5%</td></tr>
+              <tr><td>Concept drift (JS div)</td><td>Jensen-Shannon divergence</td><td>—</td><td>&gt; 0.3</td><td>&gt; 0.1</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-3">Alert Triage Flow</h3>
+        <div class="mermaid mb-8">
+flowchart TD
+    A[Alert fires] --> B{Severity?}
+    B -->|P0| C[Page on-call NOW\nSlack #incident]
+    B -->|P1| D[Page on-call\nbusiness hours]
+    B -->|P2/P3| E[Create Jira ticket\nSlack #ml-alerts]
+    C --> F{Service down?}
+    F -->|Yes| G[Rollback model\nRunbook: model-rollback.md]
+    F -->|No| H{Drift confirmed?}
+    H -->|Yes| I[Trigger retraining\nRunbook: retrain.md]
+    H -->|No| J[Check data pipeline\nRunbook: data-debug.md]
+    G --> K[Post-mortem within 48h]
+    I --> L[Monitor retrained model\n in shadow mode 1h]
+    L --> M{Metrics improved?}
+    M -->|Yes| N[Promote to production]
+    M -->|No| O[Escalate to ML team lead]
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-3">PagerDuty / OpsGenie Webhook Integration</h3>
+        <div class="mb-6">
+          <span class="code-label">python · alerting_webhook.py</span>
+          <pre><code class="language-python">"""Send structured ML alerts to PagerDuty (Events v2) or OpsGenie."""
+import httpx, os, json
+from datetime import datetime, timezone
+from enum import Enum
+
+class Severity(str, Enum):
+    CRITICAL = "critical"   # P0
+    ERROR    = "error"      # P1
+    WARNING  = "warning"    # P2
+    INFO     = "info"       # P3
+
+PD_ROUTING_KEY = os.environ["PAGERDUTY_ROUTING_KEY"]
+OG_API_KEY     = os.environ["OPSGENIE_API_KEY"]
+
+async def page_pagerduty(
+    summary: str,
+    severity: Severity,
+    model: str,
+    details: dict,
+) -> str:
+    payload = {
+        "routing_key": PD_ROUTING_KEY,
+        "event_action": "trigger",
+        "payload": {
+            "summary": f"[ML Alert] {summary}",
+            "severity": severity.value,
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "source": f"ml-monitoring/{model}",
+            "custom_details": {
+                "model": model,
+                **details,
+            },
+        },
+        "links": [{"href": f"https://grafana.internal/d/ml/{model}", "text": "Dashboard"}],
+    }
+    async with httpx.AsyncClient() as client:
+        r = await client.post(
+            "https://events.pagerduty.com/v2/enqueue",
+            json=payload, timeout=10,
+        )
+        r.raise_for_status()
+    return r.json()["dedup_key"]
+
+async def page_opsgenie(summary: str, severity: Severity, model: str, details: dict):
+    priority_map = {
+        Severity.CRITICAL: "P1", Severity.ERROR: "P2",
+        Severity.WARNING: "P3", Severity.INFO: "P5",
+    }
+    payload = {
+        "message": f"[ML] {summary}",
+        "alias": f"ml-{model}-{severity.value}",   # dedup key
+        "priority": priority_map[severity],
+        "tags": ["ml", "monitoring", model],
+        "details": details,
+        "source": "ml-monitoring",
+    }
+    async with httpx.AsyncClient() as client:
+        r = await client.post(
+            "https://api.opsgenie.com/v2/alerts",
+            json=payload,
+            headers={"Authorization": f"GenieKey {OG_API_KEY}"},
+            timeout=10,
+        )
+        r.raise_for_status()
+
+# Example usage from a monitoring job:
+async def check_and_alert(model_name: str, psi_score: float):
+    if psi_score > 0.5:
+        await page_pagerduty(
+            summary=f"CRITICAL drift on {model_name} (PSI={psi_score:.3f})",
+            severity=Severity.CRITICAL,
+            model=model_name,
+            details={"psi_score": psi_score, "threshold": 0.5, "action": "rollback"},
+        )
+    elif psi_score > 0.25:
+        await page_pagerduty(
+            summary=f"High drift on {model_name} (PSI={psi_score:.3f})",
+            severity=Severity.ERROR,
+            model=model_name,
+            details={"psi_score": psi_score, "threshold": 0.25, "action": "retrain"},
+        )</code></pre>
+        </div>
+      </section>
+
+      <!-- Section 3: SageMaker Model Monitor -->
+      <section id="s3" class="section-anchor">
+        <h2 class="text-3xl font-bold text-gray-900 mb-2">3. SageMaker Model Monitor</h2>
+        <p class="text-gray-500 text-sm mb-6">Baseline creation · Schedule configuration · Comparison table</p>
+
+        <p class="text-gray-700 mb-4">SageMaker Model Monitor runs continuously on endpoints, capturing prediction traffic and comparing it against a baseline. It supports four monitor types: data quality, model quality, bias drift, and feature attribution drift.</p>
+
+        <div class="mb-6">
+          <span class="code-label">python · sm_baseline.py</span>
+          <pre><code class="language-python">"""Create a SageMaker Model Monitor baseline from training data."""
+import boto3
+from sagemaker.model_monitor import DefaultModelMonitor, DatasetFormat
+from sagemaker import get_execution_role
+
+role  = get_execution_role()
+sm    = boto3.client("sagemaker")
+
+monitor = DefaultModelMonitor(
+    role=role,
+    instance_count=1,
+    instance_type="ml.m5.xlarge",
+    volume_size_in_gb=20,
+    max_runtime_in_seconds=3600,
+)
+
+# Suggest baseline statistics and constraints from a reference dataset
+monitor.suggest_baseline(
+    baseline_dataset="s3://my-bucket/baselines/train_data.csv",
+    dataset_format=DatasetFormat.csv(header=True),
+    output_s3_uri="s3://my-bucket/baselines/output/",
+    wait=True,
+    logs=False,
+)
+
+baseline_job = monitor.latest_baselining_job
+stats = baseline_job.baseline_statistics()
+constr = baseline_job.suggested_constraints()
+print(f"Baseline stats: {stats.body_dict['features'][0]}")
+print(f"Constraints:    {constr.body_dict['features'][0]}")</code></pre>
+        </div>
+
+        <div class="mb-6">
+          <span class="code-label">python · sm_schedule.py</span>
+          <pre><code class="language-python">"""Configure a Model Monitor schedule on a live endpoint."""
+from sagemaker.model_monitor import (
+    DefaultModelMonitor, CronExpressionGenerator,
+    MonitoringOutput, MonitoringInput,
+)
+from sagemaker.model_monitor.dataset_format import DatasetFormat
+
+ENDPOINT = "churn-model-v3"
+monitor  = DefaultModelMonitor.attach(monitor_schedule_name="churn-monitor")
+
+monitor.create_monitoring_schedule(
+    monitor_schedule_name="churn-monitor-hourly",
+    endpoint_input=ENDPOINT,
+    output_s3_uri="s3://my-bucket/monitor/reports/",
+    statistics=monitor.baseline_statistics(),
+    constraints=monitor.suggested_constraints(),
+    schedule_cron_expression=CronExpressionGenerator.hourly(),
+    enable_cloudwatch_metrics=True,          # emit to CloudWatch for alerting
+)
+
+# Add a CloudWatch Alarm on the violation metric
+import boto3
+cw = boto3.client("cloudwatch")
+cw.put_metric_alarm(
+    AlarmName="churn-monitor-data-quality",
+    MetricName="feature_baseline_drift_check_pass_rate",
+    Namespace="aws/sagemaker/Endpoints/data-metrics",
+    Dimensions=[{"Name": "Endpoint", "Value": ENDPOINT}],
+    Period=3600,
+    EvaluationPeriods=1,
+    Threshold=0.8,           # alarm if < 80% of features pass
+    ComparisonOperator="LessThanThreshold",
+    Statistic="Average",
+    AlarmActions=["arn:aws:sns:us-east-1:123456:ml-alerts"],
+)</code></pre>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-3">Monitoring Tool Comparison</h3>
+        <div class="overflow-x-auto rounded-xl border border-gray-200 mb-4">
+          <table>
+            <thead><tr><th>Feature</th><th>SageMaker Monitor</th><th>Evidently AI</th><th>Custom (Prometheus)</th></tr></thead>
+            <tbody>
+              <tr><td>Setup effort</td><td>Low (managed)</td><td>Medium</td><td>High</td></tr>
+              <tr><td>Cost</td><td>$0.20/h compute</td><td>Free OSS</td><td>Infra cost only</td></tr>
+              <tr><td>Cloud lock-in</td><td>AWS only</td><td>None</td><td>None</td></tr>
+              <tr><td>Bias drift detection</td><td>Yes (Clarify)</td><td>Yes</td><td>Custom</td></tr>
+              <tr><td>Alerting integration</td><td>CloudWatch → SNS</td><td>Webhook / Grafana</td><td>AlertManager</td></tr>
+              <tr><td>Data capture</td><td>Automatic on endpoint</td><td>Manual log push</td><td>Manual log push</td></tr>
+              <tr><td>Custom metrics</td><td>Limited</td><td>Extensive</td><td>Unlimited</td></tr>
+              <tr><td>Batch monitoring</td><td>Yes</td><td>Yes</td><td>Yes</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Section 4: Vertex AI -->
+      <section id="s4" class="section-anchor">
+        <h2 class="text-3xl font-bold text-gray-900 mb-2">4. Vertex AI Model Monitoring (GCP)</h2>
+        <p class="text-gray-500 text-sm mb-6">Skew detection · Drift detection · Job setup</p>
+
+        <p class="text-gray-700 mb-4">Vertex AI Model Monitoring supports two detection modes: <strong>training-serving skew</strong> (compare production features against training distribution) and <strong>prediction drift</strong> (compare today's predictions against a rolling window). Both trigger alerts via Cloud Monitoring.</p>
+
+        <div class="mb-6">
+          <span class="code-label">python · vertex_monitoring.py</span>
+          <pre><code class="language-python">"""Configure Vertex AI model monitoring for a deployed endpoint."""
+from google.cloud import aiplatform_v1
+from google.protobuf.duration_pb2 import Duration
+
+project  = "my-gcp-project"
+location = "us-central1"
+endpoint = "projects/my-gcp-project/locations/us-central1/endpoints/12345"
+
+client = aiplatform_v1.ModelDeploymentMonitoringJobsClient(
+    client_options={"api_endpoint": f"{location}-aiplatform.googleapis.com"}
+)
+
+job = aiplatform_v1.ModelDeploymentMonitoringJob(
+    display_name="churn-model-monitoring",
+    endpoint=endpoint,
+    model_deployment_monitoring_objective_configs=[
+        aiplatform_v1.ModelDeploymentMonitoringObjectiveConfig(
+            deployed_model_id="churn-v3",
+            objective_config=aiplatform_v1.ModelMonitoringObjectiveConfig(
+                training_dataset=aiplatform_v1.ModelMonitoringObjectiveConfig.TrainingDataset(
+                    gcs_source=aiplatform_v1.GcsSource(
+                        uris=["gs://my-bucket/train/data.csv"]
+                    ),
+                    target_field="churn_label",
+                    data_format="csv",
+                ),
+                training_prediction_skew_detection_config=(
+                    aiplatform_v1.ModelMonitoringObjectiveConfig
+                    .TrainingPredictionSkewDetectionConfig(
+                        skew_thresholds={
+                            "age":          aiplatform_v1.ThresholdConfig(value=0.3),
+                            "tenure_months":aiplatform_v1.ThresholdConfig(value=0.3),
+                            "monthly_spend":aiplatform_v1.ThresholdConfig(value=0.3),
+                        }
+                    )
+                ),
+                prediction_drift_detection_config=(
+                    aiplatform_v1.ModelMonitoringObjectiveConfig
+                    .PredictionDriftDetectionConfig(
+                        drift_thresholds={
+                            "age":          aiplatform_v1.ThresholdConfig(value=0.3),
+                            "monthly_spend":aiplatform_v1.ThresholdConfig(value=0.3),
+                        }
+                    )
+                ),
+            )
+        )
+    ],
+    model_deployment_monitoring_schedule_config=(
+        aiplatform_v1.ModelDeploymentMonitoringScheduleConfig(
+            monitor_interval=Duration(seconds=3600)  # hourly
+        )
+    ),
+    logging_sampling_strategy=aiplatform_v1.SamplingStrategy(
+        random_sample_config=aiplatform_v1.SamplingStrategy.RandomSampleConfig(
+            sample_rate=0.1  # sample 10% of traffic
+        )
+    ),
+    log_anomaly_cloud_monitoring_notification_channels=[
+        "projects/my-gcp-project/notificationChannels/789"
+    ],
+)
+
+response = client.create_model_deployment_monitoring_job(
+    parent=f"projects/{project}/locations/{location}",
+    model_deployment_monitoring_job=job,
+)
+print(f"Created monitoring job: {response.name}")</code></pre>
+        </div>
+
+        <div class="callout-warning rounded-lg p-4 mb-4">
+          <strong class="text-yellow-800">SageMaker vs Vertex AI — key differences:</strong>
+          <ul class="mt-2 text-yellow-900 text-sm space-y-1 list-disc ml-5">
+            <li>Vertex requires a <em>training dataset in GCS</em> for skew detection; SageMaker works from a captured baseline job.</li>
+            <li>Vertex sampling is configured at monitor creation; SageMaker uses endpoint data capture rules.</li>
+            <li>Both emit violations to their native alert systems (CloudWatch vs Cloud Monitoring) — integrate with your existing on-call tooling via webhooks.</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Section 5: Continuous Retraining Triggers -->
+      <section id="s5" class="section-anchor">
+        <h2 class="text-3xl font-bold text-gray-900 mb-2">5. Continuous Retraining Triggers</h2>
+        <p class="text-gray-500 text-sm mb-6">Scheduled · Drift-based · Performance-based · Data-volume</p>
+
+        <p class="text-gray-700 mb-4">There are four trigger types for automated retraining. Use the simplest one that satisfies your SLA — don't over-engineer.</p>
+
+        <div class="overflow-x-auto rounded-xl border border-gray-200 mb-8">
+          <table>
+            <thead><tr><th>Trigger Type</th><th>When to Use</th><th>Risk</th><th>Example</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Scheduled</strong></td><td>Stable domains, known seasonal patterns</td><td>May retrain when not needed</td><td>Weekly cron, monthly batch</td></tr>
+              <tr><td><strong>Drift-based</strong></td><td>Dynamic data distributions (ad-tech, fraud)</td><td>Noisy drift detectors → thrashing</td><td>PSI &gt; 0.25 on input features</td></tr>
+              <tr><td><strong>Performance-based</strong></td><td>When ground truth is available quickly</td><td>Label delay makes metric stale</td><td>Accuracy drops &gt; 10% over 24 h</td></tr>
+              <tr><td><strong>Data-volume</strong></td><td>New data accumulates in batches</td><td>Small batches may not improve model</td><td>10 000 new labelled records</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-3">Drift-Triggered Retraining Pipeline (Airflow)</h3>
+        <div class="mb-6">
+          <span class="code-label">python · retrain_dag.py</span>
+          <pre><code class="language-python">"""Airflow DAG: drift-triggered retraining with automatic promotion."""
+from __future__ import annotations
+from airflow import DAG
+from airflow.operators.python import PythonOperator, BranchPythonOperator
+from airflow.providers.http.sensors.http import HttpSensor
+from airflow.utils.dates import days_ago
+from datetime import timedelta
+import json, requests, mlflow
+
+DRIFT_API   = "http://monitoring-api/drift/latest"
+MLFLOW_URI  = "http://mlflow:5000"
+MODEL_NAME  = "churn-classifier"
+PSI_THRESH  = 0.25
+
+default_args = {"owner": "mlops", "retries": 1, "retry_delay": timedelta(minutes=5)}
+
+def check_drift(**ctx) -> str:
+    resp  = requests.get(DRIFT_API, params={"model": MODEL_NAME}).json()
+    psi   = resp["psi_score"]
+    ctx["ti"].xcom_push(key="psi_score", value=psi)
+    return "trigger_retrain" if psi > PSI_THRESH else "skip_retrain"
+
+def trigger_retrain(**ctx):
+    import subprocess
+    psi = ctx["ti"].xcom_pull(key="psi_score")
+    print(f"Drift PSI={psi:.3f} > threshold={PSI_THRESH}. Starting retraining.")
+    subprocess.run(["python", "/pipelines/train.py", "--trigger", "drift"], check=True)
+
+def evaluate_candidate(**ctx):
+    client = mlflow.tracking.MlflowClient(MLFLOW_URI)
+    runs   = client.search_runs(
+        experiment_ids=["1"],
+        order_by=["start_time DESC"],
+        max_results=1,
+    )
+    run    = runs[0]
+    acc    = run.data.metrics.get("eval_accuracy", 0)
+    ctx["ti"].xcom_push(key="candidate_run_id", value=run.info.run_id)
+    ctx["ti"].xcom_push(key="candidate_acc", value=acc)
+    return "promote_model" if acc >= 0.82 else "rollback"
+
+def promote_model(**ctx):
+    run_id = ctx["ti"].xcom_pull(key="candidate_run_id")
+    client = mlflow.tracking.MlflowClient(MLFLOW_URI)
+    mv     = client.create_model_version(MODEL_NAME, f"runs:/{run_id}/model", MODEL_NAME)
+    client.transition_model_version_stage(MODEL_NAME, mv.version, "Production")
+    print(f"Promoted {MODEL_NAME} v{mv.version} to Production")
+
+def rollback(**ctx):
+    print("Candidate did not meet quality gate. Keeping current production model.")
+
+with DAG(
+    dag_id="drift_triggered_retrain",
+    default_args=default_args,
+    schedule_interval="@hourly",
+    catchup=False,
+    tags=["mlops", "retraining"],
+) as dag:
+    check  = BranchPythonOperator(task_id="check_drift",      python_callable=check_drift)
+    train  = PythonOperator(task_id="trigger_retrain",        python_callable=trigger_retrain)
+    skip   = PythonOperator(task_id="skip_retrain",           python_callable=lambda **_: print("No drift."))
+    eval_  = PythonOperator(task_id="evaluate_candidate",     python_callable=evaluate_candidate)
+    branch = BranchPythonOperator(task_id="quality_gate",     python_callable=evaluate_candidate)
+    prom   = PythonOperator(task_id="promote_model",          python_callable=promote_model)
+    rb     = PythonOperator(task_id="rollback",               python_callable=rollback)
+
+    check >> [train, skip]
+    train >> eval_
+    eval_ >> [prom, rb]</code></pre>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-3">Performance-Threshold Trigger</h3>
+        <div class="mb-6">
+          <span class="code-label">python · perf_trigger.py</span>
+          <pre><code class="language-python">"""Evaluate rolling model accuracy and trigger retraining if below threshold."""
+import pandas as pd, mlflow, boto3
+from datetime import datetime, timedelta
+
+ACCURACY_FLOOR = 0.82    # retrain if rolling 24h accuracy drops below this
+LABEL_DELAY_H  = 6       # hours until ground truth labels are available
+
+def get_rolling_accuracy(model_name: str, window_hours: int = 24) -> float:
+    """Fetch predictions + ground truth from feature store and compute accuracy."""
+    s3 = boto3.client("s3")
+    cutoff = datetime.utcnow() - timedelta(hours=window_hours + LABEL_DELAY_H)
+    # In practice: query prediction logs joined with ground-truth labels
+    preds_df = pd.read_parquet(f"s3://my-bucket/predictions/{model_name}/recent.parquet")
+    preds_df = preds_df[preds_df["timestamp"] >= cutoff]
+    if len(preds_df) < 100:               # insufficient sample — skip
+        return None
+    accuracy = (preds_df["prediction"] == preds_df["label"]).mean()
+    return float(accuracy)
+
+def maybe_trigger_retrain(model_name: str):
+    acc = get_rolling_accuracy(model_name)
+    if acc is None:
+        print("Not enough labelled samples yet.")
+        return
+
+    mlflow.log_metric("rolling_accuracy_24h", acc)
+    print(f"Rolling accuracy ({model_name}): {acc:.4f}")
+
+    if acc < ACCURACY_FLOOR:
+        print(f"Accuracy {acc:.4f} < floor {ACCURACY_FLOOR}. Triggering retrain.")
+        # Kick off Airflow DAG or Kubeflow Pipeline via REST
+        import requests
+        requests.post(
+            "http://airflow:8080/api/v1/dags/drift_triggered_retrain/dagRuns",
+            json={"conf": {"trigger": "perf_threshold", "accuracy": acc}},
+            auth=("admin", "admin"),
+        )
+    else:
+        print(f"Accuracy {acc:.4f} OK — no retraining needed.")</code></pre>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-3">Automated Retraining Feedback Loop</h3>
+        <div class="mermaid mb-4">
+flowchart LR
+    A[Production\nModel] -->|Predictions| B[Prediction\nLogger]
+    B --> C[Feature Store\n+ Labels]
+    C --> D{Monitors}
+    D -->|Drift detected| E[Retrain\nTrigger]
+    D -->|Acc below floor| E
+    D -->|Scheduled| E
+    E --> F[Training\nPipeline]
+    F --> G[Candidate\nModel]
+    G --> H{Quality Gate\nacc ≥ 0.82\nPSI ≤ 0.1}
+    H -->|Pass| I[Shadow Mode\n1 hour]
+    I -->|Metrics OK| J[Promote to\nProduction]
+    J --> A
+    H -->|Fail| K[Alert ML Team\nRollback]
+        </div>
+
+        <div class="callout-tip rounded-lg p-4">
+          <strong class="text-green-800">Rollback strategy:</strong> Always keep the previous N model versions registered in MLflow/SageMaker. On a failed promotion, a single CLI call restores the prior version — no redeployment needed. Set N=3 for most teams.
+        </div>
+      </section>
+
+      <!-- Section 6: Complete End-to-End Loop -->
+      <section id="s6" class="section-anchor">
+        <h2 class="text-3xl font-bold text-gray-900 mb-2">6. Complete Monitoring → Retrain Loop</h2>
+        <p class="text-gray-500 text-sm mb-6">Detect drift → alert → retrain → evaluate → promote</p>
+
+        <div class="mb-6">
+          <span class="code-label">python · full_monitoring_loop.py</span>
+          <pre><code class="language-python">"""
+End-to-end monitoring loop:
+  1. Compute drift and performance metrics
+  2. Decide alert severity
+  3. Page on-call if needed
+  4. Optionally trigger automated retraining
+  5. Evaluate candidate and promote / rollback
+"""
+import asyncio, logging
+from dataclasses import dataclass
+from typing import Optional
+
+import mlflow
+from evidently import ColumnMapping
+from evidently.report import Report
+from evidently.metrics import DataDriftTable, ClassificationQualityMetric
+import pandas as pd
+
+log = logging.getLogger("monitoring-loop")
+
+@dataclass
+class MonitoringResult:
+    model: str
+    psi_score: float
+    rolling_accuracy: float
+    retrain_triggered: bool
+    promoted_version: Optional[str]
+
+async def monitoring_cycle(model_name: str) -> MonitoringResult:
+    """Run one complete monitoring cycle for a model."""
+
+    # 1. Load reference and current data
+    ref_data = pd.read_parquet(f"s3://my-bucket/reference/{model_name}.parquet")
+    cur_data = pd.read_parquet(f"s3://my-bucket/live/{model_name}/latest.parquet")
+
+    # 2. Compute drift with Evidently
+    col_map = ColumnMapping(target="label", prediction="prediction")
+    report  = Report(metrics=[DataDriftTable(), ClassificationQualityMetric()])
+    report.run(reference_data=ref_data, current_data=cur_data, column_mapping=col_map)
+    result_dict  = report.as_dict()
+    dataset_drift = result_dict["metrics"][0]["result"]
+    psi_score     = dataset_drift.get("share_of_drifted_columns", 0.0)
+    accuracy      = result_dict["metrics"][1]["result"].get("current", {}).get("accuracy", 1.0)
+
+    # 3. Determine alert level and notify
+    from alerting_webhook import check_and_alert, Severity, page_pagerduty
+    await check_and_alert(model_name, psi_score)
+
+    retrain_triggered = False
+    promoted_version  = None
+
+    # 4. Trigger retraining if warranted
+    if psi_score > 0.25 or accuracy < 0.82:
+        log.warning(f"Retrain trigger: PSI={psi_score:.3f}, acc={accuracy:.3f}")
+        retrain_triggered = True
+        candidate_run_id  = await run_training_pipeline(model_name)
+
+        # 5. Evaluate and promote / rollback
+        client   = mlflow.tracking.MlflowClient()
+        run      = client.get_run(candidate_run_id)
+        cand_acc = run.data.metrics.get("eval_accuracy", 0)
+
+        if cand_acc >= 0.82 and cand_acc >= accuracy:
+            mv = client.create_model_version(model_name, f"runs:/{candidate_run_id}/model", model_name)
+            client.transition_model_version_stage(model_name, mv.version, "Production")
+            promoted_version = mv.version
+            log.info(f"Promoted {model_name} v{mv.version} (acc={cand_acc:.3f})")
+        else:
+            await page_pagerduty(
+                summary=f"Retrain candidate failed quality gate for {model_name}",
+                severity=Severity.ERROR,
+                model=model_name,
+                details={"candidate_acc": cand_acc, "floor": 0.82},
+            )
+
+    return MonitoringResult(
+        model=model_name,
+        psi_score=psi_score,
+        rolling_accuracy=accuracy,
+        retrain_triggered=retrain_triggered,
+        promoted_version=promoted_version,
+    )
+
+async def run_training_pipeline(model_name: str) -> str:
+    """Placeholder: kick off training and return MLflow run_id."""
+    import subprocess, uuid
+    run_id = str(uuid.uuid4()).replace("-", "")[:8]
+    subprocess.run(["python", "/pipelines/train.py", "--model", model_name, "--run-id", run_id], check=True)
+    return run_id
+
+if __name__ == "__main__":
+    result = asyncio.run(monitoring_cycle("churn-classifier"))
+    print(result)</code></pre>
+        </div>
+      </section>
+
+      <!-- Section 7: Reference Architecture -->
+      <section id="s7" class="section-anchor">
+        <h2 class="text-3xl font-bold text-gray-900 mb-2">7. Production Monitoring Reference Architecture</h2>
+        <p class="text-gray-500 text-sm mb-6">Component checklist · Cost · MVP for small teams</p>
+
+        <div class="mermaid mb-8">
+graph TB
+    subgraph Inference["Inference Layer"]
+        A[ML API\nFastAPI/Triton]
+        B[OTel Collector]
+        A -->|spans + metrics| B
+    end
+
+    subgraph Observability["Observability Stack"]
+        C[Prometheus\n+ Grafana]
+        D[Jaeger\nTrace Storage]
+        E[Evidently\nDrift Reports]
+        B -->|metrics| C
+        B -->|traces| D
+        A -->|prediction logs| E
+    end
+
+    subgraph Alerting["Alerting Layer"]
+        F[AlertManager]
+        G[PagerDuty /\nOpsGenie]
+        C -->|rules| F
+        E -->|violations| F
+        F -->|P0/P1| G
+    end
+
+    subgraph Retraining["Retraining Layer"]
+        H[Airflow DAG]
+        I[Training\nPipeline]
+        J[MLflow\nRegistry]
+        F -->|drift trigger| H
+        H --> I
+        I --> J
+    end
+
+    subgraph Deployment["Deployment Layer"]
+        K[Model Server\nblue/green]
+        J -->|promote| K
+        K --> A
+    end
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-3">Component Checklist</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+            <h4 class="font-semibold text-gray-800 mb-3">Must Have (MVP)</h4>
+            <ul class="text-sm text-gray-700 space-y-2">
+              <li class="flex items-start gap-2"><span class="text-green-600 font-bold mt-0.5">✓</span>Prometheus + Grafana for latency/error metrics</li>
+              <li class="flex items-start gap-2"><span class="text-green-600 font-bold mt-0.5">✓</span>Basic drift check on top 5 input features</li>
+              <li class="flex items-start gap-2"><span class="text-green-600 font-bold mt-0.5">✓</span>Slack alerting for P1/P2 issues</li>
+              <li class="flex items-start gap-2"><span class="text-green-600 font-bold mt-0.5">✓</span>Model version pinned + rollback runbook</li>
+              <li class="flex items-start gap-2"><span class="text-green-600 font-bold mt-0.5">✓</span>Weekly retraining cron (simplest trigger)</li>
+            </ul>
+          </div>
+          <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+            <h4 class="font-semibold text-gray-800 mb-3">Nice to Have (Scale)</h4>
+            <ul class="text-sm text-gray-700 space-y-2">
+              <li class="flex items-start gap-2"><span class="text-blue-500 font-bold mt-0.5">+</span>Distributed tracing (OTel + Jaeger)</li>
+              <li class="flex items-start gap-2"><span class="text-blue-500 font-bold mt-0.5">+</span>PagerDuty with severity routing</li>
+              <li class="flex items-start gap-2"><span class="text-blue-500 font-bold mt-0.5">+</span>Automated drift-triggered retraining DAG</li>
+              <li class="flex items-start gap-2"><span class="text-blue-500 font-bold mt-0.5">+</span>Shadow mode evaluation before promotion</li>
+              <li class="flex items-start gap-2"><span class="text-blue-500 font-bold mt-0.5">+</span>Bias and fairness drift detection</li>
+            </ul>
+          </div>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-3">Monitoring Tools by Team Size</h3>
+        <div class="overflow-x-auto rounded-xl border border-gray-200 mb-8">
+          <table>
+            <thead><tr><th>Team Size</th><th>Recommended Stack</th><th>Monthly Cost (est.)</th><th>Effort to Set Up</th></tr></thead>
+            <tbody>
+              <tr><td>1–3 engineers</td><td>Grafana Cloud free tier + Evidently OSS + Slack webhook</td><td>$0–50</td><td>1 day</td></tr>
+              <tr><td>4–10 engineers</td><td>Self-hosted Prometheus/Grafana + Evidently + PagerDuty starter</td><td>$200–500</td><td>1 week</td></tr>
+              <tr><td>10–50 engineers</td><td>Above + OTel/Jaeger + Airflow retraining DAG + MLflow</td><td>$1 000–3 000</td><td>2–4 weeks</td></tr>
+              <tr><td>50+ engineers</td><td>Managed: SageMaker Monitor or Vertex AI + Datadog APM + full on-call rotation</td><td>$5 000+</td><td>1–2 quarters</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout-info rounded-lg p-4">
+          <strong class="text-blue-800">Cost optimisation tip:</strong> Sampling 10–20% of inference traffic for drift monitoring reduces OTel egress costs by 80% with negligible statistical loss for high-volume endpoints (&gt;10 k req/day).
+        </div>
+      </section>
+
+      <!-- Section 8: Best Practices -->
+      <section id="s8" class="section-anchor">
+        <h2 class="text-3xl font-bold text-gray-900 mb-2">8. ML Monitoring Best Practices</h2>
+        <p class="text-gray-500 text-sm mb-6">Common mistakes · Production checklist · 30/60/90 day metrics</p>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-3">Common Monitoring Mistakes and Fixes</h3>
+        <div class="overflow-x-auto rounded-xl border border-gray-200 mb-8">
+          <table>
+            <thead><tr><th>Mistake</th><th>Symptom</th><th>Fix</th></tr></thead>
+            <tbody>
+              <tr><td>Alerting on every drift metric</td><td>Alert fatigue, ignored pages</td><td>Alert only on top-5 features by SHAP importance; use PSI thresholds</td></tr>
+              <tr><td>No baseline versioning</td><td>Drift comparisons become meaningless over time</td><td>Tag baseline to model version; update baseline after each successful retrain</td></tr>
+              <tr><td>Monitoring only infrastructure metrics</td><td>Model degrades silently; only latency alerts fire</td><td>Always add at least one business-outcome metric (CTR, conversion, error rate)</td></tr>
+              <tr><td>Retraining without quality gate</td><td>Bad model auto-promoted, production incident</td><td>Require eval_accuracy ≥ baseline before promotion; run shadow mode 1 h</td></tr>
+              <tr><td>Label delay ignored in perf monitoring</td><td>Accuracy appears to drop suddenly at label-delay boundary</td><td>Apply a time-shift equal to label delay when joining predictions to ground truth</td></tr>
+              <tr><td>Single threshold for all features</td><td>Noisy low-importance features trigger unnecessary retrains</td><td>Per-feature thresholds weighted by feature importance</td></tr>
+              <tr><td>No runbook attached to alerts</td><td>On-call engineer has no idea what to do</td><td>Every alert must have a <code>runbook_url</code> annotation in AlertManager</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-3">Production Monitoring Checklist</h3>
+        <div class="bg-white rounded-xl border border-gray-200 p-6 mb-8 shadow-sm">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+            <div>
+              <h4 class="font-semibold text-gray-700 mb-3 uppercase text-xs tracking-widest">Infrastructure</h4>
+              <ul class="space-y-2 text-gray-600">
+                <li class="flex gap-2"><span class="text-blue-500">☐</span>Prometheus scraping model server metrics</li>
+                <li class="flex gap-2"><span class="text-blue-500">☐</span>Grafana dashboard with p50/p95/p99 latency</li>
+                <li class="flex gap-2"><span class="text-blue-500">☐</span>Error rate and 5xx alerts configured</li>
+                <li class="flex gap-2"><span class="text-blue-500">☐</span>OTel spans capturing pre/model/post latency</li>
+                <li class="flex gap-2"><span class="text-blue-500">☐</span>Prediction logs stored to durable storage</li>
+              </ul>
+            </div>
+            <div>
+              <h4 class="font-semibold text-gray-700 mb-3 uppercase text-xs tracking-widest">Data Quality</h4>
+              <ul class="space-y-2 text-gray-600">
+                <li class="flex gap-2"><span class="text-blue-500">☐</span>Baseline statistics computed at model launch</li>
+                <li class="flex gap-2"><span class="text-blue-500">☐</span>Daily drift report (PSI / KS test) scheduled</li>
+                <li class="flex gap-2"><span class="text-blue-500">☐</span>Null-rate monitoring per feature</li>
+                <li class="flex gap-2"><span class="text-blue-500">☐</span>Schema validation at inference boundary</li>
+                <li class="flex gap-2"><span class="text-blue-500">☐</span>Feature freshness SLA defined and alerted</li>
+              </ul>
+            </div>
+            <div>
+              <h4 class="font-semibold text-gray-700 mb-3 uppercase text-xs tracking-widest">Model Quality</h4>
+              <ul class="space-y-2 text-gray-600">
+                <li class="flex gap-2"><span class="text-blue-500">☐</span>Rolling accuracy / AUC tracked vs baseline</li>
+                <li class="flex gap-2"><span class="text-blue-500">☐</span>Prediction distribution monitored for collapse</li>
+                <li class="flex gap-2"><span class="text-blue-500">☐</span>Business metric (revenue, CTR) correlated to model</li>
+                <li class="flex gap-2"><span class="text-blue-500">☐</span>A/B test guardrails in place</li>
+              </ul>
+            </div>
+            <div>
+              <h4 class="font-semibold text-gray-700 mb-3 uppercase text-xs tracking-widest">Retraining</h4>
+              <ul class="space-y-2 text-gray-600">
+                <li class="flex gap-2"><span class="text-blue-500">☐</span>At least one retraining trigger configured</li>
+                <li class="flex gap-2"><span class="text-blue-500">☐</span>Quality gate enforced before promotion</li>
+                <li class="flex gap-2"><span class="text-blue-500">☐</span>Shadow mode evaluation step in pipeline</li>
+                <li class="flex gap-2"><span class="text-blue-500">☐</span>Last 3 model versions kept for rollback</li>
+                <li class="flex gap-2"><span class="text-blue-500">☐</span>Retrain job failure alerts to ML team</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-3">Metrics to Track: First 90 Days Post-Launch</h3>
+        <div class="overflow-x-auto rounded-xl border border-gray-200 mb-4">
+          <table>
+            <thead><tr><th>Phase</th><th>Focus</th><th>Key Metrics</th><th>Action if Off-Track</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Days 1–30</strong></td><td>Stability &amp; baseline</td><td>Error rate, latency p99, null feature rate, prediction distribution shape</td><td>Fix data pipeline issues; verify feature values match training</td></tr>
+              <tr><td><strong>Days 31–60</strong></td><td>Drift onset detection</td><td>PSI per feature (daily), rolling accuracy (if labels available), model output entropy</td><td>First retrain cycle; validate retraining pipeline works end-to-end</td></tr>
+              <tr><td><strong>Days 61–90</strong></td><td>Business impact correlation</td><td>Business KPI vs model score correlation, A/B lift, false-positive cost</td><td>Tune decision thresholds; adjust retrain frequency based on observed drift rate</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Summary -->
+      <section id="summary" class="section-anchor">
+        <h2 class="text-3xl font-bold text-gray-900 mb-6">Summary &amp; Key Takeaways</h2>
+        <p class="text-gray-700 mb-4">This chapter (15B) and its companion (ch15 — Prometheus, Evidently, drift detection) form a complete ML observability system. Here is what to take away from both.</p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <div class="bg-blue-50 border border-blue-200 rounded-xl p-5">
+            <h4 class="font-bold text-blue-900 mb-3">From ch15 (Monitoring &amp; Drift)</h4>
+            <ul class="text-sm text-blue-800 space-y-2 list-disc ml-4">
+              <li>Prometheus + Grafana for infrastructure-level ML metrics</li>
+              <li>Evidently for feature drift (PSI, KS, JS divergence) and model quality reports</li>
+              <li>Log predictions + labels from day one — you cannot retroactively compute drift</li>
+              <li>Choose drift detectors matched to your data type (numerical vs categorical)</li>
+            </ul>
+          </div>
+          <div class="bg-green-50 border border-green-200 rounded-xl p-5">
+            <h4 class="font-bold text-green-900 mb-3">From ch15B (Alerting &amp; Retraining)</h4>
+            <ul class="text-sm text-green-800 space-y-2 list-disc ml-4">
+              <li>OTel traces reveal <em>where</em> latency is hiding in your inference pipeline</li>
+              <li>Severity taxonomy (P0–P3) prevents alert fatigue; every alert needs a runbook URL</li>
+              <li>Start with scheduled retraining; add drift/perf triggers only when you need them</li>
+              <li>Never auto-promote without a quality gate and shadow mode evaluation</li>
+              <li>Managed monitors (SageMaker, Vertex) lower ops burden at the cost of cloud lock-in</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="bg-gray-900 text-gray-100 rounded-xl p-6">
+          <h4 class="font-bold text-white mb-3 text-lg">The One Rule</h4>
+          <p class="text-gray-300 text-sm leading-relaxed">A model in production without monitoring is not an ML system — it's a time bomb. The monitoring loop you build should be boring: drift fires, retraining kicks off, quality gate passes, new version is promoted. If your on-call engineers are manually triggering retrains and making rollback decisions under pressure at 2 AM, you have not finished building your MLOps platform.</p>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<!-- Bottom Navigation -->
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+  <div class="border-t border-gray-200 pt-8 flex flex-col sm:flex-row justify-between gap-4">
+    <a href="ch15_monitoring.html" class="flex items-center gap-3 bg-white border border-gray-200 rounded-xl px-6 py-4 hover:border-blue-300 hover:bg-blue-50 transition group shadow-sm">
+      <svg class="w-5 h-5 text-gray-400 group-hover:text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+      <div>
+        <div class="text-xs text-gray-400 uppercase tracking-widest font-semibold">Previous</div>
+        <div class="text-sm font-medium text-gray-700 group-hover:text-blue-700">Chapter 15 · Monitoring &amp; Drift Detection</div>
+      </div>
+    </a>
+    <a href="ch16_llm_ops.html" class="flex items-center gap-3 bg-white border border-gray-200 rounded-xl px-6 py-4 hover:border-blue-300 hover:bg-blue-50 transition group shadow-sm">
+      <div class="text-right">
+        <div class="text-xs text-gray-400 uppercase tracking-widest font-semibold">Next</div>
+        <div class="text-sm font-medium text-gray-700 group-hover:text-blue-700">Chapter 16 · LLM Ops</div>
+      </div>
+      <svg class="w-5 h-5 text-gray-400 group-hover:text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+    </a>
+  </div>
+</div>
+
+<footer class="bg-gray-900 text-gray-400 text-sm py-8 mt-4">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+    <p>Modern MLOps Tutorial · Chapter 15B · Updated April 2026</p>
+    <p class="mt-1 text-gray-600">Staff SRE/MLOps Engineer — Netflix · All code examples are illustrative.</p>
+  </div>
+</footer>
+
+</body>
+</html>

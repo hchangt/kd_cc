@@ -1,0 +1,2484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chapter 14: Databases, Prisma &amp; Drizzle ORM — TypeScript for the AI Era</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --white: #FFFFFF;
+      --surface: #F9FAFB;
+      --surface-2: #F3F4F6;
+      --border: #E5E7EB;
+      --border-strong: #D1D5DB;
+      --text-primary: #111827;
+      --text-secondary: #6B7280;
+      --text-tertiary: #9CA3AF;
+      --indigo-50: #EEF2FF;
+      --indigo-100: #E0E7FF;
+      --indigo-200: #C7D2FE;
+      --indigo-500: #6366F1;
+      --indigo-600: #4F46E5;
+      --indigo-700: #4338CA;
+      --indigo-800: #3730A3;
+      --green-50: #F0FDF4;
+      --green-100: #DCFCE7;
+      --green-600: #16A34A;
+      --green-700: #15803D;
+      --amber-50: #FFFBEB;
+      --amber-100: #FEF3C7;
+      --amber-600: #D97706;
+      --amber-700: #B45309;
+      --rose-50: #FFF1F2;
+      --rose-100: #FFE4E6;
+      --rose-600: #E11D48;
+      --rose-700: #BE123C;
+      --violet-50: #F5F3FF;
+      --violet-100: #EDE9FE;
+      --violet-600: #7C3AED;
+      --violet-700: #6D28D9;
+      --sky-50: #F0F9FF;
+      --sky-100: #E0F2FE;
+      --sky-600: #0284C7;
+      --sky-700: #0369A1;
+      --teal-50: #F0FDFA;
+      --teal-100: #CCFBF1;
+      --teal-600: #0D9488;
+      --teal-700: #0F766E;
+      --orange-50: #FFF7ED;
+      --orange-100: #FFEDD5;
+      --orange-600: #EA580C;
+      --orange-700: #C2410C;
+      --font-body: system-ui, -apple-system, 'Segoe UI', sans-serif;
+      --font-code: 'JetBrains Mono', monospace;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--white);
+      color: var(--text-primary);
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── TOP NAV ── */
+    .top-nav {
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      background: rgba(255,255,255,0.94);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: var(--indigo-600);
+      text-decoration: none;
+    }
+
+    .ts-badge {
+      background: var(--indigo-600);
+      color: white;
+      font-family: var(--font-code);
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      letter-spacing: 0.02em;
+    }
+
+    .nav-chapter-links {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      font-size: 0.85rem;
+    }
+
+    .nav-chapter-links a {
+      text-decoration: none;
+      color: var(--text-secondary);
+      font-weight: 500;
+      padding: 0.3rem 0.75rem;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+
+    .nav-chapter-links a:hover {
+      color: var(--indigo-600);
+      border-color: var(--indigo-200);
+      background: var(--indigo-50);
+    }
+
+    .nav-progress {
+      font-size: 0.78rem;
+      color: var(--text-tertiary);
+      font-weight: 500;
+    }
+
+    /* ── CHAPTER HERO ── */
+    .chapter-hero {
+      background: linear-gradient(135deg, #1e1b4b 0%, #312e81 35%, #4338ca 65%, #4F46E5 100%);
+      padding: 4.5rem 2rem 3.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .chapter-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+
+    .chapter-hero-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .chapter-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: rgba(255,255,255,0.9);
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.3rem 0.9rem;
+      border-radius: 999px;
+      margin-bottom: 1.5rem;
+    }
+
+    .chapter-hero h1 {
+      font-size: clamp(2rem, 5vw, 3.25rem);
+      font-weight: 800;
+      color: white;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      margin-bottom: 1rem;
+    }
+
+    .chapter-hero h1 span {
+      color: #a5b4fc;
+    }
+
+    .chapter-hero-meta {
+      font-size: 1rem;
+      color: rgba(255,255,255,0.72);
+      margin-bottom: 2rem;
+    }
+
+    .chapter-hero-tags {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .hero-tag {
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: rgba(255,255,255,0.88);
+      font-size: 0.78rem;
+      font-weight: 500;
+      padding: 0.25rem 0.7rem;
+      border-radius: 999px;
+    }
+
+    /* ── LAYOUT ── */
+    .page-body {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 3rem 2rem;
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      gap: 3rem;
+      align-items: start;
+    }
+
+    /* ── SIDEBAR TOC ── */
+    .sidebar {
+      position: sticky;
+      top: 72px;
+      max-height: calc(100vh - 90px);
+      overflow-y: auto;
+      scrollbar-width: thin;
+    }
+
+    .toc-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .toc-list {
+      list-style: none;
+    }
+
+    .toc-list li { margin-bottom: 0.15rem; }
+
+    .toc-list a {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      text-decoration: none;
+      padding: 0.3rem 0.5rem;
+      border-radius: 5px;
+      border-left: 2px solid transparent;
+      transition: all 0.15s;
+      line-height: 1.4;
+    }
+
+    .toc-list a:hover {
+      color: var(--indigo-600);
+      background: var(--indigo-50);
+      border-left-color: var(--indigo-600);
+    }
+
+    .toc-list .toc-sub {
+      padding-left: 1rem;
+      font-size: 0.75rem;
+    }
+
+    .toc-progress {
+      margin-top: 1.5rem;
+      padding: 1rem;
+      background: var(--surface);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+
+    .toc-progress-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 0.5rem;
+    }
+
+    .progress-bar {
+      height: 4px;
+      background: var(--border);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 0.4rem;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 58.3%;
+      background: linear-gradient(90deg, var(--indigo-600), var(--indigo-500));
+      border-radius: 999px;
+    }
+
+    .progress-text {
+      font-size: 0.72rem;
+      color: var(--text-tertiary);
+    }
+
+    /* ── MAIN CONTENT ── */
+    .content h2 {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+      margin: 3rem 0 1rem;
+      padding-top: 1rem;
+      line-height: 1.2;
+    }
+
+    .content h2:first-child { margin-top: 0; }
+
+    .content h3 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 2rem 0 0.75rem;
+      letter-spacing: -0.01em;
+    }
+
+    .content h4 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 1.5rem 0 0.5rem;
+    }
+
+    .content p {
+      margin-bottom: 1rem;
+      color: var(--text-primary);
+    }
+
+    .content ul, .content ol {
+      margin: 0.75rem 0 1rem 1.5rem;
+    }
+
+    .content li { margin-bottom: 0.4rem; }
+
+    .content a {
+      color: var(--indigo-600);
+      text-decoration: none;
+      border-bottom: 1px solid var(--indigo-200);
+      transition: border-color 0.15s;
+    }
+
+    .content a:hover { border-color: var(--indigo-600); }
+
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 3rem 0;
+    }
+
+    /* ── CODE BLOCKS ── */
+    .code-block {
+      margin: 1.5rem 0;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    }
+
+    .code-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #f6f8fa;
+      border-bottom: 1px solid var(--border);
+      padding: 0.5rem 1rem;
+    }
+
+    .code-lang {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+    }
+
+    .code-fname {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      font-family: var(--font-code);
+    }
+
+    .code-block pre {
+      margin: 0;
+      padding: 1.25rem 1.5rem;
+      overflow-x: auto;
+      background: #f6f8fa;
+      font-size: 0.82rem;
+      line-height: 1.65;
+    }
+
+    .code-block pre code {
+      font-family: var(--font-code);
+      background: none;
+      padding: 0;
+      font-size: inherit;
+    }
+
+    /* Inline code */
+    .content code:not(pre code) {
+      font-family: var(--font-code);
+      font-size: 0.82em;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      padding: 0.1em 0.4em;
+      border-radius: 4px;
+      color: var(--indigo-700);
+    }
+
+    /* ── CALLOUT BOXES ── */
+    .callout {
+      display: flex;
+      gap: 0.9rem;
+      padding: 1rem 1.25rem;
+      border-radius: 10px;
+      border-left: 4px solid;
+      margin: 1.5rem 0;
+    }
+
+    .callout-icon {
+      font-size: 1.1rem;
+      flex-shrink: 0;
+      line-height: 1.65;
+    }
+
+    .callout-body { flex: 1; min-width: 0; }
+
+    .callout-title {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 0.35rem;
+    }
+
+    .callout-body p { margin-bottom: 0.5rem; font-size: 0.9rem; }
+    .callout-body p:last-child { margin-bottom: 0; }
+    .callout-body ul { font-size: 0.9rem; margin-top: 0.35rem; }
+
+    .callout.tip {
+      background: var(--green-50);
+      border-color: var(--green-600);
+    }
+    .callout.tip .callout-title { color: var(--green-700); }
+
+    .callout.info {
+      background: var(--sky-50);
+      border-color: var(--sky-600);
+    }
+    .callout.info .callout-title { color: var(--sky-700); }
+
+    .callout.warning {
+      background: var(--amber-50);
+      border-color: var(--amber-600);
+    }
+    .callout.warning .callout-title { color: var(--amber-700); }
+
+    .callout.python {
+      background: var(--teal-50);
+      border-color: var(--teal-600);
+    }
+    .callout.python .callout-title { color: var(--teal-700); }
+
+    .callout.ai-era {
+      background: var(--violet-50);
+      border-color: var(--violet-600);
+    }
+    .callout.ai-era .callout-title { color: var(--violet-700); }
+
+    .callout.db-tip {
+      background: var(--indigo-50);
+      border-color: var(--indigo-600);
+    }
+    .callout.db-tip .callout-title { color: var(--indigo-700); }
+
+    /* ── TABLES ── */
+    .table-wrap {
+      overflow-x: auto;
+      margin: 1.5rem 0;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+    }
+
+    thead {
+      background: var(--surface);
+      border-bottom: 2px solid var(--border);
+    }
+
+    th {
+      padding: 0.75rem 1rem;
+      text-align: left;
+      font-weight: 700;
+      font-size: 0.78rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 0.7rem 1rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+      line-height: 1.5;
+    }
+
+    tr:last-child td { border-bottom: none; }
+
+    tbody tr:hover { background: var(--surface); }
+
+    .badge {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 0.15rem 0.5rem;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+
+    .badge-green { background: var(--green-100); color: var(--green-700); }
+    .badge-amber { background: var(--amber-100); color: var(--amber-700); }
+    .badge-rose  { background: var(--rose-100);  color: var(--rose-700); }
+    .badge-indigo { background: var(--indigo-100); color: var(--indigo-700); }
+    .badge-violet { background: var(--violet-100); color: var(--violet-700); }
+    .badge-teal  { background: var(--teal-100);  color: var(--teal-700); }
+    .badge-sky   { background: var(--sky-100);   color: var(--sky-700); }
+
+    /* ── INSTALL STRIP ── */
+    .install-strip {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      background: #0d1117;
+      border-radius: 8px;
+      padding: 0.75rem 1.25rem;
+      margin: 1.25rem 0;
+      font-family: var(--font-code);
+      font-size: 0.85rem;
+      color: #e6edf3;
+      border: 1px solid #30363d;
+    }
+
+    .install-strip .prompt {
+      color: #7d8590;
+      user-select: none;
+    }
+
+    .install-strip .cmd { color: #79c0ff; }
+    .install-strip .pkg { color: #a5d6ff; }
+
+    /* ── DIAGRAMS ── */
+    .diagram-wrap {
+      margin: 2rem 0;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      background: var(--surface);
+    }
+
+    .diagram-title {
+      padding: 0.75rem 1.25rem;
+      background: white;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .diagram-body {
+      padding: 1.5rem;
+      display: flex;
+      justify-content: center;
+      background: white;
+    }
+
+    /* ── FOOTER NAV ── */
+    .chapter-footer {
+      border-top: 1px solid var(--border);
+      margin-top: 4rem;
+      padding-top: 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: gap;
+      gap: 1rem;
+    }
+
+    .footer-nav-link {
+      display: flex;
+      flex-direction: column;
+      text-decoration: none;
+      padding: 1rem 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      min-width: 200px;
+      transition: all 0.15s;
+    }
+
+    .footer-nav-link:hover {
+      border-color: var(--indigo-200);
+      background: var(--indigo-50);
+    }
+
+    .footer-nav-direction {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-tertiary);
+      margin-bottom: 0.25rem;
+    }
+
+    .footer-nav-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--indigo-600);
+    }
+
+    .footer-nav-link.next { text-align: right; }
+
+    .page-footer {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 2rem;
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text-tertiary);
+      margin-top: 2rem;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 800px) {
+      .page-body {
+        grid-template-columns: 1fr;
+      }
+      .sidebar {
+        position: static;
+        max-height: none;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="top-nav">
+  <a href="index.html" class="nav-brand">
+    <span class="ts-badge">TS</span>
+    TypeScript for the AI Era
+  </a>
+  <div class="nav-chapter-links">
+    <a href="chapter-13-graphql.html">&#8592; Ch 13 GraphQL</a>
+    <a href="chapter-15-auth.html">Ch 15 Auth &#8594;</a>
+  </div>
+  <span class="nav-progress">Chapter 14 of 24</span>
+</nav>
+
+<!-- HERO -->
+<header class="chapter-hero">
+  <div class="chapter-hero-inner">
+    <div class="chapter-eyebrow">Chapter 14 &nbsp;·&nbsp; Part III: Backend Systems</div>
+    <h1>Databases, <span>Prisma &amp; Drizzle ORM</span></h1>
+    <p class="chapter-hero-meta">By a Senior Staff Engineer (Google, Microsoft) &nbsp;·&nbsp; ~55 min read</p>
+    <div class="chapter-hero-tags">
+      <span class="hero-tag">PostgreSQL</span>
+      <span class="hero-tag">Prisma</span>
+      <span class="hero-tag">Drizzle ORM</span>
+      <span class="hero-tag">Redis</span>
+      <span class="hero-tag">pgvector</span>
+      <span class="hero-tag">Vector Databases</span>
+      <span class="hero-tag">Migrations</span>
+    </div>
+  </div>
+</header>
+
+<!-- PAGE BODY -->
+<div class="page-body">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="toc-label">In this chapter</div>
+    <ul class="toc-list">
+      <li><a href="#landscape">1. Database Landscape</a></li>
+      <li><a href="#orm-vs-raw" class="toc-sub">2. ORM vs Query Builder vs Raw SQL</a></li>
+      <li><a href="#prisma">3. Prisma — The Developer's ORM</a></li>
+      <li><a href="#prisma-advanced" class="toc-sub">4. Prisma Advanced Features</a></li>
+      <li><a href="#drizzle">5. Drizzle ORM</a></li>
+      <li><a href="#redis">6. Redis with TypeScript</a></li>
+      <li><a href="#vector">7. Vector Databases for AI</a></li>
+      <li><a href="#best-practices">8. Database Best Practices</a></li>
+      <li><a href="#testing">9. Testing with Databases</a></li>
+      <li><a href="#python-comparison">10. Python SQLAlchemy Comparison</a></li>
+    </ul>
+
+    <div class="toc-progress">
+      <div class="toc-progress-label">Book Progress</div>
+      <div class="progress-bar"><div class="progress-fill"></div></div>
+      <div class="progress-text">Chapter 14 of 24 &mdash; 58% complete</div>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="content">
+
+    <!-- ═══════════════════════════════════════
+         SECTION 1: DATABASE LANDSCAPE
+    ═══════════════════════════════════════ -->
+    <h2 id="landscape">1. Database Landscape for TypeScript</h2>
+
+    <p>
+      Every non-trivial TypeScript application needs persistent storage. In 2024 the options have multiplied — serverless-native NewSQL, edge-compatible SQLite derivatives, and an entirely new category of vector databases for AI workloads. Choosing the wrong database at the architecture phase is expensive to undo. Let's map the terrain.
+    </p>
+
+    <div class="callout info">
+      <span class="callout-icon">&#9432;</span>
+      <div class="callout-body">
+        <div class="callout-title">PostgreSQL First</div>
+        <p>Unless you have a concrete reason not to, start with PostgreSQL. It covers relational, JSON, full-text search, time-series (via TimescaleDB), and now vector similarity (via pgvector) in a single engine. That's four database categories for the price of one operational burden.</p>
+      </div>
+    </div>
+
+    <h3>SQL Databases</h3>
+    <p><strong>PostgreSQL</strong> is the default choice for new TypeScript projects. Battle-tested, open-source, feature-rich. Every managed cloud (AWS RDS/Aurora, GCP Cloud SQL, Azure Database, Neon, Supabase) supports it. <strong>MySQL</strong> remains dominant in legacy stacks and is the wire protocol behind PlanetScale. <strong>SQLite</strong> is gaining a second life in edge/embedded runtimes (Cloudflare D1, Turso, Bun's built-in).</p>
+
+    <h3>NoSQL</h3>
+    <p><strong>MongoDB</strong> provides a document model with a strong TypeScript SDK. Reach for it when your schema is genuinely document-shaped and varies heavily between records. <strong>Redis</strong> is not a primary database — it's a caching and pub/sub layer (covered in Section 6). <strong>DynamoDB</strong> is AWS-native, scales infinitely at the cost of query flexibility; use it only when you have DynamoDB-shaped access patterns.</p>
+
+    <h3>NewSQL &amp; Edge Databases</h3>
+    <p><strong>PlanetScale</strong> offers MySQL-compatible serverless scaling with a developer-friendly branching workflow. <strong>Neon</strong> brings serverless PostgreSQL with branching — a perfect fit for preview environments. <strong>Turso</strong> distributes SQLite to the edge (powered by libSQL), delivering sub-millisecond reads near every user.</p>
+
+    <h3>Vector Databases</h3>
+    <p>The AI era demands storing and querying high-dimensional embeddings. <strong>pgvector</strong> extends PostgreSQL with vector types and similarity operators — the pragmatic choice if you're already on Postgres. <strong>Pinecone</strong> is a purpose-built fully managed vector store with a first-class TypeScript SDK. <strong>Weaviate</strong> offers hybrid search (vector + BM25) as open-source.</p>
+
+    <div class="callout ai-era">
+      <span class="callout-icon">&#10024;</span>
+      <div class="callout-body">
+        <div class="callout-title">AI Era: Vector Databases Are Now Mainstream</div>
+        <p>Every RAG (Retrieval-Augmented Generation) pipeline needs a vector store. In 2023 this was exotic infrastructure. By 2025 it's table stakes. pgvector handles the majority of use cases without adding another service. Section 7 covers the full picture.</p>
+      </div>
+    </div>
+
+    <h3>Comparison Table</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Database</th>
+            <th>Category</th>
+            <th>Best For</th>
+            <th>TypeScript Support</th>
+            <th>Managed Hosting</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>PostgreSQL</strong></td>
+            <td>SQL</td>
+            <td>General purpose, 95% of apps</td>
+            <td><span class="badge badge-green">Excellent</span></td>
+            <td>Neon, Supabase, RDS, GCP</td>
+          </tr>
+          <tr>
+            <td><strong>MySQL / PlanetScale</strong></td>
+            <td>SQL / NewSQL</td>
+            <td>High-scale OLTP, schema branching</td>
+            <td><span class="badge badge-green">Excellent</span></td>
+            <td>PlanetScale, RDS</td>
+          </tr>
+          <tr>
+            <td><strong>SQLite / Turso</strong></td>
+            <td>Embedded / Edge SQL</td>
+            <td>Edge functions, local dev, mobile</td>
+            <td><span class="badge badge-green">Excellent</span></td>
+            <td>Cloudflare D1, Turso</td>
+          </tr>
+          <tr>
+            <td><strong>MongoDB</strong></td>
+            <td>Document (NoSQL)</td>
+            <td>Variable-shape documents</td>
+            <td><span class="badge badge-green">Excellent</span></td>
+            <td>Atlas</td>
+          </tr>
+          <tr>
+            <td><strong>Redis</strong></td>
+            <td>In-memory KV</td>
+            <td>Cache, sessions, pub/sub, rate limiting</td>
+            <td><span class="badge badge-green">Excellent</span></td>
+            <td>Upstash, Redis Cloud</td>
+          </tr>
+          <tr>
+            <td><strong>DynamoDB</strong></td>
+            <td>NoSQL KV + Document</td>
+            <td>AWS-native, massive scale, simple patterns</td>
+            <td><span class="badge badge-amber">Good</span></td>
+            <td>AWS only</td>
+          </tr>
+          <tr>
+            <td><strong>TimescaleDB</strong></td>
+            <td>Time-series (Postgres ext.)</td>
+            <td>Metrics, IoT, financial ticks</td>
+            <td><span class="badge badge-green">Excellent</span></td>
+            <td>Timescale Cloud</td>
+          </tr>
+          <tr>
+            <td><strong>pgvector</strong></td>
+            <td>Vector (Postgres ext.)</td>
+            <td>Embeddings in existing Postgres DB</td>
+            <td><span class="badge badge-green">Excellent</span></td>
+            <td>Neon, Supabase, RDS</td>
+          </tr>
+          <tr>
+            <td><strong>Pinecone</strong></td>
+            <td>Vector (managed)</td>
+            <td>Large-scale semantic search, RAG</td>
+            <td><span class="badge badge-green">Excellent</span></td>
+            <td>Pinecone Cloud</td>
+          </tr>
+          <tr>
+            <td><strong>Weaviate</strong></td>
+            <td>Vector + Hybrid Search</td>
+            <td>Hybrid BM25 + vector, open-source</td>
+            <td><span class="badge badge-amber">Good</span></td>
+            <td>Weaviate Cloud, self-host</td>
+          </tr>
+          <tr>
+            <td><strong>Neon</strong></td>
+            <td>Serverless Postgres</td>
+            <td>Serverless, branch-per-PR workflows</td>
+            <td><span class="badge badge-green">Excellent</span></td>
+            <td>Neon</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <hr class="section-divider" />
+
+    <!-- ═══════════════════════════════════════
+         SECTION 2: ORM VS QUERY BUILDER VS RAW
+    ═══════════════════════════════════════ -->
+    <h2 id="orm-vs-raw">2. ORM vs Query Builder vs Raw SQL</h2>
+
+    <p>
+      The data-access layer is where architectural decisions compound. A full ORM feels like magic until a complex query makes you fight it. Raw SQL gives full control but loses type safety. Query builders sit in the middle. Here's how to think about the trade-offs.
+    </p>
+
+    <h3>What is an ORM?</h3>
+    <p>An Object-Relational Mapper converts between database rows and in-memory objects (or TypeScript types). A good ORM also handles migrations, relations, and transactions. The cost: an abstraction layer that can generate inefficient queries, hide the database's actual capabilities, and introduce surprising behavior under load.</p>
+
+    <h3>Your Options</h3>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Tool</th>
+            <th>Type</th>
+            <th>Type Safety</th>
+            <th>Bundle Size</th>
+            <th>Edge-compatible</th>
+            <th>Best When</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Prisma</strong></td>
+            <td>ORM</td>
+            <td><span class="badge badge-green">Excellent</span></td>
+            <td><span class="badge badge-amber">Large</span></td>
+            <td><span class="badge badge-amber">Partial</span></td>
+            <td>Rapid development, teams, migrations first</td>
+          </tr>
+          <tr>
+            <td><strong>TypeORM</strong></td>
+            <td>ORM</td>
+            <td><span class="badge badge-amber">Good</span></td>
+            <td><span class="badge badge-amber">Large</span></td>
+            <td><span class="badge badge-rose">No</span></td>
+            <td>Decorator-heavy, NestJS projects</td>
+          </tr>
+          <tr>
+            <td><strong>Sequelize</strong></td>
+            <td>ORM</td>
+            <td><span class="badge badge-amber">Fair</span></td>
+            <td><span class="badge badge-amber">Large</span></td>
+            <td><span class="badge badge-rose">No</span></td>
+            <td>Legacy Node.js codebases</td>
+          </tr>
+          <tr>
+            <td><strong>Drizzle</strong></td>
+            <td>Query Builder</td>
+            <td><span class="badge badge-green">Excellent</span></td>
+            <td><span class="badge badge-green">Tiny</span></td>
+            <td><span class="badge badge-green">Yes</span></td>
+            <td>Edge, performance-critical, SQL control</td>
+          </tr>
+          <tr>
+            <td><strong>Kysely</strong></td>
+            <td>Query Builder</td>
+            <td><span class="badge badge-green">Excellent</span></td>
+            <td><span class="badge badge-green">Small</span></td>
+            <td><span class="badge badge-green">Yes</span></td>
+            <td>Pure SQL ergonomics with type safety</td>
+          </tr>
+          <tr>
+            <td><strong>Knex</strong></td>
+            <td>Query Builder</td>
+            <td><span class="badge badge-amber">Fair</span></td>
+            <td><span class="badge badge-green">Small</span></td>
+            <td><span class="badge badge-amber">Partial</span></td>
+            <td>Legacy projects, multi-DB portability</td>
+          </tr>
+          <tr>
+            <td><strong>postgres.js</strong></td>
+            <td>Raw SQL + tagged templates</td>
+            <td><span class="badge badge-amber">Manual</span></td>
+            <td><span class="badge badge-green">Tiny</span></td>
+            <td><span class="badge badge-rose">No</span></td>
+            <td>Maximum performance, full SQL control</td>
+          </tr>
+          <tr>
+            <td><strong>pg</strong></td>
+            <td>Raw SQL driver</td>
+            <td><span class="badge badge-rose">None</span></td>
+            <td><span class="badge badge-green">Tiny</span></td>
+            <td><span class="badge badge-rose">No</span></td>
+            <td>Lowest-level, maximum control</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout warning">
+      <span class="callout-icon">&#9888;</span>
+      <div class="callout-body">
+        <div class="callout-title">The "ORM is Fine Until it Isn't" Rule</div>
+        <p>ORMs are excellent for 80% of database access: simple CRUD, standard relations, paginated lists. They break down for: complex aggregations, window functions, recursive CTEs, bulk operations, and query plans that require specific index hints. The pragmatic answer: use an ORM for application-layer queries, drop to raw SQL for analytics and bulk jobs.</p>
+      </div>
+    </div>
+
+    <hr class="section-divider" />
+
+    <!-- ═══════════════════════════════════════
+         SECTION 3: PRISMA
+    ═══════════════════════════════════════ -->
+    <h2 id="prisma">3. Prisma — The Developer's ORM</h2>
+
+    <p>
+      Prisma is the most developer-friendly ORM in the TypeScript ecosystem. Its schema-first approach, auto-generated type-safe client, and excellent migrations tooling make it the default choice for teams that want to move fast without sacrificing type safety.
+    </p>
+
+    <h3>Installation</h3>
+    <div class="install-strip">
+      <span class="prompt">$</span>
+      <span class="cmd">pnpm add</span>
+      <span class="pkg">prisma @prisma/client</span>
+    </div>
+    <div class="install-strip">
+      <span class="prompt">$</span>
+      <span class="cmd">pnpm prisma init</span>
+    </div>
+
+    <p><code>prisma init</code> creates a <code>prisma/schema.prisma</code> file and adds <code>DATABASE_URL</code> to <code>.env</code>.</p>
+
+    <h3>Schema Definition</h3>
+    <p>The Prisma schema is the single source of truth. Database, types, and validation all derive from it.</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Prisma</span>
+        <span class="code-fname">prisma/schema.prisma</span>
+      </div>
+      <pre><code class="language-prisma">datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  posts     Post[]
+  profile   Profile?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Post {
+  id        String   @id @default(cuid())
+  title     String
+  content   String?
+  published Boolean  @default(false)
+  author    User     @relation(fields: [authorId], references: [id])
+  authorId  String
+  tags      Tag[]
+  createdAt DateTime @default(now())
+}
+
+model Profile {
+  id     String @id @default(cuid())
+  bio    String?
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @unique
+}
+
+model Tag {
+  id    String @id @default(cuid())
+  name  String @unique
+  posts Post[]
+}</code></pre>
+    </div>
+
+    <!-- ER Diagram SVG -->
+    <div class="diagram-wrap">
+      <div class="diagram-title">Entity-Relationship Diagram</div>
+      <div class="diagram-body">
+        <svg width="700" height="320" viewBox="0 0 700 320" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, sans-serif">
+          <!-- User Box -->
+          <rect x="20" y="60" width="160" height="200" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2"/>
+          <rect x="20" y="60" width="160" height="34" rx="8" fill="#4F46E5"/>
+          <rect x="20" y="82" width="160" height="12" fill="#4F46E5"/>
+          <text x="100" y="83" text-anchor="middle" font-size="13" font-weight="700" fill="white">User</text>
+          <text x="32" y="115" font-size="11" fill="#374151"><tspan font-weight="600">id</tspan>  String (PK)</text>
+          <text x="32" y="133" font-size="11" fill="#374151"><tspan font-weight="600">email</tspan>  String (unique)</text>
+          <text x="32" y="151" font-size="11" fill="#374151"><tspan font-weight="600">name</tspan>  String?</text>
+          <text x="32" y="169" font-size="11" fill="#374151"><tspan font-weight="600">createdAt</tspan>  DateTime</text>
+          <text x="32" y="187" font-size="11" fill="#374151"><tspan font-weight="600">updatedAt</tspan>  DateTime</text>
+          <!-- relations label -->
+          <text x="32" y="215" font-size="10" fill="#6366F1" font-weight="600">posts: Post[]</text>
+          <text x="32" y="232" font-size="10" fill="#6366F1" font-weight="600">profile: Profile?</text>
+
+          <!-- Post Box -->
+          <rect x="270" y="40" width="165" height="220" rx="8" fill="#F0FDF4" stroke="#16A34A" stroke-width="2"/>
+          <rect x="270" y="40" width="165" height="34" rx="8" fill="#16A34A"/>
+          <rect x="270" y="62" width="165" height="12" fill="#16A34A"/>
+          <text x="352" y="63" text-anchor="middle" font-size="13" font-weight="700" fill="white">Post</text>
+          <text x="282" y="95" font-size="11" fill="#374151"><tspan font-weight="600">id</tspan>  String (PK)</text>
+          <text x="282" y="113" font-size="11" fill="#374151"><tspan font-weight="600">title</tspan>  String</text>
+          <text x="282" y="131" font-size="11" fill="#374151"><tspan font-weight="600">content</tspan>  String?</text>
+          <text x="282" y="149" font-size="11" fill="#374151"><tspan font-weight="600">published</tspan>  Boolean</text>
+          <text x="282" y="167" font-size="11" fill="#374151"><tspan font-weight="600">authorId</tspan>  String (FK)</text>
+          <text x="282" y="185" font-size="11" fill="#374151"><tspan font-weight="600">createdAt</tspan>  DateTime</text>
+          <text x="282" y="213" font-size="10" fill="#16A34A" font-weight="600">author: User</text>
+          <text x="282" y="230" font-size="10" fill="#16A34A" font-weight="600">tags: Tag[]</text>
+
+          <!-- Profile Box -->
+          <rect x="20" y="290" width="160" height="0" rx="8" fill="#FFF7ED" stroke="#EA580C" stroke-width="2"/>
+          <!-- Simplified Profile -->
+          <rect x="30" y="278" width="140" height="35" rx="8" fill="#FFF7ED" stroke="#EA580C" stroke-width="1.5"/>
+          <text x="100" y="299" text-anchor="middle" font-size="11" fill="#374151" font-weight="700">Profile</text>
+          <text x="100" y="312" text-anchor="middle" font-size="10" fill="#6B7280">userId (FK, unique)</text>
+
+          <!-- Tag Box -->
+          <rect x="520" y="60" width="155" height="140" rx="8" fill="#F5F3FF" stroke="#7C3AED" stroke-width="2"/>
+          <rect x="520" y="60" width="155" height="34" rx="8" fill="#7C3AED"/>
+          <rect x="520" y="82" width="155" height="12" fill="#7C3AED"/>
+          <text x="597" y="83" text-anchor="middle" font-size="13" font-weight="700" fill="white">Tag</text>
+          <text x="532" y="115" font-size="11" fill="#374151"><tspan font-weight="600">id</tspan>  String (PK)</text>
+          <text x="532" y="133" font-size="11" fill="#374151"><tspan font-weight="600">name</tspan>  String (unique)</text>
+          <text x="532" y="165" font-size="10" fill="#7C3AED" font-weight="600">posts: Post[]</text>
+
+          <!-- Arrow: User 1—* Post -->
+          <line x1="180" y1="155" x2="270" y2="130" stroke="#4F46E5" stroke-width="1.5" stroke-dasharray="4 3"/>
+          <text x="210" y="138" font-size="10" fill="#4F46E5" font-weight="600">1</text>
+          <text x="248" y="125" font-size="10" fill="#4F46E5" font-weight="600">N</text>
+
+          <!-- Arrow: Post *—* Tag -->
+          <line x1="435" y1="130" x2="520" y2="115" stroke="#7C3AED" stroke-width="1.5" stroke-dasharray="4 3"/>
+          <text x="440" y="127" font-size="10" fill="#7C3AED" font-weight="600">N</text>
+          <text x="506" y="112" font-size="10" fill="#7C3AED" font-weight="600">M</text>
+
+          <!-- Arrow: User 1—1 Profile -->
+          <line x1="100" y1="260" x2="100" y2="278" stroke="#EA580C" stroke-width="1.5" stroke-dasharray="4 3"/>
+          <text x="105" y="274" font-size="10" fill="#EA580C" font-weight="600">1:1</text>
+
+          <!-- Legend -->
+          <line x1="270" y1="290" x2="295" y2="290" stroke="#6B7280" stroke-width="1.5" stroke-dasharray="4 3"/>
+          <text x="300" y="294" font-size="10" fill="#6B7280">relation</text>
+          <text x="380" y="294" font-size="10" fill="#6B7280">N = many, M = many (join table)</text>
+        </svg>
+      </div>
+    </div>
+
+    <h3>Generating the Prisma Client</h3>
+    <div class="install-strip">
+      <span class="prompt">$</span>
+      <span class="cmd">pnpm prisma generate</span>
+    </div>
+    <p>This generates a fully-typed client in <code>node_modules/@prisma/client</code>. Every model, field, and relation becomes a TypeScript type. Re-run after any schema change.</p>
+
+    <h3>CRUD Operations</h3>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">TypeScript</span>
+        <span class="code-fname">src/db/users.ts</span>
+      </div>
+      <pre><code class="language-typescript">import { PrismaClient } from '@prisma/client'
+
+const prisma = new PrismaClient()
+
+// CREATE
+const user = await prisma.user.create({
+  data: {
+    email: 'alice@example.com',
+    name: 'Alice',
+    profile: {
+      create: { bio: 'Engineer at ACME' },
+    },
+  },
+})
+
+// READ — with relations and filtering
+const users = await prisma.user.findMany({
+  where: {
+    name: { contains: 'Ali', mode: 'insensitive' },
+    posts: { some: { published: true } },
+  },
+  include: {
+    posts: {
+      where: { published: true },
+      orderBy: { createdAt: 'desc' },
+      take: 5,
+    },
+    profile: true,
+  },
+  orderBy: { createdAt: 'desc' },
+  skip: 0,
+  take: 20,
+})
+
+// UPDATE
+const updated = await prisma.user.update({
+  where: { email: 'alice@example.com' },
+  data: { name: 'Alice Smith' },
+})
+
+// UPSERT
+const upserted = await prisma.user.upsert({
+  where: { email: 'bob@example.com' },
+  create: { email: 'bob@example.com', name: 'Bob' },
+  update: { name: 'Bob Updated' },
+})
+
+// DELETE
+await prisma.user.delete({ where: { id: user.id } })</code></pre>
+    </div>
+
+    <h3>Transactions</h3>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">TypeScript</span>
+        <span class="code-fname">src/db/transactions.ts</span>
+      </div>
+      <pre><code class="language-typescript">// Sequential transaction — if any step throws, all are rolled back
+const [newUser, newPost] = await prisma.$transaction([
+  prisma.user.create({ data: { email: 'carol@example.com', name: 'Carol' } }),
+  prisma.post.create({ data: { title: 'First Post', authorId: '...' } }),
+])
+
+// Interactive transaction — for complex logic between steps
+const result = await prisma.$transaction(async (tx) => {
+  const user = await tx.user.create({
+    data: { email: 'dave@example.com', name: 'Dave' },
+  })
+
+  const post = await tx.post.create({
+    data: { title: 'My First Post', authorId: user.id, published: true },
+  })
+
+  // Update an aggregate counter atomically
+  await tx.user.update({
+    where: { id: user.id },
+    data: { updatedAt: new Date() },
+  })
+
+  return { user, post }
+})</code></pre>
+    </div>
+
+    <h3>Migrations</h3>
+    <div class="install-strip">
+      <span class="prompt">$</span>
+      <span class="cmd">pnpm prisma migrate dev</span>
+      <span class="pkg">--name add-user-model</span>
+    </div>
+    <p>Prisma compares your schema to the current database state, generates a SQL migration file in <code>prisma/migrations/</code>, applies it, and re-generates the client. In production use <code>prisma migrate deploy</code> — never <code>migrate dev</code>.</p>
+
+    <div class="callout tip">
+      <span class="callout-icon">&#128161;</span>
+      <div class="callout-body">
+        <div class="callout-title">Tip: Single Prisma Client Instance</div>
+        <p>Never create <code>new PrismaClient()</code> in each file. In development Next.js hot-reloads modules and creates connection leaks. The pattern:</p>
+        <ul>
+          <li>Create a singleton in <code>src/lib/prisma.ts</code></li>
+          <li>Export a single <code>prisma</code> instance</li>
+          <li>Use <code>global</code> as a container in dev to survive hot-reloads</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">TypeScript</span>
+        <span class="code-fname">src/lib/prisma.ts</span>
+      </div>
+      <pre><code class="language-typescript">import { PrismaClient } from '@prisma/client'
+
+const globalForPrisma = globalThis as unknown as { prisma: PrismaClient }
+
+export const prisma =
+  globalForPrisma.prisma ??
+  new PrismaClient({
+    log: process.env.NODE_ENV === 'development' ? ['query', 'error'] : ['error'],
+  })
+
+if (process.env.NODE_ENV !== 'production') {
+  globalForPrisma.prisma = prisma
+}</code></pre>
+    </div>
+
+    <hr class="section-divider" />
+
+    <!-- ═══════════════════════════════════════
+         SECTION 4: PRISMA ADVANCED
+    ═══════════════════════════════════════ -->
+    <h2 id="prisma-advanced">4. Prisma Advanced Features</h2>
+
+    <h3>Raw SQL Queries</h3>
+    <p>When you need SQL that Prisma cannot express, drop down to <code>$queryRaw</code> or <code>$executeRaw</code>. Tagged template literals are safe against SQL injection.</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">TypeScript</span>
+      </div>
+      <pre><code class="language-typescript">// Type-safe raw query
+const result = await prisma.$queryRaw<Array<{ id: string; count: bigint }>>`
+  SELECT u.id, COUNT(p.id) AS count
+  FROM "User" u
+  LEFT JOIN "Post" p ON p."authorId" = u.id
+  WHERE u."createdAt" > ${new Date('2024-01-01')}
+  GROUP BY u.id
+  ORDER BY count DESC
+  LIMIT 10
+`
+
+// Execute DDL or statements with no return
+await prisma.$executeRaw`
+  CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_posts_author
+  ON "Post" ("authorId")
+`</code></pre>
+    </div>
+
+    <h3>Middleware (Query Extensions)</h3>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">TypeScript</span>
+        <span class="code-fname">src/lib/prisma.ts</span>
+      </div>
+      <pre><code class="language-typescript">// Prisma v5+: use $extends instead of $use
+export const prisma = new PrismaClient().$extends({
+  query: {
+    $allModels: {
+      async findMany({ model, operation, args, query }) {
+        const start = performance.now()
+        const result = await query(args)
+        const duration = performance.now() - start
+        if (duration > 100) {
+          console.warn(`Slow query [${model}.${operation}]: ${duration.toFixed(1)}ms`)
+        }
+        return result
+      },
+    },
+  },
+})</code></pre>
+    </div>
+
+    <h3>Soft Deletes Pattern</h3>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Prisma</span>
+        <span class="code-fname">prisma/schema.prisma</span>
+      </div>
+      <pre><code class="language-prisma">model Post {
+  id        String    @id @default(cuid())
+  title     String
+  deletedAt DateTime? // null = active, timestamp = soft-deleted
+}</code></pre>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">TypeScript</span>
+      </div>
+      <pre><code class="language-typescript">// Wrap prisma with soft-delete extension
+const xprisma = prisma.$extends({
+  model: {
+    post: {
+      async softDelete(id: string) {
+        return prisma.post.update({
+          where: { id },
+          data: { deletedAt: new Date() },
+        })
+      },
+      async findManyActive(args?: Prisma.PostFindManyArgs) {
+        return prisma.post.findMany({
+          ...args,
+          where: { ...args?.where, deletedAt: null },
+        })
+      },
+    },
+  },
+})</code></pre>
+    </div>
+
+    <h3>Seeding Data</h3>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">TypeScript</span>
+        <span class="code-fname">prisma/seed.ts</span>
+      </div>
+      <pre><code class="language-typescript">import { PrismaClient } from '@prisma/client'
+
+const prisma = new PrismaClient()
+
+async function main() {
+  const alice = await prisma.user.upsert({
+    where: { email: 'alice@example.com' },
+    update: {},
+    create: {
+      email: 'alice@example.com',
+      name: 'Alice',
+      posts: {
+        create: [
+          { title: 'Hello World', published: true },
+          { title: 'Draft Post', published: false },
+        ],
+      },
+    },
+  })
+  console.log({ alice })
+}
+
+main()
+  .catch(console.error)
+  .finally(() => prisma.$disconnect())</code></pre>
+    </div>
+
+    <p>Add to <code>package.json</code>:</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">JSON</span>
+        <span class="code-fname">package.json</span>
+      </div>
+      <pre><code class="language-json">{
+  "prisma": {
+    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
+  }
+}</code></pre>
+    </div>
+
+    <div class="install-strip">
+      <span class="prompt">$</span>
+      <span class="cmd">pnpm prisma db seed</span>
+    </div>
+
+    <h3>Connection Pooling</h3>
+    <p>Prisma uses a single connection pool per <code>PrismaClient</code> instance. For serverless functions where each invocation may spawn a new instance, use <strong>Prisma Accelerate</strong> (managed connection pooler) or <strong>PgBouncer</strong> in transaction mode.</p>
+
+    <div class="callout db-tip">
+      <span class="callout-icon">&#128994;</span>
+      <div class="callout-body">
+        <div class="callout-title">Database Tip: Serverless Connection Limits</div>
+        <p>PostgreSQL has a hard limit on concurrent connections (typically 100 for small instances). A serverless function that creates 1000 parallel invocations will exhaust the pool. Solutions: Prisma Accelerate, PgBouncer, or Neon's HTTP driver which multiplexes over HTTP.</p>
+      </div>
+    </div>
+
+    <hr class="section-divider" />
+
+    <!-- ═══════════════════════════════════════
+         SECTION 5: DRIZZLE ORM
+    ═══════════════════════════════════════ -->
+    <h2 id="drizzle">5. Drizzle ORM — The Lightweight Alternative</h2>
+
+    <p>
+      Drizzle is a TypeScript-first query builder that feels like writing SQL — because you essentially are. It has no query plan surprises, works in edge runtimes (Cloudflare Workers, Bun), and ships in a tiny bundle. It's grown explosively because it gives you SQL semantics with full type safety.
+    </p>
+
+    <h3>Why Drizzle Over Prisma?</h3>
+    <ul>
+      <li><strong>Edge-compatible</strong> — runs in Cloudflare Workers, Bun, and Deno without workarounds</li>
+      <li><strong>SQL-like API</strong> — no magic, the query you write is the query that runs</li>
+      <li><strong>Tiny footprint</strong> — ~30KB vs Prisma's several hundred KB</li>
+      <li><strong>Schema as TypeScript</strong> — no separate DSL file, just code</li>
+      <li><strong>Faster for reads</strong> — no object mapper overhead</li>
+    </ul>
+
+    <h3>Installation</h3>
+    <div class="install-strip">
+      <span class="prompt">$</span>
+      <span class="cmd">pnpm add</span>
+      <span class="pkg">drizzle-orm pg</span>
+    </div>
+    <div class="install-strip">
+      <span class="prompt">$</span>
+      <span class="cmd">pnpm add -D</span>
+      <span class="pkg">drizzle-kit @types/pg</span>
+    </div>
+
+    <h3>Schema Definition</h3>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">TypeScript</span>
+        <span class="code-fname">src/db/schema.ts</span>
+      </div>
+      <pre><code class="language-typescript">import {
+  pgTable, serial, text, varchar, boolean,
+  timestamp, integer, primaryKey,
+} from 'drizzle-orm/pg-core'
+import { relations } from 'drizzle-orm'
+
+export const users = pgTable('users', {
+  id: serial('id').primaryKey(),
+  email: varchar('email', { length: 255 }).notNull().unique(),
+  name: text('name'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+})
+
+export const posts = pgTable('posts', {
+  id: serial('id').primaryKey(),
+  title: text('title').notNull(),
+  content: text('content'),
+  published: boolean('published').default(false).notNull(),
+  authorId: integer('author_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+})
+
+export const postsTags = pgTable(
+  'posts_tags',
+  {
+    postId: integer('post_id').notNull().references(() => posts.id),
+    tagId: integer('tag_id').notNull().references(() => tags.id),
+  },
+  (t) => ({ pk: primaryKey({ columns: [t.postId, t.tagId] }) })
+)
+
+export const tags = pgTable('tags', {
+  id: serial('id').primaryKey(),
+  name: varchar('name', { length: 100 }).notNull().unique(),
+})
+
+// Relations
+export const usersRelations = relations(users, ({ many }) => ({
+  posts: many(posts),
+}))
+
+export const postsRelations = relations(posts, ({ one, many }) => ({
+  author: one(users, { fields: [posts.authorId], references: [users.id] }),
+  tags: many(postsTags),
+}))
+
+// Inferred types — zero boilerplate
+export type User    = typeof users.$inferSelect
+export type NewUser = typeof users.$inferInsert
+export type Post    = typeof posts.$inferSelect
+export type NewPost = typeof posts.$inferInsert</code></pre>
+    </div>
+
+    <h3>Queries</h3>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">TypeScript</span>
+        <span class="code-fname">src/db/client.ts</span>
+      </div>
+      <pre><code class="language-typescript">import { drizzle } from 'drizzle-orm/node-postgres'
+import { Pool } from 'pg'
+import * as schema from './schema'
+
+const pool = new Pool({ connectionString: process.env.DATABASE_URL })
+export const db = drizzle(pool, { schema })</code></pre>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">TypeScript</span>
+        <span class="code-fname">src/db/queries.ts</span>
+      </div>
+      <pre><code class="language-typescript">import { db } from './client'
+import { users, posts } from './schema'
+import { eq, ilike, and, desc, sql } from 'drizzle-orm'
+
+// SELECT with filter
+const allUsers = await db
+  .select()
+  .from(users)
+  .where(ilike(users.name, '%alice%'))
+  .orderBy(desc(users.createdAt))
+  .limit(20)
+
+// SELECT specific columns
+const emails = await db
+  .select({ id: users.id, email: users.email })
+  .from(users)
+
+// INSERT
+const [newUser] = await db
+  .insert(users)
+  .values({ email: 'carol@example.com', name: 'Carol' })
+  .returning()
+
+// UPDATE
+await db
+  .update(users)
+  .set({ name: 'Carol Smith' })
+  .where(eq(users.email, 'carol@example.com'))
+
+// DELETE
+await db.delete(users).where(eq(users.id, 42))
+
+// JOIN
+const postsWithAuthors = await db
+  .select({
+    postId: posts.id,
+    title: posts.title,
+    authorName: users.name,
+  })
+  .from(posts)
+  .innerJoin(users, eq(posts.authorId, users.id))
+  .where(and(eq(posts.published, true)))
+  .orderBy(desc(posts.createdAt))
+
+// Aggregation
+const stats = await db
+  .select({
+    authorId: posts.authorId,
+    postCount: sql<number>`COUNT(*)::int`,
+  })
+  .from(posts)
+  .groupBy(posts.authorId)</code></pre>
+    </div>
+
+    <h3>Transactions</h3>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">TypeScript</span>
+      </div>
+      <pre><code class="language-typescript">const result = await db.transaction(async (tx) => {
+  const [user] = await tx
+    .insert(users)
+    .values({ email: 'dave@example.com', name: 'Dave' })
+    .returning()
+
+  const [post] = await tx
+    .insert(posts)
+    .values({ title: 'First Post', authorId: user.id, published: true })
+    .returning()
+
+  return { user, post }
+})</code></pre>
+    </div>
+
+    <h3>Migrations with drizzle-kit</h3>
+    <div class="install-strip">
+      <span class="prompt">$</span>
+      <span class="cmd">pnpm drizzle-kit generate</span>
+    </div>
+    <div class="install-strip">
+      <span class="prompt">$</span>
+      <span class="cmd">pnpm drizzle-kit migrate</span>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">TypeScript</span>
+        <span class="code-fname">drizzle.config.ts</span>
+      </div>
+      <pre><code class="language-typescript">import type { Config } from 'drizzle-kit'
+
+export default {
+  schema: './src/db/schema.ts',
+  out: './drizzle',
+  dialect: 'postgresql',
+  dbCredentials: {
+    url: process.env.DATABASE_URL!,
+  },
+} satisfies Config</code></pre>
+    </div>
+
+    <div class="callout tip">
+      <span class="callout-icon">&#128161;</span>
+      <div class="callout-body">
+        <div class="callout-title">When Drizzle Beats Prisma</div>
+        <ul>
+          <li>Deploying to Cloudflare Workers or Bun edge runtimes</li>
+          <li>You want to see and control the exact SQL being generated</li>
+          <li>Your team is comfortable with SQL and prefers the query builder mental model</li>
+          <li>Bundle size is a constraint (CLI tools, embedded use cases)</li>
+          <li>You need complex window functions, CTEs, or lateral joins without dropping to raw SQL</li>
+        </ul>
+      </div>
+    </div>
+
+    <hr class="section-divider" />
+
+    <!-- ═══════════════════════════════════════
+         SECTION 6: REDIS
+    ═══════════════════════════════════════ -->
+    <h2 id="redis">6. Redis with TypeScript</h2>
+
+    <p>Redis is not a primary database — it's the performance layer on top of your primary database. Use it for caching, sessions, rate limiting, and pub/sub. The TypeScript ecosystem has two strong client options.</p>
+
+    <h3>Installation</h3>
+    <div class="install-strip">
+      <span class="prompt">$</span>
+      <span class="cmd">pnpm add</span>
+      <span class="pkg">ioredis</span>
+      <span style="color:#7d8590; margin-left:0.5rem"># self-hosted / Redis Cloud</span>
+    </div>
+    <div class="install-strip">
+      <span class="prompt">$</span>
+      <span class="cmd">pnpm add</span>
+      <span class="pkg">@upstash/redis</span>
+      <span style="color:#7d8590; margin-left:0.5rem"># serverless / edge</span>
+    </div>
+
+    <h3>Basic Client Setup</h3>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">TypeScript</span>
+        <span class="code-fname">src/lib/redis.ts</span>
+      </div>
+      <pre><code class="language-typescript">import Redis from 'ioredis'
+
+export const redis = new Redis(process.env.REDIS_URL!, {
+  maxRetriesPerRequest: 3,
+  enableReadyCheck: true,
+  lazyConnect: true,
+})
+
+redis.on('error', (err) => console.error('Redis error:', err))</code></pre>
+    </div>
+
+    <h3>Caching Pattern</h3>
+
+    <div class="diagram-wrap">
+      <div class="diagram-title">Cache-Aside Flow</div>
+      <div class="diagram-body">
+        <svg width="600" height="220" viewBox="0 0 600 220" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, sans-serif" font-size="12">
+          <!-- App box -->
+          <rect x="10" y="80" width="100" height="50" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2"/>
+          <text x="60" y="109" text-anchor="middle" font-weight="700" fill="#312e81">Application</text>
+
+          <!-- Redis box -->
+          <rect x="200" y="20" width="100" height="50" rx="8" fill="#FFF7ED" stroke="#EA580C" stroke-width="2"/>
+          <text x="250" y="44" text-anchor="middle" font-weight="700" fill="#7C2D12">Redis</text>
+          <text x="250" y="60" text-anchor="middle" fill="#9A3412" font-size="10">Cache</text>
+
+          <!-- DB box -->
+          <rect x="200" y="145" width="100" height="50" rx="8" fill="#F0FDF4" stroke="#16A34A" stroke-width="2"/>
+          <text x="250" y="169" text-anchor="middle" font-weight="700" fill="#14532D">PostgreSQL</text>
+          <text x="250" y="185" text-anchor="middle" fill="#166534" font-size="10">Primary DB</text>
+
+          <!-- Step 1: App -> Redis (GET) -->
+          <line x1="110" y1="95" x2="198" y2="55" stroke="#4F46E5" stroke-width="1.5" marker-end="url(#arrowIndigo)"/>
+          <text x="145" y="68" fill="#4F46E5" font-size="10" font-weight="600">1. GET user:id</text>
+
+          <!-- Cache HIT path -->
+          <line x1="198" y1="60" x2="112" y2="100" stroke="#EA580C" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arrowOrange)"/>
+          <text x="130" y="87" fill="#EA580C" font-size="10">HIT: return</text>
+
+          <!-- Cache MISS: App -> DB -->
+          <line x1="110" y1="115" x2="198" y2="155" stroke="#4F46E5" stroke-width="1.5" marker-end="url(#arrowIndigo)"/>
+          <text x="112" y="145" fill="#4F46E5" font-size="10" font-weight="600">2. MISS: query DB</text>
+
+          <!-- DB -> App -->
+          <line x1="198" y1="162" x2="112" y2="122" stroke="#16A34A" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arrowGreen)"/>
+          <text x="110" y="155" fill="#16A34A" font-size="10">3. return row</text>
+
+          <!-- App -> Redis SET -->
+          <line x1="300" y1="162" x2="300" y2="72" stroke="#7C3AED" stroke-width="1.5" marker-end="url(#arrowViolet)"/>
+          <text x="305" y="120" fill="#7C3AED" font-size="10" font-weight="600">4. SET</text>
+          <text x="305" y="132" fill="#7C3AED" font-size="10">TTL 3600s</text>
+
+          <!-- Arrowhead markers -->
+          <defs>
+            <marker id="arrowIndigo" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+              <path d="M0,0 L0,6 L8,3 z" fill="#4F46E5"/>
+            </marker>
+            <marker id="arrowOrange" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+              <path d="M0,0 L0,6 L8,3 z" fill="#EA580C"/>
+            </marker>
+            <marker id="arrowGreen" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+              <path d="M0,0 L0,6 L8,3 z" fill="#16A34A"/>
+            </marker>
+            <marker id="arrowViolet" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+              <path d="M0,0 L0,6 L8,3 z" fill="#7C3AED"/>
+            </marker>
+          </defs>
+        </svg>
+      </div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">TypeScript</span>
+        <span class="code-fname">src/services/userCache.ts</span>
+      </div>
+      <pre><code class="language-typescript">import { redis } from '../lib/redis'
+import { prisma } from '../lib/prisma'
+import type { User } from '@prisma/client'
+
+const TTL_SECONDS = 3600
+
+async function getCachedUser(id: string): Promise<User | null> {
+  const key = `user:${id}`
+
+  // 1. Try cache first
+  const cached = await redis.get(key)
+  if (cached) return JSON.parse(cached) as User
+
+  // 2. Cache miss — fetch from DB
+  const user = await prisma.user.findUnique({ where: { id } })
+  if (!user) return null
+
+  // 3. Store in cache with TTL
+  await redis.setex(key, TTL_SECONDS, JSON.stringify(user))
+  return user
+}
+
+async function invalidateUser(id: string): Promise<void> {
+  await redis.del(`user:${id}`)
+}
+
+// Cache aside with typed helper
+async function withCache<T>(
+  key: string,
+  ttl: number,
+  fetcher: () => Promise<T>
+): Promise<T> {
+  const cached = await redis.get(key)
+  if (cached) return JSON.parse(cached) as T
+  const value = await fetcher()
+  await redis.setex(key, ttl, JSON.stringify(value))
+  return value
+}</code></pre>
+    </div>
+
+    <h3>Rate Limiting with Redis</h3>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">TypeScript</span>
+        <span class="code-fname">src/middleware/rateLimit.ts</span>
+      </div>
+      <pre><code class="language-typescript">async function isRateLimited(
+  identifier: string,
+  limit: number = 100,
+  windowSeconds: number = 60
+): Promise<{ limited: boolean; remaining: number; resetAt: number }> {
+  const key = `rate:${identifier}`
+  const now = Date.now()
+
+  const pipeline = redis.pipeline()
+  pipeline.incr(key)
+  pipeline.ttl(key)
+  const [[, count], [, ttl]] = await pipeline.exec() as [[null, number], [null, number]]
+
+  // Set expiry on first request
+  if (count === 1) await redis.expire(key, windowSeconds)
+
+  const remaining = Math.max(0, limit - count)
+  const resetAt = ttl > 0 ? now + ttl * 1000 : now + windowSeconds * 1000
+
+  return { limited: count > limit, remaining, resetAt }
+}</code></pre>
+    </div>
+
+    <h3>Pub/Sub</h3>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">TypeScript</span>
+        <span class="code-fname">src/events/pubsub.ts</span>
+      </div>
+      <pre><code class="language-typescript">import Redis from 'ioredis'
+
+// Pub/Sub requires separate connections
+const publisher  = new Redis(process.env.REDIS_URL!)
+const subscriber = new Redis(process.env.REDIS_URL!)
+
+// Publisher
+async function publishEvent(channel: string, data: unknown) {
+  await publisher.publish(channel, JSON.stringify(data))
+}
+
+// Subscriber
+await subscriber.subscribe('user:created', 'post:published')
+
+subscriber.on('message', (channel, message) => {
+  const payload = JSON.parse(message)
+  console.log(`Event on ${channel}:`, payload)
+  // dispatch to handlers...
+})</code></pre>
+    </div>
+
+    <hr class="section-divider" />
+
+    <!-- ═══════════════════════════════════════
+         SECTION 7: VECTOR DATABASES
+    ═══════════════════════════════════════ -->
+    <h2 id="vector">7. Vector Databases for AI Applications</h2>
+
+    <p>
+      Vector databases store high-dimensional numerical representations (embeddings) of text, images, and other data. They enable semantic search — finding results by meaning rather than exact keyword match. This is the foundational infrastructure for RAG systems, semantic search APIs, and recommendation engines.
+    </p>
+
+    <div class="callout ai-era">
+      <span class="callout-icon">&#10024;</span>
+      <div class="callout-body">
+        <div class="callout-title">AI Era: Embeddings Are the New Index</div>
+        <p>Traditional databases use B-tree indexes for exact lookups. Vector databases use HNSW (Hierarchical Navigable Small World) graphs for approximate nearest-neighbor search. When you embed a query with the same model used to embed your documents, you can find semantically similar content in milliseconds across millions of records.</p>
+      </div>
+    </div>
+
+    <h3>pgvector — Vectors Inside PostgreSQL</h3>
+    <p>Install the extension and you have vector similarity search inside your existing Postgres instance. No additional service to operate.</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">SQL</span>
+        <span class="code-fname">Enable pgvector</span>
+      </div>
+      <pre><code class="language-sql">CREATE EXTENSION IF NOT EXISTS vector;
+
+CREATE TABLE documents (
+  id        SERIAL PRIMARY KEY,
+  content   TEXT NOT NULL,
+  embedding vector(1536) -- OpenAI text-embedding-3-small dimension
+);
+
+-- IVFFlat index for approximate nearest neighbor (faster for large datasets)
+CREATE INDEX ON documents USING ivfflat (embedding vector_cosine_ops)
+  WITH (lists = 100);</code></pre>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">TypeScript</span>
+        <span class="code-fname">src/ai/vectorSearch.ts</span>
+      </div>
+      <pre><code class="language-typescript">import { prisma } from '../lib/prisma'
+import OpenAI from 'openai'
+
+const openai = new OpenAI()
+
+async function embedText(text: string): Promise<number[]> {
+  const response = await openai.embeddings.create({
+    model: 'text-embedding-3-small',
+    input: text,
+  })
+  return response.data[0].embedding
+}
+
+// Store a document with its embedding
+async function indexDocument(id: number, content: string): Promise<void> {
+  const embedding = await embedText(content)
+
+  await prisma.$executeRaw`
+    UPDATE documents
+    SET embedding = ${JSON.stringify(embedding)}::vector
+    WHERE id = ${id}
+  `
+}
+
+// Semantic similarity search
+type SearchResult = {
+  id: number
+  content: string
+  similarity: number
+}
+
+async function semanticSearch(
+  query: string,
+  limit: number = 5,
+  minSimilarity: number = 0.7
+): Promise<SearchResult[]> {
+  const queryEmbedding = await embedText(query)
+
+  const results = await prisma.$queryRaw<SearchResult[]>`
+    SELECT
+      id,
+      content,
+      1 - (embedding <=> ${JSON.stringify(queryEmbedding)}::vector) AS similarity
+    FROM documents
+    WHERE 1 - (embedding <=> ${JSON.stringify(queryEmbedding)}::vector) > ${minSimilarity}
+    ORDER BY embedding <=> ${JSON.stringify(queryEmbedding)}::vector
+    LIMIT ${limit}
+  `
+
+  return results
+}</code></pre>
+    </div>
+
+    <h3>Pinecone — Managed Vector Database</h3>
+    <p>Pinecone is purpose-built for vector workloads. Use it when you need to scale beyond what pgvector can handle or when your vectors are separate from your relational data.</p>
+
+    <div class="install-strip">
+      <span class="prompt">$</span>
+      <span class="cmd">pnpm add</span>
+      <span class="pkg">@pinecone-database/pinecone</span>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">TypeScript</span>
+        <span class="code-fname">src/ai/pinecone.ts</span>
+      </div>
+      <pre><code class="language-typescript">import { Pinecone } from '@pinecone-database/pinecone'
+
+const pc = new Pinecone({ apiKey: process.env.PINECONE_API_KEY! })
+const index = pc.index('documents')
+
+// Upsert vectors
+await index.upsert([
+  {
+    id: 'doc-1',
+    values: embedding, // number[]
+    metadata: { content: 'The quick brown fox...', source: 'article-42' },
+  },
+])
+
+// Query
+const results = await index.query({
+  vector: queryEmbedding,
+  topK: 5,
+  includeMetadata: true,
+  filter: { source: { $eq: 'article-42' } }, // metadata filter
+})
+
+const matches = results.matches.map((m) => ({
+  id: m.id,
+  score: m.score,
+  content: m.metadata?.content as string,
+}))</code></pre>
+    </div>
+
+    <h3>Building a Semantic Search System</h3>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">TypeScript</span>
+        <span class="code-fname">src/ai/rag.ts</span>
+      </div>
+      <pre><code class="language-typescript">import OpenAI from 'openai'
+import { semanticSearch } from './vectorSearch'
+
+const openai = new OpenAI()
+
+// RAG: Retrieval-Augmented Generation
+async function answerWithContext(question: string): Promise<string> {
+  // 1. Retrieve relevant documents
+  const docs = await semanticSearch(question, 5, 0.6)
+
+  // 2. Build context from retrieved docs
+  const context = docs
+    .map((d, i) => `[${i + 1}] ${d.content}`)
+    .join('\n\n')
+
+  // 3. Generate answer grounded in context
+  const completion = await openai.chat.completions.create({
+    model: 'gpt-4o',
+    messages: [
+      {
+        role: 'system',
+        content: 'Answer based only on the provided context. Cite sources.',
+      },
+      {
+        role: 'user',
+        content: `Context:\n${context}\n\nQuestion: ${question}`,
+      },
+    ],
+    temperature: 0.1,
+  })
+
+  return completion.choices[0].message.content ?? ''
+}</code></pre>
+    </div>
+
+    <hr class="section-divider" />
+
+    <!-- ═══════════════════════════════════════
+         SECTION 8: BEST PRACTICES
+    ═══════════════════════════════════════ -->
+    <h2 id="best-practices">8. Database Best Practices</h2>
+
+    <h3>Environment Variables</h3>
+    <p>Never hardcode database credentials. Use environment variables and validate them at startup.</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">TypeScript</span>
+        <span class="code-fname">src/env.ts</span>
+      </div>
+      <pre><code class="language-typescript">import { z } from 'zod'
+
+const envSchema = z.object({
+  DATABASE_URL: z.string().url(),
+  REDIS_URL: z.string().url().optional(),
+  NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
+})
+
+export const env = envSchema.parse(process.env)</code></pre>
+    </div>
+
+    <h3>Indexes: When and Why</h3>
+
+    <div class="callout db-tip">
+      <span class="callout-icon">&#128994;</span>
+      <div class="callout-body">
+        <div class="callout-title">Database Tip: Index Rules of Thumb</div>
+        <ul>
+          <li>Add indexes on foreign keys — Postgres does not do this automatically</li>
+          <li>Index columns used in <code>WHERE</code>, <code>ORDER BY</code>, and <code>JOIN</code> conditions for large tables</li>
+          <li>Use partial indexes for filtered queries (e.g., <code>WHERE published = true</code>)</li>
+          <li>Use <code>EXPLAIN ANALYZE</code> before and after adding indexes in production</li>
+          <li>More indexes = slower writes. Don't index everything</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Prisma</span>
+        <span class="code-fname">prisma/schema.prisma — index examples</span>
+      </div>
+      <pre><code class="language-prisma">model Post {
+  id        String   @id @default(cuid())
+  title     String
+  published Boolean  @default(false)
+  authorId  String
+  createdAt DateTime @default(now())
+
+  author User @relation(fields: [authorId], references: [id])
+
+  @@index([authorId])                        // FK index
+  @@index([createdAt(sort: Desc)])           // ordered feed
+  @@index([published, createdAt(sort: Desc)]) // compound: filter + sort
+}</code></pre>
+    </div>
+
+    <h3>N+1 Queries</h3>
+    <p>N+1 is the most common ORM performance bug: fetching a list of N records, then issuing one query per record to load a relation.</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">TypeScript</span>
+        <span class="code-fname">Anti-pattern vs correct</span>
+      </div>
+      <pre><code class="language-typescript">// ❌ N+1: 1 query for users + N queries for posts
+const users = await prisma.user.findMany()
+for (const user of users) {
+  user.posts = await prisma.post.findMany({ where: { authorId: user.id } })
+}
+
+// ✅ 1 query with include (Prisma uses a JOIN or batched IN query)
+const users = await prisma.user.findMany({
+  include: { posts: true },
+})
+
+// ✅ Drizzle: explicit join
+const result = await db
+  .select()
+  .from(users)
+  .leftJoin(posts, eq(posts.authorId, users.id))</code></pre>
+    </div>
+
+    <h3>Migrations in Production</h3>
+    <ul>
+      <li>Always run migrations in a transaction when possible</li>
+      <li>Never <code>DROP COLUMN</code> or <code>DROP TABLE</code> in a single migration step alongside application deployment — columns can be removed after the code referencing them is gone</li>
+      <li>Use <code>CREATE INDEX CONCURRENTLY</code> to avoid locking in production</li>
+      <li>Test migrations on a replica before the primary</li>
+      <li>Use Prisma's <code>migrate deploy</code> in CI/CD pipelines — it applies pending migrations without prompting</li>
+    </ul>
+
+    <h3>Audit Logs</h3>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Prisma</span>
+        <span class="code-fname">prisma/schema.prisma</span>
+      </div>
+      <pre><code class="language-prisma">model AuditLog {
+  id         String   @id @default(cuid())
+  entityType String   // "User", "Post", etc.
+  entityId   String
+  action     String   // "create", "update", "delete"
+  actorId    String?  // who made the change
+  before     Json?    // snapshot before
+  after      Json?    // snapshot after
+  createdAt  DateTime @default(now())
+
+  @@index([entityType, entityId])
+  @@index([actorId])
+  @@index([createdAt])
+}</code></pre>
+    </div>
+
+    <h3>Read Replicas</h3>
+    <p>Direct read-heavy queries (analytics, reports, search) to a read replica. Write queries go to the primary. This pattern is straightforward with Prisma:</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">TypeScript</span>
+      </div>
+      <pre><code class="language-typescript">import { PrismaClient } from '@prisma/client'
+
+export const writeDb = new PrismaClient({
+  datasources: { db: { url: process.env.DATABASE_URL } },
+})
+
+export const readDb = new PrismaClient({
+  datasources: { db: { url: process.env.DATABASE_READ_URL } },
+})</code></pre>
+    </div>
+
+    <hr class="section-divider" />
+
+    <!-- ═══════════════════════════════════════
+         SECTION 9: TESTING
+    ═══════════════════════════════════════ -->
+    <h2 id="testing">9. Testing with Databases</h2>
+
+    <h3>Test Database Strategy</h3>
+    <p>Run tests against a real database. Mocking the ORM gives false confidence and misses real query behavior. Use a separate test database that resets between test suites.</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">TypeScript</span>
+        <span class="code-fname">tests/setup.ts</span>
+      </div>
+      <pre><code class="language-typescript">import { execSync } from 'child_process'
+import { prisma } from '../src/lib/prisma'
+
+// Run before all tests in this suite
+beforeAll(async () => {
+  // Reset test DB and apply all migrations
+  execSync('pnpm prisma migrate reset --force --skip-seed', {
+    env: { ...process.env, DATABASE_URL: process.env.TEST_DATABASE_URL },
+  })
+})
+
+afterAll(async () => {
+  await prisma.$disconnect()
+})</code></pre>
+    </div>
+
+    <h3>Factory Functions</h3>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">TypeScript</span>
+        <span class="code-fname">tests/factories/user.factory.ts</span>
+      </div>
+      <pre><code class="language-typescript">import { prisma } from '../../src/lib/prisma'
+import type { Prisma } from '@prisma/client'
+
+let emailCounter = 0
+
+export async function createUser(
+  overrides: Partial<Prisma.UserCreateInput> = {}
+) {
+  return prisma.user.create({
+    data: {
+      email: `test-${++emailCounter}-${Date.now()}@example.com`,
+      name: 'Test User',
+      ...overrides,
+    },
+  })
+}
+
+export async function createUserWithPosts(postCount = 2) {
+  return prisma.user.create({
+    data: {
+      email: `user-${Date.now()}@example.com`,
+      name: 'Active Author',
+      posts: {
+        create: Array.from({ length: postCount }, (_, i) => ({
+          title: `Post ${i + 1}`,
+          published: true,
+        })),
+      },
+    },
+    include: { posts: true },
+  })
+}</code></pre>
+    </div>
+
+    <h3>Transaction Rollback in Tests</h3>
+    <p>The cleanest isolation strategy: wrap each test in a transaction and roll it back after the test.</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">TypeScript</span>
+        <span class="code-fname">tests/helpers/txRollback.ts</span>
+      </div>
+      <pre><code class="language-typescript">import { prisma } from '../../src/lib/prisma'
+import type { PrismaClient } from '@prisma/client'
+
+// Note: Prisma's interactive transactions don't expose raw connection,
+// so the cleanest approach is truncating tables between tests in the test DB.
+export async function cleanDatabase() {
+  const tables = ['Post', 'Profile', 'User', 'Tag']
+  for (const table of tables) {
+    await prisma.$executeRawUnsafe(`TRUNCATE TABLE "${table}" CASCADE`)
+  }
+}</code></pre>
+    </div>
+
+    <h3>Mocking Prisma Client</h3>
+    <p>For unit tests where you don't want a database at all — testing business logic, not queries — use <code>jest-mock-extended</code>:</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">TypeScript</span>
+        <span class="code-fname">tests/unit/userService.test.ts</span>
+      </div>
+      <pre><code class="language-typescript">import { mockDeep, mockReset } from 'jest-mock-extended'
+import type { PrismaClient } from '@prisma/client'
+
+// Create deep mock of Prisma client
+const prismaMock = mockDeep<PrismaClient>()
+
+// Replace the real client in your module (using jest.mock or dependency injection)
+jest.mock('../../src/lib/prisma', () => ({
+  prisma: prismaMock,
+}))
+
+beforeEach(() => mockReset(prismaMock))
+
+it('returns user by email', async () => {
+  const mockUser = { id: '1', email: 'alice@example.com', name: 'Alice' }
+  prismaMock.user.findUnique.mockResolvedValue(mockUser as any)
+
+  const result = await getUserByEmail('alice@example.com')
+  expect(result).toEqual(mockUser)
+  expect(prismaMock.user.findUnique).toHaveBeenCalledWith({
+    where: { email: 'alice@example.com' },
+  })
+})</code></pre>
+    </div>
+
+    <div class="callout tip">
+      <span class="callout-icon">&#128161;</span>
+      <div class="callout-body">
+        <div class="callout-title">Tip: Two Test Categories</div>
+        <p>Separate your database tests into two categories: <strong>integration tests</strong> (real DB, test real queries) and <strong>unit tests</strong> (mocked Prisma, test business logic in isolation). Run unit tests on every commit. Run integration tests in CI against a test Postgres instance (use Docker or Neon's branch-per-PR).</p>
+      </div>
+    </div>
+
+    <hr class="section-divider" />
+
+    <!-- ═══════════════════════════════════════
+         SECTION 10: PYTHON COMPARISON
+    ═══════════════════════════════════════ -->
+    <h2 id="python-comparison">10. Python SQLAlchemy Comparison</h2>
+
+    <p>Coming from Python's SQLAlchemy and Alembic, the TypeScript ecosystem maps cleanly. Here's the mental model translation.</p>
+
+    <div class="callout python">
+      <span class="callout-icon">&#128013;</span>
+      <div class="callout-body">
+        <div class="callout-title">Python Comparison</div>
+        <p>SQLAlchemy is the battle-tested ORM of Python. It's more low-level than Prisma and closer in spirit to Drizzle. Prisma is more like Django ORM in terms of abstraction level — high-level, opinionated, developer-friendly.</p>
+      </div>
+    </div>
+
+    <h3>Model Definition</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python</span>
+        <span class="code-fname">SQLAlchemy</span>
+      </div>
+      <pre><code class="language-python">from sqlalchemy import Column, String, Boolean, DateTime, ForeignKey
+from sqlalchemy.orm import DeclarativeBase, relationship
+from datetime import datetime
+
+class Base(DeclarativeBase):
+    pass
+
+class User(Base):
+    __tablename__ = "users"
+    id        = Column(String, primary_key=True)
+    email     = Column(String, unique=True, nullable=False)
+    name      = Column(String)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    posts     = relationship("Post", back_populates="author")
+
+class Post(Base):
+    __tablename__ = "posts"
+    id        = Column(String, primary_key=True)
+    title     = Column(String, nullable=False)
+    published = Column(Boolean, default=False)
+    author_id = Column(String, ForeignKey("users.id"))
+    author    = relationship("User", back_populates="posts")</code></pre>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Prisma</span>
+        <span class="code-fname">TypeScript equivalent</span>
+      </div>
+      <pre><code class="language-prisma">model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+  posts     Post[]
+}
+
+model Post {
+  id        String  @id @default(cuid())
+  title     String
+  published Boolean @default(false)
+  authorId  String
+  author    User    @relation(fields: [authorId], references: [id])
+}</code></pre>
+    </div>
+
+    <h3>CRUD Comparison Table</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Operation</th>
+            <th>SQLAlchemy (Python)</th>
+            <th>Prisma (TypeScript)</th>
+            <th>Drizzle (TypeScript)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Create</strong></td>
+            <td><code>db.session.add(User(...))</code><br/><code>db.session.commit()</code></td>
+            <td><code>prisma.user.create({data: {...}})</code></td>
+            <td><code>db.insert(users).values({...})</code></td>
+          </tr>
+          <tr>
+            <td><strong>Find one</strong></td>
+            <td><code>db.get(User, id)</code><br/>or <code>db.scalar(select(User).where(...))</code></td>
+            <td><code>prisma.user.findUnique({where: {id}})</code></td>
+            <td><code>db.select().from(users).where(eq(users.id, id))</code></td>
+          </tr>
+          <tr>
+            <td><strong>Find many</strong></td>
+            <td><code>db.scalars(select(User).where(...))</code></td>
+            <td><code>prisma.user.findMany({where: {...}})</code></td>
+            <td><code>db.select().from(users).where(...)</code></td>
+          </tr>
+          <tr>
+            <td><strong>Update</strong></td>
+            <td><code>user.name = 'new'</code><br/><code>db.session.commit()</code></td>
+            <td><code>prisma.user.update({where:{id}, data:{...}})</code></td>
+            <td><code>db.update(users).set({...}).where(...)</code></td>
+          </tr>
+          <tr>
+            <td><strong>Delete</strong></td>
+            <td><code>db.session.delete(user)</code><br/><code>db.session.commit()</code></td>
+            <td><code>prisma.user.delete({where: {id}})</code></td>
+            <td><code>db.delete(users).where(...)</code></td>
+          </tr>
+          <tr>
+            <td><strong>Relations</strong></td>
+            <td><code>user.posts</code> (lazy load)<br/>or <code>selectinload(User.posts)</code></td>
+            <td><code>include: { posts: true }</code></td>
+            <td><code>innerJoin(posts, eq(...))</code></td>
+          </tr>
+          <tr>
+            <td><strong>Transaction</strong></td>
+            <td><code>with db.begin() as tx:</code></td>
+            <td><code>prisma.$transaction(async tx => {})</code></td>
+            <td><code>db.transaction(async tx => {})</code></td>
+          </tr>
+          <tr>
+            <td><strong>Raw SQL</strong></td>
+            <td><code>db.execute(text("SELECT ..."))</code></td>
+            <td><code>prisma.$queryRaw`SELECT ...`</code></td>
+            <td><code>sql`SELECT ...`</code></td>
+          </tr>
+          <tr>
+            <td><strong>Migrations</strong></td>
+            <td><code>alembic revision --autogenerate</code><br/><code>alembic upgrade head</code></td>
+            <td><code>prisma migrate dev</code><br/><code>prisma migrate deploy</code></td>
+            <td><code>drizzle-kit generate</code><br/><code>drizzle-kit migrate</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Key Differences to Internalize</h3>
+    <ul>
+      <li><strong>Session vs connection:</strong> SQLAlchemy uses an explicit <code>Session</code> with <code>commit()</code>/<code>rollback()</code>. Prisma auto-commits each operation. Explicit control requires <code>$transaction</code>.</li>
+      <li><strong>Lazy loading:</strong> SQLAlchemy lazy-loads relations by default. Prisma never lazy-loads — you must explicitly <code>include</code> or <code>select</code> relations. This makes N+1 bugs more visible.</li>
+      <li><strong>Schema source of truth:</strong> SQLAlchemy models are Python classes. Prisma uses a DSL file. Drizzle uses TypeScript directly — closest to SQLAlchemy's model approach.</li>
+      <li><strong>Type inference:</strong> SQLAlchemy requires Pydantic or manual typing for serialization. Prisma generates TypeScript types automatically. Drizzle infers types from the schema via <code>$inferSelect</code>.</li>
+    </ul>
+
+    <div class="callout python">
+      <span class="callout-icon">&#128013;</span>
+      <div class="callout-body">
+        <div class="callout-title">Python Comparison: Alembic vs Prisma Migrations</div>
+        <p>Alembic migrations are Python scripts with <code>upgrade()</code> and <code>downgrade()</code> functions — you write both directions explicitly. Prisma generates SQL migration files automatically by diffing your schema. Prisma is faster for greenfield. Alembic gives more control for complex migrations involving data transformations. Drizzle is closer to Alembic in philosophy — you have more control over the generated SQL.</p>
+      </div>
+    </div>
+
+    <!-- FOOTER NAV -->
+    <div class="chapter-footer">
+      <a href="chapter-13-graphql.html" class="footer-nav-link">
+        <span class="footer-nav-direction">&#8592; Previous</span>
+        <span class="footer-nav-title">Chapter 13: GraphQL</span>
+      </a>
+      <a href="chapter-15-auth.html" class="footer-nav-link next">
+        <span class="footer-nav-direction">Next &#8594;</span>
+        <span class="footer-nav-title">Chapter 15: Authentication &amp; Auth</span>
+      </a>
+    </div>
+
+  </main>
+</div>
+
+<!-- PAGE FOOTER -->
+<footer class="page-footer">
+  <strong>TypeScript for the AI Era</strong> &nbsp;&middot;&nbsp; Chapter 14 of 24 &nbsp;&middot;&nbsp;
+  By a Senior Staff Engineer (Google, Microsoft) &nbsp;&middot;&nbsp;
+  &copy; 2024&ndash;2025
+</footer>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('pre code').forEach((block) => {
+      hljs.highlightElement(block)
+    })
+  })
+</script>
+</body>
+</html>

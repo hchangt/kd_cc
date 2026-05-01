@@ -1,0 +1,2468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chapter 10: Testing TypeScript Applications — TypeScript for the AI Era</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --white: #FFFFFF;
+      --surface: #F9FAFB;
+      --border: #E5E7EB;
+      --text-primary: #111827;
+      --text-secondary: #6B7280;
+      --text-tertiary: #9CA3AF;
+      --indigo-50: #EEF2FF;
+      --indigo-100: #E0E7FF;
+      --indigo-500: #6366F1;
+      --indigo-600: #4F46E5;
+      --indigo-700: #4338CA;
+      --indigo-800: #3730A3;
+      --sky-400: #38BDF8;
+      --sky-500: #0EA5E9;
+      --green-50: #F0FDF4;
+      --green-100: #DCFCE7;
+      --green-200: #BBF7D0;
+      --green-600: #16A34A;
+      --green-700: #15803D;
+      --green-800: #166534;
+      --amber-50: #FFFBEB;
+      --amber-100: #FEF3C7;
+      --amber-600: #D97706;
+      --amber-700: #B45309;
+      --amber-800: #92400E;
+      --rose-50: #FFF1F2;
+      --rose-100: #FFE4E6;
+      --rose-600: #E11D48;
+      --rose-700: #BE123C;
+      --violet-50: #F5F3FF;
+      --violet-100: #EDE9FE;
+      --violet-600: #7C3AED;
+      --violet-700: #6D28D9;
+      --teal-50: #F0FDFA;
+      --teal-100: #CCFBF1;
+      --teal-500: #14B8A6;
+      --teal-700: #0F766E;
+      --pink-50: #FDF2F8;
+      --pink-100: #FCE7F3;
+      --pink-600: #DB2777;
+      --pink-700: #BE185D;
+      --font-body: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+      --font-code: 'JetBrains Mono', 'Fira Code', monospace;
+      --radius: 10px;
+      --sidebar-w: 240px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--white);
+      color: var(--text-primary);
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── TOP NAV ── */
+    .top-nav {
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      height: 56px;
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1.5rem;
+      gap: 1rem;
+    }
+
+    .nav-chapter-link {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-decoration: none;
+      padding: 0.35rem 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      transition: color 0.15s, border-color 0.15s, background 0.15s;
+      white-space: nowrap;
+    }
+    .nav-chapter-link:hover {
+      color: var(--indigo-600);
+      border-color: var(--indigo-100);
+      background: var(--indigo-50);
+    }
+
+    .nav-center {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.1rem;
+    }
+
+    .nav-book-title {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--indigo-600);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+    }
+
+    .nav-progress {
+      font-size: 0.68rem;
+      color: var(--text-tertiary);
+      font-weight: 500;
+    }
+
+    /* ── CHAPTER HERO ── */
+    .chapter-hero {
+      background: linear-gradient(135deg, #1e1b4b 0%, #312e81 40%, #3730a3 70%, #4338ca 100%);
+      padding: 4rem 2rem 3.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .chapter-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+
+    .chapter-hero-inner {
+      position: relative;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .chapter-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: rgba(255,255,255,0.9);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.3rem 0.85rem;
+      border-radius: 999px;
+      margin-bottom: 1.5rem;
+    }
+
+    .chapter-eyebrow .ch-dot {
+      width: 5px; height: 5px;
+      background: #6ee7b7;
+      border-radius: 50%;
+    }
+
+    .chapter-hero h1 {
+      font-size: clamp(2rem, 5vw, 3.25rem);
+      font-weight: 800;
+      color: white;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      margin-bottom: 1rem;
+    }
+
+    .chapter-hero h1 .ch-num {
+      display: block;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: rgba(255,255,255,0.55);
+      letter-spacing: 0.02em;
+      margin-bottom: 0.3rem;
+      font-family: var(--font-code);
+    }
+
+    .chapter-hero-meta {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      margin-top: 1.75rem;
+    }
+
+    .author-chip {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .author-avatar-sm {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #4F46E5, #7C3AED);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.75rem;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    .author-details { line-height: 1.3; }
+    .author-name-sm { font-size: 0.85rem; font-weight: 700; color: white; }
+    .author-role-sm { font-size: 0.72rem; color: rgba(255,255,255,0.6); }
+
+    .hero-tags {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .hero-tag {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.18);
+      color: rgba(255,255,255,0.85);
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 0.25rem 0.65rem;
+      border-radius: 999px;
+    }
+
+    /* ── LAYOUT ── */
+    .page-body {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+      display: grid;
+      grid-template-columns: var(--sidebar-w) 1fr;
+      gap: 3rem;
+      align-items: start;
+    }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      position: sticky;
+      top: 72px;
+      padding: 2rem 0;
+      max-height: calc(100vh - 80px);
+      overflow-y: auto;
+    }
+
+    .sidebar::-webkit-scrollbar { width: 3px; }
+    .sidebar::-webkit-scrollbar-track { background: transparent; }
+    .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    .toc-label {
+      font-size: 0.68rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-tertiary);
+      margin-bottom: 0.75rem;
+      padding-left: 0.75rem;
+    }
+
+    .toc-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.1rem;
+    }
+
+    .toc-list a {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      text-decoration: none;
+      padding: 0.35rem 0.75rem;
+      border-radius: 6px;
+      border-left: 2px solid transparent;
+      transition: color 0.12s, background 0.12s, border-color 0.12s;
+      line-height: 1.4;
+    }
+
+    .toc-list a:hover {
+      color: var(--indigo-600);
+      background: var(--indigo-50);
+      border-left-color: var(--indigo-200);
+    }
+
+    .toc-list a.active {
+      color: var(--indigo-600);
+      background: var(--indigo-50);
+      border-left-color: var(--indigo-600);
+      font-weight: 600;
+    }
+
+    .toc-sub { padding-left: 0.75rem; }
+    .toc-sub a { font-size: 0.75rem; }
+
+    /* ── CONTENT ── */
+    .content {
+      padding: 2.5rem 0 4rem;
+      min-width: 0;
+    }
+
+    .content h2 {
+      font-size: 1.65rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      letter-spacing: -0.025em;
+      margin: 3rem 0 1rem;
+      padding-top: 0.5rem;
+      border-top: 2px solid var(--indigo-100);
+    }
+
+    .content h2:first-child { margin-top: 0; border-top: none; }
+
+    .content h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 2rem 0 0.75rem;
+      letter-spacing: -0.015em;
+    }
+
+    .content h4 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      margin: 1.5rem 0 0.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .content p {
+      font-size: 0.975rem;
+      color: var(--text-secondary);
+      margin-bottom: 1rem;
+      line-height: 1.75;
+    }
+
+    .content p strong {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .content ul, .content ol {
+      margin: 0.75rem 0 1rem 1.5rem;
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      line-height: 1.7;
+    }
+
+    .content li { margin-bottom: 0.3rem; }
+
+    .content code {
+      font-family: var(--font-code);
+      font-size: 0.83em;
+      background: var(--indigo-50);
+      color: var(--indigo-700);
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+      border: 1px solid var(--indigo-100);
+    }
+
+    .content a {
+      color: var(--indigo-600);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
+    /* ── CODE BLOCKS ── */
+    .code-block {
+      margin: 1.25rem 0;
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: #f8fafc;
+    }
+
+    .code-block-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.55rem 1rem;
+      background: #f1f5f9;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .code-lang {
+      font-family: var(--font-code);
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+    }
+
+    .code-filename {
+      font-family: var(--font-code);
+      font-size: 0.72rem;
+      color: var(--text-tertiary);
+    }
+
+    .code-block pre {
+      margin: 0;
+      padding: 1.1rem 1.25rem;
+      overflow-x: auto;
+      background: transparent !important;
+    }
+
+    .code-block pre code {
+      font-family: var(--font-code);
+      font-size: 0.835rem;
+      background: transparent;
+      border: none;
+      padding: 0;
+      color: inherit;
+      line-height: 1.65;
+    }
+
+    /* ── TERMINAL / OUTPUT BLOCKS ── */
+    .terminal {
+      margin: 1.25rem 0;
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid #374151;
+      background: #111827;
+    }
+
+    .terminal-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.55rem 1rem;
+      background: #1f2937;
+      border-bottom: 1px solid #374151;
+    }
+
+    .term-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+    }
+    .term-dot-red    { background: #ef4444; }
+    .term-dot-yellow { background: #f59e0b; }
+    .term-dot-green  { background: #10b981; }
+
+    .terminal-title {
+      font-family: var(--font-code);
+      font-size: 0.7rem;
+      color: #9ca3af;
+      margin-left: 0.25rem;
+    }
+
+    .terminal pre {
+      margin: 0;
+      padding: 1rem 1.25rem;
+      font-family: var(--font-code);
+      font-size: 0.82rem;
+      line-height: 1.65;
+      color: #d1fae5;
+      overflow-x: auto;
+    }
+
+    .terminal .pass { color: #34d399; }
+    .terminal .fail { color: #f87171; }
+    .terminal .skip { color: #fbbf24; }
+    .terminal .dim  { color: #6b7280; }
+    .terminal .bold { font-weight: 700; }
+    .terminal .cmd  { color: #93c5fd; }
+
+    /* ── CALLOUTS ── */
+    .callout {
+      display: flex;
+      gap: 1rem;
+      padding: 1.1rem 1.25rem;
+      border-radius: var(--radius);
+      border-left: 4px solid;
+      margin: 1.5rem 0;
+    }
+
+    .callout-icon { font-size: 1.15rem; flex-shrink: 0; margin-top: 0.05rem; }
+    .callout-body { flex: 1; min-width: 0; }
+    .callout-title {
+      font-size: 0.8rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.35rem;
+    }
+    .callout-body p {
+      font-size: 0.875rem;
+      margin-bottom: 0.5rem;
+      line-height: 1.65;
+    }
+    .callout-body p:last-child { margin-bottom: 0; }
+    .callout-body code {
+      font-size: 0.8em;
+    }
+
+    .callout-tip    { background: var(--green-50);  border-color: var(--green-600);  }
+    .callout-tip    .callout-title { color: var(--green-700); }
+    .callout-tip    .callout-body p { color: var(--green-800); }
+    .callout-tip    code { background: var(--green-100); border-color: var(--green-200); color: var(--green-800); }
+
+    .callout-info   { background: var(--indigo-50); border-color: var(--indigo-600); }
+    .callout-info   .callout-title { color: var(--indigo-700); }
+    .callout-info   .callout-body p { color: var(--indigo-800); }
+    .callout-info   code { background: var(--indigo-100); border-color: var(--indigo-100); color: var(--indigo-800); }
+
+    .callout-warning { background: var(--amber-50); border-color: var(--amber-600); }
+    .callout-warning .callout-title { color: var(--amber-700); }
+    .callout-warning .callout-body p { color: var(--amber-800); }
+    .callout-warning code { background: var(--amber-100); border-color: var(--amber-100); color: var(--amber-800); }
+
+    .callout-python { background: var(--violet-50); border-color: var(--violet-600); }
+    .callout-python .callout-title { color: var(--violet-700); }
+    .callout-python .callout-body p { color: #3b2564; }
+    .callout-python code { background: var(--violet-100); border-color: var(--violet-100); color: var(--violet-700); }
+
+    .callout-ai     { background: var(--pink-50);   border-color: var(--pink-600);   }
+    .callout-ai     .callout-title { color: var(--pink-700); }
+    .callout-ai     .callout-body p { color: #831843; }
+    .callout-ai     code { background: var(--pink-100); border-color: var(--pink-100); color: var(--pink-700); }
+
+    .callout-best   { background: var(--teal-50);   border-color: var(--teal-500);   }
+    .callout-best   .callout-title { color: var(--teal-700); }
+    .callout-best   .callout-body p { color: #134e4a; }
+    .callout-best   code { background: var(--teal-100); border-color: var(--teal-100); color: var(--teal-700); }
+
+    /* ── TESTING PYRAMID ── */
+    .pyramid-wrap {
+      margin: 2rem 0;
+      text-align: center;
+    }
+
+    .pyramid-wrap svg { max-width: 520px; width: 100%; }
+
+    /* ── COMPARISON TABLE ── */
+    .compare-table-wrap {
+      overflow-x: auto;
+      margin: 1.5rem 0;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+    }
+
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      min-width: 560px;
+    }
+
+    .compare-table thead tr {
+      background: linear-gradient(135deg, #312e81, #4338ca);
+    }
+
+    .compare-table thead th {
+      padding: 0.85rem 1.1rem;
+      text-align: left;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: rgba(255,255,255,0.9);
+    }
+
+    .compare-table thead th:first-child { border-radius: 0; }
+
+    .compare-table tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background 0.1s;
+    }
+
+    .compare-table tbody tr:last-child { border-bottom: none; }
+    .compare-table tbody tr:hover { background: var(--indigo-50); }
+
+    .compare-table td {
+      padding: 0.75rem 1.1rem;
+      vertical-align: top;
+      line-height: 1.55;
+      color: var(--text-secondary);
+    }
+
+    .compare-table td:first-child {
+      font-weight: 700;
+      color: var(--text-primary);
+      white-space: nowrap;
+      background: var(--surface);
+    }
+
+    .compare-table code {
+      font-family: var(--font-code);
+      font-size: 0.78rem;
+      background: var(--indigo-50);
+      color: var(--indigo-700);
+      padding: 0.1em 0.35em;
+      border-radius: 3px;
+      border: 1px solid var(--indigo-100);
+    }
+
+    .compare-table .py-col { color: #5b21b6; }
+    .compare-table .ts-col { color: #1d4ed8; }
+
+    /* ── MATCHERS TABLE ── */
+    .matchers-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1rem;
+      margin: 1.25rem 0;
+    }
+
+    .matcher-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+    }
+
+    .matcher-name {
+      font-family: var(--font-code);
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--indigo-600);
+      margin-bottom: 0.4rem;
+    }
+
+    .matcher-desc {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    /* ── RED / GREEN TEST BLOCKS ── */
+    .test-states {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin: 1.25rem 0;
+    }
+
+    @media (max-width: 700px) {
+      .test-states { grid-template-columns: 1fr; }
+    }
+
+    .test-state {
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid;
+    }
+
+    .test-state-red  { border-color: #fca5a5; }
+    .test-state-green { border-color: #86efac; }
+
+    .test-state-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 0.9rem;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+    }
+
+    .test-state-red .test-state-header { background: #fee2e2; color: #b91c1c; }
+    .test-state-green .test-state-header { background: #dcfce7; color: #15803d; }
+
+    .test-state pre {
+      margin: 0;
+      padding: 0.85rem 1rem;
+      font-family: var(--font-code);
+      font-size: 0.78rem;
+      line-height: 1.6;
+      overflow-x: auto;
+    }
+
+    .test-state-red  pre { background: #fff5f5; color: #7f1d1d; }
+    .test-state-green pre { background: #f0fdf4; color: #14532d; }
+
+    /* ── INLINE TAGS ── */
+    .tag {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      vertical-align: middle;
+    }
+
+    .tag-new    { background: var(--green-100); color: var(--green-700); }
+    .tag-py     { background: var(--violet-100); color: var(--violet-700); }
+    .tag-tip    { background: var(--teal-100); color: var(--teal-700); }
+
+    /* ── SECTION DIVIDER ── */
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 2.5rem 0;
+    }
+
+    /* ── FOOTER NAV ── */
+    .chapter-footer {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 2rem 1.5rem;
+    }
+
+    .chapter-footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .footer-nav-link {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      text-decoration: none;
+      padding: 0.85rem 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--white);
+      transition: border-color 0.15s, box-shadow 0.15s;
+      max-width: 240px;
+    }
+
+    .footer-nav-link:hover {
+      border-color: var(--indigo-200);
+      box-shadow: 0 2px 12px rgba(79,70,229,0.1);
+    }
+
+    .footer-nav-label {
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-tertiary);
+    }
+
+    .footer-nav-title {
+      font-size: 0.875rem;
+      font-weight: 700;
+      color: var(--indigo-600);
+    }
+
+    .footer-center {
+      text-align: center;
+      font-size: 0.78rem;
+      color: var(--text-tertiary);
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 860px) {
+      .page-body {
+        grid-template-columns: 1fr;
+      }
+      .sidebar { display: none; }
+    }
+
+    @media (max-width: 600px) {
+      .chapter-hero { padding: 2.5rem 1rem 2rem; }
+      .nav-chapter-link span { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════
+     TOP NAVIGATION
+════════════════════════════════════════════ -->
+<nav class="top-nav">
+  <a href="chapter-09-build-tools.html" class="nav-chapter-link">
+    &#8592; <span>Ch 9 Build Tools</span>
+  </a>
+  <div class="nav-center">
+    <span class="nav-book-title">TypeScript for the AI Era</span>
+    <span class="nav-progress">Chapter 10 of 24</span>
+  </div>
+  <a href="chapter-11-node-bun.html" class="nav-chapter-link">
+    <span>Ch 11 Node &amp; Bun</span> &#8594;
+  </a>
+</nav>
+
+<!-- ═══════════════════════════════════════════
+     CHAPTER HERO
+════════════════════════════════════════════ -->
+<header class="chapter-hero">
+  <div class="chapter-hero-inner">
+    <span class="chapter-eyebrow"><span class="ch-dot"></span> Part III &mdash; Production TypeScript</span>
+    <h1>
+      <span class="ch-num">Chapter 10</span>
+      Testing TypeScript<br>Applications
+    </h1>
+    <div class="chapter-hero-meta">
+      <div class="author-chip">
+        <div class="author-avatar-sm">JG</div>
+        <div class="author-details">
+          <div class="author-name-sm">Josh Goldberg</div>
+          <div class="author-role-sm">Open Source Maintainer &middot; Author of "Learning TypeScript"</div>
+        </div>
+      </div>
+      <div class="hero-tags">
+        <span class="hero-tag">Vitest</span>
+        <span class="hero-tag">Jest</span>
+        <span class="hero-tag">Mocking</span>
+        <span class="hero-tag">Type Testing</span>
+        <span class="hero-tag">TDD</span>
+        <span class="hero-tag">pytest comparison</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════════════
+     PAGE BODY (sidebar + content)
+════════════════════════════════════════════ -->
+<div class="page-body">
+
+  <!-- SIDEBAR TOC -->
+  <aside class="sidebar">
+    <p class="toc-label">In this chapter</p>
+    <ul class="toc-list">
+      <li><a href="#philosophy">1. Testing Philosophy</a></li>
+      <li><a href="#vitest">2. Vitest — The Modern Runner</a></li>
+      <li><a href="#jest">3. Jest (Existing Projects)</a></li>
+      <li><a href="#matchers">4. Matchers Deep Dive</a></li>
+      <li><a href="#mocking">5. Mocking in TypeScript</a></li>
+      <li><a href="#async">6. Testing Async Code</a></li>
+      <li><a href="#integration">7. Integration Testing</a></li>
+      <li><a href="#type-testing">8. Testing Types Themselves</a></li>
+      <li><a href="#coverage">9. Code Coverage</a></li>
+      <li><a href="#best-practices">10. Best Practices</a></li>
+      <li><a href="#pytest-comparison">11. pytest &#8594; Vitest Table</a></li>
+    </ul>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="content">
+
+    <!-- ══════════════════════════════
+         1. TESTING PHILOSOPHY
+    ══════════════════════════════ -->
+    <h2 id="philosophy">1. Testing Philosophy for TypeScript</h2>
+
+    <p>
+      Coming from Python, you probably have a healthy respect for automated tests. In TypeScript, the relationship between
+      the type system and your test suite is different from anything you've experienced with <code>pytest</code> or
+      <code>unittest</code>. The type system does work your tests used to do — and that changes what you need to test.
+    </p>
+
+    <h3>What the Type System Replaces</h3>
+
+    <p>
+      In Python, you might write a test to verify that <code>add(1, "two")</code> raises a <code>TypeError</code>.
+      In TypeScript, that test is pointless: the compiler refuses to compile the call in the first place. Types give you
+      a whole category of bugs for free — the entire class of "wrong-type argument" errors.
+    </p>
+
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-lang">typescript</span>
+        <span class="code-filename">math.ts</span>
+      </div>
+      <pre><code class="language-typescript">// TypeScript — you don't need to test this at runtime
+function add(a: number, b: number): number {
+  return a + b;
+}
+
+// This is a compile error, not a test case:
+add(1, "two"); // Error: Argument of type 'string' is not assignable to parameter of type 'number'
+
+// What you DO need to test: runtime behaviour types can't see
+add(0.1, 0.2); // → 0.30000000000000004 (floating point!)
+add(Infinity, -Infinity); // → NaN
+</code></pre>
+    </div>
+
+    <div class="callout callout-python">
+      <span class="callout-icon">&#127822;</span>
+      <div class="callout-body">
+        <p class="callout-title">Python Comparison</p>
+        <p>In <code>pytest</code>, you commonly write <code>with pytest.raises(TypeError)</code> to guard against wrong types.
+        TypeScript eliminates that entire category. Your test suite gets smaller — in a good way. Focus the tests you do
+        write on <strong>behaviour</strong>, not type safety.</p>
+      </div>
+    </div>
+
+    <h3>What Types Cannot Test</h3>
+
+    <ul>
+      <li><strong>Runtime values:</strong> A <code>string</code> could be an empty string, a million-character blob, or a SQL injection attempt.</li>
+      <li><strong>External systems:</strong> APIs fail, databases go down, file permissions change.</li>
+      <li><strong>Business logic edge cases:</strong> What happens when a user has exactly 0 balance?</li>
+      <li><strong>Integration:</strong> Two correctly-typed modules can still interact badly.</li>
+      <li><strong>Performance:</strong> Types don't tell you a function is O(n²).</li>
+      <li><strong>Async timing:</strong> Race conditions, ordering bugs, timeout edge cases.</li>
+    </ul>
+
+    <h3>The Testing Pyramid</h3>
+
+    <p>The testing pyramid is as applicable to TypeScript as to any language. Types shift <em>where</em> you invest:</p>
+
+    <div class="pyramid-wrap">
+      <svg viewBox="0 0 520 320" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Testing pyramid">
+        <!-- E2E top -->
+        <polygon points="260,20 360,130 160,130" fill="#f43f5e" opacity="0.9"/>
+        <text x="260" y="90" text-anchor="middle" font-family="Inter,sans-serif" font-size="13" font-weight="700" fill="white">E2E</text>
+        <text x="260" y="107" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="rgba(255,255,255,0.85)">slow · expensive · few</text>
+
+        <!-- Integration middle -->
+        <polygon points="160,140 360,140 420,230 100,230" fill="#f59e0b" opacity="0.9"/>
+        <text x="260" y="190" text-anchor="middle" font-family="Inter,sans-serif" font-size="14" font-weight="700" fill="white">Integration</text>
+        <text x="260" y="208" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="rgba(255,255,255,0.85)">real dependencies · moderate speed</text>
+
+        <!-- Unit base -->
+        <polygon points="100,240 420,240 500,310 20,310" fill="#4F46E5" opacity="0.92"/>
+        <text x="260" y="280" text-anchor="middle" font-family="Inter,sans-serif" font-size="15" font-weight="700" fill="white">Unit Tests</text>
+        <text x="260" y="300" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="rgba(255,255,255,0.85)">fast · isolated · many</text>
+
+        <!-- TypeScript types annotation -->
+        <rect x="0" y="0" width="110" height="38" rx="6" fill="#e0e7ff" stroke="#6366f1" stroke-width="1"/>
+        <text x="8" y="14" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#4338ca">TypeScript Types</text>
+        <text x="8" y="28" font-family="Inter,sans-serif" font-size="8.5" fill="#4338ca">replace many unit tests</text>
+        <line x1="110" y1="19" x2="155" y2="80" stroke="#6366f1" stroke-width="1" stroke-dasharray="4,3"/>
+
+        <!-- Type tests annotation -->
+        <rect x="390" y="50" width="125" height="38" rx="6" fill="#ede9fe" stroke="#7c3aed" stroke-width="1"/>
+        <text x="398" y="64" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#6d28d9">expectTypeOf()</text>
+        <text x="398" y="78" font-family="Inter,sans-serif" font-size="8.5" fill="#6d28d9">tests types themselves</text>
+        <line x1="390" y1="69" x2="363" y2="80" stroke="#7c3aed" stroke-width="1" stroke-dasharray="4,3"/>
+      </svg>
+    </div>
+
+    <div class="callout callout-tip">
+      <span class="callout-icon">&#10003;</span>
+      <div class="callout-body">
+        <p class="callout-title">TypeScript Shifts the Pyramid</p>
+        <p>Because the type checker catches shape errors, your unit test layer is <strong>smaller</strong> than in Python.
+        You need fewer defensive tests. But the integration and E2E layers stay equally important — types don't run in production, your code does.</p>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════
+         2. VITEST
+    ══════════════════════════════ -->
+    <h2 id="vitest">2. Vitest — The Modern Test Runner</h2>
+
+    <p>
+      If you're starting a new TypeScript project today, use <strong>Vitest</strong>. It's built on Vite, understands
+      TypeScript and ESM natively (no transpilation step needed), and its API is intentionally compatible with Jest.
+      If you know <code>pytest</code>, the mental model maps cleanly: a test runner that collects and runs functions.
+    </p>
+
+    <h3>Why Vitest Over Jest?</h3>
+
+    <ul>
+      <li><strong>Native ESM &amp; TypeScript:</strong> No Babel, no <code>ts-jest</code>, no config gymnastics.</li>
+      <li><strong>Speed:</strong> Vitest shares the Vite transform pipeline — tests typically start 5&ndash;10&times; faster on cold runs.</li>
+      <li><strong>Same API:</strong> Migrating from Jest is usually just a config change.</li>
+      <li><strong>Built-in type testing:</strong> <code>expectTypeOf</code> is a first-class citizen.</li>
+      <li><strong>UI mode:</strong> A browser-based test explorer out of the box.</li>
+    </ul>
+
+    <h3>Install &amp; Configure</h3>
+
+    <div class="terminal">
+      <div class="terminal-header">
+        <span class="term-dot term-dot-red"></span>
+        <span class="term-dot term-dot-yellow"></span>
+        <span class="term-dot term-dot-green"></span>
+        <span class="terminal-title">terminal</span>
+      </div>
+      <pre><span class="cmd">pnpm add -D vitest @vitest/coverage-v8</span>
+<span class="dim"># or npm install -D vitest @vitest/coverage-v8</span></pre>
+    </div>
+
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-lang">typescript</span>
+        <span class="code-filename">vitest.config.ts</span>
+      </div>
+      <pre><code class="language-typescript">import { defineConfig } from 'vitest/config'
+
+export default defineConfig({
+  test: {
+    // Run tests in node environment (use 'jsdom' for browser-like DOM tests)
+    environment: 'node',
+
+    // Global test functions — no imports needed in every file
+    globals: true,
+
+    // Coverage configuration
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'html', 'lcov'],
+      thresholds: {
+        lines: 80,
+        functions: 80,
+        branches: 70,
+      },
+    },
+
+    // Optional: setup file run before each test file
+    setupFiles: ['./vitest.setup.ts'],
+  },
+})
+</code></pre>
+    </div>
+
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-lang">json</span>
+        <span class="code-filename">package.json (scripts section)</span>
+      </div>
+      <pre><code class="language-json">{
+  "scripts": {
+    "test":          "vitest",
+    "test:run":      "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:ui":       "vitest --ui"
+  }
+}
+</code></pre>
+    </div>
+
+    <h3>Writing Your First Test</h3>
+
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-lang">typescript</span>
+        <span class="code-filename">src/math.ts</span>
+      </div>
+      <pre><code class="language-typescript">export function add(a: number, b: number): number {
+  return a + b
+}
+
+export function divide(a: number, b: number): number {
+  if (b === 0) throw new Error('Division by zero')
+  return a / b
+}
+</code></pre>
+    </div>
+
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-lang">typescript</span>
+        <span class="code-filename">src/math.test.ts</span>
+      </div>
+      <pre><code class="language-typescript">import { describe, it, expect } from 'vitest'
+import { add, divide } from './math'
+
+describe('add', () => {
+  it('adds two positive numbers', () => {
+    expect(add(1, 2)).toBe(3)
+  })
+
+  it('handles negative numbers', () => {
+    expect(add(-1, -2)).toBe(-3)
+  })
+
+  it('handles zero', () => {
+    expect(add(0, 5)).toBe(5)
+  })
+})
+
+describe('divide', () => {
+  it('divides correctly', () => {
+    expect(divide(10, 2)).toBe(5)
+  })
+
+  it('throws on division by zero', () => {
+    expect(() => divide(10, 0)).toThrow('Division by zero')
+  })
+})
+</code></pre>
+    </div>
+
+    <h3>Running Tests</h3>
+
+    <div class="terminal">
+      <div class="terminal-header">
+        <span class="term-dot term-dot-red"></span>
+        <span class="term-dot term-dot-yellow"></span>
+        <span class="term-dot term-dot-green"></span>
+        <span class="terminal-title">terminal — vitest run output</span>
+      </div>
+      <pre> <span class="pass bold">&#10003;</span> <span class="bold">src/math.test.ts</span> <span class="dim">(5 tests)</span>
+
+   <span class="pass">&#10003;</span> add <span class="dim">></span> adds two positive numbers
+   <span class="pass">&#10003;</span> add <span class="dim">></span> handles negative numbers
+   <span class="pass">&#10003;</span> add <span class="dim">></span> handles zero
+   <span class="pass">&#10003;</span> divide <span class="dim">></span> divides correctly
+   <span class="pass">&#10003;</span> divide <span class="dim">></span> throws on division by zero
+
+ <span class="bold">Test Files  1 passed (1)</span>
+ <span class="bold">Tests       5 passed (5)</span>
+ <span class="dim">Duration    142ms</span></pre>
+    </div>
+
+    <h3>Global Test Functions</h3>
+
+    <p>With <code>globals: true</code> in the config, you get these available everywhere without imports:</p>
+
+    <div class="matchers-grid">
+      <div class="matcher-card">
+        <div class="matcher-name">describe(name, fn)</div>
+        <div class="matcher-desc">Groups related tests. Nest freely. Equivalent to <code>class Test*</code> or a module in pytest.</div>
+      </div>
+      <div class="matcher-card">
+        <div class="matcher-name">it(name, fn) / test()</div>
+        <div class="matcher-desc">Defines a single test case. <code>it</code> and <code>test</code> are identical — choose for readability.</div>
+      </div>
+      <div class="matcher-card">
+        <div class="matcher-name">expect(value)</div>
+        <div class="matcher-desc">Creates an assertion chain. All assertions hang off this.</div>
+      </div>
+      <div class="matcher-card">
+        <div class="matcher-name">beforeEach(fn)</div>
+        <div class="matcher-desc">Runs before every test in the current <code>describe</code>. Like pytest's function-scoped fixture.</div>
+      </div>
+      <div class="matcher-card">
+        <div class="matcher-name">afterEach(fn)</div>
+        <div class="matcher-desc">Cleanup after each test. Reset state, close connections.</div>
+      </div>
+      <div class="matcher-card">
+        <div class="matcher-name">beforeAll / afterAll</div>
+        <div class="matcher-desc">Run once before/after the entire <code>describe</code> block. Expensive setup (DB connections).</div>
+      </div>
+    </div>
+
+    <div class="callout callout-tip">
+      <span class="callout-icon">&#9997;</span>
+      <div class="callout-body">
+        <p class="callout-title">Watch Mode for TDD</p>
+        <p>Run <code>pnpm vitest</code> (no arguments) for watch mode. Vitest reruns only the tests affected by your changes.
+        This is the TDD loop: write a failing test, watch it go red, make it pass, watch it go green. Extremely fast feedback.</p>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════
+         3. JEST
+    ══════════════════════════════ -->
+    <h2 id="jest">3. Jest (For Existing Projects)</h2>
+
+    <p>
+      Jest is the incumbent. Millions of projects use it. If you're joining a team with an existing test suite, odds are
+      good it's running on Jest. You don't need to immediately migrate.
+    </p>
+
+    <h3>Setup with TypeScript</h3>
+
+    <div class="terminal">
+      <div class="terminal-header">
+        <span class="term-dot term-dot-red"></span>
+        <span class="term-dot term-dot-yellow"></span>
+        <span class="term-dot term-dot-green"></span>
+        <span class="terminal-title">terminal</span>
+      </div>
+      <pre><span class="cmd">pnpm add -D jest @types/jest ts-jest</span>
+<span class="dim"># ts-jest: TypeScript preprocessor for Jest</span></pre>
+    </div>
+
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-lang">typescript</span>
+        <span class="code-filename">jest.config.ts</span>
+      </div>
+      <pre><code class="language-typescript">import type { Config } from 'jest'
+
+const config: Config = {
+  preset: 'ts-jest',
+  testEnvironment: 'node',
+  // ts-jest: pass TypeScript options from your tsconfig
+  transform: {
+    '^.+\\.tsx?$': ['ts-jest', {
+      tsconfig: './tsconfig.json',
+    }],
+  },
+  // Map module aliases if you use them in tsconfig paths
+  moduleNameMapper: {
+    '^@/(.*)$': '<rootDir>/src/$1',
+  },
+}
+
+export default config
+</code></pre>
+    </div>
+
+    <h3>Key Differences from Vitest</h3>
+
+    <div class="compare-table-wrap">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>Feature</th>
+            <th>Jest</th>
+            <th>Vitest</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>TypeScript support</td>
+            <td>via <code>ts-jest</code> or Babel</td>
+            <td>Native, zero config</td>
+          </tr>
+          <tr>
+            <td>ESM support</td>
+            <td>Experimental, finicky</td>
+            <td>First-class</td>
+          </tr>
+          <tr>
+            <td>Startup speed</td>
+            <td>Slower (CommonJS transform)</td>
+            <td>Faster (Vite pipeline)</td>
+          </tr>
+          <tr>
+            <td>Mock API</td>
+            <td><code>jest.fn()</code>, <code>jest.spyOn()</code></td>
+            <td><code>vi.fn()</code>, <code>vi.spyOn()</code></td>
+          </tr>
+          <tr>
+            <td>Type testing</td>
+            <td>via <code>tsd</code> package</td>
+            <td>Built-in <code>expectTypeOf</code></td>
+          </tr>
+          <tr>
+            <td>Config format</td>
+            <td><code>jest.config.ts</code></td>
+            <td><code>vitest.config.ts</code></td>
+          </tr>
+          <tr>
+            <td>Ecosystem age</td>
+            <td>Mature (2014)</td>
+            <td>Growing (2021)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Migrating from Jest to Vitest</h3>
+
+    <p>The migration is usually mechanical. Vitest intentionally clones the Jest API:</p>
+
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-lang">bash</span>
+        <span class="code-filename">migration steps</span>
+      </div>
+      <pre><code class="language-bash"># 1. Install vitest, remove jest
+pnpm remove jest @types/jest ts-jest babel-jest
+pnpm add -D vitest @vitest/coverage-v8
+
+# 2. Replace jest.config.ts with vitest.config.ts (see above)
+
+# 3. In test files, change imports (if not using globals: true)
+#    jest.fn()     → vi.fn()
+#    jest.spyOn()  → vi.spyOn()
+#    jest.mock()   → vi.mock()
+#    jest.useFakeTimers() → vi.useFakeTimers()
+
+# 4. Run the suite
+pnpm vitest run
+</code></pre>
+    </div>
+
+    <div class="callout callout-info">
+      <span class="callout-icon">&#8505;</span>
+      <div class="callout-body">
+        <p class="callout-title">When to Keep Jest</p>
+        <p>If your project uses <strong>Next.js with the App Router</strong>, the Next.js team ships an official Jest preset.
+        If you have a large team with established Jest tooling (custom reporters, CI integrations), migration risk may
+        outweigh the speed gain. New projects: always Vitest.</p>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════
+         4. MATCHERS DEEP DIVE
+    ══════════════════════════════ -->
+    <h2 id="matchers">4. Matchers Deep Dive</h2>
+
+    <p>
+      Both Vitest and Jest use the same matcher API. These are the methods you chain after <code>expect(value)</code>.
+      Coming from <code>pytest</code>, think of matchers as the right side of your <code>assert value == expected</code>.
+    </p>
+
+    <h3>Equality</h3>
+
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-lang">typescript</span>
+        <span class="code-filename">matchers/equality.test.ts</span>
+      </div>
+      <pre><code class="language-typescript">// toBe — strict equality (Object.is). Use for primitives.
+expect(1 + 1).toBe(2)
+expect('hello').toBe('hello')
+expect(null).toBe(null)
+
+// toEqual — deep structural equality. Use for objects and arrays.
+expect({ a: 1, b: [2, 3] }).toEqual({ a: 1, b: [2, 3] })
+expect([1, 2, 3]).toEqual([1, 2, 3])
+
+// toBe fails for objects (reference equality):
+const obj = { x: 1 }
+expect(obj).toBe(obj)         // ✓ same reference
+expect({ x: 1 }).toBe({ x: 1 }) // ✗ different references!
+expect({ x: 1 }).toEqual({ x: 1 }) // ✓ deep equal
+
+// toMatchObject — partial matching (extra keys allowed)
+const user = { id: 1, name: 'Alice', createdAt: new Date() }
+expect(user).toMatchObject({ id: 1, name: 'Alice' }) // ✓ ignores createdAt
+
+// toStrictEqual — like toEqual but also checks undefined properties and class instances
+expect({ a: 1, b: undefined }).toEqual({ a: 1 })       // ✓ (ignores undefined)
+expect({ a: 1, b: undefined }).toStrictEqual({ a: 1 })  // ✗ (undefined key matters)
+</code></pre>
+    </div>
+
+    <h3>Truthiness &amp; Existence</h3>
+
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-lang">typescript</span>
+        <span class="code-filename">matchers/existence.test.ts</span>
+      </div>
+      <pre><code class="language-typescript">expect(null).toBeNull()
+expect(undefined).toBeUndefined()
+expect('defined').toBeDefined()
+expect(true).toBeTruthy()
+expect(0).toBeFalsy()
+expect('').toBeFalsy()
+
+// Negation with .not
+expect(1).not.toBeNull()
+expect('hello').not.toBeUndefined()
+</code></pre>
+    </div>
+
+    <h3>Numbers &amp; Collections</h3>
+
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-lang">typescript</span>
+        <span class="code-filename">matchers/collections.test.ts</span>
+      </div>
+      <pre><code class="language-typescript">// Numbers
+expect(10).toBeGreaterThan(5)
+expect(5).toBeLessThan(10)
+expect(10).toBeGreaterThanOrEqual(10)
+expect(0.1 + 0.2).toBeCloseTo(0.3, 5) // floating point!
+
+// Arrays and strings
+expect([1, 2, 3]).toContain(2)
+expect([1, 2, 3]).toHaveLength(3)
+expect('hello world').toContain('world')
+expect('hello').toHaveLength(5)
+
+// Object property
+expect({ name: 'Alice' }).toHaveProperty('name')
+expect({ user: { id: 1 } }).toHaveProperty('user.id', 1)
+</code></pre>
+    </div>
+
+    <h3>Errors</h3>
+
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-lang">typescript</span>
+        <span class="code-filename">matchers/errors.test.ts</span>
+      </div>
+      <pre><code class="language-typescript">function riskyOp(): never {
+  throw new Error('Something went wrong')
+}
+
+// toThrow — wrap in arrow function!
+expect(() => riskyOp()).toThrow()
+expect(() => riskyOp()).toThrow('Something went wrong') // message match
+expect(() => riskyOp()).toThrow(Error)                  // type match
+expect(() => riskyOp()).toThrow(/went wrong/i)           // regex match
+
+// Custom error classes
+class ValidationError extends Error {
+  constructor(public field: string, message: string) {
+    super(message)
+    this.name = 'ValidationError'
+  }
+}
+
+function validateAge(age: number) {
+  if (age < 0) throw new ValidationError('age', 'Age must be non-negative')
+}
+
+expect(() => validateAge(-1)).toThrow(ValidationError)
+expect(() => validateAge(-1)).toThrow('Age must be non-negative')
+</code></pre>
+    </div>
+
+    <h3>Async Matchers</h3>
+
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-lang">typescript</span>
+        <span class="code-filename">matchers/async.test.ts</span>
+      </div>
+      <pre><code class="language-typescript">async function fetchUser(id: number): Promise&lt;{ id: number; name: string }&gt; {
+  if (id <= 0) throw new Error('Invalid ID')
+  return { id, name: 'Alice' }
+}
+
+// resolves — unwrap the resolved value
+it('fetches a user', async () => {
+  await expect(fetchUser(1)).resolves.toEqual({ id: 1, name: 'Alice' })
+  await expect(fetchUser(1)).resolves.toMatchObject({ name: 'Alice' })
+})
+
+// rejects — assert rejection
+it('rejects invalid IDs', async () => {
+  await expect(fetchUser(0)).rejects.toThrow('Invalid ID')
+  await expect(fetchUser(-1)).rejects.toThrow(Error)
+})
+</code></pre>
+    </div>
+
+    <!-- ══════════════════════════════
+         5. MOCKING
+    ══════════════════════════════ -->
+    <h2 id="mocking">5. Mocking in TypeScript</h2>
+
+    <p>
+      Mocking replaces real dependencies with controlled fakes. TypeScript makes mocking safer because your mocks must
+      match the type of the thing being mocked.
+    </p>
+
+    <h3>vi.fn() — Mock Functions</h3>
+
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-lang">typescript</span>
+        <span class="code-filename">mocking/fn.test.ts</span>
+      </div>
+      <pre><code class="language-typescript">import { vi, it, expect } from 'vitest'
+
+// Create a typed mock function
+const mockGreet = vi.fn((name: string): string => `Hello, ${name}!`)
+
+it('calls and returns correctly', () => {
+  const result = mockGreet('Alice')
+
+  expect(result).toBe('Hello, Alice!')
+  expect(mockGreet).toHaveBeenCalledOnce()
+  expect(mockGreet).toHaveBeenCalledWith('Alice')
+})
+
+it('can override the implementation', () => {
+  mockGreet.mockReturnValue('Howdy!')
+  expect(mockGreet('Bob')).toBe('Howdy!')
+
+  mockGreet.mockImplementation((name) => `Yo ${name}`)
+  expect(mockGreet('Bob')).toBe('Yo Bob')
+})
+
+it('resets between tests', () => {
+  mockGreet.mockReset() // clear calls and implementation
+  expect(mockGreet).not.toHaveBeenCalled()
+})
+</code></pre>
+    </div>
+
+    <h3>vi.spyOn() — Spy on Existing Methods</h3>
+
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-lang">typescript</span>
+        <span class="code-filename">mocking/spy.test.ts</span>
+      </div>
+      <pre><code class="language-typescript">import { vi, it, expect, afterEach } from 'vitest'
+
+const emailService = {
+  send(to: string, subject: string, body: string): boolean {
+    // Real implementation would call SMTP...
+    return true
+  }
+}
+
+afterEach(() => {
+  vi.restoreAllMocks() // ← critical: restore originals after each test
+})
+
+it('sends a welcome email on signup', () => {
+  const sendSpy = vi.spyOn(emailService, 'send')
+  sendSpy.mockReturnValue(true)
+
+  // Run the code that should send an email
+  signupUser('alice@example.com', emailService)
+
+  expect(sendSpy).toHaveBeenCalledWith(
+    'alice@example.com',
+    'Welcome!',
+    expect.stringContaining('Alice')
+  )
+})
+</code></pre>
+    </div>
+
+    <h3>vi.mock() — Module Mocking</h3>
+
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-lang">typescript</span>
+        <span class="code-filename">mocking/module.test.ts</span>
+      </div>
+      <pre><code class="language-typescript">import { vi, describe, it, expect, beforeEach } from 'vitest'
+
+// Mock an entire module — vi.mock() is hoisted to the top automatically
+vi.mock('./database', () => ({
+  db: {
+    query: vi.fn(),
+    insert: vi.fn(),
+  }
+}))
+
+import { db } from './database'  // now gets the mock
+import { createUser } from './user-service'
+
+describe('createUser', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('inserts a user and returns the result', async () => {
+    const mockUser = { id: '123', name: 'Alice', email: 'alice@example.com' }
+    vi.mocked(db.insert).mockResolvedValue(mockUser)
+
+    const result = await createUser({ name: 'Alice', email: 'alice@example.com' })
+
+    expect(db.insert).toHaveBeenCalledWith(
+      expect.objectContaining({ name: 'Alice' })
+    )
+    expect(result).toEqual(mockUser)
+  })
+})
+</code></pre>
+    </div>
+
+    <h3>Type-Safe Mocks with vi.mocked()</h3>
+
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-lang">typescript</span>
+        <span class="code-filename">mocking/typed.test.ts</span>
+      </div>
+      <pre><code class="language-typescript">import { vi } from 'vitest'
+import axios from 'axios'
+
+vi.mock('axios')
+
+// Without vi.mocked: TypeScript doesn't know axios.get is a mock
+// axios.get.mockResolvedValue(...)  // ← Error: mockResolvedValue doesn't exist on typeof axios.get
+
+// With vi.mocked: TypeScript knows this is a MockInstance, gets full autocomplete
+const mockedGet = vi.mocked(axios.get)
+mockedGet.mockResolvedValue({
+  data: { users: [{ id: 1, name: 'Alice' }] },
+  status: 200,
+})
+</code></pre>
+    </div>
+
+    <h3>Mocking Timers</h3>
+
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-lang">typescript</span>
+        <span class="code-filename">mocking/timers.test.ts</span>
+      </div>
+      <pre><code class="language-typescript">import { vi, it, expect, beforeEach, afterEach } from 'vitest'
+
+function debounce&lt;T extends unknown[]&gt;(fn: (...args: T) => void, delay: number) {
+  let timer: ReturnType&lt;typeof setTimeout&gt;
+  return (...args: T) => {
+    clearTimeout(timer)
+    timer = setTimeout(() => fn(...args), delay)
+  }
+}
+
+beforeEach(() => { vi.useFakeTimers() })
+afterEach(() => { vi.useRealTimers() })
+
+it('debounces the function call', () => {
+  const handler = vi.fn()
+  const debounced = debounce(handler, 300)
+
+  debounced('a')
+  debounced('b')
+  debounced('c')
+
+  // Handler not yet called
+  expect(handler).not.toHaveBeenCalled()
+
+  // Fast-forward time
+  vi.advanceTimersByTime(300)
+
+  expect(handler).toHaveBeenCalledOnce()
+  expect(handler).toHaveBeenCalledWith('c')
+})
+</code></pre>
+    </div>
+
+    <div class="callout callout-warning">
+      <span class="callout-icon">&#9888;</span>
+      <div class="callout-body">
+        <p class="callout-title">When NOT to Mock</p>
+        <p>Mocking has a cost: your mock is only as accurate as your understanding of the real dependency.
+        Over-mocking leads to <strong>tests that pass but code that breaks in production</strong>. Use mocks for:
+        external APIs, email services, payment providers. Avoid mocking your own internal modules — test them directly.</p>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════
+         6. ASYNC TESTING
+    ══════════════════════════════ -->
+    <h2 id="async">6. Testing Async Code</h2>
+
+    <p>
+      Async is everywhere in TypeScript — HTTP calls, database queries, file I/O. Testing it correctly requires
+      understanding how Vitest handles Promises.
+    </p>
+
+    <h3>The Golden Rule: Always Await or Return</h3>
+
+    <div class="test-states">
+      <div class="test-state test-state-red">
+        <div class="test-state-header">&#10007; Incorrect — test always passes</div>
+        <pre>it('fetches data', () => {
+  // WRONG: Promise ignored,
+  // test passes before fetch completes
+  fetchUser(1).then(user => {
+    expect(user.name).toBe('Alice')
+  })
+})</pre>
+      </div>
+      <div class="test-state test-state-green">
+        <div class="test-state-header">&#10003; Correct — awaited</div>
+        <pre>it('fetches data', async () => {
+  // RIGHT: await ensures assertion
+  // runs before test exits
+  const user = await fetchUser(1)
+  expect(user.name).toBe('Alice')
+})</pre>
+      </div>
+    </div>
+
+    <h3>Testing Error Handling</h3>
+
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-lang">typescript</span>
+        <span class="code-filename">async/error-handling.test.ts</span>
+      </div>
+      <pre><code class="language-typescript">import { it, expect } from 'vitest'
+
+async function getUser(id: number) {
+  if (id <= 0) throw new Error(`Invalid user ID: ${id}`)
+  const response = await fetch(`/api/users/${id}`)
+  if (!response.ok) throw new Error(`HTTP error ${response.status}`)
+  return response.json()
+}
+
+// Option 1: rejects matcher (cleanest)
+it('rejects negative IDs', async () => {
+  await expect(getUser(-1)).rejects.toThrow('Invalid user ID: -1')
+})
+
+// Option 2: try/catch (useful for additional assertions)
+it('throws with the correct message', async () => {
+  expect.assertions(2) // ← ensures assertions actually run
+  try {
+    await getUser(0)
+  } catch (error) {
+    expect(error).toBeInstanceOf(Error)
+    expect((error as Error).message).toBe('Invalid user ID: 0')
+  }
+})
+</code></pre>
+    </div>
+
+    <div class="callout callout-tip">
+      <span class="callout-icon">&#10003;</span>
+      <div class="callout-body">
+        <p class="callout-title">expect.assertions(n)</p>
+        <p>When using try/catch in tests, call <code>expect.assertions(n)</code> at the top of the test.
+        This causes the test to fail if the expected number of assertions didn't run — protecting you from a
+        silent pass when the error is never thrown.</p>
+      </div>
+    </div>
+
+    <h3>Timeout Configuration</h3>
+
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-lang">typescript</span>
+        <span class="code-filename">async/timeouts.test.ts</span>
+      </div>
+      <pre><code class="language-typescript">import { it } from 'vitest'
+
+// Default timeout is 5000ms. Override per-test:
+it('slow integration test', async () => {
+  await slowDatabaseMigration()
+}, 30_000) // 30 second timeout
+
+// Or set globally in vitest.config.ts:
+// test: { testTimeout: 10_000 }
+</code></pre>
+    </div>
+
+    <!-- ══════════════════════════════
+         7. INTEGRATION TESTING
+    ══════════════════════════════ -->
+    <h2 id="integration">7. Integration Testing</h2>
+
+    <p>
+      Integration tests verify that multiple parts of your system work together. In TypeScript/Node.js, the most common
+      integration tests cover HTTP APIs and database interactions.
+    </p>
+
+    <h3>Testing HTTP APIs with Hono</h3>
+
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-lang">typescript</span>
+        <span class="code-filename">integration/api.test.ts</span>
+      </div>
+      <pre><code class="language-typescript">import { describe, it, expect } from 'vitest'
+import { Hono } from 'hono'
+import { testClient } from 'hono/testing'
+
+// The actual app (or a test version of it)
+const app = new Hono()
+
+app.get('/users/:id', (c) => {
+  const id = c.req.param('id')
+  return c.json({ id, name: 'Alice' })
+})
+
+app.post('/users', async (c) => {
+  const body = await c.req.json()
+  if (!body.name) return c.json({ error: 'name required' }, 400)
+  return c.json({ id: '123', ...body }, 201)
+})
+
+// Hono's testClient: no network, direct function calls
+const client = testClient(app)
+
+describe('GET /users/:id', () => {
+  it('returns a user', async () => {
+    const res = await client.users[':id'].$get({ param: { id: '1' } })
+    expect(res.status).toBe(200)
+
+    const body = await res.json()
+    expect(body).toMatchObject({ id: '1', name: 'Alice' })
+  })
+})
+
+describe('POST /users', () => {
+  it('creates a user', async () => {
+    const res = await client.users.$post({ json: { name: 'Bob' } })
+    expect(res.status).toBe(201)
+  })
+
+  it('rejects missing name', async () => {
+    const res = await client.users.$post({ json: {} })
+    expect(res.status).toBe(400)
+  })
+})
+</code></pre>
+    </div>
+
+    <h3>Database Integration Tests</h3>
+
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-lang">typescript</span>
+        <span class="code-filename">integration/db.test.ts</span>
+      </div>
+      <pre><code class="language-typescript">import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest'
+import { drizzle } from 'drizzle-orm/node-postgres'
+import { Pool } from 'pg'
+import { users } from '../schema'
+
+// Use a separate test database — never your production DB
+const pool = new Pool({ connectionString: process.env.DATABASE_URL_TEST })
+const db = drizzle(pool)
+
+beforeAll(async () => {
+  // Run migrations on the test database
+  await runMigrations(db)
+})
+
+afterAll(async () => {
+  await pool.end()
+})
+
+beforeEach(async () => {
+  // Reset state: truncate tables before each test for isolation
+  await db.delete(users)
+})
+
+describe('user repository', () => {
+  it('inserts and retrieves a user', async () => {
+    await db.insert(users).values({ name: 'Alice', email: 'alice@example.com' })
+
+    const result = await db.select().from(users)
+    expect(result).toHaveLength(1)
+    expect(result[0]).toMatchObject({ name: 'Alice' })
+  })
+})
+</code></pre>
+    </div>
+
+    <h3>Factory Functions for Test Data</h3>
+
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-lang">typescript</span>
+        <span class="code-filename">test-utils/factories.ts</span>
+      </div>
+      <pre><code class="language-typescript">import type { User, Order, Product } from '../types'
+
+// Factory: sensible defaults, override as needed
+export function createUser(overrides: Partial&lt;User&gt; = {}): User {
+  return {
+    id: crypto.randomUUID(),
+    name: 'Test User',
+    email: `test-${Date.now()}@example.com`,
+    role: 'user',
+    createdAt: new Date(),
+    ...overrides,
+  }
+}
+
+export function createOrder(overrides: Partial&lt;Order&gt; = {}): Order {
+  return {
+    id: crypto.randomUUID(),
+    userId: createUser().id,
+    status: 'pending',
+    total: 0,
+    items: [],
+    ...overrides,
+  }
+}
+
+// Usage in tests:
+// const admin = createUser({ role: 'admin' })
+// const expiredOrder = createOrder({ status: 'expired', total: 99.99 })
+</code></pre>
+    </div>
+
+    <div class="callout callout-info">
+      <span class="callout-icon">&#9432;</span>
+      <div class="callout-body">
+        <p class="callout-title">Test Containers</p>
+        <p>For true integration testing with real databases, use <strong>Testcontainers</strong>
+        (<code>@testcontainers/postgresql</code>). It spins up a real Postgres instance in Docker for your test run,
+        then tears it down. No shared state, no interference between developers or CI runs.</p>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════
+         8. TESTING TYPES
+    ══════════════════════════════ -->
+    <h2 id="type-testing">8. Testing Types Themselves</h2>
+
+    <p>
+      This is unique to TypeScript. Library authors — and increasingly, application developers — need to verify that
+      their types behave correctly. A function might return the right runtime value but infer the wrong type. Type tests
+      catch that.
+    </p>
+
+    <h3>expectTypeOf() — Vitest's Built-in</h3>
+
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-lang">typescript</span>
+        <span class="code-filename">types/inference.test.ts</span>
+      </div>
+      <pre><code class="language-typescript">import { it, expectTypeOf } from 'vitest'
+
+function identity&lt;T&gt;(value: T): T {
+  return value
+}
+
+function getFirstItem&lt;T&gt;(arr: T[]): T | undefined {
+  return arr[0]
+}
+
+it('identity returns the same type', () => {
+  expectTypeOf(identity(42)).toBeNumber()
+  expectTypeOf(identity('hello')).toBeString()
+  expectTypeOf(identity({ x: 1 })).toEqualTypeOf&lt;{ x: number }&gt;()
+})
+
+it('getFirstItem returns T | undefined', () => {
+  expectTypeOf(getFirstItem([1, 2, 3])).toEqualTypeOf&lt;number | undefined&gt;()
+  expectTypeOf(getFirstItem(['a', 'b'])).toEqualTypeOf&lt;string | undefined&gt;()
+})
+
+it('checks function parameter types', () => {
+  expectTypeOf(identity).parameter(0).toBeNumber()
+  // ↑ This will fail because identity&lt;T&gt; is generic — good to know!
+})
+</code></pre>
+    </div>
+
+    <h3>Testing Conditional Types</h3>
+
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-lang">typescript</span>
+        <span class="code-filename">types/conditional.test.ts</span>
+      </div>
+      <pre><code class="language-typescript">import { it, expectTypeOf } from 'vitest'
+
+// A utility type we want to verify
+type NonNullable&lt;T&gt; = T extends null | undefined ? never : T
+type Awaited&lt;T&gt; = T extends Promise&lt;infer U&gt; ? U : T
+
+it('NonNullable strips null and undefined', () => {
+  expectTypeOf&lt;NonNullable&lt;string | null&gt;&gt;().toEqualTypeOf&lt;string&gt;()
+  expectTypeOf&lt;NonNullable&lt;number | undefined&gt;&gt;().toEqualTypeOf&lt;number&gt;()
+})
+
+it('Awaited unwraps Promises', () => {
+  expectTypeOf&lt;Awaited&lt;Promise&lt;string&gt;&gt;&gt;().toEqualTypeOf&lt;string&gt;()
+  expectTypeOf&lt;Awaited&lt;number&gt;&gt;().toEqualTypeOf&lt;number&gt;() // non-promise passthrough
+})
+</code></pre>
+    </div>
+
+    <h3>@ts-expect-error Directive</h3>
+
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-lang">typescript</span>
+        <span class="code-filename">types/expect-error.test.ts</span>
+      </div>
+      <pre><code class="language-typescript">// @ts-expect-error tells TypeScript: "the NEXT line MUST be a type error"
+// If the next line is NOT an error, TypeScript itself fails.
+// This is how you verify that invalid code is correctly rejected.
+
+function add(a: number, b: number): number {
+  return a + b
+}
+
+// Verify the type system rejects wrong inputs:
+// @ts-expect-error — string argument to number parameter
+add('hello', 2)
+
+// @ts-expect-error — missing argument
+add(1)
+
+// @ts-expect-error — too many arguments
+add(1, 2, 3)
+
+// If you change add's signature to accept strings, the @ts-expect-error
+// becomes an error itself — alerting you that your types loosened unexpectedly.
+</code></pre>
+    </div>
+
+    <div class="callout callout-best">
+      <span class="callout-icon">&#9733;</span>
+      <div class="callout-body">
+        <p class="callout-title">Best Practice: Library Authors</p>
+        <p>If you publish a TypeScript library, type tests are as important as runtime tests.
+        A type regression — where your library suddenly infers <code>any</code> instead of a specific type —
+        can silently break consumer code without any runtime error. The <code>tsd</code> package is an alternative
+        to <code>expectTypeOf</code> that runs type checks as a separate compilation step.</p>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════
+         9. COVERAGE
+    ══════════════════════════════ -->
+    <h2 id="coverage">9. Code Coverage</h2>
+
+    <p>
+      Coverage measures which lines, branches, and functions your tests exercise. It's a useful signal, not a target.
+      A codebase with 100% coverage can still have terrible tests.
+    </p>
+
+    <h3>Setup</h3>
+
+    <div class="terminal">
+      <div class="terminal-header">
+        <span class="term-dot term-dot-red"></span>
+        <span class="term-dot term-dot-yellow"></span>
+        <span class="term-dot term-dot-green"></span>
+        <span class="terminal-title">terminal</span>
+      </div>
+      <pre><span class="cmd">pnpm add -D @vitest/coverage-v8</span>
+<span class="dim"># Then run:</span>
+<span class="cmd">pnpm vitest run --coverage</span></pre>
+    </div>
+
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-lang">typescript</span>
+        <span class="code-filename">vitest.config.ts (coverage section)</span>
+      </div>
+      <pre><code class="language-typescript">export default defineConfig({
+  test: {
+    coverage: {
+      provider: 'v8',            // or 'istanbul'
+      reporter: ['text', 'html', 'lcov'],
+      include: ['src/**/*.ts'],  // only measure source files
+      exclude: [                 // skip test files, generated code, types
+        'src/**/*.test.ts',
+        'src/**/*.d.ts',
+        'src/generated/**',
+      ],
+      thresholds: {
+        lines: 80,
+        functions: 80,
+        branches: 70,
+        statements: 80,
+      },
+    },
+  },
+})
+</code></pre>
+    </div>
+
+    <div class="terminal">
+      <div class="terminal-header">
+        <span class="term-dot term-dot-red"></span>
+        <span class="term-dot term-dot-yellow"></span>
+        <span class="term-dot term-dot-green"></span>
+        <span class="terminal-title">coverage report output</span>
+      </div>
+      <pre><span class="bold"> Coverage report from v8</span>
+<span class="dim">--------|---------|----------|---------|---------|</span>
+<span class="dim">File    | % Stmts | % Branch | % Funcs | % Lines |</span>
+<span class="dim">--------|---------|----------|---------|---------|</span>
+<span class="pass"> math.ts|   100.0 |    100.0 |   100.0 |   100.0 |</span>
+<span class="skip"> user.ts|    78.5 |     60.0 |    80.0 |    78.5 |</span>
+<span class="fail"> db.ts  |    42.0 |     30.0 |    50.0 |    42.0 |</span>
+<span class="dim">--------|---------|----------|---------|---------|</span>
+<span class="bold"> All    |    73.5 |     63.3 |    76.7 |    73.5 |</span></pre>
+    </div>
+
+    <div class="callout callout-warning">
+      <span class="callout-icon">&#9888;</span>
+      <div class="callout-body">
+        <p class="callout-title">100% Coverage Theater</p>
+        <p>You can achieve 100% coverage with tests that make no assertions. Coverage tells you which code was
+        <em>executed</em>, not whether it was <em>tested correctly</em>. Aim for meaningful coverage of critical paths.
+        A thoughtful 75% is better than a hollow 100%. Don't let coverage thresholds drive you to write useless tests.</p>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════
+         10. BEST PRACTICES
+    ══════════════════════════════ -->
+    <h2 id="best-practices">10. Testing Best Practices</h2>
+
+    <h3>Arrange-Act-Assert (AAA)</h3>
+
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-lang">typescript</span>
+        <span class="code-filename">patterns/aaa.test.ts</span>
+      </div>
+      <pre><code class="language-typescript">it('calculates order total with discount', () => {
+  // ARRANGE — set up the world
+  const items = [
+    { price: 10.00, quantity: 2 },
+    { price: 5.00,  quantity: 1 },
+  ]
+  const discountPercent = 10
+
+  // ACT — do the thing
+  const total = calculateOrderTotal(items, discountPercent)
+
+  // ASSERT — verify the result
+  expect(total).toBeCloseTo(22.50) // (25.00 - 10%)
+})
+</code></pre>
+    </div>
+
+    <h3>Test Naming Conventions</h3>
+
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-lang">typescript</span>
+        <span class="code-filename">patterns/naming.test.ts</span>
+      </div>
+      <pre><code class="language-typescript">// Pattern: "it [verb]s [what] when [condition]"
+it('returns null when user is not found')
+it('throws ValidationError when email is invalid')
+it('sends a welcome email when user registers')
+it('calculates total including tax')
+
+// Good describe grouping:
+describe('UserService', () => {
+  describe('createUser', () => {
+    it('inserts the user into the database', ...)
+    it('hashes the password before storing', ...)
+    it('throws DuplicateEmailError when email exists', ...)
+  })
+  describe('deleteUser', () => {
+    it('marks the user as deleted', ...)
+    it('throws NotFoundError when user does not exist', ...)
+  })
+})
+</code></pre>
+    </div>
+
+    <h3>The TDD Red-Green-Refactor Cycle</h3>
+
+    <div class="test-states">
+      <div class="test-state test-state-red">
+        <div class="test-state-header">1. Red — Write a failing test</div>
+        <pre>it('validates email format', () => {
+  expect(isValidEmail('notanemail'))
+    .toBe(false)
+  expect(isValidEmail('a@b.com'))
+    .toBe(true)
+})
+
+// isValidEmail doesn't exist yet
+// → Test fails: Cannot find name</pre>
+      </div>
+      <div class="test-state test-state-green">
+        <div class="test-state-header">2. Green — Make it pass (minimal)</div>
+        <pre>export function isValidEmail(
+  email: string
+): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    .test(email)
+}
+
+// Run vitest — test passes
+// 3. Refactor: improve implementation
+//    without breaking the test</pre>
+      </div>
+    </div>
+
+    <h3>What NOT to Test</h3>
+
+    <ul>
+      <li><strong>TypeScript types:</strong> Don't test that a <code>string</code> variable holds a string — the compiler ensures it.</li>
+      <li><strong>Third-party library internals:</strong> Trust that <code>axios</code> sends HTTP requests correctly.</li>
+      <li><strong>Simple getters:</strong> A one-line property accessor usually doesn't need its own test.</li>
+      <li><strong>Implementation details:</strong> Test the <em>contract</em>, not that a specific private method was called.</li>
+      <li><strong>Trivial code:</strong> <code>return value * 2</code> is fine to leave uncovered.</li>
+    </ul>
+
+    <div class="callout callout-best">
+      <span class="callout-icon">&#9733;</span>
+      <div class="callout-body">
+        <p class="callout-title">Best Practice: Test Isolation</p>
+        <p>Each test must pass or fail independently of every other test. Never rely on execution order.
+        Use <code>beforeEach</code> to reset state. Avoid global mutable variables in test files.
+        If tests pass individually but fail when run together, you have a shared-state bug.</p>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════
+         11. PYTEST COMPARISON
+    ══════════════════════════════ -->
+    <h2 id="pytest-comparison">11. Python pytest &#8594; Vitest Comparison</h2>
+
+    <p>
+      If you've been writing <code>pytest</code> tests for years, here's everything you already know mapped to Vitest.
+      The concepts are identical — only the syntax changes.
+    </p>
+
+    <div class="compare-table-wrap">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>Concept</th>
+            <th class="py-col">pytest (Python)</th>
+            <th class="ts-col">Vitest (TypeScript)</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Test file naming</td>
+            <td><code>test_math.py</code></td>
+            <td><code>math.test.ts</code></td>
+            <td>Convention: colocate or use <code>__tests__/</code></td>
+          </tr>
+          <tr>
+            <td>Test function</td>
+            <td><code>def test_add(): ...</code></td>
+            <td><code>it('adds numbers', () =&gt; {...})</code></td>
+            <td><code>test()</code> is alias for <code>it()</code></td>
+          </tr>
+          <tr>
+            <td>Test grouping</td>
+            <td><code>class TestMath:</code></td>
+            <td><code>describe('Math', () =&gt; {...})</code></td>
+            <td><code>describe</code> nests freely</td>
+          </tr>
+          <tr>
+            <td>Assertion</td>
+            <td><code>assert result == expected</code></td>
+            <td><code>expect(result).toBe(expected)</code></td>
+            <td>Vitest gives better failure messages</td>
+          </tr>
+          <tr>
+            <td>Deep equality</td>
+            <td><code>assert obj == {'a': 1}</code></td>
+            <td><code>expect(obj).toEqual({a: 1})</code></td>
+            <td>Use <code>toEqual</code>, not <code>toBe</code>, for objects</td>
+          </tr>
+          <tr>
+            <td>Function-scoped fixture</td>
+            <td><code>@pytest.fixture</code></td>
+            <td><code>beforeEach</code> / <code>afterEach</code></td>
+            <td>Run before/after each test in block</td>
+          </tr>
+          <tr>
+            <td>Module-scoped fixture</td>
+            <td><code>@pytest.fixture(scope='module')</code></td>
+            <td><code>beforeAll</code> / <code>afterAll</code></td>
+            <td>Run once per <code>describe</code></td>
+          </tr>
+          <tr>
+            <td>Shared fixtures</td>
+            <td><code>conftest.py</code></td>
+            <td><code>vitest.setup.ts</code></td>
+            <td>Configured via <code>setupFiles</code> in vitest.config</td>
+          </tr>
+          <tr>
+            <td>Parameterized tests</td>
+            <td><code>@pytest.mark.parametrize('a,b', [(1,2)])</code></td>
+            <td><code>it.each([[1,2]])('adds %i+%i', ...)</code></td>
+            <td>Also: <code>test.each</code></td>
+          </tr>
+          <tr>
+            <td>Expected exception</td>
+            <td><code>with pytest.raises(ValueError):</code></td>
+            <td><code>expect(() =&gt; fn()).toThrow()</code></td>
+            <td>Wrap in arrow function!</td>
+          </tr>
+          <tr>
+            <td>Skip a test</td>
+            <td><code>@pytest.mark.skip</code></td>
+            <td><code>it.skip('name', ...)</code></td>
+            <td>Or prefix with <code>x</code>: <code>xit()</code></td>
+          </tr>
+          <tr>
+            <td>Run only this test</td>
+            <td><code>pytest -k "test_name"</code></td>
+            <td><code>it.only('name', ...)</code></td>
+            <td>Or: <code>vitest -t "test name"</code></td>
+          </tr>
+          <tr>
+            <td>Mock a function</td>
+            <td><code>mocker.patch('module.fn')</code></td>
+            <td><code>vi.fn()</code> / <code>vi.spyOn()</code></td>
+            <td>Vitest: explicit, type-safe</td>
+          </tr>
+          <tr>
+            <td>Mock a module</td>
+            <td><code>mocker.patch('module')</code></td>
+            <td><code>vi.mock('./module')</code></td>
+            <td>Hoisted automatically by Vitest</td>
+          </tr>
+          <tr>
+            <td>Fake time</td>
+            <td><code>freezegun</code> library</td>
+            <td><code>vi.useFakeTimers()</code></td>
+            <td>Built-in, no extra dependency</td>
+          </tr>
+          <tr>
+            <td>Async test</td>
+            <td><code>@pytest.mark.asyncio</code></td>
+            <td><code>it('name', async () =&gt; {...})</code></td>
+            <td>Vitest handles async natively</td>
+          </tr>
+          <tr>
+            <td>Coverage</td>
+            <td><code>pytest --cov</code></td>
+            <td><code>vitest run --coverage</code></td>
+            <td>Uses V8 or Istanbul</td>
+          </tr>
+          <tr>
+            <td>Watch mode</td>
+            <td><code>pytest-watch</code> (plugin)</td>
+            <td><code>vitest</code> (default mode)</td>
+            <td>Watch is the default, not <code>--watch</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>it.each — pytest.mark.parametrize Equivalent</h3>
+
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-lang">typescript</span>
+        <span class="code-filename">patterns/parametrize.test.ts</span>
+      </div>
+      <pre><code class="language-typescript">import { it, expect, describe } from 'vitest'
+import { add } from './math'
+
+// Array of [a, b, expected] tuples — identical mental model to pytest.mark.parametrize
+describe('add', () => {
+  it.each([
+    [1,  2,  3],
+    [0,  0,  0],
+    [-1, 1,  0],
+    [-5, -3, -8],
+  ])('add(%i, %i) === %i', (a, b, expected) => {
+    expect(add(a, b)).toBe(expected)
+  })
+})
+
+// Object form (more readable for many parameters):
+it.each([
+  { input: 'hello world', expected: 'HELLO WORLD' },
+  { input: '',            expected: '' },
+  { input: 'abc',         expected: 'ABC' },
+])('toUpperCase($input) === $expected', ({ input, expected }) => {
+  expect(input.toUpperCase()).toBe(expected)
+})
+</code></pre>
+    </div>
+
+    <div class="callout callout-python">
+      <span class="callout-icon">&#127822;</span>
+      <div class="callout-body">
+        <p class="callout-title">The Biggest Mental Shift</p>
+        <p>In <code>pytest</code>, fixtures are injected by name as function parameters — a form of dependency injection built into the framework.
+        In Vitest, you handle setup in <code>beforeEach</code> and share values through closure variables.
+        It's less magical but equally powerful. Once you internalize the closure pattern, you'll find the Vitest approach
+        actually easier to trace and debug.</p>
+      </div>
+    </div>
+
+    <h3>conftest.py → vitest.setup.ts</h3>
+
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-lang">typescript</span>
+        <span class="code-filename">vitest.setup.ts</span>
+      </div>
+      <pre><code class="language-typescript">import { beforeAll, afterAll, beforeEach, vi } from 'vitest'
+import { db } from './src/database'
+
+// Global setup — runs before ALL tests (like conftest.py at the root)
+beforeAll(async () => {
+  await db.connect()
+})
+
+afterAll(async () => {
+  await db.disconnect()
+})
+
+// Reset fetch mocks between every test
+beforeEach(() => {
+  vi.restoreAllMocks()
+})
+
+// Extend expect with custom matchers
+import { expect } from 'vitest'
+
+expect.extend({
+  toBeWithinRange(received: number, floor: number, ceiling: number) {
+    const pass = received >= floor && received <= ceiling
+    return {
+      pass,
+      message: () =>
+        `expected ${received} to be within range [${floor}, ${ceiling}]`,
+    }
+  },
+})
+</code></pre>
+    </div>
+
+    <hr class="section-divider" />
+
+    <div class="callout callout-ai">
+      <span class="callout-icon">&#9889;</span>
+      <div class="callout-body">
+        <p class="callout-title">AI Era: LLMs and Test Generation</p>
+        <p>AI assistants are remarkably good at generating test boilerplate from function signatures. Feed Claude or
+        GitHub Copilot a function and ask for tests — you'll get a solid starting point in seconds.
+        But read every generated test carefully: LLMs hallucinate edge cases, sometimes write assertions that
+        always pass, and rarely generate good integration tests. Use AI to skip the boring parts, then apply
+        your judgment on what actually matters to test.</p>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     FOOTER
+════════════════════════════════════════════ -->
+<footer class="chapter-footer">
+  <div class="chapter-footer-inner">
+    <a href="chapter-09-build-tools.html" class="footer-nav-link">
+      <span class="footer-nav-label">&#8592; Previous</span>
+      <span class="footer-nav-title">Chapter 9: Build Tools</span>
+    </a>
+    <div class="footer-center">
+      <div style="font-weight:700;color:var(--indigo-600);margin-bottom:0.2rem;">TypeScript for the AI Era</div>
+      <div>Chapter 10 of 24 &mdash; Testing TypeScript Applications</div>
+    </div>
+    <a href="chapter-11-node-bun.html" class="footer-nav-link" style="text-align:right">
+      <span class="footer-nav-label">Next &#8594;</span>
+      <span class="footer-nav-title">Chapter 11: Node &amp; Bun</span>
+    </a>
+  </div>
+</footer>
+
+<script>
+  // Highlight all code blocks
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('pre code').forEach((block) => {
+      hljs.highlightElement(block)
+    })
+
+    // Active TOC link tracking
+    const headings = document.querySelectorAll('h2[id]')
+    const tocLinks = document.querySelectorAll('.toc-list a')
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            tocLinks.forEach((link) => link.classList.remove('active'))
+            const active = document.querySelector(`.toc-list a[href="#${entry.target.id}"]`)
+            if (active) active.classList.add('active')
+          }
+        })
+      },
+      { rootMargin: '-20% 0px -70% 0px' }
+    )
+
+    headings.forEach((h) => observer.observe(h))
+  })
+</script>
+
+</body>
+</html>

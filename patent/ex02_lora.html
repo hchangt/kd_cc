@@ -1,0 +1,1787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Case Study: LoRA — Low-Rank Adaptation and the Business of Fine-Tuning Patents. Complete patent claim drafting, §101 analysis, prior art, and monetization strategy for parameter-efficient fine-tuning." />
+  <title>Case Study 2: LoRA Fine-Tuning Patents — Patent Law for Technologists</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .math-block {
+      background: var(--navy-dark);
+      color: #e8f4f8;
+      font-family: var(--font-mono);
+      font-size: .9375rem;
+      padding: 1.5rem 2rem;
+      border-radius: var(--radius);
+      margin: 1.5rem 0;
+      line-height: 2;
+      overflow-x: auto;
+    }
+    .math-block .math-label {
+      color: var(--gold-light);
+      font-weight: 700;
+      font-size: .75rem;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      display: block;
+      margin-bottom: .75rem;
+      border-bottom: 1px solid rgba(255,255,255,.12);
+      padding-bottom: .5rem;
+    }
+    .math-inline {
+      font-family: var(--font-mono);
+      background: var(--gray-100);
+      border: 1px solid var(--gray-200);
+      padding: .15rem .45rem;
+      border-radius: 4px;
+      font-size: .875em;
+      color: var(--navy-dark);
+      white-space: nowrap;
+    }
+    .lora-variant-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+    .lora-variant-card {
+      background: var(--white);
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      border-top: 4px solid var(--navy);
+      box-shadow: var(--shadow-sm);
+      transition: box-shadow .2s, transform .2s;
+    }
+    .lora-variant-card:hover {
+      box-shadow: var(--shadow);
+      transform: translateY(-2px);
+    }
+    .lora-variant-card.qlora { border-top-color: #e67e22; }
+    .lora-variant-card.adalora { border-top-color: var(--success); }
+    .lora-variant-card.dora { border-top-color: #8e44ad; }
+    .lora-variant-card.loftq { border-top-color: #2980b9; }
+    .lora-variant-card.loraplus { border-top-color: #c0392b; }
+    .lora-variant-card.galora { border-top-color: #16a085; }
+    .lora-variant-card h4 { margin-top: 0; font-size: .9375rem; margin-bottom: .375rem; }
+    .lora-variant-card .variant-year {
+      font-size: .7rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .08em; color: var(--gray-500); margin-bottom: .5rem;
+    }
+    .lora-variant-card p { margin-bottom: 0; font-size: .875rem; color: var(--text-light); }
+    .param-reduction {
+      display: inline-block;
+      background: var(--navy);
+      color: var(--gold-light);
+      font-weight: 700;
+      font-size: .75rem;
+      padding: .2rem .6rem;
+      border-radius: 12px;
+      margin-top: .5rem;
+    }
+    .prior-art-table th:first-child { width: 22%; }
+    .prior-art-table th:nth-child(2) { width: 18%; }
+    .claim-distinction { color: var(--success); font-weight: 600; }
+    .alice-step {
+      background: var(--gray-50);
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .alice-step-header {
+      display: flex;
+      align-items: center;
+      gap: .875rem;
+      margin-bottom: 1rem;
+    }
+    .alice-step-num {
+      background: var(--navy);
+      color: white;
+      font-weight: 700;
+      font-size: .875rem;
+      padding: .4rem .875rem;
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+    .alice-step-num.sub { background: var(--navy-light); font-size: .8rem; }
+    .alice-step-title { font-weight: 700; color: var(--navy); font-size: 1rem; }
+    .alice-outcome {
+      display: inline-flex; align-items: center; gap: .375rem;
+      font-size: .8125rem; font-weight: 700; padding: .3rem .75rem;
+      border-radius: 20px; margin-top: .75rem;
+    }
+    .alice-outcome.eligible { background: #d4efdf; color: var(--success); }
+    .alice-outcome.concern  { background: #fdebd0; color: #e67e22; }
+    .alice-outcome.ineligible { background: #fdedec; color: var(--danger); }
+    .monetization-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.25rem;
+      margin: 2rem 0;
+    }
+    .monetization-card {
+      background: var(--gray-50);
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius-lg);
+      padding: 1.375rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .monetization-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--navy), var(--gold));
+    }
+    .monetization-card h4 { margin-top: 0; font-size: .9375rem; color: var(--navy); }
+    .monetization-card p { margin-bottom: 0; font-size: .875rem; color: var(--text-light); }
+    .royalty-range {
+      font-size: 1.375rem;
+      font-weight: 800;
+      color: var(--navy);
+      display: block;
+      margin-bottom: .25rem;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════
+     TOP NAVIGATION
+══════════════════════════════════════════════════ -->
+<nav class="top-nav">
+  <div class="nav-container">
+    <a href="index.html" class="nav-logo">Patent Law <span>for Technologists</span></a>
+    <div class="nav-links">
+      <a href="ex01_transformer.html">Ex.1</a>
+      <a href="ex02_lora.html" class="active">Ex.2</a>
+      <a href="ex03_crispr.html">Ex.3</a>
+      <a href="ex04_gpt.html">Ex.4</a>
+      <a href="ex05_alphafold.html">Ex.5</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════════════════
+     CHAPTER HERO
+══════════════════════════════════════════════════ -->
+<header class="chapter-hero">
+  <div class="chapter-hero-content">
+    <div class="chapter-badge">Case Study 2</div>
+    <h1>LoRA: Low-Rank Adaptation and the Business of Fine-Tuning Patents</h1>
+    <p class="subtitle">
+      How an elegant mathematical insight — decomposing weight updates into low-rank matrices — became
+      one of the most commercially significant AI techniques of the 2020s, and what its patent strategy
+      reveals about protecting efficiency innovations in machine learning.
+    </p>
+    <div class="chapter-meta">
+      <span>Dr. Wei Chen &bull; Morrison &amp; Foerster, Silicon Valley</span>
+      <span>Patent Law for Technologists, First Edition</span>
+      <span>~6,800 words</span>
+      <span>12 Sections</span>
+    </div>
+  </div>
+</header>
+
+<!-- ══════════════════════════════════════════════════
+     STATS ROW
+══════════════════════════════════════════════════ -->
+<div style="background:var(--gray-50); border-bottom:1px solid var(--gray-200); padding:1.5rem 2rem;">
+  <div class="stats-row" style="max-width:900px; margin:0 auto;">
+    <div class="stat-item">
+      <div class="stat-number">10,000&times;</div>
+      <div class="stat-label">Reduction in trainable parameters vs. full fine-tuning (GPT-3 scale)</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">Oct 2021</div>
+      <div class="stat-label">LoRA arXiv preprint posted by Hu et al. (Microsoft)</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">r = 1–64</div>
+      <div class="stat-label">Typical rank values used; r=4 or r=8 dominate practical use</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">50K+</div>
+      <div class="stat-label">GitHub stars for the open-source LoRA implementation (2024)</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">6+</div>
+      <div class="stat-label">Major derivative innovations (QLoRA, AdaLoRA, DoRA, LoftQ, LoRA+, GaLore)</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     PAGE LAYOUT
+══════════════════════════════════════════════════ -->
+<div class="page-layout" style="max-width:1200px; margin:0 auto; padding:0 2rem; display:grid; grid-template-columns:260px 1fr; gap:3rem; align-items:start;">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <nav class="toc">
+      <h3>Sections</h3>
+      <ol>
+        <li><a href="#intro">The Fine-Tuning Revolution</a></li>
+        <li><a href="#math">The Mathematical Core</a></li>
+        <li><a href="#portfolio">Microsoft's Patent Portfolio</a></li>
+        <li><a href="#claims">Drafting the Core Claims</a></li>
+        <li><a href="#sec101">§101 Analysis for LoRA</a></li>
+        <li><a href="#prior-art">Prior Art Analysis</a></li>
+        <li><a href="#derivatives">Derivative Innovation Landscape</a></li>
+        <li><a href="#publication">Publication vs. Patent</a></li>
+        <li><a href="#monetization">Monetization Strategy</a></li>
+        <li><a href="#lessons">Lessons for Researchers</a></li>
+        <li><a href="#alt-claims">Alternative Claim Strategies</a></li>
+        <li><a href="#takeaways">Key Takeaways</a></li>
+      </ol>
+    </nav>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="chapter-content">
+
+    <!-- ─── SECTION 1: INTRODUCTION ─────────────────── -->
+    <section id="intro" class="section-anchor">
+      <h2>1. The Fine-Tuning Revolution</h2>
+
+      <p>
+        In October 2021, Edward Hu, Yelong Shen, Phillip Wallis, Zeyuan Allen-Zhu, Yuanzhi Li,
+        Shean Wang, Lu Wang, and Weizhu Chen — all researchers at Microsoft — posted a preprint to
+        arXiv with the understated title <em>"LoRA: Low-Rank Adaptation of Large Language Models."</em>
+        Within two years, the technique had become the dominant method for adapting foundation models
+        to specific tasks, spawned an entire ecosystem of derivative methods, and quietly raised one of
+        the most commercially interesting patent questions in modern AI: <strong>when a mathematical
+        technique is genuinely novel and non-obvious, who owns the right to commercialize it?</strong>
+      </p>
+
+      <h3>The Problem LoRA Solves</h3>
+
+      <p>
+        To understand why LoRA is patentable, you first need to understand the problem it solves.
+        Large language models like GPT-3 (175 billion parameters) or LLaMA-2 (70 billion parameters)
+        are extraordinarily powerful, but they are trained on general internet text. Deploying them for
+        a specific task — medical question answering, legal document summarization, code generation for
+        a proprietary API — requires <span class="key-term" title="Continuing training on task-specific data">fine-tuning</span>:
+        additional training on domain-specific data.
+      </p>
+
+      <p>
+        Traditional fine-tuning updates <em>all</em> the model's weight matrices during training.
+        For a 175B-parameter model, this requires storing gradients and optimizer states for every
+        parameter — often requiring 80+ GB of GPU VRAM just to hold the model, plus the same again
+        for training state. At 2021 cloud GPU prices, fine-tuning GPT-3 for a single downstream task
+        cost on the order of tens of thousands of dollars and required hardware unavailable to most
+        organizations. Entire research programs were foreclosed by compute costs.
+      </p>
+
+      <div class="callout callout-info">
+        <div class="callout-icon">&#128161;</div>
+        <div class="callout-body">
+          <div class="callout-title">The Compute Asymmetry Problem</div>
+          <p>
+            In 2021, a single full fine-tuning run of GPT-3 175B required approximately 1,024 A100 GPUs
+            for several days — a compute budget inaccessible to all but a handful of organizations globally.
+            LoRA reduced the trainable parameter count from 175B to as few as 4.7M (a 37,000x reduction),
+            enabling fine-tuning on a single A100 in hours. This is the <em>practical technical improvement</em>
+            that anchors LoRA's §101 eligibility argument.
+          </p>
+        </div>
+      </div>
+
+      <h3>LoRA's Elegant Solution</h3>
+
+      <p>
+        LoRA's key insight is deceptively simple: <strong>weight updates are low-rank.</strong>
+        Rather than learning a full <span class="math-inline">d &times; d</span> weight update matrix
+        &#916;W during fine-tuning, LoRA constrains the update to a product of two low-rank matrices:
+        <span class="math-inline">&#916;W = BA</span>, where
+        <span class="math-inline">B &isin; &#8477;<sup>d&times;r</sup></span> and
+        <span class="math-inline">A &isin; &#8477;<sup>r&times;d</sup></span>, with
+        <span class="math-inline">r &#8810; d</span>.
+        During training, the pre-trained weights W&#8320; are <em>frozen</em> — only B and A are updated.
+        During inference, the weight update is merged back: <span class="math-inline">W = W&#8320; + BA</span>,
+        adding no latency.
+      </p>
+
+      <p>
+        This approach is patentable for three independent reasons that patent practitioners should
+        internalize as a pattern for AI invention analysis:
+      </p>
+
+      <ol>
+        <li>
+          <strong>Specificity:</strong> The claim is not "use smaller matrices" but a precise
+          algebraic decomposition applied to a defined category of neural network weight matrices
+          (attention layers and/or feed-forward networks in transformer models).
+        </li>
+        <li>
+          <strong>Technical improvement:</strong> The method produces a concrete, quantifiable
+          reduction in computational resources — a classic category of patent-eligible subject
+          matter under <em>Enfish, LLC v. Microsoft Corp.</em> (Fed. Cir. 2016).
+        </li>
+        <li>
+          <strong>Non-obviousness:</strong> Despite matrix factorization being a classical technique,
+          applying low-rank decomposition specifically to <em>weight update matrices</em> in
+          fine-tuning — rather than to the weights themselves, as prior work had done — required
+          an inventive leap. As we will show, the prior art teaches away from this specific application.
+        </li>
+      </ol>
+    </section>
+
+    <!-- ─── SECTION 2: MATHEMATICAL CORE ─────────────── -->
+    <section id="math" class="section-anchor">
+      <h2>2. The Mathematical Core</h2>
+
+      <p>
+        A rigorous patent claim requires a rigorous understanding of the invention. Let us develop the
+        mathematics before turning to claim drafting.
+      </p>
+
+      <h3>Full Fine-Tuning: The Baseline</h3>
+
+      <p>
+        In a standard transformer model, a weight matrix W&#8320; is pre-trained. During full fine-tuning,
+        we learn an update &#916;W such that the fine-tuned weight is:
+      </p>
+
+      <div class="math-block">
+        <span class="math-label">Full Fine-Tuning (Baseline)</span>
+        W<sub>fine-tuned</sub> = W&#8320; + &#916;W<br>
+        where &#916;W &#8712; &#8477;<sup>d&times;d</sup>  (same dimensionality as W&#8320;)<br>
+        Trainable parameters: d&sup2; per weight matrix
+      </div>
+
+      <h3>LoRA's Low-Rank Parameterization</h3>
+
+      <p>
+        LoRA constrains &#916;W to lie in a low-rank subspace by decomposing it as a product of
+        two smaller matrices:
+      </p>
+
+      <div class="math-block">
+        <span class="math-label">LoRA Parameterization (Core Invention)</span>
+        &#916;W = B &middot; A<br>
+        where B &#8712; &#8477;<sup>d&times;r</sup>  (d rows, r columns)<br>
+              A &#8712; &#8477;<sup>r&times;d</sup>  (r rows, d columns)<br>
+              r &#8810; d  (rank r much less than dimension d)<br><br>
+        Trainable parameters: 2&middot;d&middot;r per weight matrix  (vs. d&sup2; for full fine-tuning)<br>
+        Parameter reduction ratio: d / (2r)<br>
+        For d=4096, r=4: ratio = 512&times; reduction
+      </div>
+
+      <h3>The Scaling Factor</h3>
+
+      <p>
+        In practice, LoRA includes a scaling factor
+        <span class="math-inline">&#945;/r</span> to stabilize training across different
+        choices of rank r. The forward pass during training becomes:
+      </p>
+
+      <div class="math-block">
+        <span class="math-label">LoRA Forward Pass (Training)</span>
+        h = W&#8320;x + (&#945;/r) &middot; B &middot; A &middot; x<br><br>
+        where:  x = input activations<br>
+               &#945; = scaling hyperparameter (fixed, not trained)<br>
+               B initialized to zero (so &#916;W = 0 at start of training)<br>
+               A initialized with random Gaussian values
+      </div>
+
+      <p>
+        The initialization strategy — <strong>B to zeros, A randomly</strong> — is a non-obvious
+        detail of considerable patent significance. It ensures that LoRA starts from the pre-trained
+        model's behavior (since &#916;W = BA = 0 initially) and diverges only as training proceeds.
+        This is distinct from adapter methods that add non-zero perturbations at initialization, and
+        it is claimable as a dependent claim element.
+      </p>
+
+      <!-- SVG DIAGRAM: WEIGHT MATRIX DECOMPOSITION -->
+      <div class="figure">
+        <div class="figure-content">
+          <svg class="diagram-svg" viewBox="0 0 680 280" xmlns="http://www.w3.org/2000/svg" aria-label="LoRA weight matrix decomposition diagram">
+            <!-- Title -->
+            <text x="340" y="22" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#1a2744">LoRA Weight Matrix Decomposition: &#916;W = B &middot; A</text>
+
+            <!-- Full ΔW matrix (left) -->
+            <rect x="30" y="45" width="110" height="110" rx="6" fill="#f1f3f5" stroke="#1a2744" stroke-width="2"/>
+            <text x="85" y="88" text-anchor="middle" font-family="Georgia, serif" font-size="17" font-style="italic" fill="#1a2744">&#916;W</text>
+            <text x="85" y="108" text-anchor="middle" font-family="Georgia, serif" font-size="12" fill="#566573">d &#215; d</text>
+            <text x="85" y="125" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#c0392b" font-weight="600">d&#178; params</text>
+            <!-- dimension labels -->
+            <text x="85" y="175" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#6c757d">Full weight update</text>
+            <!-- arrows for dimensions -->
+            <line x1="30" y1="165" x2="140" y2="165" stroke="#ced4da" stroke-width="1" marker-end="url(#arr)"/>
+            <text x="85" y="180" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#6c757d">d</text>
+            <line x1="20" y1="45" x2="20" y2="155" stroke="#ced4da" stroke-width="1" marker-end="url(#arr)"/>
+            <text x="12" y="100" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#6c757d">d</text>
+
+            <!-- EQUALS sign -->
+            <text x="170" y="108" text-anchor="middle" font-family="Georgia, serif" font-size="24" fill="#1a2744">=</text>
+
+            <!-- B matrix (tall, narrow) -->
+            <rect x="195" y="45" width="50" height="110" rx="6" fill="#eaf4fb" stroke="#1a6b8a" stroke-width="2"/>
+            <text x="220" y="93" text-anchor="middle" font-family="Georgia, serif" font-size="17" font-style="italic" fill="#1a6b8a">B</text>
+            <text x="220" y="112" text-anchor="middle" font-family="Georgia, serif" font-size="12" fill="#1a6b8a">d &#215; r</text>
+            <text x="220" y="128" text-anchor="middle" font-family="Inter, sans-serif" font-size="9.5" fill="#1a6b8a" font-weight="600">d&#183;r params</text>
+            <text x="220" y="175" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#6c757d">r &#8810; d</text>
+            <line x1="195" y1="165" x2="245" y2="165" stroke="#ced4da" stroke-width="1"/>
+            <text x="220" y="180" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#1a6b8a" font-weight="600">r</text>
+            <line x1="182" y1="45" x2="182" y2="155" stroke="#ced4da" stroke-width="1"/>
+            <text x="174" y="100" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#6c757d">d</text>
+
+            <!-- MULTIPLY sign -->
+            <text x="268" y="108" text-anchor="middle" font-family="Georgia, serif" font-size="20" fill="#1a2744">&#215;</text>
+
+            <!-- A matrix (short, wide) -->
+            <rect x="285" y="80" width="110" height="50" rx="6" fill="#e8f8f5" stroke="#1e8449" stroke-width="2"/>
+            <text x="340" y="100" text-anchor="middle" font-family="Georgia, serif" font-size="17" font-style="italic" fill="#1e8449">A</text>
+            <text x="340" y="118" text-anchor="middle" font-family="Georgia, serif" font-size="12" fill="#1e8449">r &#215; d</text>
+            <text x="340" y="175" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#1e8449" font-weight="600">r&#183;d params</text>
+            <line x1="285" y1="165" x2="395" y2="165" stroke="#ced4da" stroke-width="1"/>
+            <text x="340" y="180" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#6c757d">d</text>
+            <line x1="275" y1="80" x2="275" y2="130" stroke="#ced4da" stroke-width="1"/>
+            <text x="267" y="108" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#6c757d">r</text>
+
+            <!-- Divider -->
+            <line x1="430" y1="40" x2="430" y2="220" stroke="#dee2e6" stroke-width="1" stroke-dasharray="5,4"/>
+
+            <!-- Parameter savings callout box -->
+            <rect x="450" y="45" width="210" height="185" rx="8" fill="#fff9e6" stroke="#c8942a" stroke-width="1.5"/>
+            <text x="555" y="67" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#c8942a">PARAMETER SAVINGS</text>
+            <line x1="460" y1="73" x2="650" y2="73" stroke="#c8942a" stroke-width="1" opacity="0.4"/>
+
+            <text x="460" y="93" font-family="Inter, sans-serif" font-size="10.5" fill="#1a2744">Full fine-tuning:</text>
+            <text x="640" y="93" text-anchor="end" font-family="Inter, sans-serif" font-size="10.5" font-weight="700" fill="#922b21">d&#178; params</text>
+
+            <text x="460" y="113" font-family="Inter, sans-serif" font-size="10.5" fill="#1a2744">LoRA (rank r):</text>
+            <text x="640" y="113" text-anchor="end" font-family="Inter, sans-serif" font-size="10.5" font-weight="700" fill="#1e8449">2&#183;d&#183;r params</text>
+
+            <line x1="460" y1="120" x2="650" y2="120" stroke="#dee2e6" stroke-width="1"/>
+
+            <text x="460" y="138" font-family="Inter, sans-serif" font-size="10.5" fill="#1a2744">Reduction ratio:</text>
+            <text x="640" y="138" text-anchor="end" font-family="Inter, sans-serif" font-size="12" font-weight="800" fill="#1a2744">d / (2r)</text>
+
+            <text x="460" y="160" font-family="Inter, sans-serif" font-size="10" fill="#566573">Example (d=4096, r=4):</text>
+            <text x="640" y="160" text-anchor="end" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#1a6b8a">512&times; fewer</text>
+
+            <text x="460" y="178" font-family="Inter, sans-serif" font-size="10" fill="#566573">Example (d=12288, r=8):</text>
+            <text x="640" y="178" text-anchor="end" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#1a6b8a">768&times; fewer</text>
+
+            <rect x="460" y="188" width="180" height="28" rx="4" fill="#1a2744"/>
+            <text x="550" y="206" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#e8b84b">Init: B=0, A~&#120246;(0,1)</text>
+
+            <!-- Arrowhead marker -->
+            <defs>
+              <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                <path d="M0,0 L0,6 L8,3 z" fill="#ced4da"/>
+              </marker>
+            </defs>
+          </svg>
+        </div>
+        <p class="figure-caption">
+          Figure 1. LoRA decomposes the weight update &#916;W into a product of two low-rank matrices
+          B (d&times;r) and A (r&times;d), where rank r &#8810; d. Only B and A are trained; W&#8320; is frozen.
+          The initialization scheme (B=0, A random) ensures zero-perturbation at training start.
+        </p>
+      </div>
+
+      <h3>Where LoRA is Applied</h3>
+
+      <p>
+        In the original paper, LoRA is applied to the query (W<sub>q</sub>) and value (W<sub>v</sub>)
+        projection matrices of the transformer's multi-head attention mechanism. This is a specific,
+        claimable implementation choice — not all weight matrices are modified, which further
+        distinguishes LoRA from approaches that modify every parameter. The paper shows that applying
+        LoRA only to attention weights matches the performance of full fine-tuning on most benchmarks,
+        which is itself a non-obvious and claimable finding.
+      </p>
+
+      <div class="callout callout-tip">
+        <div class="callout-icon">&#9998;</div>
+        <div class="callout-body">
+          <div class="callout-title">Practitioner Note: Specific Layer Targeting as a Claim Element</div>
+          <p>
+            The choice to apply low-rank decomposition specifically to attention projection matrices
+            (rather than all matrices) is a patentable design decision. A dependent claim can narrow
+            to "wherein the at least a subset of weight matrices comprises query projection matrices
+            and value projection matrices of multi-head self-attention layers." This adds specificity
+            against §103 rejections while accurately capturing the preferred embodiment.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── SECTION 3: MICROSOFT PORTFOLIO ───────────── -->
+    <section id="portfolio" class="section-anchor">
+      <h2>3. Microsoft's Patent Portfolio Around LoRA</h2>
+
+      <p>
+        Microsoft Research employs all eight of the original LoRA authors. This matters enormously
+        for patent strategy: under 35 U.S.C. §115 and typical employment agreements, Microsoft
+        holds the right to file patent applications claiming the inventors' work-for-hire inventions.
+        The question is not whether Microsoft <em>could</em> patent LoRA — it clearly could —
+        but how aggressively it chose to pursue protection and how it structured the portfolio.
+      </p>
+
+      <h3>Confirmed and Related Patent Activity</h3>
+
+      <p>
+        Microsoft has filed patent applications in the parameter-efficient fine-tuning space under
+        CPC subclass G06N 3/08 (neural network learning) and G06N 3/04 (neural network structure).
+        While the specific prosecution history of any LoRA-derived application is not publicly
+        available in full at time of writing, the structural elements of how a well-advised patent
+        portfolio would be organized around LoRA are instructive:
+      </p>
+
+      <div class="table-wrapper">
+        <table>
+          <caption class="table-caption">Table 1. Illustrative LoRA Patent Portfolio Architecture</caption>
+          <thead>
+            <tr>
+              <th>Application Type</th>
+              <th>Subject Matter</th>
+              <th>Claim Focus</th>
+              <th>Strategic Purpose</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Parent / Original NPA</td>
+              <td>Core LoRA method</td>
+              <td>Method of fine-tuning via low-rank decomposition; system claims; CRM claims</td>
+              <td>Foundational coverage; broadest possible independent claims</td>
+            </tr>
+            <tr>
+              <td>Continuation #1</td>
+              <td>QLoRA: 4-bit quantization + LoRA</td>
+              <td>Method combining quantized pre-trained weights with LoRA adapters</td>
+              <td>Cover the most commercially deployed variant; block competitors</td>
+            </tr>
+            <tr>
+              <td>Continuation #2</td>
+              <td>AdaLoRA: Adaptive rank allocation</td>
+              <td>Method of dynamically adjusting rank r based on parameter importance scoring</td>
+              <td>Cover improvement that addresses LoRA's fixed-rank limitation</td>
+            </tr>
+            <tr>
+              <td>Continuation #3</td>
+              <td>Inference merging</td>
+              <td>Method of merging LoRA adapters into base model weights at deployment time</td>
+              <td>Cover the zero-inference-overhead deployment optimization</td>
+            </tr>
+            <tr>
+              <td>CIP #1</td>
+              <td>Multi-adapter composition</td>
+              <td>System and method for combining multiple LoRA adapters for multi-task inference</td>
+              <td>Cover the growing "adapter marketplace" use case</td>
+            </tr>
+            <tr>
+              <td>Divisional</td>
+              <td>Fine-tuned model product</td>
+              <td>Machine-readable storage medium encoding model weights as low-rank decomposition</td>
+              <td>Create product claims covering the fine-tuned model artifact itself</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Method Claims: Structural Approach</h3>
+
+      <p>
+        The core LoRA method claim would be drafted under the "method" patent claim format,
+        reciting a sequence of steps. Patent counsel drafting these claims face a choice between
+        functional language (broader, higher §101 risk) and structural language (narrower, more
+        likely to issue). The preferred approach for AI methods post-<em>Alice</em> is to anchor
+        functional language to specific computational structures:
+      </p>
+
+      <blockquote>
+        "A method for parameter-efficient adaptation of a pre-trained neural network, comprising:
+        receiving a pre-trained neural network comprising a plurality of weight matrices W&#8320;;
+        for each weight matrix in a selected subset, <strong>initializing a first low-rank matrix B
+        of dimensions d&times;r and a second low-rank matrix A of dimensions r&times;d, wherein r
+        is strictly less than d, wherein B is initialized to zero, and wherein A is initialized
+        from a random distribution</strong>; training the first and second low-rank matrices on
+        task-specific training data while keeping the pre-trained weight matrices frozen..."
+        <cite>— Illustrative core claim language following LoRA's specific technical details</cite>
+      </blockquote>
+
+      <h3>System Claims: The Fine-Tuning Pipeline</h3>
+
+      <p>
+        System claims cover the physical or computational apparatus performing the fine-tuning.
+        For LoRA, a system claim would cover: a processor; memory storing the pre-trained model
+        weights W&#8320;; memory storing the low-rank adapter matrices B and A; and a training
+        engine configured to execute the LoRA forward pass and update only B and A via backpropagation.
+        The system claim is valuable because it captures cloud fine-tuning API implementations
+        directly — Azure OpenAI's fine-tuning service would infringe a properly drafted system
+        claim if it uses LoRA internally.
+      </p>
+
+      <h3>Related Innovation Opportunities</h3>
+
+      <div class="lora-variant-grid">
+        <div class="lora-variant-card qlora">
+          <div class="variant-year">Dettmers et al., 2023</div>
+          <h4>QLoRA</h4>
+          <p>4-bit quantization of frozen weights combined with LoRA adapters. Enables fine-tuning
+          65B models on a single 48GB GPU.</p>
+          <span class="param-reduction">Continuation opportunity</span>
+        </div>
+        <div class="lora-variant-card adalora">
+          <div class="variant-year">Zhang et al., 2023</div>
+          <h4>AdaLoRA</h4>
+          <p>Adaptive rank allocation that distributes parameter budget based on weight importance,
+          using singular value decomposition to prune low-importance rank components.</p>
+          <span class="param-reduction">Continuation opportunity</span>
+        </div>
+        <div class="lora-variant-card dora">
+          <div class="variant-year">Liu et al., 2024</div>
+          <h4>DoRA</h4>
+          <p>Decomposes weights into magnitude and direction components; updates direction via LoRA.
+          Outperforms LoRA on several benchmarks.</p>
+          <span class="param-reduction">Continuation opportunity</span>
+        </div>
+        <div class="lora-variant-card loftq">
+          <div class="variant-year">Li et al., 2023</div>
+          <h4>LoftQ</h4>
+          <p>Simultaneously quantizes the pre-trained weights and initializes LoRA adapters to minimize
+          quantization error from the start.</p>
+          <span class="param-reduction">Continuation opportunity</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── SECTION 4: CLAIM DRAFTING ────────────────── -->
+    <section id="claims" class="section-anchor">
+      <h2>4. Drafting the Core LoRA Claims</h2>
+
+      <p>
+        The following represents a complete illustrative claim set for the core LoRA invention.
+        These claims are drafted to survive §101 (by anchoring mathematics to a specific technical
+        improvement), §102 (by reciting elements absent from the prior art), and §103 (by combining
+        elements that the prior art does not suggest combining).
+      </p>
+
+      <div class="claim-box">
+        <div class="claim-header">Illustrative LoRA Claim Set — 8 Claims</div>
+
+        <p>
+          <span class="claim-number">1.</span> A computer-implemented method for parameter-efficient
+          fine-tuning of a pre-trained neural network, the method comprising:
+          <span class="claim-element">receiving, by one or more processors, a pre-trained neural
+          network having a plurality of pre-trained weight matrices, each pre-trained weight matrix
+          having at least a first dimension d;</span>
+          <span class="claim-element">for each weight matrix of at least a subset of the plurality
+          of weight matrices:</span>
+          <span class="claim-element" style="padding-left:4.5rem; text-indent:-1rem;">allocating a first
+          low-rank matrix B having dimensions d&times;r and a second low-rank matrix A having dimensions
+          r&times;d, wherein rank r is less than dimension d;</span>
+          <span class="claim-element" style="padding-left:4.5rem; text-indent:-1rem;">initializing
+          entries of the first low-rank matrix B to zero; and</span>
+          <span class="claim-element" style="padding-left:4.5rem; text-indent:-1rem;">initializing
+          entries of the second low-rank matrix A by sampling from a random distribution;</span>
+          <span class="claim-element">training, using task-specific training data, only the first and
+          second low-rank matrices while maintaining the pre-trained weight matrices as frozen,
+          non-trainable parameters; and</span>
+          <span class="claim-element">computing, for each input vector x, an adapted output by
+          evaluating W&#8320;x + (&#945;/r)&middot;B&middot;A&middot;x, wherein &#945; is a fixed scaling
+          hyperparameter.</span>
+        </p>
+
+        <p style="margin-top:1.5rem;">
+          <span class="claim-number">2.</span> The method of claim 1, wherein rank r is selected
+          from the group consisting of 1, 2, 4, 8, 16, and 32.
+        </p>
+
+        <p>
+          <span class="claim-number">3.</span> The method of claim 1, wherein the at least a subset
+          of weight matrices comprises at least one of: query projection matrices of multi-head
+          self-attention layers; key projection matrices of multi-head self-attention layers; value
+          projection matrices of multi-head self-attention layers; output projection matrices of
+          multi-head self-attention layers; and weight matrices of feed-forward network layers
+          within the pre-trained neural network.
+        </p>
+
+        <p>
+          <span class="claim-number">4.</span> The method of claim 1, wherein prior to deploying
+          the fine-tuned neural network for inference, the method further comprises merging each
+          pre-trained weight matrix with its corresponding adapted weight by computing W = W&#8320; + BA,
+          thereby eliminating additional inference latency attributable to the first and second
+          low-rank matrices.
+        </p>
+
+        <p>
+          <span class="claim-number">5.</span> A system for parameter-efficient adaptation of a
+          pre-trained neural network, the system comprising:
+          <span class="claim-element">one or more hardware processors;</span>
+          <span class="claim-element">a memory storing: (i) parameters of a pre-trained neural network
+          comprising a plurality of pre-trained weight matrices W&#8320;, wherein the pre-trained weight
+          matrices are frozen and non-trainable; and (ii) for each weight matrix of at least a subset,
+          a first low-rank adapter matrix B of dimensions d&times;r and a second low-rank adapter matrix
+          A of dimensions r&times;d, wherein r is less than d; and</span>
+          <span class="claim-element">a training engine, implemented on the one or more processors,
+          configured to: receive task-specific training data; compute adapted outputs as W&#8320;x +
+          (&#945;/r)&middot;BAx; compute loss values with respect to the task-specific training data;
+          and update parameters of the first and second low-rank adapter matrices via backpropagation
+          while maintaining the pre-trained weight matrices as frozen.</span>
+        </p>
+
+        <p>
+          <span class="claim-number">6.</span> A non-transitory computer-readable medium storing
+          instructions that, when executed by one or more processors, cause the processors to perform
+          operations comprising:
+          <span class="claim-element">maintaining, in memory, a pre-trained neural network comprising
+          frozen pre-trained weight matrices;</span>
+          <span class="claim-element">for each frozen weight matrix W&#8320; of a selected subset,
+          maintaining a corresponding pair of adapter matrices (B, A) having respective dimensions
+          (d&times;r, r&times;d) with r &lt; d;</span>
+          <span class="claim-element">performing, for a fine-tuning iteration, a forward pass computing
+          adapted output as a sum of a base output W&#8320;x and a scaled low-rank update (&#945;/r)BAx;
+          and</span>
+          <span class="claim-element">updating only the adapter matrices (B, A) based on gradients
+          computed by backpropagation through the adapted output.</span>
+        </p>
+
+        <p>
+          <span class="claim-number">7.</span> The method of claim 1, wherein the pre-trained neural
+          network comprises a quantized neural network in which at least a portion of the pre-trained
+          weight matrices are stored in a quantized format using fewer than 16 bits per parameter,
+          and wherein the first and second low-rank matrices are stored and computed in a higher
+          precision format than the quantized pre-trained weight matrices.
+          <em style="font-size:.875rem; color:var(--text-light);">[Covers QLoRA variant]</em>
+        </p>
+
+        <p>
+          <span class="claim-number">8.</span> The method of claim 1, further comprising:
+          <span class="claim-element">computing, for each weight matrix, a singular value decomposition
+          or an importance score indicative of the significance of the weight matrix to model
+          performance;</span>
+          <span class="claim-element">adaptively allocating a respective rank r<sub>i</sub> to each
+          weight matrix based on the corresponding importance score, wherein weight matrices assigned
+          higher importance scores are allocated higher ranks; and</span>
+          <span class="claim-element">periodically pruning adapter matrix entries corresponding to
+          singular values below a threshold.</span>
+          <em style="font-size:.875rem; color:var(--text-light);">[Covers AdaLoRA variant]</em>
+        </p>
+      </div>
+
+      <div class="callout callout-warning">
+        <div class="callout-icon">&#9888;</div>
+        <div class="callout-body">
+          <div class="callout-title">Drafting Caution: Means-Plus-Function</div>
+          <p>
+            Claims 5 and 6 use functional language ("training engine configured to"). This risks
+            being construed under 35 U.S.C. §112(f) as means-plus-function if the claim does not
+            recite sufficient structure. To avoid §112(f) interpretation, the system claim should
+            identify specific structural components (processor, memory, specific software modules)
+            rather than purely functional descriptions. The illustrative claim 5 above walks the line
+            carefully but should be reviewed against the specific specification disclosure before filing.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── SECTION 5: §101 ANALYSIS ─────────────────── -->
+    <section id="sec101" class="section-anchor">
+      <h2>5. §101 Analysis for LoRA</h2>
+
+      <p>
+        The central §101 question for LoRA is whether a mathematical technique — low-rank matrix
+        decomposition applied to weight updates — constitutes patent-eligible subject matter. Under
+        the Supreme Court's <em>Alice/Mayo</em> framework and the USPTO's 2019 Revised Guidance,
+        the analysis proceeds in two steps.
+      </p>
+
+      <div class="alice-step">
+        <div class="alice-step-header">
+          <span class="alice-step-num">Step 1</span>
+          <span class="alice-step-title">Is the claim directed to a judicial exception?</span>
+        </div>
+        <p>
+          <strong>Analysis:</strong> Claim 1 recites a method of computing matrix products
+          (W&#8320;x + (&#945;/r)&middot;BAx). At its most abstract, this is a mathematical relationship
+          — specifically, a linear algebraic operation on matrices. Under <em>Alice</em>, mathematical
+          concepts are judicial exceptions to patent eligibility.
+        </p>
+        <p>
+          <strong>Counter-argument:</strong> The claim is not merely directed to the abstract concept
+          of matrix multiplication in the abstract. It is directed to a specific application of
+          low-rank decomposition to the specific technical problem of parameter-efficient neural network
+          fine-tuning. The claim recites specific initialization steps (B=0, A random), a specific
+          computational architecture (frozen pre-trained weights + trainable adapters), and a specific
+          scaling mechanism (&#945;/r). These specific technical choices are not claimed in the abstract.
+        </p>
+        <div class="alice-outcome concern">&#9888; Directed to mathematical concept — Step 2 analysis required</div>
+      </div>
+
+      <div class="alice-step">
+        <div class="alice-step-header">
+          <span class="alice-step-num sub">Step 2A, Prong 1</span>
+          <span class="alice-step-title">Is the claim integrated into a practical application?</span>
+        </div>
+        <p>
+          <strong>The strongest argument for LoRA's eligibility</strong> is the <em>Enfish</em>
+          line of cases: a claimed invention is patent-eligible when it provides a specific technical
+          improvement to a computer or computing process itself. LoRA's practical application is
+          concrete and quantifiable:
+        </p>
+        <ul>
+          <li>Reduces trainable parameters by 10,000x for GPT-3 scale models</li>
+          <li>Enables fine-tuning on consumer-grade GPU hardware (24GB VRAM) rather than
+          enterprise hardware (hundreds of GB VRAM)</li>
+          <li>Eliminates inference latency overhead (unlike adapter methods)</li>
+          <li>Achieves performance comparable to full fine-tuning on standard benchmarks</li>
+        </ul>
+        <p>
+          These are not abstract improvements — they are <em>specific, measurable improvements
+          to the technical process of training neural networks</em>. Under <em>McRO, Inc. v.
+          Bandai Namco Games America</em> and <em>Core Wireless Licensing v. LG Electronics</em>,
+          improvements to computer functionality itself (rather than improvements using a computer
+          as a tool) are patent-eligible.
+        </p>
+        <div class="alice-outcome eligible">&#10003; Integrated into a practical application — eligible</div>
+      </div>
+
+      <div class="alice-step">
+        <div class="alice-step-header">
+          <span class="alice-step-num sub">Step 2A, Prong 2 / Step 2B</span>
+          <span class="alice-step-title">Is there "significantly more" than the exception?</span>
+        </div>
+        <p>
+          Even if the USPTO examiner finds that Step 2A is not met, the "significantly more" analysis
+          under Step 2B asks whether the claim recites specific technical features beyond what is
+          well-understood, routine, or conventional in the field at the time of filing.
+        </p>
+        <p>
+          <strong>Claim elements that constitute "significantly more":</strong>
+        </p>
+        <ul>
+          <li>The specific initialization scheme (B=0, A random) was not conventional — competing
+          approaches used non-zero initialization or symmetric initialization</li>
+          <li>The &#945;/r scaling factor is a specific technical solution to training instability
+          across different rank values — not a routine implementation choice</li>
+          <li>The specific application to <em>weight update matrices</em> rather than weight matrices
+          themselves distinguishes from all prior SVD-based compression approaches</li>
+          <li>The "frozen pre-trained weights" element distinguishes from conventional fine-tuning
+          where all weights are trainable</li>
+        </ul>
+        <div class="alice-outcome eligible">&#10003; "Significantly more" present — eligible</div>
+      </div>
+
+      <h3>Claim Framing: Eligible vs. Ineligible</h3>
+
+      <p>
+        How claims are framed determines §101 outcomes more than the underlying invention.
+        The following comparison illustrates how the same LoRA concept would be drafted in
+        ineligible vs. eligible form:
+      </p>
+
+      <div class="comparison-grid">
+        <div class="comparison-item bad">
+          <h4>Ineligible Framing (Do Not Use)</h4>
+          <p style="font-family:var(--font-serif); font-size:.9rem; line-height:1.7;">
+            "A method of decomposing a matrix, comprising: receiving a first matrix W having
+            dimension d&times;d; computing a low-rank approximation of the first matrix as a
+            product of a first matrix B having dimension d&times;r and a second matrix A having
+            dimension r&times;d; and returning the product BA."
+          </p>
+          <p style="margin-top:.875rem; font-size:.875rem; color:var(--danger); font-weight:600;">
+            Problem: Pure mathematical operation with no tie to neural network fine-tuning or
+            any technical improvement. This is textbook abstract math — rejected under Alice Step 1
+            with no path through Step 2A.
+          </p>
+        </div>
+        <div class="comparison-item good">
+          <h4>Eligible Framing (Use This)</h4>
+          <p style="font-family:var(--font-serif); font-size:.9rem; line-height:1.7;">
+            "A computer-implemented method for parameter-efficient adaptation of a pre-trained
+            neural network to a downstream task, comprising: receiving a pre-trained neural network
+            comprising frozen weight matrices; decomposing a weight update for each frozen matrix
+            into a product of a first adapter matrix and a second adapter matrix of rank r less
+            than the weight matrix dimension d; training only the adapter matrices using downstream
+            task data; and reducing GPU memory consumption during training by a factor of at least
+            d/(2r) compared to full fine-tuning of the pre-trained neural network."
+          </p>
+          <p style="margin-top:.875rem; font-size:.875rem; color:var(--success); font-weight:600;">
+            Why it works: Ties mathematical operation to specific technical context (neural network
+            fine-tuning), specific technical improvement (reduced GPU memory), and specific
+            architectural constraints (frozen pre-trained weights, adapter matrices). Passes
+            Step 2A Prong 1 under Enfish.
+          </p>
+        </div>
+      </div>
+
+      <div class="callout callout-info">
+        <div class="callout-icon">&#8505;</div>
+        <div class="callout-body">
+          <div class="callout-title">The "Efficiency Improvement" Frame — Your Most Powerful §101 Tool</div>
+          <p>
+            Federal Circuit case law has consistently upheld claims to improvements in computational
+            efficiency when the improvement is specific and measurable. In <em>Enfish</em>, a
+            self-referential table that improved computer memory usage was eligible. In
+            <em>Core Wireless</em>, an improved user interface display was eligible. LoRA's
+            10,000x reduction in trainable parameters — reducing GPU memory requirements from
+            hundreds of gigabytes to single digits — is a textbook "specific technical improvement"
+            that should anchor every §101 argument in prosecution and litigation. Do not surrender
+            this framing.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── SECTION 6: PRIOR ART ──────────────────────── -->
+    <section id="prior-art" class="section-anchor">
+      <h2>6. Prior Art Analysis for LoRA</h2>
+
+      <p>
+        Patent prosecution for LoRA would face three primary categories of prior art: matrix
+        factorization literature, parameter-efficient fine-tuning methods, and intrinsic
+        dimensionality research. The following analysis maps each reference and explains how
+        LoRA distinguishes from it.
+      </p>
+
+      <div class="table-wrapper">
+        <table class="prior-art-table">
+          <caption class="table-caption">Table 2. Prior Art Landscape and LoRA Distinctions</caption>
+          <thead>
+            <tr>
+              <th>Reference</th>
+              <th>Year</th>
+              <th>Key Disclosure</th>
+              <th>How LoRA Distinguishes</th>
+              <th>Remaining Risk</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Aghajanyan et al. (Intrinsic Dimensionality)</td>
+              <td>2020</td>
+              <td>Shows that fine-tuning can occur in a low-dimensional subspace of the full
+              parameter space; empirically measures intrinsic dimension of fine-tuning tasks</td>
+              <td class="claim-distinction">Provides theoretical motivation but does not disclose
+              the specific LoRA decomposition &#916;W=BA applied to individual weight matrices.
+              Aghajanyan uses a random projection for the entire model, not per-matrix low-rank adapters.</td>
+              <td><span class="badge badge-warning">§103 Risk</span></td>
+            </tr>
+            <tr>
+              <td>Houlsby et al. (Adapters)</td>
+              <td>2019</td>
+              <td>Inserts small bottleneck adapter modules between transformer layers; trains
+              only adapter parameters while freezing pre-trained weights</td>
+              <td class="claim-distinction">Adds new parameters as sequential layers (adds inference
+              latency). LoRA modifies existing weight matrices in parallel (zero inference overhead).
+              Architecturally distinct: adapters are additive sequential modules; LoRA is parallel
+              multiplicative decomposition of existing weight matrices.</td>
+              <td><span class="badge badge-success">Low Risk</span></td>
+            </tr>
+            <tr>
+              <td>Li &amp; Liang (Prefix Tuning)</td>
+              <td>2021</td>
+              <td>Prepends trainable continuous prompt tokens ("prefix vectors") to the input
+              sequence; freezes all model parameters</td>
+              <td class="claim-distinction">Operates in the token/embedding space, not in the
+              weight matrix space. Does not disclose low-rank decomposition of weight update
+              matrices. Mathematically orthogonal approach.</td>
+              <td><span class="badge badge-success">Low Risk</span></td>
+            </tr>
+            <tr>
+              <td>Golub &amp; Van Loan (SVD / Matrix Factorization)</td>
+              <td>1965–2013</td>
+              <td>Classical singular value decomposition for low-rank matrix approximation;
+              widely used in dimensionality reduction, recommender systems</td>
+              <td class="claim-distinction">SVD operates on <em>existing</em> weight matrices
+              for compression. LoRA operates on <em>weight updates</em>
+              &#916;W during fine-tuning — a fundamentally different application. The pre-trained
+              W&#8320; is not compressed; only the update &#916;W is constrained to low rank.
+              Additionally, LoRA uses gradient descent, not SVD decomposition, to learn B and A.</td>
+              <td><span class="badge badge-success">Low Risk</span></td>
+            </tr>
+            <tr>
+              <td>Zhao et al. (FishMask) / Sung et al. (BitFit)</td>
+              <td>2020–2021</td>
+              <td>Select a subset of parameters to fine-tune based on Fisher information or
+              bias-only tuning</td>
+              <td class="claim-distinction">These methods select a subset of <em>existing</em>
+              parameters to unfreeze and train. LoRA adds new trainable parameters (B, A) that
+              are initialized specifically to perturb weights by zero, rather than unfreezing
+              existing parameters. Structurally and mathematically distinct.</td>
+              <td><span class="badge badge-success">Low Risk</span></td>
+            </tr>
+            <tr>
+              <td>Mahabadi et al. (Compacter)</td>
+              <td>2021</td>
+              <td>Uses Kronecker product adapters with shared parameterization</td>
+              <td class="claim-distinction">Uses Kronecker product decomposition rather than
+              simple rank decomposition BA. Different algebraic structure; LoRA's BA product
+              preserves the original matrix dimensions and enables zero-cost merging at inference
+              time, which Compacter does not.</td>
+              <td><span class="badge badge-warning">Moderate Risk</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Crafting the §103 Argument</h3>
+
+      <p>
+        The most challenging prior art combination an examiner would likely cite is:
+        <strong>Houlsby (adapters) + Aghajanyan (intrinsic dimensionality) + SVD literature</strong>,
+        arguing that it would have been obvious to apply a low-rank decomposition to the weight
+        update matrix given the known low intrinsic dimensionality of fine-tuning tasks.
+      </p>
+
+      <p>
+        The prosecution response should argue: (1) Aghajanyan's low-dimensionality finding
+        concerns the aggregate parameter space of the entire model, not individual weight matrices;
+        (2) Houlsby's adapters operate sequentially and orthogonally to weight matrices, not
+        as decompositions of weight updates; (3) there is no suggestion in the combined references
+        to apply matrix factorization specifically to <em>weight update matrices &#916;W</em>
+        during fine-tuning rather than to weight matrices themselves; and (4) the specific
+        initialization scheme (B=0) that enables LoRA's practical superiority is absent from
+        all cited references and is non-obvious.
+      </p>
+
+      <div class="callout callout-danger">
+        <div class="callout-icon">&#9888;</div>
+        <div class="callout-body">
+          <div class="callout-title">The Mahabadi (Compacter) Risk</div>
+          <p>
+            Compacter (2021) shares LoRA's motivation and its deployment as a parallel branch
+            to existing layers. The key distinction is the algebraic form: Compacter uses Kronecker
+            products while LoRA uses simple rank decomposition. This distinction is real and
+            technically meaningful (Kronecker products have different computational properties),
+            but an examiner may find it insufficiently inventive. A Rule 132 declaration from
+            the inventors explaining why the rank-r matrix product BA was non-obvious over
+            Kronecker-product adapters would strengthen the prosecution record significantly.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── SECTION 7: DERIVATIVE INNOVATION LANDSCAPE ── -->
+    <section id="derivatives" class="section-anchor">
+      <h2>7. The Derivative Innovation Landscape</h2>
+
+      <p>
+        LoRA is not merely a single invention — it is the seed of an innovation tree. Each variant
+        addresses a specific limitation or extends LoRA to a new context, and each represents
+        a potential continuation patent opportunity that builds on the original filing.
+        Understanding this tree is essential for both patent portfolio strategy and
+        freedom-to-operate analysis.
+      </p>
+
+      <!-- SVG: LORA INNOVATION TREE -->
+      <div class="figure">
+        <div class="figure-content" style="width:100%; max-width:700px;">
+          <svg viewBox="0 0 680 420" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:auto;" aria-label="LoRA innovation tree showing derivative methods">
+
+            <!-- Root: LoRA -->
+            <rect x="240" y="20" width="200" height="60" rx="8" fill="#1a2744"/>
+            <text x="340" y="46" text-anchor="middle" font-family="Inter, sans-serif" font-size="14" font-weight="800" fill="#e8b84b">LoRA (2021)</text>
+            <text x="340" y="64" text-anchor="middle" font-family="Inter, sans-serif" font-size="10.5" fill="rgba(255,255,255,.8)">Hu et al. — Microsoft Research</text>
+
+            <!-- Trunk line down -->
+            <line x1="340" y1="80" x2="340" y2="130" stroke="#ced4da" stroke-width="2"/>
+
+            <!-- Second level row -->
+            <!-- QLoRA -->
+            <line x1="340" y1="130" x2="90" y2="155" stroke="#ced4da" stroke-width="1.5"/>
+            <rect x="20" y="155" width="140" height="55" rx="6" fill="#e67e22"/>
+            <text x="90" y="177" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="white">QLoRA (2023)</text>
+            <text x="90" y="193" text-anchor="middle" font-family="Inter, sans-serif" font-size="9.5" fill="rgba(255,255,255,.88)">Dettmers et al.</text>
+            <text x="90" y="206" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" fill="rgba(255,255,255,.7)">4-bit quantized weights</text>
+
+            <!-- AdaLoRA -->
+            <line x1="340" y1="130" x2="220" y2="155" stroke="#ced4da" stroke-width="1.5"/>
+            <rect x="155" y="155" width="130" height="55" rx="6" fill="#1e8449"/>
+            <text x="220" y="177" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="white">AdaLoRA (2023)</text>
+            <text x="220" y="193" text-anchor="middle" font-family="Inter, sans-serif" font-size="9.5" fill="rgba(255,255,255,.88)">Zhang et al.</text>
+            <text x="220" y="206" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" fill="rgba(255,255,255,.7)">Adaptive rank allocation</text>
+
+            <!-- DoRA -->
+            <line x1="340" y1="130" x2="350" y2="155" stroke="#ced4da" stroke-width="1.5"/>
+            <rect x="290" y="155" width="120" height="55" rx="6" fill="#7d3c98"/>
+            <text x="350" y="177" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="white">DoRA (2024)</text>
+            <text x="350" y="193" text-anchor="middle" font-family="Inter, sans-serif" font-size="9.5" fill="rgba(255,255,255,.88)">Liu et al.</text>
+            <text x="350" y="206" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" fill="rgba(255,255,255,.7)">Magnitude + direction</text>
+
+            <!-- LoftQ -->
+            <line x1="340" y1="130" x2="480" y2="155" stroke="#ced4da" stroke-width="1.5"/>
+            <rect x="415" y="155" width="130" height="55" rx="6" fill="#2980b9"/>
+            <text x="480" y="177" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="white">LoftQ (2023)</text>
+            <text x="480" y="193" text-anchor="middle" font-family="Inter, sans-serif" font-size="9.5" fill="rgba(255,255,255,.88)">Li et al.</text>
+            <text x="480" y="206" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" fill="rgba(255,255,255,.7)">Quantize + init jointly</text>
+
+            <!-- LoRA+ -->
+            <line x1="340" y1="130" x2="610" y2="155" stroke="#ced4da" stroke-width="1.5"/>
+            <rect x="545" y="155" width="120" height="55" rx="6" fill="#c0392b"/>
+            <text x="605" y="177" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="white">LoRA+ (2024)</text>
+            <text x="605" y="193" text-anchor="middle" font-family="Inter, sans-serif" font-size="9.5" fill="rgba(255,255,255,.88)">Hayou et al.</text>
+            <text x="605" y="206" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" fill="rgba(255,255,255,.7)">Asymmetric learning rates</text>
+
+            <!-- Third level: GaLore off AdaLoRA -->
+            <line x1="220" y1="210" x2="165" y2="265" stroke="#ced4da" stroke-width="1.5" stroke-dasharray="4,3"/>
+            <rect x="85" y="265" width="160" height="55" rx="6" fill="#16a085"/>
+            <text x="165" y="287" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="white">GaLore (2024)</text>
+            <text x="165" y="303" text-anchor="middle" font-family="Inter, sans-serif" font-size="9.5" fill="rgba(255,255,255,.88)">Zhao et al.</text>
+            <text x="165" y="316" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" fill="rgba(255,255,255,.7)">Gradient low-rank projection</text>
+
+            <!-- Third level: Multi-adapter off LoRA -->
+            <line x1="350" y1="210" x2="380" y2="265" stroke="#ced4da" stroke-width="1.5" stroke-dasharray="4,3"/>
+            <rect x="300" y="265" width="165" height="55" rx="6" fill="#566573"/>
+            <text x="382" y="287" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="white">Multi-LoRA (2024)</text>
+            <text x="382" y="303" text-anchor="middle" font-family="Inter, sans-serif" font-size="9.5" fill="rgba(255,255,255,.88)">LoraHub / MixLoRA</text>
+            <text x="382" y="316" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" fill="rgba(255,255,255,.7)">Adapter composition</text>
+
+            <!-- Legend -->
+            <rect x="20" y="355" width="12" height="12" rx="2" fill="#1a2744"/>
+            <text x="38" y="366" font-family="Inter, sans-serif" font-size="10" fill="#566573">Core invention</text>
+            <rect x="130" y="355" width="12" height="12" rx="2" fill="#e67e22"/>
+            <text x="148" y="366" font-family="Inter, sans-serif" font-size="10" fill="#566573">Continuation opportunities</text>
+            <line x1="290" y1="361" x2="310" y2="361" stroke="#ced4da" stroke-width="1.5" stroke-dasharray="4,3"/>
+            <text x="318" y="366" font-family="Inter, sans-serif" font-size="10" fill="#566573">Possible CIP targets</text>
+          </svg>
+        </div>
+        <p class="figure-caption">
+          Figure 2. The LoRA innovation tree. Solid lines indicate direct architectural descendants
+          suitable for continuation patent applications. Dashed lines indicate continuation-in-part
+          opportunities where new matter must be added to support the derivative invention.
+        </p>
+      </div>
+
+      <h3>Portfolio Filing Strategy for the Innovation Tree</h3>
+
+      <div class="table-wrapper">
+        <table>
+          <caption class="table-caption">Table 3. Continuation Strategy for LoRA Derivative Innovations</caption>
+          <thead>
+            <tr>
+              <th>Variant</th>
+              <th>New Technical Element</th>
+              <th>Filing Vehicle</th>
+              <th>Timing Consideration</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>QLoRA</td>
+              <td>4-bit NormalFloat quantization of frozen weights; double quantization; paged attention for memory spikes</td>
+              <td>Continuation-in-Part (new matter: quantization algorithm)</td>
+              <td>File before QLoRA arXiv posting (May 2023)</td>
+            </tr>
+            <tr>
+              <td>AdaLoRA</td>
+              <td>Singular value decomposition for rank allocation; importance scoring; rank pruning during training</td>
+              <td>Continuation-in-Part (new matter: adaptive rank allocation algorithm)</td>
+              <td>File before AdaLoRA publication (Mar 2023)</td>
+            </tr>
+            <tr>
+              <td>DoRA</td>
+              <td>Weight decomposition into magnitude vector and direction matrix; LoRA applied only to direction component</td>
+              <td>Continuation (direction/magnitude decomposition arguably within LoRA spec) or CIP</td>
+              <td>File before DoRA arXiv (Jan 2024)</td>
+            </tr>
+            <tr>
+              <td>LoftQ</td>
+              <td>Alternating optimization of quantized weights and LoRA init for minimum approximation error</td>
+              <td>Continuation-in-Part</td>
+              <td>File before LoftQ publication (Oct 2023)</td>
+            </tr>
+            <tr>
+              <td>Multi-LoRA / LoraHub</td>
+              <td>Weighted combination of multiple pre-trained LoRA adapters for new tasks without additional training</td>
+              <td>Continuation (compositional inference within LoRA architecture)</td>
+              <td>File as LoRA application ecosystem emerges</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ─── SECTION 8: PUBLICATION VS PATENT ─────────── -->
+    <section id="publication" class="section-anchor">
+      <h2>8. Publication vs. Patent: The Race-to-File Problem</h2>
+
+      <p>
+        The LoRA paper was posted to arXiv on <strong>October 16, 2021</strong>. Under the
+        America Invents Act (AIA), 35 U.S.C. §102(b)(1)(A), the inventors' own disclosures —
+        including arXiv preprints — do not constitute prior art against their own patent application
+        if the patent application is filed within <strong>12 months</strong> of the disclosure.
+        This is the AIA's "grace period" for inventor-made disclosures.
+      </p>
+
+      <div class="callout callout-warning">
+        <div class="callout-icon">&#9888;</div>
+        <div class="callout-body">
+          <div class="callout-title">The AIA Grace Period: Protection with a Deadline</div>
+          <p>
+            Under AIA §102(b)(1)(A), if the LoRA paper was published on arXiv on October 16, 2021,
+            Microsoft had until <strong>October 16, 2022</strong> to file a patent application and
+            retain the grace period protection. After that date, the paper itself becomes §102(a)(1)
+            prior art against Microsoft's own application. The grace period is not infinite protection —
+            it is a one-year lifeline that demands action.
+          </p>
+        </div>
+      </div>
+
+      <h3>The Third-Party Race-to-File Problem</h3>
+
+      <p>
+        The grace period protects only against the <em>inventors' own</em> disclosures. It does
+        <em>not</em> protect against a third party who reads the LoRA paper and files a patent
+        application on a closely related (but arguably distinct) invention within the same window.
+        Under the AIA's first-inventor-to-file system, the first party to file a patent application
+        for a given invention generally wins — regardless of who invented it first.
+      </p>
+
+      <p>
+        The race-to-file problem for LoRA played out in slow motion across the derivative invention
+        landscape. Researchers at institutions other than Microsoft read the LoRA paper and developed
+        variants. Whether those variants were independently invented or derived from the LoRA disclosure
+        is a factual question — but from a patent strategy perspective, the risk was real: a competitor
+        could patent a LoRA improvement, cover the most commercially valuable use cases, and then
+        assert those patents against Microsoft itself.
+      </p>
+
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-date">October 2021</div>
+          <h4>LoRA arXiv Preprint Published</h4>
+          <p>Hu et al. post LoRA to arXiv. AIA 12-month grace period clock starts.
+          Simultaneously, the paper becomes publicly available to competitors globally.</p>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-date">October 2022 (Deadline)</div>
+          <h4>Last Day to File Under Grace Period</h4>
+          <p>Microsoft must have a complete (or at minimum provisional) patent application
+          on file by this date or lose the grace period protection for the arXiv preprint.
+          After this date, the paper is §102 prior art against Microsoft's own application.</p>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-date">2022–2023</div>
+          <h4>Derivative Works Published</h4>
+          <p>QLoRA, AdaLoRA, LoftQ, and other variants appear. Each variant could potentially
+          be patented by its inventors independent of Microsoft's LoRA application.</p>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-date">2023–2024</div>
+          <h4>Commercial Deployment at Scale</h4>
+          <p>LoRA and its variants become the de facto standard for LLM fine-tuning. Azure AI
+          Studio, Hugging Face, Replicate, and dozens of startups offer LoRA fine-tuning as
+          a commercial service. Patent licensing value crystallizes.</p>
+        </div>
+      </div>
+
+      <h3>Strategic Lesson: File Before Posting to arXiv</h3>
+
+      <p>
+        The LoRA publication timeline illustrates the central tension between academic norms
+        (publish early, publish openly) and patent practice (file before disclosing). The
+        operationally correct answer for a corporate research environment like Microsoft Research
+        is unambiguous: <strong>file the patent application before posting to arXiv.</strong>
+        The ideal workflow is:
+      </p>
+
+      <ol>
+        <li>Invention disclosure submitted to IP department at first conception of novel results</li>
+        <li>IP counsel prepares and files provisional patent application (cost: $2,000–$5,000)</li>
+        <li>arXiv preprint posted the same day as or after the provisional filing</li>
+        <li>Non-provisional patent application filed within 12 months of provisional</li>
+        <li>Continuation applications filed as derivative innovations are developed</li>
+      </ol>
+
+      <p>
+        At Microsoft Research's scale, this workflow is operationally feasible and routinely
+        practiced for commercially significant inventions. The question is whether a given
+        research team and IP department communicate effectively enough to catch every
+        patentable result before it goes public.
+      </p>
+
+      <blockquote>
+        "In academic research, publishing first is a career imperative. In corporate research,
+        filing first is a fiduciary obligation. The companies that manage both simultaneously
+        are winning the AI patent race."
+        <cite>— Dr. Wei Chen, Morrison &amp; Foerster</cite>
+      </blockquote>
+    </section>
+
+    <!-- ─── SECTION 9: MONETIZATION STRATEGY ─────────── -->
+    <section id="monetization" class="section-anchor">
+      <h2>9. Monetization Strategy</h2>
+
+      <p>
+        LoRA's monetization potential is substantial precisely because the technique became a
+        de facto standard across the industry. When a patented technology becomes ubiquitous,
+        the patent holder occupies a uniquely powerful licensing position — and faces commensurate
+        obligations if the technology meets the threshold for standard-essential patent treatment.
+      </p>
+
+      <h3>Licensing Tiers</h3>
+
+      <div class="monetization-grid">
+        <div class="monetization-card">
+          <h4>Cloud Fine-Tuning APIs</h4>
+          <span class="royalty-range">$0.50–$2.00</span>
+          <p>Per fine-tuning job (GPU-hour equivalent). Target: AWS SageMaker, Google Vertex AI,
+          Azure AI Studio, Replicate. These services generate millions of fine-tuning jobs monthly.</p>
+        </div>
+        <div class="monetization-card">
+          <h4>Enterprise Licenses</h4>
+          <span class="royalty-range">$100K–$5M/yr</span>
+          <p>Annual per-organization license for companies deploying internal fine-tuning infrastructure
+          (e.g., large financial institutions, healthcare systems, defense contractors).</p>
+        </div>
+        <div class="monetization-card">
+          <h4>Model Vendor Licenses</h4>
+          <span class="royalty-range">Revenue share</span>
+          <p>For companies whose fine-tuned model products are sold (e.g., model-as-a-service fine-tuning
+          offerings from Cohere, AI21 Labs, Mistral AI). 0.5–2% of fine-tuning revenue.</p>
+        </div>
+        <div class="monetization-card">
+          <h4>On-Device Deployment</h4>
+          <span class="royalty-range">$0.01–$0.10</span>
+          <p>Per-device royalty for consumer electronics manufacturers deploying LoRA-adapted models
+          on-device (smartphones, laptops). Applicable to Apple, Samsung, Qualcomm partnerships.</p>
+        </div>
+      </div>
+
+      <h3>Cross-Licensing Opportunities</h3>
+
+      <p>
+        Microsoft's LoRA portfolio would have significant cross-licensing value with:
+      </p>
+
+      <ul>
+        <li>
+          <strong>Google:</strong> Holds core transformer patents and training optimization patents.
+          A cross-license covering LoRA + Transformer would give both parties freedom to operate
+          across the full fine-tuning pipeline.
+        </li>
+        <li>
+          <strong>Meta:</strong> The primary distributor of open-weight models (LLaMA series) that
+          are fine-tuned using LoRA by millions of users. Meta's Llama fine-tuning tools use LoRA
+          extensively.
+        </li>
+        <li>
+          <strong>Hugging Face:</strong> Hosts the PEFT library implementing LoRA; their platform
+          facilitates LoRA fine-tuning for hundreds of thousands of users. A license or partnership
+          arrangement would address potential indirect infringement liability.
+        </li>
+        <li>
+          <strong>NVIDIA:</strong> GPU hardware and NeMo framework tools for LoRA fine-tuning;
+          cross-license with NVIDIA's GPU computing optimization patents.
+        </li>
+      </ul>
+
+      <h3>FRAND Considerations: If LoRA Becomes Standard-Essential</h3>
+
+      <p>
+        If LoRA patents were declared essential to a technical standard (e.g., if an AI standardization
+        body adopted LoRA as a recommended fine-tuning method), the patent holder would face
+        <span class="key-term" title="Fair, Reasonable, and Non-Discriminatory licensing">FRAND</span>
+        obligations. Under FRAND, the holder must offer licenses on fair, reasonable, and
+        non-discriminatory terms — typically meaning royalty rates derived from the patent's
+        technical contribution to the standard, not from the market power the standard creates.
+      </p>
+
+      <p>
+        At the time of writing, no formal AI standard-setting body has adopted LoRA, but the de facto
+        standardization created by Hugging Face's PEFT library and its near-universal adoption creates
+        practical pressures analogous to formal FRAND obligations. Asserting prohibitive royalty rates
+        against the open-source LoRA ecosystem would create significant reputational and competitive
+        risk for Microsoft — particularly given the importance of developer goodwill to Azure AI
+        adoption.
+      </p>
+
+      <div class="callout callout-info">
+        <div class="callout-icon">&#128176;</div>
+        <div class="callout-body">
+          <div class="callout-title">The Open-Source Dilemma</div>
+          <p>
+            LoRA was released as open-source code on GitHub simultaneously with the arXiv paper.
+            This does not create a patent license — open-source code release is not a patent license
+            grant unless the license text explicitly grants one. MIT and Apache 2.0 licenses, the
+            most common for ML code, do not include implied patent licenses broad enough to cover
+            commercial fine-tuning at scale. However, aggressively asserting LoRA patents against
+            open-source users would harm Microsoft's developer relations significantly. The pragmatic
+            strategy is to license commercial cloud deployments while tolerating open-source
+            research use.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── SECTION 10: LESSONS FOR RESEARCHERS ─────── -->
+    <section id="lessons" class="section-anchor">
+      <h2>10. Lessons for Researchers</h2>
+
+      <p>
+        The LoRA case study distills into concrete, actionable lessons for AI researchers working
+        at the intersection of mathematical innovation and commercial application.
+      </p>
+
+      <ol class="process-steps">
+        <li>
+          <div class="step-content">
+            <h4>Mathematical Techniques CAN Be Patented — With the Right Framing</h4>
+            <p>
+              The LoRA insight (low-rank decomposition of weight updates) is fundamentally mathematical.
+              But framed as a specific technical improvement to neural network fine-tuning efficiency —
+              with quantifiable benefits, specific initialization steps, and a defined computational
+              architecture — it clears §101. The lesson: anchoring mathematics to a specific technical
+              problem with measurable outcomes is the key to eligibility.
+            </p>
+          </div>
+        </li>
+        <li>
+          <div class="step-content">
+            <h4>The "Efficiency Improvement" Frame Is Powerful for §101</h4>
+            <p>
+              Every AI patent application should identify specific, quantifiable efficiency improvements
+              as early as the abstract. For LoRA: "reduces trainable parameters by a factor of d/(2r)"
+              is the anchor. For a different AI invention, look for: reduced inference latency,
+              reduced memory footprint, improved convergence speed, or reduced training compute.
+              These are not just performance claims — they are patent eligibility anchors.
+            </p>
+          </div>
+        </li>
+        <li>
+          <div class="step-content">
+            <h4>File the Provisional Before Posting to arXiv</h4>
+            <p>
+              This lesson cannot be overstated. The cost differential is immense: a provisional
+              patent application costs $2,000–$5,000 in attorney fees, preserves your filing date,
+              and does not require complete claims. An arXiv post that precedes filing costs you
+              the ability to file in most countries outside the U.S. and starts the 12-month
+              grace period clock. Post after filing, always.
+            </p>
+          </div>
+        </li>
+        <li>
+          <div class="step-content">
+            <h4>Think About the Derivative Innovation Tree When Filing</h4>
+            <p>
+              The original LoRA specification should have been drafted to support continuations
+              for QLoRA, AdaLoRA, and DoRA — even before those variants were fully developed.
+              This means: including working examples with quantized weights, describing variable
+              rank allocation conceptually, and disclosing magnitude-direction decomposition as
+              an alternative embodiment. Continuation practice only covers what the original
+              specification discloses.
+            </p>
+          </div>
+        </li>
+        <li>
+          <div class="step-content">
+            <h4>Claim Both the Training Method AND the Resulting Model</h4>
+            <p>
+              LoRA produces a fine-tuned model artifact: a base model plus a set of (B, A) adapter
+              matrices. This model artifact is itself claimable as a product — "a non-transitory
+              computer-readable medium storing a fine-tuned neural network comprising frozen
+              pre-trained weight matrices and a plurality of adapter matrix pairs (B, A)."
+              Product claims are often broader and more valuable than method claims for software
+              inventions because they capture possession, not just use.
+            </p>
+          </div>
+        </li>
+        <li>
+          <div class="step-content">
+            <h4>Initialization Details Are Patent Gold</h4>
+            <p>
+              The decision to initialize B=0 and A randomly is not merely an implementation detail —
+              it is the element that makes LoRA work in practice and that distinguishes it from all
+              prior adapter methods. Non-obvious implementation choices that drive real-world performance
+              improvements are exactly the kind of specificity that survives §103 rejections. Capture
+              these details in dependent claims.
+            </p>
+          </div>
+        </li>
+        <li>
+          <div class="step-content">
+            <h4>Attention to Layer Specificity Strengthens Claims</h4>
+            <p>
+              LoRA's empirical finding that applying low-rank adapters only to query and value
+              projection matrices achieves full fine-tuning performance is a claimable result.
+              Dependent claims reciting specific layer targeting (attention Q/V matrices vs.
+              FFN matrices vs. all matrices) create a claim ladder that is progressively harder
+              to design around, progressively easier to issue, and progressively more valuable
+              as the art matures.
+            </p>
+          </div>
+        </li>
+        <li>
+          <div class="step-content">
+            <h4>Disclose Quantitative Results in the Specification</h4>
+            <p>
+              The LoRA paper provides benchmark results showing LoRA matches full fine-tuning
+              on GLUE, SuperGLUE, and other benchmarks. This data should be in the patent
+              specification. Quantitative evidence in the specification (i) supports enablement
+              (the claimed method produces the stated results), (ii) provides a §103 argument
+              (unexpected results), and (iii) anchors damages calculations in infringement litigation.
+            </p>
+          </div>
+        </li>
+      </ol>
+    </section>
+
+    <!-- ─── SECTION 11: ALTERNATIVE CLAIM STRATEGIES ─── -->
+    <section id="alt-claims" class="section-anchor">
+      <h2>11. Alternative Claim Strategies</h2>
+
+      <h3>Hypothetical: Broader Claims Covering the Concept</h3>
+
+      <p>
+        What if the LoRA inventors had attempted to patent the broadest possible concept —
+        "parameter-efficient fine-tuning via low-rank decomposition of any weight matrix in
+        any neural network"? The following hypothetical claim illustrates the failure mode
+        and how to fix it:
+      </p>
+
+      <div class="claim-box">
+        <div class="claim-header">Hypothetical Broad Claim (Would Likely Fail)</div>
+        <p>
+          <span class="claim-number">Claim H-1 (PROBLEMATIC).</span> A method of training a neural
+          network, comprising:
+          <span class="claim-element">representing a weight update matrix as a product of two
+          matrices of lower rank; and</span>
+          <span class="claim-element">updating only the two lower-rank matrices during training.</span>
+        </p>
+        <p style="margin-top:1rem; color:var(--danger); font-size:.9rem; font-weight:600;">
+          Expected Rejection: §101 (abstract mathematical concept — pure matrix factorization
+          without specific technical application), §112(b) (indefinite — "lower rank" relative
+          to what?), and §103 (matrix factorization for parameter reduction is well-known from
+          SVD literature, Fisher matrix approximations, etc.).
+        </p>
+      </div>
+
+      <p>
+        The hypothetical claim H-1 fails because it does not (i) tie the mathematical operation
+        to a specific technical application, (ii) define "lower rank" with specific reference to
+        the base matrix dimension d, (iii) disclose the specific initialization scheme that makes
+        the method work, or (iv) claim the "frozen pre-trained weights" limitation that provides
+        the method's central efficiency benefit. Every word that was omitted for breadth is a
+        word that distinguished LoRA from the prior art.
+      </p>
+
+      <h3>How to Pursue Breadth While Maintaining Validity</h3>
+
+      <div class="claim-box">
+        <div class="claim-header">Improved Broad Independent Claim (Preferred Approach)</div>
+        <p>
+          <span class="claim-number">Claim I-1.</span> A computer-implemented method for
+          parameter-efficient adaptation of a pre-trained neural network to a downstream task,
+          the method comprising:
+          <span class="claim-element">maintaining, in memory, parameters of a pre-trained neural
+          network as frozen, non-trainable parameters;</span>
+          <span class="claim-element">for each weight matrix of a selected subset of weight matrices
+          of the pre-trained neural network, associating a weight update representation comprising
+          a product of a first matrix and a second matrix, wherein a first dimension of the first
+          matrix and a second dimension of the second matrix are each less than a corresponding
+          dimension of the weight matrix;</span>
+          <span class="claim-element">training the first and second matrices on downstream task
+          training data while maintaining the frozen, non-trainable parameters unchanged; and</span>
+          <span class="claim-element">wherein training the first and second matrices reduces a number
+          of trainable parameters during training compared to training all parameters of the
+          pre-trained neural network.</span>
+        </p>
+        <p style="margin-top:1rem; color:var(--success); font-size:.9rem; font-weight:600;">
+          Why this works: Broad enough to cover all low-rank adapter variants (LoRA, AdaLoRA,
+          DoRA, etc.) while anchoring: (i) the "frozen pre-trained weights" technical improvement,
+          (ii) the per-matrix product structure, and (iii) the parameter reduction benefit for §101.
+          Specific rank values, initialization schemes, and layer targeting are reserved for
+          dependent claims.
+        </p>
+      </div>
+
+      <div class="callout callout-example">
+        <div class="callout-icon">&#128218;</div>
+        <div class="callout-body">
+          <div class="callout-title">The Breadth Paradox in AI Patent Claims</div>
+          <p>
+            There is an inherent tension in AI patent claim drafting: the broadest claims are
+            most likely to face §101 and §103 rejections, while the narrowest claims survive
+            prosecution but provide narrow commercial protection. The resolution is not to split
+            the difference on the independent claim — it is to draft an independent claim as
+            broad as the prior art and §101 will allow, then use dependent claims to provide
+            narrower, harder-to-reject fallback positions. A 20-claim patent application covering
+            LoRA might have one broad independent claim (Claim I-1 above) with 18 dependent
+            claims progressively narrowing to specific rank values, specific layers, specific
+            initialization, and specific variants. If the independent claim fails, the narrow
+            dependent claims still provide value.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── SECTION 12: KEY TAKEAWAYS ────────────────── -->
+    <section id="takeaways" class="section-anchor">
+      <h2>12. Key Takeaways</h2>
+
+      <p>
+        The LoRA case study illustrates principles that apply broadly to AI method patents.
+        These lessons should inform how researchers, practitioners, and in-house counsel
+        approach the full lifecycle of an AI invention — from conception through commercialization.
+      </p>
+
+      <ul class="checklist">
+        <li>
+          Mathematical techniques applied to specific technical problems (neural network fine-tuning)
+          with measurable, concrete benefits (10,000x parameter reduction) are patent-eligible under
+          the <em>Enfish</em> "specific technical improvement" framework.
+        </li>
+        <li>
+          The AIA 12-month grace period under §102(b)(1)(A) is not a substitute for a pre-publication
+          filing strategy — it is an emergency backstop that should rarely be needed if an IP
+          workflow is functioning properly.
+        </li>
+        <li>
+          File a provisional patent application before posting to arXiv, every time. The cost
+          ($2K–5K) is trivial relative to the value of a well-prosecuted AI patent, and arXiv
+          preprints are prior art in virtually every major jurisdiction outside the U.S.
+        </li>
+        <li>
+          The "frozen pre-trained weights + trainable low-rank adapters" architectural pattern
+          is the key technical distinction over adapter methods (Houlsby), prefix tuning (Li &amp; Liang),
+          and weight compression (SVD-based) — each independent claim should recite the frozen
+          weights limitation explicitly.
+        </li>
+        <li>
+          Initialization strategy (B=0, A random Gaussian) is a non-obvious, performance-critical
+          implementation detail that distinguishes LoRA from prior methods and deserves its own
+          dependent claim.
+        </li>
+        <li>
+          Layer targeting specificity (Q/V attention matrices vs. all matrices) is a claimable
+          embodiment choice supported by experimental results in the original paper — include it
+          as a dependent claim with benchmark data in the specification.
+        </li>
+        <li>
+          Draft the original patent specification broadly enough to support continuation
+          applications for derivative innovations that have not yet been developed — include
+          quantized weight embodiments, variable rank embodiments, and multi-adapter
+          composition embodiments as alternative embodiments.
+        </li>
+        <li>
+          Product claims ("a computer-readable medium storing a fine-tuned neural network
+          comprising frozen pre-trained weights and adapter matrices") capture the model
+          artifact and are often commercially more valuable than method claims for AI inventions.
+        </li>
+        <li>
+          The §103 obviousness argument over Aghajanyan (intrinsic dimensionality) + SVD literature
+          requires a Rule 132 declaration explaining why applying per-matrix low-rank decomposition
+          to <em>weight updates</em> (not weights) was non-obvious — prepare this declaration
+          early in prosecution.
+        </li>
+        <li>
+          Open-source code release does not grant a patent license under MIT or Apache 2.0 terms —
+          but aggressive assertion against open-source research users creates reputational risk
+          and should be avoided in licensing strategy design.
+        </li>
+        <li>
+          Cross-licensing with Google (transformer patents), Meta (open-weight model deployment),
+          and NVIDIA (GPU training infrastructure) creates a more valuable outcome than unilateral
+          assertion for most large technology companies.
+        </li>
+        <li>
+          If LoRA achieves de facto standard status through ecosystem adoption (Hugging Face PEFT
+          library), informal FRAND-like constraints emerge even without formal standards
+          body involvement — factor this into licensing rate calculations.
+        </li>
+        <li>
+          The scaling factor &#945;/r is a claimable technical element — it is not an obvious
+          routine choice and is absent from all prior art. Include it in at least one dependent
+          claim to add a fallback position against §103 rejections.
+        </li>
+        <li>
+          System claims covering the fine-tuning pipeline (processor + frozen weight memory +
+          adapter matrix memory + training engine) directly capture cloud AI fine-tuning API
+          implementations — these are often more commercially valuable than method claims
+          for corporate licensing programs.
+        </li>
+        <li>
+          The LoRA innovation tree (QLoRA, AdaLoRA, DoRA, LoftQ) demonstrates that a single
+          seminal AI invention can anchor a multi-year continuation portfolio — each variant
+          should be evaluated for continuation vs. CIP treatment based on whether it introduces
+          new matter beyond what the original specification discloses.
+        </li>
+        <li>
+          When presenting §101 eligibility arguments to the USPTO, lead with the quantitative
+          efficiency improvement (parameter reduction ratio d/(2r)), then support with the
+          specific technical architecture (frozen weights, zero initialization). Abstract
+          arguments about "practical applications" are weaker than numbers.
+        </li>
+      </ul>
+
+      <div class="highlight-box">
+        <h4>The Central Lesson of LoRA for AI Patent Practice</h4>
+        <p>
+          LoRA demonstrates that the most commercially significant AI inventions are often not
+          the largest models or the most complex architectures — they are the <em>efficiency
+          innovations</em> that make powerful models accessible. A technique that reduces
+          fine-tuning compute by 10,000x is worth more to the industry than a marginal model
+          quality improvement, and its patent value reflects this. AI patent practitioners should
+          actively seek out efficiency innovations — in training, inference, memory, communication
+          overhead, quantization — because these are both technically patentable (specific,
+          measurable, tied to hardware) and commercially valuable (every AI company wants
+          to do the same computation cheaper).
+        </p>
+      </div>
+
+      <!-- Chapter Navigation -->
+      <nav class="chapter-nav">
+        <a href="ex01_transformer.html" class="chapter-nav-btn">
+          <span class="nav-label">&#8592; Previous Case Study</span>
+          <span class="nav-title">Case Study 1: The Transformer Architecture</span>
+        </a>
+        <a href="ex03_crispr.html" class="chapter-nav-btn nav-next">
+          <span class="nav-label">Next Case Study &#8594;</span>
+          <span class="nav-title">Case Study 3: CRISPR Gene Editing</span>
+        </a>
+      </nav>
+    </section>
+
+  </main>
+</div><!-- /page-layout -->
+
+<!-- ══════════════════════════════════════════════════
+     FOOTER
+══════════════════════════════════════════════════ -->
+<footer>
+  <div class="footer-content">
+    <p style="font-size:1rem; font-weight:600; color:white; margin-bottom:.625rem;">
+      Patent Law for Technologists: A Practical Guide for AI, ML, and Biotech Innovators
+    </p>
+    <p>Case Study 2 &bull; LoRA Fine-Tuning Patents &bull; Dr. Wei Chen, Morrison &amp; Foerster</p>
+    <p style="margin-top:1.25rem;">
+      <a href="ex01_transformer.html">Transformer Case Study</a> &nbsp;&bull;&nbsp;
+      <a href="ex02_lora.html">LoRA Case Study</a> &nbsp;&bull;&nbsp;
+      <a href="ex03_crispr.html">CRISPR Case Study</a> &nbsp;&bull;&nbsp;
+      <a href="ex04_gpt.html">GPT Case Study</a> &nbsp;&bull;&nbsp;
+      <a href="ex05_alphafold.html">AlphaFold Case Study</a>
+    </p>
+    <p style="margin-top:1.25rem;">
+      <a href="ch01_patent_system_overview.html">Ch.1</a> &nbsp;&bull;&nbsp;
+      <a href="ch02_patent_eligibility.html">Ch.2</a> &nbsp;&bull;&nbsp;
+      <a href="ch03_prior_art_research.html">Ch.3</a> &nbsp;&bull;&nbsp;
+      <a href="ch04_patent_anatomy.html">Ch.4</a> &nbsp;&bull;&nbsp;
+      <a href="ch05_writing_claims.html">Ch.5</a> &nbsp;&bull;&nbsp;
+      <a href="ch06_specification.html">Ch.6</a> &nbsp;&bull;&nbsp;
+      <a href="ch07_drawings.html">Ch.7</a> &nbsp;&bull;&nbsp;
+      <a href="ch08_application_process.html">Ch.8</a> &nbsp;&bull;&nbsp;
+      <a href="ch09_office_actions.html">Ch.9</a> &nbsp;&bull;&nbsp;
+      <a href="ch10_portfolio_strategy.html">Ch.10</a> &nbsp;&bull;&nbsp;
+      <a href="ch11_international.html">Ch.11</a> &nbsp;&bull;&nbsp;
+      <a href="ch12_monetization.html">Ch.12</a>
+    </p>
+    <p style="margin-top:1.5rem; font-size:.775rem; color:rgba(255,255,255,.4);">
+      This chapter is for educational purposes only and does not constitute legal advice.
+      Patent law is highly fact-specific; consult qualified patent counsel before making filing decisions.
+      &copy; 2025 Morrison &amp; Foerster LLP. All rights reserved.
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>

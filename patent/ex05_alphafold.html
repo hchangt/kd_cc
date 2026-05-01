@@ -1,0 +1,1811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Case Study 5: AlphaFold — Patenting the AI That Solved Protein Folding. How DeepMind navigated §101 patent eligibility at the intersection of AI and biology, the dual open-source and patent strategy, and lessons for computational biology researchers." />
+  <title>Case Study 5: AlphaFold — Patent Law for Technologists</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* ── AlphaFold chapter-specific styles ─────────────── */
+    .arch-label {
+      font-family: var(--font-mono);
+      font-size: .75rem;
+      fill: var(--navy);
+      font-weight: 600;
+    }
+    .arch-ref {
+      font-family: var(--font-mono);
+      font-size: .7rem;
+      fill: var(--gold);
+      font-weight: 700;
+    }
+    .evoformer-block {
+      fill: #d6eaf8;
+      stroke: #1a6b8a;
+      stroke-width: 1.5;
+    }
+    .struct-block {
+      fill: #d5f5e3;
+      stroke: #1e8449;
+      stroke-width: 1.5;
+    }
+    .input-block {
+      fill: #fef9e7;
+      stroke: #d4a017;
+      stroke-width: 1.5;
+    }
+    .output-block {
+      fill: #fdf2f8;
+      stroke: #7d3c98;
+      stroke-width: 1.5;
+    }
+    .recycle-arrow {
+      stroke: var(--gold);
+      stroke-width: 2;
+      stroke-dasharray: 6 3;
+      fill: none;
+      marker-end: url(#arrowGold);
+    }
+    .flow-connector {
+      stroke: var(--navy);
+      stroke-width: 1.5;
+      fill: none;
+      marker-end: url(#arrowNavy);
+    }
+
+    /* timeline SVG */
+    .timeline-svg-label {
+      font-family: var(--font-sans);
+      font-size: .75rem;
+      fill: var(--navy);
+    }
+    .timeline-svg-year {
+      font-family: var(--font-sans);
+      font-size: .7rem;
+      fill: var(--gold);
+      font-weight: 700;
+    }
+    .timeline-svg-event {
+      font-family: var(--font-sans);
+      font-size: .7rem;
+      fill: var(--text);
+    }
+
+    /* highlight-gold box variant */
+    .highlight-gold {
+      background: linear-gradient(135deg, #fef9e7, #fdebd0);
+      border: 1px solid var(--gold);
+      border-left: 5px solid var(--gold);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      margin: 2rem 0;
+    }
+    .highlight-gold h4 { color: var(--navy); margin-top: 0; }
+
+    /* conclusion hero */
+    .conclusion-hero {
+      background: linear-gradient(135deg, var(--navy-dark) 0%, var(--navy) 60%, var(--navy-light) 100%);
+      border-radius: var(--radius-lg);
+      padding: 3rem 2.5rem;
+      margin: 3rem 0;
+      color: white;
+      text-align: center;
+    }
+    .conclusion-hero h2 {
+      color: white;
+      border-bottom: 2px solid rgba(255,255,255,.15);
+      padding-bottom: .75rem;
+      margin-bottom: 1.25rem;
+    }
+    .conclusion-hero p {
+      color: rgba(255,255,255,.85);
+      font-size: 1.05rem;
+      max-width: 720px;
+      margin: 0 auto 1.25rem;
+    }
+    .conclusion-hero .gold-text { color: var(--gold-light); font-weight: 600; }
+
+    /* pill tags in tables */
+    .pill {
+      display: inline-block;
+      background: var(--gray-100);
+      border: 1px solid var(--gray-200);
+      border-radius: 12px;
+      font-size: .75rem;
+      padding: .15rem .5rem;
+      color: var(--gray-700);
+      margin: .1rem;
+      white-space: nowrap;
+    }
+    .pill-blue { background: #d6eaf8; border-color: #85c1e9; color: var(--info); }
+    .pill-green { background: #d5f5e3; border-color: #82e0aa; color: var(--success); }
+    .pill-gold  { background: #fef9e7; border-color: #f9e79f; color: #b7770d; }
+    .pill-purple { background: #f4ecf7; border-color: #d2b4de; color: #7d3c98; }
+
+    /* claim analysis sidebar */
+    .claim-analysis {
+      background: var(--gray-50);
+      border: 1px solid var(--gray-200);
+      border-left: 4px solid var(--navy);
+      border-radius: 0 var(--radius) var(--radius) 0;
+      padding: 1rem 1.25rem;
+      margin: .75rem 0 1.5rem;
+      font-size: .875rem;
+    }
+    .claim-analysis strong { color: var(--navy); }
+
+    /* Ref numeral labels in SVG */
+    .ref-bubble {
+      fill: var(--navy);
+    }
+    .ref-bubble-text {
+      font-family: var(--font-sans);
+      font-size: .65rem;
+      fill: white;
+      font-weight: 700;
+    }
+
+    /* Book wrap section at end */
+    .book-wrap-section {
+      background: var(--gray-50);
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius-lg);
+      padding: 2rem 2rem;
+      margin: 2.5rem 0;
+    }
+    .book-wrap-section h3 { margin-top: 0; }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .conclusion-hero { padding: 2rem 1.25rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════
+     TOP NAVIGATION
+══════════════════════════════════════════════════ -->
+<nav class="top-nav">
+  <div class="nav-container">
+    <a href="index.html" class="nav-logo">Patent Law <span>for Technologists</span></a>
+    <div class="nav-links">
+      <a href="ex01_transformer.html">Ex.1</a>
+      <a href="ex02_lora.html">Ex.2</a>
+      <a href="ex03_crispr.html">Ex.3</a>
+      <a href="ex04_gpt.html">Ex.4</a>
+      <a href="ex05_alphafold.html" class="active">Ex.5</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════════════════
+     CHAPTER HERO
+══════════════════════════════════════════════════ -->
+<header class="chapter-hero">
+  <div class="chapter-hero-content">
+    <div class="chapter-badge">Case Study 5</div>
+    <h1>AlphaFold: Patenting the AI That Solved Protein Folding</h1>
+    <p class="subtitle">
+      DeepMind's unprecedented breakthrough at the intersection of deep learning and structural biology —
+      how open science coexists with patent strategy, and what computational biologists must know
+      before publishing their next Nature paper.
+    </p>
+    <div class="chapter-meta">
+      <span>Dr. Tara S. Yoo &bull; Fish &amp; Richardson, Silicon Valley</span>
+      <span>38 min read</span>
+      <span>12 Sections &bull; 6 Claim Sets &bull; 4 Diagrams</span>
+    </div>
+  </div>
+</header>
+
+<!-- ══════════════════════════════════════════════════
+     LAYOUT
+══════════════════════════════════════════════════ -->
+<div class="page-layout" style="padding-top:2rem;">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <nav class="toc">
+      <h3>Chapter Contents</h3>
+      <ol>
+        <li><a href="#intro">The 50-Year Problem Solved In Silico</a></li>
+        <li><a href="#technical">The Technical Innovation of AlphaFold2</a></li>
+        <li><a href="#strategy">DeepMind's Patent Strategy</a></li>
+        <li><a href="#eligibility">The §101/Biotech Eligibility Challenge</a></li>
+        <li><a href="#claims">Representative Claim Analysis</a></li>
+        <li><a href="#rosettafold">AlphaFold vs. RoseTTAFold</a></li>
+        <li><a href="#alphafold3">AlphaFold3 and the Next Generation</a></li>
+        <li><a href="#commercial">Commercial Applications and Licensing</a></li>
+        <li><a href="#open-data">The Open Data Challenge</a></li>
+        <li><a href="#lessons">Lessons for Computational Biology Researchers</a></li>
+        <li><a href="#tension">The Patent–Open Science Tension</a></li>
+        <li><a href="#takeaways">Key Takeaways</a></li>
+        <li><a href="#book-conclusion">Conclusion: What We Have Learned</a></li>
+      </ol>
+    </nav>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="chapter-content">
+
+    <!-- ─────────────────────────────────────────────────
+         SECTION 1: INTRODUCTION
+    ───────────────────────────────────────────────── -->
+    <section id="intro" class="section-anchor">
+      <h2>1. The 50-Year Problem Solved In Silico</h2>
+
+      <p>
+        On the morning of November 30, 2020, the global structural biology community received the news
+        that many had quietly expected and others had assumed would take another decade: the protein
+        folding problem — how a chain of amino acids collapses from a linear sequence into a precisely
+        folded three-dimensional structure — had been, for all practical purposes, solved. The solver
+        was not a crystallographer, not a cryo-electron microscopist, and not a team of biochemists
+        working with $100 million in grant funding. It was AlphaFold2, a deep learning system built
+        by DeepMind, a subsidiary of Alphabet Inc., and it had just obliterated the state of the art
+        at the 14th Critical Assessment of Protein Structure Prediction (CASP14) competition.
+      </p>
+
+      <div class="stats-row">
+        <div class="stat-item">
+          <div class="stat-number">92.4</div>
+          <div class="stat-label">Median GDT score at CASP14 (out of 100), compared to ~75 for prior best methods</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">50 yrs</div>
+          <div class="stat-label">Duration of the protein folding problem as an open challenge in biochemistry</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">200M+</div>
+          <div class="stat-label">Protein structures predicted and released freely in the AlphaFold Database</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">2024</div>
+          <div class="stat-label">Nobel Prize in Chemistry awarded to Jumper, Hassabis (AlphaFold) and Baker (RoseTTAFold)</div>
+        </div>
+      </div>
+
+      <h3>From Anfinsen's Hypothesis to CASP14</h3>
+      <p>
+        The modern era of protein folding research begins with Christian Anfinsen's 1972 Nobel
+        Prize Lecture, in which he articulated what became known as the <span class="key-term" title="The thermodynamic hypothesis of protein folding">thermodynamic hypothesis</span>:
+        the native (biologically active) conformation of a protein is the one with the lowest
+        free energy, and it is therefore completely specified by the amino acid sequence alone.
+        Anfinsen's ribonuclease experiments demonstrated this: a fully denatured enzyme could
+        spontaneously refold to its active conformation. The sequence was, in principle, all
+        you needed.
+      </p>
+      <p>
+        What followed was fifty years of effort — experimental, computational, and theoretical —
+        to predict that native conformation from sequence alone. The CASP competition, established
+        in 1994, provided an objective benchmark: give your algorithm a sequence whose structure
+        has been solved but not published, and see how close you get. Through CASP1 to CASP13,
+        progress was real but incremental. Template-based methods like Rosetta (David Baker,
+        University of Washington) and threading approaches like I-TASSER (Yang Zhang, University
+        of Michigan) produced useful predictions for sequences homologous to known structures.
+        But for novel folds — sequences with no close evolutionary relatives in the Protein Data
+        Bank — accuracy remained frustratingly limited.
+      </p>
+      <p>
+        AlphaFold1, DeepMind's entry to CASP13 in 2018, was already impressive: it placed first
+        overall. But it was still anchored in traditional approaches, using deep learning primarily
+        for contact prediction. AlphaFold2, presented at CASP14 in 2020 and published in <em>Nature</em>
+        in July 2021, was qualitatively different. Its median GDT score of 92.4 represented accuracy
+        comparable to experimental methods for many targets. For 25 of 43 free-modeling targets,
+        it produced results within experimental error. The assessors described it plainly: this
+        was a solution to the protein folding problem.
+      </p>
+
+      <h3>The Nobel Prize and the Question of Ownership</h3>
+      <p>
+        In October 2024, the Royal Swedish Academy of Sciences awarded the Nobel Prize in Chemistry
+        to John M. Jumper and Demis Hassabis of Google DeepMind "for protein structure prediction"
+        (AlphaFold), and to David Baker of the University of Washington "for computational protein
+        design." This was the Nobel Committee's explicit acknowledgment that computational methods —
+        specifically, deep learning applied to sequence-to-structure prediction — had transformed
+        structural biology at a fundamental level.
+      </p>
+      <p>
+        For the patent law community, the Nobel raised an immediate and pointed question: what, exactly,
+        does Google/DeepMind own? AlphaFold2's code was released on GitHub under the Apache 2.0 license.
+        The full database of 200 million predicted structures was released free for academic and
+        commercial use. Yet DeepMind and Google filed patent applications covering the AlphaFold
+        technology — including, notably, applications filed <em>after</em> the public release of the code.
+        This chapter examines that strategy, analyzes the §101 patent eligibility landscape for AI-based
+        structural prediction, and provides a complete claim strategy for computational biology
+        researchers navigating this domain.
+      </p>
+
+      <div class="callout callout-info">
+        <div class="callout-icon">&#8505;</div>
+        <div class="callout-body">
+          <div class="callout-title">Why This Case Study Is Different</div>
+          <p>
+            AlphaFold presents a unique triple challenge in patent law. First, it sits at the
+            intersection of AI eligibility (<em>Alice</em>) and natural phenomena eligibility (<em>Mayo</em>),
+            requiring claims to satisfy two distinct doctrinal frameworks simultaneously. Second, the
+            open-source release created prior art that the patent applicant itself generated. Third, the
+            commercial landscape — where one company owns the best tool in drug discovery and has chosen
+            to give it away for free — is unlike anything in the prior history of technology licensing.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─────────────────────────────────────────────────
+         SECTION 2: TECHNICAL INNOVATION
+    ───────────────────────────────────────────────── -->
+    <section id="technical" class="section-anchor">
+      <h2>2. The Technical Innovation of AlphaFold2</h2>
+
+      <p>
+        Understanding what is patentable about AlphaFold2 requires understanding what is technically
+        novel about it. The system is not simply "a neural network that predicts protein structure" —
+        that description would encompass hundreds of prior publications and make any claim hopelessly
+        broad and vulnerable to prior art. AlphaFold2's patentable novelty lives in specific architectural
+        innovations that collectively produced its extraordinary accuracy.
+      </p>
+
+      <h3>2a. The Evoformer: A Novel Attention-Based Block</h3>
+      <p>
+        The heart of AlphaFold2 is the <strong>Evoformer</strong>, a novel neural network block that
+        processes two interrelated representations simultaneously: a <span class="key-term" title="Multiple Sequence Alignment — an alignment of the query sequence against evolutionarily related sequences">multiple sequence alignment (MSA)</span>
+        representation and a pairwise residue representation. The MSA encodes evolutionary
+        co-variation information — when two residues co-evolve across species, they are likely in
+        physical contact. The pairwise representation encodes the predicted spatial relationships
+        between every pair of residues.
+      </p>
+      <p>
+        What makes the Evoformer architecturally novel is how it processes these two representations:
+        not sequentially, but through a careful series of attention operations that enforce geometric
+        consistency. The MSA representation uses <strong>row-wise gated self-attention</strong> (attention
+        across residues within a single sequence) and <strong>column-wise gated attention</strong>
+        (attention across sequences at the same residue position, capturing evolutionary relationships).
+        The pairwise representation uses <strong>triangle attention</strong> — a novel operation where
+        attention weights are modulated by the third edge of every triangle of residue pairs, enforcing
+        the geometric constraint that if residue A is close to B and B is close to C, then A and C
+        must bear some spatial relationship.
+      </p>
+      <p>
+        This triangle attention module has no prior art in the transformer literature as of the 2020
+        AlphaFold2 publication. It is, in patent terms, a novel architectural element with a clear
+        technical function: it enforces metric-space consistency constraints on the learned pairwise
+        distances, reducing the solution space the structure module must search.
+      </p>
+
+      <h3>2b. The Structure Module: SE(3)-Equivariant Transformer</h3>
+      <p>
+        The structure module converts the Evoformer's abstract pairwise representations into actual
+        3D coordinates. It uses what AlphaFold's authors call an <strong>invariant point attention (IPA)</strong>
+        mechanism — a form of attention that operates directly in 3D space, equivariant to
+        rotations and translations (the SE(3) group). Each residue is represented as a rigid body
+        frame — a local coordinate system defined by its backbone atoms — and the IPA mechanism
+        updates these frames iteratively, maintaining geometric consistency throughout.
+      </p>
+      <p>
+        This approach is technically distinct from applying a standard transformer to coordinate
+        vectors. Standard transformers are not equivariant to rotations: if you rotate the input
+        coordinates, the output changes arbitrarily. The IPA mechanism is designed such that the
+        output backbone torsion angles and atomic coordinates are invariant under global rotations
+        and translations of the input — a necessary property for any physically meaningful structure
+        prediction.
+      </p>
+
+      <h3>2c. Recycling: Iterative Refinement</h3>
+      <p>
+        AlphaFold2 employs an iterative refinement strategy in which the full network is run
+        multiple times (typically three "recycles"), with the output of each pass fed back as
+        additional input to the next. Specifically, the predicted structure from one pass is
+        converted back into a pairwise distance representation that is added to the input of the
+        Evoformer in the next pass. This recycling process progressively refines the prediction,
+        with each iteration correcting errors introduced in the previous one.
+      </p>
+
+      <h3>2d. End-to-End Differentiable Training</h3>
+      <p>
+        Unlike earlier hybrid systems that combined separate, independently trained modules,
+        AlphaFold2 is trained end-to-end: every parameter from the MSA processing to the final
+        coordinate prediction is jointly optimized against a single loss function (the Frame-Aligned
+        Point Error, or FAPE) that directly measures the accuracy of predicted 3D atomic positions.
+        This end-to-end differentiability is a key enabling factor in the system's accuracy and
+        is itself a claimable architectural feature.
+      </p>
+
+      <!-- SVG ARCHITECTURE DIAGRAM -->
+      <div class="figure">
+        <div class="figure-content" style="width:100%;">
+          <svg viewBox="0 0 760 460" class="diagram-svg" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="AlphaFold2 Architecture Diagram with Reference Numerals">
+            <defs>
+              <marker id="arrowNavy" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                <polygon points="0 0, 10 3.5, 0 7" fill="#1a2744"/>
+              </marker>
+              <marker id="arrowGold" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                <polygon points="0 0, 10 3.5, 0 7" fill="#c8942a"/>
+              </marker>
+              <marker id="arrowGray" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                <polygon points="0 0, 10 3.5, 0 7" fill="#6c757d"/>
+              </marker>
+            </defs>
+
+            <!-- Background -->
+            <rect width="760" height="460" fill="#f8f9fa" rx="12"/>
+
+            <!-- Title -->
+            <text x="380" y="30" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#1a2744">AlphaFold2 Architecture — Patent Reference Diagram</text>
+
+            <!-- ── INPUT BLOCK (100) ── -->
+            <!-- MSA Input box -->
+            <rect x="30" y="60" width="150" height="70" rx="8" class="input-block"/>
+            <text x="105" y="85" text-anchor="middle" class="arch-label" font-family="Inter, sans-serif">MSA Input</text>
+            <text x="105" y="101" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#566573">(Query + Homologs)</text>
+            <text x="105" y="117" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#566573">N_seq × L × C_m</text>
+            <!-- Ref bubble 100 -->
+            <circle cx="167" cy="63" r="11" fill="#c8942a"/>
+            <text x="167" y="67" text-anchor="middle" class="ref-bubble-text" font-family="Inter, sans-serif">100</text>
+
+            <!-- Template Input box -->
+            <rect x="30" y="150" width="150" height="60" rx="8" class="input-block"/>
+            <text x="105" y="176" text-anchor="middle" class="arch-label" font-family="Inter, sans-serif">Template Input</text>
+            <text x="105" y="192" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#566573">(PDB homologs)</text>
+
+            <!-- Pairwise Init box -->
+            <rect x="30" y="230" width="150" height="60" rx="8" class="input-block"/>
+            <text x="105" y="256" text-anchor="middle" class="arch-label" font-family="Inter, sans-serif">Pairwise Init</text>
+            <text x="105" y="272" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#566573">L × L × C_z</text>
+
+            <!-- Arrows from inputs to Evoformer -->
+            <line x1="180" y1="95" x2="240" y2="155" stroke="#1a2744" stroke-width="1.5" marker-end="url(#arrowNavy)"/>
+            <line x1="180" y1="180" x2="240" y2="185" stroke="#1a2744" stroke-width="1.5" marker-end="url(#arrowNavy)"/>
+            <line x1="180" y1="260" x2="240" y2="215" stroke="#1a2744" stroke-width="1.5" marker-end="url(#arrowNavy)"/>
+
+            <!-- ── EVOFORMER STACK (102) ── -->
+            <rect x="240" y="100" width="210" height="230" rx="10" class="evoformer-block"/>
+            <text x="345" y="125" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#1a6b8a">Evoformer Stack</text>
+            <text x="345" y="141" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#566573">48 blocks × {</text>
+            <!-- Ref bubble 102 -->
+            <circle cx="438" cy="103" r="11" fill="#c8942a"/>
+            <text x="438" y="107" text-anchor="middle" class="ref-bubble-text" font-family="Inter, sans-serif">102</text>
+
+            <!-- Inner block: Row-wise attention -->
+            <rect x="255" y="150" width="180" height="38" rx="6" fill="white" stroke="#1a6b8a" stroke-width="1"/>
+            <text x="345" y="165" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" font-weight="600" fill="#1a6b8a">MSA Row-wise Gated</text>
+            <text x="345" y="179" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#1a6b8a">Self-Attention</text>
+
+            <!-- Inner block: Col-wise attention -->
+            <rect x="255" y="196" width="180" height="38" rx="6" fill="white" stroke="#1a6b8a" stroke-width="1"/>
+            <text x="345" y="211" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" font-weight="600" fill="#1a6b8a">MSA Column-wise</text>
+            <text x="345" y="225" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#1a6b8a">Gated Attention</text>
+
+            <!-- Inner block: Triangle attention -->
+            <rect x="255" y="242" width="180" height="38" rx="6" fill="#ebf5fb" stroke="#1a6b8a" stroke-width="1.5" stroke-dasharray="4 2"/>
+            <text x="345" y="257" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" font-weight="700" fill="#1a2744">Triangle Attention</text>
+            <text x="345" y="271" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#1a2744">(Novel: pairwise rep.)</text>
+
+            <!-- Inner block: transition -->
+            <rect x="255" y="288" width="180" height="30" rx="6" fill="white" stroke="#1a6b8a" stroke-width="1"/>
+            <text x="345" y="307" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#1a6b8a">Pair Transition + Outer Product Mean</text>
+
+            <!-- Arrow: Evoformer → Structure Module -->
+            <line x1="450" y1="215" x2="510" y2="215" stroke="#1a2744" stroke-width="2" marker-end="url(#arrowNavy)"/>
+            <text x="480" y="208" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" fill="#566573">MSA repr.</text>
+            <text x="480" y="232" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" fill="#566573">Pair repr.</text>
+
+            <!-- ── STRUCTURE MODULE (104) ── -->
+            <rect x="510" y="140" width="195" height="150" rx="10" class="struct-block"/>
+            <text x="607" y="163" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#1e8449">Structure Module</text>
+            <text x="607" y="179" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#566573">8 layers × {</text>
+            <!-- Ref bubble 104 -->
+            <circle cx="694" cy="143" r="11" fill="#c8942a"/>
+            <text x="694" y="147" text-anchor="middle" class="ref-bubble-text" font-family="Inter, sans-serif">104</text>
+
+            <!-- IPA inner block -->
+            <rect x="525" y="188" width="165" height="40" rx="6" fill="white" stroke="#1e8449" stroke-width="1"/>
+            <text x="607" y="203" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" font-weight="600" fill="#1e8449">Invariant Point</text>
+            <text x="607" y="217" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#1e8449">Attention (IPA) [SE(3)]</text>
+
+            <!-- Backbone update -->
+            <rect x="525" y="236" width="165" height="38" rx="6" fill="white" stroke="#1e8449" stroke-width="1"/>
+            <text x="607" y="251" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" font-weight="600" fill="#1e8449">Backbone Frame</text>
+            <text x="607" y="265" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#1e8449">Update + Torsion Angles</text>
+
+            <!-- Arrow: Structure module → output -->
+            <line x1="607" y1="290" x2="607" y2="340" stroke="#1a2744" stroke-width="2" marker-end="url(#arrowNavy)"/>
+
+            <!-- ── 3D OUTPUT (106) ── -->
+            <rect x="510" y="340" width="195" height="70" rx="8" class="output-block"/>
+            <text x="607" y="363" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#7d3c98">3D Coordinate Output</text>
+            <text x="607" y="379" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#566573">All-atom coordinates + pLDDT</text>
+            <text x="607" y="395" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#566573">per-residue confidence score</text>
+            <!-- Ref bubble 106 -->
+            <circle cx="694" cy="343" r="11" fill="#c8942a"/>
+            <text x="694" y="347" text-anchor="middle" class="ref-bubble-text" font-family="Inter, sans-serif">106</text>
+
+            <!-- ── RECYCLING LOOP (108) ── -->
+            <!-- Dashed arc from output back to input -->
+            <path d="M 510 390 Q 360 440 240 360 Q 200 330 200 295 Q 200 250 230 225" stroke="#c8942a" stroke-width="2" stroke-dasharray="7 3" fill="none" marker-end="url(#arrowGold)"/>
+            <text x="330" y="440" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#c8942a">Recycling (×3 iterations)</text>
+            <!-- Ref bubble 108 -->
+            <circle cx="355" cy="417" r="11" fill="#c8942a"/>
+            <text x="355" y="421" text-anchor="middle" class="ref-bubble-text" font-family="Inter, sans-serif">108</text>
+
+            <!-- Legend -->
+            <rect x="30" y="310" width="170" height="120" rx="8" fill="white" stroke="#dee2e6" stroke-width="1"/>
+            <text x="115" y="328" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" font-weight="700" fill="#1a2744">Reference Numerals</text>
+            <rect x="42" y="336" width="12" height="10" rx="2" fill="#fef9e7" stroke="#d4a017"/>
+            <text x="60" y="345" font-family="Inter, sans-serif" font-size="10" fill="#566573">100 — MSA Input</text>
+            <rect x="42" y="352" width="12" height="10" rx="2" fill="#d6eaf8" stroke="#1a6b8a"/>
+            <text x="60" y="361" font-family="Inter, sans-serif" font-size="10" fill="#566573">102 — Evoformer Stack</text>
+            <rect x="42" y="368" width="12" height="10" rx="2" fill="#d5f5e3" stroke="#1e8449"/>
+            <text x="60" y="377" font-family="Inter, sans-serif" font-size="10" fill="#566573">104 — Structure Module</text>
+            <rect x="42" y="384" width="12" height="10" rx="2" fill="#fdf2f8" stroke="#7d3c98"/>
+            <text x="60" y="393" font-family="Inter, sans-serif" font-size="10" fill="#566573">106 — 3D Output / pLDDT</text>
+            <line x1="42" y1="408" x2="54" y2="408" stroke="#c8942a" stroke-width="2" stroke-dasharray="4 2"/>
+            <text x="60" y="412" font-family="Inter, sans-serif" font-size="10" fill="#566573">108 — Recycling Loop</text>
+          </svg>
+        </div>
+        <p class="figure-caption">
+          Fig. 1 — AlphaFold2 system architecture with patent reference numerals. Reference 100: MSA and
+          template input representations. Reference 102: the Evoformer stack (48 blocks), comprising
+          row-wise gated self-attention, column-wise gated attention, and triangle attention modules.
+          Reference 104: the SE(3)-equivariant structure module using Invariant Point Attention (IPA).
+          Reference 106: all-atom 3D coordinate output with per-residue pLDDT confidence score.
+          Reference 108: the recycling connection enabling iterative refinement over three passes.
+        </p>
+      </div>
+
+      <div class="callout callout-example">
+        <div class="callout-icon">&#128300;</div>
+        <div class="callout-body">
+          <div class="callout-title">Technical Novelty Checklist for Patent Purposes</div>
+          <p>
+            For a computational biology patent to withstand §101 and §103 challenges, each architectural
+            novelty must be identified and documented before the system is described in any publication.
+            AlphaFold2's novel elements include: (1) triangle attention operating on pairwise residue
+            representations; (2) invariant point attention for SE(3)-equivariant 3D coordinate updates;
+            (3) joint MSA-row and MSA-column attention; (4) outer product mean for MSA-to-pair communication;
+            and (5) the specific recycling protocol with coordinate-to-pair conversion. Each of these is
+            a potentially independent claim element.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─────────────────────────────────────────────────
+         SECTION 3: DEEPMIND'S PATENT STRATEGY
+    ───────────────────────────────────────────────── -->
+    <section id="strategy" class="section-anchor">
+      <h2>3. DeepMind's Patent Strategy</h2>
+
+      <p>
+        DeepMind's approach to AlphaFold2 is, by any measure, the most significant experiment in
+        open-source/patent coexistence in the history of computational science. Understanding it
+        requires appreciating each component of the strategy and why it was chosen.
+      </p>
+
+      <h3>The Open Release</h3>
+      <p>
+        In July 2021, contemporaneous with the publication of the AlphaFold2 paper in <em>Nature</em>,
+        DeepMind released the full AlphaFold2 source code on GitHub under the Apache 2.0 open-source
+        license, including model weights for the full-scale model. This was not a stripped-down research
+        prototype: it was the complete, production-quality system capable of reproducing CASP14-level
+        accuracy. Apache 2.0 includes an explicit patent grant — users of the code receive a license
+        to any patents that DeepMind holds that are necessary to practice the code as licensed.
+      </p>
+      <p>
+        Then, in collaboration with EMBL's European Bioinformatics Institute (EMBL-EBI), DeepMind
+        released the AlphaFold Protein Structure Database: initially covering 98% of the human proteome
+        and twenty model organisms, later expanded to over 200 million structures representing virtually
+        every known protein in UniProt. This database, updated as AlphaFold improved, is freely
+        accessible to academic researchers and — under its current terms — to commercial users as well,
+        subject to EMBL-EBI's terms of use.
+      </p>
+
+      <h3>The Patent Filings</h3>
+      <p>
+        Alongside this open release, DeepMind and Google pursued patent protection. Key filings include:
+      </p>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Application / Publication</th>
+              <th>Inventors</th>
+              <th>Title / Subject Matter</th>
+              <th>Status (as of 2024)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>WO2022/256848</td>
+              <td>Jumper, Evans, Pritzel, et al.</td>
+              <td>"Protein structure prediction using machine learning" — core AlphaFold2 architecture including Evoformer and structure module</td>
+              <td>PCT published; national phase entries</td>
+            </tr>
+            <tr>
+              <td>US application (pub. 2022)</td>
+              <td>Jumper et al.</td>
+              <td>Evoformer: attention-based processing of MSA and pairwise representations with triangle attention</td>
+              <td>Pending prosecution</td>
+            </tr>
+            <tr>
+              <td>US application (pub. 2022)</td>
+              <td>Jumper et al.</td>
+              <td>Template-based structure prediction using ML; template embedding into Evoformer</td>
+              <td>Pending prosecution</td>
+            </tr>
+            <tr>
+              <td>WO2022/256851</td>
+              <td>Jumper et al.</td>
+              <td>AlphaFold-Multimer: predicting protein complex (multi-chain) structures</td>
+              <td>PCT published</td>
+            </tr>
+            <tr>
+              <td>AlphaFold3 patents (2024)</td>
+              <td>Abramson, Adler, Barnett, et al.</td>
+              <td>Diffusion-based unified molecular structure prediction (proteins, DNA, RNA, small molecules)</td>
+              <td>Patent applications filed 2024</td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="table-caption">Table 1 — Key DeepMind/Google patent filings related to AlphaFold technology</p>
+      </div>
+
+      <h3>Why Both? The Logic of Dual Open-Source + Patent Strategy</h3>
+      <p>
+        The apparent paradox of open-sourcing while patenting resolves when you understand DeepMind's
+        actual objectives and the legal mechanics involved.
+      </p>
+
+      <p>
+        <strong>Deterring future competitors.</strong> Even if DeepMind never enforces its AlphaFold
+        patents against academic users, the existence of issued patents creates a legal shadow over
+        any commercial entity that seeks to build a competing product using the same architectural
+        principles. A startup attempting to commercialize a similar Evoformer-based system must
+        either design around the claims or take a license — giving DeepMind/Google leverage they
+        would not otherwise possess.
+      </p>
+      <p>
+        <strong>The Apache 2.0 carve-out.</strong> The Apache 2.0 license grants a patent license
+        only for the specific code as released. A company that takes the AlphaFold2 weights, fine-tunes
+        them, wraps them in a SaaS drug discovery platform, and sells subscriptions is arguably doing
+        something beyond the scope of the Apache 2.0 patent grant. The underlying method patents give
+        DeepMind/Isomorphic Labs a potential claim against such an entity.
+      </p>
+      <p>
+        <strong>The Isomorphic Labs angle.</strong> DeepMind's commercial drug discovery spinout,
+        Isomorphic Labs, uses AlphaFold commercially. Patents on the underlying technology protect
+        Isomorphic's competitive position even as the open-source release of AlphaFold builds
+        the ecosystem and scientific credibility that makes Isomorphic's partnerships with pharma
+        (Eli Lilly, Novartis) valuable.
+      </p>
+      <p>
+        <strong>Freedom of action.</strong> Open-sourcing under Apache 2.0 with a patent grant
+        signals to the scientific community that DeepMind is not using patents to suppress research.
+        This maintains DeepMind's reputation as a good actor in science, which is valuable for
+        recruiting, for academic partnerships, and for regulatory goodwill — while the patents
+        remain available for commercial enforcement if needed.
+      </p>
+
+      <div class="callout callout-warning">
+        <div class="callout-icon">&#9888;</div>
+        <div class="callout-body">
+          <div class="callout-title">The Self-Created Prior Art Problem</div>
+          <p>
+            DeepMind's July 2021 open release created a substantial prior art problem for its own patent
+            applications. Under the AIA's one-year grace period (35 U.S.C. § 102(b)(1)(A)), an inventor's
+            own public disclosures made within one year before the effective filing date do not constitute
+            prior art. DeepMind filed its PCT applications (with priority dates in 2021, before the open
+            release) carefully structured to precede the public disclosure. Any company that performed
+            similar work but failed to file before its own public disclosure — a common error in academic
+            labs — would face the full force of AlphaFold2 as prior art, with no grace period protection.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─────────────────────────────────────────────────
+         SECTION 4: §101 ELIGIBILITY CHALLENGE
+    ───────────────────────────────────────────────── -->
+    <section id="eligibility" class="section-anchor">
+      <h2>4. The §101/Biotech Patent Eligibility Challenge</h2>
+
+      <p>
+        AlphaFold2 presents what is arguably the most conceptually difficult §101 eligibility scenario
+        in contemporary patent law. It sits at the precise intersection where two independent lines of
+        eligibility doctrine — the <em>Alice</em> abstract-idea doctrine and the <em>Mayo</em>
+        natural-phenomena doctrine — both potentially apply. A protein's three-dimensional structure
+        is determined by physics. The Boltzmann distribution over conformations is a law of nature.
+        Anfinsen's thermodynamic hypothesis is a natural phenomenon. Is AlphaFold simply discovering
+        (not inventing) something that already exists in nature?
+      </p>
+
+      <h3>The Threshold Question: Is Protein Folding a "Natural Law"?</h3>
+      <p>
+        The USPTO's own guidance on natural phenomena, following <em>Mayo Collaborative Services v.
+        Prometheus Laboratories</em> (2012) and <em>Association for Molecular Pathology v. Myriad
+        Genetics</em> (2013), draws a distinction between the natural phenomenon itself — which
+        is not patentable — and specific technical methods of detecting, measuring, or applying
+        that phenomenon, which may be patentable. The challenge for AlphaFold claims is that the
+        natural phenomenon at issue is itself a mapping: sequence → structure. If the claim is
+        at base "a method of determining the three-dimensional structure that corresponds to a
+        given amino acid sequence," it is difficult to articulate why this is not simply a method
+        of observing a natural phenomenon.
+      </p>
+      <p>
+        The answer lies in the <em>specificity of the technical implementation</em>. No natural law
+        tells us to use triangle attention mechanisms, invariant point attention, or the specific
+        recycling protocol that AlphaFold uses. Those are human-invented engineering choices that
+        happen to approximate the physical reality extremely well. The claim should cover the
+        engineering system, not the biological fact it reveals.
+      </p>
+
+      <h3>Alice/Mayo Two-Step Analysis for an AlphaFold Claim</h3>
+
+      <p>
+        <strong>Step 1A — Directed to a judicial exception?</strong>
+        A claim reciting "processing a protein sequence through a neural network to predict its 3D
+        structure" is almost certainly directed to a combination of mathematical concepts (the neural
+        network's operations) and a natural law (the sequence-structure relationship). This is an
+        uncomfortable yes: the claim as described in generic terms does implicate judicial exceptions.
+      </p>
+      <p>
+        <strong>Step 2A, Prong 1 — Practical application?</strong>
+        The practical application question asks whether the claim integrates the judicial exception
+        into a practical application. Under <em>Enfish</em> and its progeny, an improvement to computer
+        functionality itself — not just applying a computer to a problem — can qualify. The Evoformer's
+        specific architecture, including triangle attention and the joint MSA/pairwise processing, is
+        arguably an improvement to machine-learning-based prediction systems as a technical matter:
+        it produces better results, faster, with better calibrated confidence estimates, than prior
+        art computer systems. It is not merely implementing abstract prediction on a computer; it is
+        a specific new machine architecture that produces technically superior outputs.
+      </p>
+      <p>
+        <strong>Step 2A, Prong 2 — Additional elements beyond the exception?</strong>
+        Alternatively: does the claim include additional elements that are not well-understood, routine,
+        or conventional? Triangle attention is not well-understood or routine — it was invented by the
+        AlphaFold2 team. Invariant point attention is not routine — it was first described in the
+        AlphaFold2 paper. The recycling protocol is not conventional. Each of these elements independently
+        satisfies the "not well-understood, routine, or conventional" test.
+      </p>
+      <p>
+        <strong>Step 2B — Significantly more?</strong>
+        Even if the claim is directed to an abstract idea and the practical application argument fails,
+        the novel architectural elements — the triangle attention module, the IPA mechanism, the specific
+        recycling protocol with coordinate-to-pair conversion — constitute "significantly more" than
+        the abstract idea or natural law. They represent concrete engineering innovations that transform
+        the claim into something patent-eligible.
+      </p>
+
+      <div class="comparison-grid">
+        <div class="comparison-item bad">
+          <h4>Patent-Ineligible Claim Framing</h4>
+          <p><em>A method for predicting the three-dimensional structure of a protein comprising:</em></p>
+          <ul>
+            <li>receiving an amino acid sequence of the protein; and</li>
+            <li>using a machine learning model to predict the three-dimensional structure of the protein from the amino acid sequence.</li>
+          </ul>
+          <p><strong>Why it fails:</strong> This claim is directed to "predict 3D structure from sequence" — essentially a statement of Anfinsen's hypothesis implemented on a computer. It would be rejected under §101 as directed to a natural phenomenon (the sequence-structure relationship) implemented with a generic "machine learning model" — the classic abstract-idea claim failing Alice Step 2B. There is nothing in the claim beyond the natural phenomenon and a generic computer implementation.</p>
+        </div>
+        <div class="comparison-item good">
+          <h4>Patent-Eligible Claim Framing</h4>
+          <p><em>A computer-implemented method comprising:</em></p>
+          <ul>
+            <li>generating a multiple sequence alignment (MSA) representation comprising N_seq aligned sequences each of length L;</li>
+            <li>processing the MSA representation and a pairwise residue representation through a plurality of Evoformer blocks, wherein each block applies a triangle attention mechanism to the pairwise representation by computing attention weights as a function of all three edges of each triangle of residue pairs; and</li>
+            <li>iteratively refining backbone frame representations using invariant point attention operating in SE(3) space.</li>
+          </ul>
+          <p><strong>Why it survives:</strong> The triangle attention mechanism is not well-understood, routine, or conventional — it is a novel architectural element. Invariant point attention in SE(3) space is a novel technical contribution. The claim is tied to a specific technical architecture that represents a genuine improvement to prior protein structure prediction systems.</p>
+        </div>
+      </div>
+
+      <div class="callout callout-tip">
+        <div class="callout-icon">&#9733;</div>
+        <div class="callout-body">
+          <div class="callout-title">The Preemption Test in Practice</div>
+          <p>
+            The Supreme Court's concern underlying §101 is preemption: a claim should not monopolize
+            all practical uses of a natural law or abstract idea. The AlphaFold-type claim avoids
+            preemption precisely because it is tied to a specific technical implementation. Researchers
+            remain free to use other architectures to predict protein structure — Rosetta's energy-based
+            methods, RoseTTAFold's three-track architecture, ESMFold's language-model approach. The
+            claim covers only the specific Evoformer-based pipeline with triangle attention. The natural
+            law (sequence determines structure) is freely available; only this particular implementation
+            method is claimed.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─────────────────────────────────────────────────
+         SECTION 5: REPRESENTATIVE CLAIMS
+    ───────────────────────────────────────────────── -->
+    <section id="claims" class="section-anchor">
+      <h2>5. Representative Claim Analysis</h2>
+
+      <p>
+        The following claim set is drafted for illustrative purposes, representing the type of claims
+        that would protect an AlphaFold-type invention while surviving §101, §102, and §103 challenges.
+        Each claim is followed by an analysis of why the specific limitations were chosen.
+      </p>
+
+      <div class="claim-box">
+        <div class="claim-header">Hypothetical Claim Set — AlphaFold-Type Protein Structure Prediction</div>
+
+        <p>
+          <span class="claim-number">Claim 1.</span> A computer-implemented method for predicting a
+          three-dimensional structure of a protein, the method comprising:
+        </p>
+        <p class="claim-indent">
+          <span class="claim-element">receiving, as input, an amino acid sequence of the protein;</span>
+          <span class="claim-element">generating a multiple sequence alignment (MSA) representation by aligning the amino acid sequence against a database of homologous protein sequences, wherein the MSA representation encodes N<sub>seq</sub> aligned sequences, each of length L, in an N<sub>seq</sub> × L × C<sub>m</sub> dimensional feature representation;</span>
+          <span class="claim-element">generating an initial pairwise residue representation encoding predicted spatial relationships between residue pairs in an L × L × C<sub>z</sub> dimensional feature representation;</span>
+          <span class="claim-element">processing the MSA representation and the pairwise residue representation through a plurality of Evoformer blocks arranged in a sequential stack, wherein each Evoformer block comprises:</span>
+          <span class="claim-element" style="padding-left:4rem;">(i) an MSA row-wise gated self-attention module configured to compute, for each sequence in the MSA, attention weights over residue positions along the sequence dimension;</span>
+          <span class="claim-element" style="padding-left:4rem;">(ii) an MSA column-wise gated attention module configured to compute, for each residue position, attention weights over sequences in the MSA dimension; and</span>
+          <span class="claim-element" style="padding-left:4rem;">(iii) a triangle attention module configured to update the pairwise residue representation by computing, for each ordered pair of residue positions (i, j), attention weights that are a function of the pairwise representations for all residue positions k, thereby incorporating geometric constraints imposed by the triangle inequality on predicted pairwise distances;</span>
+          <span class="claim-element">predicting, using a structure module receiving the processed MSA representation and processed pairwise residue representation, backbone torsion angles and three-dimensional atomic coordinates for each residue in the amino acid sequence, wherein the structure module updates a set of rigid-body backbone frame representations using invariant point attention operating equivariantly under the group of rigid-body transformations SE(3); and</span>
+          <span class="claim-element">outputting the predicted three-dimensional protein structure comprising the three-dimensional atomic coordinates for each residue.</span>
+        </p>
+      </div>
+
+      <div class="claim-analysis">
+        <strong>Claim 1 Analysis.</strong> The independent method claim is carefully constructed to
+        distinguish the two principal prior-art systems: Rosetta (energy function-based, no MSA
+        transformer) and I-TASSER (threading/fragment assembly, no attention mechanism). The triangle
+        attention module limitation (element iii) is the most novel element — it has no clear prior art
+        as of July 2021. The SE(3)-equivariant invariant point attention limitation distinguishes all
+        prior deep learning approaches to structure prediction, which either ignored rotational equivariance
+        entirely or addressed it through data augmentation. Dimensionality parameters (N_seq, L, C_m, C_z)
+        ground the claim in the specific architectural design rather than the abstract task.
+        <strong>§101:</strong> The triangle attention and IPA mechanisms are not well-understood or
+        conventional, satisfying Alice Step 2B.
+      </div>
+
+      <div class="claim-box">
+        <p>
+          <span class="claim-number">Claim 2.</span> The method of claim 1, further comprising:
+        </p>
+        <p class="claim-indent">
+          <span class="claim-element">iteratively refining the predicted three-dimensional protein structure by performing a plurality of recycling iterations, wherein each recycling iteration comprises:</span>
+          <span class="claim-element" style="padding-left:4rem;">(a) converting the three-dimensional atomic coordinates predicted in a preceding iteration into an updated pairwise residue representation encoding inter-residue distances and orientations derived from the predicted coordinates; and</span>
+          <span class="claim-element" style="padding-left:4rem;">(b) re-processing the updated pairwise residue representation and the MSA representation through the plurality of Evoformer blocks and the structure module to produce an updated predicted three-dimensional protein structure;</span>
+          <span class="claim-element">wherein the plurality of recycling iterations comprises at least three iterations.</span>
+        </p>
+      </div>
+
+      <div class="claim-analysis">
+        <strong>Claim 2 Analysis.</strong> This dependent claim captures the recycling protocol that
+        contributes meaningfully to AlphaFold2's accuracy advantage. The "converting predicted coordinates
+        into an updated pairwise representation" limitation is novel — prior iterative refinement methods
+        (e.g., gradient descent on energy functions in Rosetta) did not convert predicted 3D coordinates
+        back into an attention-based pairwise representation. The "at least three iterations" limitation
+        is drawn from the published AlphaFold2 training procedure and is a specific technical choice
+        supported by ablation studies in the paper.
+      </div>
+
+      <div class="claim-box">
+        <p>
+          <span class="claim-number">Claim 3.</span> The method of claim 1 or 2, further comprising:
+        </p>
+        <p class="claim-indent">
+          <span class="claim-element">generating, for each residue in the amino acid sequence, a per-residue local distance difference test (pLDDT) confidence score, wherein the pLDDT score is predicted by the structure module as an additional output head trained to estimate the agreement between the predicted atomic coordinates and experimentally determined coordinates for the corresponding residue; and</span>
+          <span class="claim-element">outputting the pLDDT scores as a per-residue confidence estimate accompanying the predicted three-dimensional protein structure.</span>
+        </p>
+      </div>
+
+      <div class="claim-analysis">
+        <strong>Claim 3 Analysis.</strong> The pLDDT confidence score is an important novel feature:
+        prior structure prediction methods (Rosetta, I-TASSER) did not produce per-residue confidence
+        scores calibrated to experimentally validated accuracy metrics. The pLDDT score, trained to
+        predict agreement with PDB structures, enables downstream users to identify high-confidence
+        regions for drug binding while flagging low-confidence loops. This claim supports a separate
+        commercial use: the pLDDT as a drug discovery filtering tool.
+      </div>
+
+      <div class="claim-box">
+        <p>
+          <span class="claim-number">Claim 4.</span> The method of claim 1, wherein:
+        </p>
+        <p class="claim-indent">
+          <span class="claim-element">the amino acid sequence comprises a plurality of polypeptide chains forming a protein complex;</span>
+          <span class="claim-element">generating the MSA representation further comprises constructing separate MSA representations for each polypeptide chain and pairing homologous sequences from the separate MSA representations based on shared taxonomic origin; and</span>
+          <span class="claim-element">the pairwise residue representation encodes both intra-chain and inter-chain residue pair relationships, thereby enabling prediction of quaternary protein structure comprising relative orientations and contact interfaces of the plurality of polypeptide chains in the protein complex.</span>
+        </p>
+      </div>
+
+      <div class="claim-analysis">
+        <strong>Claim 4 Analysis.</strong> This claim covers AlphaFold-Multimer, the extension to
+        protein complex prediction. The "paired MSA" strategy — pairing homologs based on shared
+        taxonomic origin to capture co-evolutionary signals between chains — is a specific technical
+        innovation disclosed in the AlphaFold-Multimer paper (Evans et al., 2021). Prior complex
+        structure prediction methods (HADDOCK, ClusPro) used docking rather than end-to-end learned
+        prediction, and none used paired MSA with taxonomic pairing. Commercially valuable: antibody-antigen
+        complex prediction is a high-demand drug discovery application.
+      </div>
+
+      <div class="claim-box">
+        <p>
+          <span class="claim-number">Claim 5.</span> A system for predicting protein three-dimensional structures, the system comprising:
+        </p>
+        <p class="claim-indent">
+          <span class="claim-element">one or more processors; and</span>
+          <span class="claim-element">one or more non-transitory computer-readable media storing instructions that, when executed by the one or more processors, cause the system to perform the method of any one of claims 1–4.</span>
+        </p>
+      </div>
+
+      <div class="claim-box">
+        <p>
+          <span class="claim-number">Claim 6.</span> One or more non-transitory computer-readable media storing:
+        </p>
+        <p class="claim-indent">
+          <span class="claim-element">a trained machine learning model comprising a plurality of trained Evoformer blocks and a trained structure module, wherein:</span>
+          <span class="claim-element" style="padding-left:4rem;">(a) each Evoformer block comprises trained parameters for an MSA row-wise gated self-attention module, a trained MSA column-wise gated attention module, and a trained triangle attention module configured to update pairwise residue representations using geometric constraints derived from triangle relationships among residue pairs;</span>
+          <span class="claim-element" style="padding-left:4rem;">(b) the trained structure module comprises trained parameters for invariant point attention operating in SE(3) space; and</span>
+          <span class="claim-element" style="padding-left:4rem;">(c) the trained machine learning model is configured to receive a multiple sequence alignment representation and a pairwise residue representation and to output predicted three-dimensional atomic coordinates for each residue of a query protein sequence.</span>
+        </p>
+      </div>
+
+      <div class="claim-analysis">
+        <strong>Claim 6 Analysis — CRM Claim.</strong> The computer-readable medium claim covering
+        a "trained machine learning model" is a relatively new claim type in AI patents. The Federal
+        Circuit's decisions in <em>Enfish</em> and subsequent cases allow CRM claims covering software
+        that embodies novel technical functionality. Claiming the trained model itself — as opposed
+        to only the training method or the inference method — provides potentially broader coverage:
+        anyone who distributes the model weights (even without running inference) is a potential
+        infringer. Note: whether trained model weights constitute patentable subject matter is an
+        actively developing area of law; prosecution strategy should include arguments prepared
+        for §101 challenges to this claim type.
+      </div>
+
+      <div class="callout callout-danger">
+        <div class="callout-icon">&#9888;</div>
+        <div class="callout-body">
+          <div class="callout-title">Apache 2.0 Patent Grant — Interaction with the CRM Claim</div>
+          <p>
+            DeepMind's Apache 2.0 release of the trained AlphaFold2 weights includes an express patent
+            license. If a court determines that the CRM claim above is infringed by distribution of
+            the weights, that infringement is licensed under Apache 2.0 for users of the released weights.
+            The claim would, however, reach parties who independently train a similar model (without
+            using DeepMind's weights) or who use the architecture to train a commercial model on private
+            data. Commercial drug discovery companies that retrain AlphaFold-type models on proprietary
+            structural databases — a common practice — may be outside the Apache 2.0 license scope.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─────────────────────────────────────────────────
+         SECTION 6: ALPHAFOLD vs ROSETTAFOLD
+    ───────────────────────────────────────────────── -->
+    <section id="rosettafold" class="section-anchor">
+      <h2>6. AlphaFold vs. RoseTTAFold</h2>
+
+      <p>
+        In July 2021 — just days after the AlphaFold2 Nature paper appeared — a separate research
+        group at the University of Washington, led by David Baker, published RoseTTAFold in
+        <em>Science</em>. RoseTTAFold achieved accuracy approaching AlphaFold2 using an independently
+        developed architecture. This simultaneous development raises significant patent questions:
+        Was there a race to patent? How do the claims differ? Who licenses what?
+      </p>
+
+      <h3>Independent Development and the First-Inventor-to-File Framework</h3>
+      <p>
+        Under the Leahy-Smith America Invents Act (AIA), the United States transitioned from a
+        first-to-invent to a <span class="key-term" title="Under the AIA, the first inventor to file a patent application gets priority, not the first to reduce the invention to practice">first-inventor-to-file</span>
+        system in 2013. There are no more patent interference proceedings (except for applications
+        with pre-AIA priority dates). If both DeepMind and Baker's group independently developed
+        similar prediction architectures, the party who filed first prevails on any overlapping
+        claims — period. There is no separate track for demonstrating prior conception or reduction
+        to practice.
+      </p>
+      <p>
+        Both teams published within days of each other in July 2021. Whether they filed patent
+        applications before that publication date — and which application has the earlier priority
+        date — determines priority on any overlapping claims. The public record suggests DeepMind
+        filed first on the core Evoformer architecture. But the University of Washington has filed
+        patents on RoseTTAFold-specific innovations, and Baker's protein design work (which won
+        him the other half of the 2024 Nobel) is separately protected.
+      </p>
+
+      <h3>Architectural Comparison</h3>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Feature</th>
+              <th>AlphaFold2 (DeepMind)</th>
+              <th>RoseTTAFold (UW/Baker Lab)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Core architecture</td>
+              <td>Evoformer: separate MSA and pair tracks; triangle attention on pair representation</td>
+              <td>Three-track architecture: 1D (MSA), 2D (pairwise), 3D (atomic coordinates) processed simultaneously</td>
+            </tr>
+            <tr>
+              <td>3D processing</td>
+              <td>SE(3)-equivariant Invariant Point Attention (IPA); frame updates in structure module</td>
+              <td>3D coordinates updated in real-time during processing via SE(3)-Transformer-like mechanism</td>
+            </tr>
+            <tr>
+              <td>Recycling</td>
+              <td>Explicit recycling of full network (3 passes); coordinates → pairwise representation</td>
+              <td>Iterative refinement within each forward pass; simpler recycling protocol</td>
+            </tr>
+            <tr>
+              <td>Training data</td>
+              <td>PDB + self-distillation on UniRef90; FAPE loss; end-to-end</td>
+              <td>PDB structures; more reliance on MSA-based co-evolution signals</td>
+            </tr>
+            <tr>
+              <td>CASP14 performance</td>
+              <td>Median GDT 92.4; best-in-class</td>
+              <td>Not entered CASP14; benchmarked against CASP14 afterward; similar performance range</td>
+            </tr>
+            <tr>
+              <td>Open source license</td>
+              <td>Apache 2.0 (code + weights)</td>
+              <td>MIT License (code); weights available</td>
+            </tr>
+            <tr>
+              <td>Filing strategy</td>
+              <td>Multiple PCT + US national applications; broad claims on Evoformer and structure module</td>
+              <td>University of Washington tech transfer; narrower claims on three-track architecture specifics</td>
+            </tr>
+            <tr>
+              <td>Licensing approach</td>
+              <td>Isomorphic Labs (DeepMind spinout); pharma partnerships (Lilly, Novartis)</td>
+              <td>Licensed to Arzeda (protein engineering); Xaira Therapeutics; Baker Ventures portfolio</td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="table-caption">Table 2 — Technical and patent strategy comparison: AlphaFold2 vs. RoseTTAFold</p>
+      </div>
+
+      <h3>The Open Science Ecosystem</h3>
+      <p>
+        One of the most remarkable features of the 2021 protein structure prediction revolution is
+        that both major actors — a private company (DeepMind/Google) and a public university (UW)
+        — chose to release their code and weights openly. This was not legally required. It was a
+        strategic and scientific choice. The result has been an explosion of downstream applications,
+        including ESMFold (Meta), OmegaFold, ColabFold (accessible via Google Colab), and dozens
+        of specialized models for antibodies, RNA, and small molecules.
+      </p>
+      <p>
+        From a patent perspective, this open ecosystem creates a complex landscape: there are
+        now hundreds of "downstream" applications of AlphaFold-type predictions that are themselves
+        potentially patentable — and that sit in a complex relationship to the upstream architectural
+        patents. A drug discovery company that patents "a method of identifying a drug candidate
+        using AlphaFold-predicted binding pocket geometry" has a valid claim to its specific
+        method without infringing DeepMind's architectural patents (which are licensed under
+        Apache 2.0 for use of the released code).
+      </p>
+    </section>
+
+    <!-- ─────────────────────────────────────────────────
+         SECTION 7: ALPHAFOLD3 AND THE NEXT GENERATION
+    ───────────────────────────────────────────────── -->
+    <section id="alphafold3" class="section-anchor">
+      <h2>7. AlphaFold3 and the Next Generation</h2>
+
+      <p>
+        In May 2024, DeepMind and Isomorphic Labs published AlphaFold3 in <em>Nature</em>, representing
+        a qualitative expansion beyond AlphaFold2's scope. Where AlphaFold2 predicted protein structure
+        from sequence, AlphaFold3 is a unified model that predicts the structure of molecular complexes
+        involving proteins, DNA, RNA, and small-molecule ligands — essentially any combination of
+        biologically relevant molecules. This expansion creates an entirely new patent landscape.
+      </p>
+
+      <h3>AlphaFold3's Novel Technical Contributions</h3>
+      <p>
+        AlphaFold3 replaces AlphaFold2's structure module with a <strong>diffusion-based generation
+        module</strong>. Rather than predicting backbone torsion angles and iteratively refining
+        frames (AlphaFold2's approach), AlphaFold3 generates all-atom coordinates through a
+        diffusion process: starting from random noise, iteratively denoising coordinates toward
+        a physically realistic structure, conditioned on the Evoformer-derived representations.
+        This is architecturally similar to image diffusion models (DALL-E, Stable Diffusion) but
+        operating in the space of 3D molecular coordinates.
+      </p>
+
+      <p>
+        A second key innovation is the <strong>unified tokenization scheme</strong>: DNA nucleotides,
+        RNA nucleotides, amino acid residues, and ligand atoms are all represented using a common
+        token vocabulary. The Evoformer processes these tokens uniformly, allowing the model to
+        capture inter-molecular interactions (protein-DNA, protein-ligand, protein-RNA) that
+        AlphaFold2 could not address. This has direct commercial value in drug discovery: predicting
+        where and how a small molecule drug binds to its protein target.
+      </p>
+
+      <h3>New Claim Strategies Required by AlphaFold3</h3>
+      <p>
+        AlphaFold3's architectural novelty suggests several new claim directions:
+      </p>
+
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-icon">&#127980;</div>
+          <h3>Diffusion-Based Structure Generation</h3>
+          <p>Claims covering the specific diffusion process applied to 3D molecular coordinates, including the noise schedule, the conditioning on Evoformer representations, and the all-atom denoising network. Must distinguish score-matching protein structure methods (RFDiffusion, FrameDiff) that appeared before AF3.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">&#128257;</div>
+          <h3>Unified Molecular Tokenization</h3>
+          <p>Claims on the specific token vocabulary and embedding scheme that represents amino acids, nucleotides, and small molecule atoms in a common representation space. The unified approach is novel over AlphaFold2, which addressed proteins only, and over specialized DNA/RNA models.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">&#128138;</div>
+          <h3>Drug-Protein Interaction Prediction Pipeline</h3>
+          <p>Application-layer claims covering the end-to-end pipeline from ligand SMILES + protein sequence → predicted binding pose + binding affinity estimate. These sit "above" the architecture patents and are separately valuable for drug discovery applications.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">&#128300;</div>
+          <h3>Confidence Estimation for Multi-Molecular Complexes</h3>
+          <p>Claims on the novel pTM (predicted Template Modeling) and ipTM (interface pTM) confidence metrics extended to multi-chain, multi-molecule complexes. These calibrated confidence scores are themselves a novel technical contribution with commercial utility in virtual screening.</p>
+        </div>
+      </div>
+
+      <p>
+        Notably, DeepMind's release strategy for AlphaFold3 was more restrictive than AlphaFold2:
+        the AlphaFold3 code was released under a non-commercial license, reserving commercial rights.
+        This shift in licensing strategy reflects the growing commercial value of the technology and
+        the more direct competition from academic groups (RFDiffusion, FrameDiff, Boltz-1) that had
+        emerged in the intervening three years.
+      </p>
+
+      <div class="callout callout-info">
+        <div class="callout-icon">&#8505;</div>
+        <div class="callout-body">
+          <div class="callout-title">The Continuation Strategy for AlphaFold3</div>
+          <p>
+            DeepMind's patent strategy for AlphaFold3 likely involves continuation applications
+            building on the priority dates of the AlphaFold2 filings. To the extent that AlphaFold3's
+            Evoformer component (which builds on AlphaFold2's Evoformer) is covered by the original
+            AlphaFold2 claims, those earlier priority dates provide prior art protection even against
+            the flood of transformer-based protein modeling papers published between 2021 and 2024.
+            The diffusion module and unified tokenization would require new independent claims,
+            but the underlying Evoformer architecture claims continue to accrue value.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─────────────────────────────────────────────────
+         SECTION 8: COMMERCIAL APPLICATIONS
+    ───────────────────────────────────────────────── -->
+    <section id="commercial" class="section-anchor">
+      <h2>8. Commercial Applications and Licensing</h2>
+
+      <p>
+        AlphaFold's commercial value is extraordinary — and paradoxically, it may be most valuable
+        to its creator precisely because it was given away for free. Understanding DeepMind's
+        commercial strategy requires understanding how an open technology creates commercial moats.
+      </p>
+
+      <h3>The Isomorphic Labs Model</h3>
+      <p>
+        Isomorphic Labs was incorporated in late 2021, shortly after the AlphaFold2 open release,
+        as a DeepMind-spinout dedicated to using AI for drug discovery. Isomorphic does not license
+        AlphaFold to pharma companies; it uses AlphaFold internally as part of a broader computational
+        drug discovery platform, then partners with pharma companies to discover drugs using that
+        platform. The partnerships with Eli Lilly (announced January 2024, up to $1.7B in potential
+        milestone payments) and Novartis (announced January 2024, up to $1.2B) illustrate the model:
+        Isomorphic provides computational drug discovery services, AlphaFold is one (central) tool
+        in the platform.
+      </p>
+      <p>
+        The patents on AlphaFold's architecture protect this business in a specific way: they prevent
+        a competitor from building an equivalent computational drug discovery platform using the same
+        architectural approach without either licensing from DeepMind or designing around the claims.
+        The open-source release ensures that academic drug discovery programs benefit from AlphaFold,
+        which builds the scientific reputation and validation of the technology — a form of
+        non-monetary marketing for Isomorphic's commercial services.
+      </p>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Application Domain</th>
+              <th>How AlphaFold Is Used</th>
+              <th>Commercial Value</th>
+              <th>Patentable Downstream Methods</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Drug Target Identification</td>
+              <td>Predict structures of novel disease proteins; identify druggable binding pockets from structure alone</td>
+              <td>Dramatically accelerates hit identification; enables targets previously undruggable due to lack of structure</td>
+              <td>Methods of identifying binding pockets in AlphaFold-predicted structures using geometry-based scoring; methods of prioritizing targets by structural confidence</td>
+            </tr>
+            <tr>
+              <td>Antibody Design</td>
+              <td>AlphaFold-Multimer predicts antibody-antigen complex structures; guides CDR optimization</td>
+              <td>Reduces wet-lab screening by pre-filtering antibody designs in silico</td>
+              <td>Methods of designing CDR sequences for a target epitope using predicted complex structures; methods of predicting antibody-antigen binding affinity from structure</td>
+            </tr>
+            <tr>
+              <td>Protein Engineering</td>
+              <td>Inverse folding: design sequences predicted to fold into desired structures; stability engineering</td>
+              <td>Enables protein therapeutics, industrial enzymes, and agricultural proteins with enhanced properties</td>
+              <td>Methods of designing protein sequences with predicted thermostability exceeding a threshold using structural prediction; specific engineered protein sequences themselves (composition claims)</td>
+            </tr>
+            <tr>
+              <td>Vaccine Design</td>
+              <td>Predict antigen structures for novel pathogens; design multi-epitope vaccines with predicted conformational epitopes</td>
+              <td>Pandemic preparedness; faster antigen characterization</td>
+              <td>Methods of selecting vaccine antigens based on surface-exposed epitope structure predictions; specific antigen constructs designed using AI structural prediction</td>
+            </tr>
+            <tr>
+              <td>Virtual Screening</td>
+              <td>AlphaFold3: predict protein-ligand binding poses for drug candidate libraries; replace experimental docking inputs</td>
+              <td>Accelerates lead identification; reduces cost of experimental screening</td>
+              <td>Methods of virtual screening using AlphaFold-predicted binding pocket geometries; scoring functions trained on AlphaFold-derived structural features</td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="table-caption">Table 3 — Commercial applications of AlphaFold with downstream patentable methods</p>
+      </div>
+
+      <h3>The Competitive Landscape</h3>
+      <p>
+        DeepMind/Isomorphic competes in a crowded and well-funded commercial structural biology space.
+        Schrödinger (NASDAQ: SDGR) offers physics-based molecular simulation platforms that now
+        integrate AlphaFold predictions. Atomwise, Recursion Pharmaceuticals, and Relay Therapeutics
+        are AI-driven drug discovery companies that leverage AlphaFold as a foundation. The key
+        competitive differentiator for Isomorphic is the integration of AlphaFold with other
+        proprietary models (binding affinity prediction, ADMET modeling, synthesis planning) into
+        a vertically integrated platform — and the patents that protect the integration pipeline.
+      </p>
+    </section>
+
+    <!-- ─────────────────────────────────────────────────
+         SECTION 9: THE OPEN DATA CHALLENGE
+    ───────────────────────────────────────────────── -->
+    <section id="open-data" class="section-anchor">
+      <h2>9. The Open Data Challenge</h2>
+
+      <p>
+        The AlphaFold Database contains over 200 million protein structure predictions, freely
+        accessible via API or bulk download. Every one of these structures is now prior art —
+        a published, dated, publicly accessible disclosure — for any subsequent patent application
+        that relies on the same structural information. This creates a novel and important challenge
+        for structural biology patents filed after July 2022 (the database expansion to 200M structures).
+      </p>
+
+      <h3>Does AlphaFold Database Entry Block Future Structural Patents?</h3>
+      <p>
+        The answer depends on exactly what is claimed. A claim reciting "a protein having the
+        three-dimensional structure shown in FIG. X" — where FIG. X depicts a structure that
+        could be extracted from the AlphaFold Database — faces a §102 anticipation challenge:
+        the structure has been publicly disclosed. But a claim reciting "an isolated protein
+        comprising the amino acid sequence of SEQ ID NO:1, wherein the protein exhibits
+        [specific functional property, e.g., binds target X with Kd < 1 nM]" is not anticipated
+        by the AlphaFold Database entry — because the database entry is a structure prediction,
+        not a demonstration of binding affinity.
+      </p>
+      <p>
+        More importantly, the AlphaFold Database creates prior art on the <em>structure</em>, not
+        on downstream applications of knowledge of that structure. A drug candidate designed to
+        bind a specific pocket in the AlphaFold-predicted structure of target protein Y remains
+        patentable even if the structure was in the database — because neither the drug candidate
+        nor its binding to the pocket was disclosed.
+      </p>
+
+      <h3>Three Claiming Strategies in the AlphaFold Era</h3>
+
+      <p>
+        <strong>1. Patent the application, not the structure.</strong>
+        Claims directed to the use of AlphaFold predictions in a specific drug discovery or protein
+        engineering workflow are patentable independent of whether the structural data is public.
+        "A method of identifying an inhibitor of [target protein], the method comprising: obtaining
+        a predicted three-dimensional structure of the target protein using a machine learning-based
+        protein structure prediction system; identifying a binding pocket in the predicted structure
+        using [specific algorithm or criteria]; and screening a library of compounds against the
+        identified binding pocket using [specific scoring function]" — this claim is not anticipated
+        by the AlphaFold Database.
+      </p>
+
+      <p>
+        <strong>2. Patent improvements to AlphaFold.</strong>
+        The AlphaFold2 architecture, though state-of-the-art, has known limitations: it struggles
+        with intrinsically disordered regions, with very large complexes, and with predicting
+        conformational changes induced by ligand binding. Methods that improve on these specific
+        limitations — a modified Evoformer that better handles disorder; an ensemble method that
+        captures conformational diversity — are patentable as improvements over AlphaFold2.
+      </p>
+
+      <p>
+        <strong>3. Patent the downstream pipeline.</strong>
+        The full drug discovery pipeline — from AlphaFold structure to docking, to hit selection,
+        to lead optimization, to ADMET prediction — involves dozens of individual steps, each
+        of which may be patentable. A computational chemistry workflow that uses AlphaFold structures
+        as input to a proprietary docking and scoring pipeline is a legitimate subject for patent
+        protection even if the individual AlphaFold step is not.
+      </p>
+
+      <div class="highlight-gold">
+        <h4>The "Specific Application of AI Output" Strategy</h4>
+        <p>
+          The emerging best practice for drug discovery companies is to claim the <em>specific application</em>
+          of AI-predicted structural information in a way that is tied to concrete technical results
+          (identified compound classes, specific binding modes, measurable activity thresholds). Claims
+          drafted at this level of specificity are distinguishable from the publicly available
+          AlphaFold Database predictions, survive §101 by being directed to specific technological
+          applications, and survive §102/§103 because the specific downstream use is not anticipated
+          in the database itself.
+        </p>
+      </div>
+    </section>
+
+    <!-- ─────────────────────────────────────────────────
+         SECTION 10: LESSONS FOR COMPUTATIONAL BIOLOGY
+    ───────────────────────────────────────────────── -->
+    <section id="lessons" class="section-anchor">
+      <h2>10. Lessons for Computational Biology Researchers</h2>
+
+      <p>
+        The AlphaFold story provides a comprehensive playbook for patent strategy in computational
+        biology. The following process steps distill the key lessons for researchers at the interface
+        of AI and structural biology.
+      </p>
+
+      <ol class="process-steps">
+        <li>
+          <div class="step-content">
+            <h4>Claim the AI Architecture, Not Just the Prediction Task</h4>
+            <p>
+              "A method of predicting protein structure using a neural network" is almost certainly
+              ineligible under §101 and anticipatable under §102 given the breadth of prior art.
+              "A method using a plurality of Evoformer blocks comprising triangle attention modules
+              configured to enforce geometric constraints on pairwise residue representations" is
+              specific enough to be both eligible and novel. Identify the architectural innovations
+              in your model — the novel layer types, the novel attention mechanisms, the novel
+              training objectives — and build your claims around those, not around the high-level task.
+            </p>
+          </div>
+        </li>
+        <li>
+          <div class="step-content">
+            <h4>Frame Claims Around Specific Technical Implementations</h4>
+            <p>
+              Every departure from prior-art models is a potential claim element. RoseTTAFold's
+              "three-track processing" is different from AlphaFold2's Evoformer — both are
+              patentable on their own terms. Enumerate the specific architectural choices in
+              your model: the specific attention mechanism, the specific loss function, the
+              specific tokenization scheme, the specific training data curation process. Each
+              is a potential independent claim element or dependent claim.
+            </p>
+          </div>
+        </li>
+        <li>
+          <div class="step-content">
+            <h4>Address §101 Preemptively with Architecture-Level Specificity</h4>
+            <p>
+              The Mayo concern is that a patent will "monopolize" a natural phenomenon. Answer this
+              concern directly in your specification and claims: your triangle attention mechanism
+              does not prevent others from predicting protein structures using Rosetta, I-TASSER,
+              ESMFold, or any other approach. You are claiming only your specific technical
+              implementation. Include an explicit discussion in the specification of alternative
+              architectures and why your approach represents a specific technical improvement
+              over them — this record supports eligibility arguments during prosecution.
+            </p>
+          </div>
+        </li>
+        <li>
+          <div class="step-content">
+            <h4>File Before Your Nature / Science / Cell Submission</h4>
+            <p>
+              Under 35 U.S.C. § 102(b)(1)(A), you have a one-year grace period after your own
+              public disclosure. But the grace period does not apply to third parties: if someone
+              else independently publishes the same idea the day before your filing, and it is
+              more than a year after their disclosure, you have no grace period protection.
+              More importantly, the grace period is jurisdiction-specific: many countries
+              (including all EPC members) have no grace period at all. An academic publication
+              is an absolute bar to European patent protection. File the provisional application
+              before the preprint hits bioRxiv.
+            </p>
+          </div>
+        </li>
+        <li>
+          <div class="step-content">
+            <h4>Consider Broad Claims + Narrow Claims in the Same Application</h4>
+            <p>
+              Claim 1 should be as broad as the prior art allows — capturing the general architectural
+              principle. Later claims should progressively narrow: specific hyperparameters, specific
+              training protocols, specific modifications for particular applications (multimer prediction,
+              antibody prediction). The narrow claims survive even if the broad claims are invalidated
+              in litigation. Independent system, method, and CRM claims give you multiple alternative
+              infringement theories.
+            </p>
+          </div>
+        </li>
+        <li>
+          <div class="step-content">
+            <h4>Patent the Application Pipeline Separately from the Model</h4>
+            <p>
+              The drug discovery pipeline — using AlphaFold structure → docking → scoring → ADMET →
+              lead optimization — is separately patentable from the model itself. File separate
+              applications (or continuation applications) covering the downstream applications. These
+              application patents have different prior art landscapes, different claim strategies,
+              and different licensing prospects (pharma companies may license the application patents
+              independently of the model patents).
+            </p>
+          </div>
+        </li>
+        <li>
+          <div class="step-content">
+            <h4>If Releasing Open-Source, Use Apache 2.0 with Explicit Patent Grant Language</h4>
+            <p>
+              The MIT License has no patent grant. GPL is copyleft and triggers copyleft obligations
+              for proprietary modifications. Apache 2.0 includes an explicit patent grant that
+              licenses all patent claims "necessarily infringed" by use of the software as released —
+              which is broad enough to protect bona fide academic and commercial users of the released
+              code, while leaving room to enforce against parties who build on the architecture
+              independently without using the released code.
+            </p>
+          </div>
+        </li>
+      </ol>
+    </section>
+
+    <!-- ─────────────────────────────────────────────────
+         SECTION 11: PATENT-OPEN SCIENCE TENSION
+    ───────────────────────────────────────────────── -->
+    <section id="tension" class="section-anchor">
+      <h2>11. The Patent–Open Science Tension</h2>
+
+      <p>
+        AlphaFold forces a clear-eyed confrontation with one of the deepest tensions in innovation
+        policy: the conflict between the open-science ideal of free information and the patent
+        system's bargain of disclosure in exchange for exclusive rights.
+      </p>
+
+      <p>
+        The open-science norm in biology — going back to the Human Genome Project's commitment to
+        release sequence data within 24 hours — holds that fundamental scientific data belongs to
+        humanity. The protein folding problem has been a collective global scientific effort for
+        fifty years. AlphaFold's solution arguably synthesizes insights from every structural
+        biology laboratory that deposited a structure in the Protein Data Bank — itself a public
+        resource. Is it appropriate for a private company to patent a solution that stands on
+        such a massive public foundation?
+      </p>
+
+      <p>
+        The counterargument, which is also the argument for the patent system itself, is that the
+        act of synthesis — of assembling and engineering the specific technical solution that solved
+        the problem — is itself an inventive contribution that justifies patent protection. DeepMind
+        invested hundreds of millions of dollars and assembled a team of extraordinary researchers.
+        The specific architectural innovations — triangle attention, invariant point attention,
+        the recycling protocol — are genuine human inventions. They would not exist but for DeepMind's
+        investment. The patent system, in its ideal form, compensates exactly this kind of investment.
+      </p>
+
+      <p>
+        AlphaFold offers a third way: <em>file first, then publish and open-source</em>. By securing
+        patent priority before the public release, DeepMind preserved the ability to protect commercial
+        applications while simultaneously contributing the technology freely to science. The patents
+        provide a backstop for commercial enforcement; the Apache 2.0 release provides the open-science
+        contribution. These are not contradictory — they are complementary strategies that serve
+        different purposes.
+      </p>
+
+      <blockquote>
+        The goal of the patent system is not to reward inventors; the goal of the patent system is to
+        promote the progress of the useful arts. Open release promotes progress directly. Patents
+        promote progress by providing incentive for investment. In AlphaFold, we see both mechanisms
+        operating simultaneously — and the result has been scientific progress at an unprecedented scale.
+        <cite>— adapted from the Constitutional justification for the patent system, Art. I, §8, cl. 8</cite>
+      </blockquote>
+
+      <h3>Practical Guidance for Researchers</h3>
+      <p>
+        For computational biology researchers in academic settings, the practical takeaway is clear:
+        the open-science norm and the patent system are fully compatible, but they require sequencing.
+        Establish the patent priority date — file a provisional application — before the preprint,
+        before the conference presentation, before the lab meeting with collaborators outside your
+        institution. Then publish openly, release the code, deposit the structures. Honor both
+        the scientific norm and the legal opportunity.
+      </p>
+      <p>
+        For researchers at companies like DeepMind, the lesson is that the open release is not a
+        barrier to patent protection if you have filed first. The Bayh-Dole Act provides a framework
+        for universities; the AIA one-year grace period provides a framework for all inventors. Use
+        these tools, in sequence, to serve both science and the commercial interests that sustain
+        scientific investment.
+      </p>
+    </section>
+
+    <!-- ─────────────────────────────────────────────────
+         SECTION 12: KEY TAKEAWAYS
+    ───────────────────────────────────────────────── -->
+    <section id="takeaways" class="section-anchor">
+      <h2>12. Key Takeaways</h2>
+
+      <p>
+        The AlphaFold story crystallizes fifteen distinct patent lessons that apply across
+        computational biology and AI-driven science. These form the working checklist for any
+        researcher or company operating at this intersection.
+      </p>
+
+      <ul class="checklist">
+        <li><strong>File before you publish.</strong> The one-year grace period protects you in the U.S. but provides no protection in Europe. File the provisional before the preprint.</li>
+        <li><strong>Claim the architecture, not the task.</strong> "Predict protein structure" describes a task; "triangle attention with geometric constraint enforcement on pairwise residue representations" describes a patentable invention.</li>
+        <li><strong>Identify every novel layer type, attention mechanism, and training objective</strong> as a separate potential claim element or dependent claim.</li>
+        <li><strong>Both Alice and Mayo apply to computational biology patents.</strong> Address both the abstract-idea concern (by claiming specific technical architecture) and the natural-phenomena concern (by tying claims to engineering innovations, not the underlying biology).</li>
+        <li><strong>Triangle attention and IPA are novel.</strong> If your model uses them, you are using DeepMind's claimed innovations. Understand the Apache 2.0 license scope before building a commercial product on the released weights.</li>
+        <li><strong>AlphaFold Database entries are prior art for structural claims.</strong> Claims reciting a specific protein structure may be anticipated if the structure is in the public database. Claim function and application, not structure alone.</li>
+        <li><strong>End-to-end differentiable training is patentable.</strong> If your computational biology model uses a single end-to-end training objective rather than pipelined independently-trained modules, that is a patentable architectural choice.</li>
+        <li><strong>Confidence calibration metrics are independently patentable.</strong> The pLDDT, pTM, and ipTM scores are novel technical contributions that can be claimed independently of the underlying prediction architecture.</li>
+        <li><strong>Multi-chain and multi-molecular prediction is a separate patent space</strong> from single-chain protein structure. File separately on multimer prediction, protein-ligand prediction, and protein-nucleic acid prediction.</li>
+        <li><strong>The downstream drug discovery pipeline is separately patentable</strong> from the AI model. Patent the application workflow even if you release the model under an open license.</li>
+        <li><strong>Apache 2.0 is the appropriate open-source license</strong> when you have filed patents and want to grant a conditional patent license to users of the code without giving up enforcement rights against competing commercial implementations.</li>
+        <li><strong>The continuation strategy is essential.</strong> File continuation applications as you improve the model (AF2 → AF3), keeping the core priority date while adding claims on new innovations.</li>
+        <li><strong>Diffusion-based structure generation is a new patent frontier.</strong> AlphaFold3 and RFDiffusion represent the current frontier; patent claims on score-matching approaches, noise schedules, and conditioning mechanisms for molecular diffusion are active prosecution opportunities.</li>
+        <li><strong>First-inventor-to-file means file early.</strong> In the high-speed publication environment of machine learning research, the gap between independent development by two groups can be measured in days. File before you present at NeurIPS, ICLR, or ISMB.</li>
+        <li><strong>Nobel Prize ≠ automatic patent.</strong> AlphaFold won the Nobel Prize, but whether its patents issue and survive challenge depends on the specific claim language, the prior art, and the §101 analysis. Nobel recognition and patent protection are independent legal and scientific determinations.</li>
+      </ul>
+
+      <div class="callout callout-tip">
+        <div class="callout-icon">&#9733;</div>
+        <div class="callout-body">
+          <div class="callout-title">The Unified Lesson from AlphaFold</div>
+          <p>
+            AlphaFold teaches that open science and patent protection are not competing values —
+            they are complementary strategies that can and should coexist. The key is sequencing:
+            secure the priority date first, then contribute to science through open publication
+            and open-source release. Done correctly, you simultaneously serve the scientific community,
+            protect commercial investment, and honor the spirit of the patent system's original
+            constitutional bargain: disclosure in exchange for a limited exclusive right.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─────────────────────────────────────────────────
+         ALPHAFOLD DEVELOPMENT TIMELINE SVG
+    ───────────────────────────────────────────────── -->
+    <h3>AlphaFold Development Timeline</h3>
+    <div class="figure">
+      <div class="figure-content" style="width:100%;">
+        <svg viewBox="0 0 740 320" class="diagram-svg" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="AlphaFold Development Timeline from CASP competitions to AlphaFold3">
+          <!-- Background -->
+          <rect width="740" height="320" fill="#f8f9fa" rx="12"/>
+          <text x="370" y="28" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#1a2744">AlphaFold Development Timeline</text>
+
+          <!-- Central horizontal timeline bar -->
+          <rect x="40" y="140" width="670" height="4" rx="2" fill="#dee2e6"/>
+
+          <!-- CASP13 2018 -->
+          <circle cx="100" cy="142" r="10" fill="#1a2744" stroke="white" stroke-width="2"/>
+          <line x1="100" y1="132" x2="100" y2="80" stroke="#1a2744" stroke-width="1.5" stroke-dasharray="4 2"/>
+          <rect x="30" y="50" width="140" height="30" rx="5" fill="#fef9e7" stroke="#d4a017"/>
+          <text x="100" y="63" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" font-weight="700" fill="#b7770d">CASP13 — 2018</text>
+          <text x="100" y="75" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" fill="#566573">AlphaFold1 wins</text>
+
+          <!-- DeepMind AF2 dev 2019-2020 -->
+          <circle cx="210" cy="142" r="8" fill="#6c757d" stroke="white" stroke-width="2"/>
+          <line x1="210" y1="150" x2="210" y2="200" stroke="#6c757d" stroke-width="1.5" stroke-dasharray="4 2"/>
+          <rect x="150" y="200" width="130" height="30" rx="5" fill="#f1f3f5" stroke="#dee2e6"/>
+          <text x="215" y="213" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" font-weight="600" fill="#495057">2019–2020</text>
+          <text x="215" y="225" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" fill="#566573">AlphaFold2 developed</text>
+
+          <!-- CASP14 Nov 2020 -->
+          <circle cx="330" cy="142" r="12" fill="#c8942a" stroke="white" stroke-width="2"/>
+          <line x1="330" y1="130" x2="330" y2="75" stroke="#c8942a" stroke-width="1.5"/>
+          <rect x="250" y="45" width="160" height="32" rx="5" fill="#fef9e7" stroke="#c8942a" stroke-width="1.5"/>
+          <text x="330" y="58" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" font-weight="700" fill="#b7770d">CASP14 — Nov 2020</text>
+          <text x="330" y="72" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" fill="#566573">GDT 92.4 — problem solved</text>
+
+          <!-- PCT Filing 2021 (early) -->
+          <circle cx="430" cy="142" r="10" fill="#1a2744" stroke="white" stroke-width="2"/>
+          <line x1="430" y1="152" x2="430" y2="205" stroke="#1a2744" stroke-width="1.5" stroke-dasharray="4 2"/>
+          <rect x="360" y="205" width="145" height="30" rx="5" fill="#d6eaf8" stroke="#1a6b8a"/>
+          <text x="432" y="218" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" font-weight="600" fill="#1a6b8a">Early 2021</text>
+          <text x="432" y="230" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" fill="#566573">PCT applications filed</text>
+
+          <!-- Nature paper + open release July 2021 -->
+          <circle cx="530" cy="142" r="12" fill="#1e8449" stroke="white" stroke-width="2"/>
+          <line x1="530" y1="130" x2="530" y2="75" stroke="#1e8449" stroke-width="1.5"/>
+          <rect x="450" y="45" width="165" height="32" rx="5" fill="#d5f5e3" stroke="#1e8449" stroke-width="1.5"/>
+          <text x="532" y="58" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" font-weight="700" fill="#1e8449">July 2021</text>
+          <text x="532" y="72" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" fill="#566573">Nature paper + Apache 2.0 release</text>
+
+          <!-- AlphaFold DB expansion 2022 -->
+          <circle cx="610" cy="142" r="8" fill="#7d3c98" stroke="white" stroke-width="2"/>
+          <line x1="610" y1="150" x2="610" y2="200" stroke="#7d3c98" stroke-width="1.5" stroke-dasharray="4 2"/>
+          <rect x="545" y="200" width="130" height="30" rx="5" fill="#f4ecf7" stroke="#7d3c98"/>
+          <text x="610" y="213" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" font-weight="600" fill="#7d3c98">July 2022</text>
+          <text x="610" y="225" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" fill="#566573">200M+ structures released</text>
+
+          <!-- AlphaFold3 May 2024 -->
+          <circle cx="695" cy="142" r="12" fill="#922b21" stroke="white" stroke-width="2"/>
+          <line x1="695" y1="130" x2="695" y2="75" stroke="#922b21" stroke-width="1.5"/>
+          <rect x="620" y="45" width="110" height="32" rx="5" fill="#fdedec" stroke="#922b21" stroke-width="1.5"/>
+          <text x="675" y="58" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" font-weight="700" fill="#922b21">May 2024</text>
+          <text x="675" y="72" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" fill="#566573">AlphaFold3 (diffusion)</text>
+
+          <!-- Nobel Prize 2024 -->
+          <rect x="560" y="252" width="165" height="45" rx="8" fill="#1a2744"/>
+          <text x="642" y="270" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#c8942a">Nobel Prize 2024</text>
+          <text x="642" y="284" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" fill="rgba(255,255,255,.8)">Jumper, Hassabis + Baker</text>
+          <text x="642" y="293" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" fill="rgba(255,255,255,.8)">Chemistry</text>
+          <line x1="642" y1="252" x2="695" y2="155" stroke="#c8942a" stroke-width="1.5" stroke-dasharray="4 2"/>
+
+          <!-- Year axis labels -->
+          <text x="100" y="165" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" fill="#6c757d">2018</text>
+          <text x="330" y="165" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" fill="#6c757d">2020</text>
+          <text x="530" y="165" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" fill="#6c757d">2021</text>
+          <text x="695" y="165" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" fill="#6c757d">2024</text>
+        </svg>
+      </div>
+      <p class="figure-caption">
+        Fig. 2 — AlphaFold development timeline from CASP13 (2018) through AlphaFold3 (2024) and the
+        Nobel Prize in Chemistry. Note that PCT patent applications were filed in early 2021, before the
+        public Nature paper and open-source release in July 2021 — a critical sequencing decision.
+      </p>
+    </div>
+
+    <!-- ─────────────────────────────────────────────────
+         BOOK CONCLUSION SECTION
+    ───────────────────────────────────────────────── -->
+    <section id="book-conclusion" class="section-anchor">
+      <h2>Conclusion: What We Have Learned — A Note to Close the Book</h2>
+
+      <p>
+        This is the final chapter of <em>Patent Law for Technologists</em>. Across twelve core chapters
+        and five case studies, we have examined the patent system from its constitutional foundations
+        through the complex doctrines that govern the most consequential technologies of our era. Before
+        closing, it is worth taking stock of what the five case studies — the Transformer, LoRA, CRISPR,
+        GPT, and AlphaFold — collectively teach.
+      </p>
+
+      <div class="book-wrap-section">
+        <h3>What the Case Studies Taught Us</h3>
+
+        <p>
+          <strong>The Transformer (Case Study 1)</strong> taught us that a team of world-class researchers
+          at one of the most patent-sophisticated companies on earth can underestimate the patentable
+          novelty of their own invention. "Attention Is All You Need" generated a multi-trillion-dollar
+          industry with patents owned substantially by others who built on the open publication.
+          The lesson: the authors of foundational work have both the opportunity and the obligation
+          to evaluate their own inventions against the patent system's criteria before submitting
+          to arXiv.
+        </p>
+
+        <p>
+          <strong>LoRA (Case Study 2)</strong> taught us that elegant mathematical simplifications
+          are patentable. Low-rank adaptation is a simple, beautiful idea — yet it is novel, non-obvious
+          over the prior matrix factorization literature, and embodied in specific technical
+          implementations that qualify as patent-eligible subject matter. Small innovations —
+          a single architectural modification — can be as patentable as the most complex systems.
+          Simplicity is not a barrier to patentability.
+        </p>
+
+        <p>
+          <strong>CRISPR (Case Study 3)</strong> taught us that biotech patent strategy is a contact
+          sport. The Broad Institute vs. UC Berkeley dispute demonstrated that even the most
+          significant scientific breakthrough can be subject to priority contests that play out
+          over a decade in post-grant proceedings. The lesson for biotech researchers: document
+          everything, file early, and never assume that publication credit and patent priority
+          are the same thing. They are not.
+        </p>
+
+        <p>
+          <strong>GPT (Case Study 4)</strong> taught us that commercial deployment strategy shapes
+          patent strategy in ways that can constrain future options. OpenAI's decision to keep
+          its models proprietary — unlike DeepMind's open release — meant that the architectural
+          innovations in GPT were trade secrets rather than patent subject matter. The lesson:
+          the decision between trade secret and patent protection must be made deliberately,
+          with full knowledge of each strategy's limitations.
+        </p>
+
+        <p>
+          <strong>AlphaFold (this chapter)</strong> teaches us the synthesis: that open science and
+          patent protection can coexist, and that the sequencing matters more than the choice between
+          them. File first. Release second. The patent system and the scientific publication system
+          are not enemies — they are parallel mechanisms for advancing human knowledge, one through
+          the incentive of exclusivity and one through the social norms of scientific credit and
+          replication.
+        </p>
+      </div>
+
+      <div class="conclusion-hero">
+        <h2>What All Twelve Chapters Add Up To</h2>
+        <p>
+          The twelve core chapters of this book have given you the tools: the §101 eligibility
+          framework (<span class="gold-text">Chapter 2</span>), the claim-drafting craft
+          (<span class="gold-text">Chapter 5</span>), the specification requirements that enable
+          ambitious claims (<span class="gold-text">Chapter 6</span>), the prosecution strategies
+          that survive office actions (<span class="gold-text">Chapter 9</span>), the portfolio
+          architecture that creates durable competitive moats (<span class="gold-text">Chapter 10</span>),
+          and the international prosecution channels that extend protection globally
+          (<span class="gold-text">Chapter 11</span>).
+        </p>
+        <p>
+          The five case studies have shown you how those tools apply to real inventions — inventions
+          that changed how we compute, how we understand language, how we edit genomes, and how we
+          understand the fundamental biology of life itself.
+        </p>
+        <p>
+          Patent law is imperfect. The §101 doctrine remains unstable; Congress has debated
+          reform for more than a decade without resolution. The biotech eligibility doctrine
+          creates real uncertainty for diagnostic and structural biology claims. The AI art unit
+          at the USPTO is still developing consistent examination practice for machine learning
+          patents. These are real challenges.
+        </p>
+        <p>
+          But the patent system — imperfect as it is — remains the most powerful tool available
+          to researchers and companies who want to capture the value of their inventions while
+          contributing to the broader scientific enterprise. AlphaFold proves that it is possible
+          to give a technology to the world and still protect the commercial investment that
+          made it. CRISPR proves that strategic prosecution can build durable value even from
+          contested priority. The Transformer proves — perhaps most painfully — that the opportunity
+          can be missed, and that there is no going back once the publication is live.
+        </p>
+        <p class="gold-text" style="font-size:1.15rem; font-weight:700; margin-top:1.5rem;">
+          Go patent your next breakthrough. File before you publish. Claim the architecture,
+          not the task. The tools are in your hands.
+        </p>
+      </div>
+    </section>
+
+    <!-- ─────────────────────────────────────────────────
+         CHAPTER NAVIGATION
+    ───────────────────────────────────────────────── -->
+    <nav class="chapter-nav" aria-label="Chapter navigation">
+      <a href="ex04_gpt.html" class="chapter-nav-btn">
+        <span class="nav-label">&#8592; Previous Case Study</span>
+        <span class="nav-title">Case Study 4: GPT and LLMs</span>
+      </a>
+      <a href="index.html" class="chapter-nav-btn nav-next">
+        <span class="nav-label">Return to &#8594;</span>
+        <span class="nav-title">Table of Contents</span>
+      </a>
+    </nav>
+
+  </main><!-- /chapter-content -->
+
+</div><!-- /page-layout -->
+
+<!-- ══════════════════════════════════════════════════
+     FOOTER
+══════════════════════════════════════════════════ -->
+<footer>
+  <div class="footer-content">
+    <p style="font-size:1rem; font-weight:600; color:white; margin-bottom:.625rem;">
+      Patent Law for Technologists: A Practical Guide for AI, ML, and Biotech Innovators
+    </p>
+    <p>
+      Case Study 5: AlphaFold — Patenting the AI That Solved Protein Folding
+    </p>
+    <p>
+      Dr. Tara S. Yoo &bull; Fish &amp; Richardson P.C., Silicon Valley
+    </p>
+    <p style="margin-top:1.25rem;">
+      <a href="ex01_transformer.html">Case Study 1: Transformer</a> &nbsp;&bull;&nbsp;
+      <a href="ex02_lora.html">Case Study 2: LoRA</a> &nbsp;&bull;&nbsp;
+      <a href="ex03_crispr.html">Case Study 3: CRISPR</a> &nbsp;&bull;&nbsp;
+      <a href="ex04_gpt.html">Case Study 4: GPT</a> &nbsp;&bull;&nbsp;
+      <a href="ex05_alphafold.html">Case Study 5: AlphaFold</a>
+    </p>
+    <p style="margin-top:.75rem;">
+      <a href="index.html">Table of Contents</a> &nbsp;&bull;&nbsp;
+      <a href="ch01_patent_system_overview.html">Chapter 1</a> &nbsp;&bull;&nbsp;
+      <a href="ch02_patent_eligibility.html">Chapter 2</a> &nbsp;&bull;&nbsp;
+      <a href="ch05_writing_claims.html">Chapter 5</a> &nbsp;&bull;&nbsp;
+      <a href="ch10_portfolio_strategy.html">Chapter 10</a>
+    </p>
+    <p style="margin-top:1.5rem; font-size:.775rem; color:rgba(255,255,255,.4);">
+      &copy; 2025 Fish &amp; Richardson P.C. &bull; Stanford Law School &bull; All rights reserved.<br/>
+      This guide is for educational and informational purposes only and does not constitute legal advice.
+      Consult qualified patent counsel before making filing, prosecution, or enforcement decisions.
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>

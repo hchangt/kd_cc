@@ -1,0 +1,1868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Chapter 11: International Patent Protection — PCT strategy, EPO prosecution, China CNIPA AI patents, Japan JPO guidelines, cost planning, and the Patent Prosecution Highway." />
+  <title>Chapter 11: International Patent Protection — Patent Law for Technologists</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* ── Chapter 11 local styles ── */
+    .world-map-container {
+      background: linear-gradient(160deg, #eaf4fb 0%, #d6eaf8 100%);
+      border: 1px solid #85c1e9;
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      margin: 2rem 0;
+      overflow: hidden;
+    }
+    .world-map-container svg { width: 100%; height: auto; display: block; }
+
+    .country-pill {
+      display: inline-flex; align-items: center; gap: .4rem;
+      background: var(--navy); color: white;
+      font-size: .75rem; font-weight: 600;
+      padding: .25rem .75rem; border-radius: 20px;
+      margin: .2rem;
+    }
+    .country-pill.eu   { background: #003399; }
+    .country-pill.cn   { background: #c0392b; }
+    .country-pill.jp   { background: #c0392b; }
+    .country-pill.kr   { background: #1a5276; }
+    .country-pill.in   { background: #e67e22; }
+    .country-pill.br   { background: #1e8449; }
+    .country-pill.au   { background: #7d3c98; }
+
+    .pct-phase-box {
+      background: var(--gray-50);
+      border: 2px solid var(--navy);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .pct-phase-box.phase-intl { border-color: #1a6b8a; background: #eaf4fb; }
+    .pct-phase-box.phase-natl { border-color: var(--success); background: #e8f8f5; }
+    .pct-phase-label {
+      font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em;
+      margin-bottom: .5rem;
+    }
+    .pct-phase-box.phase-intl .pct-phase-label { color: #1a6b8a; }
+    .pct-phase-box.phase-natl .pct-phase-label { color: var(--success); }
+
+    .cost-tier {
+      display: inline-flex; align-items: center; gap: .35rem;
+      font-size: .8125rem; font-weight: 600; padding: .2rem .6rem;
+      border-radius: 4px;
+    }
+    .cost-low  { background: #d4efdf; color: #1e8449; }
+    .cost-mid  { background: #fef9e7; color: #b7770d; }
+    .cost-high { background: #fdedec; color: #922b21; }
+
+    .jurisdiction-card {
+      background: white;
+      border: 1px solid var(--gray-200);
+      border-top: 4px solid var(--navy);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      box-shadow: var(--shadow-sm);
+    }
+    .jurisdiction-card.eu-card  { border-top-color: #003399; }
+    .jurisdiction-card.cn-card  { border-top-color: #c0392b; }
+    .jurisdiction-card.jp-card  { border-top-color: #e74c3c; }
+    .jurisdiction-card.kr-card  { border-top-color: #1a5276; }
+    .jurisdiction-card h4 { margin-top: 0; display: flex; align-items: center; gap: .625rem; }
+
+    .flag-emoji { font-size: 1.25rem; }
+
+    .pph-bar {
+      display: flex; align-items: center; gap: .75rem; margin-bottom: .5rem;
+    }
+    .pph-bar-label { min-width: 120px; font-size: .875rem; font-weight: 500; }
+    .pph-bar-track { flex: 1; height: 12px; background: var(--gray-200); border-radius: 6px; overflow: hidden; }
+    .pph-bar-fill  { height: 100%; background: linear-gradient(90deg, var(--navy), var(--gold)); border-radius: 6px; }
+    .pph-bar-value { min-width: 3rem; font-size: .875rem; font-weight: 700; color: var(--navy); text-align: right; }
+
+    .decision-matrix {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: .5rem;
+      margin: 1.5rem 0;
+    }
+    .dm-header { font-size: .75rem; font-weight: 700; text-align: center; color: var(--gray-600); padding: .5rem .25rem; }
+    .dm-cell {
+      padding: .5rem .25rem; text-align: center; border-radius: 6px;
+      font-size: .8125rem; font-weight: 500;
+    }
+    .dm-cell.yes   { background: #d4efdf; color: #1e8449; }
+    .dm-cell.maybe { background: #fef9e7; color: #b7770d; }
+    .dm-cell.no    { background: #fdedec; color: #922b21; }
+    .dm-cell.label { background: var(--gray-100); color: var(--navy); font-weight: 600; }
+
+    @media (max-width: 768px) {
+      .decision-matrix { grid-template-columns: repeat(3, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════
+     TOP NAVIGATION
+══════════════════════════════════════════════════ -->
+<nav class="top-nav">
+  <div class="nav-container">
+    <a href="index.html" class="nav-logo">Patent Law <span>for Technologists</span></a>
+    <div class="nav-links">
+      <a href="ch01_patent_system_overview.html">Ch.1</a>
+      <a href="ch02_patent_eligibility.html">Ch.2</a>
+      <a href="ch03_prior_art_research.html">Ch.3</a>
+      <a href="ch04_patent_anatomy.html">Ch.4</a>
+      <a href="ch05_writing_claims.html">Ch.5</a>
+      <a href="ch06_specification.html">Ch.6</a>
+      <a href="ch07_drawings.html">Ch.7</a>
+      <a href="ch08_application_process.html">Ch.8</a>
+      <a href="ch09_office_actions.html">Ch.9</a>
+      <a href="ch10_portfolio_strategy.html">Ch.10</a>
+      <a href="ch11_international.html" class="active">Ch.11</a>
+      <a href="ch12_monetization.html">Ch.12</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════════════════
+     CHAPTER HERO
+══════════════════════════════════════════════════ -->
+<header class="chapter-hero">
+  <div class="chapter-hero-content">
+    <div class="chapter-badge">Chapter 11</div>
+    <h1>International Patent Protection</h1>
+    <p class="subtitle">Going Global with Your Innovation: PCT Strategy, Key Jurisdictions, Cost Planning, and the Patent Prosecution Highway</p>
+    <div class="chapter-meta">
+      <span>&#128196; Prof. Peter K. Yu — Texas A&amp;M School of Law / Cooley LLP</span>
+      <span>&#128337; Estimated reading time: 65 minutes</span>
+      <span>&#127760; 12 Sections &bull; PCT, EPO, CNIPA, JPO, KIPO</span>
+    </div>
+  </div>
+</header>
+
+<!-- ══════════════════════════════════════════════════
+     PAGE LAYOUT
+══════════════════════════════════════════════════ -->
+<div class="page-layout">
+
+  <!-- ── Sidebar TOC ── -->
+  <aside class="sidebar">
+    <nav class="toc">
+      <h3>In This Chapter</h3>
+      <ol>
+        <li><a href="#s1-landscape">The International Patent Landscape</a></li>
+        <li><a href="#s2-pct">The Patent Cooperation Treaty (PCT)</a></li>
+        <li><a href="#s3-offices">Key Patent Offices Compared</a></li>
+        <li><a href="#s4-europe">European Patent Protection</a></li>
+        <li><a href="#s5-china">China Patent Strategy</a></li>
+        <li><a href="#s6-japan">Japan Patent Strategy</a></li>
+        <li><a href="#s7-emerging">Korea, India &amp; Emerging Markets</a></li>
+        <li><a href="#s8-pct-steps">PCT Process Step by Step</a></li>
+        <li><a href="#s9-costs">Cost Planning for International Filing</a></li>
+        <li><a href="#s10-pph">Patent Prosecution Highway (PPH)</a></li>
+        <li><a href="#s11-translation">Translation Requirements</a></li>
+        <li><a href="#s12-checklist">International Filing Checklist</a></li>
+      </ol>
+    </nav>
+  </aside>
+
+  <!-- ── Main Content ── -->
+  <main class="chapter-content">
+
+    <!-- ════════════════════════════════════════════
+         SECTION 1 — THE INTERNATIONAL PATENT LANDSCAPE
+    ════════════════════════════════════════════ -->
+    <section id="s1-landscape" class="section-anchor">
+      <h2>1. The International Patent Landscape</h2>
+
+      <p>
+        When an AI company builds a breakthrough model — a novel transformer variant, a new training
+        methodology, an efficient inference engine — the competitive stakes extend far beyond domestic
+        borders. Competitors operate in Shenzhen, Seoul, Tokyo, and Munich as readily as in San
+        Francisco. Manufacturers who might infringe a process patent are scattered across supply
+        chains that span a dozen countries. Licensees who might pay royalties are often large
+        multinationals headquartered in Europe or Japan. And the fastest-growing AI markets in the
+        world — China, South Korea, and India — represent enormous revenue opportunities that
+        domestic patents cannot touch.
+      </p>
+
+      <p>
+        Yet one of the most persistent misconceptions in technology innovation is the idea that a
+        single "world patent" exists. It does not. A U.S. patent grants rights only within the
+        territory of the United States. A Chinese patent grants rights only within China. An issued
+        European patent, once validated in individual member states, grants rights only in those
+        states where validation fees were paid and translations were filed. International patent
+        protection is, at bottom, a collection of national and regional grants — each obtained
+        through separate prosecution, each independently maintained, and each enforced in local
+        courts applying local rules.
+      </p>
+
+      <h3>Why International Protection Matters for AI/ML Companies</h3>
+
+      <p>
+        For an AI or machine learning company, international patent strategy is rarely optional.
+        Consider the following structural facts about the AI industry:
+      </p>
+
+      <ul>
+        <li><strong>Manufacturing is global.</strong> If an AI chip, training appliance, or
+        inference accelerator embodies your patented architecture, and that hardware is
+        manufactured in Taiwan or South Korea, a U.S. patent alone cannot block importation
+        unless you have also secured rights in those manufacturing jurisdictions — or rely on
+        U.S. ITC remedies.</li>
+
+        <li><strong>Cloud services cross borders.</strong> A competitor running your patented
+        AI inference method on servers in the EU or Japan does not infringe U.S. patent rights.
+        You need European and Japanese patents to pursue that conduct.</li>
+
+        <li><strong>China is the world's largest AI filer.</strong> Chinese companies filed more
+        AI-related patents than any other country since 2019. If your technology enters the
+        Chinese market — whether through products, services, or licensing — Chinese patent rights
+        are the only meaningful lever you have.</li>
+
+        <li><strong>Acquisitions and due diligence.</strong> Strategic acquirers, particularly
+        large technology companies and sovereign wealth funds, assign substantial value to
+        international patent families. A purely domestic portfolio signals limited geographic
+        ambition and reduces enterprise valuation in M&amp;A.</li>
+
+        <li><strong>Cross-licensing leverage.</strong> International coverage creates
+        cross-licensing parity with global technology companies. Without European and Japanese
+        patents, a U.S. AI startup negotiating a cross-license with a Japanese industrial
+        conglomerate has minimal leverage.</li>
+      </ul>
+
+      <h3>The Paris Convention and National Treatment</h3>
+
+      <p>
+        The foundational instrument of international patent law is the <span class="key-term"
+        title="The Paris Convention for the Protection of Industrial Property (1883), the foundational multilateral treaty establishing priority rights and national treatment.">Paris
+        Convention for the Protection of Industrial Property</span>, adopted in 1883 and now
+        administered by the World Intellectual Property Organization (WIPO) with 180 member states.
+        The Paris Convention establishes two principles that every international filer relies upon:
+      </p>
+
+      <p>
+        <strong>National treatment</strong> requires each member state to grant nationals of other
+        member states the same rights as its own nationals in matters of intellectual property.
+        A Chinese company filing a patent application at the USPTO must be treated identically to
+        a U.S. company filing the same application. National treatment is the bedrock principle
+        that makes a multilateral patent system coherent.
+      </p>
+
+      <p>
+        <strong>Convention priority</strong> — codified in Article 4 of the Paris Convention —
+        gives an applicant who files a patent application in one member country the right to file
+        in any other member country within twelve months and claim the original filing date as the
+        "priority date" for prior art purposes. This twelve-month priority window is the
+        cornerstone of international filing strategy: it gives applicants time to assess commercial
+        viability in foreign markets before committing to the substantial expense of international
+        filing.
+      </p>
+
+      <div class="callout callout-info">
+        <div class="callout-icon">&#9432;</div>
+        <div class="callout-body">
+          <div class="callout-title">The Priority Date Is Everything</div>
+          <p>Under the AIA's first-inventor-to-file system, and under most international patent
+          systems, the priority date determines which prior art counts against your application.
+          A publication by a competitor that appears between your priority date and your foreign
+          filing date does not invalidate your claims in most jurisdictions — as long as you file
+          before the priority year expires. Protecting your priority date is the single most
+          important deadline in international patent practice.</p>
+        </div>
+      </div>
+
+      <h3>AI Patent Filing: Global Statistics</h3>
+
+      <p>
+        The AI patent landscape has undergone a structural shift in the past decade. The following
+        statistics illustrate the scale and geographic distribution of AI-related patent activity
+        globally as of 2024–2025:
+      </p>
+
+      <div class="stats-row">
+        <div class="stat-item">
+          <div class="stat-number">340K+</div>
+          <div class="stat-label">AI patent families published globally through 2023 (WIPO Technology Trends)</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">38%</div>
+          <div class="stat-label">Share of global AI patent families originating from China (CNIPA)</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">26%</div>
+          <div class="stat-label">Share originating from the United States (USPTO)</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">11%</div>
+          <div class="stat-label">Share originating from South Korea (KIPO)</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">9%</div>
+          <div class="stat-label">Share originating from Japan (JPO)</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">7%</div>
+          <div class="stat-label">Share originating from European jurisdictions (EPO+national)</div>
+        </div>
+      </div>
+
+      <p>
+        PCT international applications have grown steadily, with technology companies dominating
+        the top filer rankings. In 2023, WIPO received approximately 272,600 PCT applications —
+        a record. China's State Grid Corporation and Huawei Technologies have been among the
+        top five PCT filers globally for several consecutive years, reflecting an aggressive
+        internationalization strategy by Chinese industry.
+      </p>
+
+      <!-- World Map SVG -->
+      <div class="world-map-container">
+        <p style="font-size:.8125rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:var(--navy); margin-bottom:1rem; text-align:center;">
+          Major AI Patent Jurisdictions — Geographic Overview
+        </p>
+        <svg viewBox="0 0 900 440" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="World map showing major AI patent jurisdictions">
+          <!-- Ocean background -->
+          <rect width="900" height="440" fill="#d6eaf8" rx="8"/>
+
+          <!-- North America -->
+          <path d="M 80 60 L 200 50 L 230 80 L 250 120 L 240 170 L 210 200 L 180 220 L 160 240 L 130 230 L 100 200 L 80 160 L 70 120 Z"
+                fill="#2471a3" stroke="#1a5276" stroke-width="1.5" opacity="0.85"/>
+          <!-- Mexico + Central America -->
+          <path d="M 130 230 L 160 240 L 170 260 L 155 280 L 135 270 L 120 250 Z"
+                fill="#2e86c1" stroke="#1a5276" stroke-width="1" opacity="0.75"/>
+
+          <!-- South America -->
+          <path d="M 170 290 L 220 280 L 250 310 L 260 360 L 240 400 L 210 420 L 185 410 L 165 380 L 155 340 L 160 300 Z"
+                fill="#27ae60" stroke="#1e8449" stroke-width="1.5" opacity="0.75"/>
+
+          <!-- Greenland -->
+          <path d="M 240 20 L 290 15 L 295 50 L 275 65 L 250 55 Z"
+                fill="#85c1e9" stroke="#5dade2" stroke-width="1" opacity="0.6"/>
+
+          <!-- Europe -->
+          <path d="M 390 55 L 450 50 L 480 70 L 475 110 L 455 130 L 430 140 L 410 130 L 390 110 L 385 85 Z"
+                fill="#2874a6" stroke="#1a5276" stroke-width="1.5" opacity="0.85"/>
+          <!-- UK -->
+          <path d="M 375 60 L 390 55 L 392 80 L 378 82 Z"
+                fill="#1a5276" stroke="#154360" stroke-width="1" opacity="0.9"/>
+
+          <!-- Africa -->
+          <path d="M 405 145 L 455 135 L 490 155 L 510 200 L 515 260 L 490 310 L 460 330 L 430 320 L 400 290 L 390 250 L 385 200 L 390 165 Z"
+                fill="#82e0aa" stroke="#1e8449" stroke-width="1" opacity="0.7"/>
+
+          <!-- Russia -->
+          <path d="M 480 30 L 740 25 L 760 65 L 720 90 L 660 85 L 600 75 L 540 80 L 495 70 Z"
+                fill="#7fb3d3" stroke="#5499c7" stroke-width="1" opacity="0.75"/>
+
+          <!-- Middle East -->
+          <path d="M 490 140 L 555 135 L 570 165 L 545 190 L 510 185 L 490 165 Z"
+                fill="#f9e79f" stroke="#d4ac0d" stroke-width="1" opacity="0.75"/>
+
+          <!-- India -->
+          <path d="M 575 160 L 620 155 L 635 185 L 640 230 L 620 265 L 595 270 L 570 250 L 560 210 L 565 175 Z"
+                fill="#e67e22" stroke="#ca6f1e" stroke-width="1.5" opacity="0.85"/>
+
+          <!-- China — highlighted prominently -->
+          <path d="M 640 80 L 740 75 L 775 100 L 780 140 L 760 165 L 730 175 L 700 165 L 665 155 L 640 135 L 625 105 Z"
+                fill="#c0392b" stroke="#922b21" stroke-width="2" opacity="0.9"/>
+
+          <!-- Japan -->
+          <path d="M 785 100 L 810 95 L 820 115 L 808 130 L 790 125 Z"
+                fill="#e74c3c" stroke="#c0392b" stroke-width="1.5" opacity="0.9"/>
+
+          <!-- South Korea -->
+          <path d="M 758 130 L 782 128 L 785 148 L 762 150 Z"
+                fill="#1a5276" stroke="#154360" stroke-width="1.5" opacity="0.9"/>
+
+          <!-- Southeast Asia -->
+          <path d="M 690 195 L 750 190 L 770 220 L 755 250 L 720 260 L 690 245 L 675 220 Z"
+                fill="#76d7c4" stroke="#1abc9c" stroke-width="1" opacity="0.7"/>
+
+          <!-- Australia -->
+          <path d="M 720 310 L 810 295 L 840 330 L 840 380 L 800 400 L 750 395 L 710 370 L 700 340 Z"
+                fill="#7d3c98" stroke="#6c3483" stroke-width="1.5" opacity="0.8"/>
+
+          <!-- Labels -->
+          <text x="150" y="155" font-size="12" font-weight="bold" fill="white" text-anchor="middle">🇺🇸 USPTO</text>
+          <text x="430" y="100" font-size="11" font-weight="bold" fill="white" text-anchor="middle">🇪🇺 EPO</text>
+          <text x="700" y="130" font-size="12" font-weight="bold" fill="white" text-anchor="middle">🇨🇳 CNIPA</text>
+          <text x="800" y="118" font-size="10" font-weight="bold" fill="white" text-anchor="middle">🇯🇵 JPO</text>
+          <text x="770" y="143" font-size="9" font-weight="bold" fill="white" text-anchor="middle">🇰🇷 KIPO</text>
+          <text x="600" y="220" font-size="10" font-weight="bold" fill="white" text-anchor="middle">🇮🇳 India</text>
+          <text x="195" y="360" font-size="10" font-weight="bold" fill="white" text-anchor="middle">🇧🇷 Brazil</text>
+          <text x="775" y="355" font-size="10" font-weight="bold" fill="white" text-anchor="middle">🇦🇺 AU</text>
+
+          <!-- PCT label at top -->
+          <rect x="340" y="10" width="220" height="28" rx="14" fill="#1a2744" opacity="0.9"/>
+          <text x="450" y="29" font-size="12" font-weight="bold" fill="#e8b84b" text-anchor="middle">PCT — 153 Member States</text>
+
+          <!-- Legend -->
+          <rect x="10" y="380" width="180" height="52" rx="6" fill="white" opacity="0.85"/>
+          <circle cx="26" cy="396" r="6" fill="#c0392b"/>
+          <text x="38" y="400" font-size="10" fill="#333">#1 AI filer (CN)</text>
+          <circle cx="26" cy="412" r="6" fill="#2471a3"/>
+          <text x="38" y="416" font-size="10" fill="#333">#2 AI filer (US)</text>
+          <circle cx="26" cy="428" r="6" fill="#2874a6"/>
+          <text x="38" y="432" font-size="10" fill="#333">Major PCT jurisdictions</text>
+        </svg>
+        <p style="text-align:center; font-size:.8125rem; color:var(--gray-600); margin-top:.625rem; font-style:italic;">
+          Figure 11.1 — Major AI patent jurisdictions. China (CNIPA) surpassed the United States (USPTO) in total AI patent family originations circa 2019 and has led globally since. Diagram is schematic and not to geographic scale.
+        </p>
+      </div>
+
+      <div class="callout callout-warning">
+        <div class="callout-icon">&#9888;</div>
+        <div class="callout-body">
+          <div class="callout-title">Foreign Filing License Required Before Filing Abroad</div>
+          <p>Under 35 U.S.C. § 184, applicants may not file a patent application in a foreign country
+          for an invention made in the United States without first obtaining a foreign filing license
+          from the USPTO — or waiting six months from the U.S. filing date. Violations can result in
+          abandonment of the U.S. application and criminal penalties. Always check foreign filing
+          license requirements with counsel before filing internationally, particularly for inventions
+          with national security implications (defense AI, cryptography, satellite navigation).</p>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ════════════════════════════════════════════
+         SECTION 2 — THE PATENT COOPERATION TREATY
+    ════════════════════════════════════════════ -->
+    <section id="s2-pct" class="section-anchor">
+      <h2>2. The Patent Cooperation Treaty (PCT)</h2>
+
+      <p>
+        The <span class="key-term" title="The Patent Cooperation Treaty (PCT), administered by WIPO, allows a single international application to be filed in one language and designate 153 member states simultaneously.">Patent Cooperation Treaty (PCT)</span>,
+        administered by WIPO in Geneva, is the single most important procedural instrument in
+        international patent practice. Concluded in 1970 and entered into force in 1978, the PCT
+        now has 153 contracting states — encompassing virtually every commercially significant
+        patent jurisdiction in the world.
+      </p>
+
+      <p>
+        The PCT does not create a "world patent." What it does is establish a unified procedure
+        that allows an applicant to file a single international application in one language, pay
+        one set of international fees, and effectively designate all 153 member states simultaneously.
+        The critical benefit is temporal: the PCT buys time. By filing one PCT application within
+        twelve months of the priority filing, an applicant can defer the national phase entries —
+        and the substantial national filing fees, translation costs, and attorney fees that come
+        with them — for up to thirty months from the priority date.
+      </p>
+
+      <h3>The Two Phases of PCT Prosecution</h3>
+
+      <div class="pct-phase-box phase-intl">
+        <div class="pct-phase-label">Phase 1 — International Phase (Months 0–30)</div>
+        <p style="margin-bottom:.75rem;">The international phase begins when the PCT application is filed and encompasses all activity under WIPO's framework before national phase entry. Key events:</p>
+        <ul style="margin-bottom:0;">
+          <li><strong>Filing:</strong> Submit the international application (PCT/RO/101) to a receiving office (e.g., USPTO, EPO, or WIPO directly) with the international filing fee, search fee, and transmittal fee.</li>
+          <li><strong>International Search (ISA):</strong> An International Searching Authority (ISA) — typically the USPTO, EPO, JPO, or KIPO — searches for relevant prior art and produces an <strong>International Search Report (ISR)</strong> within 16 months of priority.</li>
+          <li><strong>Written Opinion (WO/ISA):</strong> The ISA issues a non-binding Written Opinion on novelty, inventive step, and industrial applicability — effectively a preliminary assessment of patentability.</li>
+          <li><strong>International Publication:</strong> WIPO publishes the application at 18 months from priority date. After publication, provisional patent protection may be available in many countries.</li>
+          <li><strong>Chapter II Demand (optional):</strong> If the Written Opinion is unfavorable, applicants may file a Demand for International Preliminary Examination (IPEA) — effectively an optional second look at patentability before national phase entry.</li>
+        </ul>
+      </div>
+
+      <div class="pct-phase-box phase-natl">
+        <div class="pct-phase-label">Phase 2 — National Phase (30 months from priority)</div>
+        <p style="margin-bottom:.75rem;">At 30 months from priority, the applicant must enter the national phase in each desired country or regional patent office. This is when costs escalate significantly:</p>
+        <ul style="margin-bottom:0;">
+          <li>Pay national filing fees in each jurisdiction</li>
+          <li>Retain local patent attorneys or patent agents in each country</li>
+          <li>File certified translations (where required)</li>
+          <li>Respond to national office actions under local examination standards</li>
+          <li>Each jurisdiction then examines the application independently under its own substantive law</li>
+        </ul>
+      </div>
+
+      <div class="callout callout-tip">
+        <div class="callout-icon">&#9728;</div>
+        <div class="callout-body">
+          <div class="callout-title">The PCT's Core Value Proposition: Buy Time, Reduce Risk</div>
+          <p>For an AI startup assessing whether to pursue international protection, the PCT provides
+          a disciplined decision framework. At month 12, you file the PCT application and pay a
+          manageable set of international fees (typically $3,000–$5,000 total for a U.S.-origin
+          filing). You then have until month 30 — an additional 18 months — to watch the market,
+          assess commercial traction, see whether a competitor enters your space, and determine
+          which specific countries are worth the cost of national phase entry. If the technology
+          stalls or the market shifts, you can let the PCT application lapse at month 30 without
+          having spent $50,000–$100,000 on national filings that will never be commercialized.</p>
+        </div>
+      </div>
+
+      <h3>The International Search Report and Written Opinion</h3>
+
+      <p>
+        The <span class="key-term" title="A report prepared by an International Searching Authority listing prior art documents relevant to the claimed invention.">International Search Report (ISR)</span>
+        is produced by the ISA and lists the prior art documents (Category A: anticipatory, Category X: novelty-defeating,
+        Category Y: obviousness-relevant, Category E: prior documents, Category D: documents cited in the application)
+        that the ISA searcher identified. The ISR is not binding on national phase examiners, but it serves as a
+        roadmap for prosecution: it tells you what art you will face and gives you an opportunity to amend claims before
+        national phase entry.
+      </p>
+
+      <p>
+        The <span class="key-term" title="A non-binding preliminary opinion on patentability prepared by the ISA alongside the ISR.">Written Opinion (WO/ISA)</span>
+        accompanies the ISR and applies PCT Article 33 criteria — novelty, inventive step, and industrial applicability.
+        A favorable Written Opinion is an asset: it creates prosecution history you can leverage in national phases,
+        and some national offices give it substantial weight. An unfavorable Written Opinion signals the need for
+        strategic claim amendment before national phase entry.
+      </p>
+
+      <h3>PCT Timeline Flowchart</h3>
+
+      <div class="flowchart">
+        <div class="flow-node">Priority Application Filed<br><small style="font-weight:400; opacity:.85;">(Month 0 — Home Country)</small></div>
+        <div class="flow-arrow"></div>
+        <div class="flow-node phase-intl" style="background:#1a6b8a;">PCT Application Filed<br><small style="font-weight:400; opacity:.85;">(Month 12 — Within Paris Convention Window)</small></div>
+        <div class="flow-arrow"></div>
+        <div class="flow-node" style="background:#5499c7;">ISA Search Initiated<br><small style="font-weight:400; opacity:.85;">(Months 12–16)</small></div>
+        <div class="flow-arrow"></div>
+        <div class="flow-node" style="background:#2471a3;">ISR + Written Opinion Issued<br><small style="font-weight:400; opacity:.85;">(By Month 16 from priority)</small></div>
+        <div class="flow-arrow"></div>
+        <div class="flow-node" style="background:#1a2744;">International Publication (WIPO)<br><small style="font-weight:400; opacity:.85;">(Month 18 — Application published globally)</small></div>
+        <div class="flow-arrow"></div>
+        <div class="flow-row">
+          <div style="text-align:center; flex:1;">
+            <div class="flow-node" style="background:#7d3c98; min-width:180px; font-size:.875rem;">Chapter II Demand<br><small style="font-weight:400;">(Optional — by Month 22)</small></div>
+            <div style="font-size:.75rem; color:var(--gray-600); margin-top:.35rem;">IPEA examination</div>
+          </div>
+          <div style="display:flex; align-items:center; padding:0 1rem; color:var(--gray-500); font-size:.875rem;">OR</div>
+          <div style="text-align:center; flex:1;">
+            <div class="flow-node" style="background:#5d6d7e; min-width:180px; font-size:.875rem;">Proceed Directly<br><small style="font-weight:400;">to National Phase</small></div>
+          </div>
+        </div>
+        <div class="flow-arrow"></div>
+        <div class="flow-node warning">National Phase Entry Deadline<br><small style="font-weight:400; opacity:.85;">(Month 30 — All Countries)</small></div>
+        <div class="flow-arrow"></div>
+        <div class="flow-row" style="flex-wrap:wrap; gap:.75rem; justify-content:center;">
+          <div class="flow-node" style="min-width:120px; font-size:.8125rem; background:#2471a3;">USPTO</div>
+          <div class="flow-node eu-card" style="min-width:120px; font-size:.8125rem; background:#003399;">EPO</div>
+          <div class="flow-node" style="min-width:120px; font-size:.8125rem; background:#c0392b;">CNIPA</div>
+          <div class="flow-node" style="min-width:120px; font-size:.8125rem; background:#e74c3c;">JPO</div>
+          <div class="flow-node" style="min-width:120px; font-size:.8125rem; background:#1a5276;">KIPO</div>
+          <div class="flow-node" style="min-width:120px; font-size:.8125rem; background:#7d3c98;">Others</div>
+        </div>
+        <div class="flow-arrow"></div>
+        <div class="flow-node success">National Examination → Grant<br><small style="font-weight:400; opacity:.85;">(Timeline varies: 2–5 years by jurisdiction)</small></div>
+      </div>
+
+    </section>
+
+    <!-- ════════════════════════════════════════════
+         SECTION 3 — KEY PATENT OFFICES COMPARED
+    ════════════════════════════════════════════ -->
+    <section id="s3-offices" class="section-anchor">
+      <h2>3. Key Patent Offices Compared</h2>
+
+      <p>
+        The following table provides a comparative overview of the six most important patent
+        offices for AI and ML companies pursuing international protection. Each office operates
+        under distinct legal frameworks, examines AI inventions under unique guidelines, and
+        presents different cost and prosecution timeline profiles.
+      </p>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Office</th>
+              <th>AI Patent Policy</th>
+              <th>Software Eligibility</th>
+              <th>Prosecution Time (AI)</th>
+              <th>Est. Cost to Grant</th>
+              <th>Notable Features</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>&#127482;&#127480; USPTO</strong><br><small style="color:var(--gray-600);">United States</small></td>
+              <td>Alice/Mayo two-step §101 framework; 2019 PEG guidelines; AI-specific examples issued 2024. Functional claiming permitted.</td>
+              <td>Difficult — abstract idea exception; requires "practical application" with "particular machine" or transformation</td>
+              <td>2.5–4 years (standard); 6–12 months (Track One)</td>
+              <td>$15,000–$40,000 (small entity)<br>$25,000–$65,000 (large entity)</td>
+              <td>Continuation practice; Track One; IPR/PGR; ITC enforcement; AIA first-to-file</td>
+            </tr>
+            <tr>
+              <td><strong>&#127466;&#127482; EPO</strong><br><small style="color:var(--gray-600);">Europe (38 states)</small></td>
+              <td>"Technical character" requirement under EPC Art. 52; software-as-such excluded; AI claims require technical effect. Examiner Guidelines Ch. II §3.3.1.</td>
+              <td>Moderate — "further technical effect" overcomes exclusion; technical problem-solution approach; no Alice doctrine per se</td>
+              <td>3–5 years (standard); PACE program for acceleration</td>
+              <td>€25,000–€60,000 (prosecution) + validation costs per state (€1,000–€3,000 each)</td>
+              <td>Unitary Patent (2023); opposition proceedings (9 months post-grant); PACE acceleration; broad geographic coverage</td>
+            </tr>
+            <tr>
+              <td><strong>&#127464;&#127475; CNIPA</strong><br><small style="color:var(--gray-600);">China</small></td>
+              <td>2017 AI guidelines revised; 2021 draft AI examination guidelines; computer-implemented inventions require "technical solution." Actively promotes AI patent filing as national policy.</td>
+              <td>Moderate — "technical solution" test; methods of mental activity excluded; data processing claims acceptable if tied to technical solution</td>
+              <td>1.5–3 years (utility patents fastest in G20 for some art units); prioritized examination available</td>
+              <td>¥40,000–¥120,000 (~$5,500–$17,000) — significantly lower than US/EU</td>
+              <td>Three patent types (utility, utility model, design); patent linkage system; 20-year term; strong government support for AI patents</td>
+            </tr>
+            <tr>
+              <td><strong>&#127471;&#127477; JPO</strong><br><small style="color:var(--gray-600);">Japan</small></td>
+              <td>2019 AI examination guidelines; "Creations utilizing AI" category; software claims allowable if "information processing based on software is concretely realized." Updated 2024 guidelines.</td>
+              <td>Moderate-favorable — "creation using AI" framework; less restrictive than Alice; software on hardware claims widely accepted; generous claim interpretation</td>
+              <td>2–3 years (standard); Super Express (3 months) and PPH available</td>
+              <td>¥1,500,000–¥3,500,000 (~$10,000–$25,000)</td>
+              <td>Super Express examination; extensive PPH network; JPO-USPTO bilateral PPH; utility model available; strong electronics and semiconductor focus</td>
+            </tr>
+            <tr>
+              <td><strong>&#127472;&#127479; KIPO</strong><br><small style="color:var(--gray-600);">South Korea</small></td>
+              <td>2021 AI examination guidelines; computer program claims; AI technology-specific criteria under Examination Guidelines §7. Significant investment in AI patent quality.</td>
+              <td>Favorable — "software recorded on a computer-readable medium" claims accepted; technical effect on hardware required; more permissive than EPO</td>
+              <td>16–24 months (fastest major office); Priority Examination available (&lt;3 months)</td>
+              <td>₩3,000,000–¥8,000,000 (~$2,200–$6,000) — among lowest costs of major offices</td>
+              <td>Priority examination; Patent Term Adjustment; KIPO-USPTO PPH; major Korean tech companies (Samsung, LG, SK) drive examination standards</td>
+            </tr>
+            <tr>
+              <td><strong>&#127464;&#127469; WIPO</strong><br><small style="color:var(--gray-600);">PCT Authority</small></td>
+              <td>ISA/IPEA function only; applies national standards of chosen ISA. No substantive grant. 2021 AI-related guidance for ISAs.</td>
+              <td>N/A (procedural only) — ISR/WO reflects ISA's national standard (EPO ISA applies EPC; USPTO ISA applies Alice)</td>
+              <td>16 months for ISR; 28 months for IPER (Chapter II)</td>
+              <td>$3,200–$5,500 (international phase fees from US, large entity)</td>
+              <td>153 member states; single application; 30-month national phase deadline; multiple ISA choices; IB-published translations available</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="table-caption">Table 11.1 — Comparative overview of major patent offices for AI/ML patent prosecution. Costs are estimates for a single application of moderate complexity (15–25 claims). Translation and maintenance costs not included. Data as of 2025.</p>
+
+    </section>
+
+    <!-- ════════════════════════════════════════════
+         SECTION 4 — EUROPEAN PATENT PROTECTION
+    ════════════════════════════════════════════ -->
+    <section id="s4-europe" class="section-anchor">
+      <h2>4. European Patent Protection</h2>
+
+      <p>
+        The European patent system offers some of the most commercially valuable protection
+        available outside the United States — and some of the most nuanced doctrinal hurdles
+        for AI and software inventions. Understanding the system requires grasping both the
+        regional EPO layer and the national validation layer that follows.
+      </p>
+
+      <h3>The European Patent Convention Framework</h3>
+
+      <p>
+        The <span class="key-term" title="The European Patent Convention (EPC) is the multilateral treaty establishing the European Patent Office and the substantive patent law applied to European patent applications.">European Patent Convention (EPC)</span>,
+        currently in its 2000 revision, governs the European patent system. The EPO examines
+        applications under the EPC and, upon grant, issues a "bundle patent" — a single granted
+        patent that must then be validated separately in each EPC member state by paying a national
+        validation fee and, in most states, filing a certified translation of the claims into the
+        national language. There are 39 EPC contracting states as of 2025, encompassing the major
+        European economies.
+      </p>
+
+      <h3>The Unitary Patent: A Structural Shift (2023)</h3>
+
+      <p>
+        On June 1, 2023, the <span class="key-term" title="A unitary effect applied to a European patent that provides uniform protection across participating EU member states without separate validation.">Unitary Patent</span>
+        system entered into force, representing the most significant structural reform of European
+        patent law in decades. A patentee whose European patent is granted by the EPO may now
+        request "unitary effect" within one month of grant, which creates a single patent with
+        uniform protection across all participating EU member states — currently 17, with more
+        expected to join.
+      </p>
+
+      <p>
+        The Unitary Patent dramatically reduces validation costs. Instead of paying validation fees
+        in each member state (which could easily total €15,000–€30,000 for comprehensive European
+        coverage), a single renewal fee is paid to the EPO. The Unified Patent Court (UPC) has
+        exclusive jurisdiction over Unitary Patents and also has jurisdiction over classic European
+        patents not opted out of the UPC system.
+      </p>
+
+      <div class="callout callout-info">
+        <div class="callout-icon">&#9432;</div>
+        <div class="callout-body">
+          <div class="callout-title">Brexit and the UK Patent Situation</div>
+          <p>The United Kingdom left the EU and therefore cannot participate in the Unitary Patent
+          system or the Unified Patent Court. Post-Brexit, UK patent coverage requires either (a)
+          a separate UK national patent application, (b) validation of a granted European patent at
+          the UK Intellectual Property Office (UKIPO) with translation of claims into English
+          (free, since English is accepted), or (c) entry through the national phase of a PCT
+          application at the UKIPO. Companies with significant UK market presence — common in
+          fintech, life sciences, and enterprise AI — must account for UK filing separately.</p>
+        </div>
+      </div>
+
+      <h3>Software Patents in Europe: The "Technical Character" Requirement</h3>
+
+      <p>
+        Article 52(2) EPC explicitly excludes from patentability, among other things, mathematical
+        methods, mental acts, and "programs for computers" — as such. The critical phrase is "as
+        such." The EPO's Technical Boards of Appeal have held, consistently since <em>Vicom</em>
+        (T 208/84) and refined through <em>IBM/Computer program product</em> (T 1173/97) and
+        subsequent cases, that software claims are eligible if they produce a "further technical
+        effect" beyond the normal physical interactions between software and the hardware on which
+        it runs.
+      </p>
+
+      <p>
+        For AI inventions at the EPO, the relevant question is whether the AI method produces a
+        technical effect that serves a technical purpose. This is assessed using the
+        <strong>technical problem-solution approach</strong>: the claim must define a technical
+        problem and a technical solution to that problem. An AI model that improves image compression
+        efficiency, reduces noise in a signal, or optimizes network routing presents a technical
+        problem with a technical solution. An AI model that predicts financial market movements,
+        generates creative text, or classifies business entities is more likely to be found
+        non-technical — even if it runs on hardware.
+      </p>
+
+      <p>
+        <strong>Practical implication for AI patent drafting at the EPO:</strong> Claims should
+        be structured to emphasize the technical character of the invention. Method claims should
+        specify the technical effect achieved (e.g., "reducing computational complexity," "improving
+        signal-to-noise ratio," "enabling real-time processing with bounded memory"). The description
+        should frame the technical problem solved — not just the business or commercial problem —
+        and the claims should be tied to specific technical implementation details rather than
+        functional outcomes.
+      </p>
+
+      <h3>Comparison: EPO Article 52 vs. U.S. Alice Doctrine</h3>
+
+      <div class="comparison-grid">
+        <div class="comparison-item">
+          <h4>&#127482;&#127480; USPTO / Alice</h4>
+          <ul>
+            <li>Two-step Mayo/Alice framework</li>
+            <li>Step 1: Is the claim directed to an abstract idea, law of nature, or natural phenomenon?</li>
+            <li>Step 2A: Does the claim integrate the exception into a practical application?</li>
+            <li>Step 2B (if Step 2A fails): Does the claim add "significantly more"?</li>
+            <li>Outcome: Highly uncertain — fact-specific, subjective "abstract idea" analysis</li>
+            <li>AI impact: Substantial rejection rate; functional claiming under fire</li>
+          </ul>
+        </div>
+        <div class="comparison-item">
+          <h4>&#127466;&#127482; EPO / Article 52</h4>
+          <ul>
+            <li>Exclusions are listed in Art. 52(2) but apply only "as such"</li>
+            <li>Technical character test: Does the claim have a technical character?</li>
+            <li>Technical contribution test: Does the invention make a technical contribution to the art?</li>
+            <li>Problem-solution approach: Is the inventive step assessed over technical prior art?</li>
+            <li>Outcome: More predictable — "technical" vs. "non-technical" is cleaner than "abstract idea"</li>
+            <li>AI impact: AI tied to hardware or physical processes generally passes; pure statistical methods fail</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>EPO Opposition Proceedings</h3>
+
+      <p>
+        One of the most powerful (and most used) post-grant tools in European patent practice is
+        the <span class="key-term" title="A centralized EPO proceeding allowing any third party to challenge the validity of a granted European patent within nine months of grant.">opposition proceeding</span>.
+        Within nine months of the date of publication of the grant of a European patent, any third
+        party may file an opposition at the EPO on grounds of lack of novelty, lack of inventive
+        step, added matter, insufficiency of disclosure, or subject matter excluded under Article 52.
+        Opposition is cheap relative to litigation — the EPO opposition filing fee is approximately
+        €815 — and highly effective: roughly one-third of opposed European patents are revoked
+        outright, and over half are maintained in amended form.
+      </p>
+
+      <p>
+        For AI companies, the opposition proceeding is both a risk and an opportunity. Your
+        competitors can use opposition to challenge your European AI patents at modest cost with
+        significant effect. Conversely, you can use opposition to challenge competitor patents
+        before they become enforcement tools. Given the growing number of AI patents being granted
+        by the EPO, opposition filings in the AI technology sector have increased sharply since 2021.
+      </p>
+
+    </section>
+
+    <!-- ════════════════════════════════════════════
+         SECTION 5 — CHINA PATENT STRATEGY
+    ════════════════════════════════════════════ -->
+    <section id="s5-china" class="section-anchor">
+      <h2>5. China Patent Strategy</h2>
+
+      <p>
+        China's rise to become the world's largest AI patent filer is not accidental — it reflects
+        deliberate national policy. The State Council's "New Generation Artificial Intelligence
+        Development Plan" (2017) set explicit targets for AI patent output as a metric of
+        technological leadership. CNIPA (the China National Intellectual Property Administration,
+        which replaced SIPO in 2018) has responded with updated AI examination guidelines, fast-track
+        examination programs, and a surge in patent grant rates for AI-related inventions.
+      </p>
+
+      <h3>The Chinese Patent System Overview</h3>
+
+      <p>
+        China offers three types of patent protection:
+      </p>
+
+      <ul>
+        <li><strong>Invention patents</strong> (发明专利): Full substantive examination; 20-year term;
+        equivalent to utility patents in the U.S. and EP. AI methods and systems are filed as
+        invention patents.</li>
+        <li><strong>Utility model patents</strong> (实用新型专利): No substantive examination; 10-year
+        term; limited to structural features of a product (not methods). Useful for hardware
+        implementations but not for software or AI methods.</li>
+        <li><strong>Design patents</strong> (外观设计专利): UI/UX designs; 15-year term since 2021
+        patent law revision.</li>
+      </ul>
+
+      <p>
+        For AI companies, invention patents are the relevant category. The key eligibility concept
+        under Chinese patent law is the <strong>"technical solution"</strong> requirement: under
+        Article 2 of the Patent Law, an invention must constitute a "technical solution utilizing
+        natural laws to solve a technical problem." Methods of mental activity and abstract
+        mathematical rules are excluded — but an AI method that operates on technical data (sensor
+        inputs, hardware parameters, network traffic) to solve a technical problem is generally
+        eligible.
+      </p>
+
+      <div class="callout callout-example">
+        <div class="callout-icon">&#128161;</div>
+        <div class="callout-body">
+          <div class="callout-title">CNIPA 2021 Draft AI Examination Guidelines — Key Provisions</div>
+          <p>CNIPA's 2021 draft guidelines on computer program-related inventions (issued for public comment) addressed AI patents specifically. Key provisions relevant to AI patent drafting:</p>
+          <ul style="margin-bottom:0;">
+            <li><strong>Neural network model claims:</strong> Acceptable if the neural network architecture and training method are defined with sufficient technical specificity to be distinguished from the prior art.</li>
+            <li><strong>Training data claims:</strong> Claims to datasets or training data compilations may be eligible as computer-implemented inventions if tied to a specific technical use.</li>
+            <li><strong>AI application claims:</strong> Claims should recite the specific technical field of application (medical imaging, industrial inspection, autonomous driving) to anchor the "technical solution" requirement.</li>
+            <li><strong>Functional language:</strong> Permitted, but must be supported by the specification with concrete implementation details.</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>Prosecution Tips for AI Patents in China</h3>
+
+      <ol>
+        <li><strong>Use method + system + computer-readable medium ("tri-claim") structure.</strong> Chinese examiners generally allow all three claim types in a single application, providing broader coverage than some other jurisdictions.</li>
+        <li><strong>Emphasize the technical problem and technical solution.</strong> Unlike the U.S., where "practical application" is the touchstone, Chinese eligibility analysis centers on the "technical solution" to a "technical problem." Explicitly frame the invention this way in both the claims and the specification.</li>
+        <li><strong>File both Chinese-language and English-language descriptions.</strong> While Chinese is required, filing an English description concurrently (as an annex or in parallel) helps ensure the Chinese translation is accurate and complete.</li>
+        <li><strong>Use CNIPA's fast-track examination programs.</strong> CNIPA offers prioritized examination (优先审查) for key technical areas including AI, reducing prosecution time from ~22 months to ~6 months for qualifying applications.</li>
+        <li><strong>Consider filing utility model alongside invention patent.</strong> Where the AI system has a structural hardware implementation (dedicated inference chip, training appliance), filing a utility model provides fast protection (no substantive examination; grant in ~6 months) while the invention patent is examined.</li>
+        <li><strong>Monitor continuation-equivalent practice.</strong> China does not have continuation applications in the U.S. sense, but divisional applications and voluntary amendment practice can be used to create related applications covering improvements.</li>
+      </ol>
+
+      <h3>Joint Ventures and IP Protection Concerns</h3>
+
+      <p>
+        Foreign companies operating in China — particularly through joint ventures (JVs) or
+        technology licensing arrangements — face distinct IP risks that patent strategy must address.
+        These include contractual assignment of improvements to the JV, technology transfer
+        obligations under regulatory approval conditions, and the risk that locally-created
+        improvements or derivative works may be owned by the Chinese JV partner under joint
+        ownership rules.
+      </p>
+
+      <p>
+        Best practices for AI companies entering the Chinese market include: (1) filing Chinese
+        national patent applications before entering JV negotiations; (2) ensuring AI model weights,
+        training data, and core algorithms are maintained as trade secrets separate from any
+        technology transferred; (3) using contractual provisions specifying ownership of
+        AI-generated improvements; and (4) registering patents with CNIPA before entering China
+        operations to establish documented prior ownership.
+      </p>
+
+    </section>
+
+    <!-- ════════════════════════════════════════════
+         SECTION 6 — JAPAN PATENT STRATEGY
+    ════════════════════════════════════════════ -->
+    <section id="s6-japan" class="section-anchor">
+      <h2>6. Japan Patent Strategy</h2>
+
+      <p>
+        Japan is consistently among the top three patent jurisdictions globally, and the Japanese
+        market for AI — spanning robotics, automotive, manufacturing, healthcare, and consumer
+        electronics — is among the most commercially significant in the world. The JPO has invested
+        substantially in developing AI-specific examination guidelines and has positioned Japan as
+        a leading jurisdiction for AI patent protection.
+      </p>
+
+      <h3>JPO AI Examination Guidelines: "Creations Utilizing AI"</h3>
+
+      <p>
+        In January 2019, the JPO issued landmark examination guidelines specifically addressing
+        AI-related inventions. These guidelines introduced the category of <strong>"creations
+        utilizing AI"</strong> and addressed patentability from both the eligibility and
+        inventive step perspectives. The guidelines were updated in 2024 to address generative AI
+        and large language models.
+      </p>
+
+      <p>
+        Under Japanese patent law, <span class="key-term" title="The JPO's eligibility test for software: an information-processing method concretely realized on hardware.">computer software patents</span>
+        are eligible when "information processing by software is concretely realized using hardware
+        resources." The JPO applies this test under Article 2(1) of the Patent Act: an "creation
+        of technical ideas utilizing natural laws." An AI method that implements specific computational
+        steps on identified hardware — even if the hardware is general-purpose — will generally
+        meet this threshold.
+      </p>
+
+      <p>
+        For AI-specific inventions, the JPO guidelines specify that the following claim types are
+        acceptable:
+      </p>
+
+      <ul>
+        <li>Method claims for machine learning training procedures (with specified training data types, loss functions, and hardware configurations)</li>
+        <li>System claims for AI inference systems (with defined model architecture, input/output specifications)</li>
+        <li>Computer program claims (stored on computer-readable media)</li>
+        <li>Data structure claims (for novel training datasets or structured AI outputs with defined technical applications)</li>
+      </ul>
+
+      <h3>Fast Examination Programs at the JPO</h3>
+
+      <p>
+        The JPO offers several acceleration programs particularly valuable for AI companies:
+      </p>
+
+      <ul>
+        <li><strong>Super Accelerated Examination:</strong> For applicants who have not filed a foreign application (or who will not do so). Target examination within 3 months of request.</li>
+        <li><strong>Accelerated Examination:</strong> For applicants filing in Japan first, or where foreign application has been filed. Target examination within 6 months.</li>
+        <li><strong>PPH (Patent Prosecution Highway):</strong> Where a corresponding application has been allowed at a partner office (USPTO, EPO, KIPO, CNIPA, etc.), JPO examination can be accelerated using the foreign office's work product. Average grant time under PPH: approximately 12 months.</li>
+        <li><strong>Early publication:</strong> Japan defaults to 18-month publication, with an option to request earlier publication — useful for applicants wishing to establish prior art dates or stimulate licensing inquiries.</li>
+      </ul>
+
+      <div class="callout callout-tip">
+        <div class="callout-icon">&#9728;</div>
+        <div class="callout-body">
+          <div class="callout-title">Japan as a High-Value AI Market: Strategic Filing Priority</div>
+          <p>Japan should be near the top of any "Global Five" international filing strategy for AI
+          companies in sectors including: industrial robotics and automation, automotive AI systems
+          (Toyota, Honda, Nissan), semiconductor and chip design (Renesas, Kioxia), precision
+          manufacturing, and medical device AI. Japanese corporations are also significant licensees
+          — having strong Japanese patent coverage creates cross-licensing leverage with companies
+          that generate substantial royalty income from U.S. operations. The JPO's relatively
+          fast prosecution timeline and reasonable costs make it one of the most cost-efficient
+          major jurisdictions for AI patent protection.</p>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ════════════════════════════════════════════
+         SECTION 7 — KOREA, INDIA, AND EMERGING MARKETS
+    ════════════════════════════════════════════ -->
+    <section id="s7-emerging" class="section-anchor">
+      <h2>7. Korea, India, and Emerging Markets</h2>
+
+      <h3>South Korea (KIPO)</h3>
+
+      <div class="jurisdiction-card kr-card">
+        <h4><span class="flag-emoji">&#127472;&#127479;</span> Korea Intellectual Property Office (KIPO)</h4>
+        <p>South Korea is the fourth-largest AI patent filer globally, driven primarily by Samsung Electronics, LG Electronics, SK Hynix, and a growing number of AI-native startups. KIPO issued AI-specific examination guidelines in 2021 that take a relatively permissive approach to software and AI patent eligibility.</p>
+        <p><strong>Key KIPO AI patent features:</strong></p>
+        <ul>
+          <li>Computer program claims accepted when the program causes specific technical effects on hardware</li>
+          <li>AI model training method claims generally eligible without significant eligibility hurdles (similar to JPO approach)</li>
+          <li>Claim-by-claim examination approach allows mixed eligible/ineligible claim sets</li>
+          <li>Priority Examination program: grants within 3–4 months for qualifying applications</li>
+          <li>KIPO-USPTO PPH: substantial prosecution acceleration for applications with USPTO allowances</li>
+          <li>Annual maintenance fees are among the lowest of the major five offices</li>
+        </ul>
+        <p><strong>Strategic note:</strong> Korea is particularly important for companies in the semiconductor, memory, display, and consumer electronics AI sectors. The Korean domestic market is large, concentrated, and dominated by players who are themselves major patent holders — cross-licensing is common.</p>
+      </div>
+
+      <h3>India (IPO/CGPDTM)</h3>
+
+      <div class="jurisdiction-card" style="border-top-color: #e67e22;">
+        <h4><span class="flag-emoji">&#127470;&#127475;</span> Indian Patent Office (IPO)</h4>
+        <p>India presents a distinct patent landscape for AI companies. Section 3(k) of the Indian Patents Act explicitly excludes from patentability "a mathematical or business method or a computer programme per se or algorithms." The phrase "per se" creates ambiguity — and the Indian Patent Office has historically applied Section 3(k) broadly, rejecting many software and AI method claims.</p>
+        <p><strong>Prosecution strategy for AI patents in India:</strong></p>
+        <ul>
+          <li>Claim AI methods as implemented on hardware (system claims perform better than method claims in India)</li>
+          <li>Emphasize technical application and physical effect — claims tied to specific technical domains (medical imaging, industrial sensing) fare better</li>
+          <li>Computer-implemented inventions with a "novel hardware configuration" are more likely to be allowed</li>
+          <li>India's prosecution timeline is historically slow: 5–7 years is not unusual, though reforms since 2020 have improved throughput</li>
+          <li>India does not participate in the Unitary Patent and has a distinct national examination framework</li>
+        </ul>
+        <p><strong>Strategic note:</strong> India is a rapidly growing AI market, home to major technology outsourcing operations for U.S. and EU companies. For AI companies with significant India revenue or operations, patent protection — despite the challenges — is strategically important. Given India's growing role as an AI services hub, trade secret protection is often more practically enforceable than patents in the near term.</p>
+      </div>
+
+      <h3>Brazil, Australia, and Canada</h3>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Jurisdiction</th>
+              <th>Software/AI Eligibility</th>
+              <th>Prosecution Time</th>
+              <th>Est. Cost to Grant</th>
+              <th>Strategic Priority</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>&#127463;&#127479; Brazil (INPI)</strong></td>
+              <td>Software "per se" excluded; AI methods eligible if tied to technical effect; slower reform than peers</td>
+              <td>7–10 years (historically very slow; backlog reduction efforts ongoing)</td>
+              <td>R$15,000–R$40,000 (~$3,000–$8,000 USD)</td>
+              <td>Medium — large market; growing AI startup ecosystem; manufacturing operations</td>
+            </tr>
+            <tr>
+              <td><strong>&#127462;&#127482; Australia (IP Australia)</strong></td>
+              <td>Post-<em>Aristocrat Technologies</em> Federal Court decision (2022): computer-implemented inventions require ingenuity in the computer implementation itself. Stricter than prior <em>RPL Central</em> approach.</td>
+              <td>2–3 years</td>
+              <td>A$15,000–A$30,000 (~$10,000–$20,000 USD)</td>
+              <td>Medium-high — English-language prosecution; strong mining, agri-tech, and biotech AI sectors; Five Eyes intelligence sharing has IP implications</td>
+            </tr>
+            <tr>
+              <td><strong>&#127464;&#127462; Canada (CIPO)</strong></td>
+              <td>Post-<em>Amazon</em> Federal Court (2023): "actual invention" test focuses on "inventive concept" — similar to post-Alice uncertainty; CIPO Practice Notice 2020 requires practical application</td>
+              <td>3–4 years</td>
+              <td>C$20,000–C$45,000 (~$15,000–$33,000 USD)</td>
+              <td>Medium-high — closely tied to U.S. market; important for companies with Canadian operations, government contracts (DoD/DND), or data-localization requirements</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="table-caption">Table 11.2 — Secondary international jurisdictions for AI patent strategy. Costs and timelines are approximate and subject to change with office reform programs.</p>
+
+      <h3>Strategic Jurisdiction Selection: Decision Framework</h3>
+
+      <p>
+        No AI company has unlimited IP budget. Selecting which jurisdictions to pursue requires
+        a disciplined decision framework that weighs commercial value against prosecution cost and
+        risk. The following factors should drive jurisdiction selection:
+      </p>
+
+      <ol>
+        <li><strong>Revenue and market presence:</strong> File where you sell, license, or derive revenue. If 40% of your revenue comes from Europe, the EPO is non-negotiable.</li>
+        <li><strong>Manufacturing and supply chain:</strong> File where your product or the infringing product is manufactured. Process patents are infringed where the process is practiced.</li>
+        <li><strong>Competitor presence:</strong> File where your primary competitors are headquartered. Domestic patents create licensing leverage in cross-license negotiations.</li>
+        <li><strong>Technical field:</strong> Semiconductor and electronics AI → Korea and Japan. Industrial AI → Germany (via EPO). Pharmaceutical AI → EU, Japan, Australia. Consumer AI → US, China, EU.</li>
+        <li><strong>Enforcement availability:</strong> Patents are only as good as the courts that enforce them. The U.S. ITC, German regional courts, and the new Unified Patent Court offer strong and relatively fast enforcement. Some jurisdictions offer nominal rights but weak enforcement infrastructure.</li>
+      </ol>
+
+    </section>
+
+    <!-- ════════════════════════════════════════════
+         SECTION 8 — PCT PROCESS STEP BY STEP
+    ════════════════════════════════════════════ -->
+    <section id="s8-pct-steps" class="section-anchor">
+      <h2>8. The PCT Process Step by Step</h2>
+
+      <p>
+        The following process steps walk through a complete international filing from initial
+        priority application through national phase grant, with practical guidance at each stage
+        for AI and ML patent applicants.
+      </p>
+
+      <ol class="process-steps">
+        <li>
+          <div class="step-content">
+            <h4>File the Priority Application in the Home Country</h4>
+            <p>File a provisional (U.S.) or utility patent application — or equivalent — in your
+            home jurisdiction. This establishes the priority date under Article 4 of the Paris
+            Convention. For U.S.-origin AI inventions, a well-drafted provisional application
+            with complete technical disclosure (architecture diagrams, training methods, benchmark
+            data) is strongly preferred over a bare-bones placeholder. The priority application's
+            disclosure limits what you can claim internationally — new matter cannot be added.
+            <strong>Key deadline: This filing starts the 12-month Paris Convention clock.</strong></p>
+          </div>
+        </li>
+        <li>
+          <div class="step-content">
+            <h4>File the PCT Application Within 12 Months</h4>
+            <p>Before the one-year anniversary of the priority filing, file the PCT application
+            (PCT/RO/101) at a receiving office. Typically this is the USPTO (if a U.S. applicant),
+            EPO, or WIPO directly. The application must include: the description, claims (in the
+            filing language), abstract, drawings, inventor information, and designation of states.
+            Select your International Searching Authority (ISA) at this stage — your choice of
+            ISA determines which examiner searches your claims and which national law standard
+            is applied in the Written Opinion. For AI inventions, EPO as ISA typically provides
+            the most thorough prior art search; USPTO as ISA typically produces faster results.
+            <strong>Key deadline: PCT filing must be within 12 months of priority date.</strong></p>
+          </div>
+        </li>
+        <li>
+          <div class="step-content">
+            <h4>International Search Phase — ISR and Written Opinion</h4>
+            <p>The ISA searches global patent and non-patent literature (including arXiv,
+            conference proceedings, and technical standards — highly relevant for AI) and
+            produces the International Search Report (ISR) and Written Opinion (WO/ISA).
+            Upon receiving the ISR, carefully review the cited prior art. If the Written
+            Opinion indicates §101/Art. 52 issues or significant prior art, prepare a
+            responsive amendment or "Article 19 amendment" to the claims before publication.
+            Article 19 amendments are filed within two months of ISR receipt and are published
+            alongside the application. <strong>Key deadline: Article 19 amendments due within
+            2 months of ISR issuance.</strong></p>
+          </div>
+        </li>
+        <li>
+          <div class="step-content">
+            <h4>Chapter II Demand — Optional Preliminary Examination</h4>
+            <p>If the Written Opinion is unfavorable, consider filing a Chapter II Demand for
+            International Preliminary Examination. This triggers a second examination cycle
+            before an International Preliminary Examining Authority (IPEA) — usually the same
+            body as the ISA. You can file written arguments and "Article 34 amendments" in
+            response to a preliminary examination report (IPER/A). A positive IPEA report
+            (IPER) stating "YES" to novelty, inventive step, and industrial applicability
+            carries weight in national phases, particularly in Japan, Korea, and Australia.
+            Chapter II is optional and adds fees (~$600 for a U.S. applicant, large entity)
+            but can be valuable for borderline cases. <strong>Key deadline: Demand must be
+            filed before 22 months from priority.</strong></p>
+          </div>
+        </li>
+        <li>
+          <div class="step-content">
+            <h4>National Phase Entry at 30 Months</h4>
+            <p>By the 30-month deadline (counted from the earliest priority date), you must
+            enter the national phase in each jurisdiction where you seek protection. National
+            phase entry requires: (1) payment of the national filing fee, (2) appointment
+            of local patent counsel, (3) filing of certified translations (in non-English
+            jurisdictions), and (4) any specific national formality documents. Some countries
+            allow early national phase entry (e.g., if you need an earlier grant for licensing
+            or enforcement) — this can be requested before the 30-month deadline.
+            <strong>Key deadline: 30 months from priority date (31 months in some jurisdictions
+            — verify country-by-country).</strong></p>
+          </div>
+        </li>
+        <li>
+          <div class="step-content">
+            <h4>Individual Country Examination</h4>
+            <p>Each national or regional patent office examines the application independently
+            under its own substantive law. The ISR and WO/ISA are not binding, but most
+            examiners review them. Prosecution strategy differs by jurisdiction: U.S. prosecution
+            requires Alice/§101 vigilance; EPO prosecution requires technical character arguments;
+            Chinese prosecution should emphasize the technical solution framework. In each
+            jurisdiction, respond to office actions with claim amendments and arguments tailored
+            to local examination standards. This phase typically takes 1–4 years per jurisdiction.
+            Use PPH wherever available to accelerate examination (see Section 10).</p>
+          </div>
+        </li>
+        <li>
+          <div class="step-content">
+            <h4>Grant and Maintenance</h4>
+            <p>Upon grant, each patent requires ongoing maintenance fee payments at regular
+            intervals (annually in most jurisdictions; every 3.5 years at USPTO) to keep the
+            patent in force. A patent that lapses for non-payment of maintenance fees becomes
+            permanently abandoned and enters the public domain. For a global AI patent family
+            covering the "Big Five" jurisdictions (US + EP + CN + JP + KR), total maintenance
+            costs over the 20-year patent term can reach $80,000–$120,000. Patent portfolio
+            management software (Anaqua, Dennemeyer, CPA Global) is essential for tracking
+            maintenance deadlines across large international portfolios.</p>
+          </div>
+        </li>
+      </ol>
+
+    </section>
+
+    <!-- ════════════════════════════════════════════
+         SECTION 9 — COST PLANNING
+    ════════════════════════════════════════════ -->
+    <section id="s9-costs" class="section-anchor">
+      <h2>9. Cost Planning for International Filing</h2>
+
+      <p>
+        International patent protection is a significant financial commitment. Understanding the
+        cost structure allows AI companies to budget accurately, make informed jurisdiction
+        decisions, and avoid the common mistake of under-funding prosecution — which leads to
+        either abandoned applications or inadequately broad granted claims.
+      </p>
+
+      <h3>Comprehensive Cost Table by Jurisdiction</h3>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Jurisdiction</th>
+              <th>Filing / Natl. Phase Fee</th>
+              <th>Search Fee</th>
+              <th>Examination Fee</th>
+              <th>Translation Costs</th>
+              <th>Attorney Fees (est.)</th>
+              <th>Total Est. (to grant)</th>
+              <th>Maintenance (5-yr periods)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>&#127482;&#127480; USPTO</strong></td>
+              <td>$1,760 (large)<br>$440 (small)</td>
+              <td>$700 (large)<br>$350 (small)</td>
+              <td>$800 (large)<br>$400 (small)</td>
+              <td>None (English)</td>
+              <td>$15,000–$30,000</td>
+              <td><span class="cost-mid">$18,000–$35,000</span></td>
+              <td>Yr 3.5: $2,000<br>Yr 7.5: $3,760<br>Yr 11.5: $7,700</td>
+            </tr>
+            <tr>
+              <td><strong>&#127466;&#127482; EPO (prosecution)</strong></td>
+              <td>€1,780 (filing)<br>+€660 (search)</td>
+              <td>Included above</td>
+              <td>€1,910</td>
+              <td>None (ENG/DE/FR accepted)</td>
+              <td>€20,000–€40,000</td>
+              <td><span class="cost-high">€25,000–€55,000</span></td>
+              <td>~€1,000–€1,700/yr (EPO renewal)</td>
+            </tr>
+            <tr>
+              <td><strong>EPO Validation (per state)</strong></td>
+              <td>€500–€1,000<br>per state</td>
+              <td>—</td>
+              <td>—</td>
+              <td>€500–€2,000<br>per state</td>
+              <td>€500–€2,000 per state</td>
+              <td>€1,500–€5,000 per state (top 5 states ~€15,000)</td>
+              <td>€200–€800/yr per state</td>
+            </tr>
+            <tr>
+              <td><strong>&#127464;&#127475; CNIPA</strong></td>
+              <td>¥3,450 (~$480)</td>
+              <td>¥2,500 (~$350)</td>
+              <td>¥2,500 (~$350)</td>
+              <td>¥8,000–¥25,000 (~$1,100–$3,500)</td>
+              <td>¥20,000–¥60,000 (~$2,800–$8,400)</td>
+              <td><span class="cost-low">$5,000–$13,000</span></td>
+              <td>Yr 1–3: ~¥900/yr<br>Yr 4–6: ~¥1,500/yr<br>Yr 7+: escalating</td>
+            </tr>
+            <tr>
+              <td><strong>&#127471;&#127477; JPO</strong></td>
+              <td>¥14,000 (~$95)</td>
+              <td>¥118,000 (~$800)</td>
+              <td>¥197,000 (~$1,330)</td>
+              <td>¥300,000–¥700,000 (~$2,000–$4,700)</td>
+              <td>¥800,000–¥2,000,000 (~$5,400–$13,500)</td>
+              <td><span class="cost-mid">$9,000–$20,000</span></td>
+              <td>~¥50,000–¥100,000/yr (varies by claim count)</td>
+            </tr>
+            <tr>
+              <td><strong>&#127472;&#127479; KIPO</strong></td>
+              <td>₩46,000 (~$35)</td>
+              <td>₩462,000 (~$350)</td>
+              <td>₩143,000 (~$110)</td>
+              <td>₩1,500,000–₩4,000,000 (~$1,100–$3,000)</td>
+              <td>₩2,500,000–₩6,000,000 (~$1,900–$4,500)</td>
+              <td><span class="cost-low">$3,500–$8,000</span></td>
+              <td>₩40,000–₩200,000/yr (claim-count based)</td>
+            </tr>
+            <tr>
+              <td><strong>WIPO (PCT intl. phase)</strong></td>
+              <td>$1,418 (intl. filing)<br>+$208 transmittal</td>
+              <td>$2,100 (USPTO as ISA, large entity)</td>
+              <td>$600 (Ch. II, optional)</td>
+              <td>None (English)</td>
+              <td>$3,000–$8,000</td>
+              <td><span class="cost-low">$5,000–$12,000</span></td>
+              <td>None — deferred to national phase</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="table-caption">Table 11.3 — Cost estimates for international patent prosecution. Official fees as of 2025; attorney fees are market estimates for complex AI applications (20+ claims, 40+ pages specification). All amounts approximate and subject to change. Consult qualified counsel for current fee schedules.</p>
+
+      <h3>Total Cost Estimate: "Global Five" Strategy</h3>
+
+      <p>
+        The "Global Five" strategy — securing AI patent protection in the United States, Europe
+        (EPO + key validations), China, Japan, and South Korea — represents the standard baseline
+        for well-funded AI companies. The following budget model assumes a single application family
+        with moderate complexity filed via PCT:
+      </p>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Phase</th>
+              <th>Action</th>
+              <th>Timing</th>
+              <th>Est. Cost</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Priority filing</strong></td>
+              <td>U.S. provisional (or utility)</td>
+              <td>Month 0</td>
+              <td>$3,000–$8,000</td>
+            </tr>
+            <tr>
+              <td><strong>PCT filing</strong></td>
+              <td>International application (EPO as ISA)</td>
+              <td>Month 12</td>
+              <td>$6,000–$12,000</td>
+            </tr>
+            <tr>
+              <td><strong>Chapter II</strong></td>
+              <td>IPEA demand (if needed)</td>
+              <td>Month 22</td>
+              <td>$1,500–$3,000</td>
+            </tr>
+            <tr>
+              <td><strong>US national phase</strong></td>
+              <td>USPTO filing + prosecution to grant</td>
+              <td>Months 30–54</td>
+              <td>$18,000–$35,000</td>
+            </tr>
+            <tr>
+              <td><strong>EP national phase</strong></td>
+              <td>EPO prosecution + validation in DE, FR, GB, NL, CH (5 states)</td>
+              <td>Months 30–66</td>
+              <td>€35,000–€60,000</td>
+            </tr>
+            <tr>
+              <td><strong>CN national phase</strong></td>
+              <td>CNIPA prosecution</td>
+              <td>Months 30–54</td>
+              <td>$6,000–$13,000</td>
+            </tr>
+            <tr>
+              <td><strong>JP national phase</strong></td>
+              <td>JPO prosecution</td>
+              <td>Months 30–60</td>
+              <td>$10,000–$20,000</td>
+            </tr>
+            <tr>
+              <td><strong>KR national phase</strong></td>
+              <td>KIPO prosecution</td>
+              <td>Months 30–48</td>
+              <td>$4,000–$8,000</td>
+            </tr>
+            <tr>
+              <td colspan="3"><strong>Total (Global Five) — to grant across all jurisdictions</strong></td>
+              <td><strong>$90,000–$175,000</strong></td>
+            </tr>
+            <tr>
+              <td colspan="3"><strong>20-year maintenance fees (all five jurisdictions)</strong></td>
+              <td><strong>$60,000–$100,000</strong></td>
+            </tr>
+            <tr>
+              <td colspan="3"><strong>Total lifecycle cost per patent family</strong></td>
+              <td><strong>$150,000–$275,000</strong></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="table-caption">Table 11.4 — "Global Five" strategy budget model. Costs are total estimates including official fees, translation, and local attorney fees. Exchange rates used: EUR/USD 1.10; JPY/USD 0.0067; KRW/USD 0.00075; CNY/USD 0.14. All figures approximate as of Q1 2025.</p>
+
+      <div class="callout callout-warning">
+        <div class="callout-icon">&#9888;</div>
+        <div class="callout-body">
+          <div class="callout-title">Plan for Maintenance Fees — They Are Frequently Overlooked</div>
+          <p>Many companies budget only for prosecution costs and are surprised by the ongoing
+          maintenance fee obligations that accumulate across an international portfolio. A Global
+          Five patent family in force for 20 years will require $60,000–$100,000 in maintenance
+          fees alone — before any additional office action responses, divisional applications,
+          or enforcement costs. Model these costs into your IP budget from day one, and implement
+          a portfolio review process to actively abandon patents that no longer align with
+          commercial strategy. An abandoned patent reduces budget drag; a patent allowed to lapse
+          accidentally due to missed deadlines is an unrecoverable loss.</p>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ════════════════════════════════════════════
+         SECTION 10 — PATENT PROSECUTION HIGHWAY
+    ════════════════════════════════════════════ -->
+    <section id="s10-pph" class="section-anchor">
+      <h2>10. Patent Prosecution Highway (PPH)</h2>
+
+      <p>
+        The <span class="key-term" title="A bilateral program allowing an applicant whose claims have been found allowable by one patent office to request accelerated examination in a partner patent office based on that allowance.">Patent Prosecution Highway (PPH)</span>
+        is one of the most powerful cost-reduction and time-acceleration tools available to
+        international patent applicants. The program allows an applicant whose claims have been
+        found allowable (or patentable, in PCT context) by one participating patent office — the
+        "Office of Earlier Examination" (OEE) — to request accelerated examination in a partner
+        office — the "Office of Later Examination" (OLE) — based on the work product from the
+        first office.
+      </p>
+
+      <p>
+        The logic is simple and effective: if the USPTO has examined a set of claims and found
+        them allowable over the prior art, the JPO need not duplicate that search from scratch.
+        Under PPH, the JPO examiner can leverage the USPTO's search and examination work, examine
+        only the claims that correspond to the allowed U.S. claims, and issue a first office action
+        — or in many cases a notice of allowance — in weeks rather than years.
+      </p>
+
+      <h3>Major PPH Agreements and Coverage</h3>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>OEE (First Office)</th>
+              <th>OLE (Partner Office)</th>
+              <th>Program Name</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>USPTO</td>
+              <td>JPO</td>
+              <td>USPTO-JPO PPH</td>
+              <td><span class="badge badge-success">Active — Unlimited</span></td>
+            </tr>
+            <tr>
+              <td>USPTO</td>
+              <td>EPO</td>
+              <td>USPTO-EPO PPH</td>
+              <td><span class="badge badge-success">Active — Unlimited</span></td>
+            </tr>
+            <tr>
+              <td>USPTO</td>
+              <td>KIPO</td>
+              <td>USPTO-KIPO PPH</td>
+              <td><span class="badge badge-success">Active — Unlimited</span></td>
+            </tr>
+            <tr>
+              <td>USPTO</td>
+              <td>CNIPA</td>
+              <td>USPTO-CNIPA PPH (Pilot)</td>
+              <td><span class="badge badge-warning">Active — Pilot Program</span></td>
+            </tr>
+            <tr>
+              <td>EPO</td>
+              <td>JPO</td>
+              <td>EPO-JPO PPH</td>
+              <td><span class="badge badge-success">Active</span></td>
+            </tr>
+            <tr>
+              <td>EPO</td>
+              <td>KIPO</td>
+              <td>EPO-KIPO PPH</td>
+              <td><span class="badge badge-success">Active</span></td>
+            </tr>
+            <tr>
+              <td>PCT (WO/ISA positive)</td>
+              <td>USPTO, JPO, EPO, KIPO, CNIPA</td>
+              <td>PCT-PPH / Global PPH</td>
+              <td><span class="badge badge-success">Active — Most Major Offices</span></td>
+            </tr>
+            <tr>
+              <td>JPO</td>
+              <td>CNIPA</td>
+              <td>JPO-CNIPA PPH</td>
+              <td><span class="badge badge-success">Active</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="table-caption">Table 11.5 — Selected PPH agreements among major AI patent jurisdictions. The Global PPH (IP5 offices) allows applicants to use PCT work product at any of the five major offices. Status as of 2025.</p>
+
+      <h3>PPH Impact: Acceleration and Allowance Rates</h3>
+
+      <p>
+        Empirical data consistently demonstrates that PPH substantially accelerates prosecution
+        and improves allowance rates. The following figures are based on publicly available
+        statistics from the USPTO, JPO, and EPO annual PPH program reports:
+      </p>
+
+      <div class="highlight-box" style="margin:2rem 0;">
+        <h4>PPH Impact Statistics</h4>
+
+        <p style="font-size:.875rem; color:var(--gray-600); margin-bottom:1rem;">Average time from PPH request to first office action or allowance (vs. standard track)</p>
+
+        <div class="pph-bar">
+          <div class="pph-bar-label">USPTO (standard)</div>
+          <div class="pph-bar-track"><div class="pph-bar-fill" style="width:100%; background:#c0392b;"></div></div>
+          <div class="pph-bar-value">26 months</div>
+        </div>
+        <div class="pph-bar">
+          <div class="pph-bar-label">USPTO (PPH)</div>
+          <div class="pph-bar-track"><div class="pph-bar-fill" style="width:27%;"></div></div>
+          <div class="pph-bar-value">~7 months</div>
+        </div>
+        <div class="pph-bar" style="margin-top:.75rem;">
+          <div class="pph-bar-label">JPO (standard)</div>
+          <div class="pph-bar-track"><div class="pph-bar-fill" style="width:85%; background:#c0392b;"></div></div>
+          <div class="pph-bar-value">22 months</div>
+        </div>
+        <div class="pph-bar">
+          <div class="pph-bar-label">JPO (PPH)</div>
+          <div class="pph-bar-track"><div class="pph-bar-fill" style="width:15%;"></div></div>
+          <div class="pph-bar-value">~4 months</div>
+        </div>
+        <div class="pph-bar" style="margin-top:.75rem;">
+          <div class="pph-bar-label">KIPO (standard)</div>
+          <div class="pph-bar-track"><div class="pph-bar-fill" style="width:70%; background:#c0392b;"></div></div>
+          <div class="pph-bar-value">18 months</div>
+        </div>
+        <div class="pph-bar">
+          <div class="pph-bar-label">KIPO (PPH)</div>
+          <div class="pph-bar-track"><div class="pph-bar-fill" style="width:12%;"></div></div>
+          <div class="pph-bar-value">~3 months</div>
+        </div>
+
+        <p style="font-size:.875rem; color:var(--gray-600); margin-top:1.25rem; margin-bottom:.5rem;">Allowance rate comparison (USPTO data, large entity AI applications):</p>
+        <ul style="margin-bottom:0; font-size:.9375rem;">
+          <li>Standard track: approximately 68% ultimate allowance rate (all AI art units)</li>
+          <li>PPH (with USPTO as OEE, JPO as OLE): approximately 89% allowance rate at JPO</li>
+          <li>PPH (PCT-PPH, positive WO/ISA): approximately 82% allowance rate across IP5</li>
+        </ul>
+      </div>
+
+      <h3>How to Use PPH Strategically</h3>
+
+      <p>
+        The most effective PPH strategy for AI companies follows a sequence of deliberate steps:
+      </p>
+
+      <ol>
+        <li><strong>Optimize claims for allowance in the "lead office."</strong> Choose one jurisdiction — typically the USPTO or EPO, depending on where the technology is most clearly patentable — as the lead office and focus prosecution resources on securing a clean allowance quickly. Use Track One (USPTO) or PACE (EPO) to accelerate the first allowance.</li>
+        <li><strong>Align foreign claims to allowed claims.</strong> Upon allowance in the lead office, amend the claims in each foreign national phase to correspond to (or narrow to) the allowed claims. This is the prerequisite for PPH: the foreign claims must "sufficiently correspond" to the allowed lead-office claims.</li>
+        <li><strong>File PPH requests at national phase entry.</strong> When entering each national phase, simultaneously file the PPH request with a copy of the lead-office allowance, the allowed claims, and a claim correspondence table. Many offices accept PPH requests filed concurrently with national phase entry.</li>
+        <li><strong>Use PCT-PPH where available.</strong> A positive International Preliminary Examination Report (IPER/Chapter II) with a "YES" opinion on all claims enables PCT-PPH at all participating offices — making the PCT Chapter II investment highly cost-effective if PPH savings are factored in.</li>
+      </ol>
+
+    </section>
+
+    <!-- ════════════════════════════════════════════
+         SECTION 11 — TRANSLATION REQUIREMENTS
+    ════════════════════════════════════════════ -->
+    <section id="s11-translation" class="section-anchor">
+      <h2>11. Translation Requirements</h2>
+
+      <p>
+        Translation costs represent a significant and often underestimated component of
+        international patent expenditure. For a Global Five filing strategy, professional
+        patent translation can easily add $15,000–$30,000 to total prosecution costs. Managing
+        translation requirements intelligently — choosing when to translate, what to translate,
+        and which tools to use — can meaningfully reduce this burden without sacrificing quality.
+      </p>
+
+      <h3>Country-by-Country Translation Requirements</h3>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Jurisdiction</th>
+              <th>Filing Language(s)</th>
+              <th>Translation Required?</th>
+              <th>Deadline</th>
+              <th>Est. Cost (30-pg spec)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>USPTO (US)</strong></td>
+              <td>English</td>
+              <td>No (English only)</td>
+              <td>N/A</td>
+              <td>—</td>
+            </tr>
+            <tr>
+              <td><strong>EPO (prosecution)</strong></td>
+              <td>English, French, or German</td>
+              <td>No (during prosecution in one of three official languages)</td>
+              <td>N/A during prosecution</td>
+              <td>—</td>
+            </tr>
+            <tr>
+              <td><strong>EPO validation states</strong></td>
+              <td>State language + French/German/English</td>
+              <td>Yes — claims (or full spec) into national language for most states</td>
+              <td>3 months from grant</td>
+              <td>€500–€2,500 per state (claims only); €2,000–€8,000 (full spec)</td>
+            </tr>
+            <tr>
+              <td><strong>CNIPA (China)</strong></td>
+              <td>Chinese (Mandarin)</td>
+              <td>Yes — full specification into Chinese</td>
+              <td>At national phase entry (30 months)</td>
+              <td>$2,500–$5,000 (technical, certified)</td>
+            </tr>
+            <tr>
+              <td><strong>JPO (Japan)</strong></td>
+              <td>Japanese</td>
+              <td>Yes — full specification into Japanese; English provisional description accepted with 2-month delayed Japanese translation</td>
+              <td>At national phase; 2-month grace for provisional English</td>
+              <td>$3,000–$8,000 (technical, certified)</td>
+            </tr>
+            <tr>
+              <td><strong>KIPO (Korea)</strong></td>
+              <td>Korean</td>
+              <td>Yes — full specification into Korean; English provisional accepted with 14-month delayed translation</td>
+              <td>English provisional: 14 months from PCT filing deadline</td>
+              <td>$2,000–$5,000 (technical, certified)</td>
+            </tr>
+            <tr>
+              <td><strong>INPI (Brazil)</strong></td>
+              <td>Portuguese</td>
+              <td>Yes — full specification into Portuguese</td>
+              <td>30 months (national phase entry)</td>
+              <td>$2,500–$5,000</td>
+            </tr>
+            <tr>
+              <td><strong>IP Australia</strong></td>
+              <td>English</td>
+              <td>No</td>
+              <td>N/A</td>
+              <td>—</td>
+            </tr>
+            <tr>
+              <td><strong>CIPO (Canada)</strong></td>
+              <td>English or French</td>
+              <td>No (English accepted)</td>
+              <td>N/A for English</td>
+              <td>—</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="table-caption">Table 11.6 — Translation requirements by jurisdiction. "Certified" translations for patent offices must be prepared by a professional patent translator with subject-matter expertise. Machine translation alone is not accepted for official filings, though AI-assisted translation reviewed by qualified human translators is increasingly standard practice.</p>
+
+      <h3>The London Agreement: Reducing European Translation Burdens</h3>
+
+      <p>
+        The <span class="key-term" title="The London Agreement (2000), also called the Agreement on the Application of Article 65 EPC, allows member states to waive the requirement for translations of European patents into their national language upon validation.">London Agreement</span>
+        on the Application of Article 65 EPC, in force since 2008, allows EPC member states to
+        partially waive the translation requirement for European patents. States participating in
+        the London Agreement (including Germany, France, the UK, Switzerland, the Netherlands, and
+        others) agree to either: (a) waive translation entirely if the patent is granted in one of
+        the EPO's official languages, or (b) require only a translation of the claims (not the full
+        specification) into their national language.
+      </p>
+
+      <p>
+        This substantially reduces European validation costs for English-language applicants. For
+        a European patent granted in English and validated in London Agreement states, only claims
+        translations (rather than full specification translations) are required in states that have
+        the national language as an official EPO language. Non-London Agreement states — including
+        Italy, Spain, Portugal, Greece, and several Eastern European states — still require full
+        specification translations.
+      </p>
+
+      <h3>Machine Translation vs. Certified Human Translation</h3>
+
+      <p>
+        The quality and acceptability of machine-translated patent text has improved dramatically
+        with neural machine translation (NMT) models, and the irony is not lost that the same AI
+        technologies being patented are now materially improving the translation process. However,
+        the following distinctions remain important:
+      </p>
+
+      <ul>
+        <li><strong>Official filing translations must be human-certified.</strong> All major patent
+        offices require translations to be certified as accurate by a qualified translator. An
+        uncertified machine translation output does not meet this requirement and will be rejected.</li>
+
+        <li><strong>AI-assisted translation (human-in-the-loop) is standard practice.</strong>
+        Most professional patent translation firms now use DeepL, WIPO's PatentScope machine
+        translation engine, or specialized patent NMT tools as a first-pass draft, which is then
+        reviewed, corrected, and certified by a qualified human translator. This hybrid approach
+        reduces cost and turnaround time without sacrificing the human certification required
+        by patent offices.</li>
+
+        <li><strong>WIPO's Patent Scope translation tool</strong> is available free of charge
+        and supports translations across 10 language pairs relevant to patent prosecution.
+        It is useful for internal review and prior art research, but the output is not
+        suitable for official filing without professional review.</li>
+
+        <li><strong>Critical claims language requires specialist review.</strong> The exact
+        language of patent claims — particularly for AI inventions with nuanced technical
+        terminology — requires a translator with both linguistic proficiency and technical
+        domain expertise. A mistranslation in a claim can narrow scope, create prosecution
+        history estoppel, or render the claim unenforceable. Do not use generic translation
+        services for claims.</li>
+      </ul>
+
+      <div class="callout callout-tip">
+        <div class="callout-icon">&#9728;</div>
+        <div class="callout-body">
+          <div class="callout-title">Budget Tip: Stage Your Translations</div>
+          <p>For PCT applicants, translation costs can be staged to align with commercial milestones.
+          The PCT system allows filing in English with deferred translations in Japan (2-month English
+          provisional) and Korea (14-month delayed Korean translation). This means you can enter the
+          national phase at month 30 in Japan and Korea with an English provisional, then commit to
+          the translation cost only after confirming commercial traction in those markets — effectively
+          buying an additional 2–14 months of optionality on translation spend.</p>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ════════════════════════════════════════════
+         SECTION 12 — INTERNATIONAL FILING CHECKLIST
+    ════════════════════════════════════════════ -->
+    <section id="s12-checklist" class="section-anchor">
+      <h2>12. International Filing Checklist</h2>
+
+      <p>
+        The following checklist covers the key planning and execution steps for a comprehensive
+        international patent filing strategy. Items are organized by phase: pre-filing strategy,
+        PCT filing, international phase management, and national phase execution.
+      </p>
+
+      <h3>Pre-Filing Strategy</h3>
+
+      <ul class="checklist">
+        <li>Identify all target jurisdictions based on revenue, manufacturing, competitor presence, and market strategy</li>
+        <li>Classify the invention by technology area to determine jurisdiction-specific eligibility risks (especially software/AI under Alice, Art. 52 EPC, Section 3(k) India)</li>
+        <li>Confirm foreign filing license from USPTO (35 U.S.C. § 184) or confirm 6-month waiting period has elapsed</li>
+        <li>Identify all inventors by country of residence — ensure proper inventorship in each jurisdiction (inventorship rules differ: U.S. requires all joint inventors; some jurisdictions permit employer as named applicant)</li>
+        <li>File provisional (U.S.) or utility application with complete technical disclosure — do not skimp on specification detail, as it limits what can be claimed internationally</li>
+        <li>Confirm written assignments from all inventors to the corporate applicant (chain of title must be clean before national phase entry in most jurisdictions)</li>
+        <li>Choose target ISA for PCT filing (EPO = thorough search; USPTO = fast; JPO = strong electronics/AI)</li>
+        <li>Build a 12-month budget model covering PCT filing fees, translation estimates, and national phase entry cost projections by jurisdiction</li>
+      </ul>
+
+      <h3>PCT Filing (Month 12 from Priority)</h3>
+
+      <ul class="checklist">
+        <li>File PCT application before 12-month Paris Convention anniversary — verify exact date and build in a safety buffer of at least 2 weeks</li>
+        <li>Verify all formal requirements of the receiving office (signature, power of attorney, inventor declarations)</li>
+        <li>File well-structured claims covering independent method, system, and CRM (computer-readable medium) claim types</li>
+        <li>Include claims of varying scope (broad, medium, and narrow) to preserve prosecution options internationally</li>
+        <li>Designate all contracting states (default under current PCT rules, but confirm designation)</li>
+        <li>Confirm receipt of filing receipt and international application number (PCT/XX/YYYY/NNNNNN format)</li>
+      </ul>
+
+      <h3>International Phase Management (Months 12–30)</h3>
+
+      <ul class="checklist">
+        <li>Docket and track the 16-month ISR deadline — create calendar alerts at the ISA</li>
+        <li>Upon receipt of ISR: analyze cited prior art, identify potential §103/Art. 56 vulnerabilities, assess Written Opinion</li>
+        <li>Evaluate Article 19 amendment (claims only) within 2 months of ISR to improve WO/ISA before national phase</li>
+        <li>Assess whether Chapter II Demand is warranted — file by month 22 if proceeding</li>
+        <li>Begin national phase preparation at month 24 — do not wait until month 30 to engage local counsel in each jurisdiction</li>
+        <li>Confirm translation deadlines for Japan (2-month provisional English) and Korea (14-month delayed Korean) to stage costs</li>
+        <li>Track WIPO publication at month 18 — verify publication is accurate and complete</li>
+        <li>Assess whether any publication-triggering events (commercialization, press releases) are imminent in target jurisdictions — confirm provisional protection status</li>
+      </ul>
+
+      <h3>National Phase Execution (Month 30 onward)</h3>
+
+      <ul class="checklist">
+        <li>Enter national phase at each selected jurisdiction by month 30 (or 31 where available)</li>
+        <li>File PPH requests simultaneously with national phase entry where USPTO or EPO allowance is in hand</li>
+        <li>File certified translations into required national languages (Chinese, Japanese, Korean) — use AI-assisted + human review workflow</li>
+        <li>Engage local patent agents with AI/ML subject-matter expertise in each jurisdiction — generic IP firms without technical staff will produce weaker prosecution</li>
+        <li>Conduct jurisdiction-specific claim amendments for EPO (technical character), CNIPA (technical solution), and India (non-software per se) before first office action to front-load prosecution efficiency</li>
+        <li>Set up patent docketing system (or service) to track all office action response deadlines, annuity due dates, and grant publication dates across all jurisdictions</li>
+        <li>Implement portfolio review process: annually assess whether each in-progress or granted foreign case aligns with current commercial strategy — abandon non-strategic cases before the next annuity payment is due</li>
+        <li>Upon grant in any jurisdiction: evaluate whether Unitary Patent request is appropriate (EPO-granted patents, within 1 month of grant)</li>
+        <li>Upon first grant (typically Korea or China): assess PPH eligibility in remaining jurisdictions and file PPH requests immediately</li>
+        <li>Track opposition deadlines for EPO grants (9 months from publication of grant) — assess whether competitors are filing oppositions; consider filing opposition against competitor AI patents within their 9-month window</li>
+      </ul>
+
+      <div class="callout callout-danger">
+        <div class="callout-icon">&#9888;</div>
+        <div class="callout-body">
+          <div class="callout-title">Missed PCT Deadlines Are Non-Recoverable</div>
+          <p>The 12-month Paris Convention priority deadline and the 30-month PCT national phase
+          entry deadline are absolute. Unlike some USPTO deadlines that can be revived with a
+          petition and showing of unintentional delay, a missed priority year results in the
+          permanent loss of priority rights internationally — meaning any publications between
+          your priority date and the late filing date can be used as prior art against you.
+          A missed national phase entry deadline results in the permanent abandonment of your
+          application in that jurisdiction — the application cannot be revived except in very
+          limited circumstances. Build multi-calendar systems, legal docketing software, and
+          redundant attorney reminders around these two deadlines. No exception.</p>
+        </div>
+      </div>
+
+      <h3>Ongoing Portfolio Management</h3>
+
+      <ul class="checklist">
+        <li>Maintain a master patent family spreadsheet tracking status in each jurisdiction, next deadline, last action, and annuity due dates</li>
+        <li>Review and pay annuity (maintenance) fees in each jurisdiction — automate through a patent renewals service (Dennemeyer, CPA Global, Anaqua) for portfolios with 20+ patents</li>
+        <li>Conduct biennial "portfolio pruning" to abandon patents that no longer map to products, revenue, or licensing targets — each abandoned patent saves ongoing maintenance spend</li>
+        <li>Monitor foreign competitor patent grants in your technology space — consider opposition (EPO) or inter partes review equivalents (Japan, Korea) against patents that threaten FTO</li>
+        <li>Track national law changes — AI patent examination guidelines are evolving rapidly in China, Japan, Korea, and India; a change in examination standards may affect pending applications</li>
+      </ul>
+
+    </section>
+
+    <!-- ════════════════════════════════════════════
+         CHAPTER SUMMARY
+    ════════════════════════════════════════════ -->
+    <section style="margin-top:3rem; padding-top:2rem; border-top:2px solid var(--gray-200);">
+      <h2>Chapter Summary</h2>
+
+      <p>
+        International patent protection for AI and ML companies is not optional — it is a
+        structural requirement for any company operating in global markets. The absence of a
+        "world patent" means that protection must be assembled jurisdiction by jurisdiction,
+        each with its own substantive law, procedural requirements, and cost structure. The
+        PCT provides the essential tool for managing this complexity: a single international
+        application that preserves optionality across 153 countries while deferring the major
+        cost commitments to the 30-month national phase entry.
+      </p>
+
+      <p>
+        The "Global Five" strategy — USPTO, EPO, CNIPA, JPO, KIPO — covers the jurisdictions
+        where the vast majority of commercially significant AI activity occurs, where leading
+        AI companies are headquartered, and where patent enforcement infrastructure is most
+        robust. Total lifecycle cost for a Global Five family is $150,000–$275,000 over 20 years —
+        a substantial but manageable commitment when weighed against the commercial value of
+        the underlying AI technology.
+      </p>
+
+      <p>
+        The Patent Prosecution Highway dramatically reduces both time and cost when used
+        strategically: secure one allowance in a lead jurisdiction, align claims in foreign
+        offices, and file PPH requests to collapse a 2–4-year prosecution timeline into months.
+        Combined with thoughtful translation staging and active portfolio pruning, these tools
+        give AI companies the ability to build genuinely global patent protection on budgets
+        that would have been impossible two decades ago.
+      </p>
+
+      <blockquote>
+        "International patent strategy is ultimately a question of where your technology will
+        create value — not where it was invented. File where your customers are, where your
+        competitors operate, and where courts will actually enforce your rights. Everything
+        else is overhead."
+        <cite>— Prof. Peter K. Yu, Texas A&amp;M School of Law / Cooley LLP</cite>
+      </blockquote>
+    </section>
+
+    <!-- ════════════════════════════════════════════
+         CHAPTER NAVIGATION
+    ════════════════════════════════════════════ -->
+    <nav class="chapter-nav">
+      <a href="ch10_portfolio_strategy.html" class="chapter-nav-btn">
+        <span class="nav-label">&#8592; Previous Chapter</span>
+        <span class="nav-title">Chapter 10: Patent Portfolio Strategy</span>
+      </a>
+      <a href="ch12_monetization.html" class="chapter-nav-btn nav-next">
+        <span class="nav-label">Next Chapter &#8594;</span>
+        <span class="nav-title">Chapter 12: Licensing and Monetization</span>
+      </a>
+    </nav>
+
+  </main><!-- /chapter-content -->
+</div><!-- /page-layout -->
+
+<!-- ══════════════════════════════════════════════════
+     FOOTER
+══════════════════════════════════════════════════ -->
+<footer>
+  <div class="footer-content">
+    <p style="font-size:1rem; font-weight:600; color:white; margin-bottom:.625rem;">
+      Patent Law for Technologists: A Practical Guide for AI, ML, and Biotech Innovators
+    </p>
+    <p>
+      Chapter 11 — International Patent Protection &bull;
+      Author: Prof. Peter K. Yu, Texas A&amp;M School of Law / Cooley LLP
+    </p>
+    <p style="margin-top:1.25rem;">
+      <a href="ch01_patent_system_overview.html">Ch.1</a> &nbsp;&bull;&nbsp;
+      <a href="ch02_patent_eligibility.html">Ch.2</a> &nbsp;&bull;&nbsp;
+      <a href="ch03_prior_art_research.html">Ch.3</a> &nbsp;&bull;&nbsp;
+      <a href="ch04_patent_anatomy.html">Ch.4</a> &nbsp;&bull;&nbsp;
+      <a href="ch05_writing_claims.html">Ch.5</a> &nbsp;&bull;&nbsp;
+      <a href="ch06_specification.html">Ch.6</a> &nbsp;&bull;&nbsp;
+      <a href="ch07_drawings.html">Ch.7</a> &nbsp;&bull;&nbsp;
+      <a href="ch08_application_process.html">Ch.8</a> &nbsp;&bull;&nbsp;
+      <a href="ch09_office_actions.html">Ch.9</a> &nbsp;&bull;&nbsp;
+      <a href="ch10_portfolio_strategy.html">Ch.10</a> &nbsp;&bull;&nbsp;
+      <a href="ch11_international.html">Ch.11</a> &nbsp;&bull;&nbsp;
+      <a href="ch12_monetization.html">Ch.12</a>
+    </p>
+    <p style="margin-top:1.5rem; font-size:.775rem; color:rgba(255,255,255,.4);">
+      &copy; 2025 Patent Law for Technologists. For educational purposes only.
+      This chapter does not constitute legal advice. Consult qualified patent counsel.
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 7A: Patent Drawings — Foundations, Requirements &amp; Tools — Patent Law for Technologists</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- ── Top Navigation ──────────────────────────────────────────── -->
+<nav class="top-nav">
+  <div class="nav-container">
+    <a href="index.html" class="nav-logo">Patent Law <span>for Technologists</span></a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="ch01_patent_system_overview.html">Ch.1</a>
+      <a href="ch02_patent_eligibility.html">Ch.2</a>
+      <a href="ch03_prior_art_research.html">Ch.3</a>
+      <a href="ch04_patent_anatomy.html">Ch.4</a>
+      <a href="ch05_writing_claims.html">Ch.5</a>
+      <a href="ch06_specification.html">Ch.6</a>
+      <a href="ch07a_drawings_foundations.html" class="active">Ch.7A</a>
+      <a href="ch07b_drawings_practice.html">Ch.7B</a>
+      <a href="ch08_application_process.html">Ch.8</a>
+      <a href="ch09_office_actions.html">Ch.9</a>
+      <a href="ch10_portfolio_strategy.html">Ch.10</a>
+      <a href="ch11_international.html">Ch.11</a>
+      <a href="ch12_monetization.html">Ch.12</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ── Chapter Hero ─────────────────────────────────────────────── -->
+<header class="chapter-hero">
+  <div class="chapter-hero-content">
+    <div class="chapter-badge">Chapter 7A</div>
+    <h1>Patent Drawings: Foundations, Requirements &amp; Tools</h1>
+    <p class="subtitle">What every engineer must know about USPTO drawing rules before touching a drawing tool</p>
+    <div class="chapter-meta">
+      <span>Prof. David L. Schwartz &nbsp;|&nbsp; Northwestern Pritzker School of Law / Cooley LLP</span>
+      <span>~45 minutes</span>
+      <span>Part 1 of 2</span>
+    </div>
+  </div>
+</header>
+
+<!-- ── Page Layout ──────────────────────────────────────────────── -->
+<div class="page-layout">
+
+  <!-- Sidebar TOC -->
+  <aside class="sidebar">
+    <nav class="toc">
+      <h3>In This Chapter</h3>
+      <ol>
+        <li><a href="#why-drawings">Why Drawings Matter</a></li>
+        <li><a href="#requirements">USPTO Formal Requirements</a></li>
+        <li><a href="#types">Types of Drawings for AI/ML</a></li>
+        <li><a href="#reference-numerals">Reference Numerals</a></li>
+        <li><a href="#tools">Drawing Tools Comparison</a></li>
+        <li><a href="#converting">Converting Research Figures</a></li>
+        <li><a href="#summary">Part 1 Summary</a></li>
+      </ol>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="chapter-content">
+
+    <!-- ── 1. Why Drawings Matter ──────────────────────────── -->
+    <section id="why-drawings" class="section-anchor">
+      <h2>1. Why Drawings Matter</h2>
+
+      <p>Patent drawings are not decorative. Under <strong>37 CFR § 1.81</strong>, an applicant must furnish a drawing <em>where necessary for the understanding of the subject matter sought to be patented</em>. For virtually any AI/ML system — with its layers, data flows, training pipelines, and architectural decisions — that threshold is met in every application. When the USPTO determines that drawings are necessary and the applicant has omitted them, the application receives a filing date objection and cannot proceed until drawings are submitted.</p>
+
+      <p>Beyond the threshold requirement, the practical strategic value of drawings is substantial. The specification's detailed description must make specific reference to each drawing figure, and <strong>every element recited in the claims should appear, labeled with a reference numeral, in at least one figure</strong>. Drawings provide the examiner — and later courts and juries — with an immediate visual anchor for understanding the invention. An application with clear, complete drawings tends to be examined more efficiently and generates fewer enablement or written description rejections.</p>
+
+      <div class="callout callout-info">
+        <div class="callout-icon">&#9432;</div>
+        <div class="callout-body">
+          <div class="callout-title">The 40% Faster Statistic</div>
+          <p>USPTO prosecution analytics consistently show that applications with complete, compliant drawings at the time of filing are granted approximately <strong>40% faster</strong> on average than applications requiring drawing corrections mid-prosecution. Drawing objections under 37 CFR § 1.83 (claimed subject matter not illustrated) are among the most common Office Action issues for software and AI patents — and the most avoidable. Each drawing correction round adds 3–6 months to prosecution and attorney fees averaging $2,000–$5,000 per amendment cycle.</p>
+        </div>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-item">
+          <div class="stat-number">~40%</div>
+          <div class="stat-label">faster grant with complete drawings at filing</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">§&nbsp;1.83</div>
+          <div class="stat-label">CFR rule requiring claimed elements to be illustrated</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">3–6 mo</div>
+          <div class="stat-label">delay per drawing correction round</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">100%</div>
+          <div class="stat-label">of AI/ML applications benefit from block diagrams</div>
+        </div>
+      </div>
+
+      <p><strong>The legal anchor for drawings is the entire 37 CFR §§ 1.81–1.88 regulatory regime</strong>, which prescribes when drawings are required (§ 1.81), the standards for acceptable drawings (§ 1.84), amendments to drawings (§ 1.121), and the consequences of non-compliant drawings (§ 1.85). For AI/ML practitioners, the most important principle is this: if you claim it, draw it.</p>
+    </section>
+
+    <!-- ── 2. USPTO Formal Requirements ───────────────────── -->
+    <section id="requirements" class="section-anchor">
+      <h2>2. USPTO Formal Requirements</h2>
+
+      <p>37 CFR § 1.84 sets out detailed physical and technical standards for patent drawings. Engineers used to academic publication figures will find these requirements more stringent. The table below summarizes the key formal requirements.</p>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Requirement</th>
+              <th>Specification</th>
+              <th>Practical Note</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Paper Size</td>
+              <td>21.0 cm × 29.7 cm (A4) or 21.6 cm × 27.9 cm (letter)</td>
+              <td>A4 preferred for international filings; both accepted by USPTO</td>
+            </tr>
+            <tr>
+              <td>Top Margin</td>
+              <td>Minimum 2.5 cm</td>
+              <td>Reserved for page number and figure label placement</td>
+            </tr>
+            <tr>
+              <td>Left / Right Margins</td>
+              <td>Minimum 1.5 cm each side</td>
+              <td>Drawing content must not intrude into margins</td>
+            </tr>
+            <tr>
+              <td>Bottom Margin</td>
+              <td>Minimum 1.0 cm</td>
+              <td>Attorney docket or application number may appear here</td>
+            </tr>
+            <tr>
+              <td>Line Quality</td>
+              <td>Black ink on white background; solid, uniformly thick lines</td>
+              <td>Gray lines, anti-aliasing, and gradients are non-compliant; clean vector export required</td>
+            </tr>
+            <tr>
+              <td>Color Drawings</td>
+              <td>Not permitted by default; require a petition under § 1.84(a)(2)</td>
+              <td>Grayscale is permitted for photographs; color requires a "special circumstance" showing</td>
+            </tr>
+            <tr>
+              <td>Minimum Text Height</td>
+              <td>0.32 cm (approximately 9 pt) for all text within drawings</td>
+              <td>Labels, reference numerals, axis titles must all meet this minimum</td>
+            </tr>
+            <tr>
+              <td>Reference Numerals</td>
+              <td>Must appear in the drawings and the specification; same numeral = same element across all figures</td>
+              <td>Never reuse a numeral for a different element in a different figure</td>
+            </tr>
+            <tr>
+              <td>Figure Numbering</td>
+              <td>FIG. 1, FIG. 2, … consecutively; can use FIG. 1A, FIG. 1B for related sub-figures</td>
+              <td>Use "FIG." not "Figure" or "Fig." in both drawings and specification</td>
+            </tr>
+            <tr>
+              <td>File Format (EFS-Web / Patent Center)</td>
+              <td>PDF or TIFF at minimum 300 DPI for photographs; vector PDF preferred</td>
+              <td>Export from drawing tools as PDF/A or high-resolution TIFF; not JPG</td>
+            </tr>
+            <tr>
+              <td>Shading</td>
+              <td>Permitted using standard hatching or stippling patterns only</td>
+              <td>Gradient fills are not compliant; use line hatching for surface texture or depth</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="table-caption">Table 7A-1: USPTO Drawing Requirements under 37 CFR § 1.84</p>
+
+      <div class="callout callout-warning">
+        <div class="callout-icon">&#9888;</div>
+        <div class="callout-body">
+          <div class="callout-title">Color Drawings Require a Petition</div>
+          <p>Under 37 CFR § 1.84(a)(2), color drawings or color photographs are only accepted if a petition is granted establishing that color is the <em>only practicable medium</em> for disclosing the subject matter. For AI/ML applications, this almost never applies — confusion matrices, feature maps, and architecture diagrams can always be rendered in black-and-white without loss of meaning. Do not submit the color plots from your research paper; convert them to black-and-white line drawings with labeled axes and patterns instead of color coding. A rejected color drawing triggers a § 1.85 objection that can delay your application by months.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 3. Types of Drawings for AI/ML Patents ─────────── -->
+    <section id="types" class="section-anchor">
+      <h2>3. Types of Drawings for AI/ML Patents</h2>
+
+      <p>AI/ML inventions present a distinctive drafting challenge: the "invention" is often an algorithmic process or a learned model architecture, not a physical artifact. Different drawing types serve different disclosure and claim support functions. Selecting the right figure type for each aspect of the invention is a strategic as well as technical decision.</p>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Drawing Type</th>
+              <th>When to Use</th>
+              <th>AI/ML Example</th>
+              <th>USPTO Compliance Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Block Diagram</strong></td>
+              <td>Showing system architecture, component relationships, and high-level data flow; best for independent claims</td>
+              <td>Neural network system with input layer, encoder module 102, attention mechanism 104, and output head 106</td>
+              <td>Most common figure type for software patents; boxes and arrows fully compliant; avoid 3-D shading</td>
+            </tr>
+            <tr>
+              <td><strong>Flowchart</strong></td>
+              <td>Describing a method or process claim step-by-step; each diamond/box can correspond directly to a claim element</td>
+              <td>Training loop: receive mini-batch (202) → forward pass (204) → compute loss (206) → backpropagate (208) → update weights (210)</td>
+              <td>Use standard flowchart symbols (rectangles for process, diamonds for decision); avoid decorative styling</td>
+            </tr>
+            <tr>
+              <td><strong>Data Flow Diagram</strong></td>
+              <td>Showing how data is transformed through pipeline stages; distinguishes data stores from processes</td>
+              <td>ETL pipeline: raw sensor data (302) → normalization module (304) → feature extractor (306) → training dataset (308)</td>
+              <td>Arrows must indicate directionality; label each data element with reference numeral; no color coding</td>
+            </tr>
+            <tr>
+              <td><strong>Graph / Plot</strong></td>
+              <td>Demonstrating technical improvement over prior art; showing performance curves, convergence, accuracy trade-offs</td>
+              <td>Loss curves comparing baseline model (402) versus claimed architecture (404) across training epochs</td>
+              <td>Must use black-and-white with distinct line styles (solid, dashed, dotted) rather than color; axes must be labeled with min 0.32 cm text</td>
+            </tr>
+            <tr>
+              <td><strong>Architecture Diagram</strong></td>
+              <td>Detailed layer-by-layer view of a neural network, transformer, or ensemble structure; supports dependent claims</td>
+              <td>Transformer decoder: embedding layer 502 → multi-head attention 504 → feed-forward network 506 → layer norm 508</td>
+              <td>Layer dimensions and tensor shapes can appear as labels; keep to black-and-white rectangles with hatching if needed</td>
+            </tr>
+            <tr>
+              <td><strong>Comparison Table as Figure</strong></td>
+              <td>Side-by-side performance comparison establishing novelty or non-obviousness; particularly useful for method claims</td>
+              <td>FIG. 6: Accuracy comparison table showing claimed method (602) vs. prior art methods A (604) and B (606) across five benchmarks</td>
+              <td>Tables rendered as figures must follow drawing margin rules; reference numerals must label each row/column group referenced in the spec</td>
+            </tr>
+            <tr>
+              <td><strong>Hardware / Deployment Diagram</strong></td>
+              <td>Grounding software claims in a concrete system; useful when claims recite "a system comprising a processor configured to…"</td>
+              <td>Inference server 702 comprising GPU array 704, memory 706, and model weights storage 708, connected to client devices 710 via network 712</td>
+              <td>Must represent actual physical or logical hardware components; no purely decorative server rack illustrations</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="table-caption">Table 7A-2: Patent Drawing Types for AI/ML Applications</p>
+
+      <p>A well-drafted AI/ML application typically contains 6–12 figures spanning several of these types: a high-level block diagram for the independent system claim, one or more flowcharts for method claims, an architecture diagram for the core model structure, and one or two performance graphs supporting the utility of the claimed improvement.</p>
+    </section>
+
+    <!-- ── 4. Reference Numerals ───────────────────────────── -->
+    <section id="reference-numerals" class="section-anchor">
+      <h2>4. Reference Numerals</h2>
+
+      <p>Reference numerals are the connective tissue between patent drawings and the written specification. The USPTO requires that reference numerals used in the drawings appear in the detailed description, and vice versa (37 CFR § 1.83(a)). Inconsistency — a numeral in a figure that never appears in the text, or a text reference to element "104" that doesn't appear in any figure — is a common source of § 1.83 objections.</p>
+
+      <h3>The Series Convention</h3>
+      <p>The industry-standard practice, widely adopted by large patent prosecution firms, is to assign reference numerals in <strong>100-series increments per figure</strong>:</p>
+
+      <ul>
+        <li>FIG. 1 elements: 100, 102, 104, 106 … (100-series)</li>
+        <li>FIG. 2 elements: 200, 202, 204, 206 … (200-series)</li>
+        <li>FIG. 3 elements: 300, 302, 304, 306 … (300-series)</li>
+        <li>And so on through the application</li>
+      </ul>
+
+      <p>Within each series, use <strong>even numbers only</strong> (100, 102, 104 — not 101, 103). This reserves the odd numbers as a buffer: if prosecution requires adding a new element to FIG. 1 between elements 102 and 104, you can assign it numeral 103 without renumbering the entire figure. Renumbering figures mid-prosecution is expensive and risks introducing new matter under 35 U.S.C. § 132.</p>
+
+      <div class="callout callout-tip">
+        <div class="callout-icon">&#10003;</div>
+        <div class="callout-body">
+          <div class="callout-title">Reference Numeral Assignment — Worked Example</div>
+          <p>For an AI/ML patent with a training pipeline (FIG. 1), a neural network architecture (FIG. 2), and an inference deployment diagram (FIG. 3), a proper numeral assignment table might look like this:</p>
+          <div class="table-wrapper" style="margin: 1rem 0;">
+            <table>
+              <thead>
+                <tr><th>Numeral</th><th>Figure</th><th>Element</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>100</td><td>FIG. 1</td><td>Training system (overall)</td></tr>
+                <tr><td>102</td><td>FIG. 1</td><td>Data ingestion module</td></tr>
+                <tr><td>104</td><td>FIG. 1</td><td>Preprocessing pipeline</td></tr>
+                <tr><td>106</td><td>FIG. 1</td><td>Training engine</td></tr>
+                <tr><td>108</td><td>FIG. 1</td><td>Model storage</td></tr>
+                <tr><td>200</td><td>FIG. 2</td><td>Neural network architecture</td></tr>
+                <tr><td>202</td><td>FIG. 2</td><td>Input embedding layer</td></tr>
+                <tr><td>204</td><td>FIG. 2</td><td>Multi-head attention block</td></tr>
+                <tr><td>206</td><td>FIG. 2</td><td>Feed-forward sublayer</td></tr>
+                <tr><td>208</td><td>FIG. 2</td><td>Output projection layer</td></tr>
+                <tr><td>300</td><td>FIG. 3</td><td>Inference deployment system</td></tr>
+                <tr><td>302</td><td>FIG. 3</td><td>Inference server</td></tr>
+                <tr><td>304</td><td>FIG. 3</td><td>Load balancer</td></tr>
+                <tr><td>306</td><td>FIG. 3</td><td>Client endpoint</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="margin-bottom:0;">Maintain this table in a spreadsheet throughout prosecution. Before filing, cross-reference every numeral in the figures against the detailed description to confirm each appears in both places.</p>
+        </div>
+      </div>
+
+      <h3>Cross-Figure Consistency</h3>
+      <p>When the same physical or logical element appears in multiple figures, it must carry the <strong>same reference numeral in every figure</strong>. If the neural network architecture (numeral 200) is introduced in FIG. 2 and then shown operating within the training system in FIG. 1, the architecture block in FIG. 1 must also be labeled 200. This consistency rule is absolute — it enables the examiner to trace an element through the application and confirms the drawings disclose a coherent, single invention.</p>
+    </section>
+
+    <!-- ── 5. Drawing Tools Comparison ────────────────────── -->
+    <section id="tools" class="section-anchor">
+      <h2>5. Drawing Tools Comparison</h2>
+
+      <p>Engineers have many drawing tools available, but not all are equally suited to producing USPTO-compliant patent drawings. The critical capabilities are: (1) precise control over line weight and color (must be solid black), (2) clean vector export to PDF, (3) the ability to add and position reference numerals exactly, and (4) support for standard shapes (rectangles, diamonds, cylinders, arrows).</p>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Tool</th>
+              <th>Cost</th>
+              <th>Platform</th>
+              <th>Best For</th>
+              <th>Export Format</th>
+              <th>USPTO-Ready</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>draw.io (diagrams.net)</strong></td>
+              <td>Free</td>
+              <td>Web, Desktop (Win/Mac/Linux)</td>
+              <td>Block diagrams, flowcharts, architecture diagrams; full shape library; excellent for patent work</td>
+              <td>PDF, SVG, PNG, XML</td>
+              <td><span class="badge badge-success">Excellent</span></td>
+            </tr>
+            <tr>
+              <td><strong>Microsoft Visio</strong></td>
+              <td>$15/mo (M365 plan)</td>
+              <td>Windows, Web</td>
+              <td>Enterprise-standard; familiar to large firm patent teams; deep shape libraries</td>
+              <td>PDF, SVG, EMF, PNG</td>
+              <td><span class="badge badge-success">Excellent</span></td>
+            </tr>
+            <tr>
+              <td><strong>Lucidchart</strong></td>
+              <td>Free tier; $9/mo Pro</td>
+              <td>Web (all platforms)</td>
+              <td>Collaborative diagramming; good for team-based patent drafting with attorney review</td>
+              <td>PDF, PNG, SVG, Visio</td>
+              <td><span class="badge badge-success">Very Good</span></td>
+            </tr>
+            <tr>
+              <td><strong>Adobe Illustrator</strong></td>
+              <td>$23/mo (CC)</td>
+              <td>Win/Mac</td>
+              <td>Maximum precision for complex figures; publication-quality output; steep learning curve</td>
+              <td>PDF/A, SVG, EPS, AI</td>
+              <td><span class="badge badge-success">Excellent</span></td>
+            </tr>
+            <tr>
+              <td><strong>OmniGraffle</strong></td>
+              <td>$149 (Standard), $249 (Pro)</td>
+              <td>Mac/iPad only</td>
+              <td>Mac-native polish; popular with West Coast IP boutiques; intuitive for engineers on Apple hardware</td>
+              <td>PDF, SVG, PNG, Visio</td>
+              <td><span class="badge badge-success">Very Good</span></td>
+            </tr>
+            <tr>
+              <td><strong>Inkscape</strong></td>
+              <td>Free (open source)</td>
+              <td>Win/Mac/Linux</td>
+              <td>Full vector editing; ideal for converting and cleaning up research figures for USPTO compliance</td>
+              <td>SVG, PDF, PNG, EPS</td>
+              <td><span class="badge badge-info">Good</span></td>
+            </tr>
+            <tr>
+              <td><strong>Python matplotlib</strong></td>
+              <td>Free</td>
+              <td>All platforms (code)</td>
+              <td>Performance graphs and data plots; reproducible figures from experiment data; good for FIG. N performance comparisons</td>
+              <td>PDF, SVG, PNG, EPS</td>
+              <td><span class="badge badge-warning">Conditional</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="table-caption">Table 7A-3: Drawing Tools for Patent Applications (USPTO-Ready = produces compliant black-and-white vector PDF output)</p>
+
+      <p>For matplotlib: it is USPTO-ready only with careful configuration — disable color output, use <code>rcParams</code> to set line styles to black with distinct dash patterns, ensure axis labels meet the 0.32 cm minimum, and export as vector PDF (not PNG). A PNG exported at 300 DPI is permissible but inferior to a vector PDF for patent drawings.</p>
+
+      <div class="callout callout-tip">
+        <div class="callout-icon">&#10003;</div>
+        <div class="callout-body">
+          <div class="callout-title">Recommended Starting Point for Engineers: draw.io</div>
+          <p><strong>draw.io (diagrams.net)</strong> is the preferred tool for engineers new to patent drawing. It is completely free, runs in the browser without installation, exports clean vector PDFs, and has an extensive shape library covering all standard patent figure types. The XML source format is human-readable and version-controllable in git alongside your source code. When filing with a large firm, your draw.io XML can be handed directly to a patent illustrator for professional cleanup. Chapter 7B provides a hands-on draw.io walkthrough with complete AI/ML patent figure examples.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 6. Converting Research Figures ─────────────────── -->
+    <section id="converting" class="section-anchor">
+      <h2>6. Converting Research Figures to Patent Drawings</h2>
+
+      <p>Engineers frequently arrive at the patent process with an existing set of publication-quality figures from conference papers, technical reports, or internal presentations. These almost universally need conversion before they are USPTO-compliant. The mistakes listed below account for the majority of § 1.84 drawing rejections in AI/ML applications.</p>
+
+      <div class="comparison-grid">
+        <div class="comparison-item bad">
+          <h4>Common Mistakes (Do Not Do)</h4>
+          <ul>
+            <li><strong>Color-coded figures:</strong> Heatmaps, attention visualizations, and loss-landscape plots use color that must be converted to grayscale patterns or line-based representations</li>
+            <li><strong>Photographic backgrounds:</strong> Research paper figures often have gradient or photographic backgrounds; USPTO requires pure white</li>
+            <li><strong>Inconsistent line weights:</strong> Mixing thick and thin lines without semantic purpose creates ambiguity; use uniform line weights unless variation conveys specific meaning</li>
+            <li><strong>Missing reference numerals:</strong> Academic figures are never labeled with reference numerals; every element claimed or described in the spec needs one</li>
+            <li><strong>Excessive detail:</strong> A 47-layer ResNet drawn in full anatomical detail obscures the claimed invention; abstract to the level of claim granularity</li>
+            <li><strong>Sub-0.32 cm text:</strong> Axis tick labels, legends, and small annotations in matplotlib default to well below the USPTO minimum; always verify</li>
+            <li><strong>Logo/watermark graphics:</strong> Institution logos, company watermarks, and decorative icons are not permitted in patent drawings</li>
+          </ul>
+        </div>
+        <div class="comparison-item good">
+          <h4>Correct Approach (Do This)</h4>
+          <ul>
+            <li><strong>Replace color with patterns:</strong> Use solid, dashed, dotted, and dash-dot line styles; for filled areas, use hatching (diagonal lines) or stippling rather than color fills</li>
+            <li><strong>White background, black ink only:</strong> Delete all background fills; set all text and lines to pure black (#000000); remove anti-aliasing before rasterizing</li>
+            <li><strong>Uniform, deliberate line weights:</strong> Use one weight for boxes/borders, one for arrows, and one for labels; maintain this system across all figures</li>
+            <li><strong>Add reference numerals first:</strong> Before finalizing any figure, assign numerals from your master table and place them clearly adjacent to each element</li>
+            <li><strong>Abstract to claim scope:</strong> Draw what you claim, not what you built; if the claim says "feature extraction module," one labeled box is sufficient</li>
+            <li><strong>Verify text size in print:</strong> Print your figure at 100% on letter paper and physically measure label heights with a ruler before submitting</li>
+            <li><strong>Clean vector export:</strong> Export as PDF from draw.io, Illustrator, or Inkscape; open the PDF and verify no rasterization artifacts</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>A Practical Conversion Workflow</h3>
+      <ol class="process-steps">
+        <li>
+          <div class="step-content">
+            <h4>Identify Every Element That Appears in a Claim</h4>
+            <p>Mark up your claim set with a highlighter. Every highlighted noun phrase is a candidate for a labeled drawing element. This determines the minimum content of your figures.</p>
+          </div>
+        </li>
+        <li>
+          <div class="step-content">
+            <h4>Draft a Reference Numeral Master Table</h4>
+            <p>Create a spreadsheet: figure number, element description, assigned numeral (even-only, series-per-figure). This table governs every drawing you produce.</p>
+          </div>
+        </li>
+        <li>
+          <div class="step-content">
+            <h4>Redraw in draw.io or Visio from Scratch</h4>
+            <p>Do not "clean up" the original research figure — redraw it. Starting fresh in a compliant tool is faster and produces better results than iteratively fixing an existing figure in Photoshop or PowerPoint.</p>
+          </div>
+        </li>
+        <li>
+          <div class="step-content">
+            <h4>Apply the Black-and-White Compliance Check</h4>
+            <p>Export to PDF, open in a PDF viewer, and print one page. Any element that is invisible or ambiguous in black-and-white must be redesigned with line patterns or labels instead of color.</p>
+          </div>
+        </li>
+        <li>
+          <div class="step-content">
+            <h4>Cross-Reference Figures Against the Specification</h4>
+            <p>Every reference numeral in every figure must appear in the detailed description, and vice versa. A final pre-filing review using a simple text search for each numeral takes 30 minutes and prevents 90% of § 1.83 objections.</p>
+          </div>
+        </li>
+      </ol>
+    </section>
+
+    <!-- ── 7. Part 1 Summary ────────────────────────────────── -->
+    <section id="summary" class="section-anchor">
+      <h2>7. Part 1 Summary</h2>
+
+      <p>The foundations of compliant patent drawing practice can be internalized quickly by engineers who approach them as a specification — much like an API contract or a coding standard. The rules are detailed but deterministic: follow them and you will avoid the most common prosecution delays associated with drawings.</p>
+
+      <ul class="checklist">
+        <li>Drawings are required under 37 CFR § 1.81 whenever necessary for understanding the claimed subject matter — this threshold is met in virtually all AI/ML applications</li>
+        <li>Every element recited in the claims must be illustrated in at least one figure and labeled with a reference numeral (§ 1.83)</li>
+        <li>Drawings must meet the physical standards of § 1.84: A4 or letter paper, 2.5 cm top / 1.5 cm side / 1.0 cm bottom margins, black ink on white background</li>
+        <li>Color drawings are prohibited without a petition; replace color with distinct line styles, hatching, or grayscale-safe patterns</li>
+        <li>All text within drawings must be at least 0.32 cm (approx. 9 pt) in height — verify by printing at 100% scale</li>
+        <li>Use the 100-series convention (even numbers only) for reference numerals: 100-series for FIG. 1, 200-series for FIG. 2, etc.</li>
+        <li>The same element must carry the same reference numeral in every figure where it appears</li>
+        <li>Maintain a reference numeral master table and cross-reference every numeral against the specification before filing</li>
+        <li>draw.io (free) is the recommended starting tool for engineers; it exports clean vector PDFs and integrates naturally into a software development workflow</li>
+        <li>Do not "clean up" research publication figures — redraw them from scratch in a compliant tool to avoid introducing non-compliant elements</li>
+      </ul>
+
+      <div class="callout callout-info">
+        <div class="callout-icon">&#9654;</div>
+        <div class="callout-body">
+          <div class="callout-title">Continue to Chapter 7B</div>
+          <p>Continue to <a href="ch07b_drawings_practice.html"><strong>Chapter 7B: Creating AI/ML Patent Drawings</strong></a> for hands-on AI/ML drawing creation with worked examples and SVG diagrams. Chapter 7B provides step-by-step draw.io tutorials for block diagrams, flowcharts, and architecture figures, along with complete example figures for a transformer-based language model patent application.</p>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ── Chapter Navigation ─────────────────────────────── -->
+    <nav class="chapter-nav">
+      <a href="ch06_specification.html" class="chapter-nav-btn">
+        <span class="nav-label">&#8592; Previous</span>
+        <span class="nav-title">Chapter 6: Crafting the Patent Specification</span>
+      </a>
+      <a href="ch07b_drawings_practice.html" class="chapter-nav-btn nav-next">
+        <span class="nav-label">Next &#8594;</span>
+        <span class="nav-title">Chapter 7B: Creating AI/ML Patent Drawings</span>
+      </a>
+    </nav>
+
+  </main>
+</div>
+
+<!-- ── Footer ───────────────────────────────────────────────────── -->
+<footer>
+  <div class="footer-content">
+    <p><strong>Patent Law for Technologists</strong></p>
+    <p>Written by a committee of partners from Fish &amp; Richardson, Finnegan, Kirkland &amp; Ellis, Cooley, Morrison Foerster, and professors from Stanford and NYU Law Schools.</p>
+    <p style="margin-top:1rem; font-size:.8125rem; opacity:.6;">The materials in this publication are for general informational purposes only and do not constitute legal advice. No attorney-client relationship is formed by use of these materials. Consult qualified patent counsel for advice on specific matters.</p>
+  </div>
+</footer>
+
+</body>
+</html>

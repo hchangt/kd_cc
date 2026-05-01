@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 6: Crafting the Patent Specification — Patent Law for Technologists</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- ── Top Navigation ──────────────────────────────────────────── -->
+<nav class="top-nav">
+  <div class="nav-container">
+    <a href="index.html" class="nav-logo">Patent Law <span>for Technologists</span></a>
+    <div class="nav-links">
+      <a href="ch01_intro.html">Ch 1</a>
+      <a href="ch02_patentability.html">Ch 2</a>
+      <a href="ch03_prior_art.html">Ch 3</a>
+      <a href="ch04_101.html">Ch 4</a>
+      <a href="ch05_writing_claims.html">Ch 5</a>
+      <a href="ch06_specification.html" class="active">Ch 6</a>
+      <a href="ch07_drawings.html">Ch 7</a>
+      <a href="ch08_prosecution.html">Ch 8</a>
+      <a href="ch09_fto.html">Ch 9</a>
+      <a href="ch10_litigation.html">Ch 10</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ── Chapter Hero ─────────────────────────────────────────────── -->
+<header class="chapter-hero">
+  <div class="chapter-hero-content">
+    <div class="chapter-badge">Chapter 6</div>
+    <h1>Crafting the Patent Specification</h1>
+    <p class="subtitle">Enabling Your Innovation for the World — The Law, Strategy, and Craft of Writing a Bulletproof Specification for AI/ML Inventions</p>
+    <div class="chapter-meta">
+      <span>Dr. Lisa M. Chang &nbsp;|&nbsp; Kirkland &amp; Ellis, New York</span>
+      <span>~90 minutes</span>
+      <span>AI/ML Patent Prosecution</span>
+    </div>
+  </div>
+</header>
+
+<!-- ── Page Layout ──────────────────────────────────────────────── -->
+<div class="page-layout">
+
+  <!-- Sidebar TOC -->
+  <aside class="sidebar">
+    <nav class="toc">
+      <h3>In This Chapter</h3>
+      <ol>
+        <li><a href="#legal-role">The Specification's Legal Role</a></li>
+        <li><a href="#background">Technical Background Section</a></li>
+        <li><a href="#detailed-description">Drafting the Detailed Description</a></li>
+        <li><a href="#aiml-description">Describing AI/ML Systems</a></li>
+        <li><a href="#enablement">Enablement for AI</a></li>
+        <li><a href="#written-description">Written Description for AI/ML</a></li>
+        <li><a href="#training-data">Describing Training Data</a></li>
+        <li><a href="#hyperparameters">Hyperparameters &amp; Reproducibility</a></li>
+        <li><a href="#figures">Figures and the Spec</a></li>
+        <li><a href="#checklist">Completeness Checklist</a></li>
+        <li><a href="#mistakes">Common Mistakes</a></li>
+        <li><a href="#continuation-strategy">Continuation Strategy</a></li>
+        <li><a href="#key-takeaways">Key Takeaways</a></li>
+      </ol>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="chapter-content">
+
+    <p>The claims are the metes and bounds of your patent — the property lines on the deed. But the specification is the deed itself, the survey, the title history, and the engineer's report all rolled into one. You can have the most elegant, strategically drafted claims in the world; without a specification that <em>enables</em> those claims, supports them with adequate written description, and discloses the best mode of practicing the invention, a court or the Patent Trial and Appeal Board (PTAB) will strike them down.</p>
+
+    <p>For practitioners working at the intersection of artificial intelligence, machine learning, and patent law, the specification presents unique and still-evolving challenges. How do you describe a stochastic training process in a way that another researcher could reproduce? Must you disclose trained model weights? What does "possession" of a neural network architecture mean? These are not academic questions — they arise in prosecution and litigation every day, and the answers are still being written by the courts and the USPTO.</p>
+
+    <p>This chapter answers those questions with practical guidance, concrete examples, and the analytical frameworks you need to draft AI/ML specifications that will survive scrutiny.</p>
+
+    <div class="stats-row">
+      <div class="stat-item">
+        <div class="stat-number">§ 112</div>
+        <div class="stat-label">The governing statute — "full, clear, concise, and exact terms"</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">2023</div>
+        <div class="stat-label"><em>Amgen v. Sanofi</em> — the Supreme Court's enablement framework</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">2021</div>
+        <div class="stat-label"><em>Juno v. Kite</em> — written description lessons for functional claims</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">1988</div>
+        <div class="stat-label"><em>In re Wands</em> — the 8-factor enablement test still controlling today</div>
+      </div>
+    </div>
+
+    <!-- ─────────────────────────────────────────────────────────── -->
+    <h2 id="legal-role" class="section-anchor">1. The Specification's Legal Role</h2>
+
+    <p>Under 35 U.S.C. § 112(a), the specification must satisfy three distinct but overlapping requirements. Each has independent legal force, and failure on any one of them can be fatal to patent validity.</p>
+
+    <h3>1.1 Enablement — § 112(a), First Clause</h3>
+
+    <p>The specification must "contain a written description of the invention, and of the manner and process of making and using it, in such full, clear, concise, and exact terms as to enable any person skilled in the art to which it pertains, or with which it is most nearly connected, to make and use the same." 35 U.S.C. § 112(a).</p>
+
+    <p>Enablement is tested at the <em>full scope of the claims</em>. This is the operative word. The specification must enable not just one embodiment, but the entire genus of inventions covered by the claim language. For a claim to "a neural network trained to predict protein folding," the specification must enable a person of ordinary skill in the art (POSITA) to make and use neural networks trained for this purpose across the full breadth of what the claim covers — not just the one architecture the inventors happened to use.</p>
+
+    <p>The Supreme Court's 2023 decision in <em>Amgen Inc. v. Sanofi</em>, 598 U.S. 594 (2023) — while a biotech case involving antibodies — sent shockwaves through AI patent prosecution. The Court held that a claim sweeping across "potentially millions" of antibodies was not enabled when the specification only described a handful. The Court emphasized that enabling a genus requires enabling each species within that genus, at least to the point where a skilled artisan need not "engage in undue experimentation." The implications for broad AI/ML claims — "a machine learning model trained to classify…" — are substantial and not yet fully resolved.</p>
+
+    <h3>1.2 Written Description — § 112(a), First Clause</h3>
+
+    <p>Although written description and enablement share a statutory home in § 112(a), the Federal Circuit has long recognized them as separate requirements. See <em>Ariad Pharmaceuticals, Inc. v. Eli Lilly &amp; Co.</em>, 598 F.3d 1336, 1341 (Fed. Cir. 2010) (en banc).</p>
+
+    <p>Written description asks: does the specification demonstrate that the inventor <em>possessed</em> the claimed invention at the time of filing? This is not the same as asking whether the spec enables a skilled artisan to make the invention. A spec could, in theory, enable a broad genus through general principles while failing to show that the inventor actually had possession of the whole genus as of the filing date.</p>
+
+    <p>For AI/ML inventions, written description raises pointed questions. If an inventor claims a "transformer-based model achieving greater than 95% accuracy on benchmark X," did she possess that model at filing? She need not have trained all possible models that meet this functional description — but she must have possessed a representative cross-section sufficient to show she was in possession of the claimed genus, not just a vague idea of it.</p>
+
+    <h3>1.3 Best Mode — § 112(a), Third Clause</h3>
+
+    <p>The inventor must disclose "the best mode contemplated by the inventor or joint inventor of carrying out the invention." 35 U.S.C. § 112(a). This is a subjective inquiry: what did <em>this inventor</em> consider the best way to practice the invention at the time of filing?</p>
+
+    <p>Although the America Invents Act (AIA) of 2011 eliminated best mode as a basis for invalidity in litigation (35 U.S.C. § 282(b)(3)(A)), it remains a ground for rejection during USPTO prosecution. And in inter partes review (IPR) or post-grant review (PGR), some practitioners argue best mode evidence can bear on inequitable conduct, though the primary teeth have been pulled.</p>
+
+    <div class="callout callout-warning">
+      <div class="callout-icon">⚠️</div>
+      <div class="callout-body">
+        <div class="callout-title">Best Mode in AI/ML Prosecution</div>
+        <p>Even if best mode is no longer an invalidity basis in litigation, examiners can and do reject applications during prosecution for failure to disclose best mode. More importantly, if you knowingly conceal the best mode from the specification, you may be sailing toward inequitable conduct. For AI/ML cases, the "best mode" is often a specific combination of: (1) a particular architecture variant, (2) a specific optimizer and learning rate schedule, and (3) specific data preprocessing steps. Practitioners must ensure inventors fully disclose these details during the invention disclosure process.</p>
+      </div>
+    </div>
+
+    <h3>1.4 Why These Requirements Are Uniquely Challenging for AI/ML</h3>
+
+    <p>Traditional mechanical or chemical inventions present specification challenges that the profession has worked out over more than a century. AI/ML inventions face a new frontier:</p>
+
+    <ul>
+      <li><strong>Stochastic training processes:</strong> Neural network training is inherently non-deterministic. Even with identical architecture, data, and hyperparameters, different hardware and random seeds produce different models. The specification cannot guarantee reproduction of the exact model, only a model with substantially similar properties.</li>
+      <li><strong>Emergent behaviors:</strong> Large language models exhibit capabilities that emerge only at scale — capabilities not present in smaller versions and not explicitly trained for. A specification drafted for a model that "translates between languages" may not have anticipated the model's emergent ability to reason step-by-step. Claim scope often races ahead of specification support.</li>
+      <li><strong>Data dependency:</strong> An ML model's behavior is inseparable from its training data. Two identical architectures trained on different data are, in a meaningful sense, different inventions. Yet specifying training data with too much particularity risks narrowing the claims impermissibly.</li>
+      <li><strong>Rapid evolution of the field:</strong> A POSITA in 2018 could not be assumed to know transformer architecture; a POSITA in 2024 can. The specification's adequacy is assessed as of the filing date against what the POSITA then knew.</li>
+      <li><strong>Functional claim language:</strong> AI inventors naturally describe their inventions in functional terms ("a model that predicts…"). Such language may claim an enormous — possibly unenabled — scope, as <em>Amgen</em> demonstrated for analogous functional claims in biotech.</li>
+    </ul>
+
+    <!-- ─────────────────────────────────────────────────────────── -->
+    <h2 id="background" class="section-anchor">2. Technical Background — Strategic Drafting</h2>
+
+    <p>The Background section is the one part of the patent specification that serves primarily a <em>rhetorical</em> function: it frames the problem your invention solves and educates the reader (examiner, judge, jury) about the technical context. Drafted well, it creates the narrative frame that makes your claims both understandable and compelling. Drafted poorly, it can become a weapon in your adversary's hands.</p>
+
+    <h3>2.1 What to Include</h3>
+
+    <ul>
+      <li><strong>The state of the art:</strong> What existed before your invention? Describe it at a level of generality that sets up the problem without painting yourself into a corner on prior art.</li>
+      <li><strong>The unsolved problem:</strong> Identify with specificity what prior solutions failed to achieve. This is your setup for the claimed invention.</li>
+      <li><strong>Why the problem mattered:</strong> Briefly note the consequences of the problem — commercial impact, patient harm, scientific gap — to establish motivation.</li>
+    </ul>
+
+    <h3>2.2 What Not to Include</h3>
+
+    <div class="callout callout-danger">
+      <div class="callout-icon">🚨</div>
+      <div class="callout-body">
+        <div class="callout-title">The Background Section Can Hurt You</div>
+        <p>Anything described in the background as "prior art" or "conventional" may be treated as an admission of prior art — even if the reference was not publicly known at the time of filing or was your own prior work. Courts routinely use background statements as prosecution history estoppel and as evidence of claim scope. Do <strong>not</strong> describe specific prior art systems by name, do not admit that all prior approaches suffered a limitation if that is not universally true, and do not acknowledge your own prior publications as "prior art" without careful thought.</p>
+      </div>
+    </div>
+
+    <h3>2.3 The "Problem" Frame</h3>
+
+    <p>The most effective background sections do not describe the invention at all. They describe the problem landscape with enough detail that a skilled reader can see why the invention matters, but not so much detail that you inadvertently limit the claims or concede prior art positions you'll need in prosecution.</p>
+
+    <p>Use the formulation: "There is a need in the art for [X]. Existing approaches fail to provide [X] because [Y]. The present disclosure addresses this need." This simple structure has been validated across thousands of patents and is recognized by examiners as appropriate framing.</p>
+
+    <h3>2.4 Example Background Sections</h3>
+
+    <h4>Example A: Attention Mechanism Improvement</h4>
+
+    <pre><code>BACKGROUND OF THE INVENTION
+
+Attention mechanisms have become a foundational component of modern natural language
+processing (NLP) architectures. In standard multi-head self-attention, each query vector
+attends to all key-value pairs in the sequence, producing an attention distribution that
+is used to compute a weighted sum of value vectors. While effective, this approach
+exhibits quadratic computational complexity with respect to sequence length, creating
+practical limitations when processing long documents, genomic sequences, or extended
+time-series data.
+
+Prior approaches to reducing attention complexity include sparse attention patterns,
+local window attention, and linear approximations of the softmax function. However,
+these approaches typically require explicit specification of the attention pattern prior
+to training, limiting the model's ability to adaptively concentrate attention on the most
+informative token pairs as learned during training. Furthermore, existing sparse attention
+methods often sacrifice performance on tasks requiring long-range dependencies for gains
+in computational efficiency.
+
+There exists a need in the art for attention mechanisms that dynamically adapt their
+sparsity patterns during and after training, preserving performance on long-range
+dependency tasks while substantially reducing computational and memory requirements.</code></pre>
+
+    <h4>Example B: Protein Folding</h4>
+
+    <pre><code>BACKGROUND OF THE INVENTION
+
+The prediction of three-dimensional protein structure from amino acid sequence — the
+"protein folding problem" — has remained one of the central challenges of structural
+biology. The native conformation of a protein determines its biological function, and
+misfolded proteins are implicated in numerous diseases including Alzheimer's disease,
+Parkinson's disease, and type 2 diabetes.
+
+Computational approaches to structure prediction have historically relied on
+physics-based energy minimization, homology modeling from known structures, or
+fragment assembly methods. These approaches are computationally intensive, require
+either known homologous structures or extensive simulation, and often yield predictions
+with root-mean-square deviation (RMSD) from crystal structure that is too large for
+reliable drug design applications.
+
+Recent deep learning approaches have demonstrated substantially improved prediction
+accuracy for single-chain proteins with known homologs. However, predictions for
+protein complexes, intrinsically disordered regions, and sequences with few known
+homologs remain substantially less accurate. Additionally, existing deep learning
+approaches do not provide reliable estimates of prediction confidence at the residue
+level, limiting their utility for downstream drug discovery applications where
+uncertainty quantification is critical.</code></pre>
+
+    <h4>Example C: Drug-Target Interaction Prediction</h4>
+
+    <pre><code>BACKGROUND OF THE INVENTION
+
+Drug discovery depends critically on identifying pairs of chemical compounds and
+biological target proteins for which the compound modulates target activity at
+therapeutically relevant concentrations. Traditional high-throughput screening (HTS)
+assays provide ground-truth binding data but are expensive, time-consuming, and
+typically limited to compound libraries of fewer than 10 million molecules — a small
+fraction of the estimated 10^60 molecules in drug-like chemical space.
+
+Computational models for predicting drug-target interaction (DTI) have been developed
+using both ligand-based and structure-based approaches. Ligand-based methods require
+known actives against the target of interest, failing for novel or understudied targets.
+Structure-based methods require high-quality three-dimensional target structure and
+suffer from computational costs prohibitive for large-scale virtual screening. Both
+approaches struggle with the "activity cliff" phenomenon, wherein chemically similar
+compounds exhibit dramatically different binding affinities due to fine-grained
+structural features.
+
+There is a need in the art for DTI prediction systems capable of generalizing across
+chemical and target space, handling novel protein targets with limited known ligands,
+and providing calibrated uncertainty estimates that enable prioritization of experimental
+validation resources.</code></pre>
+
+    <!-- ─────────────────────────────────────────────────────────── -->
+    <h2 id="detailed-description" class="section-anchor">3. Drafting the Detailed Description</h2>
+
+    <p>The Detailed Description of the Preferred Embodiment(s) is the heart of the patent specification. It must do everything: define terms, support every claim element, describe alternative embodiments, disclose the best mode, and do so in language accessible to a person of ordinary skill in the art.</p>
+
+    <p>The governing rule is simple to state and hard to execute: <strong>every element recited in any claim must find antecedent basis and full support in the detailed description.</strong> Work backward from your claims to ensure every term is defined, every step is described, and every element is illustrated in at least one embodiment.</p>
+
+    <h3>3.1 Writing the Detailed Description: A Process</h3>
+
+    <ol class="process-steps">
+      <li>
+        <div class="step-content">
+          <h4>Map Every Claim Term to a Corresponding Description</h4>
+          <p>Create a claim-mapping matrix: list every claim (independent and dependent) in one column, and for each claim term in that claim, verify there is at least one passage in the detailed description that defines it, describes it, and shows how it functions. Any term lacking a corresponding passage must be added before filing.</p>
+        </div>
+      </li>
+      <li>
+        <div class="step-content">
+          <h4>Define Every Technical Term on First Use</h4>
+          <p>The patentee is "his own lexicographer." This is a power and a trap. Every time you introduce a technical term — especially terms that might mean different things to different practitioners in the field — define it explicitly. Use formulations such as: "As used herein, the term 'attention weight matrix' refers to…" or "For purposes of this disclosure, a 'training epoch' is defined as…"</p>
+        </div>
+      </li>
+      <li>
+        <div class="step-content">
+          <h4>Describe Multiple Embodiments</h4>
+          <p>A specification describing only one embodiment almost always creates claim scope problems. Describe at least two or three distinct embodiments covering different implementations. For AI/ML inventions, these might be: different neural architectures, different loss functions, different hardware platforms, or different application domains. Each embodiment reinforces that the claimed invention is broader than any single implementation.</p>
+        </div>
+      </li>
+      <li>
+        <div class="step-content">
+          <h4>Disclose the Best Mode Explicitly</h4>
+          <p>Identify the preferred embodiment as such. Use language like: "In a presently preferred embodiment…" or "The inventors have determined that best results are obtained when…" Do not bury the best mode — make it clear. This protects you during prosecution and forecloses inequitable conduct arguments.</p>
+        </div>
+      </li>
+      <li>
+        <div class="step-content">
+          <h4>Include Operative Examples with Quantitative Results</h4>
+          <p>Working examples with measured results provide the strongest enablement support. For AI/ML, this means: specific architectures with layer dimensions, specific training configurations with hyperparameters, specific datasets with sample counts, and specific evaluation results with confidence intervals or error bars. These examples anchor the claims and give the examiner concrete evidence that the invention works.</p>
+          <p>Structure working examples as labeled subsections: "Working Example 1 — Performance on Molecular Property Prediction Benchmarks." Include tables of results with baseline comparisons. Where computationally feasible, include ablation studies showing the contribution of each novel component — these are invaluable for overcoming obviousness rejections because they demonstrate that each claimed feature contributes measurably to the technical improvement.</p>
+        </div>
+      </li>
+      <li>
+        <div class="step-content">
+          <h4>Include Alternative Embodiments and Variations</h4>
+          <p>After describing the preferred embodiment, explicitly note the range of variations that fall within the scope of the claims. This is especially important in AI/ML cases where architecture choices are numerous. Use language such as: "Although the foregoing example uses a transformer encoder, persons skilled in the art will appreciate that the present invention is not limited to any particular neural network architecture, and that recurrent neural networks, convolutional networks, or graph neural networks may be substituted without departing from the spirit of the invention."</p>
+        </div>
+      </li>
+      <li>
+        <div class="step-content">
+          <h4>Connect Every Figure to the Text</h4>
+          <p>Each figure must be introduced and described in the detailed description. Do not simply include figures as decoration — they must be referenced, numbered consistently, and their contents described in enough detail to support the claims they illustrate. The standard formulation is: "FIG. 1 illustrates a block diagram of [system element], in accordance with one embodiment of the present disclosure."</p>
+        </div>
+      </li>
+      <li>
+        <div class="step-content">
+          <h4>Close with a Comprehensive Summary of Embodiments</h4>
+          <p>End the detailed description with a paragraph that sweeps up any remaining ambiguity: "The foregoing description of specific embodiments is presented for purposes of illustration and description. It is not intended to be exhaustive or to limit the disclosure to the precise forms described. Modifications and variations are possible in light of the above teachings, as will be apparent to those skilled in the art."</p>
+        </div>
+      </li>
+    </ol>
+
+    <!-- ─────────────────────────────────────────────────────────── -->
+    <h2 id="aiml-description" class="section-anchor">4. Describing AI/ML Systems in the Specification</h2>
+
+    <p>AI/ML inventions present unique descriptive challenges. Unlike a mechanical linkage or a chemical synthesis, a neural network's behavior is the product of a complex, high-dimensional optimization process that is difficult to characterize completely in words. This section addresses the four core descriptive challenges: architecture, training, data, and evaluation.</p>
+
+    <h3>4.1 Describing Neural Network Architectures</h3>
+
+    <p>Architecture descriptions must be complete enough that a POSITA could reconstruct the network from the written description alone. The critical elements are:</p>
+
+    <ul>
+      <li><strong>Layer types and sequence:</strong> Identify each layer type (e.g., fully-connected, convolutional, multi-head attention, layer normalization), and their ordering from input to output.</li>
+      <li><strong>Dimensionality:</strong> Specify the number of layers, hidden dimensions, number of attention heads, convolutional filter sizes and strides. Ranges are acceptable ("64 to 512 hidden units") but at least one preferred configuration should be specific.</li>
+      <li><strong>Activation functions:</strong> Identify the nonlinearity used at each layer or layer type (ReLU, GELU, SiLU, softmax at output, etc.).</li>
+      <li><strong>Residual connections, normalization:</strong> Note skip connections, layer or batch normalization, dropout, and their placement.</li>
+      <li><strong>Input/output specification:</strong> Define the input tensor shape, preprocessing steps, and output format.</li>
+    </ul>
+
+    <h3>4.2 Describing Training Procedures</h3>
+
+    <p>The training procedure is as much a part of the invention as the architecture. A specification that describes only the trained model without the process of training it may face serious enablement challenges. Training description should include:</p>
+
+    <ul>
+      <li><strong>Loss function:</strong> The exact form of the loss (cross-entropy, mean squared error, contrastive loss, ELBO for variational models), including any regularization terms and their weights.</li>
+      <li><strong>Optimizer:</strong> The optimization algorithm (Adam, AdamW, SGD with momentum, LAMB) and key hyperparameters.</li>
+      <li><strong>Learning rate schedule:</strong> Constant, cosine annealing, warmup with decay, cyclical — specify the schedule and key parameters.</li>
+      <li><strong>Batch size and training duration:</strong> Number of steps or epochs and batch size (or gradient accumulation steps for memory-constrained training).</li>
+      <li><strong>Data augmentation and preprocessing:</strong> Transformations applied to inputs during training (random crop, mixup, token masking) that are part of the method.</li>
+    </ul>
+
+    <h3>4.3 Describing Datasets Without Over-Narrowing</h3>
+
+    <p>Dataset description is among the trickiest aspects of AI patent drafting. You must describe training data with enough specificity to support enablement while avoiding language that limits the claims to a single proprietary dataset. The preferred approach is to describe data by its <em>characteristics</em> rather than by name:</p>
+
+    <div class="comparison-grid">
+      <div class="comparison-item bad">
+        <h4>Risky — Too Specific</h4>
+        <p>"The model was trained on the ImageNet-1K dataset, available from image-net.org, comprising 1,281,167 training images across 1,000 categories."</p>
+      </div>
+      <div class="comparison-item good">
+        <h4>Better — Characteristic Description</h4>
+        <p>"The model was trained on a large-scale image classification dataset comprising at least 1 million labeled images spanning at least 100 semantic categories, wherein the training images include examples of natural scenes, objects, and textured surfaces."</p>
+      </div>
+    </div>
+
+    <h3>4.4 Describing Evaluation Metrics and Performance Benchmarks</h3>
+
+    <p>Evaluation results serve a dual purpose: they support enablement (the invention demonstrably works) and they establish commercial utility. Include:</p>
+
+    <ul>
+      <li>The specific metrics used (accuracy, F1, AUROC, BLEU, perplexity, RMSD)</li>
+      <li>The evaluation dataset or held-out test set (described by characteristics)</li>
+      <li>Baseline comparisons to prior art systems</li>
+      <li>Statistical significance or confidence intervals where available</li>
+    </ul>
+
+    <h3>4.5 Describing Emergent Properties</h3>
+
+    <p>Emergent capabilities — behaviors not explicitly trained for that arise from scale or architecture — present particular challenges. A specification drafted in 2019 for a language model could not reasonably have claimed that the model would exhibit in-context few-shot learning, yet those same architectural choices gave rise to it. Best practice for large models is to describe capabilities broadly using functional language while grounding each described capability in at least one working example that demonstrates the capability in the specification.</p>
+
+    <h3>4.6 Full Example: Detailed Description of a Multi-Head Attention Pooling System</h3>
+
+    <p>The following is a representative excerpt from a patent specification for a Multi-Head Attention Pooling System for molecular representation learning. Note how each element of the eventual claims finds support in this passage, how the architecture is described with sufficient specificity for a POSITA to reconstruct it, and how the training procedure is disclosed.</p>
+
+    <pre><code>DETAILED DESCRIPTION OF THE PREFERRED EMBODIMENTS
+
+I. OVERVIEW
+
+The present disclosure provides a multi-head attention pooling system and method for
+generating fixed-length molecular representations from variable-length sequences of
+atomic feature vectors. The system addresses the limitations of prior art pooling
+operations — mean pooling, sum pooling, and max pooling — that treat each atom's
+contribution to the molecular representation as equal regardless of structural context.
+The present invention enables context-aware, learned aggregation of atomic representations,
+yielding molecular embeddings that capture both local chemical environments and global
+molecular topology.
+
+In a preferred embodiment, the multi-head attention pooling system 100, shown in FIG. 1,
+comprises: a graph neural network (GNN) encoder 110 that generates per-atom hidden
+representations from molecular graphs; a multi-head attention pooling module 120 that
+aggregates per-atom representations into a fixed-length molecular embedding; and a
+task-specific prediction head 130 that maps the molecular embedding to a predicted
+property value or class label.
+
+II. MOLECULAR GRAPH REPRESENTATION
+
+As used herein, a "molecular graph" is a data structure G = (V, E, X, E_attr), wherein
+V is a set of nodes representing atoms, E ⊆ V × V is a set of edges representing
+covalent bonds, X ∈ ℝ^(|V| × d_atom) is a matrix of per-atom feature vectors, and
+E_attr ∈ ℝ^(|E| × d_bond) is a matrix of per-bond feature vectors.
+
+In a preferred embodiment, the per-atom feature vector for atom v comprises:
+(a) a one-hot encoding of the atomic number from the set {H, C, N, O, F, P, S, Cl,
+    Br, I, and other}, yielding an 11-dimensional vector;
+(b) a one-hot encoding of the formal charge from the set {-2, -1, 0, +1, +2}, yielding
+    a 5-dimensional vector;
+(c) a one-hot encoding of the number of hydrogen atoms attached {0, 1, 2, 3, 4},
+    yielding a 5-dimensional vector;
+(d) a one-hot encoding of the hybridization state {sp, sp2, sp3, sp3d, sp3d2},
+    yielding a 5-dimensional vector;
+(e) a binary indicator for aromaticity; and
+(f) a one-hot encoding of the ring membership {not in ring, 3-membered, 4-membered,
+    5-membered, 6-membered, larger ring}, yielding a 6-dimensional vector;
+resulting in a d_atom = 33 dimensional per-atom feature vector. Persons skilled in
+the art will appreciate that additional atom features may be incorporated, including
+but not limited to partial charge estimates, electronegativity, van der Waals radius,
+and graph-theoretic topological indices.
+
+III. GRAPH NEURAL NETWORK ENCODER
+
+The GNN encoder 110 comprises L stacked message-passing layers, wherein each layer
+updates per-atom hidden representations by aggregating information from neighboring
+atoms. In a preferred embodiment, L = 5 and the hidden dimension d_h = 256.
+
+At each message-passing layer l ∈ {1, ..., L}, the hidden representation h_v^l of atom
+v is updated according to:
+
+    m_v^l = AGG({MSG(h_v^{l-1}, h_u^{l-1}, e_{vu}) : u ∈ N(v)})
+    h_v^l = UPDATE(h_v^{l-1}, m_v^l)
+
+wherein N(v) denotes the set of atoms adjacent to atom v in the molecular graph,
+MSG(·) is an edge-conditioned message function, AGG(·) is a permutation-invariant
+aggregation function (preferably summation), and UPDATE(·) is a gated recurrent
+unit (GRU) update. In alternative embodiments, AGG(·) may comprise mean aggregation,
+max aggregation, or attention-weighted aggregation without departing from the scope
+of the present disclosure.
+
+The message function MSG is implemented as a two-layer fully-connected network with
+ReLU activations and hidden dimension 128, operating on the concatenation of the
+source atom representation, destination atom representation, and bond feature vector:
+
+    MSG(h_v, h_u, e_{vu}) = MLP([h_v || h_u || e_{vu}])
+
+Each message-passing layer is followed by layer normalization and dropout with rate p = 0.1
+during training. The initial atom representations h_v^0 are computed by a learned linear
+projection of the raw atomic feature vector: h_v^0 = W_in · x_v + b_in, wherein
+W_in ∈ ℝ^{d_h × d_atom} and b_in ∈ ℝ^{d_h} are learnable parameters.
+
+IV. MULTI-HEAD ATTENTION POOLING MODULE
+
+The multi-head attention pooling module 120 receives as input the set of per-atom
+hidden representations {h_v^L : v ∈ V} produced by the final GNN encoder layer and
+produces a fixed-length molecular embedding z ∈ ℝ^{d_mol}.
+
+The module employs H attention heads, wherein each head h ∈ {1, ..., H} learns a
+distinct query vector q^h ∈ ℝ^{d_k} that captures a different aspect of molecular
+structure. In a preferred embodiment, H = 8 and d_k = 32.
+
+For each attention head h, the attention weight for atom v is computed as:
+
+    α_v^h = softmax_v(q^h · W_K^h · h_v^L / √d_k)
+
+wherein W_K^h ∈ ℝ^{d_k × d_h} is a learned key projection matrix for head h.
+The softmax is computed over all atoms v ∈ V, producing a probability distribution
+over atoms. The head-h contribution to the molecular embedding is:
+
+    z^h = Σ_{v ∈ V} α_v^h · (W_V^h · h_v^L)
+
+wherein W_V^h ∈ ℝ^{d_v × d_h} is a learned value projection matrix for head h,
+and d_v = d_mol / H. The final molecular embedding is the concatenation of all
+head contributions:
+
+    z = [z^1 || z^2 || ... || z^H] ∈ ℝ^{d_mol}
+
+wherein d_mol = H · d_v. In a preferred embodiment, d_mol = 256.
+
+V. TASK-SPECIFIC PREDICTION HEAD
+
+The molecular embedding z is passed through the prediction head 130, which comprises
+a two-layer fully-connected network with hidden dimension 128, ReLU activations
+between layers, and dropout with rate p = 0.2 during training. The output layer
+produces either:
+(a) a scalar predicted value for regression tasks (e.g., binding affinity, logP,
+    aqueous solubility), or
+(b) a vector of class scores for classification tasks (e.g., toxicity classification,
+    activity classification), with final softmax or sigmoid activation as appropriate.
+
+VI. TRAINING PROCEDURE
+
+In a preferred embodiment, the complete system — comprising the GNN encoder,
+multi-head attention pooling module, and prediction head — is trained end-to-end by
+minimizing a task-appropriate loss function using the Adam optimizer.
+
+For regression tasks, the loss function is the mean squared error (MSE) between the
+predicted value ŷ and the ground-truth label y:
+
+    L_reg = (1/N) Σ_{i=1}^{N} (ŷ_i - y_i)^2
+
+For binary classification tasks, the loss function is the binary cross-entropy:
+
+    L_cls = -(1/N) Σ_{i=1}^{N} [y_i log(ŷ_i) + (1 - y_i) log(1 - ŷ_i)]
+
+Training is performed using the Adam optimizer with initial learning rate η = 1×10^{-3},
+β_1 = 0.9, β_2 = 0.999, ε = 1×10^{-8}, and weight decay λ = 1×10^{-5}. The learning
+rate is reduced by a factor of 0.5 when the validation loss fails to decrease for 10
+consecutive epochs. Training proceeds for a maximum of 300 epochs with early stopping
+based on validation loss, with a patience parameter of 30 epochs. The mini-batch size
+is 64 molecules. Persons skilled in the art will appreciate that alternative optimizers
+including AdamW, SGD with momentum, and LAMB may be substituted without substantially
+altering the predictive performance of the trained model.
+
+VII. WORKING EXAMPLE — PERFORMANCE ON MOLECULAR PROPERTY BENCHMARKS
+
+The multi-head attention pooling system described herein was evaluated on four
+molecular property prediction benchmarks from the MoleculeNet benchmark suite.
+The evaluation datasets were characterized as follows: (i) a blood-brain barrier
+permeability classification dataset comprising 2,050 compounds with binary labels
+derived from published experimental measurements; (ii) a solubility regression dataset
+comprising 9,982 compounds with log-molar solubility values; (iii) a toxicity
+multi-label classification dataset comprising 8,014 compounds with 12 binary toxicity
+endpoints measured across in vitro assays; and (iv) a bioavailability classification
+dataset comprising 643 compounds with binary oral bioavailability labels.
+
+For each dataset, 80% of compounds were used for training, 10% for validation (for
+hyperparameter selection and early stopping), and 10% for held-out testing. Reported
+performance metrics are the mean and standard deviation across 10 independent training
+runs with different random seeds. The baseline systems evaluated include: (i) a
+message-passing neural network (MPNN) with mean pooling; (ii) a graph attention
+network (GAT) with mean pooling; and (iii) a random forest (RF) model operating on
+Morgan fingerprints.
+
+Results on the blood-brain barrier classification dataset (AUROC; higher is better):
+  Multi-Head Attention Pooling (this invention):  0.924 ± 0.008
+  MPNN + Mean Pooling (baseline):                 0.891 ± 0.011
+  GAT + Mean Pooling (baseline):                  0.902 ± 0.009
+  Random Forest + Morgan FP (baseline):           0.877 ± 0.006
+
+The multi-head attention pooling system achieved statistically significant improvement
+over all baseline systems (p &lt; 0.01, paired t-test across 10 random seeds). Ablation
+experiments demonstrated that removing the multi-head structure (reducing to a single
+attention head) reduced AUROC to 0.911 ± 0.010, and replacing attention pooling with
+mean pooling reduced AUROC to the baseline MPNN level of 0.891 ± 0.011, confirming
+that both the multi-head structure and the learned attention aggregation contribute
+independently to the performance improvement.</code></pre>
+
+    <div class="callout callout-tip">
+      <div class="callout-icon">💡</div>
+      <div class="callout-body">
+        <div class="callout-title">Drafting Tip: Equations in Specifications</div>
+        <p>Mathematical equations greatly strengthen AI/ML specifications. They are unambiguous, they demonstrate the inventor's technical possession of the invention, and they provide a POSITA with exactly the information needed to reconstruct the system. Do not shy away from including full mathematical notation — examiners and courts are increasingly sophisticated in handling it. Where equations are used, define every symbol on first use and provide the dimensions of all matrices and vectors.</p>
+      </div>
+    </div>
+
+    <!-- ─────────────────────────────────────────────────────────── -->
+    <h2 id="enablement" class="section-anchor">5. The Enablement Requirement for AI/ML</h2>
+
+    <p>The enablement standard asks whether a person of ordinary skill in the art would be able to make and use the full scope of the claimed invention without "undue experimentation." This "undue experimentation" standard is evaluated using the eight-factor <em>Wands</em> analysis, first articulated in <em>In re Wands</em>, 858 F.2d 731 (Fed. Cir. 1988), and recently affirmed in <em>Amgen</em>.</p>
+
+    <h3>5.1 The Wands Factors</h3>
+
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Wands Factor</th>
+            <th>What It Measures</th>
+            <th>AI/ML Considerations</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>Quantity of experimentation needed</td>
+            <td>How much work must a POSITA do to make and use the full scope of the claimed invention?</td>
+            <td>Training a large model from scratch may require thousands of GPU-hours. Is the experimentation "routine" for a POSITA in the field?</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>Amount of direction or guidance provided</td>
+            <td>Does the specification provide specific instructions, or must the POSITA figure it out?</td>
+            <td>Specifying exact architecture, hyperparameters, and training procedure provides strong guidance. Omitting these forces extensive experimentation.</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>Presence or absence of working examples</td>
+            <td>Are there operative examples that demonstrate the invention works?</td>
+            <td>Working examples with quantitative results (accuracy metrics, benchmark comparisons) substantially strengthen the enablement case.</td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td>Nature of the invention</td>
+            <td>Is this a predictable technology (mechanical) or unpredictable (biological, chemical)?</td>
+            <td>Courts treat ML as highly unpredictable — small changes to architecture, data, or hyperparameters can dramatically alter outcomes. This cuts against enablement for broad claims.</td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td>State of the prior art</td>
+            <td>What did a POSITA know how to do without the specification?</td>
+            <td>A POSITA in 2024 knows how to train a transformer; a POSITA in 2017 did not. The state of the art shifts what the specification must teach.</td>
+          </tr>
+          <tr>
+            <td>6</td>
+            <td>Relative skill in the art</td>
+            <td>What is the POSITA's skill level?</td>
+            <td>A POSITA in AI/ML today is typically a researcher with a PhD or equivalent industrial experience in machine learning, familiar with major frameworks (PyTorch, JAX, TensorFlow).</td>
+          </tr>
+          <tr>
+            <td>7</td>
+            <td>Predictability of the art</td>
+            <td>Can a skilled artisan predict the outcome of experiments without running them?</td>
+            <td>ML training outcomes are highly sensitive to hyperparameter choices, data quality, and random initialization — classically unpredictable. The spec must compensate.</td>
+          </tr>
+          <tr>
+            <td>8</td>
+            <td>Breadth of the claims</td>
+            <td>How wide is the claimed scope relative to what was disclosed?</td>
+            <td>A claim to "any neural network trained to classify proteins" while disclosing only one architecture is the <em>Amgen</em> problem applied to AI. Claim breadth must be commensurate with disclosure breadth.</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="table-caption">Table 6.1 — The Wands Factors Applied to AI/ML Patent Claims (<em>In re Wands</em>, 858 F.2d 731 (Fed. Cir. 1988))</p>
+    </div>
+
+    <h3>5.2 AI-Specific Enablement Pitfalls</h3>
+
+    <div class="callout callout-warning">
+      <div class="callout-icon">⚠️</div>
+      <div class="callout-body">
+        <div class="callout-title">Pitfall 1: Irreproducibility Due to Stochastic Training</div>
+        <p>Neural network training is non-deterministic. Floating-point arithmetic on GPUs is not strictly reproducible across hardware, CUDA versions, or library versions. A specification that promises exact reproduction of trained weights is over-promising. Instead, the specification should describe the training procedure with sufficient detail to produce a model with <em>substantially equivalent performance</em> on the claimed task — a standard examiners and courts are beginning to accept. Disclose random seeds where they are material, and note that performance within a specified tolerance range constitutes a practicing embodiment.</p>
+      </div>
+    </div>
+
+    <div class="callout callout-warning">
+      <div class="callout-icon">⚠️</div>
+      <div class="callout-body">
+        <div class="callout-title">Pitfall 2: Undisclosed Random Seeds and Initialization Schemes</div>
+        <p>Weight initialization significantly affects final model performance, particularly for smaller datasets. If the inventors discovered that a specific initialization scheme (e.g., Glorot uniform, Kaiming normal, orthogonal initialization) was critical to achieving the claimed performance, this is part of the best mode and must be disclosed. Similarly, if specific random seeds were used to achieve the reported results and are material to reproducibility, disclose them — and then describe the range of seeds that produce equivalent results.</p>
+      </div>
+    </div>
+
+    <div class="callout callout-warning">
+      <div class="callout-icon">⚠️</div>
+      <div class="callout-body">
+        <div class="callout-title">Pitfall 3: Hardware Requirements and Reproducibility</div>
+        <p>Training large models may require specialized hardware (TPUs, H100 clusters, multi-node distributed training) that may not be available to a POSITA. If the invention requires hardware that is not generally available in the field, the enablement requirement may not be met for a POSITA lacking access to such hardware. The specification should describe the minimum hardware sufficient to practice the invention, and — where possible — describe techniques (mixed-precision training, gradient checkpointing, model parallelism) that allow the invention to be practiced on more widely available hardware. If the invention requires a model with 100+ billion parameters that only three organizations in the world have the compute to train, the claim scope should reflect this practical reality.</p>
+      </div>
+    </div>
+
+    <div class="callout callout-warning">
+      <div class="callout-icon">⚠️</div>
+      <div class="callout-body">
+        <div class="callout-title">Pitfall 4: Training Data Availability</div>
+        <p>If the claimed invention requires training on a proprietary dataset that is not publicly available, a third party attempting to practice the invention cannot replicate it. This is an emerging enablement challenge with no definitive case law yet. Practitioners should: (1) describe the data by its characteristics and availability (e.g., "publicly available genome databases as of [date]"), (2) deposit representative training data in a recognized repository where feasible, and (3) ensure the claims can be practiced without access to the specific proprietary dataset used by the inventors.</p>
+      </div>
+    </div>
+
+    <!-- ─────────────────────────────────────────────────────────── -->
+    <h2 id="written-description" class="section-anchor">6. Written Description for AI/ML</h2>
+
+    <p>Written description asks whether the inventor had possession of the claimed invention at the time of filing. For AI/ML, this question fractures along a critical axis: are you claiming the <em>architecture</em>, the <em>trained model</em>, or the <em>function the model performs</em>? Each raises different written description issues.</p>
+
+    <p>The Federal Circuit has articulated that written description requires "a precise definition, such as by structure, formula, chemical name, physical properties, or other properties, of species falling within the genus sufficient to distinguish the genus from other materials." <em>Regents of the Univ. of Cal. v. Eli Lilly &amp; Co.</em>, 119 F.3d 1559, 1568 (Fed. Cir. 1997). For AI/ML, this translates to a requirement that the specification characterize the space of model architectures, training procedures, and performance profiles that fall within the claimed genus with sufficient specificity that a skilled artisan can distinguish claimed from unclaimed embodiments.</p>
+
+    <h3>6.1 Architecture vs. Trained Model Claims</h3>
+
+    <p>A claim to an <em>architecture</em> — "a multi-head attention pooling system comprising…" — is like a claim to a mechanical device. The specification must describe the architecture in detail sufficient to show possession of its structure. This is manageable with precise layer descriptions, dimensionality specifications, and connection patterns.</p>
+
+    <p>A claim to a <em>trained model</em> — "a trained neural network that, when presented with a molecular graph, outputs a predicted binding affinity within 0.5 kcal/mol of experimental IC50" — is different in kind. It claims something defined entirely by its behavior, not its structure. This is "functional claiming at the point of novelty," and it raises both written description and enablement concerns.</p>
+
+    <p>Must you disclose trained weights to satisfy written description for a trained model claim? The law on this is unsettled, but the current consensus among practitioners is:</p>
+
+    <ul>
+      <li>You generally do <em>not</em> need to deposit the trained weights, analogous to how biotech patents need not deposit all biological materials if a POSITA could reproduce the result.</li>
+      <li>You must, however, describe the training procedure with enough detail that the trained model could be reproduced (within a reasonable performance tolerance) by a POSITA following the specification.</li>
+      <li>If the trained weights represent a <em>unique result</em> that cannot be reproduced by following the procedure, the written description and enablement issues are more serious.</li>
+    </ul>
+
+    <h3>6.2 The Problem of Functional Claiming</h3>
+
+    <p>Functional claiming describes an invention by what it <em>does</em> rather than what it <em>is</em>. In the biotech context, the Federal Circuit has repeatedly invalidated functionally claimed genera that were too broad relative to the specification's structural disclosure. The lesson of <em>Ariad v. Eli Lilly</em> is directly applicable to AI: a claim to "a machine learning model that reduces off-target drug binding" may sweep across a nearly unlimited genus of possible model architectures, training procedures, and data regimes. If the specification only describes one or two, the written description is almost certainly inadequate for the full claim scope.</p>
+
+    <blockquote>
+      "The hallmark of written description is disclosure. Whatever the specific articulation, the test requires an objective inquiry into the four corners of the specification from the perspective of a person of ordinary skill in the art."
+      <cite>— Ariad Pharmaceuticals, Inc. v. Eli Lilly &amp; Co., 598 F.3d 1336, 1351 (Fed. Cir. 2010) (en banc)</cite>
+    </blockquote>
+
+    <h3>6.3 Lessons from Juno Therapeutics v. Kite Pharma</h3>
+
+    <p>In <em>Juno Therapeutics, Inc. v. Kite Pharma, Inc.</em>, 10 F.4th 1330 (Fed. Cir. 2021), the Federal Circuit affirmed invalidity of Juno's chimeric antigen receptor (CAR-T) patents for failure of written description. The claims covered all CAR-T cells comprising an "antigen binding domain" and certain signaling domains. The specification described a handful of antigen binding domains out of the potentially thousands that fell within the claim scope.</p>
+
+    <p>The court held that a "newly characterized antigen" was insufficient to claim a vast genus, and that "the mere description of a method of making [the claimed genus] is insufficient to constitute written description support for a genus claim where the genus is not described in the specification."</p>
+
+    <p>The lessons for AI/ML patent practitioners are stark:</p>
+
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Juno Problem (CAR-T)</th>
+            <th>Analogous AI/ML Problem</th>
+            <th>Mitigation Strategy</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Claimed all "antigen binding domains" but described only a few</td>
+            <td>Claiming all "neural network architectures" achieving X performance but describing only one</td>
+            <td>Describe multiple representative architectures; characterize the structural features that provide the claimed function</td>
+          </tr>
+          <tr>
+            <td>Functional description did not substitute for structural disclosure</td>
+            <td>"A model trained to classify" without structural support for the full functional class</td>
+            <td>Include both structural (architecture) and functional (performance) descriptions; tie structure to function</td>
+          </tr>
+          <tr>
+            <td>Novel antigen target didn't automatically enable all binding domains</td>
+            <td>Novel task doesn't enable all models that perform the task</td>
+            <td>Describe the task plus multiple representative model solutions; cover the solution space, not just the problem</td>
+          </tr>
+          <tr>
+            <td>Breadth of genus wildly exceeded disclosure</td>
+            <td>Claim covers millions of possible model configurations; spec describes one training run</td>
+            <td>Calibrate claim breadth to disclosure depth; consider narrower independent claims with broader dependent claims</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="table-caption">Table 6.2 — <em>Juno v. Kite</em> Written Description Lessons Applied to AI/ML Patent Prosecution</p>
+    </div>
+
+    <!-- ─────────────────────────────────────────────────────────── -->
+    <h2 id="training-data" class="section-anchor">7. Describing Training Data</h2>
+
+    <p>Training data is the lifeblood of a machine learning model, but it is also a liability in patent specifications if not described carefully. The challenge is finding the level of abstraction that provides genuine enablement support without either (a) limiting the claims to a single proprietary dataset or (b) describing the data at such a high level of generality that a POSITA cannot determine what data to use.</p>
+
+    <h3>7.1 How Much Detail Is Required?</h3>
+
+    <p>Enablement requires that a POSITA be able to practice the invention without undue experimentation. For training data, this means the specification must enable a POSITA to assemble a training set that will produce a model capable of practicing the claimed invention. The specification need not identify the exact dataset used by the inventors — but it must provide enough guidance that a POSITA would know what type of data to gather and in what quantities.</p>
+
+    <h3>7.2 Should You Name Specific Datasets?</h3>
+
+    <p>Naming specific datasets in the specification — even in working examples — creates risk. If the named dataset is no longer publicly available, enablement may be compromised. More importantly, named datasets in the detailed description may be imported into the claims through prosecution history, creating unintended narrowing.</p>
+
+    <p>The better practice is to use named datasets only in clearly labeled working examples (as in: "In one working example, the training data comprised images downloaded from [Dataset Name], but the invention is not limited to this dataset.") and then to characterize the data by its properties in the main body of the description.</p>
+
+    <h3>7.3 Alternative Approaches: Describing Data by Characteristics</h3>
+
+    <p>The preferred approach is to describe training data along four dimensions:</p>
+
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Dimension</th>
+            <th>What to Describe</th>
+            <th>Example Specification Language</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Domain</td>
+            <td>The subject matter and source of the data</td>
+            <td>"Biomedical literature comprising peer-reviewed journal articles, clinical trial reports, and drug package inserts"</td>
+          </tr>
+          <tr>
+            <td>Scale</td>
+            <td>Number of samples, tokens, or examples</td>
+            <td>"At least 100,000 labeled training examples, and in preferred embodiments at least 1,000,000 training examples"</td>
+          </tr>
+          <tr>
+            <td>Format/structure</td>
+            <td>How the data is formatted and labeled</td>
+            <td>"Each training example comprising a SMILES string and a corresponding experimental IC50 value in nanomolar units"</td>
+          </tr>
+          <tr>
+            <td>Quality criteria</td>
+            <td>Filters, curation steps, and quality thresholds applied</td>
+            <td>"Training data was filtered to exclude samples with assay coefficient of variation exceeding 20%, and to include only data from validated assay formats"</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="table-caption">Table 6.3 — Framework for Describing Training Data Characteristics Without Over-Narrowing</p>
+    </div>
+
+    <h3>7.4 Data Preprocessing and Feature Engineering</h3>
+
+    <p>If the preprocessing steps are part of the invention — or if they are critical to achieving the claimed performance — they must be described in the specification with enough specificity to enable practice. Preprocessing that is "routine in the art" need not be described in detail, but novel preprocessing steps, data augmentation strategies, and feature engineering pipelines are part of the technical disclosure and should be described completely.</p>
+
+    <h3>7.5 Handling Proprietary and Regulated Data</h3>
+
+    <p>In pharmaceutical, genomic, and clinical AI applications, training data may be proprietary, subject to HIPAA or GDPR restrictions, or covered by data use agreements that limit redistribution. This creates a genuine tension with the enablement requirement: a POSITA may not be able to obtain the exact data used to train the claimed model, raising the question of whether the claimed invention can be practiced without access to that data.</p>
+
+    <p>The emerging practitioner consensus is to address this issue proactively in the specification by: (1) describing what publicly available data sources have similar characteristics to the proprietary training data; (2) describing the minimum data characteristics (size, domain, labeling quality, class balance) sufficient to train a model practicing the invention; and (3) including at least one working example trained exclusively on publicly available data to demonstrate that the invention is not limited to the proprietary dataset. Where regulatory limitations on data sharing exist, it may be appropriate to note that "training data of the type described herein is available from [described category of sources] and may be obtained subject to applicable data use agreements."</p>
+
+    <!-- ─────────────────────────────────────────────────────────── -->
+    <h2 id="hyperparameters" class="section-anchor">8. Hyperparameters and Reproducibility</h2>
+
+    <p>The reproducibility crisis in machine learning — wherein published results cannot be replicated by independent researchers — has direct implications for patent law. A patent specification must enable a POSITA to practice the invention without undue experimentation. If the key hyperparameters are not disclosed, or are disclosed with such imprecision that a POSITA would have to conduct an extensive hyperparameter search to practice the invention, the enablement requirement may not be met.</p>
+
+    <h3>8.1 Which Hyperparameters Must Be Disclosed?</h3>
+
+    <p>Not every hyperparameter needs to appear in the specification. The disclosure obligation is calibrated to what a POSITA would need to know that they could not determine from their own knowledge. In general:</p>
+
+    <ul>
+      <li><strong>Must disclose:</strong> Hyperparameters where the choice is non-obvious, where the choice significantly affects performance, or where the choice is part of what distinguishes the invention from the prior art.</li>
+      <li><strong>Should disclose:</strong> Hyperparameters that define the preferred embodiment, even if alternatives are known.</li>
+      <li><strong>May omit:</strong> Hyperparameters that are standard and well-known in the art (e.g., "Adam with default parameters" where the defaults are widely published), provided the POSITA would know to try them.</li>
+    </ul>
+
+    <h3>8.2 Example Hyperparameter Disclosure Table</h3>
+
+    <p>The following table illustrates the level of hyperparameter disclosure appropriate for a multi-head attention model specification. This type of structured disclosure provides clear, unambiguous guidance to a POSITA attempting to practice the invention.</p>
+
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Hyperparameter</th>
+            <th>Symbol</th>
+            <th>Preferred Value</th>
+            <th>Acceptable Range</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Number of GNN layers</td>
+            <td>L</td>
+            <td>5</td>
+            <td>3–8</td>
+            <td>More layers improve long-range capture at cost of over-smoothing risk</td>
+          </tr>
+          <tr>
+            <td>Hidden dimension (GNN)</td>
+            <td>d_h</td>
+            <td>256</td>
+            <td>128–512</td>
+            <td>Must be divisible by number of attention heads H</td>
+          </tr>
+          <tr>
+            <td>Number of attention heads</td>
+            <td>H</td>
+            <td>8</td>
+            <td>4–16</td>
+            <td>Each head captures different structural motif</td>
+          </tr>
+          <tr>
+            <td>Attention key dimension</td>
+            <td>d_k</td>
+            <td>32</td>
+            <td>16–64</td>
+            <td>Equal to d_h / H in preferred embodiment</td>
+          </tr>
+          <tr>
+            <td>Molecular embedding dimension</td>
+            <td>d_mol</td>
+            <td>256</td>
+            <td>128–1024</td>
+            <td>Equal to H × d_v</td>
+          </tr>
+          <tr>
+            <td>Dropout rate (GNN)</td>
+            <td>p_gnn</td>
+            <td>0.10</td>
+            <td>0.0–0.3</td>
+            <td>Applied after each message-passing layer</td>
+          </tr>
+          <tr>
+            <td>Dropout rate (prediction head)</td>
+            <td>p_head</td>
+            <td>0.20</td>
+            <td>0.0–0.5</td>
+            <td>Higher values for small datasets to prevent overfit</td>
+          </tr>
+          <tr>
+            <td>Initial learning rate</td>
+            <td>η_0</td>
+            <td>1×10<sup>−3</sup></td>
+            <td>5×10<sup>−4</sup>–5×10<sup>−3</sup></td>
+            <td>Larger models benefit from lower initial learning rate</td>
+          </tr>
+          <tr>
+            <td>Optimizer β₁</td>
+            <td>β₁</td>
+            <td>0.90</td>
+            <td>0.85–0.95</td>
+            <td>Standard Adam parameter</td>
+          </tr>
+          <tr>
+            <td>Optimizer β₂</td>
+            <td>β₂</td>
+            <td>0.999</td>
+            <td>0.99–0.9999</td>
+            <td>Standard Adam parameter</td>
+          </tr>
+          <tr>
+            <td>Weight decay</td>
+            <td>λ</td>
+            <td>1×10<sup>−5</sup></td>
+            <td>0–1×10<sup>−4</sup></td>
+            <td>L2 regularization; critical for molecular property datasets</td>
+          </tr>
+          <tr>
+            <td>LR decay factor</td>
+            <td>γ</td>
+            <td>0.50</td>
+            <td>0.3–0.7</td>
+            <td>Reduces LR by factor γ on plateau</td>
+          </tr>
+          <tr>
+            <td>LR decay patience</td>
+            <td>—</td>
+            <td>10 epochs</td>
+            <td>5–20 epochs</td>
+            <td>Number of epochs without validation improvement before decay</td>
+          </tr>
+          <tr>
+            <td>Early stopping patience</td>
+            <td>—</td>
+            <td>30 epochs</td>
+            <td>20–50 epochs</td>
+            <td>Measured on validation set loss</td>
+          </tr>
+          <tr>
+            <td>Maximum training epochs</td>
+            <td>—</td>
+            <td>300</td>
+            <td>100–1000</td>
+            <td>Combined with early stopping</td>
+          </tr>
+          <tr>
+            <td>Batch size</td>
+            <td>B</td>
+            <td>64</td>
+            <td>32–256</td>
+            <td>Adjust for available GPU memory</td>
+          </tr>
+          <tr>
+            <td>Random seed (initialization)</td>
+            <td>—</td>
+            <td>42</td>
+            <td>Any integer</td>
+            <td>Results are substantially equivalent across seeds ±2% AUROC</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="table-caption">Table 6.4 — Example Hyperparameter Disclosure Table for a Multi-Head Attention Pooling System (as would appear in a working patent specification)</p>
+    </div>
+
+    <h3>8.3 The Reproducibility Crisis and Patent Law</h3>
+
+    <p>A 2018 survey of machine learning researchers found that a majority could not reproduce results from published papers in their own field. This systemic reproducibility problem is not merely a scientific embarrassment — it is a patent law problem. If the specification describes a system that, in practice, only the inventors can reproduce because of undisclosed implementation details, the enablement requirement is not met.</p>
+
+    <p>The practical lesson is that patent specifications for AI/ML inventions should be drafted to a higher standard of implementation detail than ML papers are typically held to. Every hyperparameter that matters, every preprocessing step that is non-obvious, every training trick that was needed to achieve the claimed results — all of it belongs in the specification. The specification is a legal document first and a technical document second; it must satisfy the law's requirement of enabling a POSITA to practice the invention, even if a reviewer for NeurIPS would consider such detail excessive.</p>
+
+    <!-- ─────────────────────────────────────────────────────────── -->
+    <h2 id="figures" class="section-anchor">9. Figures and Their Relationship to the Specification</h2>
+
+    <p>Patent figures are not decoration. They are part of the legal disclosure and must be integrated into the detailed description with precision. Under 37 C.F.R. § 1.83, every element shown in a drawing must be described in the specification, and every element described in the specification should, where practical, be shown in a drawing.</p>
+
+    <h3>9.1 Figure Reference Format</h3>
+
+    <p>Patent specification prose uses a highly conventional figure-reference style. Reference numerals (typically three-digit numbers starting at 100) are assigned to every element shown in the drawings and must be used consistently throughout the specification. The standard formulation is:</p>
+
+    <pre><code>FIG. 1 illustrates a block diagram of the multi-head attention pooling system 100,
+in accordance with one embodiment of the present disclosure. The system 100 comprises
+a graph neural network encoder 110, a multi-head attention pooling module 120, and a
+prediction head 130. The encoder 110 receives as input a molecular graph 105
+comprising atom feature vectors and bond feature vectors. The output of the encoder 110
+is a set of per-atom hidden representations 115, which serve as input to the pooling
+module 120. The pooling module 120 generates a fixed-length molecular embedding 125,
+which is passed to the prediction head 130. The prediction head 130 outputs a predicted
+property value or class probability vector 135.
+
+FIG. 2 illustrates the internal architecture of the multi-head attention pooling
+module 120 in detail. As shown in FIG. 2, the module 120 comprises H parallel attention
+heads 210-1 through 210-H, each computing a set of per-atom attention weights 215 from
+the corresponding query vector 220 and the key projections of the per-atom
+representations. The attention-weighted value vectors 225 from each head are
+concatenated to form the molecular embedding 125.
+
+FIG. 3 is a flowchart illustrating the training procedure 300 for the system 100.
+As shown in FIG. 3, the procedure 300 begins at step 310 with the assembly of a
+training dataset comprising molecular graphs and corresponding property labels.
+At step 320, the model parameters are initialized using Kaiming uniform initialization
+for weight matrices and zero initialization for bias vectors. At step 330, mini-batches
+of training examples are sampled from the training dataset and forward-propagated
+through the system 100. At step 340, the task-appropriate loss function is computed
+and backpropagated through the system. At step 350, model parameters are updated by
+the Adam optimizer. Steps 330 through 350 are repeated until the early stopping
+criterion of step 360 is satisfied, at which point training terminates at step 370
+and the trained model is returned.</code></pre>
+
+    <h3>9.2 Best Practices for AI/ML Figures</h3>
+
+    <ul>
+      <li><strong>System architecture diagrams (block diagrams):</strong> Show the major components as numbered blocks with arrows indicating data flow. Every component mentioned in the claims must appear as a labeled block.</li>
+      <li><strong>Data flow diagrams:</strong> Show the transformation of input data through the system to the output, with intermediate representations labeled and dimensioned.</li>
+      <li><strong>Training procedure flowcharts:</strong> Show the training loop with all major steps (data loading, forward pass, loss computation, backpropagation, parameter update, evaluation) as numbered flowchart elements.</li>
+      <li><strong>Network architecture diagrams:</strong> For novel architectures, show the layer-by-layer structure with connections, dimensions labeled at each layer boundary, and activation functions noted.</li>
+      <li><strong>Performance graphs:</strong> Training and validation loss curves, metric curves, and baseline comparisons provide strong enablement support and should be included as figures where they meaningfully support the claims.</li>
+    </ul>
+
+    <div class="callout callout-info">
+      <div class="callout-icon">ℹ️</div>
+      <div class="callout-body">
+        <div class="callout-title">Figures Must Match the Specification</div>
+        <p>A common prosecution stumbling block is inconsistency between figures and the written description. If FIG. 3 shows a six-layer encoder but the specification describes "a five-layer encoder," the examiner will reject the application under 37 C.F.R. § 1.83 and may also raise written description rejections against claims referencing either version. Before filing, conduct a figure-text reconciliation review: every reference numeral, every layer count, every dimension mentioned in the text must match the corresponding figure exactly.</p>
+      </div>
+    </div>
+
+    <!-- ─────────────────────────────────────────────────────────── -->
+    <h2 id="checklist" class="section-anchor">10. Specification Completeness Checklist</h2>
+
+    <p>Use the following checklist to evaluate a draft AI/ML patent specification before filing. Each item addresses a distinct legal requirement or common deficiency.</p>
+
+    <h3>Claim Support</h3>
+    <ul class="checklist">
+      <li>Every term used in any independent claim is explicitly defined in the detailed description</li>
+      <li>Every term used in any dependent claim is either defined in the independent claim's support or separately defined</li>
+      <li>Every element recited in every claim appears in at least one figure and is described in the detailed description</li>
+      <li>Every claim element that is novel (not conventional) is described with at least one operative working example</li>
+      <li>Functional claim language (e.g., "configured to," "trained to") is supported by structural disclosure that a POSITA would recognize as achieving that function</li>
+      <li>Preamble language (apparatus, method, system, computer-readable medium) is consistent with the detailed description's disclosure of the corresponding embodiment type</li>
+    </ul>
+
+    <h3>Enablement</h3>
+    <ul class="checklist">
+      <li>A POSITA could identify what data to use to practice the invention (by type, scale, domain, and quality criteria) without undue experimentation</li>
+      <li>A POSITA could determine the neural network architecture from the specification (layer types, order, dimensions, connections, activations)</li>
+      <li>A POSITA could reproduce the training procedure (loss function, optimizer, hyperparameters, training schedule, early stopping criteria)</li>
+      <li>Sufficient hyperparameters are disclosed to enable practice without extensive search (see Table 6.4 format)</li>
+      <li>The hardware requirements for practicing the invention are described, and the invention is either practically achievable on widely available hardware or the claims are scoped accordingly</li>
+      <li>At least one working example with quantitative performance results is provided</li>
+      <li>The performance results are demonstrated on a dataset described with sufficient specificity that a POSITA could assemble a comparable dataset</li>
+      <li>For stochastic elements (random initialization, data sampling), the range of acceptable variation is described</li>
+    </ul>
+
+    <h3>Written Description / Possession</h3>
+    <ul class="checklist">
+      <li>The specification discloses at least two to three distinct embodiments for each independent claim</li>
+      <li>For genus claims (e.g., "any neural network trained to…"), the specification describes a representative cross-section of the genus — not merely the problem the genus solves</li>
+      <li>The relationship between the described structure and the claimed function is made explicit in the specification</li>
+      <li>Where the claims cover multiple neural architectures, multiple representative architectures are described</li>
+      <li>Performance claims (e.g., "achieving at least 95% accuracy") are supported by experimental results disclosed in the specification</li>
+    </ul>
+
+    <h3>Best Mode</h3>
+    <ul class="checklist">
+      <li>The preferred embodiment is identified as such with explicit language ("in a presently preferred embodiment…")</li>
+      <li>The best known training configuration (optimizer choice, learning rate schedule, data augmentation pipeline) is disclosed</li>
+      <li>Any proprietary techniques, non-obvious preprocessing steps, or implementation details that the inventors found critical to performance are disclosed</li>
+    </ul>
+
+    <h3>Figures</h3>
+    <ul class="checklist">
+      <li>All figures are referenced in the brief description of drawings and in the detailed description</li>
+      <li>All reference numerals in figures correspond to numbered elements described in the detailed description</li>
+      <li>Figure element counts (layers, heads, etc.) are numerically consistent with the detailed description</li>
+      <li>All flowchart steps are numbered and described in the detailed description</li>
+      <li>Figures are in acceptable USPTO format (black and white line drawings unless color is specifically approved)</li>
+    </ul>
+
+    <h3>Formal Completeness</h3>
+    <ul class="checklist">
+      <li>Field of the invention is defined and consistent with the claims</li>
+      <li>Background section does not inadvertently admit prior art positions that could be used against the claims</li>
+      <li>Summary of the invention tracks the independent claims (or is broader, never narrower)</li>
+      <li>Abstract is 150 words or fewer and accurately summarizes the disclosure</li>
+      <li>All cross-references to related applications are included and correct</li>
+      <li>Incorporation by reference statements are proper and complete</li>
+    </ul>
+
+    <h3>AI/ML-Specific</h3>
+    <ul class="checklist">
+      <li>Neural network architecture is described with layer types, ordering, dimensions, activation functions, and normalization placement</li>
+      <li>Training loss function is written in mathematical notation with all symbols defined and all regularization terms included</li>
+      <li>Optimizer and key hyperparameters are disclosed (see Table 6.4 format)</li>
+      <li>Learning rate schedule is described in full (type, parameters, triggering conditions)</li>
+      <li>Training data is described by domain, scale, labeling scheme, and quality criteria — not solely by name of a specific proprietary or public dataset</li>
+      <li>Evaluation metrics are defined unambiguously (what is "accuracy"? on what benchmark type?)</li>
+      <li>At least one ablation study or controlled comparison is included to demonstrate which claimed features produce the technical improvement</li>
+      <li>For any emergent or capability-level properties claimed, at least one concrete demonstration of that capability appears in the working examples</li>
+      <li>Trained model weight or checkpoint deposit, if applicable, is cited and its location described for enabling access</li>
+    </ul>
+
+    <!-- ─────────────────────────────────────────────────────────── -->
+    <h2 id="mistakes" class="section-anchor">11. Common Specification Mistakes</h2>
+
+    <p>After reviewing hundreds of AI/ML patent applications, certain mistakes appear with frustrating regularity. Each of the following accordion items describes a recurring error, why it matters legally, and how to avoid it.</p>
+
+    <details class="accordion">
+      <summary>Mistake 1: Failing to Define Key Terms</summary>
+      <div class="accordion-content">
+        <p><strong>The mistake:</strong> The specification uses technical terms — "attention mechanism," "latent space," "fine-tuning," "transformer," "contrastive loss" — without defining them. The drafter assumes the meaning is obvious to a skilled reader.</p>
+        <p><strong>Why it matters:</strong> Terms that lack explicit definitions in the specification will be construed according to their "ordinary and customary meaning" in the art — which may be narrower, broader, or more ambiguous than the patentee intended. In claim construction proceedings, the examiner or court will not defer to the patentee's preferred meaning if the specification provides no definition. The result is often claims that exclude embodiments the inventor clearly intended to cover, or that read on prior art the inventor didn't intend to claim.</p>
+        <p><strong>The fix:</strong> Establish a "Definitions" section early in the detailed description, or define each term on its first use with explicit definitional language ("As used herein…"). For AI/ML, define at minimum: every architectural component named in the claims, every loss function or metric named in the claims, any performance threshold claimed ("accuracy" — on what metric? on what dataset type?), and any reference to training procedures that could vary.</p>
+      </div>
+    </details>
+
+    <details class="accordion">
+      <summary>Mistake 2: Describing Only One Embodiment</summary>
+      <div class="accordion-content">
+        <p><strong>The mistake:</strong> The specification describes a single specific implementation — one architecture, one training configuration, one dataset type — even though the claims are written broadly to cover a genus.</p>
+        <p><strong>Why it matters:</strong> Courts applying written description doctrine look to whether the specification demonstrates possession of the "full scope" of the claim. When only one species is disclosed for a genus claim, challengers will argue — often successfully — that the specification shows possession of that species, not the genus. This is the core holding of <em>Juno v. Kite</em> applied to AI.</p>
+        <p><strong>The fix:</strong> For every independent claim, identify the dimension of generality being claimed (all transformer architectures? all graph neural networks? all neural networks achieving X accuracy?) and ensure the specification describes at least two to three representative species across that dimension. Add explicit "alternative embodiments" paragraphs: "In alternative embodiments, the GNN encoder may be replaced with a transformer operating on the sequence of atom feature vectors, a convolutional network operating on a grid representation, or any other differentiable function mapping atom features to per-atom representations…"</p>
+      </div>
+    </details>
+
+    <details class="accordion">
+      <summary>Mistake 3: Inadvertent Best Mode Problems</summary>
+      <div class="accordion-content">
+        <p><strong>The mistake:</strong> The inventors, during the invention disclosure interview, mention a specific technique — a particular data augmentation strategy, a specific initialization trick, a proprietary preprocessing pipeline — that they found critical to achieving the claimed performance. This information does not make it into the specification because the drafter wasn't paying attention, the inventor didn't realize it was legally significant, or the client wanted to keep it as a trade secret.</p>
+        <p><strong>Why it matters:</strong> Intentional concealment of the best mode from the specification is inequitable conduct, which can result in unenforceability of the entire patent. Even unintentional omission can result in a prosecution rejection for failure to disclose best mode. More importantly, a competitor reading the specification to understand how to practice the invention may find it cannot reproduce the claimed results because the critical technique was withheld.</p>
+        <p><strong>The fix:</strong> Conduct a thorough invention disclosure interview specifically focused on: (1) what did you do that you would not want a competitor to know? (2) what implementation details were critical to achieving the reported results? (3) are there any preprocessing steps, training tricks, or post-processing steps not in the draft? Then ensure all such information is included in the specification, possibly in a section marked "presently preferred embodiment."</p>
+      </div>
+    </details>
+
+    <details class="accordion">
+      <summary>Mistake 4: Not Supporting Broad Claim Language with Representative Disclosure</summary>
+      <div class="accordion-content">
+        <p><strong>The mistake:</strong> Claims use broad functional or structural language — "a neural network," "a machine learning model," "an encoder," "a feature extractor" — while the specification only describes a specific type (e.g., a transformer encoder). The specification doesn't address how other types of networks, models, encoders, or feature extractors would be used in the invention.</p>
+        <p><strong>Why it matters:</strong> After <em>Amgen</em>, functional claiming of a broad genus without commensurate structural disclosure of that genus faces serious enablement and written description hurdles. The Court specifically rejected the argument that it is sufficient to disclose a method of making members of the genus and a "roadmap" to find the rest — you must actually describe representative members or provide sufficient guidance to navigate the genus without undue experimentation.</p>
+        <p><strong>The fix:</strong> For each broad term in the independent claims, include a paragraph in the specification explicitly describing the alternatives: "Although the presently described embodiment uses a transformer-based encoder, in other embodiments the encoder may comprise a recurrent neural network (RNN), a long short-term memory (LSTM) network, a convolutional neural network operating on atomic features, or a message-passing graph neural network." Then describe at least one alternative in enough detail to be enabling. This demonstrates that the claim scope is supported by disclosure across its breadth.</p>
+      </div>
+    </details>
+
+    <details class="accordion">
+      <summary>Mistake 5: Over-Specifying Training Data in the Claims or Key Definitional Passages</summary>
+      <div class="accordion-content">
+        <p><strong>The mistake:</strong> The specification — particularly in claim-definition passages and the summary — describes the invention as requiring training on a specific named dataset or a dataset with very specific properties (exact size, specific source, specific collection date range). These descriptions migrate into the claims during prosecution when an examiner cites prior art and the applicant narrows the claims to distinguish it.</p>
+        <p><strong>Why it matters:</strong> A claim that requires "training on a dataset of at least 1.2 million SMILES-annotated compounds from the ChEMBL database, version 30" is extraordinarily narrow. A competitor using a different dataset of similar size and scope will not infringe. More perniciously, as datasets evolve and newer versions are released, the claim may not cover models trained on updated data even when the improvement is trivial.</p>
+        <p><strong>The fix:</strong> Describe training data by its functional and structural characteristics — domain, scale, labeling scheme, quality criteria — not by the name or version of a specific public dataset. Reserve dataset-specific language for working examples marked clearly as illustrative. During prosecution, resist narrowing claims to specific dataset references; instead, argue based on the data characteristics that distinguish the claimed training methodology from the prior art.</p>
+      </div>
+    </details>
+
+    <details class="accordion">
+      <summary>Mistake 6: Failing to Describe the Training Procedure in Enough Detail</summary>
+      <div class="accordion-content">
+        <p><strong>The mistake:</strong> The specification says, in its entirety regarding training: "The model was trained using standard deep learning techniques well-known in the art." The hyperparameters are not disclosed, the loss function is not specified, the optimizer is not identified, and there is no description of the training schedule or stopping criteria.</p>
+        <p><strong>Why it matters:</strong> This is almost certainly insufficient for enablement when the claims include any limitation relating to a "trained" model. The training procedure is how you get from the architecture (which may be prior art or obvious) to the trained model (which is presumably where the novelty lies). If the training procedure is not described, a POSITA cannot reproduce the trained model, and the claim to a "trained model having property X" is likely not enabled. Examiners increasingly make this rejection for AI/ML applications.</p>
+        <p><strong>The fix:</strong> Treat the training procedure as a co-equal part of the invention with the architecture. Use the hyperparameter disclosure table format (like Table 6.4) to provide structured, complete disclosure. Include the loss function in mathematical notation, specify the optimizer and its key parameters, describe the learning rate schedule, note the training duration and early stopping criteria, and provide working results demonstrating that the procedure produces a model meeting the performance requirements recited in the claims.</p>
+      </div>
+    </details>
+
+    <details class="accordion">
+      <summary>Mistake 7: Using Claim Language in the Specification That Doesn't Match the Claims</summary>
+      <div class="accordion-content">
+        <p><strong>The mistake:</strong> The specification uses one set of terms (e.g., "classifier module," "scoring engine," "relevance network") while the claims use different terms (e.g., "classification component," "ranking module," "relevance neural network") for what appears to be the same element. The drafter assumed the equivalence would be obvious.</p>
+        <p><strong>Why it matters:</strong> Patent claim terms are construed in light of the specification and prosecution history. When a claim term does not appear in the specification, or appears in a different form, courts may construe the term narrowly or broadly in ways the patentee did not intend. Examiners will require that claim terms "find clear support or antecedent basis in the disclosure" (MPEP § 2173.05). The result is either prosecution rejections, narrowing amendments that give up scope, or claim construction rulings in litigation that exclude the patentee's preferred embodiment.</p>
+        <p><strong>The fix:</strong> Conduct a terminology reconciliation before filing. Create a terminology map listing every term used in every claim alongside the corresponding term(s) used in the specification. Every claim term should appear verbatim in the specification, or the specification should define the claim term with an explicit mapping ("as used herein, the 'classification component' corresponds to what is also referred to herein as the 'classifier module'"). Use a consistent lexicon throughout drafting and reconcile before filing.</p>
+      </div>
+    </details>
+
+    <details class="accordion">
+      <summary>Mistake 8: Claiming Performance Thresholds Without Specification Support</summary>
+      <div class="accordion-content">
+        <p><strong>The mistake:</strong> Claims recite performance thresholds — "achieving at least 95% accuracy on a protein structure prediction benchmark," "reducing inference latency by at least 40% compared to prior art systems" — that are not supported by experimental results in the specification. The threshold was chosen to distinguish prior art during prosecution but was never demonstrated by the inventors.</p>
+        <p><strong>Why it matters:</strong> A claim to a system "achieving at least X% performance" is an enablement problem if the specification does not disclose how a POSITA would make a system achieving that threshold. It is also a written description problem if the specification does not demonstrate that the inventors possessed — and had evidence for — the claimed performance level. This is the combination punch from <em>Ariad</em> and <em>Amgen</em>: you must describe what you possess and enable what you claim, and they must match.</p>
+        <p><strong>The fix:</strong> Every performance threshold in the claims must be (1) demonstrated in at least one working example in the specification, (2) described with enough implementation detail that a POSITA following the specification would expect to achieve at least the claimed threshold, and (3) accompanied by a description of the evaluation methodology precise enough that "achieving 95% accuracy" means something definite rather than something that shifts based on evaluation protocol. If you discover the threshold you want to claim doesn't appear in the original specification, do not add it by amendment after filing — you must file a continuation application with the new data.</p>
+      </div>
+    </details>
+
+    <!-- ─────────────────────────────────────────────────────────── -->
+    <h2 id="continuation-strategy" class="section-anchor">12. Specification Strategy for AI/ML Continuation Applications</h2>
+
+    <p>A single patent application is rarely sufficient to protect a commercial AI/ML innovation. Modern AI patent strategy almost always involves a family of related applications — continuations, continuation-in-part (CIPs), and divisional applications — that collectively cover the invention at multiple levels of abstraction and from multiple legal angles. The specification you file on day one sets the boundaries for everything that follows.</p>
+
+    <h3>12.1 The Continuation Family Strategy</h3>
+
+    <p>Continuations allow you to pursue different claim sets from the same original specification, so long as the continuation application is filed before the parent issues and the new claims are fully supported by the original disclosure. The strategic implications for AI/ML are significant:</p>
+
+    <ul>
+      <li><strong>Architecture claims:</strong> Independent claims covering the architectural innovation — the specific arrangement of layers, modules, and connections that constitutes the invention.</li>
+      <li><strong>Method claims:</strong> Independent claims covering the training method, inference procedure, or deployment method as a process claim.</li>
+      <li><strong>System claims:</strong> Claims to the deployed system — a server system, a medical device, a drug discovery platform — incorporating the AI/ML invention.</li>
+      <li><strong>Computer-readable medium claims:</strong> Claims to non-transitory computer-readable media storing instructions for performing the method or implementing the system.</li>
+      <li><strong>Trained model claims:</strong> Narrower claims specifically to the trained model product, including its performance characteristics.</li>
+    </ul>
+
+    <p>Because all of these claim types derive from the same specification, the specification must be drafted from day one with all of these downstream claim strategies in mind. A specification that describes only the training method, without describing the resulting trained model as a product, cannot support product claims in a later continuation.</p>
+
+    <h3>12.2 Protecting Improvements via Continuation-in-Part</h3>
+
+    <p>AI/ML research moves fast. By the time a patent application publishes (typically 18 months after filing), the inventors may have developed a substantially improved version of the original invention. A continuation-in-part (CIP) allows new material to be added to the specification while maintaining the priority date of the original application for those elements that were already disclosed.</p>
+
+    <p>The CIP strategy is particularly valuable for AI/ML when:</p>
+    <ul>
+      <li>A new architecture variant achieves substantially better performance than the originally disclosed architecture</li>
+      <li>A new application domain has been demonstrated for the original model</li>
+      <li>New training data or data characteristics have been found to improve performance</li>
+      <li>An emergent capability of the model has been discovered and demonstrated after original filing</li>
+    </ul>
+
+    <div class="callout callout-tip">
+      <div class="callout-icon">💡</div>
+      <div class="callout-body">
+        <div class="callout-title">Draft With the Family in Mind</div>
+        <p>Every time you draft an AI/ML patent specification, ask: what will we want to claim in eighteen months that we cannot claim today because the research isn't done yet? For those future claims, include at least a conceptual description ("in further embodiments, the system may be extended to multi-modal inputs combining molecular graph representations with textual descriptions of biological assay conditions") even without the experimental results. This seeds the specification for a CIP that can later add the experimental data. The concept, once in the specification, establishes priority for the conception even before reduction to practice.</p>
+      </div>
+    </div>
+
+    <h3>12.3 International Filing Considerations for AI/ML Specifications</h3>
+
+    <p>The Patent Cooperation Treaty (PCT) provides a mechanism for simultaneously seeking patent protection in multiple countries through a single international application. AI/ML patent practitioners must be aware of significant differences between U.S. and foreign patent law that affect specification drafting:</p>
+
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Jurisdiction</th>
+            <th>Key Specification Consideration</th>
+            <th>AI/ML-Specific Issue</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>United States (USPTO)</td>
+            <td>Enablement, written description, best mode; functional claiming permitted with sufficient structural support</td>
+            <td>Post-<em>Amgen</em> scrutiny of broad functional AI claims; increasing examiner sophistication on ML topics</td>
+          </tr>
+          <tr>
+            <td>European Patent Office (EPO)</td>
+            <td>Industrial applicability; claims must not be solely defined by functional result if structure is achievable; Article 83 sufficiency of disclosure</td>
+            <td>EPO requires more structure in AI claims; pure mathematical methods and mental acts excluded; must show "technical character" throughout specification</td>
+          </tr>
+          <tr>
+            <td>China (CNIPA)</td>
+            <td>Disclosure must enable skilled person to reproduce; algorithm claims must have technical solution to technical problem</td>
+            <td>CNIPA has issued specific guidelines for AI patents; specification must explicitly connect AI method to technical effect on hardware or real-world process</td>
+          </tr>
+          <tr>
+            <td>Japan (JPO)</td>
+            <td>Description requirement analogous to U.S. enablement; claims must be supported by description</td>
+            <td>JPO examines AI claims under software patent guidelines; specification should describe the specific processing steps and data structures in detail</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="table-caption">Table 6.5 — International Specification Considerations for AI/ML Patents</p>
+    </div>
+
+    <p>When drafting a specification for international filing, the safest approach is to include both the structural detail required by the EPO (to establish "technical character") and the functional breadth that U.S. practice permits. A specification drafted for the EPO's higher structural requirements will almost always satisfy U.S. enablement — but the reverse is not necessarily true.</p>
+
+    <h3>12.4 The Specification as a Living Document in Prosecution</h3>
+
+    <p>Unlike the claims — which can be amended during prosecution — the specification is essentially locked at filing. You cannot add new matter to the specification after your filing date. This makes the original specification the most important document you will ever draft for a patent family. Every major technical detail that might be claimed now or in the future must be in the original specification.</p>
+
+    <p>The practical implication: before filing, circulate the draft specification among the inventors and ask: "Is there anything we might want to claim in the next three years that isn't somewhere in this specification?" Add forward-looking language ("in further embodiments, the system may be adapted for…") for foreseeable improvements even if the full technical details are not yet available. This seeds the continuation strategy without requiring fully worked examples for every future direction.</p>
+
+    <!-- ─────────────────────────────────────────────────────────── -->
+    <h2 id="key-takeaways" class="section-anchor">13. Key Takeaways</h2>
+
+    <p>This chapter has covered the legal requirements and practical craft of drafting AI/ML patent specifications. The core principles can be summarized as follows:</p>
+
+    <div class="stats-row">
+      <div class="stat-item">
+        <div class="stat-number">3</div>
+        <div class="stat-label">Independent legal requirements under § 112(a): enablement, written description, best mode</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">8</div>
+        <div class="stat-label">Wands factors for evaluating enablement — all must be assessed for AI/ML claims</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">25+</div>
+        <div class="stat-label">Checklist items to verify before filing any AI/ML patent application</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">∞</div>
+        <div class="stat-label">Importance of the original specification — you cannot add new matter after filing</div>
+      </div>
+    </div>
+
+    <div class="highlight-box">
+      <h4>The Fundamental Rule of AI/ML Patent Specifications</h4>
+      <p>Every patent claim you will ever want to make — now or in any future continuation — must find its roots in the original specification. The claims are temporary: they can be amended, narrowed, broadened, and rewritten throughout prosecution. The specification is permanent: once filed, its four corners define the universe of everything you can ever claim. For AI/ML inventions that evolve rapidly, the single most important investment you can make is a specification that is technically complete, architecturally deep, and strategically forward-looking.</p>
+      <p>Draft it as if you are writing the technical report of record for an invention that will define a field. Because you might be.</p>
+    </div>
+
+    <!-- ─────────────────────────────────────────────────────────── -->
+    <!-- Chapter Nav Footer -->
+    <nav class="chapter-nav">
+      <a href="ch05_writing_claims.html" class="chapter-nav-btn">
+        <span class="nav-label">← Previous Chapter</span>
+        <span class="nav-title">Chapter 5: Writing Patent Claims That Win</span>
+      </a>
+      <a href="ch07_drawings.html" class="chapter-nav-btn nav-next">
+        <span class="nav-label">Next Chapter →</span>
+        <span class="nav-title">Chapter 7: Patent Drawings and Technical Diagrams</span>
+      </a>
+    </nav>
+
+  </main>
+</div><!-- /page-layout -->
+
+<!-- ── Footer ────────────────────────────────────────────────────── -->
+<footer>
+  <div class="footer-content">
+    <p><strong>Patent Law for Technologists</strong> — A Practical Guide for Engineers, Scientists, and AI Researchers</p>
+    <p>Chapter 6 authored by Dr. Lisa M. Chang, Senior Partner, Kirkland &amp; Ellis LLP, New York</p>
+    <p style="margin-top:1rem; font-size:.8125rem; opacity:.6;">This chapter is provided for educational purposes only and does not constitute legal advice. Patent law varies by jurisdiction and changes over time. Consult qualified patent counsel for advice specific to your invention and circumstances.</p>
+  </div>
+</footer>
+
+</body>
+</html>

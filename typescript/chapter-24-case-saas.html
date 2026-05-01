@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chapter 24: Case Study — Full-Stack AI SaaS (DocuMind) — TypeScript for the AI Era</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/sql.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --white: #FFFFFF; --surface: #F9FAFB; --border: #E5E7EB;
+      --border-code: #E1E4E8; --text-primary: #111827;
+      --text-secondary: #6B7280; --text-muted: #9CA3AF;
+      --indigo-600: #4F46E5; --indigo-700: #4338CA; --indigo-100: #EEF2FF; --indigo-50: #EEF2FF;
+      --green-500: #10B981; --green-50: #ECFDF5;
+      --blue-500: #3B82F6; --blue-50: #EFF6FF;
+      --amber-500: #F59E0B; --amber-50: #FFFBEB;
+      --purple-500: #8B5CF6; --purple-50: #F5F3FF;
+      --pink-500: #EC4899; --pink-50: #FDF2F8;
+      --nav-height: 60px; --toc-width: 240px; --max-width: 1100px;
+      --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+    }
+    html { scroll-behavior: smooth; font-size: 16px; }
+    body { font-family: var(--font-sans); background: var(--white); color: var(--text-primary); line-height: 1.7; -webkit-font-smoothing: antialiased; }
+
+    .progress-bar-wrap { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 3px; background: var(--border); }
+    .progress-bar-fill { height: 100%; width: 100%; background: linear-gradient(90deg, var(--indigo-600), #818CF8, #EC4899); }
+    .progress-label { position: fixed; top: 3px; right: 0; background: var(--indigo-600); color: white; font-size: 10px; font-weight: 700; letter-spacing: 0.08em; padding: 2px 8px; border-radius: 0 0 0 4px; z-index: 1000; }
+
+    .top-nav { position: fixed; top: 3px; left: 0; right: 0; height: var(--nav-height); background: rgba(255,255,255,0.97); border-bottom: 1px solid var(--border); backdrop-filter: blur(8px); z-index: 900; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; }
+    .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text-primary); }
+    .nav-logo-badge { background: var(--indigo-600); color: white; font-size: 11px; font-weight: 800; letter-spacing: 0.06em; padding: 3px 8px; border-radius: 4px; font-family: var(--font-mono); }
+    .nav-logo-text { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+    .nav-chapters { display: flex; align-items: center; gap: 6px; }
+    .nav-chapters a { display: flex; align-items: center; gap: 5px; text-decoration: none; font-size: 13px; font-weight: 500; color: var(--text-secondary); padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border); transition: all 0.15s; }
+    .nav-chapters a:hover { background: var(--indigo-50); color: var(--indigo-600); border-color: #C7D2FE; }
+    .nav-chapters .sep { color: var(--border); font-size: 18px; }
+
+    .page-wrap { max-width: var(--max-width); margin: 0 auto; padding-top: calc(var(--nav-height) + 3px + 24px); padding-bottom: 80px; display: grid; grid-template-columns: var(--toc-width) 1fr; gap: 40px; padding-left: 24px; padding-right: 24px; }
+
+    .toc-sidebar { position: sticky; top: calc(var(--nav-height) + 3px + 24px); height: calc(100vh - var(--nav-height) - 3px - 48px); overflow-y: auto; padding-right: 12px; scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+    .toc-sidebar::-webkit-scrollbar { width: 4px; }
+    .toc-sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+    .toc-label { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 12px; }
+    .toc-list { list-style: none; }
+    .toc-list li { margin-bottom: 2px; }
+    .toc-list a { display: block; font-size: 13px; color: var(--text-secondary); text-decoration: none; padding: 5px 10px; border-radius: 5px; border-left: 2px solid transparent; transition: all 0.15s; line-height: 1.4; }
+    .toc-list a:hover, .toc-list a.active { color: var(--indigo-600); background: var(--indigo-50); border-left-color: var(--indigo-600); }
+    .toc-list .toc-sub { padding-left: 22px; font-size: 12px; }
+
+    .main-content { min-width: 0; }
+
+    .chapter-hero { background: linear-gradient(135deg, #EEF2FF 0%, #FDF2F8 50%, #ECFDF5 100%); border: 1px solid #C7D2FE; border-radius: 16px; padding: 48px 48px 40px; margin-bottom: 48px; position: relative; overflow: hidden; }
+    .chapter-hero::before { content: ''; position: absolute; top: -60px; right: -60px; width: 240px; height: 240px; background: radial-gradient(circle, rgba(236,72,153,0.08) 0%, transparent 70%); pointer-events: none; }
+    .chapter-number { font-size: 100px; font-weight: 900; line-height: 1; color: rgba(79,70,229,0.10); font-family: var(--font-mono); position: absolute; top: 16px; right: 32px; user-select: none; }
+    .chapter-eyebrow { font-size: 12px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--indigo-600); margin-bottom: 12px; }
+    .chapter-title { font-size: 34px; font-weight: 800; line-height: 1.15; color: var(--text-primary); margin-bottom: 8px; max-width: 620px; }
+    .chapter-subtitle { font-size: 17px; color: var(--text-secondary); margin-bottom: 24px; max-width: 560px; line-height: 1.6; }
+    .chapter-meta { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+    .chapter-author { display: flex; align-items: center; gap: 10px; }
+    .author-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--indigo-600), #EC4899); display: flex; align-items: center; justify-content: center; color: white; font-size: 15px; font-weight: 700; }
+    .author-info { line-height: 1.3; }
+    .author-name { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+    .author-title { font-size: 12px; color: var(--text-secondary); }
+    .chapter-meta-pills { display: flex; gap: 8px; flex-wrap: wrap; }
+    .meta-pill { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 500; color: var(--text-secondary); background: white; border: 1px solid var(--border); border-radius: 100px; padding: 4px 12px; }
+
+    .main-content h2 { font-size: 26px; font-weight: 800; color: var(--text-primary); margin: 56px 0 20px; padding-top: 8px; border-top: 1px solid var(--border); line-height: 1.25; }
+    .main-content h2:first-of-type { margin-top: 0; border-top: none; }
+    .main-content h3 { font-size: 19px; font-weight: 700; color: var(--text-primary); margin: 36px 0 14px; line-height: 1.3; }
+    .main-content h4 { font-size: 15px; font-weight: 700; color: var(--text-primary); margin: 24px 0 10px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .main-content p { margin-bottom: 18px; font-size: 16px; line-height: 1.75; color: #1F2937; }
+    .main-content ul, .main-content ol { margin: 0 0 20px 24px; }
+    .main-content li { margin-bottom: 8px; font-size: 16px; line-height: 1.7; color: #1F2937; }
+    .main-content a { color: var(--indigo-600); text-decoration: underline; text-underline-offset: 3px; }
+    .main-content a:hover { color: var(--indigo-700); }
+
+    code { font-family: var(--font-mono); font-size: 0.875em; background: #F3F4F6; border: 1px solid #E5E7EB; border-radius: 4px; padding: 1px 6px; color: #B91C1C; }
+
+    .code-block { position: relative; margin: 24px 0; border-radius: 10px; border: 1px solid var(--border-code); overflow: hidden; }
+    .code-block-header { display: flex; align-items: center; justify-content: space-between; padding: 8px 16px; background: #F6F8FA; border-bottom: 1px solid var(--border-code); }
+    .code-lang-badge { font-family: var(--font-mono); font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 8px; border-radius: 4px; }
+    .badge-ts { background: #DBEAFE; color: #1D4ED8; }
+    .badge-sql { background: #FEF9C3; color: #78350F; }
+    .badge-sh { background: #D1FAE5; color: #065F46; }
+    .code-filename { font-family: var(--font-mono); font-size: 12px; color: var(--text-secondary); }
+    .code-block pre { margin: 0; padding: 20px; background: #F6F8FA; overflow-x: auto; }
+    .code-block pre code { background: none; border: none; padding: 0; font-size: 13.5px; line-height: 1.6; color: inherit; }
+
+    .callout { display: flex; gap: 14px; padding: 18px 20px; border-radius: 10px; border-left: 4px solid; margin: 28px 0; }
+    .callout-icon { font-size: 20px; flex-shrink: 0; line-height: 1.4; }
+    .callout-body { flex: 1; min-width: 0; }
+    .callout-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 6px; }
+    .callout-body p { margin-bottom: 8px; font-size: 15px; }
+    .callout-body p:last-child { margin-bottom: 0; }
+    .callout-body ul { margin-bottom: 0; }
+    .callout-body li { font-size: 15px; }
+    .callout-tip { background: var(--green-50); border-color: var(--green-500); }
+    .callout-tip .callout-title { color: #065F46; }
+    .callout-info { background: var(--blue-50); border-color: var(--blue-500); }
+    .callout-info .callout-title { color: #1E40AF; }
+    .callout-warn { background: var(--amber-50); border-color: var(--amber-500); }
+    .callout-warn .callout-title { color: #92400E; }
+    .callout-ai { background: var(--pink-50); border-color: var(--pink-500); }
+    .callout-ai .callout-title { color: #9D174D; }
+    .callout-arch { background: var(--indigo-50); border-color: var(--indigo-600); }
+    .callout-arch .callout-title { color: #3730A3; }
+    .callout-lesson { background: var(--purple-50); border-color: var(--purple-500); }
+    .callout-lesson .callout-title { color: #5B21B6; }
+
+    .table-wrap { overflow-x: auto; margin: 28px 0; border-radius: 10px; border: 1px solid var(--border); }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th { background: var(--indigo-50); color: var(--indigo-600); font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.07em; padding: 12px 16px; text-align: left; border-bottom: 2px solid #C7D2FE; }
+    td { padding: 12px 16px; border-bottom: 1px solid var(--border); vertical-align: top; line-height: 1.5; }
+    tr:last-child td { border-bottom: none; }
+    tr:nth-child(even) td { background: var(--surface); }
+    td code { font-size: 12px; }
+
+    .diagram-wrap { margin: 36px 0; padding: 32px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow-x: auto; text-align: center; }
+    .diagram-caption { text-align: center; font-size: 13px; color: var(--text-secondary); margin-top: 16px; font-style: italic; }
+    svg text { font-family: var(--font-sans); }
+
+    .file-tree { background: #F6F8FA; border: 1px solid var(--border-code); border-radius: 10px; padding: 20px 24px; margin: 24px 0; font-family: var(--font-mono); font-size: 13.5px; line-height: 1.8; }
+    .file-tree .dir { color: var(--indigo-600); font-weight: 600; }
+    .file-tree .file { color: #374151; }
+    .file-tree .comment { color: var(--text-muted); font-style: italic; }
+
+    .pattern-list { list-style: none; margin-left: 0; counter-reset: pattern-counter; }
+    .pattern-list li { counter-increment: pattern-counter; display: flex; gap: 16px; align-items: flex-start; margin-bottom: 20px; padding: 16px 20px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; }
+    .pattern-list li::before { content: counter(pattern-counter); width: 28px; height: 28px; min-width: 28px; border-radius: 50%; background: var(--indigo-600); color: white; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+    .pattern-body strong { font-size: 15px; color: var(--text-primary); display: block; margin-bottom: 4px; }
+    .pattern-body span { font-size: 14px; color: var(--text-secondary); }
+
+    /* Graduation section */
+    .graduation-section { margin-top: 64px; padding: 56px 48px; background: linear-gradient(135deg, #EEF2FF 0%, #FDF2F8 40%, #ECFDF5 100%); border: 2px solid #C7D2FE; border-radius: 20px; position: relative; overflow: hidden; }
+    .graduation-section::before { content: ''; position: absolute; top: -80px; right: -80px; width: 320px; height: 320px; background: radial-gradient(circle, rgba(236,72,153,0.12) 0%, transparent 70%); pointer-events: none; }
+    .graduation-section::after { content: ''; position: absolute; bottom: -80px; left: -40px; width: 240px; height: 240px; background: radial-gradient(circle, rgba(79,70,229,0.10) 0%, transparent 70%); pointer-events: none; }
+    .grad-eyebrow { font-size: 11px; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; color: var(--pink-500); margin-bottom: 16px; }
+    .grad-title { font-size: 38px; font-weight: 900; color: var(--text-primary); margin-bottom: 16px; line-height: 1.15; }
+    .grad-subtitle { font-size: 18px; color: var(--text-secondary); margin-bottom: 32px; max-width: 600px; line-height: 1.65; }
+    .grad-skills { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-bottom: 40px; }
+    .grad-skill { background: white; border: 1px solid #C7D2FE; border-radius: 10px; padding: 16px 20px; }
+    .grad-skill-title { font-size: 13px; font-weight: 700; color: var(--indigo-600); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.06em; }
+    .grad-skill-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+    .grad-divider { border: none; border-top: 1px solid #C7D2FE; margin: 40px 0; }
+    .grad-resources { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 40px; }
+    .grad-resource { background: white; border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; }
+    .grad-resource-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 4px; }
+    .grad-resource-name { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 2px; }
+    .grad-resource-desc { font-size: 12px; color: var(--text-secondary); }
+    .grad-closing { background: white; border-left: 4px solid var(--indigo-600); border-radius: 0 12px 12px 0; padding: 28px 32px; position: relative; z-index: 1; }
+    .grad-closing p { font-size: 17px; line-height: 1.75; color: var(--text-primary); margin-bottom: 12px; }
+    .grad-closing p:last-child { margin-bottom: 0; }
+    .grad-closing cite { font-size: 13px; font-weight: 700; color: var(--indigo-600); font-style: normal; display: block; margin-top: 16px; }
+
+    .section-anchor { scroll-margin-top: calc(var(--nav-height) + 3px + 20px); }
+
+    .footer-nav { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 64px; padding-top: 32px; border-top: 1px solid var(--border); }
+    .footer-nav-btn { display: flex; align-items: center; gap: 12px; text-decoration: none; padding: 20px 24px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); transition: all 0.2s; }
+    .footer-nav-btn:hover { border-color: #C7D2FE; background: var(--indigo-50); }
+    .footer-nav-btn.home { justify-content: center; grid-column: 2; }
+    .footer-nav-arrow { font-size: 24px; color: var(--indigo-600); flex-shrink: 0; }
+    .footer-nav-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 3px; }
+    .footer-nav-title { font-size: 15px; font-weight: 700; color: var(--text-primary); }
+
+    @media (max-width: 860px) {
+      .page-wrap { grid-template-columns: 1fr; }
+      .toc-sidebar { display: none; }
+      .chapter-number { display: none; }
+      .chapter-title { font-size: 26px; }
+      .chapter-hero { padding: 32px 24px; }
+      .graduation-section { padding: 36px 24px; }
+      .grad-title { font-size: 28px; }
+    }
+    @media (max-width: 600px) {
+      .nav-logo-text { display: none; }
+      .footer-nav { grid-template-columns: 1fr; }
+      .footer-nav-btn.home { grid-column: 1; }
+    }
+    .hljs { background: #F6F8FA !important; }
+  </style>
+</head>
+<body>
+
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-fill"></div>
+  </div>
+  <div class="progress-label">Chapter 24 of 24 — FINAL</div>
+
+  <nav class="top-nav">
+    <a href="../index.html" class="nav-logo">
+      <span class="nav-logo-badge">TS</span>
+      <span class="nav-logo-text">TypeScript for the AI Era</span>
+    </a>
+    <div class="nav-chapters">
+      <a href="chapter-23-case-pulumi.html">&#8592; Ch 23 Pulumi</a>
+      <span class="sep">|</span>
+      <a href="../index.html">&#127968; Back to Index</a>
+    </div>
+  </nav>
+
+  <div class="page-wrap">
+
+    <!-- SIDEBAR TOC -->
+    <aside class="toc-sidebar">
+      <div class="toc-label">On this page</div>
+      <ul class="toc-list">
+        <li><a href="#architecture">1. Architecture Overview</a></li>
+        <li><a href="#monorepo">2. Monorepo Structure</a></li>
+        <li><a href="#schema">3. Database Schema</a></li>
+        <li><a href="#pipeline">4. Document Pipeline</a></li>
+        <li><a href="#rag">5. RAG Query Engine</a></li>
+        <li><a href="#frontend">6. Next.js Frontend</a></li>
+        <li><a href="#stripe">7. Stripe Integration</a></li>
+        <li><a href="#apikeys">8. API Key System</a></li>
+        <li><a href="#deployment">9. Deployment</a></li>
+        <li><a href="#patterns">10. TypeScript Patterns</a></li>
+        <li><a href="#graduation">Graduation</a></li>
+      </ul>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+      <div class="chapter-hero">
+        <div class="chapter-number">24</div>
+        <div class="chapter-eyebrow">Chapter Twenty-Four &middot; Final Case Study</div>
+        <h1 class="chapter-title">Full-Stack AI SaaS Application: DocuMind</h1>
+        <p class="chapter-subtitle">Build a production-ready AI document Q&amp;A platform — monorepo, RAG pipeline, Stripe billing, and S3 uploads — with TypeScript at every layer.</p>
+        <div class="chapter-meta">
+          <div class="chapter-author">
+            <div class="author-avatar">SSE</div>
+            <div class="author-info">
+              <div class="author-name">Senior Staff Engineer</div>
+              <div class="author-title">Full-Stack &middot; AI Systems &middot; SaaS Architecture</div>
+            </div>
+          </div>
+          <div class="chapter-meta-pills">
+            <span class="meta-pill">Final Chapter</span>
+            <span class="meta-pill">Production Patterns</span>
+            <span class="meta-pill">RAG + Stripe</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== 1. ARCHITECTURE ===== -->
+      <h2 id="architecture" class="section-anchor">1. Architecture Overview</h2>
+
+      <p>DocuMind lets users upload PDFs, ask questions in natural language, and receive AI-generated answers grounded in their documents. The system combines a Next.js frontend, a Hono API server, a pgvector database for semantic search, Redis for rate limiting and job queues, Anthropic for inference, Stripe for billing, and S3 for file storage.</p>
+
+      <div class="diagram-wrap">
+        <svg viewBox="0 0 760 380" width="100%" style="max-width:760px;">
+          <!-- User -->
+          <rect x="10" y="155" width="100" height="50" rx="8" fill="#EEF2FF" stroke="#C7D2FE" stroke-width="1.5"/>
+          <text x="60" y="175" text-anchor="middle" font-size="12" font-weight="600" fill="#4F46E5">Browser</text>
+          <text x="60" y="192" text-anchor="middle" font-size="11" fill="#6B7280">Next.js / Vercel</text>
+
+          <!-- Arrow browser -> Hono -->
+          <line x1="111" y1="180" x2="167" y2="180" stroke="#C7D2FE" stroke-width="1.5" marker-end="url(#arr)"/>
+
+          <!-- Hono API -->
+          <rect x="168" y="145" width="120" height="70" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2"/>
+          <text x="228" y="170" text-anchor="middle" font-size="12" font-weight="700" fill="#4F46E5">Hono API</text>
+          <text x="228" y="186" text-anchor="middle" font-size="11" fill="#6B7280">Railway / Node</text>
+          <text x="228" y="202" text-anchor="middle" font-size="10" fill="#9CA3AF">REST + SSE</text>
+
+          <!-- Arrow Hono -> Postgres -->
+          <line x1="289" y1="165" x2="345" y2="120" stroke="#C7D2FE" stroke-width="1.5" marker-end="url(#arr)"/>
+          <!-- Postgres -->
+          <rect x="346" y="90" width="120" height="55" rx="8" fill="#F0FFF4" stroke="#10B981" stroke-width="1.5"/>
+          <text x="406" y="114" text-anchor="middle" font-size="12" font-weight="600" fill="#065F46">PostgreSQL</text>
+          <text x="406" y="130" text-anchor="middle" font-size="11" fill="#6B7280">+ pgvector (Neon)</text>
+
+          <!-- Arrow Hono -> Redis -->
+          <line x1="289" y1="180" x2="345" y2="180" stroke="#C7D2FE" stroke-width="1.5" marker-end="url(#arr)"/>
+          <!-- Redis -->
+          <rect x="346" y="158" width="120" height="46" rx="8" fill="#FFF7ED" stroke="#F59E0B" stroke-width="1.5"/>
+          <text x="406" y="178" text-anchor="middle" font-size="12" font-weight="600" fill="#78350F">Redis</text>
+          <text x="406" y="195" text-anchor="middle" font-size="11" fill="#6B7280">Upstash</text>
+
+          <!-- Arrow Hono -> S3 -->
+          <line x1="289" y1="200" x2="345" y2="245" stroke="#C7D2FE" stroke-width="1.5" marker-end="url(#arr)"/>
+          <!-- S3 -->
+          <rect x="346" y="225" width="120" height="46" rx="8" fill="#FDF2F8" stroke="#EC4899" stroke-width="1.5"/>
+          <text x="406" y="248" text-anchor="middle" font-size="12" font-weight="600" fill="#9D174D">S3 / R2</text>
+          <text x="406" y="264" text-anchor="middle" font-size="11" fill="#6B7280">File Storage</text>
+
+          <!-- Arrow Hono -> Anthropic -->
+          <line x1="289" y1="172" x2="345" y2="330" stroke="#C7D2FE" stroke-width="1.5" marker-end="url(#arr)"/>
+          <!-- Anthropic -->
+          <rect x="346" y="305" width="120" height="46" rx="8" fill="#F5F3FF" stroke="#8B5CF6" stroke-width="1.5"/>
+          <text x="406" y="328" text-anchor="middle" font-size="12" font-weight="600" fill="#5B21B6">Anthropic</text>
+          <text x="406" y="345" text-anchor="middle" font-size="11" fill="#6B7280">Claude (streaming)</text>
+
+          <!-- Arrow Hono -> Stripe -->
+          <line x1="228" y1="216" x2="228" y2="290" stroke="#C7D2FE" stroke-width="1.5" marker-end="url(#arr)"/>
+          <!-- Stripe -->
+          <rect x="168" y="291" width="120" height="46" rx="8" fill="#EFF6FF" stroke="#3B82F6" stroke-width="1.5"/>
+          <text x="228" y="314" text-anchor="middle" font-size="12" font-weight="600" fill="#1E40AF">Stripe</text>
+          <text x="228" y="331" text-anchor="middle" font-size="11" fill="#6B7280">Billing + Webhooks</text>
+
+          <!-- Shared types arrow -->
+          <rect x="580" y="145" width="160" height="70" rx="8" fill="#F9FAFB" stroke="#E5E7EB" stroke-width="1.5" stroke-dasharray="5,3"/>
+          <text x="660" y="172" text-anchor="middle" font-size="12" font-weight="600" fill="#374151">packages/shared</text>
+          <text x="660" y="188" text-anchor="middle" font-size="11" fill="#6B7280">Types, schemas,</text>
+          <text x="660" y="203" text-anchor="middle" font-size="11" fill="#6B7280">API contracts</text>
+          <line x1="289" y1="160" x2="579" y2="165" stroke="#E5E7EB" stroke-width="1" stroke-dasharray="4,3"/>
+          <line x1="111" y1="165" x2="168" y2="165" stroke="#E5E7EB" stroke-width="1" stroke-dasharray="4,3"/>
+
+          <defs>
+            <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+              <path d="M0,0 L0,6 L8,3 z" fill="#C7D2FE"/>
+            </marker>
+          </defs>
+        </svg>
+        <div class="diagram-caption">DocuMind system architecture — all layers typed end-to-end via the shared package</div>
+      </div>
+
+      <div class="callout callout-arch">
+        <div class="callout-icon">&#9670;</div>
+        <div class="callout-body">
+          <div class="callout-title">Architecture Note</div>
+          <p>The key insight: a <code>packages/shared</code> library contains every domain type, Zod schema, and API contract. Both the Next.js client and the Hono server import from it — no type drift, no duplication.</p>
+        </div>
+      </div>
+
+      <!-- ===== 2. MONOREPO ===== -->
+      <h2 id="monorepo" class="section-anchor">2. Monorepo Structure</h2>
+
+      <p>We use pnpm workspaces. Three packages: <code>web</code> (Next.js), <code>api</code> (Hono), and <code>shared</code> (types + schemas). The shared package is the contract layer — both apps depend on it, never on each other.</p>
+
+      <div class="file-tree">
+<span class="dir">documind/</span>
+├── <span class="dir">apps/</span>
+│   ├── <span class="dir">web/</span>            <span class="comment"># Next.js 14 (App Router)</span>
+│   │   ├── <span class="dir">app/</span>
+│   │   │   ├── <span class="file">chat/[docId]/page.tsx</span>
+│   │   │   └── <span class="file">upload/page.tsx</span>
+│   │   └── <span class="file">package.json</span>
+│   └── <span class="dir">api/</span>            <span class="comment"># Hono on Node/Railway</span>
+│       ├── <span class="dir">src/</span>
+│       │   ├── <span class="file">routes/documents.ts</span>
+│       │   ├── <span class="file">routes/chat.ts</span>
+│       │   ├── <span class="file">services/rag.ts</span>
+│       │   └── <span class="file">services/pipeline.ts</span>
+│       └── <span class="file">package.json</span>
+└── <span class="dir">packages/</span>
+    └── <span class="dir">shared/</span>         <span class="comment"># The contract layer</span>
+        └── <span class="dir">src/</span>
+            ├── <span class="file">types.ts</span>    <span class="comment"># Domain types</span>
+            ├── <span class="file">schemas.ts</span>  <span class="comment"># Zod schemas</span>
+            └── <span class="file">api.ts</span>      <span class="comment"># API client factory</span>
+      </div>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-lang-badge badge-ts">TS</span>
+          <span class="code-filename">packages/shared/src/types.ts</span>
+        </div>
+        <pre><code class="language-typescript">export type Document = {
+  id: string; name: string; size: number;
+  status: 'processing' | 'ready' | 'error';
+  createdAt: Date;
+}
+export type ChatMessage = { role: 'user' | 'assistant'; content: string }
+export type Plan = 'free' | 'pro' | 'enterprise'
+export type Workspace = { id: string; name: string; plan: Plan; docCount: number }
+export type ApiError = { code: string; message: string; status: number }</code></pre>
+      </div>
+
+      <div class="callout callout-tip">
+        <div class="callout-icon">&#10003;</div>
+        <div class="callout-body">
+          <div class="callout-title">Tip — Shared First</div>
+          <p>Define types in shared <em>before</em> writing any route or component. The type is the specification. Both sides of the API boundary compile against it.</p>
+        </div>
+      </div>
+
+      <!-- ===== 3. SCHEMA ===== -->
+      <h2 id="schema" class="section-anchor">3. Database Schema (Prisma)</h2>
+
+      <p>Five core models. The <code>DocumentChunk</code> model holds the pgvector embedding column — Prisma's <code>Unsupported</code> type lets us declare it without native support, while raw queries handle vector operations.</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-lang-badge badge-sql">Prisma</span>
+          <span class="code-filename">api/prisma/schema.prisma — key models</span>
+        </div>
+        <pre><code class="language-typescript">model User { id String @id @default(cuid())
+  email String @unique; workspaceId String
+  workspace Workspace @relation(fields: [workspaceId], references: [id]) }
+
+model Document { id String @id @default(cuid())
+  name String; s3Key String; status DocumentStatus @default(PROCESSING)
+  chunks DocumentChunk[]; workspaceId String }
+
+model DocumentChunk { id String @id @default(cuid())
+  content String; pageNum Int; documentId String
+  embedding Unsupported("vector(1536)")?    // pgvector
+  document Document @relation(fields: [documentId], references: [id]) }
+
+model Subscription { id String @id; stripeCustomerId String @unique
+  plan Plan @default(FREE); status SubStatus; workspaceId String @unique }</code></pre>
+      </div>
+
+      <div class="callout callout-info">
+        <div class="callout-icon">&#9432;</div>
+        <div class="callout-body">
+          <div class="callout-title">Info — pgvector in Neon</div>
+          <p>Enable the extension with <code>CREATE EXTENSION vector;</code> and create an HNSW index: <code>CREATE INDEX ON "DocumentChunk" USING hnsw (embedding vector_cosine_ops);</code>. Queries use raw SQL via <code>prisma.$queryRaw</code>.</p>
+        </div>
+      </div>
+
+      <!-- ===== 4. PIPELINE ===== -->
+      <h2 id="pipeline" class="section-anchor">4. Document Processing Pipeline</h2>
+
+      <p>When a document upload completes, a background job processes it through five stages: download from S3, extract text, split into chunks, embed via OpenAI, store in pgvector, generate a Claude summary, then mark ready.</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-lang-badge badge-ts">TS</span>
+          <span class="code-filename">api/src/services/pipeline.ts</span>
+        </div>
+        <pre><code class="language-typescript">export async function processDocument(docId: string): Promise<void> {
+  const doc = await prisma.document.findUniqueOrThrow({ where: { id: docId } })
+  const buffer = await downloadFromS3(doc.s3Key)
+  const text = await extractText(buffer)
+  const chunks = chunkText(text, { size: 512, overlap: 64 })
+  const embeddings = await embedBatch(chunks.map(c => c.content))
+  await storeChunks(docId, chunks, embeddings)          // raw SQL + pgvector
+  const summary = await summarizeWithClaude(text.slice(0, 8000))
+  await prisma.document.update({
+    where: { id: docId },
+    data: { status: 'READY', summary }
+  })
+}</code></pre>
+      </div>
+
+      <div class="callout callout-lesson">
+        <div class="callout-icon">&#9670;</div>
+        <div class="callout-body">
+          <div class="callout-title">Lesson Learned</div>
+          <p>Run the pipeline in a separate worker process (BullMQ + Redis), not inside the HTTP request. A PDF processing job can take 30–120 seconds. The API endpoint only enqueues the job and returns immediately.</p>
+        </div>
+      </div>
+
+      <!-- ===== 5. RAG ===== -->
+      <h2 id="rag" class="section-anchor">5. RAG Query Engine</h2>
+
+      <p>Retrieval-Augmented Generation: embed the user's question, find the nearest document chunks via cosine similarity, then stream a Claude response grounded in those chunks.</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-lang-badge badge-ts">TS</span>
+          <span class="code-filename">api/src/services/rag.ts</span>
+        </div>
+        <pre><code class="language-typescript">export async function* ragQuery(
+  question: string, docId: string
+): AsyncGenerator<string> {
+  const qEmbedding = await embed(question)
+  const chunks = await prisma.$queryRaw<ChunkRow[]>`
+    SELECT content, 1 - (embedding <=> ${qEmbedding}::vector) AS score
+    FROM "DocumentChunk" WHERE "documentId" = ${docId}
+    ORDER BY embedding <=> ${qEmbedding}::vector LIMIT 5`
+  const context = chunks.map(c => c.content).join('\n\n')
+  const stream = await anthropic.messages.stream({
+    model: 'claude-opus-4-5', max_tokens: 1024,
+    messages: [{ role: 'user', content:
+      `Context:\n${context}\n\nQuestion: ${question}` }]
+  })
+  for await (const chunk of stream) {
+    if (chunk.type === 'content_block_delta') yield chunk.delta.text ?? ''
+  }
+}</code></pre>
+      </div>
+
+      <div class="callout callout-ai">
+        <div class="callout-icon">&#9733;</div>
+        <div class="callout-body">
+          <div class="callout-title">AI Era Pattern</div>
+          <p>The generator signature <code>AsyncGenerator&lt;string&gt;</code> composes cleanly: the Hono route pipes it to an SSE response, the Next.js page reads it via the Vercel AI SDK. The streaming contract is typed, not ad-hoc.</p>
+        </div>
+      </div>
+
+      <!-- ===== 6. FRONTEND ===== -->
+      <h2 id="frontend" class="section-anchor">6. Next.js Frontend Key Patterns</h2>
+
+      <h3>Chat Page</h3>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-lang-badge badge-ts">TSX</span>
+          <span class="code-filename">apps/web/app/chat/[docId]/page.tsx</span>
+        </div>
+        <pre><code class="language-typescript">'use client'
+import { useChat } from 'ai/react'
+export default function ChatPage({ params }: { params: { docId: string } }) {
+  const { messages, input, handleInputChange, handleSubmit } = useChat({
+    api: `/api/chat/${params.docId}`,
+  })
+  return (
+    <div className="flex flex-col h-screen">
+      <MessageList messages={messages} />
+      <form onSubmit={handleSubmit}>
+        <input value={input} onChange={handleInputChange} placeholder="Ask a question..." />
+      </form>
+    </div>
+  )
+}</code></pre>
+      </div>
+
+      <h3>Upload Component with Presigned S3 URL</h3>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-lang-badge badge-ts">TSX</span>
+          <span class="code-filename">apps/web/components/Uploader.tsx (key logic)</span>
+        </div>
+        <pre><code class="language-typescript">async function uploadFile(file: File) {
+  // 1. Get presigned URL from our API
+  const { uploadUrl, s3Key, docId } =
+    await api.documents.presign({ name: file.name, size: file.size })
+  // 2. PUT directly to S3 — never through our server
+  await fetch(uploadUrl, { method: 'PUT', body: file,
+    headers: { 'Content-Type': file.type } })
+  // 3. Trigger processing pipeline
+  await api.documents.process(docId)
+  return docId
+}</code></pre>
+      </div>
+
+      <div class="callout callout-tip">
+        <div class="callout-icon">&#10003;</div>
+        <div class="callout-body">
+          <div class="callout-title">Tip — Presigned Uploads</div>
+          <p>Never proxy file uploads through your API server. A 50 MB PDF would tie up a server thread for seconds. Presigned S3 URLs let the browser upload directly to S3; your API only authorizes the operation.</p>
+        </div>
+      </div>
+
+      <!-- ===== 7. STRIPE ===== -->
+      <h2 id="stripe" class="section-anchor">7. Stripe Integration</h2>
+
+      <h3>Checkout Session</h3>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-lang-badge badge-ts">TS</span>
+          <span class="code-filename">api/src/routes/billing.ts — checkout</span>
+        </div>
+        <pre><code class="language-typescript">app.post('/billing/checkout', requireAuth, async (c) => {
+  const { plan } = await c.req.json<{ plan: Plan }>()
+  const session = await stripe.checkout.sessions.create({
+    mode: 'subscription', customer: c.var.user.stripeCustomerId,
+    line_items: [{ price: PRICE_IDS[plan], quantity: 1 }],
+    success_url: `${env.APP_URL}/dashboard?upgraded=1`,
+    cancel_url: `${env.APP_URL}/pricing`,
+    metadata: { workspaceId: c.var.user.workspaceId }
+  })
+  return c.json({ url: session.url })
+})</code></pre>
+      </div>
+
+      <h3>Webhook Handler</h3>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-lang-badge badge-ts">TS</span>
+          <span class="code-filename">api/src/routes/billing.ts — webhook</span>
+        </div>
+        <pre><code class="language-typescript">app.post('/billing/webhook', async (c) => {
+  const sig = c.req.header('stripe-signature')!
+  const event = stripe.webhooks.constructEvent(
+    await c.req.arrayBuffer(), sig, env.STRIPE_WEBHOOK_SECRET)
+  if (event.type === 'customer.subscription.updated') {
+    const sub = event.data.object
+    await prisma.subscription.upsert({
+      where: { stripeCustomerId: sub.customer as string },
+      update: { plan: stripePlanToPlan(sub), status: sub.status },
+      create: { stripeCustomerId: sub.customer as string,
+        plan: stripePlanToPlan(sub), status: sub.status,
+        workspaceId: sub.metadata.workspaceId }
+    })
+  }
+  return c.json({ received: true })
+})</code></pre>
+      </div>
+
+      <div class="callout callout-warn">
+        <div class="callout-icon">&#9888;</div>
+        <div class="callout-body">
+          <div class="callout-title">Warning — Webhook Security</div>
+          <p>Always verify the Stripe signature with <code>stripe.webhooks.constructEvent</code>. Never read plan status from the checkout success redirect URL — that is easily spoofed. Trust only webhook events.</p>
+        </div>
+      </div>
+
+      <!-- ===== 8. API KEYS ===== -->
+      <h2 id="apikeys" class="section-anchor">8. API Key System</h2>
+
+      <p>Developers can query DocuMind programmatically. API keys are stored as bcrypt hashes. The middleware validates the key and attaches the workspace to the request context.</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-lang-badge badge-ts">TS</span>
+          <span class="code-filename">api/src/middleware/apiKey.ts</span>
+        </div>
+        <pre><code class="language-typescript">export const apiKeyAuth: MiddlewareHandler = async (c, next) => {
+  const key = c.req.header('x-api-key')
+  if (!key) return c.json({ code: 'MISSING_KEY' }, 401)
+  const prefix = key.slice(0, 8)
+  const record = await prisma.apiKey.findFirst({ where: { prefix } })
+  if (!record || !await bcrypt.compare(key, record.hash))
+    return c.json({ code: 'INVALID_KEY' }, 401)
+  c.set('workspaceId', record.workspaceId)
+  await next()
+}</code></pre>
+      </div>
+
+      <h3>Rate Limiting</h3>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-lang-badge badge-ts">TS</span>
+          <span class="code-filename">api/src/middleware/rateLimit.ts</span>
+        </div>
+        <pre><code class="language-typescript">export const rateLimit = (rpm: number): MiddlewareHandler => async (c, next) => {
+  const key = `rl:${c.var.workspaceId}`
+  const count = await redis.incr(key)
+  if (count === 1) await redis.expire(key, 60)
+  if (count > rpm) return c.json({ code: 'RATE_LIMITED' }, 429)
+  await next()
+}</code></pre>
+      </div>
+
+      <!-- ===== 9. DEPLOYMENT ===== -->
+      <h2 id="deployment" class="section-anchor">9. Deployment Architecture</h2>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Layer</th><th>Service</th><th>Why</th><th>Cost tier</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Frontend</strong></td><td>Vercel</td><td>Edge SSR, instant deploys, built-in CDN</td><td>Free / Pro $20</td></tr>
+            <tr><td><strong>API Server</strong></td><td>Railway</td><td>Simple Node deployment, auto-scaling, no Dockerfile needed</td><td>$5 / month base</td></tr>
+            <tr><td><strong>Database</strong></td><td>Neon (PostgreSQL + pgvector)</td><td>Serverless Postgres, branching for preview envs</td><td>Free / $19</td></tr>
+            <tr><td><strong>Redis</strong></td><td>Upstash</td><td>Serverless Redis, pay-per-request, zero idle cost</td><td>Free / $10</td></tr>
+            <tr><td><strong>File Storage</strong></td><td>AWS S3 / Cloudflare R2</td><td>R2 has zero egress fees, S3 for ecosystem familiarity</td><td>~$0.015 / GB</td></tr>
+            <tr><td><strong>AI Inference</strong></td><td>Anthropic API</td><td>Claude for Q&amp;A and summarization</td><td>Usage-based</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout callout-info">
+        <div class="callout-icon">&#9432;</div>
+        <div class="callout-body">
+          <div class="callout-title">Info — Zero-Config Preview Environments</div>
+          <p>Neon's branch-per-PR feature pairs with Vercel preview deployments. Each pull request gets its own database branch — schema migrations are safe to test without touching production data.</p>
+        </div>
+      </div>
+
+      <!-- ===== 10. PATTERNS ===== -->
+      <h2 id="patterns" class="section-anchor">10. Key TypeScript Patterns Used</h2>
+
+      <ul class="pattern-list">
+        <li>
+          <div class="pattern-body">
+            <strong>Shared contract package</strong>
+            <span>One source of truth for domain types, Zod schemas, and API response shapes. Eliminates frontend/backend drift at compile time.</span>
+          </div>
+        </li>
+        <li>
+          <div class="pattern-body">
+            <strong>Discriminated unions for status</strong>
+            <span><code>'processing' | 'ready' | 'error'</code> on <code>Document.status</code> forces exhaustive handling in every switch — no forgotten error states.</span>
+          </div>
+        </li>
+        <li>
+          <div class="pattern-body">
+            <strong>AsyncGenerator for streaming</strong>
+            <span><code>AsyncGenerator&lt;string&gt;</code> from the RAG engine composes with any streaming transport (SSE, WebSocket, NDJSON) without changing the core logic.</span>
+          </div>
+        </li>
+        <li>
+          <div class="pattern-body">
+            <strong>Branded types for IDs</strong>
+            <span><code>type DocumentId = string &amp; { readonly __brand: 'DocumentId' }</code> prevents passing a <code>WorkspaceId</code> where a <code>DocumentId</code> is expected — caught at compile time, not runtime.</span>
+          </div>
+        </li>
+        <li>
+          <div class="pattern-body">
+            <strong>Type-safe API client from shared types</strong>
+            <span>A factory function generates a fully-typed client directly from the shared route definitions — no separate schema file, no code generation step.</span>
+          </div>
+        </li>
+      </ul>
+
+      <h3>Type-Safe API Client</h3>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-lang-badge badge-ts">TS</span>
+          <span class="code-filename">packages/shared/src/api.ts</span>
+        </div>
+        <pre><code class="language-typescript">import type { Document, ChatMessage, Workspace } from './types'
+
+export function createApiClient(baseUrl: string) {
+  const get = <T>(path: string) =>
+    fetch(`${baseUrl}${path}`).then(r => r.json() as Promise<T>)
+  const post = <T>(path: string, body: unknown) =>
+    fetch(`${baseUrl}${path}`, { method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body) }).then(r => r.json() as Promise<T>)
+  return {
+    documents: {
+      list: (wsId: string) => get<Document[]>(`/workspaces/${wsId}/documents`),
+      presign: (body: { name: string; size: number }) =>
+        post<{ uploadUrl: string; s3Key: string; docId: string }>('/documents/presign', body),
+    },
+    workspace: { get: (id: string) => get<Workspace>(`/workspaces/${id}`) },
+  }
+}</code></pre>
+      </div>
+
+      <div class="callout callout-lesson">
+        <div class="callout-icon">&#9670;</div>
+        <div class="callout-body">
+          <div class="callout-title">Lesson Learned — The Shared Package Pays Off</div>
+          <p>When we renamed <code>Document.status</code> values from lowercase to uppercase to match Prisma enums, TypeScript found 23 mismatches across the frontend and API in one compilation pass. Without shared types that would have been 23 runtime bugs discovered in production.</p>
+        </div>
+      </div>
+
+      <!-- ===== GRADUATION ===== -->
+      <section id="graduation" class="graduation-section section-anchor">
+        <div class="grad-eyebrow">Course Complete &mdash; Chapter 24 of 24</div>
+        <h2 class="grad-title" style="border:none;margin:0 0 16px;padding:0;">You Have Completed TypeScript for the AI Era</h2>
+        <p class="grad-subtitle">Twenty-four chapters. One language. An entire production stack — from type fundamentals to AI pipelines to cloud infrastructure. Here is what you can now build:</p>
+
+        <div class="grad-skills">
+          <div class="grad-skill">
+            <div class="grad-skill-title">Type System Mastery</div>
+            <div class="grad-skill-desc">Generics, conditional types, template literals, branded types — you reason in types, not around them.</div>
+          </div>
+          <div class="grad-skill">
+            <div class="grad-skill-title">Full-Stack Confidence</div>
+            <div class="grad-skill-desc">Next.js, Hono, tRPC, GraphQL — shared types from database to browser with zero drift.</div>
+          </div>
+          <div class="grad-skill">
+            <div class="grad-skill-title">AI Integration</div>
+            <div class="grad-skill-desc">RAG pipelines, streaming responses, prompt engineering — AI as a typed, composable module.</div>
+          </div>
+          <div class="grad-skill">
+            <div class="grad-skill-title">Production Patterns</div>
+            <div class="grad-skill-desc">Auth, billing, file uploads, rate limiting, webhooks — the plumbing that makes SaaS work.</div>
+          </div>
+          <div class="grad-skill">
+            <div class="grad-skill-title">Infrastructure as Code</div>
+            <div class="grad-skill-desc">Pulumi, Docker, CI/CD — the entire stack defined, versioned, and tested in TypeScript.</div>
+          </div>
+          <div class="grad-skill">
+            <div class="grad-skill-title">Engineering Judgment</div>
+            <div class="grad-skill-desc">When to use strict types, when pragmatism wins, how to design for change — the craft behind the syntax.</div>
+          </div>
+        </div>
+
+        <hr class="grad-divider" />
+
+        <h3 style="font-size:18px;font-weight:700;color:var(--text-primary);margin-bottom:20px;">What Next? Recommended Resources</h3>
+
+        <div class="grad-resources">
+          <div class="grad-resource">
+            <div class="grad-resource-label">Official Docs</div>
+            <div class="grad-resource-name">TypeScript Handbook</div>
+            <div class="grad-resource-desc">typescriptlang.org/docs — the authoritative reference, updated with every release.</div>
+          </div>
+          <div class="grad-resource">
+            <div class="grad-resource-label">Deep Type System</div>
+            <div class="grad-resource-name">Total TypeScript</div>
+            <div class="grad-resource-desc">Matt Pocock's workshops — the best resource for advanced type-level programming.</div>
+          </div>
+          <div class="grad-resource">
+            <div class="grad-resource-label">Interactive Learning</div>
+            <div class="grad-resource-name">Execute Program</div>
+            <div class="grad-resource-desc">Spaced-repetition TypeScript exercises — solidify concepts that fade without practice.</div>
+          </div>
+          <div class="grad-resource">
+            <div class="grad-resource-label">Type Challenges</div>
+            <div class="grad-resource-name">type-challenges</div>
+            <div class="grad-resource-desc">github.com/type-challenges — 200+ puzzles from warm-up to extreme. Work through them all.</div>
+          </div>
+          <div class="grad-resource">
+            <div class="grad-resource-label">Contribute</div>
+            <div class="grad-resource-name">Open Source</div>
+            <div class="grad-resource-desc">DefinitelyTyped, tRPC, Zod — contributing to typed OSS accelerates mastery faster than any course.</div>
+          </div>
+          <div class="grad-resource">
+            <div class="grad-resource-label">Stay Current</div>
+            <div class="grad-resource-name">TC39 + TypeScript Blog</div>
+            <div class="grad-resource-desc">Follow the TypeScript GitHub releases and TC39 proposals — the language moves fast.</div>
+          </div>
+        </div>
+
+        <hr class="grad-divider" />
+
+        <div class="grad-closing">
+          <p>The TypeScript ecosystem in 2026 is a different world than it was five years ago. AI has changed what applications do — but it has not changed what good software is. It is still composed of clear contracts, honest types, small functions, and systems that fail visibly rather than silently.</p>
+          <p>TypeScript did not make that easier because it is fashionable. It made it easier because types are the cheapest form of documentation, the fastest form of testing, and the most honest form of communication between a developer and a future version of themselves.</p>
+          <p>Build things that matter. Keep your types honest. Ship with confidence.</p>
+          <cite>— The "TypeScript for the AI Era" Committee, April 2026</cite>
+        </div>
+      </section>
+
+      <!-- FOOTER NAV -->
+      <nav class="footer-nav">
+        <a href="chapter-23-case-pulumi.html" class="footer-nav-btn">
+          <span class="footer-nav-arrow">&#8592;</span>
+          <div>
+            <div class="footer-nav-label">Previous Chapter</div>
+            <div class="footer-nav-title">Ch 23: Infrastructure as Code (Pulumi)</div>
+          </div>
+        </a>
+        <a href="../index.html" class="footer-nav-btn home">
+          <span class="footer-nav-arrow">&#127968;</span>
+          <div>
+            <div class="footer-nav-label">Course Complete</div>
+            <div class="footer-nav-title">Back to Index</div>
+          </div>
+        </a>
+      </nav>
+
+    </main>
+  </div><!-- /page-wrap -->
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('pre code').forEach(el => hljs.highlightElement(el))
+
+      // Active TOC on scroll
+      const headings = document.querySelectorAll('.section-anchor')
+      const links = document.querySelectorAll('.toc-list a')
+      const observer = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            links.forEach(l => l.classList.remove('active'))
+            const active = document.querySelector(`.toc-list a[href="#${e.target.id}"]`)
+            active?.classList.add('active')
+          }
+        })
+      }, { rootMargin: '-20% 0px -70% 0px' })
+      headings.forEach(h => observer.observe(h))
+    })
+  </script>
+</body>
+</html>

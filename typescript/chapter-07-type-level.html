@@ -1,0 +1,1845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chapter 7: Type-Level Programming &amp; Template Literal Types — TypeScript for the AI Era</title>
+
+  <!-- highlight.js (GitHub theme) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
+
+  <style>
+    /* ─── Tokens ─────────────────────────────────────────────────── */
+    :root {
+      --indigo: #4F46E5;
+      --indigo-light: #EEF2FF;
+      --indigo-dark: #3730A3;
+      --gray-50: #F9FAFB;
+      --gray-100: #F3F4F6;
+      --gray-200: #E5E7EB;
+      --gray-400: #9CA3AF;
+      --gray-600: #4B5563;
+      --gray-800: #1F2937;
+      --gray-900: #111827;
+      --green: #16A34A;
+      --green-bg: #F0FDF4;
+      --green-border: #86EFAC;
+      --blue: #2563EB;
+      --blue-bg: #EFF6FF;
+      --blue-border: #93C5FD;
+      --amber: #D97706;
+      --amber-bg: #FFFBEB;
+      --amber-border: #FCD34D;
+      --orange: #EA580C;
+      --orange-bg: #FFF7ED;
+      --orange-border: #FDBA74;
+      --red: #DC2626;
+      --red-bg: #FEF2F2;
+      --red-border: #FCA5A5;
+      --pink: #DB2777;
+      --pink-bg: #FDF2F8;
+      --pink-border: #F9A8D4;
+      --nav-h: 56px;
+      --sidebar-w: 240px;
+      --content-max: 1100px;
+      --radius: 8px;
+    }
+
+    /* ─── Reset ──────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      color: var(--gray-800);
+      background: #fff;
+      line-height: 1.7;
+    }
+    a { color: var(--indigo); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    code, pre { font-family: "JetBrains Mono", "Fira Code", "Cascadia Code", monospace; }
+
+    /* ─── Top Nav ────────────────────────────────────────────────── */
+    .top-nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: var(--nav-h);
+      background: #fff;
+      border-bottom: 1px solid var(--gray-200);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      z-index: 100;
+      box-shadow: 0 1px 3px rgba(0,0,0,.06);
+    }
+    .top-nav__links { display: flex; gap: 24px; font-size: .875rem; font-weight: 500; }
+    .top-nav__title { font-size: .875rem; color: var(--gray-600); }
+    .top-nav__progress {
+      font-size: .75rem;
+      color: var(--gray-400);
+      background: var(--gray-100);
+      padding: 2px 10px;
+      border-radius: 99px;
+      font-weight: 600;
+      letter-spacing: .03em;
+    }
+
+    /* ─── Layout ─────────────────────────────────────────────────── */
+    .layout {
+      display: flex;
+      max-width: var(--content-max);
+      margin: 0 auto;
+      padding-top: var(--nav-h);
+    }
+
+    /* ─── Sidebar ────────────────────────────────────────────────── */
+    .sidebar {
+      width: var(--sidebar-w);
+      flex-shrink: 0;
+      position: sticky;
+      top: var(--nav-h);
+      height: calc(100vh - var(--nav-h));
+      overflow-y: auto;
+      padding: 28px 16px 40px;
+      border-right: 1px solid var(--gray-200);
+      background: var(--gray-50);
+    }
+    .sidebar__label {
+      font-size: .7rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--gray-400);
+      padding: 0 8px;
+      margin-bottom: 8px;
+    }
+    .toc { list-style: none; }
+    .toc li { margin-bottom: 2px; }
+    .toc a {
+      display: block;
+      font-size: .82rem;
+      color: var(--gray-600);
+      padding: 5px 8px;
+      border-radius: 5px;
+      line-height: 1.4;
+      transition: background .15s, color .15s;
+    }
+    .toc a:hover { background: var(--indigo-light); color: var(--indigo); text-decoration: none; }
+    .toc a.active { background: var(--indigo-light); color: var(--indigo); font-weight: 600; }
+    .toc .toc-sub { padding-left: 12px; }
+    .toc .toc-sub a { font-size: .78rem; }
+
+    /* ─── Main Content ───────────────────────────────────────────── */
+    .main {
+      flex: 1;
+      min-width: 0;
+      padding: 48px 48px 80px;
+    }
+
+    /* ─── Chapter header ─────────────────────────────────────────── */
+    .chapter-eyebrow {
+      font-size: .75rem;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--indigo);
+      margin-bottom: 12px;
+    }
+    .chapter-title {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: var(--gray-900);
+      line-height: 1.15;
+      margin-bottom: 16px;
+    }
+    .chapter-subtitle {
+      font-size: 1.15rem;
+      color: var(--gray-600);
+      max-width: 640px;
+      margin-bottom: 32px;
+    }
+    .author-byline {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 20px;
+      background: var(--gray-50);
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      margin-bottom: 48px;
+      font-size: .875rem;
+    }
+    .author-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--indigo), #7C3AED);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 700;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+    .author-meta { line-height: 1.4; }
+    .author-name { font-weight: 700; color: var(--gray-900); }
+    .author-role { color: var(--gray-600); font-size: .8rem; }
+
+    /* ─── Sections & Headings ────────────────────────────────────── */
+    .section { margin-bottom: 72px; }
+    h2.section-title {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: var(--gray-900);
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--gray-200);
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+    }
+    .section-number {
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--indigo);
+      background: var(--indigo-light);
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+    h3 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--gray-900);
+      margin: 32px 0 12px;
+    }
+    h4 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--gray-800);
+      margin: 24px 0 8px;
+    }
+    p { margin-bottom: 16px; }
+    ul, ol { padding-left: 24px; margin-bottom: 16px; }
+    li { margin-bottom: 6px; }
+
+    /* ─── Inline code ────────────────────────────────────────────── */
+    :not(pre) > code {
+      font-size: .87em;
+      background: var(--gray-100);
+      color: #c7254e;
+      padding: 1px 5px;
+      border-radius: 3px;
+      border: 1px solid var(--gray-200);
+    }
+
+    /* ─── Code blocks ────────────────────────────────────────────── */
+    .code-block {
+      position: relative;
+      margin: 24px 0;
+      border-radius: var(--radius);
+      border: 1px solid var(--gray-200);
+      overflow: hidden;
+      background: #fff;
+    }
+    .code-block__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 16px;
+      background: var(--gray-100);
+      border-bottom: 1px solid var(--gray-200);
+      font-size: .78rem;
+      color: var(--gray-600);
+      font-family: "JetBrains Mono", monospace;
+    }
+    .code-block__header-left { display: flex; align-items: center; gap: 8px; }
+    .code-block pre { margin: 0; border-radius: 0; background: #fff !important; }
+    .code-block pre code { font-size: .85rem; line-height: 1.65; padding: 20px !important; }
+    .hljs { background: #fff !important; }
+
+    /* ─── Badges ─────────────────────────────────────────────────── */
+    .badge {
+      display: inline-block;
+      font-size: .68rem;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      padding: 2px 8px;
+      border-radius: 99px;
+    }
+    .badge-intermediate { background: #DBEAFE; color: #1E40AF; }
+    .badge-advanced     { background: #EDE9FE; color: #5B21B6; }
+    .badge-expert       { background: #FEE2E2; color: #991B1B; }
+    .badge-new          { background: #D1FAE5; color: #065F46; }
+
+    /* ─── Playground ─────────────────────────────────────────────── */
+    .playground {
+      border: 2px solid var(--indigo);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin: 28px 0;
+      box-shadow: 0 4px 16px rgba(79,70,229,.1);
+    }
+    .playground__header {
+      background: var(--indigo);
+      color: #fff;
+      padding: 8px 16px;
+      font-size: .8rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .playground__icon { font-size: 1rem; }
+    .playground pre { margin: 0; border-radius: 0; }
+    .playground pre code { font-size: .85rem; padding: 20px !important; }
+
+    /* ─── SVG Diagrams ───────────────────────────────────────────── */
+    .diagram-wrap {
+      margin: 28px 0;
+      overflow-x: auto;
+    }
+    .diagram-wrap svg { display: block; margin: 0 auto; max-width: 100%; }
+
+    /* ─── Callout boxes ──────────────────────────────────────────── */
+    .callout {
+      display: flex;
+      gap: 14px;
+      padding: 16px 20px;
+      border-radius: var(--radius);
+      margin: 24px 0;
+      border-left: 4px solid;
+      font-size: .92rem;
+    }
+    .callout__icon { font-size: 1.2rem; flex-shrink: 0; line-height: 1.5; }
+    .callout__body { flex: 1; min-width: 0; }
+    .callout__body strong { display: block; margin-bottom: 4px; }
+    .callout__body p:last-child { margin-bottom: 0; }
+
+    .callout-tip     { background: var(--green-bg);  border-color: var(--green);  }
+    .callout-info    { background: var(--blue-bg);   border-color: var(--blue);   }
+    .callout-warning { background: var(--amber-bg);  border-color: var(--amber);  }
+    .callout-mental  { background: var(--orange-bg); border-color: var(--orange); }
+    .callout-advanced{ background: var(--red-bg);    border-color: var(--red);    }
+    .callout-ai      { background: var(--pink-bg);   border-color: var(--pink);   }
+
+    /* ─── Transformation table ───────────────────────────────────── */
+    .transform-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: .875rem;
+    }
+    .transform-table th {
+      text-align: left;
+      padding: 10px 16px;
+      background: var(--gray-100);
+      border: 1px solid var(--gray-200);
+      font-weight: 700;
+      color: var(--gray-700);
+    }
+    .transform-table td {
+      padding: 9px 16px;
+      border: 1px solid var(--gray-200);
+      vertical-align: top;
+    }
+    .transform-table tr:nth-child(even) td { background: var(--gray-50); }
+    .transform-table code { font-size: .82em; }
+
+    /* ─── Section divider ────────────────────────────────────────── */
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--gray-200);
+      margin: 48px 0;
+    }
+
+    /* ─── Footer nav ─────────────────────────────────────────────── */
+    .footer-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 28px 0 0;
+      border-top: 2px solid var(--gray-200);
+      margin-top: 60px;
+      gap: 16px;
+    }
+    .footer-nav__link {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 16px 20px;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      min-width: 200px;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .footer-nav__link:hover { border-color: var(--indigo); box-shadow: 0 2px 8px rgba(79,70,229,.1); text-decoration: none; }
+    .footer-nav__dir { font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--gray-400); }
+    .footer-nav__title { font-size: .95rem; font-weight: 600; color: var(--gray-800); }
+    .footer-nav__link--next { text-align: right; }
+
+    /* ─── scrollbar ──────────────────────────────────────────────── */
+    .sidebar::-webkit-scrollbar { width: 4px; }
+    .sidebar::-webkit-scrollbar-track { background: transparent; }
+    .sidebar::-webkit-scrollbar-thumb { background: var(--gray-200); border-radius: 4px; }
+
+    /* ─── Responsive ─────────────────────────────────────────────── */
+    @media (max-width: 900px) {
+      .sidebar { display: none; }
+      .main { padding: 32px 20px 60px; }
+      .chapter-title { font-size: 1.8rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     TOP NAV
+════════════════════════════════════════════════════════════════ -->
+<nav class="top-nav">
+  <div class="top-nav__links">
+    <a href="chapter-06-advanced-types.html">&#8592; Ch 6 Advanced Types</a>
+    <span style="color:var(--gray-300)">|</span>
+    <a href="chapter-08-modules.html">Ch 8 Modules &#8594;</a>
+  </div>
+  <span class="top-nav__title">TypeScript for the AI Era</span>
+  <span class="top-nav__progress">Chapter 7 of 24</span>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     LAYOUT
+════════════════════════════════════════════════════════════════ -->
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <p class="sidebar__label">Contents</p>
+    <ul class="toc">
+      <li><a href="#s1">1. What Is Type-Level Programming?</a></li>
+      <li><a href="#s2">2. Template Literal Types</a></li>
+      <li class="toc-sub"><ul class="toc">
+        <li><a href="#s2-basics">Basics</a></li>
+        <li><a href="#s2-union">Union distribution</a></li>
+        <li><a href="#s2-builtins">Built-in utilities</a></li>
+        <li><a href="#s2-patterns">Real patterns</a></li>
+      </ul></li>
+      <li><a href="#s3">3. The infer Keyword</a></li>
+      <li class="toc-sub"><ul class="toc">
+        <li><a href="#s3-strings">String inference</a></li>
+        <li><a href="#s3-parseqs">ParseQueryString</a></li>
+      </ul></li>
+      <li><a href="#s4">4. Recursive Types</a></li>
+      <li class="toc-sub"><ul class="toc">
+        <li><a href="#s4-json">JSON type</a></li>
+        <li><a href="#s4-deep">Deep utilities</a></li>
+        <li><a href="#s4-strings">Recursive strings</a></li>
+      </ul></li>
+      <li><a href="#s5">5. Mapped Types Advanced</a></li>
+      <li><a href="#s6">6. Conditional Types Advanced</a></li>
+      <li><a href="#s7">7. Type-Level Algorithms</a></li>
+      <li><a href="#s8">8. Pattern Matching (ts-pattern)</a></li>
+      <li><a href="#s9">9. Real-World Type Tricks</a></li>
+      <li><a href="#s10">10. Performance</a></li>
+    </ul>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- Chapter header -->
+    <div class="chapter-eyebrow">Chapter 7</div>
+    <h1 class="chapter-title">Type-Level Programming<br>&amp; Template Literal Types</h1>
+    <p class="chapter-subtitle">
+      TypeScript's type system is not just an annotation layer — it's a full programming language
+      that runs entirely at compile time. This chapter shows you how to exploit that power to build
+      zero-cost abstractions that make the impossible type-safe.
+    </p>
+    <div class="author-byline">
+      <div class="author-avatar">GV</div>
+      <div class="author-meta">
+        <div class="author-name">Gabriel Vergnaud</div>
+        <div class="author-role">Staff Engineer @ Stripe &nbsp;·&nbsp; Creator of ts-pattern &amp; HotScript</div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════
+         SECTION 1
+    ══════════════════════════════════════════════════════════ -->
+    <section class="section" id="s1">
+      <h2 class="section-title"><span class="section-number">01</span> What Is Type-Level Programming?</h2>
+
+      <p>
+        Most TypeScript developers think of types as documentation: you write them, the compiler checks
+        them, the runtime ignores them. That's true, but it's only half the picture. TypeScript's type
+        system has <strong>computation</strong> built in — conditional branches, recursion, pattern matching
+        on type structure, string manipulation. Every operation executes at compile time and produces zero
+        bytes of JavaScript output.
+      </p>
+      <p>
+        The spectrum runs from trivial to mind-bending:
+      </p>
+      <ul>
+        <li><strong>Level 0</strong> — Simple annotations: <code>const x: string = "hello"</code></li>
+        <li><strong>Level 1</strong> — Generic constraints: <code>function head&lt;T&gt;(arr: T[]): T</code></li>
+        <li><strong>Level 2</strong> — Conditional types: <code>T extends string ? "yes" : "no"</code></li>
+        <li><strong>Level 3</strong> — Recursive mapped types, template literal parsing</li>
+        <li><strong>Level 4</strong> — Turing-complete programs: type-level arithmetic, SQL parsers, regex engines</li>
+      </ul>
+
+      <div class="callout callout-info">
+        <span class="callout__icon">&#128161;</span>
+        <div class="callout__body">
+          <strong>TypeScript's type system is Turing-complete</strong>
+          <p>
+            This was proven empirically when community members implemented cellular automata,
+            chess validators, and even a JSON query language entirely at the type level.
+            The limit is not capability — it's the depth counter and your colleagues' patience.
+          </p>
+        </div>
+      </div>
+
+      <h3>Why does this matter?</h3>
+      <p>
+        The libraries that defined modern TypeScript — tRPC, Prisma, Zod, React Query — lean
+        heavily on type-level computation. When you call <code>z.object({ name: z.string() })</code>,
+        Zod derives the TypeScript type <code>{ name: string }</code> from the schema value.
+        When tRPC wraps your router, the entire procedure signature flows to the client with
+        perfect type safety — no codegen step, no manual type duplication.
+      </p>
+      <p>
+        Understanding these techniques lets you build APIs with the same ergonomics — and lets you
+        read and contribute to the libraries you depend on.
+      </p>
+
+      <!-- SVG: spectrum diagram -->
+      <div class="diagram-wrap">
+        <svg width="720" height="120" viewBox="0 0 720 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Type-level programming spectrum from simple annotations to Turing-complete programs">
+          <!-- gradient bar -->
+          <defs>
+            <linearGradient id="specGrad" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%"   stop-color="#DBEAFE"/>
+              <stop offset="50%"  stop-color="#EDE9FE"/>
+              <stop offset="100%" stop-color="#FEE2E2"/>
+            </linearGradient>
+          </defs>
+          <rect x="20" y="44" width="680" height="32" rx="16" fill="url(#specGrad)" stroke="#E5E7EB"/>
+          <!-- labels -->
+          <text x="54"  y="38" font-family="system-ui" font-size="11" fill="#1E40AF" text-anchor="middle">Simple</text>
+          <text x="54"  y="50" font-family="system-ui" font-size="11" fill="#1E40AF" text-anchor="middle">annotations</text>
+          <text x="214" y="38" font-family="system-ui" font-size="11" fill="#4338CA" text-anchor="middle">Generics &amp;</text>
+          <text x="214" y="50" font-family="system-ui" font-size="11" fill="#4338CA" text-anchor="middle">constraints</text>
+          <text x="374" y="38" font-family="system-ui" font-size="11" fill="#6D28D9" text-anchor="middle">Conditional</text>
+          <text x="374" y="50" font-family="system-ui" font-size="11" fill="#6D28D9" text-anchor="middle">types</text>
+          <text x="534" y="38" font-family="system-ui" font-size="11" fill="#9333EA" text-anchor="middle">Recursive</text>
+          <text x="534" y="50" font-family="system-ui" font-size="11" fill="#9333EA" text-anchor="middle">mapped types</text>
+          <text x="670" y="38" font-family="system-ui" font-size="11" fill="#DC2626" text-anchor="middle">Turing</text>
+          <text x="670" y="50" font-family="system-ui" font-size="11" fill="#DC2626" text-anchor="middle">complete</text>
+          <!-- ticks -->
+          <line x1="54"  y1="44" x2="54"  y2="76" stroke="#C7D2FE" stroke-width="1"/>
+          <line x1="214" y1="44" x2="214" y2="76" stroke="#A5B4FC" stroke-width="1"/>
+          <line x1="374" y1="44" x2="374" y2="76" stroke="#8B5CF6" stroke-width="1" stroke-dasharray="3 2"/>
+          <line x1="534" y1="44" x2="534" y2="76" stroke="#A855F7" stroke-width="1" stroke-dasharray="3 2"/>
+          <!-- arrow -->
+          <text x="360" y="110" font-family="system-ui" font-size="11" fill="#6B7280" text-anchor="middle">increasing complexity and compile-time cost &#8594;</text>
+        </svg>
+      </div>
+
+      <h3>Famous examples in the wild</h3>
+      <table class="transform-table">
+        <thead>
+          <tr><th>Library</th><th>Type-level trick</th><th>User benefit</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>tRPC</strong></td>
+            <td>Router inference threads through <code>inferRouterInputs</code> / <code>inferRouterOutputs</code></td>
+            <td>Client knows every procedure's exact input/output shape</td>
+          </tr>
+          <tr>
+            <td><strong>Prisma</strong></td>
+            <td>Schema-to-type codegen + conditional <code>select</code> types</td>
+            <td>Query result type matches exactly what you selected</td>
+          </tr>
+          <tr>
+            <td><strong>Zod</strong></td>
+            <td><code>z.infer&lt;typeof schema&gt;</code> extracts runtime schema as TS type</td>
+            <td>Single source of truth for validation + types</td>
+          </tr>
+          <tr>
+            <td><strong>ts-pattern</strong></td>
+            <td>Pattern matching narrows union types exhaustively</td>
+            <td>Compiler errors on missing cases</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════
+         SECTION 2
+    ══════════════════════════════════════════════════════════ -->
+    <section class="section" id="s2">
+      <h2 class="section-title"><span class="section-number">02</span> Template Literal Types</h2>
+
+      <p>
+        Template literal types — introduced in TypeScript 4.1 — do to strings what mapped types do to
+        objects. They let you <em>construct</em> and <em>deconstruct</em> string types at compile time,
+        opening a class of APIs that were simply impossible before.
+      </p>
+
+      <!-- ── 2.1 Basics ── -->
+      <h3 id="s2-basics">Basics</h3>
+      <div class="code-block">
+        <div class="code-block__header">
+          <div class="code-block__header-left">
+            <span>TypeScript</span>
+            <span class="badge badge-intermediate">Intermediate</span>
+          </div>
+        </div>
+        <pre><code class="language-typescript">// Simplest form: embed a type into a string
+type Greeting = `Hello, ${string}!`;
+// → accepts any string that starts with "Hello, " and ends with "!"
+
+const a: Greeting = "Hello, world!";   // ✓
+const b: Greeting = "Hello, !";        // ✓ (string can be empty)
+const c: Greeting = "Goodbye, world!"; // ✗ Type '"Goodbye..."' not assignable
+
+// Embedding a literal union
+type Size = "sm" | "md" | "lg";
+type SizeClass = `text-${Size}`;
+// → "text-sm" | "text-md" | "text-lg"</code></pre>
+      </div>
+
+      <!-- ── 2.2 Union distribution ── -->
+      <h3 id="s2-union">Union distribution in template literals</h3>
+      <p>
+        When you embed a union type in a template literal, TypeScript distributes over it automatically —
+        producing the Cartesian product of all combinations.
+      </p>
+
+      <div class="code-block">
+        <div class="code-block__header">
+          <div class="code-block__header-left">
+            <span>TypeScript</span>
+            <span class="badge badge-intermediate">Intermediate</span>
+          </div>
+        </div>
+        <pre><code class="language-typescript">type NS = "north" | "south";
+type EW = "east"  | "west";
+
+type Directions = `${NS}-${EW}`;
+// → "north-east" | "north-west" | "south-east" | "south-west"
+
+// This is the Cartesian product: |NS| × |EW| = 2 × 2 = 4 members
+// Union size grows multiplicatively — be careful with large unions!</code></pre>
+      </div>
+
+      <!-- Diagram: union distribution -->
+      <div class="diagram-wrap">
+        <svg width="620" height="160" viewBox="0 0 620 160" xmlns="http://www.w3.org/2000/svg" aria-label="Union distribution diagram showing north/south cross east/west producing four direction strings">
+          <rect x="10"  y="50" width="100" height="60" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+          <text x="60"  y="74" font-family="monospace" font-size="12" fill="#3730A3" text-anchor="middle">"north"</text>
+          <text x="60"  y="92" font-family="monospace" font-size="12" fill="#6B7280" text-anchor="middle">|</text>
+          <text x="60"  y="108" font-family="monospace" font-size="12" fill="#3730A3" text-anchor="middle">"south"</text>
+
+          <text x="130" y="85" font-family="system-ui" font-size="20" fill="#4F46E5">×</text>
+
+          <rect x="150" y="50" width="100" height="60" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+          <text x="200" y="74" font-family="monospace" font-size="12" fill="#3730A3" text-anchor="middle">"east"</text>
+          <text x="200" y="92" font-family="monospace" font-size="12" fill="#6B7280" text-anchor="middle">|</text>
+          <text x="200" y="108" font-family="monospace" font-size="12" fill="#3730A3" text-anchor="middle">"west"</text>
+
+          <text x="268" y="85" font-family="system-ui" font-size="16" fill="#6B7280">→</text>
+
+          <rect x="290" y="20" width="140" height="120" rx="6" fill="#F0FDF4" stroke="#16A34A" stroke-width="1.5"/>
+          <text x="360" y="46"  font-family="monospace" font-size="11" fill="#166534" text-anchor="middle">"north-east"</text>
+          <text x="360" y="64"  font-family="monospace" font-size="11" fill="#166534" text-anchor="middle">"north-west"</text>
+          <text x="360" y="82"  font-family="monospace" font-size="11" fill="#166534" text-anchor="middle">"south-east"</text>
+          <text x="360" y="100" font-family="monospace" font-size="11" fill="#166534" text-anchor="middle">"south-west"</text>
+          <text x="360" y="126" font-family="system-ui" font-size="10" fill="#6B7280" text-anchor="middle">4-member union</text>
+
+          <text x="460" y="85" font-family="system-ui" font-size="13" fill="#6B7280">= Cartesian product</text>
+        </svg>
+      </div>
+
+      <!-- ── 2.3 Built-ins ── -->
+      <h3 id="s2-builtins">Built-in string manipulation types</h3>
+      <p>
+        TypeScript ships four intrinsic string utilities implemented in the compiler itself
+        (not expressible in user-land):
+      </p>
+      <table class="transform-table">
+        <thead>
+          <tr><th>Utility</th><th>Input</th><th>Output</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>Uppercase&lt;S&gt;</code></td><td><code>"hello"</code></td><td><code>"HELLO"</code></td></tr>
+          <tr><td><code>Lowercase&lt;S&gt;</code></td><td><code>"WORLD"</code></td><td><code>"world"</code></td></tr>
+          <tr><td><code>Capitalize&lt;S&gt;</code></td><td><code>"foo"</code></td><td><code>"Foo"</code></td></tr>
+          <tr><td><code>Uncapitalize&lt;S&gt;</code></td><td><code>"Foo"</code></td><td><code>"foo"</code></td></tr>
+        </tbody>
+      </table>
+
+      <!-- ── 2.4 Real patterns ── -->
+      <h3 id="s2-patterns">Real-world patterns</h3>
+
+      <div class="code-block">
+        <div class="code-block__header">
+          <div class="code-block__header-left">
+            <span>TypeScript — event handler derivation</span>
+            <span class="badge badge-advanced">Advanced</span>
+          </div>
+        </div>
+        <pre><code class="language-typescript">// Pattern: derive handler types from event name unions
+type EventName = "click" | "focus" | "blur" | "keydown";
+
+// From event names to handler prop names
+type HandlerProps = {
+  [K in EventName as `on${Capitalize<K>}`]: (event: Event) => void;
+};
+// → { onClick: ..., onFocus: ..., onBlur: ..., onKeydown: ... }
+
+// ── API routes ──────────────────────────────────────────────────
+type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
+type ResourceName = "users" | "posts" | "comments";
+
+type APIEndpoint = `/${ResourceName}` | `/${ResourceName}/${string}`;
+// → "/users" | "/users/${string}" | "/posts" | ...
+
+// ── Database column conventions ────────────────────────────────
+type ForeignKey<T extends string> = `${T}_id`;
+type Timestamp = "created_at" | "updated_at";
+
+// ── CSS properties ─────────────────────────────────────────────
+type CSSDirection = "top" | "right" | "bottom" | "left";
+type CSSSpacing = `${"margin" | "padding"}-${CSSDirection}`;
+// → "margin-top" | "margin-right" | "padding-left" | ... (8 members)</code></pre>
+      </div>
+
+      <div class="playground">
+        <div class="playground__header">
+          <span class="playground__icon">&#9654;</span>
+          Type Playground — Try it mentally
+        </div>
+        <pre><code class="language-typescript">// What does this produce?
+type Events = "mouseenter" | "mouseleave" | "mousedown";
+type Handlers = `on${Capitalize<Events>}`;
+//                ↑ hover here in your IDE to see:
+// "onMouseenter" | "onMouseleave" | "onMousedown"
+
+// Now flip it: given a handler prop name, extract the event name
+type ExtractEvent<H extends string> =
+  H extends `on${infer E}` ? Uncapitalize<E> : never;
+
+type E = ExtractEvent<"onClick">;  // → "click"
+type F = ExtractEvent<"onFocus">;  // → "focus"</code></pre>
+      </div>
+
+      <div class="callout callout-tip">
+        <span class="callout__icon">&#10003;</span>
+        <div class="callout__body">
+          <strong>Tip: Template literals check at assignment, not declaration</strong>
+          <p>
+            The type <code>`${string}-${string}`</code> matches any string containing a hyphen.
+            TypeScript validates this at assignment sites, not when you define the type alias.
+            Use this for "stringly-typed" APIs you can't enumerate exhaustively.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════
+         SECTION 3
+    ══════════════════════════════════════════════════════════ -->
+    <section class="section" id="s3">
+      <h2 class="section-title"><span class="section-number">03</span> The <code>infer</code> Keyword Deep Dive</h2>
+
+      <p>
+        <code>infer</code> is the pattern-matching operator of TypeScript's type system. Inside a
+        <code>extends</code> clause, it introduces a type variable that TypeScript fills in during
+        structural matching. Think of it as destructuring, but for types.
+      </p>
+
+      <div class="code-block">
+        <div class="code-block__header">
+          <div class="code-block__header-left">
+            <span>TypeScript — core infer patterns</span>
+            <span class="badge badge-intermediate">Intermediate</span>
+          </div>
+        </div>
+        <pre><code class="language-typescript">// Unwrap a Promise
+type UnwrapPromise<T> = T extends Promise<infer U> ? U : T;
+
+type A = UnwrapPromise<Promise<string>>;  // → string
+type B = UnwrapPromise<Promise<number[]>>;// → number[]
+type C = UnwrapPromise<boolean>;          // → boolean (not a Promise, returned as-is)
+
+// Extract array element type
+type ArrayElement<T> = T extends Array<infer Item> ? Item : never;
+
+type D = ArrayElement<string[]>;  // → string
+type E = ArrayElement<[1, 2, 3]>; // → 1 | 2 | 3 (tuple → union of elements)
+
+// Extract function return type (reimplementing the built-in)
+type ReturnType<T> = T extends (...args: any[]) => infer R ? R : never;
+
+// Extract function parameters
+type Parameters<T> = T extends (...args: infer P) => any ? P : never;
+
+// Multiple infer in one clause
+type FirstAndRest<T extends any[]> =
+  T extends [infer First, ...infer Rest] ? { first: First; rest: Rest } : never;
+
+type X = FirstAndRest<[string, number, boolean]>;
+// → { first: string; rest: [number, boolean] }</code></pre>
+      </div>
+
+      <!-- ── 3.1 String inference ── -->
+      <h3 id="s3-strings">Inferring parts of strings</h3>
+      <p>
+        Combined with template literal types, <code>infer</code> lets you extract substrings by structure.
+        This is where the real magic happens.
+      </p>
+
+      <div class="code-block">
+        <div class="code-block__header">
+          <div class="code-block__header-left">
+            <span>TypeScript — string pattern extraction</span>
+            <span class="badge badge-advanced">Advanced</span>
+          </div>
+        </div>
+        <pre><code class="language-typescript">// Extract the "namespace" from "namespace.property"
+type Namespace<S extends string> =
+  S extends `${infer N}.${string}` ? N : never;
+
+type NS = Namespace<"config.timeout">; // → "config"
+
+// Split on the LAST dot (recursive approach)
+type BeforeLast<S extends string, D extends string> =
+  S extends `${infer H}${D}${infer T}`
+    ? T extends `${string}${D}${string}`
+      ? `${H}${D}${BeforeLast<T, D>}`  // there's another delimiter, keep going
+      : H                                // T has no more delimiters, H is the answer
+    : never;
+
+// Extract route params: "/users/:id/posts/:postId" → "id" | "postId"
+type ExtractParams<S extends string> =
+  S extends `${string}:${infer Param}/${infer Rest}`
+    ? Param | ExtractParams<`/${Rest}`>
+    : S extends `${string}:${infer LastParam}`
+    ? LastParam
+    : never;
+
+type Params = ExtractParams<"/users/:id/posts/:postId">;
+// → "id" | "postId"
+
+// Type-safe route builder
+declare function buildRoute<S extends string>(
+  pattern: S,
+  params: Record<ExtractParams<S>, string>
+): string;
+
+buildRoute("/users/:id/posts/:postId", { id: "42", postId: "7" }); // ✓
+buildRoute("/users/:id/posts/:postId", { id: "42" });              // ✗ missing postId</code></pre>
+      </div>
+
+      <!-- SVG: infer diagram -->
+      <div class="diagram-wrap">
+        <svg width="660" height="140" viewBox="0 0 660 140" xmlns="http://www.w3.org/2000/svg" aria-label="Diagram showing how infer matches parts of a template literal string">
+          <!-- source type -->
+          <rect x="10" y="30" width="260" height="80" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+          <text x="140" y="20" font-family="system-ui" font-size="11" fill="#6B7280" text-anchor="middle">Input type T</text>
+          <text x="140" y="65" font-family="monospace" font-size="13" fill="#1F2937" text-anchor="middle">"/users/:id/posts/:postId"</text>
+          <text x="140" y="95" font-family="system-ui" font-size="11" fill="#6B7280" text-anchor="middle">extends `${string}:${infer Param}/...`</text>
+
+          <!-- arrow -->
+          <line x1="270" y1="70" x2="320" y2="70" stroke="#4F46E5" stroke-width="1.5" marker-end="url(#arr)"/>
+          <defs>
+            <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+              <path d="M0 0 L6 3 L0 6 Z" fill="#4F46E5"/>
+            </marker>
+          </defs>
+          <text x="295" y="62" font-family="system-ui" font-size="10" fill="#4F46E5" text-anchor="middle">match</text>
+
+          <!-- output -->
+          <rect x="330" y="20" width="180" height="50" rx="8" fill="#F0FDF4" stroke="#16A34A" stroke-width="1.5"/>
+          <text x="420" y="40" font-family="monospace" font-size="12" fill="#166534" text-anchor="middle">Param = "id"</text>
+          <text x="420" y="58" font-family="monospace" font-size="11" fill="#6B7280" text-anchor="middle">first capture</text>
+
+          <rect x="330" y="85" width="180" height="50" rx="8" fill="#FDF2F8" stroke="#DB2777" stroke-width="1.5"/>
+          <text x="420" y="105" font-family="monospace" font-size="12" fill="#9D174D" text-anchor="middle">Param = "postId"</text>
+          <text x="420" y="123" font-family="monospace" font-size="11" fill="#6B7280" text-anchor="middle">recursive call</text>
+
+          <text x="525" y="75" font-family="system-ui" font-size="16" fill="#6B7280">→</text>
+          <rect x="550" y="52" width="100" height="36" rx="8" fill="#FFFBEB" stroke="#D97706" stroke-width="1.5"/>
+          <text x="600" y="66" font-family="monospace" font-size="11" fill="#92400E" text-anchor="middle">"id" | "postId"</text>
+          <text x="600" y="82" font-family="system-ui" font-size="10" fill="#6B7280" text-anchor="middle">union result</text>
+        </svg>
+      </div>
+
+      <!-- ── 3.2 ParseQueryString ── -->
+      <h3 id="s3-parseqs">Building <code>ParseQueryString&lt;S&gt;</code></h3>
+
+      <div class="callout callout-advanced">
+        <span class="callout__icon">&#9888;</span>
+        <div class="callout__body">
+          <strong>Advanced — this is genuinely hard</strong>
+          <p>
+            The following type parses a query string at the type level. It's a realistic example of
+            recursive template literal inference and is close to what you'd find in a production routing library.
+          </p>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-block__header">
+          <div class="code-block__header-left">
+            <span>TypeScript — ParseQueryString</span>
+            <span class="badge badge-expert">Expert</span>
+          </div>
+        </div>
+        <pre><code class="language-typescript">// Parse a single key=value pair
+type ParsePair<S extends string> =
+  S extends `${infer Key}=${infer Value}`
+    ? { [K in Key]: Value }
+    : Record<string, never>;
+
+// Parse the full query string recursively
+type ParseQueryString<S extends string> =
+  S extends `${infer Pair}&${infer Rest}`
+    ? Merge<ParsePair<Pair>, ParseQueryString<Rest>>
+    : ParsePair<S>;
+
+// Helper: merge two objects (shallow)
+type Merge<A, B> = {
+  [K in keyof A | keyof B]:
+    K extends keyof B ? B[K] :
+    K extends keyof A ? A[K] : never
+};
+
+// Usage:
+type Q = ParseQueryString<"name=Alice&age=30&role=admin">;
+// → { name: "Alice"; age: "30"; role: "admin" }
+
+// This is the foundation of type-safe URL routing libraries
+declare function parseQuery<S extends string>(qs: S): ParseQueryString<S>;
+const result = parseQuery("name=Alice&age=30");
+result.name; // type: "Alice"
+result.age;  // type: "30"
+result.foo;  // ✗ Property 'foo' does not exist</code></pre>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════
+         SECTION 4
+    ══════════════════════════════════════════════════════════ -->
+    <section class="section" id="s4">
+      <h2 class="section-title"><span class="section-number">04</span> Recursive Types</h2>
+
+      <p>
+        TypeScript allows type aliases to reference themselves — a feature that unlocks the ability to
+        describe data structures of arbitrary depth, parse strings of arbitrary length, and build
+        type-level algorithms.
+      </p>
+
+      <!-- ── 4.1 JSON ── -->
+      <h3 id="s4-json">The canonical example: JSON</h3>
+
+      <div class="code-block">
+        <div class="code-block__header">
+          <div class="code-block__header-left">
+            <span>TypeScript</span>
+            <span class="badge badge-intermediate">Intermediate</span>
+          </div>
+        </div>
+        <pre><code class="language-typescript">// The JSON type is naturally recursive — and TypeScript can express it:
+type JSONValue =
+  | string
+  | number
+  | boolean
+  | null
+  | JSONValue[]                    // arrays of JSON values
+  | { [key: string]: JSONValue };  // objects with JSON values
+
+// This correctly models:
+const valid: JSONValue = {
+  name: "Alice",
+  scores: [10, 20, 30],
+  meta: { active: true, data: null }
+};</code></pre>
+      </div>
+
+      <!-- ── 4.2 Deep utilities ── -->
+      <h3 id="s4-deep">Deep utility types</h3>
+
+      <div class="code-block">
+        <div class="code-block__header">
+          <div class="code-block__header-left">
+            <span>TypeScript — DeepReadonly, DeepPartial, DeepRequired</span>
+            <span class="badge badge-advanced">Advanced</span>
+          </div>
+        </div>
+        <pre><code class="language-typescript">// DeepReadonly: recursively marks all properties readonly
+type DeepReadonly<T> =
+  T extends (infer Item)[]
+    ? ReadonlyArray<DeepReadonly<Item>>
+    : T extends object
+    ? { readonly [K in keyof T]: DeepReadonly<T[K]> }
+    : T;
+
+// DeepPartial: makes all nested properties optional
+type DeepPartial<T> =
+  T extends object
+    ? { [K in keyof T]?: DeepPartial<T[K]> }
+    : T;
+
+// DeepRequired: makes all nested properties required (removes ?)
+type DeepRequired<T> =
+  T extends object
+    ? { [K in keyof T]-?: DeepRequired<T[K]> }   // note: -? removes optionality
+    : T;
+
+// Usage
+interface Config {
+  server: {
+    host: string;
+    port?: number;
+    tls?: {
+      cert: string;
+      key?: string;
+    };
+  };
+}
+
+type FrozenConfig = DeepReadonly<Config>;
+// Every field at every depth is now readonly
+
+type PartialConfig = DeepPartial<Config>;
+// Every field at every depth is optional — great for patch payloads</code></pre>
+      </div>
+
+      <!-- ── 4.3 Recursive strings ── -->
+      <h3 id="s4-strings">Recursive template literals: Split and Join</h3>
+
+      <div class="code-block">
+        <div class="code-block__header">
+          <div class="code-block__header-left">
+            <span>TypeScript — Split and Join</span>
+            <span class="badge badge-expert">Expert</span>
+          </div>
+        </div>
+        <pre><code class="language-typescript">// Split a string into a tuple at a delimiter
+type Split<S extends string, D extends string> =
+  S extends `${infer Head}${D}${infer Tail}`
+    ? [Head, ...Split<Tail, D>]
+    : [S];
+
+type Parts = Split<"a.b.c.d", ".">;
+// → ["a", "b", "c", "d"]
+
+// Join a tuple of strings with a delimiter
+type Join<T extends string[], D extends string> =
+  T extends []
+    ? ""
+    : T extends [infer Only extends string]
+    ? Only
+    : T extends [infer First extends string, ...infer Rest extends string[]]
+    ? `${First}${D}${Join<Rest, D>}`
+    : never;
+
+type Path = Join<["users", "123", "posts"], "/">;
+// → "users/123/posts"
+
+// Practical: type-safe deep property access
+type Get<T, P extends string> =
+  P extends `${infer Key}.${infer Rest}`
+    ? Key extends keyof T
+      ? Get<T[Key], Rest>
+      : never
+    : P extends keyof T
+    ? T[P]
+    : never;
+
+interface Data { user: { name: string; age: number } }
+type Name = Get<Data, "user.name">; // → string
+type Age  = Get<Data, "user.age">;  // → number
+type Nope = Get<Data, "user.foo">;  // → never</code></pre>
+      </div>
+
+      <div class="callout callout-warning">
+        <span class="callout__icon">&#9888;</span>
+        <div class="callout__body">
+          <strong>Depth limit: TypeScript caps recursive instantiation</strong>
+          <p>
+            TypeScript enforces a recursion depth limit (currently ~100 levels for conditional types).
+            For very deep recursion, use an "accumulator" tuple parameter to help the compiler short-circuit:
+            <code>type Split&lt;S, D, Acc extends string[] = []&gt;</code>. This is the type-level
+            equivalent of tail-call optimization.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════
+         SECTION 5
+    ══════════════════════════════════════════════════════════ -->
+    <section class="section" id="s5">
+      <h2 class="section-title"><span class="section-number">05</span> Mapped Types: Advanced Patterns</h2>
+
+      <p>
+        Mapped types have been in TypeScript since 2.1, but the <code>as</code> key-remapping clause
+        (4.1) turned them from a convenience into a full type-transformation language.
+      </p>
+
+      <div class="code-block">
+        <div class="code-block__header">
+          <div class="code-block__header-left">
+            <span>TypeScript — key remapping and filtering</span>
+            <span class="badge badge-advanced">Advanced</span>
+          </div>
+        </div>
+        <pre><code class="language-typescript">// ── Filter keys by value type ──────────────────────────────────
+// Keep only string-valued properties
+type StringKeys<T> = {
+  [K in keyof T as T[K] extends string ? K : never]: T[K]
+};
+
+interface Mixed { id: number; name: string; active: boolean; tag: string }
+type StringProps = StringKeys<Mixed>;
+// → { name: string; tag: string }
+
+// ── Rename keys ────────────────────────────────────────────────
+// Generate getter method signatures from a plain object type
+type Getters<T> = {
+  [K in keyof T as `get${Capitalize<string & K>}`]: () => T[K]
+};
+
+type PersonGetters = Getters<{ name: string; age: number }>;
+// → { getName: () => string; getAge: () => number }
+
+// ── Remove readonly (variance modifier) ───────────────────────
+type Mutable<T> = {
+  -readonly [K in keyof T]: T[K]
+};
+// The minus prefix removes the readonly modifier
+
+type RequiredAndMutable<T> = {
+  -readonly [K in keyof T]-?: T[K]  // remove both readonly and ?
+};
+
+// ── Variance annotations (TS 4.7) ─────────────────────────────
+// Explicit covariance and contravariance annotations
+type Provider<out T> = () => T;    // covariant: Producer<Dog> ⊆ Producer<Animal>
+type Consumer<in T> = (x: T) => void; // contravariant</code></pre>
+      </div>
+
+      <!-- SVG: mapped type transformation -->
+      <div class="diagram-wrap">
+        <svg width="660" height="170" viewBox="0 0 660 170" xmlns="http://www.w3.org/2000/svg" aria-label="Diagram showing mapped type filtering: Mixed object with id/name/active/tag producing StringProps with only name and tag">
+          <!-- input -->
+          <rect x="10" y="10" width="200" height="150" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+          <text x="110" y="30" font-family="system-ui" font-size="11" font-weight="700" fill="#3730A3" text-anchor="middle">Mixed</text>
+          <text x="30" y="56"  font-family="monospace" font-size="12" fill="#1F2937">id: number</text>
+          <text x="30" y="80"  font-family="monospace" font-size="12" fill="#166534">name: string</text>
+          <text x="30" y="104" font-family="monospace" font-size="12" fill="#1F2937">active: boolean</text>
+          <text x="30" y="128" font-family="monospace" font-size="12" fill="#166534">tag: string</text>
+
+          <!-- filter box -->
+          <rect x="235" y="60" width="140" height="50" rx="6" fill="#FFFBEB" stroke="#D97706" stroke-width="1.5"/>
+          <text x="305" y="80"  font-family="monospace" font-size="10" fill="#92400E" text-anchor="middle">T[K] extends string</text>
+          <text x="305" y="96" font-family="system-ui"  font-size="10" fill="#92400E" text-anchor="middle">? K : never</text>
+          <text x="305" y="128" font-family="system-ui" font-size="10" fill="#6B7280" text-anchor="middle">key filter</text>
+
+          <!-- arrows -->
+          <line x1="210" y1="85" x2="233" y2="85" stroke="#4F46E5" stroke-width="1.5" marker-end="url(#arr2)"/>
+          <line x1="375" y1="85" x2="400" y2="85" stroke="#4F46E5" stroke-width="1.5" marker-end="url(#arr2)"/>
+          <defs>
+            <marker id="arr2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+              <path d="M0 0 L6 3 L0 6 Z" fill="#4F46E5"/>
+            </marker>
+          </defs>
+
+          <!-- output -->
+          <rect x="400" y="50" width="200" height="90" rx="8" fill="#F0FDF4" stroke="#16A34A" stroke-width="1.5"/>
+          <text x="500" y="70" font-family="system-ui" font-size="11" font-weight="700" fill="#166534" text-anchor="middle">StringProps</text>
+          <text x="420" y="95"  font-family="monospace" font-size="12" fill="#166534">name: string</text>
+          <text x="420" y="119" font-family="monospace" font-size="12" fill="#166534">tag: string</text>
+        </svg>
+      </div>
+
+      <div class="code-block">
+        <div class="code-block__header">
+          <div class="code-block__header-left">
+            <span>TypeScript — building an event emitter type</span>
+            <span class="badge badge-advanced">Advanced</span>
+          </div>
+        </div>
+        <pre><code class="language-typescript">// Combining everything: type-safe EventEmitter
+type EventMap = {
+  connect:    { userId: string };
+  disconnect: { userId: string; reason: string };
+  message:    { from: string; body: string };
+};
+
+type EventEmitter<Events extends Record<string, object>> = {
+  on<K extends keyof Events>(
+    event: K,
+    listener: (payload: Events[K]) => void
+  ): void;
+  off<K extends keyof Events>(event: K, listener: (payload: Events[K]) => void): void;
+  emit<K extends keyof Events>(event: K, payload: Events[K]): void;
+};
+
+declare const emitter: EventEmitter<EventMap>;
+
+// Every call is precisely typed:
+emitter.on("message", ({ from, body }) => { /* from: string, body: string */ });
+emitter.emit("disconnect", { userId: "42", reason: "timeout" });
+emitter.emit("connect", { userId: "42", extra: "x" }); // ✗ 'extra' unexpected</code></pre>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════
+         SECTION 6
+    ══════════════════════════════════════════════════════════ -->
+    <section class="section" id="s6">
+      <h2 class="section-title"><span class="section-number">06</span> Conditional Types: Advanced Techniques</h2>
+
+      <h3>Distributive conditional types</h3>
+      <p>
+        When a bare type parameter appears on the left of <code>extends</code> inside a conditional type,
+        TypeScript <em>distributes</em> the conditional over each member of a union. This is usually
+        what you want — but occasionally you need to suppress it.
+      </p>
+
+      <div class="code-block">
+        <div class="code-block__header">
+          <div class="code-block__header-left">
+            <span>TypeScript — distribution vs non-distribution</span>
+            <span class="badge badge-advanced">Advanced</span>
+          </div>
+        </div>
+        <pre><code class="language-typescript">// Distributive (default):
+type IsString<T> = T extends string ? true : false;
+type R1 = IsString<string | number>;
+// → boolean (= true | false) — distributed over each union member
+
+// Non-distributive (wrap in tuple):
+type IsStringND<T> = [T] extends [string] ? true : false;
+type R2 = IsStringND<string | number>;
+// → false — evaluated as one unit: (string | number) extends string?
+
+// This technique enables precise utility types:
+type IsNever<T>  = [T] extends [never] ? true : false;
+type IsAny<T>    = 0 extends (1 & T)  ? true : false;
+
+// IsUnion: true only when T is a union type
+type IsUnion<T, U = T> =
+  T extends U
+    ? [U] extends [T] ? false : true
+    : never;
+// IsUnion<string | number> → true
+// IsUnion<string>          → false
+// IsUnion<never>           → false</code></pre>
+      </div>
+
+      <h3>Building complex utility types</h3>
+
+      <div class="code-block">
+        <div class="code-block__header">
+          <div class="code-block__header-left">
+            <span>TypeScript — Flatten, TupleToUnion, UnionToTuple</span>
+            <span class="badge badge-expert">Expert</span>
+          </div>
+        </div>
+        <pre><code class="language-typescript">// Flatten a nested array type one level
+type Flatten<T> = T extends Array<infer Item> ? Item : T;
+type F1 = Flatten<number[][]>; // → number[]
+type F2 = Flatten<string[]>;   // → string
+type F3 = Flatten<boolean>;    // → boolean
+
+// Tuple to union (easy direction)
+type TupleToUnion<T extends readonly unknown[]> = T[number];
+type U = TupleToUnion<[string, number, boolean]>; // → string | number | boolean
+
+// UnionToTuple (hard direction — requires variance trick)
+// This exploits the fact that function parameter position is contravariant
+type UnionToIntersection<U> =
+  (U extends any ? (x: U) => void : never) extends (x: infer I) => void ? I : never;
+
+type LastOf<U> =
+  UnionToIntersection<U extends any ? () => U : never> extends () => infer Last
+    ? Last : never;
+
+type UnionToTuple<U, Last = LastOf<U>> =
+  [U] extends [never]
+    ? []
+    : [...UnionToTuple<Exclude<U, Last>>, Last];
+
+type T = UnionToTuple<"a" | "b" | "c">;
+// → ["a", "b", "c"] — order is an implementation detail, not guaranteed</code></pre>
+      </div>
+
+      <div class="callout callout-mental">
+        <span class="callout__icon">&#129504;</span>
+        <div class="callout__body">
+          <strong>Mental Model: Union &#8594; Tuple is fundamentally hard</strong>
+          <p>
+            Converting a union to a tuple requires imposing an <em>order</em> on something that has none.
+            The contravariance hack works because function intersection creates a call signature that
+            TypeScript resolves by returning the last overload — which gives us a consistent (if
+            arbitrary) ordering. This is why <code>UnionToTuple</code> is considered a compiler exploit
+            rather than a feature.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════
+         SECTION 7
+    ══════════════════════════════════════════════════════════ -->
+    <section class="section" id="s7">
+      <h2 class="section-title"><span class="section-number">07</span> Type-Level Algorithms</h2>
+
+      <h3>Type-level arithmetic</h3>
+      <p>
+        TypeScript has no number literal arithmetic built in (<code>1 + 1</code> is not
+        <code>2</code> at the type level). The community workaround uses tuple lengths as numbers.
+      </p>
+
+      <div class="code-block">
+        <div class="code-block__header">
+          <div class="code-block__header-left">
+            <span>TypeScript — type-level addition via tuples</span>
+            <span class="badge badge-expert">Expert</span>
+          </div>
+        </div>
+        <pre><code class="language-typescript">// Build a tuple of length N
+type BuildTuple<N extends number, T extends unknown[] = []> =
+  T["length"] extends N ? T : BuildTuple<N, [...T, unknown]>;
+
+// Add two numbers via tuple concatenation
+type Add<A extends number, B extends number> =
+  [...BuildTuple<A>, ...BuildTuple<B>]["length"];
+
+type Sum = Add<3, 4>; // → 7
+
+// Subtract: remove B elements from a tuple of length A
+type Subtract<A extends number, B extends number> =
+  BuildTuple<A> extends [...BuildTuple<B>, ...infer Rest]
+    ? Rest["length"]
+    : never;
+
+type Diff = Subtract<10, 3>; // → 7
+
+// Type-level comparison
+type IsGreater<A extends number, B extends number> =
+  BuildTuple<A> extends [...BuildTuple<B>, ...infer _Rest extends [unknown, ...unknown[]]]
+    ? true : false;
+
+type CMP = IsGreater<5, 3>; // → true</code></pre>
+      </div>
+
+      <div class="callout callout-warning">
+        <span class="callout__icon">&#9888;</span>
+        <div class="callout__body">
+          <strong>Practical limit: ~999</strong>
+          <p>
+            Tuple tricks for arithmetic break down around 999 due to TypeScript's tuple size limit.
+            For large-number arithmetic use a different encoding (e.g., decimal digit tuples).
+            In practice, type-level math is most useful for small, bounded values like array indices.
+          </p>
+        </div>
+      </div>
+
+      <h3>Reimplementing Pick and Omit from scratch</h3>
+
+      <div class="code-block">
+        <div class="code-block__header">
+          <div class="code-block__header-left">
+            <span>TypeScript — from first principles</span>
+            <span class="badge badge-intermediate">Intermediate</span>
+          </div>
+        </div>
+        <pre><code class="language-typescript">// Pick: keep only specified keys
+type MyPick<T, K extends keyof T> = {
+  [P in K]: T[P]
+};
+// Equivalent to the built-in Pick<T, K>
+
+// Omit: remove specified keys
+type MyOmit<T, K extends keyof T> = {
+  [P in keyof T as P extends K ? never : P]: T[P]
+};
+// The "as" clause remaps K-keys to never, effectively removing them
+
+// Strict: Omit that catches misspelled keys
+type StrictOmit<T, K extends keyof T> = MyOmit<T, K>;
+
+// NonNullable from scratch
+type MyNonNullable<T> = T extends null | undefined ? never : T;
+
+// Required from scratch (remove optionality modifier)
+type MyRequired<T> = { [K in keyof T]-?: T[K] };
+
+// Readonly from scratch
+type MyReadonly<T> = { +readonly [K in keyof T]: T[K] };</code></pre>
+      </div>
+
+      <h3>A type-safe query builder</h3>
+
+      <div class="playground">
+        <div class="playground__header">
+          <span class="playground__icon">&#9654;</span>
+          Type Playground — QueryBuilder
+        </div>
+        <pre><code class="language-typescript">// Imagine a typed query builder where select() narrows the result type
+
+type Table = {
+  id: number;
+  name: string;
+  email: string;
+  age: number;
+  active: boolean;
+};
+
+declare function from<T extends Record<string, unknown>>(table: string): {
+  select<K extends keyof T>(...cols: K[]): {
+    where(condition: Partial<Pick<T, K>>): Promise<Pick<T, K>[]>;
+  };
+};
+
+// Usage: result is precisely typed to selected columns
+const query = from<Table>("users").select("id", "name", "email");
+// query.where() expects: Partial<{ id: number; name: string; email: string }>
+
+const rows = await query.where({ name: "Alice" });
+// rows: Array<{ id: number; name: string; email: string }>
+// rows[0].age  → ✗ Property 'age' does not exist (wasn't selected)</code></pre>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════
+         SECTION 8
+    ══════════════════════════════════════════════════════════ -->
+    <section class="section" id="s8">
+      <h2 class="section-title"><span class="section-number">08</span> Pattern Matching with ts-pattern</h2>
+
+      <p>
+        <code>ts-pattern</code> brings ML-style pattern matching to TypeScript. Where a switch statement
+        narrows by equality, ts-pattern narrows by <em>structure</em> — and enforces exhaustiveness at
+        compile time, not runtime.
+      </p>
+
+      <div class="callout callout-ai">
+        <span class="callout__icon">&#10024;</span>
+        <div class="callout__body">
+          <strong>AI Era: LLM responses are perfect candidates for pattern matching</strong>
+          <p>
+            LLM tool-call responses, streaming events, and structured outputs arrive as discriminated
+            unions. ts-pattern's exhaustive matching ensures you handle every case — a critical property
+            when model behavior can evolve.
+          </p>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-block__header">
+          <div class="code-block__header-left">
+            <span>TypeScript — ts-pattern basics</span>
+            <span class="badge badge-intermediate">Intermediate</span>
+          </div>
+        </div>
+        <pre><code class="language-typescript">import { match, P } from "ts-pattern";
+
+type Shape =
+  | { kind: "circle";    radius: number }
+  | { kind: "rectangle"; width: number; height: number }
+  | { kind: "triangle";  base: number;  height: number };
+
+const area = (shape: Shape): number =>
+  match(shape)
+    .with({ kind: "circle" },    ({ radius }) => Math.PI * radius ** 2)
+    .with({ kind: "rectangle" }, ({ width, height }) => width * height)
+    .with({ kind: "triangle" },  ({ base, height }) => 0.5 * base * height)
+    .exhaustive();
+// If you remove one .with() branch, TypeScript errors:
+// "NonExhaustiveError<{ kind: 'triangle'; ... }>"
+
+// ── Wildcards and guards ────────────────────────────────────────
+const describe = (value: unknown): string =>
+  match(value)
+    .with(P.string,               (s) => `string: "${s}"`)
+    .with(P.number.positive(),    (n) => `positive number: ${n}`)
+    .with(P.number.negative(),    (n) => `negative number: ${n}`)
+    .with({ kind: P.string },     (o) => `object with kind: ${o.kind}`)
+    .with(P.array(P.number),      (a) => `number array of length ${a.length}`)
+    .otherwise(() => "something else");</code></pre>
+      </div>
+
+      <div class="code-block">
+        <div class="code-block__header">
+          <div class="code-block__header-left">
+            <span>TypeScript — handling AI tool responses</span>
+            <span class="badge badge-advanced">Advanced</span>
+          </div>
+        </div>
+        <pre><code class="language-typescript">// Modeling Claude tool call responses as a discriminated union
+type ToolResult =
+  | { type: "text";       text: string }
+  | { type: "tool_use";   id: string; name: string; input: unknown }
+  | { type: "tool_result"; tool_use_id: string; content: string }
+  | { type: "error";      error: { type: string; message: string } };
+
+const handleContent = (block: ToolResult): string =>
+  match(block)
+    .with({ type: "text" }, ({ text }) =>
+      `Response: ${text}`)
+    .with({ type: "tool_use" }, ({ name, input }) =>
+      `Calling tool "${name}" with ${JSON.stringify(input)}`)
+    .with({ type: "tool_result" }, ({ tool_use_id, content }) =>
+      `Tool ${tool_use_id} returned: ${content}`)
+    .with({ type: "error", error: { type: "rate_limit_error" } }, () =>
+      "Rate limited — retry after delay")
+    .with({ type: "error" }, ({ error }) =>
+      `Error: ${error.message}`)
+    .exhaustive();</code></pre>
+      </div>
+
+      <div class="callout callout-tip">
+        <span class="callout__icon">&#10003;</span>
+        <div class="callout__body">
+          <strong>Tip: .exhaustive() vs .otherwise()</strong>
+          <p>
+            Use <code>.exhaustive()</code> when you want a compile-time guarantee that all cases
+            are covered — the compiler will error if you add a new union member and forget to handle it.
+            Use <code>.otherwise(fallback)</code> when the input type is wider than you can enumerate
+            (e.g., <code>unknown</code> from external JSON).
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════
+         SECTION 9
+    ══════════════════════════════════════════════════════════ -->
+    <section class="section" id="s9">
+      <h2 class="section-title"><span class="section-number">09</span> Real-World Type Tricks</h2>
+
+      <h3>How tRPC's type inference works</h3>
+      <p>
+        tRPC's magic is that procedure types flow from server to client without a codegen step.
+        The key insight is that the router type itself <em>is</em> the API contract.
+      </p>
+
+      <div class="code-block">
+        <div class="code-block__header">
+          <div class="code-block__header-left">
+            <span>TypeScript — tRPC-style type inference sketch</span>
+            <span class="badge badge-advanced">Advanced</span>
+          </div>
+        </div>
+        <pre><code class="language-typescript">// Simplified: how tRPC threads types from router → client
+type Procedure<Input, Output> = {
+  _input: Input;
+  _output: Output;
+};
+
+type Router<Procedures extends Record<string, Procedure<any, any>>> = {
+  _procedures: Procedures;
+};
+
+// Extract input/output from a router type
+type RouterInputs<R extends Router<any>> = {
+  [K in keyof R["_procedures"]]: R["_procedures"][K]["_input"]
+};
+type RouterOutputs<R extends Router<any>> = {
+  [K in keyof R["_procedures"]]: R["_procedures"][K]["_output"]
+};
+
+// On the server:
+declare const appRouter: Router<{
+  getUser:  Procedure<{ id: string }, { name: string; email: string }>;
+  listPosts: Procedure<{ page: number }, { posts: string[]; total: number }>;
+}>;
+
+// On the client — derived entirely from the server type, zero duplication:
+type Inputs  = RouterInputs<typeof appRouter>;
+// → { getUser: { id: string }; listPosts: { page: number } }
+
+type Outputs = RouterOutputs<typeof appRouter>;
+// → { getUser: { name: string; email: string }; ... }</code></pre>
+      </div>
+
+      <h3>Zod schema to TypeScript type</h3>
+
+      <div class="code-block">
+        <div class="code-block__header">
+          <div class="code-block__header-left">
+            <span>TypeScript — Zod inference</span>
+            <span class="badge badge-intermediate">Intermediate</span>
+          </div>
+        </div>
+        <pre><code class="language-typescript">import { z } from "zod";
+
+const UserSchema = z.object({
+  id:    z.string().uuid(),
+  name:  z.string().min(1),
+  email: z.string().email(),
+  role:  z.enum(["admin", "user", "guest"]),
+  meta:  z.object({
+    createdAt: z.date(),
+    tags: z.array(z.string()),
+  }),
+});
+
+// The magic: derive the TypeScript type from the schema
+type User = z.infer<typeof UserSchema>;
+// → {
+//     id: string;
+//     name: string;
+//     email: string;
+//     role: "admin" | "user" | "guest";
+//     meta: { createdAt: Date; tags: string[] };
+//   }
+
+// Zod uses the Infer pattern:
+// type ZodType<Output> = { _output: Output; ... }
+// type infer<T extends ZodType<any>> = T["_output"]
+// Simple, powerful, single source of truth.</code></pre>
+      </div>
+
+      <h3>Express request augmentation</h3>
+
+      <div class="code-block">
+        <div class="code-block__header">
+          <div class="code-block__header-left">
+            <span>TypeScript — declaration merging for middleware</span>
+            <span class="badge badge-intermediate">Intermediate</span>
+          </div>
+        </div>
+        <pre><code class="language-typescript">// Express middleware often attaches data to req — type it safely
+// via declaration merging with Express's namespace
+
+declare global {
+  namespace Express {
+    interface Request {
+      user?: {
+        id: string;
+        role: "admin" | "user";
+        permissions: string[];
+      };
+      requestId: string;
+    }
+  }
+}
+
+// Now req.user is typed throughout your entire codebase:
+app.get("/profile", (req, res) => {
+  if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+  // req.user is now { id: string; role: ...; permissions: string[] }
+  res.json({ profile: req.user });
+});</code></pre>
+      </div>
+
+      <div class="callout callout-mental">
+        <span class="callout__icon">&#129504;</span>
+        <div class="callout__body">
+          <strong>Mental Model: TypeScript namespaces as "open interfaces"</strong>
+          <p>
+            Declaration merging lets library consumers extend third-party types without modifying
+            source code. This is TypeScript's answer to monkey-patching — but done at the type level,
+            with no runtime cost and full type safety.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════
+         SECTION 10
+    ══════════════════════════════════════════════════════════ -->
+    <section class="section" id="s10">
+      <h2 class="section-title"><span class="section-number">10</span> Performance of Type Computation</h2>
+
+      <p>
+        Complex recursive types come with a real cost: slower IDE response times, longer
+        <code>tsc</code> runs, and occasionally hitting compiler limits. Understanding the performance
+        model lets you make informed tradeoffs.
+      </p>
+
+      <h3>Where types get slow</h3>
+      <ul>
+        <li><strong>Deep recursion</strong>: Each recursive instantiation adds to the depth counter. Types that recurse per-character of a string are the worst offenders.</li>
+        <li><strong>Large unions</strong>: Union distribution multiplies instantiation count. A 20-member union conditional type can trigger 20× as many checks as expected.</li>
+        <li><strong>Uncached instantiations</strong>: TypeScript caches type instantiations, but only when arguments are structurally identical. Variance in type parameters kills caching.</li>
+      </ul>
+
+      <div class="code-block">
+        <div class="code-block__header">
+          <div class="code-block__header-left">
+            <span>Shell — profiling TypeScript type performance</span>
+            <span class="badge badge-intermediate">Intermediate</span>
+          </div>
+        </div>
+        <pre><code class="language-bash"># Run the compiler with diagnostics
+tsc --diagnostics
+
+# Output includes:
+# Types:                    12,847
+# Instantiations:           48,392
+# Memory used:              82MB
+# Total time:               3.21s
+
+# For detailed per-file timing:
+tsc --extendedDiagnostics
+
+# Use the TypeScript trace to profile specific types:
+tsc --generateTrace ./trace-output
+# Open trace-output/trace.json in chrome://tracing</code></pre>
+      </div>
+
+      <h3>Patterns for faster types</h3>
+
+      <div class="code-block">
+        <div class="code-block__header">
+          <div class="code-block__header-left">
+            <span>TypeScript — optimization patterns</span>
+            <span class="badge badge-advanced">Advanced</span>
+          </div>
+        </div>
+        <pre><code class="language-typescript">// ── 1. Use interface instead of type alias for object shapes ────
+// Interfaces are lazily evaluated; type aliases are eager.
+// Prefer interface for large object types that are used many times.
+
+// SLOWER:
+type User = { id: string; name: string; /* 50 more fields */ };
+
+// FASTER (deferred evaluation):
+interface User { id: string; name: string; /* 50 more fields */ }
+
+// ── 2. Avoid distributive conditionals on large unions ──────────
+// If T has 30 members, "T extends string ? ..." runs 30 times.
+// Wrap to prevent distribution when you don't need it:
+type NonDistributive<T> = [T] extends [string] ? true : false;
+
+// ── 3. Use early termination in recursion ───────────────────────
+// Check the base case FIRST to short-circuit:
+type SafeSplit<S extends string, D extends string, Acc extends string[] = []> =
+  S extends ""                           // base case first
+    ? Acc
+    : S extends `${infer H}${D}${infer T}`
+    ? SafeSplit<T, D, [...Acc, H]>
+    : [...Acc, S];
+
+// ── 4. Extract hot paths to interface declarations ──────────────
+// TypeScript resolves interfaces lazily — use this for large intermediates
+interface ExtractedResult<T> {
+  value: T extends { data: infer D } ? D : never;
+}
+// Reference ExtractedResult<SomeType> instead of inlining the conditional</code></pre>
+      </div>
+
+      <div class="callout callout-info">
+        <span class="callout__icon">&#128161;</span>
+        <div class="callout__body">
+          <strong>The real-world guidance</strong>
+          <p>
+            Most applications never need to worry about type performance. The types that get slow are
+            the ones parsing unbounded strings character-by-character, or doing arithmetic on large numbers.
+            If you're building a library for other developers, run <code>tsc --diagnostics</code>
+            on your test suite and watch the instantiation count. Above ~500,000 instantiations,
+            your users will feel it.
+          </p>
+        </div>
+      </div>
+
+      <hr class="section-divider" />
+
+      <!-- Summary table -->
+      <h3>Chapter summary</h3>
+      <table class="transform-table">
+        <thead>
+          <tr><th>Technique</th><th>Use when</th><th>Watch out for</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Template literals</td>
+            <td>Constructing or validating string shapes</td>
+            <td>Cartesian explosion with large unions</td>
+          </tr>
+          <tr>
+            <td><code>infer</code></td>
+            <td>Extracting parts of types by structure</td>
+            <td>Multiple infer in one clause can be ambiguous</td>
+          </tr>
+          <tr>
+            <td>Recursive types</td>
+            <td>Deeply nested data, string parsing</td>
+            <td>Depth limit ~100; accumulator pattern helps</td>
+          </tr>
+          <tr>
+            <td>Key remapping (<code>as</code>)</td>
+            <td>Filtering/renaming object keys</td>
+            <td>Keys mapped to <code>never</code> are dropped</td>
+          </tr>
+          <tr>
+            <td>Distribution control (<code>[T]</code>)</td>
+            <td><code>IsNever</code>, <code>IsAny</code>, precise predicates</td>
+            <td>Easy to forget, causes subtle bugs</td>
+          </tr>
+          <tr>
+            <td>ts-pattern</td>
+            <td>Exhaustive matching on discriminated unions</td>
+            <td>Bundle size (small but non-zero runtime)</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Footer nav -->
+    <nav class="footer-nav" aria-label="Chapter navigation">
+      <a href="chapter-06-advanced-types.html" class="footer-nav__link">
+        <span class="footer-nav__dir">&#8592; Previous chapter</span>
+        <span class="footer-nav__title">Ch 6: Advanced Types</span>
+      </a>
+      <a href="chapter-08-modules.html" class="footer-nav__link footer-nav__link--next">
+        <span class="footer-nav__dir">Next chapter &#8594;</span>
+        <span class="footer-nav__title">Ch 8: Modules &amp; Namespaces</span>
+      </a>
+    </nav>
+
+  </main>
+</div><!-- /.layout -->
+
+<script>
+  // Highlight.js init
+  document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll("pre code").forEach((block) => {
+      hljs.highlightElement(block);
+    });
+
+    // Active TOC link on scroll
+    const sections = document.querySelectorAll("section[id], h3[id]");
+    const tocLinks = document.querySelectorAll(".toc a");
+    if (!tocLinks.length) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            tocLinks.forEach((a) => a.classList.remove("active"));
+            const active = document.querySelector(`.toc a[href="#${entry.target.id}"]`);
+            if (active) active.classList.add("active");
+          }
+        });
+      },
+      { rootMargin: `-${56}px 0px -60% 0px`, threshold: 0 }
+    );
+
+    sections.forEach((s) => observer.observe(s));
+  });
+</script>
+</body>
+</html>

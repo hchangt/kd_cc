@@ -1,0 +1,1762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chapter 21: Developer Experience in the AI Era — TypeScript for the AI Era</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/json.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/yaml.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --indigo: #4F46E5;
+      --indigo-light: #6366F1;
+      --indigo-dark: #3730A3;
+      --indigo-bg: #EEF2FF;
+      --gray-50: #F9FAFB;
+      --gray-100: #F3F4F6;
+      --gray-200: #E5E7EB;
+      --gray-300: #D1D5DB;
+      --gray-400: #9CA3AF;
+      --gray-500: #6B7280;
+      --gray-600: #4B5563;
+      --gray-700: #374151;
+      --gray-800: #1F2937;
+      --gray-900: #111827;
+      --green-50: #F0FDF4;
+      --green-200: #BBF7D0;
+      --green-700: #15803D;
+      --green-800: #166534;
+      --blue-50: #EFF6FF;
+      --blue-200: #BFDBFE;
+      --blue-700: #1D4ED8;
+      --blue-800: #1E40AF;
+      --amber-50: #FFFBEB;
+      --amber-200: #FDE68A;
+      --amber-700: #B45309;
+      --amber-800: #92400E;
+      --purple-50: #FAF5FF;
+      --purple-200: #E9D5FF;
+      --purple-700: #7E22CE;
+      --purple-800: #6B21A8;
+      --pink-50: #FDF2F8;
+      --pink-200: #FBCFE8;
+      --pink-700: #BE185D;
+      --pink-800: #9D174D;
+      --teal-50: #F0FDFA;
+      --teal-200: #99F6E4;
+      --teal-700: #0F766E;
+      --teal-800: #115E59;
+      --nav-h: 52px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: var(--gray-800);
+      background: #fff;
+      font-size: 16px;
+      line-height: 1.7;
+    }
+
+    /* Top Nav */
+    .top-nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: var(--nav-h);
+      background: #fff;
+      border-bottom: 1px solid var(--gray-200);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      z-index: 100;
+      box-shadow: 0 1px 3px rgba(0,0,0,.06);
+    }
+    .top-nav .book-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--gray-500);
+      letter-spacing: .02em;
+    }
+    .top-nav .nav-links {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+    .top-nav a {
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--indigo);
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--indigo-bg);
+      background: var(--indigo-bg);
+      transition: background .15s, border-color .15s;
+    }
+    .top-nav a:hover {
+      background: #E0E7FF;
+      border-color: #C7D2FE;
+    }
+    .progress-badge {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--gray-500);
+      background: var(--gray-100);
+      border: 1px solid var(--gray-200);
+      border-radius: 12px;
+      padding: 3px 10px;
+    }
+
+    /* Layout */
+    .layout {
+      display: flex;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding-top: var(--nav-h);
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 240px;
+      flex-shrink: 0;
+      position: sticky;
+      top: var(--nav-h);
+      height: calc(100vh - var(--nav-h));
+      overflow-y: auto;
+      padding: 28px 16px 40px 0;
+      border-right: 1px solid var(--gray-200);
+    }
+    .sidebar-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--gray-400);
+      margin-bottom: 10px;
+      padding-left: 12px;
+    }
+    .toc-list { list-style: none; }
+    .toc-list li a {
+      display: block;
+      font-size: 13px;
+      color: var(--gray-600);
+      text-decoration: none;
+      padding: 5px 12px;
+      border-radius: 6px;
+      transition: background .12s, color .12s;
+      line-height: 1.4;
+    }
+    .toc-list li a:hover {
+      background: var(--indigo-bg);
+      color: var(--indigo);
+    }
+    .toc-list li a.active {
+      background: var(--indigo-bg);
+      color: var(--indigo);
+      font-weight: 600;
+    }
+    .toc-list .toc-sub { padding-left: 12px; }
+    .toc-list .toc-sub a {
+      font-size: 12px;
+      color: var(--gray-500);
+      padding: 3px 12px;
+    }
+
+    /* Main Content */
+    .main {
+      flex: 1;
+      min-width: 0;
+      padding: 40px 48px 80px 48px;
+    }
+
+    .chapter-eyebrow {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--indigo);
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    h1.chapter-title {
+      font-size: 2.25rem;
+      font-weight: 800;
+      color: var(--gray-900);
+      line-height: 1.2;
+      margin-bottom: 8px;
+    }
+    .author-line {
+      font-size: 14px;
+      color: var(--gray-500);
+      margin-bottom: 32px;
+    }
+    .author-line strong { color: var(--gray-700); }
+    .chapter-intro {
+      font-size: 1.05rem;
+      color: var(--gray-700);
+      border-left: 3px solid var(--indigo);
+      padding: 16px 20px;
+      background: var(--indigo-bg);
+      border-radius: 0 8px 8px 0;
+      margin-bottom: 48px;
+      line-height: 1.7;
+    }
+
+    h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--gray-900);
+      margin: 52px 0 16px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--gray-200);
+      scroll-margin-top: calc(var(--nav-h) + 16px);
+    }
+    h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--gray-800);
+      margin: 32px 0 12px;
+      scroll-margin-top: calc(var(--nav-h) + 16px);
+    }
+    h4 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--gray-700);
+      margin: 24px 0 8px;
+    }
+    p { margin-bottom: 16px; }
+    ul, ol { margin: 12px 0 16px 24px; }
+    li { margin-bottom: 6px; }
+    a { color: var(--indigo); }
+
+    /* Code */
+    code {
+      font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+      font-size: 0.85em;
+      background: var(--gray-100);
+      border: 1px solid var(--gray-200);
+      border-radius: 4px;
+      padding: 1px 5px;
+    }
+    pre {
+      margin: 20px 0;
+      border-radius: 10px;
+      overflow-x: auto;
+      border: 1px solid var(--gray-200);
+      box-shadow: 0 1px 4px rgba(0,0,0,.06);
+    }
+    pre code {
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+      font-size: 0.82rem;
+      background: none;
+      border: none;
+      padding: 0;
+      border-radius: 0;
+    }
+    .hljs { background: var(--gray-50); padding: 20px 22px; }
+
+    .code-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--gray-500);
+      background: var(--gray-100);
+      border: 1px solid var(--gray-200);
+      border-bottom: none;
+      padding: 5px 14px;
+      border-radius: 8px 8px 0 0;
+      display: inline-block;
+      margin-bottom: -1px;
+    }
+
+    /* Callout Boxes */
+    .callout {
+      border-radius: 10px;
+      padding: 18px 20px;
+      margin: 24px 0;
+      border-left: 4px solid;
+    }
+    .callout .callout-title {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .callout p:last-child { margin-bottom: 0; }
+    .callout ul:last-child, .callout ol:last-child { margin-bottom: 0; }
+
+    .callout-tip     { background: var(--green-50);   border-color: var(--green-700);  }
+    .callout-tip     .callout-title { color: var(--green-800); }
+    .callout-info    { background: var(--blue-50);    border-color: var(--blue-700);   }
+    .callout-info    .callout-title { color: var(--blue-800); }
+    .callout-warning { background: var(--amber-50);   border-color: var(--amber-700);  }
+    .callout-warning .callout-title { color: var(--amber-800); }
+    .callout-python  { background: var(--purple-50);  border-color: var(--purple-700); }
+    .callout-python  .callout-title { color: var(--purple-800); }
+    .callout-ai      { background: var(--pink-50);    border-color: var(--pink-700);   }
+    .callout-ai      .callout-title { color: var(--pink-800); }
+    .callout-tool    { background: var(--teal-50);    border-color: var(--teal-700);   }
+    .callout-tool    .callout-title { color: var(--teal-800); }
+    .callout-protip  {
+      background: var(--indigo-bg);
+      border-color: var(--indigo);
+      border-left-width: 4px;
+    }
+    .callout-protip  .callout-title { color: var(--indigo-dark); }
+
+    /* Tables */
+    .table-wrap { overflow-x: auto; margin: 24px 0; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+    thead th {
+      background: var(--indigo);
+      color: #fff;
+      font-weight: 600;
+      text-align: left;
+      padding: 10px 14px;
+      font-size: 13px;
+    }
+    thead th:first-child { border-radius: 8px 0 0 0; }
+    thead th:last-child  { border-radius: 0 8px 0 0; }
+    tbody tr { border-bottom: 1px solid var(--gray-200); }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:nth-child(even) { background: var(--gray-50); }
+    tbody td { padding: 9px 14px; vertical-align: top; line-height: 1.5; }
+    tbody td code { font-size: 0.8em; }
+
+    /* SVG diagram wrappers */
+    .diagram-wrap {
+      margin: 32px 0;
+      overflow-x: auto;
+    }
+    .diagram-svg {
+      display: block;
+      width: 100%;
+    }
+
+    /* Step list */
+    .step-list {
+      list-style: none;
+      margin: 16px 0;
+      padding: 0;
+      counter-reset: step-counter;
+    }
+    .step-list li {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      margin-bottom: 14px;
+      counter-increment: step-counter;
+    }
+    .step-list li::before {
+      content: counter(step-counter);
+      flex-shrink: 0;
+      width: 28px;
+      height: 28px;
+      background: var(--indigo);
+      color: #fff;
+      border-radius: 50%;
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 2px;
+    }
+
+    /* Stat highlight */
+    .stat-block {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      background: var(--indigo-bg);
+      border: 1px solid #C7D2FE;
+      border-radius: 12px;
+      padding: 16px 28px;
+      margin: 8px 8px 8px 0;
+      gap: 4px;
+    }
+    .stat-block .stat-number {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--indigo);
+      line-height: 1;
+    }
+    .stat-block .stat-label {
+      font-size: 12px;
+      color: var(--gray-600);
+      text-align: center;
+    }
+    .stats-row {
+      display: flex;
+      flex-wrap: wrap;
+      margin: 24px 0;
+    }
+
+    /* Section divider */
+    .section-divider {
+      border: none;
+      border-top: 2px solid var(--gray-200);
+      margin: 60px 0;
+    }
+
+    /* Footer */
+    .chapter-footer {
+      margin-top: 80px;
+      border-top: 2px solid var(--gray-200);
+      padding-top: 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+    .footer-nav-btn {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      text-decoration: none;
+      border: 1px solid var(--gray-200);
+      border-radius: 10px;
+      padding: 14px 20px;
+      transition: border-color .15s, box-shadow .15s;
+      min-width: 180px;
+    }
+    .footer-nav-btn:hover {
+      border-color: var(--indigo);
+      box-shadow: 0 0 0 3px var(--indigo-bg);
+    }
+    .footer-nav-btn .nav-dir {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--gray-400);
+    }
+    .footer-nav-btn .nav-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--indigo);
+    }
+    .footer-nav-btn.next { text-align: right; }
+
+    .highlight-text { background: #FEF3C7; border-radius: 3px; padding: 1px 3px; }
+
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .main { padding: 24px 20px 60px; }
+      h1.chapter-title { font-size: 1.75rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Top Navigation -->
+<nav class="top-nav">
+  <span class="book-title">TypeScript for the AI Era</span>
+  <div class="nav-links">
+    <a href="chapter-20-ai-apps.html">&#8592; Ch 20 AI Apps</a>
+    <span class="progress-badge">Chapter 21 of 24</span>
+    <a href="chapter-22-case-cli.html">Ch 22 Case: CLI &#8594;</a>
+  </div>
+</nav>
+
+<!-- Layout -->
+<div class="layout">
+
+  <!-- Sidebar TOC -->
+  <aside class="sidebar">
+    <p class="sidebar-title">On This Page</p>
+    <ul class="toc-list">
+      <li><a href="#ai-augmented">1. The AI-Augmented Developer</a></li>
+      <li class="toc-sub"><a href="#ai-changed">How Dev Has Changed</a></li>
+      <li class="toc-sub"><a href="#ai-types-context">Types as AI Context</a></li>
+      <li class="toc-sub"><a href="#ai-workflow">Pair-Programming Workflow</a></li>
+      <li><a href="#copilot">2. GitHub Copilot</a></li>
+      <li class="toc-sub"><a href="#copilot-types">Types &rarr; Better Suggestions</a></li>
+      <li class="toc-sub"><a href="#copilot-instructions">copilot-instructions.md</a></li>
+      <li class="toc-sub"><a href="#copilot-tips">Best Practices</a></li>
+      <li><a href="#cursor">3. Cursor</a></li>
+      <li class="toc-sub"><a href="#cursor-composer">Composer</a></li>
+      <li class="toc-sub"><a href="#cursor-rules">.cursorrules</a></li>
+      <li class="toc-sub"><a href="#cursor-vs-copilot">Cursor vs Copilot</a></li>
+      <li><a href="#claude-code">4. Claude Code (CLI)</a></li>
+      <li class="toc-sub"><a href="#claude-agentic">The Agentic Loop</a></li>
+      <li class="toc-sub"><a href="#claude-types-comms">Types as Communication</a></li>
+      <li><a href="#eslint">5. ESLint</a></li>
+      <li class="toc-sub"><a href="#eslint-config">eslint.config.ts</a></li>
+      <li class="toc-sub"><a href="#eslint-rules">Key Rules</a></li>
+      <li><a href="#prettier">6. Prettier</a></li>
+      <li><a href="#biome">7. Biome</a></li>
+      <li><a href="#strict">8. Strict Mode</a></li>
+      <li><a href="#toolchain">9. Developer Toolchain</a></li>
+      <li><a href="#precommit">10. Pre-commit Hooks</a></li>
+      <li><a href="#cicd">11. CI/CD</a></li>
+      <li><a href="#debugging">12. Debugging TypeScript</a></li>
+    </ul>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main">
+
+    <p class="chapter-eyebrow">Chapter 21</p>
+    <h1 class="chapter-title">Developer Experience in the AI Era</h1>
+    <p class="author-line">By <strong>Senior Staff Engineer</strong> @ Anthropic (previously Google)</p>
+
+    <div class="chapter-intro">
+      The tools around TypeScript have always mattered — but the arrival of AI coding assistants changed everything. Type annotations are no longer just for humans and compilers: they are structured context that AI understands. This chapter covers the complete modern DX stack: Copilot, Cursor, Claude Code, ESLint, Prettier, Biome, strict mode, pre-commit hooks, and CI — everything you need to build a productive, AI-augmented TypeScript project in 2025.
+    </div>
+
+    <!-- ================================================================ -->
+    <h2 id="ai-augmented">1. The AI-Augmented Developer</h2>
+
+    <h3 id="ai-changed">How Development Has Changed</h3>
+
+    <p>The developer's job description has quietly changed. A year ago you wrote nearly every line. Today, a well-configured AI coding environment writes a majority of boilerplate, fills in function bodies from signatures, suggests tests, and proposes refactors — while you navigate, review, reject, guide, and judge.</p>
+
+    <p>This shift is not subtle. GitHub's research found that developers using AI tools complete tasks <span class="highlight-text">55% faster</span> and report higher job satisfaction. The productivity compound is real.</p>
+
+    <div class="stats-row">
+      <div class="stat-block">
+        <span class="stat-number">55%</span>
+        <span class="stat-label">faster task completion<br>(GitHub research, 2023)</span>
+      </div>
+      <div class="stat-block">
+        <span class="stat-number">46%</span>
+        <span class="stat-label">of all code written<br>by AI tools (2024 avg)</span>
+      </div>
+      <div class="stat-block">
+        <span class="stat-number">3x</span>
+        <span class="stat-label">more PRs merged per week<br>by AI-assisted devs</span>
+      </div>
+    </div>
+
+    <h3 id="ai-types-context">TypeScript's Unique Advantage: Types as Context for AI</h3>
+
+    <p>Python developers using Copilot get reasonable suggestions. TypeScript developers get <em>remarkably</em> good ones. The difference is types.</p>
+
+    <p>When you write a function signature like:</p>
+
+    <pre><code class="language-typescript">async function fetchUserOrders(
+  userId: UserId,
+  options: { limit: number; cursor?: string; status?: OrderStatus }
+): Promise&lt;PaginatedResult&lt;Order&gt;&gt;</code></pre>
+
+    <p>Copilot and Cursor now know: the argument is a branded <code>UserId</code>, not a raw string. It returns a generic paginated result. The <code>status</code> filter is optional and constrained to a specific enum. The function is async. Every one of those constraints narrows the space of valid implementations. The AI produces better code because the types act as a specification.</p>
+
+    <div class="callout callout-ai">
+      <div class="callout-title">AI Era — Types Are a Prompt</div>
+      <p>Think of your TypeScript interfaces and type aliases as implicit prompts to every AI tool in your pipeline. The more precisely you type your domain, the fewer hallucinated implementations the AI suggests. Invest in types not just for type safety — invest in them because they make every AI touchpoint smarter.</p>
+    </div>
+
+    <h3 id="ai-workflow">The AI Pair-Programming Workflow</h3>
+
+    <p>The highest-leverage workflow I've found after years of using these tools:</p>
+
+    <ol>
+      <li><strong>Write the type signature first.</strong> Define the function name, parameters, return type, and any relevant JSDoc. This is the spec.</li>
+      <li><strong>Let AI fill the implementation.</strong> Accept if it looks correct. If not, guide with a comment like <code>// use Array.reduce, not a for loop</code> and re-trigger.</li>
+      <li><strong>Write the test skeleton.</strong> AI suggests test cases from the signature and implementation — review each.</li>
+      <li><strong>Run the linter and type-checker.</strong> Errors become feedback to AI in Cursor's Composer or Claude Code's agentic loop.</li>
+      <li><strong>Human review for correctness and architecture.</strong> AI is wrong about business logic, edge cases, and system design more than it is wrong about syntax.</li>
+    </ol>
+
+    <div class="callout callout-warning">
+      <div class="callout-title">Warning — Where Human Judgment Wins</div>
+      <p>AI excels at: boilerplate, CRUD operations, test generation, documentation, refactoring patterns, and well-known algorithms. AI struggles with: domain-specific business rules, security-sensitive code, distributed system edge cases, and anything that requires understanding organizational context. Always own the review.</p>
+    </div>
+
+    <!-- ================================================================ -->
+    <h2 id="copilot">2. GitHub Copilot with TypeScript</h2>
+
+    <h3 id="copilot-types">How Copilot Uses TypeScript Types to Generate Better Code</h3>
+
+    <p>Copilot's context window includes the current file, nearby open files, and recently edited files. TypeScript's type information flows through all of it. The pattern that unlocks the best suggestions: <strong>write the type signature first, then position your cursor in the function body and wait.</strong></p>
+
+    <pre><code class="language-typescript">// 1. Write this first — Copilot reads it as specification
+interface CartItem {
+  productId: ProductId
+  quantity: number
+  unitPrice: Money
+}
+
+type Money = { amount: number; currency: 'USD' | 'EUR' | 'GBP' }
+type CartTotal = { subtotal: Money; tax: Money; total: Money }
+
+// 2. Type signature is the prompt
+function calculateCartTotal(
+  items: CartItem[],
+  taxRate: number,
+  currency: Money['currency']
+): CartTotal {
+  // 3. Copilot fills this — and it's correct because the types constrain it
+}</code></pre>
+
+    <p>Copilot Chat takes this further. With <code>Ctrl+I</code> (inline) or the chat sidebar, you can ask architectural questions grounded in your actual codebase types:</p>
+
+    <pre><code class="language-typescript">// @workspace What's the best way to add caching to all functions
+// that return Promise&lt;Product&gt; without changing their signatures?</code></pre>
+
+    <h3 id="copilot-instructions">Project-Specific Context: <code>.github/copilot-instructions.md</code></h3>
+
+    <p>Copilot reads this file and applies it as system context for all suggestions in your repo. Use it to encode project conventions the model wouldn't otherwise know:</p>
+
+    <div class="code-label">.github/copilot-instructions.md</div>
+    <pre><code class="language-bash"># Copilot Instructions
+
+## Project conventions
+- This is a TypeScript monorepo using pnpm workspaces.
+- All monetary values use the `Money` branded type — never raw numbers.
+- Use `Result&lt;T, E&gt;` from `~/lib/result` for fallible operations — never throw.
+- Prefer `zod` for runtime validation at system boundaries.
+- All async functions must be typed with explicit return types.
+- Use `pino` for logging — never `console.log` in library code.
+
+## Architecture
+- Domain layer in `packages/domain` — pure functions, no I/O.
+- Application layer in `packages/app` — orchestrates domain + infrastructure.
+- Infrastructure in `packages/infra` — database, HTTP, queues.
+
+## Testing
+- Use vitest. All tests co-located with source in `*.test.ts` files.
+- Mock at the boundary: infrastructure mocked, domain tested directly.</code></pre>
+
+    <h3 id="copilot-tips">Best Practices: Accept, Reject, Guide</h3>
+
+    <div class="callout callout-protip">
+      <div class="callout-title">Pro Tip — The Three-Speed Copilot Workflow</div>
+      <ul>
+        <li><strong>Accept (Tab):</strong> When the suggestion is clearly correct and you'd write the same thing.</li>
+        <li><strong>Accept word (Ctrl+Right):</strong> When the suggestion starts right but drifts — take the first few tokens.</li>
+        <li><strong>Reject and guide:</strong> Add a comment stating your intent more precisely, or rename a variable to something more expressive, then re-trigger. Better input = better output.</li>
+        <li><strong>Reject and write:</strong> For security-sensitive code, complex business rules, or anything where you have strong opinions. Don't fight the AI — own the keyboard.</li>
+      </ul>
+    </div>
+
+    <p><strong>TypeScript tricks that supercharge Copilot suggestions:</strong></p>
+    <ul>
+      <li>Use <strong>branded types</strong> — <code>type UserId = string &amp; { readonly _brand: 'UserId' }</code> — so Copilot won't confuse IDs.</li>
+      <li>Use <strong>discriminated unions</strong> for state — Copilot correctly handles each variant when generating <code>switch</code> statements.</li>
+      <li>Add <strong>JSDoc with examples</strong> — Copilot treats example code as additional context.</li>
+      <li>Keep <strong>interface names semantic</strong> — <code>OrderRepository</code> beats <code>IOrderRepo</code> for AI comprehension.</li>
+    </ul>
+
+    <!-- ================================================================ -->
+    <h2 id="cursor">3. Cursor — The AI-Native Editor</h2>
+
+    <div class="callout callout-tool">
+      <div class="callout-title">Tool Spotlight — Cursor</div>
+      <p>Cursor is a fork of VS Code with deep AI integration baked into the editor itself rather than added as an extension. It ships its own model routing, inline editing, multi-file Composer, and codebase-aware chat — all out of the box. Your VS Code extensions, keybindings, and settings import automatically.</p>
+    </div>
+
+    <h3 id="cursor-composer">Composer: AI That Edits Multiple Files at Once</h3>
+
+    <p>Composer (<code>Cmd+I</code>) is the feature that separates Cursor from Copilot. Instead of single-location completions, Composer can plan and execute changes across an entire feature: creating files, modifying interfaces, updating imports, and adjusting tests — all in a single session.</p>
+
+    <p>A real Composer prompt for a TypeScript project:</p>
+
+    <pre><code class="language-bash"># In Cursor Composer:
+
+Add a `discountCode` optional field to the `Order` type. Propagate it:
+- Update the `Order` interface in src/domain/order.ts
+- Update the `CreateOrderInput` zod schema in src/validation/order.schema.ts
+- Update the `OrderRepository.create()` method signature
+- Add a migration in src/db/migrations/
+- Update the `OrderMapper` to/from DB in src/infra/order.mapper.ts
+- Update relevant tests</code></pre>
+
+    <p>Cursor reads the TypeScript type graph to understand what "propagate" means. It follows imports, understands which interfaces depend on <code>Order</code>, and generates a diff you review before applying.</p>
+
+    <h3 id="cursor-codebase"><code>@codebase</code> Context</h3>
+
+    <p>In Cursor chat, prefix your question with <code>@codebase</code> to ground the answer in your actual repository:</p>
+
+    <pre><code class="language-bash">@codebase Where does error handling happen for failed payments?
+Show me the types involved and whether they propagate up to the HTTP layer.</code></pre>
+
+    <p>Cursor indexes your repo (including TypeScript types) and performs semantic search to answer. This is where TypeScript pays dividends: the type graph is a navigable map of your architecture that Cursor's index understands.</p>
+
+    <h3 id="cursor-rules">`.cursorrules`: Project-Specific AI Instructions</h3>
+
+    <div class="code-label">.cursorrules</div>
+    <pre><code class="language-bash">You are working on a TypeScript e-commerce API.
+
+Tech stack: Node.js 22, TypeScript 5.6, Hono, Drizzle ORM, Zod, Vitest, pnpm.
+
+Architecture: Domain-Driven Design. Bounded contexts: orders, catalog, fulfillment.
+Never put business logic in route handlers. Always go through the application layer.
+
+Type conventions:
+- Branded primitives for all IDs: UserId, OrderId, ProductId
+- Money type for all monetary values — never raw numbers
+- Result&lt;T, E&gt; for fallible operations — never throw from domain code
+- All external inputs validated with Zod at the HTTP boundary
+
+Code style:
+- No `any`. Use `unknown` and narrow.
+- No non-null assertions `!` unless inside a test file.
+- Explicit return types on all exported functions.
+- Prefer `const` over `let`. Never `var`.
+
+When writing tests: co-locate with source, use vitest, mock infrastructure not domain.</code></pre>
+
+    <h3 id="cursor-vs-copilot">Cursor vs Copilot: When to Use Which</h3>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Task</th>
+            <th>Copilot</th>
+            <th>Cursor</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Single-location autocomplete</td>
+            <td>Excellent — low friction, stays in flow</td>
+            <td>Good, but heavier feel</td>
+          </tr>
+          <tr>
+            <td>Multi-file refactor</td>
+            <td>Awkward — must open files manually</td>
+            <td>Excellent — Composer handles it</td>
+          </tr>
+          <tr>
+            <td>Architectural questions</td>
+            <td>Good with Copilot Chat @workspace</td>
+            <td>Excellent with @codebase indexing</td>
+          </tr>
+          <tr>
+            <td>Project-specific conventions</td>
+            <td>copilot-instructions.md</td>
+            <td>.cursorrules (more powerful)</td>
+          </tr>
+          <tr>
+            <td>TypeScript error feedback loop</td>
+            <td>Manual: copy error, paste into chat</td>
+            <td>Automatic: errors flow into Composer</td>
+          </tr>
+          <tr>
+            <td>Cost</td>
+            <td>$10/mo (individual)</td>
+            <td>$20/mo (Pro)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout callout-ai">
+      <div class="callout-title">AI Era — The TypeScript Advantage in Cursor</div>
+      <p>When Cursor's Composer generates code that has TypeScript errors, the editor shows them inline. The agent can read those errors and iterate — without you doing anything. Type errors become <em>automatic feedback</em> in the agentic loop. This is why TypeScript projects get more out of Cursor than JavaScript ones: the compiler is a critic the AI can hear.</p>
+    </div>
+
+    <!-- ================================================================ -->
+    <h2 id="claude-code">4. Claude Code (CLI)</h2>
+
+    <div class="callout callout-tool">
+      <div class="callout-title">Tool Spotlight — Claude Code</div>
+      <p>Claude Code is Anthropic's official CLI for Claude. Run <code>claude</code> from your terminal inside any project directory. It can read files, write files, execute shell commands, run your test suite, and iterate — autonomously, with your approval at each step. It is not a chatbot you describe code to. It is an agent that operates on your actual codebase.</p>
+    </div>
+
+    <h3>Running Claude Code in Your TypeScript Project</h3>
+
+    <pre><code class="language-bash"># Install
+npm install -g @anthropic-ai/claude-code
+
+# Launch in your project root
+cd my-typescript-project
+claude</code></pre>
+
+    <p>From there, you interact in natural language. Claude Code reads your <code>tsconfig.json</code>, understands your package structure, and operates within your actual file tree. It's not working from a description — it reads the real files.</p>
+
+    <h3>Using Claude Code for Code Review and Refactoring</h3>
+
+    <pre><code class="language-bash"># In the claude session:
+
+"Review src/services/order.service.ts for:
+- any implicit `any` types
+- missing error handling on async calls
+- business logic that should be in the domain layer
+- functions over 30 lines that should be extracted"</code></pre>
+
+    <p>Claude Code reads the file, analyzes it against the criteria, and proposes specific edits — which it can apply directly with your permission.</p>
+
+    <h3>Complex Multi-File Edits</h3>
+
+    <p>For large refactors, Claude Code's approach is methodical:</p>
+    <ol>
+      <li>Read the relevant files to understand the current state.</li>
+      <li>Propose a plan (which you can modify).</li>
+      <li>Execute edits file by file, running <code>pnpm typecheck</code> after each batch to verify.</li>
+      <li>Run the test suite. Fix failures. Repeat.</li>
+    </ol>
+
+    <p>The feedback loop between TypeScript's compiler and Claude Code's edit-verify cycle is tight. A change that introduces a type error gets caught in the next <code>tsc</code> run, and the agent iterates.</p>
+
+    <h3 id="claude-agentic">The Agentic Loop: Claude Uses Tools Autonomously</h3>
+
+    <div class="diagram-wrap">
+      <svg class="diagram-svg" viewBox="0 0 680 160" xmlns="http://www.w3.org/2000/svg" font-family="system-ui,sans-serif">
+        <!-- boxes -->
+        <rect x="10"  y="50" width="110" height="60" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+        <text x="65"  y="77" text-anchor="middle" font-size="12" font-weight="600" fill="#3730A3">Your</text>
+        <text x="65"  y="93" text-anchor="middle" font-size="12" font-weight="600" fill="#3730A3">Instruction</text>
+
+        <rect x="155" y="50" width="110" height="60" rx="8" fill="#F0FDFA" stroke="#0F766E" stroke-width="1.5"/>
+        <text x="210" y="77" text-anchor="middle" font-size="12" font-weight="600" fill="#115E59">Claude</text>
+        <text x="210" y="93" text-anchor="middle" font-size="12" font-weight="600" fill="#115E59">Plans</text>
+
+        <rect x="300" y="50" width="110" height="60" rx="8" fill="#FDF2F8" stroke="#BE185D" stroke-width="1.5"/>
+        <text x="355" y="77" text-anchor="middle" font-size="12" font-weight="600" fill="#9D174D">Edits</text>
+        <text x="355" y="93" text-anchor="middle" font-size="12" font-weight="600" fill="#9D174D">Files</text>
+
+        <rect x="445" y="50" width="110" height="60" rx="8" fill="#FFFBEB" stroke="#B45309" stroke-width="1.5"/>
+        <text x="500" y="77" text-anchor="middle" font-size="12" font-weight="600" fill="#92400E">Runs tsc</text>
+        <text x="500" y="93" text-anchor="middle" font-size="12" font-weight="600" fill="#92400E">+ Tests</text>
+
+        <rect x="590" y="50" width="80" height="60" rx="8" fill="#F0FDF4" stroke="#15803D" stroke-width="1.5"/>
+        <text x="630" y="77" text-anchor="middle" font-size="12" font-weight="600" fill="#166534">Done /</text>
+        <text x="630" y="93" text-anchor="middle" font-size="12" font-weight="600" fill="#166534">Iterate</text>
+
+        <!-- arrows forward -->
+        <line x1="120" y1="80" x2="150" y2="80" stroke="#9CA3AF" stroke-width="1.5" marker-end="url(#arr)"/>
+        <line x1="265" y1="80" x2="295" y2="80" stroke="#9CA3AF" stroke-width="1.5" marker-end="url(#arr)"/>
+        <line x1="410" y1="80" x2="440" y2="80" stroke="#9CA3AF" stroke-width="1.5" marker-end="url(#arr)"/>
+        <line x1="555" y1="80" x2="585" y2="80" stroke="#9CA3AF" stroke-width="1.5" marker-end="url(#arr)"/>
+
+        <!-- feedback loop arrow -->
+        <path d="M500,110 Q500,140 355,140 Q210,140 210,115" fill="none" stroke="#4F46E5" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arri)"/>
+        <text x="355" y="155" text-anchor="middle" font-size="10" fill="#6B7280">errors? iterate</text>
+
+        <defs>
+          <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#9CA3AF"/>
+          </marker>
+          <marker id="arri" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#4F46E5"/>
+          </marker>
+        </defs>
+      </svg>
+    </div>
+
+    <h3 id="claude-types-comms">TypeScript Types as Communication with Claude</h3>
+
+    <p>When you ask Claude Code to implement something, the most effective prompt is often just a type signature:</p>
+
+    <pre><code class="language-typescript">// Add this to src/domain/inventory.ts and implement it.
+// No external calls — pure domain logic only.
+function reserveStock(
+  inventory: Inventory,
+  productId: ProductId,
+  quantity: number
+): Result&lt;Inventory, 'INSUFFICIENT_STOCK' | 'PRODUCT_NOT_FOUND'&gt;</code></pre>
+
+    <p>This signature encodes: the function is pure, it operates on an <code>Inventory</code> value object, it returns a discriminated result (not throws), and the failure modes are finite and named. Claude produces a correct implementation on the first try because the types eliminate most of the ambiguity.</p>
+
+    <!-- ================================================================ -->
+    <h2 id="eslint">5. ESLint — Automated Code Quality</h2>
+
+    <h3>Installation</h3>
+
+    <pre><code class="language-bash">pnpm add -D eslint @eslint/js typescript-eslint</code></pre>
+
+    <h3 id="eslint-config"><code>eslint.config.ts</code> with typescript-eslint</h3>
+
+    <div class="code-label">eslint.config.ts</div>
+    <pre><code class="language-typescript">import eslint from '@eslint/js'
+import tseslint from 'typescript-eslint'
+
+export default tseslint.config(
+  eslint.configs.recommended,
+  ...tseslint.configs.recommendedTypeChecked,
+  {
+    languageOptions: {
+      parserOptions: {
+        project: true,
+        tsconfigRootDir: import.meta.dirname,
+      }
+    },
+    rules: {
+      '@typescript-eslint/no-explicit-any': 'error',
+      '@typescript-eslint/explicit-function-return-type': 'warn',
+      '@typescript-eslint/no-floating-promises': 'error',
+      '@typescript-eslint/strict-boolean-expressions': 'error',
+      '@typescript-eslint/no-unnecessary-condition': 'warn',
+    }
+  }
+)</code></pre>
+
+    <div class="callout callout-info">
+      <div class="callout-title">Info — Flat Config Format</div>
+      <p>ESLint v9+ uses the new "flat config" format (<code>eslint.config.ts</code> or <code>eslint.config.js</code>). If you're on ESLint 8, use <code>.eslintrc.js</code> with <code>@typescript-eslint/parser</code> as the parser. The flat format is now the default and supports <code>import.meta.dirname</code> for finding your tsconfig.</p>
+    </div>
+
+    <h3 id="eslint-rules">Key Rules</h3>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Rule</th>
+            <th>What it catches</th>
+            <th>Recommended setting</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>no-explicit-any</code></td>
+            <td>Stops <code>any</code> from spreading through your codebase</td>
+            <td><code>'error'</code></td>
+          </tr>
+          <tr>
+            <td><code>no-floating-promises</code></td>
+            <td>Catches <code>async</code> calls whose Promise is never awaited or handled</td>
+            <td><code>'error'</code></td>
+          </tr>
+          <tr>
+            <td><code>strict-boolean-expressions</code></td>
+            <td>Prevents <code>if (user)</code> when user could be <code>0</code> or <code>""</code></td>
+            <td><code>'error'</code></td>
+          </tr>
+          <tr>
+            <td><code>no-unnecessary-condition</code></td>
+            <td>Flags conditions that are always true/false (types prove it)</td>
+            <td><code>'warn'</code></td>
+          </tr>
+          <tr>
+            <td><code>explicit-function-return-type</code></td>
+            <td>Forces explicit return types — AI-generated code often omits these</td>
+            <td><code>'warn'</code></td>
+          </tr>
+          <tr>
+            <td><code>await-thenable</code></td>
+            <td>Catches <code>await nonPromise</code> which silently works but is wrong</td>
+            <td><code>'error'</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Type-Aware Linting</h3>
+
+    <p>The rules marked with a lightning bolt in the typescript-eslint docs are <strong>type-aware</strong>: they invoke TypeScript's compiler API to check rules that require type information. They're slower but catch bugs that non-type-aware rules miss entirely. The <code>project: true</code> in <code>parserOptions</code> is what enables them.</p>
+
+    <div class="callout callout-ai">
+      <div class="callout-title">AI Era — ESLint as AI Output Reviewer</div>
+      <p><code>no-explicit-any</code> and <code>explicit-function-return-type</code> are especially valuable in AI-assisted projects. AI-generated code often uses <code>any</code> to sidestep type complexity and omits return types because they're inferred. ESLint catches both, forcing every AI-generated function through the same quality bar as hand-written code.</p>
+    </div>
+
+    <h3>Auto-fix on Save in VS Code</h3>
+
+    <div class="code-label">.vscode/settings.json</div>
+    <pre><code class="language-json">{
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "eslint.validate": ["typescript", "typescriptreact"]
+}</code></pre>
+
+    <h3>ESLint in CI</h3>
+
+    <div class="code-label">package.json</div>
+    <pre><code class="language-json">{
+  "scripts": {
+    "lint": "eslint . --ext .ts,.tsx",
+    "lint:fix": "eslint . --ext .ts,.tsx --fix"
+  }
+}</code></pre>
+
+    <!-- ================================================================ -->
+    <h2 id="prettier">6. Prettier — Code Formatting</h2>
+
+    <p>Automated formatting is not about style preferences — it's about eliminating entire categories of code review comments and merge conflicts. When every file is formatted by the same tool, diffs are meaningful: every change is a logic change, not a whitespace change.</p>
+
+    <pre><code class="language-bash">pnpm add -D prettier</code></pre>
+
+    <div class="code-label">.prettierrc</div>
+    <pre><code class="language-json">{
+  "semi": false,
+  "singleQuote": true,
+  "tabWidth": 2,
+  "trailingComma": "es5",
+  "printWidth": 100
+}</code></pre>
+
+    <h3>Integrating Prettier with ESLint</h3>
+
+    <p>Without coordination, ESLint and Prettier conflict on formatting rules. The fix:</p>
+
+    <pre><code class="language-bash">pnpm add -D eslint-config-prettier</code></pre>
+
+    <div class="code-label">eslint.config.ts — add at the end</div>
+    <pre><code class="language-typescript">import eslint from '@eslint/js'
+import tseslint from 'typescript-eslint'
+import prettier from 'eslint-config-prettier'   // ← add this
+
+export default tseslint.config(
+  eslint.configs.recommended,
+  ...tseslint.configs.recommendedTypeChecked,
+  { /* your rules */ },
+  prettier   // ← must be last; disables formatting rules
+)</code></pre>
+
+    <h3>Format on Save in VS Code</h3>
+
+    <div class="code-label">.vscode/settings.json</div>
+    <pre><code class="language-json">{
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
+}</code></pre>
+
+    <div class="callout callout-info">
+      <div class="callout-title">Info — Prettier vs Biome</div>
+      <p>Prettier is the established standard with the widest plugin ecosystem. Biome (next section) is a Rust-based replacement that formats and lints in a single tool, running 10-20x faster. For new projects with no legacy tooling, Biome is worth evaluating. For existing projects with extensive ESLint rules, Prettier + ESLint remains the practical choice.</p>
+    </div>
+
+    <!-- ================================================================ -->
+    <h2 id="biome">7. Biome — The All-in-One Tool</h2>
+
+    <div class="callout callout-tool">
+      <div class="callout-title">Tool Spotlight — Biome</div>
+      <p>Biome is a single Rust binary that replaces ESLint + Prettier. It formats and lints in one pass, with a unified configuration file, no plugin system complexity, and speeds that make it feel instant even on large codebases. It's not a drop-in replacement for every ESLint rule, but it covers the most impactful ones.</p>
+    </div>
+
+    <pre><code class="language-bash">pnpm add -D @biomejs/biome</code></pre>
+
+    <div class="code-label">biome.json</div>
+    <pre><code class="language-json">{
+  "$schema": "https://biomejs.dev/schemas/1.9.0/schema.json",
+  "organizeImports": { "enabled": true },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 100
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "correctness": {
+        "noUnusedVariables": "error",
+        "useExhaustiveDependencies": "warn"
+      },
+      "suspicious": {
+        "noExplicitAny": "error",
+        "noConsole": "warn"
+      }
+    }
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "single",
+      "trailingCommas": "es5",
+      "semicolons": "asNeeded"
+    }
+  }
+}</code></pre>
+
+    <div class="code-label">package.json scripts for Biome</div>
+    <pre><code class="language-json">{
+  "scripts": {
+    "lint": "biome lint .",
+    "format": "biome format . --write",
+    "check": "biome check . --apply"
+  }
+}</code></pre>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Factor</th>
+            <th>ESLint + Prettier</th>
+            <th>Biome</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Speed</td>
+            <td>Slow on large repos (JS-based)</td>
+            <td>10-20x faster (Rust-based)</td>
+          </tr>
+          <tr>
+            <td>Rule coverage</td>
+            <td>300+ rules, extensive plugin ecosystem</td>
+            <td>~200 rules, growing fast</td>
+          </tr>
+          <tr>
+            <td>Type-aware rules</td>
+            <td>Yes (typescript-eslint)</td>
+            <td>Not yet (planned)</td>
+          </tr>
+          <tr>
+            <td>Configuration complexity</td>
+            <td>High (multiple files)</td>
+            <td>Low (single biome.json)</td>
+          </tr>
+          <tr>
+            <td>Migration cost</td>
+            <td>—</td>
+            <td>Medium (some rules differ)</td>
+          </tr>
+          <tr>
+            <td>Best for</td>
+            <td>Complex existing projects, type-aware rules required</td>
+            <td>New projects, speed-critical CI</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ================================================================ -->
+    <h2 id="strict">8. TypeScript Strict Mode — Your AI Safety Net</h2>
+
+    <p>Strict mode is a single tsconfig flag that activates a suite of checks TypeScript omits by default for backwards compatibility. In 2025, there is no good reason to ship a new TypeScript project without it.</p>
+
+    <div class="code-label">tsconfig.json</div>
+    <pre><code class="language-json">{
+  "compilerOptions": {
+    "strict": true
+  }
+}</code></pre>
+
+    <p><code>strict: true</code> is shorthand for all of these:</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Flag</th>
+            <th>What it enforces</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>strictNullChecks</code></td>
+            <td><code>null</code> and <code>undefined</code> are separate types. Accessing <code>user.name</code> when user might be <code>null</code> is a compile error.</td>
+          </tr>
+          <tr>
+            <td><code>noImplicitAny</code></td>
+            <td>Every value must have an explicit type or a type that can be inferred. No silent <code>any</code>.</td>
+          </tr>
+          <tr>
+            <td><code>strictFunctionTypes</code></td>
+            <td>Function parameter types are checked contravariantly. Prevents subtle callback type bugs.</td>
+          </tr>
+          <tr>
+            <td><code>strictBindCallApply</code></td>
+            <td>Checks <code>.bind()</code>, <code>.call()</code>, and <code>.apply()</code> for correct argument types.</td>
+          </tr>
+          <tr>
+            <td><code>strictPropertyInitialization</code></td>
+            <td>Class properties must be initialized in the constructor or declared <code>!</code>.</td>
+          </tr>
+          <tr>
+            <td><code>noImplicitThis</code></td>
+            <td>Catches <code>this</code> in contexts where its type can't be determined.</td>
+          </tr>
+          <tr>
+            <td><code>useUnknownInCatchVariables</code></td>
+            <td>Catch clause variables are typed <code>unknown</code> rather than <code>any</code>. Forces safe error handling.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout callout-ai">
+      <div class="callout-title">AI Era — Strict Mode as Protection Against AI-Generated Bugs</div>
+      <p>AI coding tools are optimistic. They generate code that looks right and compiles — but may silently mishandle <code>null</code>, skip error handling, or use <code>any</code> to avoid figuring out the real type. Strict mode catches all three categories. It's not just a best practice for human code: it's the most effective automated reviewer you can apply to AI-generated code in your repo.</p>
+    </div>
+
+    <h3>Enabling Strict Mode on an Existing Project (Incremental Approach)</h3>
+
+    <p>Turning on <code>strict: true</code> in a large existing codebase often reveals hundreds of errors. The pragmatic approach:</p>
+
+    <ol>
+      <li>Enable one flag at a time, starting with <code>noImplicitAny</code>.</li>
+      <li>Fix errors in one directory, commit, repeat.</li>
+      <li>Use <code>// @ts-expect-error</code> with a comment for errors you're deferring — not <code>// @ts-ignore</code>, which hides errors silently.</li>
+      <li>Use Claude Code: <code>"Enable strictNullChecks in tsconfig.json, then fix all resulting errors in src/domain/. Do not touch src/infra/."</code></li>
+    </ol>
+
+    <div class="callout callout-protip">
+      <div class="callout-title">Pro Tip — ts-reset</div>
+      <p>After enabling strict mode, install <a href="https://www.totaltypescript.com/ts-reset"><code>@total-typescript/ts-reset</code></a>. It tightens TypeScript's built-in lib types — for example, <code>Array.filter(Boolean)</code> correctly narrows to non-nullable values, and <code>JSON.parse()</code> returns <code>unknown</code> instead of <code>any</code>. One import, zero configuration.</p>
+    </div>
+
+    <!-- ================================================================ -->
+    <h2 id="toolchain">9. Developer Tooling Chain</h2>
+
+    <h3>Complete Setup Guide</h3>
+
+    <ol class="step-list">
+      <li>
+        <div>
+          <strong>Initialize the project</strong>
+          <pre><code class="language-bash">mkdir my-project && cd my-project
+pnpm init</code></pre>
+        </div>
+      </li>
+      <li>
+        <div>
+          <strong>Install TypeScript and runtime tooling</strong>
+          <pre><code class="language-bash">pnpm add -D typescript @types/node tsx</code></pre>
+        </div>
+      </li>
+      <li>
+        <div>
+          <strong>Initialize and configure tsconfig</strong>
+          <pre><code class="language-bash">npx tsc --init</code></pre>
+          <div class="code-label">tsconfig.json (key options)</div>
+          <pre><code class="language-json">{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "skipLibCheck": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}</code></pre>
+        </div>
+      </li>
+      <li>
+        <div>
+          <strong>Install ESLint</strong>
+          <pre><code class="language-bash">pnpm add -D eslint @eslint/js typescript-eslint eslint-config-prettier</code></pre>
+        </div>
+      </li>
+      <li>
+        <div>
+          <strong>Install Prettier</strong>
+          <pre><code class="language-bash">pnpm add -D prettier</code></pre>
+        </div>
+      </li>
+      <li>
+        <div>
+          <strong>Install VS Code extensions</strong>
+          <ul>
+            <li><strong>ESLint</strong> — <code>dbaeumer.vscode-eslint</code></li>
+            <li><strong>Prettier</strong> — <code>esbenp.prettier-vscode</code></li>
+            <li><strong>GitHub Copilot</strong> — <code>GitHub.copilot</code></li>
+            <li><strong>Error Lens</strong> — <code>usernamehw.errorlens</code> (inline TypeScript errors)</li>
+            <li><strong>Pretty TypeScript Errors</strong> — <code>yoavbls.pretty-ts-errors</code></li>
+          </ul>
+        </div>
+      </li>
+      <li>
+        <div>
+          <strong>Install pre-commit hooks</strong>
+          <pre><code class="language-bash">pnpm add -D lefthook</code></pre>
+        </div>
+      </li>
+      <li>
+        <div>
+          <strong>Configure package.json scripts</strong>
+          <div class="code-label">package.json</div>
+          <pre><code class="language-json">{
+  "scripts": {
+    "dev":       "tsx watch src/index.ts",
+    "build":     "tsc --noEmit false",
+    "typecheck": "tsc --noEmit",
+    "lint":      "eslint . --max-warnings 0",
+    "lint:fix":  "eslint . --fix",
+    "format":    "prettier --write .",
+    "test":      "vitest",
+    "test:run":  "vitest run",
+    "ci":        "pnpm typecheck && pnpm lint && pnpm test:run && pnpm build"
+  }
+}</code></pre>
+        </div>
+      </li>
+    </ol>
+
+    <h3>Toolchain Flow Diagram</h3>
+
+    <div class="diagram-wrap">
+      <svg class="diagram-svg" viewBox="0 0 760 200" xmlns="http://www.w3.org/2000/svg" font-family="system-ui,sans-serif">
+        <defs>
+          <marker id="fw" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#9CA3AF"/>
+          </marker>
+        </defs>
+
+        <!-- nodes -->
+        <!-- Code -->
+        <rect x="10"  y="60" width="100" height="50" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+        <text x="60"  y="81" text-anchor="middle" font-size="12" font-weight="700" fill="#3730A3">Code</text>
+        <text x="60"  y="97" text-anchor="middle" font-size="10" fill="#6366F1">src/*.ts</text>
+
+        <!-- ESLint -->
+        <rect x="140" y="60" width="100" height="50" rx="8" fill="#F0FDFA" stroke="#0F766E" stroke-width="1.5"/>
+        <text x="190" y="81" text-anchor="middle" font-size="12" font-weight="700" fill="#115E59">ESLint</text>
+        <text x="190" y="97" text-anchor="middle" font-size="10" fill="#0F766E">lint + rules</text>
+
+        <!-- TypeScript -->
+        <rect x="270" y="60" width="100" height="50" rx="8" fill="#EFF6FF" stroke="#1D4ED8" stroke-width="1.5"/>
+        <text x="320" y="81" text-anchor="middle" font-size="12" font-weight="700" fill="#1E40AF">TypeScript</text>
+        <text x="320" y="97" text-anchor="middle" font-size="10" fill="#1D4ED8">typecheck</text>
+
+        <!-- Tests -->
+        <rect x="400" y="60" width="100" height="50" rx="8" fill="#FFFBEB" stroke="#B45309" stroke-width="1.5"/>
+        <text x="450" y="81" text-anchor="middle" font-size="12" font-weight="700" fill="#92400E">Tests</text>
+        <text x="450" y="97" text-anchor="middle" font-size="10" fill="#B45309">vitest run</text>
+
+        <!-- Build -->
+        <rect x="530" y="60" width="100" height="50" rx="8" fill="#FAF5FF" stroke="#7E22CE" stroke-width="1.5"/>
+        <text x="580" y="81" text-anchor="middle" font-size="12" font-weight="700" fill="#6B21A8">Build</text>
+        <text x="580" y="97" text-anchor="middle" font-size="10" fill="#7E22CE">tsc / tsup</text>
+
+        <!-- CI -->
+        <rect x="660" y="60" width="90" height="50" rx="8" fill="#F0FDF4" stroke="#15803D" stroke-width="1.5"/>
+        <text x="705" y="81" text-anchor="middle" font-size="12" font-weight="700" fill="#166534">CI</text>
+        <text x="705" y="97" text-anchor="middle" font-size="10" fill="#15803D">GitHub Actions</text>
+
+        <!-- arrows -->
+        <line x1="110" y1="85" x2="136" y2="85" stroke="#9CA3AF" stroke-width="1.5" marker-end="url(#fw)"/>
+        <line x1="240" y1="85" x2="266" y2="85" stroke="#9CA3AF" stroke-width="1.5" marker-end="url(#fw)"/>
+        <line x1="370" y1="85" x2="396" y2="85" stroke="#9CA3AF" stroke-width="1.5" marker-end="url(#fw)"/>
+        <line x1="500" y1="85" x2="526" y2="85" stroke="#9CA3AF" stroke-width="1.5" marker-end="url(#fw)"/>
+        <line x1="630" y1="85" x2="656" y2="85" stroke="#9CA3AF" stroke-width="1.5" marker-end="url(#fw)"/>
+
+        <!-- labels below -->
+        <text x="380" y="155" text-anchor="middle" font-size="11" fill="#9CA3AF">pre-commit hooks run steps 1-2 locally &nbsp;|&nbsp; CI runs all steps on push</text>
+      </svg>
+    </div>
+
+    <!-- ================================================================ -->
+    <h2 id="precommit">10. Pre-commit Hooks</h2>
+
+    <p>Pre-commit hooks catch errors before they reach CI — faster feedback, fewer red builds. <code>lefthook</code> is faster than <code>husky</code> (written in Go) and has first-class support for running hooks only on changed files.</p>
+
+    <pre><code class="language-bash">pnpm add -D lefthook
+pnpm lefthook install</code></pre>
+
+    <div class="code-label">lefthook.yml</div>
+    <pre><code class="language-yaml">pre-commit:
+  parallel: false
+  commands:
+    typecheck:
+      run: pnpm typecheck
+    lint:
+      glob: "*.{ts,tsx}"
+      run: pnpm lint --fix
+      stage_fixed: true
+    format:
+      glob: "*.{ts,tsx,json,md}"
+      run: pnpm format
+      stage_fixed: true</code></pre>
+
+    <p>The <code>stage_fixed: true</code> option automatically re-stages files that were auto-fixed by ESLint or Prettier — so the commit includes the fixes without you doing anything.</p>
+
+    <h3>Pre-commit Flow Diagram</h3>
+
+    <div class="diagram-wrap">
+      <svg class="diagram-svg" viewBox="0 0 680 130" xmlns="http://www.w3.org/2000/svg" font-family="system-ui,sans-serif">
+        <defs>
+          <marker id="pa" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#9CA3AF"/>
+          </marker>
+          <marker id="green" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#15803D"/>
+          </marker>
+          <marker id="red" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#DC2626"/>
+          </marker>
+        </defs>
+
+        <rect x="10"  y="40" width="100" height="48" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+        <text x="60"  y="62" text-anchor="middle" font-size="12" font-weight="700" fill="#3730A3">git commit</text>
+        <text x="60"  y="78" text-anchor="middle" font-size="10" fill="#6366F1">triggered</text>
+
+        <rect x="140" y="40" width="100" height="48" rx="8" fill="#F0FDFA" stroke="#0F766E" stroke-width="1.5"/>
+        <text x="190" y="62" text-anchor="middle" font-size="12" font-weight="700" fill="#115E59">typecheck</text>
+        <text x="190" y="78" text-anchor="middle" font-size="10" fill="#0F766E">pnpm tsc</text>
+
+        <rect x="270" y="40" width="100" height="48" rx="8" fill="#FDF2F8" stroke="#BE185D" stroke-width="1.5"/>
+        <text x="320" y="62" text-anchor="middle" font-size="12" font-weight="700" fill="#9D174D">lint + fix</text>
+        <text x="320" y="78" text-anchor="middle" font-size="10" fill="#BE185D">eslint --fix</text>
+
+        <rect x="400" y="40" width="100" height="48" rx="8" fill="#FFFBEB" stroke="#B45309" stroke-width="1.5"/>
+        <text x="450" y="62" text-anchor="middle" font-size="12" font-weight="700" fill="#92400E">format</text>
+        <text x="450" y="78" text-anchor="middle" font-size="10" fill="#B45309">prettier</text>
+
+        <!-- pass -->
+        <rect x="530" y="20" width="100" height="40" rx="8" fill="#F0FDF4" stroke="#15803D" stroke-width="1.5"/>
+        <text x="580" y="38" text-anchor="middle" font-size="12" font-weight="700" fill="#166534">Commit</text>
+        <text x="580" y="53" text-anchor="middle" font-size="10" fill="#15803D">succeeds</text>
+
+        <!-- fail -->
+        <rect x="530" y="80" width="100" height="40" rx="8" fill="#FEF2F2" stroke="#DC2626" stroke-width="1.5"/>
+        <text x="580" y="98" text-anchor="middle" font-size="12" font-weight="700" fill="#991B1B">Abort</text>
+        <text x="580" y="113" text-anchor="middle" font-size="10" fill="#DC2626">fix errors</text>
+
+        <line x1="110" y1="64" x2="136" y2="64" stroke="#9CA3AF" stroke-width="1.5" marker-end="url(#pa)"/>
+        <line x1="240" y1="64" x2="266" y2="64" stroke="#9CA3AF" stroke-width="1.5" marker-end="url(#pa)"/>
+        <line x1="370" y1="64" x2="396" y2="64" stroke="#9CA3AF" stroke-width="1.5" marker-end="url(#pa)"/>
+
+        <line x1="500" y1="56" x2="526" y2="42" stroke="#15803D" stroke-width="1.5" marker-end="url(#green)"/>
+        <text x="513" y="46" font-size="9" fill="#15803D">pass</text>
+
+        <line x1="500" y1="72" x2="526" y2="88" stroke="#DC2626" stroke-width="1.5" marker-end="url(#red)"/>
+        <text x="510" y="88" font-size="9" fill="#DC2626">fail</text>
+      </svg>
+    </div>
+
+    <h3>lint-staged Alternative</h3>
+
+    <p>If you prefer <code>husky</code> + <code>lint-staged</code>:</p>
+
+    <pre><code class="language-bash">pnpm add -D husky lint-staged
+pnpm husky init</code></pre>
+
+    <div class="code-label">package.json</div>
+    <pre><code class="language-json">{
+  "lint-staged": {
+    "*.{ts,tsx}": ["eslint --fix", "prettier --write"],
+    "*.{json,md,yml}": ["prettier --write"]
+  }
+}</code></pre>
+
+    <div class="code-label">.husky/pre-commit</div>
+    <pre><code class="language-bash">pnpm typecheck
+pnpm lint-staged</code></pre>
+
+    <div class="callout callout-tip">
+      <div class="callout-title">Tip — Run Only on Changed Files</div>
+      <p><code>lint-staged</code> runs linting only on staged files, making hooks fast even in large repos. <code>lefthook</code>'s <code>glob</code> option does the same. Never run <code>tsc</code> on a subset of files though — type checking requires the full project graph. Run <code>tsc --noEmit</code> on every commit regardless of which files changed.</p>
+    </div>
+
+    <!-- ================================================================ -->
+    <h2 id="cicd">11. CI/CD for TypeScript</h2>
+
+    <h3>GitHub Actions Workflow</h3>
+
+    <div class="code-label">.github/workflows/ci.yml</div>
+    <pre><code class="language-yaml">name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  check:
+    name: Type Check, Lint, Test, Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Type check
+        run: pnpm typecheck
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Test
+        run: pnpm test --run
+
+      - name: Build
+        run: pnpm build</code></pre>
+
+    <h3>Caching <code>node_modules</code> and <code>.pnpm-store</code></h3>
+
+    <p>The <code>cache: 'pnpm'</code> option in <code>setup-node</code> handles pnpm store caching automatically when used with <code>pnpm/action-setup</code>. For more control:</p>
+
+    <pre><code class="language-yaml">      - name: Get pnpm store directory
+        id: pnpm-cache
+        run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-</code></pre>
+
+    <div class="callout callout-info">
+      <div class="callout-title">Info — Type Checking vs Building Separately in CI</div>
+      <p>Run <code>pnpm typecheck</code> (which is <code>tsc --noEmit</code>) and <code>pnpm build</code> (which is <code>tsc</code> or <code>tsup</code>) as separate steps. This way, if the build fails due to a tool configuration issue rather than a type error, the error messages are distinct. It also allows you to fail fast on type errors before spending time on the full build.</p>
+    </div>
+
+    <div class="callout callout-ai">
+      <div class="callout-title">AI Era — CI as the Final AI Code Reviewer</div>
+      <p>In AI-assisted projects, CI is not optional — it's mandatory. When Copilot, Cursor, or Claude Code generates code that passes your local checks but fails a rule you forgot to configure locally, CI catches it. Think of CI as the safety net below the AI safety net. Every AI-generated PR goes through the same pipeline as hand-written code.</p>
+    </div>
+
+    <!-- ================================================================ -->
+    <h2 id="debugging">12. Debugging TypeScript</h2>
+
+    <h3>VS Code Debugger with TypeScript Source Maps</h3>
+
+    <p>TypeScript compiles to JavaScript, but with source maps you can set breakpoints in <code>.ts</code> files and the debugger maps them correctly. Ensure your tsconfig has:</p>
+
+    <pre><code class="language-json">{
+  "compilerOptions": {
+    "sourceMap": true
+  }
+}</code></pre>
+
+    <div class="code-label">.vscode/launch.json</div>
+    <pre><code class="language-json">{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug TypeScript (ts-node)",
+      "type": "node",
+      "request": "launch",
+      "runtimeArgs": ["--import", "tsx/esm"],
+      "args": ["${workspaceFolder}/src/index.ts"],
+      "sourceMaps": true,
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    },
+    {
+      "name": "Debug current file",
+      "type": "node",
+      "request": "launch",
+      "runtimeArgs": ["--import", "tsx/esm"],
+      "args": ["${file}"],
+      "sourceMaps": true,
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Debug Vitest tests",
+      "type": "node",
+      "request": "launch",
+      "runtimeArgs": ["--import", "tsx/esm"],
+      "args": [
+        "${workspaceFolder}/node_modules/.bin/vitest",
+        "--reporter=verbose"
+      ],
+      "sourceMaps": true,
+      "console": "integratedTerminal"
+    }
+  ]
+}</code></pre>
+
+    <h3>Node.js <code>--inspect</code> Flag</h3>
+
+    <pre><code class="language-bash"># Start with debugger, pause at first line
+node --inspect-brk --import tsx/esm src/index.ts
+
+# Then open chrome://inspect in Chrome, or attach VS Code</code></pre>
+
+    <h3>The <code>debugger</code> Statement</h3>
+
+    <p>Drop <code>debugger</code> anywhere in TypeScript — it works identically to JavaScript. When the debugger is attached, execution pauses there:</p>
+
+    <pre><code class="language-typescript">function processOrder(order: Order): ProcessedOrder {
+  debugger  // ← execution stops here when debugger attached
+  const validated = validateOrder(order)
+  return applyBusinessRules(validated)
+}</code></pre>
+
+    <div class="callout callout-warning">
+      <div class="callout-title">Warning — Remove debugger Before Commit</div>
+      <p>Add a lint rule to catch forgotten <code>debugger</code> statements: <code>"no-debugger": "error"</code> in ESLint. ESLint's base <code>recommended</code> config already includes this. Pre-commit hooks + CI will catch any that slip through.</p>
+    </div>
+
+    <h3>Structured Logging in Production</h3>
+
+    <p>For production code, replace <code>console.log</code> with <code>pino</code> — the fastest structured logger for Node.js, with TypeScript support built in:</p>
+
+    <pre><code class="language-bash">pnpm add pino
+pnpm add -D pino-pretty @types/pino</code></pre>
+
+    <div class="code-label">src/lib/logger.ts</div>
+    <pre><code class="language-typescript">import pino from 'pino'
+
+export const logger = pino({
+  level: process.env['LOG_LEVEL'] ?? 'info',
+  transport:
+    process.env['NODE_ENV'] !== 'production'
+      ? { target: 'pino-pretty', options: { colorize: true } }
+      : undefined,
+})
+
+// Usage — fully typed
+logger.info({ orderId, userId }, 'Order created')
+logger.error({ err, orderId }, 'Payment failed')
+logger.debug({ query, params }, 'DB query executed')</code></pre>
+
+    <div class="callout callout-tip">
+      <div class="callout-title">Tip — TypeScript + Pino for AI-Generated Logging</div>
+      <p>Pino's structured logging works beautifully with TypeScript types. When you log <code>{ orderId }</code>, the type of <code>orderId</code> is preserved. This makes logs machine-parseable and searchable in tools like Datadog or Grafana Loki — essential when debugging production issues in AI-generated code where you didn't write every path yourself.</p>
+    </div>
+
+    <hr class="section-divider" />
+
+    <!-- AI Tool Comparison Table -->
+    <h2 id="comparison">AI Tool Comparison: Copilot vs Cursor vs Claude Code</h2>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Feature</th>
+            <th>GitHub Copilot</th>
+            <th>Cursor</th>
+            <th>Claude Code</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Interface</strong></td>
+            <td>VS Code extension</td>
+            <td>Standalone editor (VS Code fork)</td>
+            <td>Terminal CLI</td>
+          </tr>
+          <tr>
+            <td><strong>Best for</strong></td>
+            <td>Inline completion, single-location edits</td>
+            <td>Multi-file edits, architectural work</td>
+            <td>Complex refactors, agentic tasks</td>
+          </tr>
+          <tr>
+            <td><strong>Context</strong></td>
+            <td>Open files + recent edits</td>
+            <td>Full repo indexed (@codebase)</td>
+            <td>Full repo + shell + arbitrary tools</td>
+          </tr>
+          <tr>
+            <td><strong>Multi-file editing</strong></td>
+            <td>Limited (manual coordination)</td>
+            <td>Excellent (Composer)</td>
+            <td>Excellent (agentic loop)</td>
+          </tr>
+          <tr>
+            <td><strong>Runs code/tests</strong></td>
+            <td>No</td>
+            <td>Limited</td>
+            <td>Yes — bash, npm, git, etc.</td>
+          </tr>
+          <tr>
+            <td><strong>TypeScript advantage</strong></td>
+            <td>Types improve completion quality</td>
+            <td>Type errors fed into Composer loop</td>
+            <td>Types as spec; tsc as verifier</td>
+          </tr>
+          <tr>
+            <td><strong>Project instructions</strong></td>
+            <td>copilot-instructions.md</td>
+            <td>.cursorrules</td>
+            <td>CLAUDE.md</td>
+          </tr>
+          <tr>
+            <td><strong>Price</strong></td>
+            <td>$10/mo individual</td>
+            <td>$20/mo Pro</td>
+            <td>Usage-based (API tokens)</td>
+          </tr>
+          <tr>
+            <td><strong>Offline / air-gapped</strong></td>
+            <td>No</td>
+            <td>No</td>
+            <td>No (API required)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout callout-protip">
+      <div class="callout-title">Pro Tip — Use All Three</div>
+      <p>The highest-leverage setup uses all three tools for different task sizes: <strong>Copilot</strong> for continuous inline completion as you type; <strong>Cursor</strong> for multi-file features and architectural Q&amp;A; <strong>Claude Code</strong> for large-scale refactors, migrations, and tasks that require running commands. They are not competitors — they are layers of the same augmented workflow.</p>
+    </div>
+
+    <!-- Chapter Footer -->
+    <div class="chapter-footer">
+      <a href="chapter-20-ai-apps.html" class="footer-nav-btn prev">
+        <span class="nav-dir">&#8592; Previous</span>
+        <span class="nav-label">Chapter 20: Building AI Apps</span>
+      </a>
+      <a href="chapter-22-case-cli.html" class="footer-nav-btn next">
+        <span class="nav-dir">Next &#8594;</span>
+        <span class="nav-label">Chapter 22: Case Study: CLI</span>
+      </a>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  // Highlight.js init
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('pre code').forEach(block => {
+      hljs.highlightElement(block)
+    })
+  })
+
+  // Active TOC link on scroll
+  const sections = document.querySelectorAll('h2[id], h3[id]')
+  const tocLinks = document.querySelectorAll('.toc-list a')
+
+  const observer = new IntersectionObserver(
+    entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          tocLinks.forEach(link => {
+            link.classList.toggle(
+              'active',
+              link.getAttribute('href') === '#' + entry.target.id
+            )
+          })
+        }
+      })
+    },
+    { rootMargin: '-60px 0px -70% 0px' }
+  )
+
+  sections.forEach(s => observer.observe(s))
+</script>
+</body>
+</html>

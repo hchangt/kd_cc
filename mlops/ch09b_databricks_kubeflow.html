@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 9B: Databricks, Kubeflow & Platform Selection - Modern MLOps Tutorial</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script>hljs.highlightAll(); mermaid.initialize({startOnLoad:true, theme:'default'});</script>
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; color: #1f2937; }
+    .prose-custom h2 { font-size:1.75rem; font-weight:700; color:#1e3a8a; margin:2.5rem 0 1rem; border-bottom:2px solid #dbeafe; padding-bottom:.5rem; }
+    .prose-custom h3 { font-size:1.25rem; font-weight:600; color:#1d4ed8; margin:2rem 0 .75rem; }
+    .prose-custom h4 { font-size:1.05rem; font-weight:600; color:#2563eb; margin:1.5rem 0 .5rem; }
+    .prose-custom p  { line-height:1.75; margin-bottom:1rem; }
+    .prose-custom ul { list-style:disc; padding-left:1.5rem; margin-bottom:1rem; }
+    .prose-custom li { margin-bottom:.4rem; line-height:1.7; }
+    pre code.hljs { border-radius:.5rem; font-size:.82rem; }
+    .callout-tip  { background:#ecfdf5; border-left:4px solid #059669; padding:1rem 1.25rem; border-radius:0 .5rem .5rem 0; margin:1.5rem 0; }
+    .callout-warn { background:#fffbeb; border-left:4px solid #d97706; padding:1rem 1.25rem; border-radius:0 .5rem .5rem 0; margin:1.5rem 0; }
+    .callout-info { background:#eff6ff; border-left:4px solid #2563eb; padding:1rem 1.25rem; border-radius:0 .5rem .5rem 0; margin:1.5rem 0; }
+    .callout-danger{ background:#fef2f2; border-left:4px solid #dc2626; padding:1rem 1.25rem; border-radius:0 .5rem .5rem 0; margin:1.5rem 0; }
+    table { width:100%; border-collapse:collapse; margin:1.5rem 0; font-size:.88rem; }
+    th { background:#1e40af; color:#fff; padding:.65rem 1rem; text-align:left; }
+    td { padding:.6rem 1rem; border-bottom:1px solid #e5e7eb; }
+    tr:nth-child(even) td { background:#f9fafb; }
+    .section-badge { display:inline-block; background:#dbeafe; color:#1d4ed8; font-size:.75rem; font-weight:600; padding:.2rem .7rem; border-radius:9999px; margin-bottom:.5rem; text-transform:uppercase; letter-spacing:.05em; }
+    .mermaid-wrap { background:#f8fafc; border:1px solid #e2e8f0; border-radius:.75rem; padding:1.5rem; margin:1.5rem 0; overflow-x:auto; }
+    .takeaway-card { background:#f0fdf4; border:1px solid #bbf7d0; border-radius:.75rem; padding:1.25rem 1.5rem; margin:.75rem 0; }
+  </style>
+</head>
+<body class="bg-white">
+
+<!-- NAVBAR -->
+<nav class="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm no-print">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-14">
+    <a href="index.html" class="flex items-center gap-3">
+      <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/>
+        </svg>
+      </div>
+      <span class="font-bold text-gray-900 text-sm tracking-tight">Modern MLOps Tutorial</span>
+    </a>
+    <div class="hidden md:flex items-center gap-6 text-sm text-gray-600">
+      <a href="#databricks" class="hover:text-blue-600">Databricks</a>
+      <a href="#kubeflow" class="hover:text-blue-600">Kubeflow</a>
+      <a href="#mlflow" class="hover:text-blue-600">MLflow</a>
+      <a href="#selection" class="hover:text-blue-600">Selection</a>
+      <a href="#internal" class="hover:text-blue-600">Internal Platform</a>
+      <a href="#migration" class="hover:text-blue-600">Migration</a>
+    </div>
+    <span class="text-xs text-gray-400">Chapter 9B · ~60 min</span>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="bg-gradient-to-br from-blue-50 via-white to-green-50 border-b border-gray-100">
+  <div class="max-w-5xl mx-auto px-6 py-12">
+    <div class="flex items-center gap-3 mb-4">
+      <span class="bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">Chapter 9B</span>
+      <span class="bg-green-100 text-green-800 text-xs font-semibold px-3 py-1 rounded-full">~60 min read</span>
+      <span class="bg-gray-100 text-gray-600 text-xs px-3 py-1 rounded-full">Companion to Ch 9</span>
+    </div>
+    <h1 class="text-4xl font-extrabold text-gray-900 mb-3">Databricks, Kubeflow &amp; Platform Selection</h1>
+    <p class="text-lg text-gray-600 max-w-3xl">Deep dives into Databricks (Delta Lake + MLflow + Unity Catalog), Kubeflow as a Kubernetes-native ML platform, MLflow as a full platform, and a rigorous framework for choosing — or building — the right ML platform for your organization.</p>
+  </div>
+</header>
+
+<main class="max-w-5xl mx-auto px-6 py-10 prose-custom">
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SECTION 1: DATABRICKS -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h2 id="databricks">Section 1: Databricks for ML</h2>
+
+<h3>Architecture Overview</h3>
+<p>Databricks is a Lakehouse platform: it unifies data warehousing and ML on a single runtime. The three foundational layers are <strong>Delta Lake</strong> (ACID-transactional storage on cloud object stores), <strong>Apache Spark</strong> (distributed compute), and <strong>managed MLflow</strong> (experiment tracking + model registry). Unity Catalog adds a governance layer across all assets.</p>
+
+<div class="mermaid-wrap">
+<div class="mermaid">
+graph TD
+  subgraph Storage["Storage Layer"]
+    DL["Delta Lake\n(ACID on S3/ADLS/GCS)"]
+    UC["Unity Catalog\n(Governance + Lineage)"]
+  end
+  subgraph Compute["Compute Layer"]
+    SP["Apache Spark\n(Batch + Streaming)"]
+    GPU["GPU Clusters\n(ML Training)"]
+    SQL["Databricks SQL\n(Warehouses)"]
+  end
+  subgraph ML["ML Layer"]
+    MLF["Managed MLflow\n(Tracking + Registry)"]
+    FS["Feature Store"]
+    AML["AutoML"]
+    MS["Model Serving\n(Serverless)"]
+  end
+  DL --> SP
+  DL --> SQL
+  UC --> DL
+  SP --> MLF
+  GPU --> MLF
+  FS --> MLF
+  MLF --> MS
+  AML --> MLF
+  style Storage fill:#dbeafe,stroke:#2563eb
+  style Compute fill:#d1fae5,stroke:#059669
+  style ML fill:#fef3c7,stroke:#d97706
+</div>
+</div>
+
+<h3>Unity Catalog for Data and Model Governance</h3>
+<p>Unity Catalog (UC) provides a three-level namespace: <code>catalog.schema.table</code> and <code>catalog.schema.model</code>. It enforces column-level access control, captures data lineage automatically, and applies the same permissions to Delta tables, feature store tables, and registered models. This makes it the single source of truth for compliance auditing in regulated industries.</p>
+
+<div class="callout-info">
+  <strong>Key UC concepts:</strong> Metastore (one per region), Catalogs (environments), Schemas (domains), Tables/Volumes/Models. Unity Catalog replaces the legacy Hive Metastore and workspace-level model registry.
+</div>
+
+<h3>Databricks AutoML</h3>
+<p>AutoML generates a best-of-breed notebook for classification, regression, or forecasting by running a FLAML/HyperOpt sweep over scikit-learn and XGBoost baselines. Every trial is logged to MLflow. You get transparent, editable Python code — not a black-box API. This is its key differentiator versus SageMaker Autopilot.</p>
+
+<h3>Feature Store on Databricks</h3>
+<p>The Databricks Feature Store persists feature tables as Delta tables, enforces point-in-time lookups to prevent leakage, and packages features into models so that online serving automatically retrieves them from an online store (DynamoDB, Cosmos DB, or Bigtable). The <code>FeatureEngineeringClient</code> API links training data to model lineage.</p>
+
+<h3>Code: Databricks ML Pipeline (Notebook Style)</h3>
+<pre><code class="language-python"># Databricks notebook — cells separated by # COMMAND ----------
+import mlflow
+import mlflow.sklearn
+from databricks.feature_engineering import FeatureEngineeringClient
+from pyspark.sql import functions as F
+from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.metrics import roc_auc_score
+import pandas as pd
+
+# COMMAND ----------
+# 1. Load features from Feature Store
+fe = FeatureEngineeringClient()
+training_set = fe.create_training_set(
+    df=spark.table("ml_catalog.churn.labels"),
+    feature_lookups=[
+        fe.FeatureLookup(
+            table_name="ml_catalog.churn.customer_features",
+            feature_names=["tenure_days", "monthly_spend", "support_tickets"],
+            lookup_key="customer_id",
+        )
+    ],
+    label="churned",
+    exclude_columns=["customer_id"],
+)
+df = training_set.load_df().toPandas()
+
+# COMMAND ----------
+# 2. Train with MLflow autolog
+mlflow.sklearn.autolog(log_input_examples=True)
+X, y = df.drop("churned", axis=1), df["churned"]
+X_train, X_test = X[:8000], X[8000:]
+y_train, y_test = y[:8000], y[8000:]
+
+with mlflow.start_run(run_name="gbm_churn_v1") as run:
+    model = GradientBoostingClassifier(n_estimators=200, max_depth=5)
+    model.fit(X_train, y_train)
+    auc = roc_auc_score(y_test, model.predict_proba(X_test)[:,1])
+    mlflow.log_metric("test_auc", auc)
+    # Log model WITH feature store metadata for online serving
+    fe.log_model(
+        model=model,
+        artifact_path="model",
+        flavor=mlflow.sklearn,
+        training_set=training_set,
+    )
+    print(f"AUC: {auc:.4f}  Run: {run.info.run_id}")
+
+# COMMAND ----------
+# 3. Register in Unity Catalog Model Registry
+mlflow.set_registry_uri("databricks-uc")
+model_uri = f"runs:/{run.info.run_id}/model"
+mv = mlflow.register_model(model_uri, "ml_catalog.churn.gbm_churn")
+client = mlflow.tracking.MlflowClient()
+client.set_registered_model_alias("ml_catalog.churn.gbm_churn", "champion", mv.version)
+print(f"Registered version {mv.version} as @champion")
+</code></pre>
+
+<h3>Code: Databricks Jobs API (REST)</h3>
+<pre><code class="language-python">import requests, os
+
+DATABRICKS_HOST = os.environ["DATABRICKS_HOST"]   # https://adb-xxxx.azuredatabricks.net
+DATABRICKS_TOKEN = os.environ["DATABRICKS_TOKEN"]
+HEADERS = {"Authorization": f"Bearer {DATABRICKS_TOKEN}"}
+
+# Create a job that runs a notebook on a new cluster
+job_payload = {
+    "name": "churn-model-weekly-retrain",
+    "schedule": {"quartz_cron_expression": "0 0 2 * * ?", "timezone_id": "UTC"},
+    "tasks": [{
+        "task_key": "train",
+        "notebook_task": {
+            "notebook_path": "/Repos/ml-team/churn-model/notebooks/train",
+            "base_parameters": {"env": "prod", "model_alias": "champion"}
+        },
+        "new_cluster": {
+            "spark_version": "15.4.x-ml-scala2.12",
+            "node_type_id": "Standard_DS3_v2",
+            "num_workers": 4,
+            "spark_conf": {"spark.databricks.delta.preview.enabled": "true"},
+        },
+        "libraries": [{"pypi": {"package": "scikit-learn==1.4.0"}}],
+        "timeout_seconds": 3600,
+    }],
+    "email_notifications": {"on_failure": ["ml-alerts@company.com"]},
+}
+
+resp = requests.post(f"{DATABRICKS_HOST}/api/2.1/jobs/create",
+                     json=job_payload, headers=HEADERS)
+resp.raise_for_status()
+print(f"Job ID: {resp.json()['job_id']}")
+
+# Trigger an immediate run
+run_resp = requests.post(f"{DATABRICKS_HOST}/api/2.1/jobs/run-now",
+                         json={"job_id": resp.json()["job_id"]}, headers=HEADERS)
+print(f"Run ID: {run_resp.json()['run_id']}")
+</code></pre>
+
+<h3>Databricks vs Spark on EMR Comparison</h3>
+<table>
+  <thead><tr><th>Dimension</th><th>Databricks</th><th>Spark on EMR</th></tr></thead>
+  <tbody>
+    <tr><td>Setup time</td><td>Minutes (fully managed)</td><td>Hours (cluster bootstrapping)</td></tr>
+    <tr><td>Delta Lake</td><td>Native, OSS + proprietary optimizations</td><td>OSS Delta only, no Photon</td></tr>
+    <tr><td>MLflow</td><td>Managed, integrated with Unity Catalog</td><td>Self-hosted or SageMaker Experiments</td></tr>
+    <tr><td>Feature Store</td><td>Built-in, online/offline parity</td><td>Must build or use SageMaker FS</td></tr>
+    <tr><td>Cost model</td><td>DBU + cloud compute (can be 2–3x EMR)</td><td>EC2 + EMR per-node fee (lower base)</td></tr>
+    <tr><td>Photon engine</td><td>Yes (vectorized query engine)</td><td>No</td></tr>
+    <tr><td>Unity Catalog</td><td>Yes</td><td>AWS Glue Catalog only</td></tr>
+    <tr><td>Model serving</td><td>Serverless, auto-scaling</td><td>Deploy to SageMaker separately</td></tr>
+    <tr><td>Notebook collaboration</td><td>Real-time co-authoring</td><td>JupyterHub on cluster</td></tr>
+    <tr><td>Best for</td><td>Lakehouse + ML unified platform</td><td>Pure ETL, cost-sensitive, AWS-native</td></tr>
+  </tbody>
+</table>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SECTION 2: KUBEFLOW -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h2 id="kubeflow">Section 2: Kubeflow</h2>
+
+<h3>Kubernetes-Native ML Platform</h3>
+<p>Kubeflow is a collection of Kubernetes-native tools for ML workflows. Unlike managed platforms, Kubeflow gives you complete control: any cloud, any hardware, no vendor lock-in. The trade-off is operational complexity — you own the Kubernetes cluster and all its components.</p>
+
+<div class="mermaid-wrap">
+<div class="mermaid">
+graph LR
+  subgraph K8s["Kubernetes Cluster"]
+    NB["Notebooks\n(JupyterHub)"]
+    KFP["KF Pipelines\n(Argo Workflows)"]
+    TO["Training Operator\n(TFJob/PyTorchJob)"]
+    KAT["Katib\n(HPO)"]
+    KS["KServe\n(Model Serving)"]
+    MV["MinIO / PVC\n(Artifact Store)"]
+  end
+  DEV["Data Scientist"] --> NB
+  DEV --> KFP
+  KFP --> TO
+  KFP --> KAT
+  KFP --> KS
+  TO --> MV
+  KAT --> MV
+  MV --> KS
+  style K8s fill:#f0f9ff,stroke:#0369a1
+</div>
+</div>
+
+<h3>Core Components</h3>
+<ul>
+  <li><strong>Kubeflow Pipelines (KFP v2):</strong> DAG-based ML pipelines compiled to Argo Workflows. Python SDK for defining components and pipelines as reusable, containerized steps.</li>
+  <li><strong>Training Operator:</strong> Custom Resources (TFJob, PyTorchJob, MXNetJob, XGBoostJob) for distributed training across multiple pods with synchronized parameter updates.</li>
+  <li><strong>Katib:</strong> Kubernetes-native HPO supporting grid search, random search, Bayesian optimization (using Optuna), and neural architecture search.</li>
+  <li><strong>KServe:</strong> Kubernetes-native model serving with canary rollout, traffic splitting, pre/post-processing transformers, and explainers. Formerly KFServing.</li>
+  <li><strong>Notebooks:</strong> JupyterHub-based multi-user notebook environment with GPU quota management per namespace.</li>
+</ul>
+
+<h3>Code: Kubeflow Pipeline (KFP v2 SDK)</h3>
+<pre><code class="language-python">from kfp import dsl, compiler
+from kfp.dsl import Dataset, Model, Metrics, Input, Output
+
+@dsl.component(base_image="python:3.11-slim",
+               packages_to_install=["scikit-learn==1.4.0", "pandas", "joblib"])
+def train_model(
+    dataset: Input[Dataset],
+    model: Output[Model],
+    metrics: Output[Metrics],
+    n_estimators: int = 100,
+    max_depth: int = 6,
+):
+    import pandas as pd
+    from sklearn.ensemble import RandomForestClassifier
+    from sklearn.metrics import roc_auc_score
+    import joblib, json
+
+    df = pd.read_parquet(dataset.path)
+    X, y = df.drop("label", axis=1), df["label"]
+    split = int(len(df) * 0.8)
+    clf = RandomForestClassifier(n_estimators=n_estimators, max_depth=max_depth)
+    clf.fit(X[:split], y[:split])
+    auc = roc_auc_score(y[split:], clf.predict_proba(X[split:])[:,1])
+    joblib.dump(clf, model.path + "/model.joblib")
+    metrics.log_metric("auc", auc)
+    metrics.log_metric("n_estimators", n_estimators)
+
+
+@dsl.component(base_image="python:3.11-slim",
+               packages_to_install=["mlflow", "joblib"])
+def register_model(
+    model: Input[Model],
+    metrics: Input[Metrics],
+    model_name: str,
+    mlflow_uri: str,
+):
+    import mlflow, joblib
+    mlflow.set_tracking_uri(mlflow_uri)
+    auc = metrics.metadata["auc"]
+    with mlflow.start_run():
+        import sklearn
+        clf = joblib.load(model.path + "/model.joblib")
+        mlflow.sklearn.log_model(clf, "model",
+                                 registered_model_name=model_name)
+        mlflow.log_metric("auc", auc)
+
+
+@dsl.pipeline(name="rf-training-pipeline", description="Random Forest training + registration")
+def ml_pipeline(
+    data_gcs_path: str = "gs://my-bucket/data/train.parquet",
+    model_name: str = "rf-classifier",
+    mlflow_uri: str = "http://mlflow-server:5000",
+    n_estimators: int = 200,
+    max_depth: int = 8,
+):
+    # Step 1: load data (in real pipeline, use a data loading component)
+    train_op = train_model(
+        dataset=dsl.importer(artifact_uri=data_gcs_path,
+                             artifact_class=Dataset).output,
+        n_estimators=n_estimators,
+        max_depth=max_depth,
+    )
+    train_op.set_cpu_request("2").set_memory_request("4Gi")
+
+    # Step 2: register only if AUC > threshold
+    with dsl.If(train_op.outputs["metrics"].metadata["auc"] > 0.75):
+        reg_op = register_model(
+            model=train_op.outputs["model"],
+            metrics=train_op.outputs["metrics"],
+            model_name=model_name,
+            mlflow_uri=mlflow_uri,
+        )
+        reg_op.set_cpu_request("1").set_memory_request("2Gi")
+
+
+if __name__ == "__main__":
+    compiler.Compiler().compile(ml_pipeline, "ml_pipeline.yaml")
+    print("Pipeline compiled to ml_pipeline.yaml")
+</code></pre>
+
+<h3>Code: PyTorchJob YAML for Distributed Training</h3>
+<pre><code class="language-yaml">apiVersion: kubeflow.org/v1
+kind: PyTorchJob
+metadata:
+  name: bert-finetune-job
+  namespace: ml-team
+spec:
+  pytorchReplicaSpecs:
+    Master:
+      replicas: 1
+      restartPolicy: OnFailure
+      template:
+        spec:
+          containers:
+            - name: pytorch
+              image: my-registry/bert-train:v1.2
+              args:
+                - "--epochs=10"
+                - "--batch-size=32"
+                - "--lr=2e-5"
+                - "--model=bert-base-uncased"
+                - "--output-dir=/mnt/models/bert-finetune"
+              resources:
+                requests:
+                  cpu: "4"
+                  memory: "16Gi"
+                  nvidia.com/gpu: "1"
+                limits:
+                  nvidia.com/gpu: "1"
+              volumeMounts:
+                - name: model-storage
+                  mountPath: /mnt/models
+          volumes:
+            - name: model-storage
+              persistentVolumeClaim:
+                claimName: model-pvc
+    Worker:
+      replicas: 3
+      restartPolicy: OnFailure
+      template:
+        spec:
+          containers:
+            - name: pytorch
+              image: my-registry/bert-train:v1.2
+              args:
+                - "--epochs=10"
+                - "--batch-size=32"
+                - "--lr=2e-5"
+              resources:
+                requests:
+                  nvidia.com/gpu: "1"
+                limits:
+                  nvidia.com/gpu: "1"
+              volumeMounts:
+                - name: model-storage
+                  mountPath: /mnt/models
+          volumes:
+            - name: model-storage
+              persistentVolumeClaim:
+                claimName: model-pvc
+</code></pre>
+
+<h3>Code: Katib Hyperparameter Tuning Experiment</h3>
+<pre><code class="language-yaml">apiVersion: kubeflow.org/v1beta1
+kind: Experiment
+metadata:
+  name: rf-hpo-experiment
+  namespace: ml-team
+spec:
+  objective:
+    type: maximize
+    goal: 0.90
+    objectiveMetricName: auc
+    additionalMetricNames: ["accuracy"]
+  algorithm:
+    algorithmName: bayesianoptimization
+    algorithmSettings:
+      - name: "random_state"
+        value: "42"
+  parallelTrialCount: 4
+  maxTrialCount: 20
+  maxFailedTrialCount: 3
+  parameters:
+    - name: n_estimators
+      parameterType: int
+      feasibleSpace:
+        min: "50"
+        max: "500"
+    - name: max_depth
+      parameterType: int
+      feasibleSpace:
+        min: "3"
+        max: "12"
+    - name: min_samples_split
+      parameterType: double
+      feasibleSpace:
+        min: "0.01"
+        max: "0.5"
+  trialTemplate:
+    primaryContainerName: training
+    trialParameters:
+      - name: n_estimators
+        description: Number of trees
+        reference: n_estimators
+      - name: max_depth
+        description: Max tree depth
+        reference: max_depth
+      - name: min_samples_split
+        description: Min samples to split
+        reference: min_samples_split
+    trialSpec:
+      apiVersion: batch/v1
+      kind: Job
+      spec:
+        template:
+          spec:
+            containers:
+              - name: training
+                image: my-registry/rf-train:v1.0
+                command:
+                  - "python"
+                  - "train.py"
+                  - "--n-estimators=${trialParameters.n_estimators}"
+                  - "--max-depth=${trialParameters.max_depth}"
+                  - "--min-samples-split=${trialParameters.min_samples_split}"
+            restartPolicy: Never
+</code></pre>
+
+<h3>When to Choose Kubeflow vs Managed Platforms</h3>
+<table>
+  <thead><tr><th>Factor</th><th>Choose Kubeflow</th><th>Choose Managed (Vertex/SageMaker)</th></tr></thead>
+  <tbody>
+    <tr><td>Cloud strategy</td><td>Multi-cloud / on-prem hybrid</td><td>Single cloud, full commitment</td></tr>
+    <tr><td>Team K8s expertise</td><td>Strong K8s / platform team</td><td>Little K8s expertise</td></tr>
+    <tr><td>Regulatory</td><td>Data must stay on-prem</td><td>Cloud-compliant is acceptable</td></tr>
+    <tr><td>Cost sensitivity</td><td>Need to avoid per-API markups</td><td>Operational simplicity worth premium</td></tr>
+    <tr><td>Customization</td><td>Custom schedulers, hardware, storage</td><td>Standard workflows</td></tr>
+    <tr><td>Time to value</td><td>Weeks to months to set up</td><td>Days</td></tr>
+    <tr><td>ML team size</td><td>Large (50+ ML engineers)</td><td>Small/growing teams</td></tr>
+  </tbody>
+</table>
+
+<h3>Installation Options</h3>
+<ul>
+  <li><strong>Standalone KFP:</strong> Install only Kubeflow Pipelines via Helm. Lightweight, runs on any K8s cluster. Best starting point.</li>
+  <li><strong>Full Kubeflow manifest:</strong> All components via <code>kustomize</code>. Complex, but includes Notebooks, Katib, Training Operator, and KServe.</li>
+  <li><strong>Managed distributions:</strong> Charmed Kubeflow (Canonical), Kubeflow on GKE (Vertex AI Pipelines uses KFP SDK), AWS Kubeflow on EKS, OpenShift AI (Red Hat).</li>
+</ul>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SECTION 3: MLFLOW AS A FULL PLATFORM -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h2 id="mlflow">Section 3: MLflow as a Full Platform</h2>
+
+<h3>Beyond Experiment Tracking</h3>
+<p>Most teams use MLflow only for <code>mlflow.log_metric()</code>, but the full platform spans five components: <strong>Tracking</strong> (experiments/runs), <strong>Projects</strong> (reproducible code packaging), <strong>Models</strong> (model flavor abstraction), <strong>Registry</strong> (lifecycle management), and <strong>Serving</strong> (REST inference endpoints). Together they form a complete, cloud-agnostic ML platform at zero cost.</p>
+
+<h3>MLflow Tracking + Projects + Models + Registry</h3>
+<ul>
+  <li><strong>Tracking:</strong> Logs params, metrics, artifacts, tags. Stores to local FS, S3/GCS/ADLS, or MLflow server backed by PostgreSQL/MySQL.</li>
+  <li><strong>Projects:</strong> <code>MLproject</code> YAML + conda/Docker env = reproducible entry points. Run with <code>mlflow run git://github.com/org/repo</code>.</li>
+  <li><strong>Models:</strong> Framework-agnostic model format. A model directory contains <code>MLmodel</code> YAML, the serialized artifact, conda env, and requirements.txt. Supports 30+ flavors.</li>
+  <li><strong>Registry:</strong> Versioned models with stages (Staging, Production, Archived). UC-backed registry uses three-level namespaces.</li>
+</ul>
+
+<h3>Code: mlflow models serve (REST Endpoint)</h3>
+<pre><code class="language-bash"># Serve a registered model version locally
+mlflow models serve \
+  --model-uri "models:/rf-classifier/Production" \
+  --port 5001 \
+  --host 0.0.0.0 \
+  --env-manager conda \
+  --workers 4
+
+# Query the endpoint
+curl -X POST http://localhost:5001/invocations \
+  -H "Content-Type: application/json" \
+  -d '{"dataframe_records": [{"tenure_days": 365, "monthly_spend": 89.5, "support_tickets": 2}]}'
+# Response: {"predictions": [0.23]}
+
+# Build a Docker image for the model (production deployment)
+mlflow models build-docker \
+  --model-uri "models:/rf-classifier/Production" \
+  --name "rf-classifier-serving:v3" \
+  --enable-mlserver
+
+# Push and deploy
+docker push my-registry/rf-classifier-serving:v3
+kubectl apply -f - <<EOF
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rf-classifier
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: rf-classifier
+  template:
+    metadata:
+      labels:
+        app: rf-classifier
+    spec:
+      containers:
+        - name: model
+          image: my-registry/rf-classifier-serving:v3
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              cpu: "1"
+              memory: "2Gi"
+EOF
+</code></pre>
+
+<h3>Code: MLflow on Kubernetes (Full Deployment)</h3>
+<pre><code class="language-yaml"># mlflow-server/values.yaml for Helm chart
+# helm install mlflow community-charts/mlflow -f values.yaml
+replicaCount: 2
+image:
+  repository: ghcr.io/mlflow/mlflow
+  tag: "2.13.0"
+service:
+  type: ClusterIP
+  port: 5000
+ingress:
+  enabled: true
+  hosts:
+    - host: mlflow.internal.company.com
+      paths: [{ path: /, pathType: Prefix }]
+  tls:
+    - secretName: mlflow-tls
+      hosts: ["mlflow.internal.company.com"]
+extraEnvVars:
+  - name: MLFLOW_BACKEND_STORE_URI
+    valueFrom:
+      secretKeyRef: { name: mlflow-secrets, key: db-uri }
+  - name: MLFLOW_DEFAULT_ARTIFACT_ROOT
+    value: "s3://mlflow-artifacts/mlflow"
+  - name: AWS_DEFAULT_REGION
+    value: "us-east-1"
+resources:
+  requests: { cpu: "500m", memory: "1Gi" }
+  limits: { cpu: "2", memory: "4Gi" }
+postgresql:
+  enabled: true
+  auth:
+    database: mlflow
+    username: mlflow
+    existingSecret: mlflow-secrets
+</code></pre>
+
+<h3>MLflow Ecosystem Integrations</h3>
+<p>MLflow integrates natively with: scikit-learn, PyTorch, TensorFlow/Keras, XGBoost, LightGBM, Hugging Face Transformers, LangChain, OpenAI, Spark MLlib, and more via <code>mlflow.autolog()</code>. Deployment targets include Databricks Model Serving, SageMaker, Azure ML, Kubernetes (MLServer/TorchServe), and local REST endpoints.</p>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SECTION 4: PLATFORM SELECTION FRAMEWORK -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h2 id="selection">Section 4: Platform Selection Framework</h2>
+
+<h3>Make vs Buy Decision Framework</h3>
+<p>The decision to build or buy an ML platform hinges on three axes: <strong>differentiation</strong> (does this capability create competitive advantage?), <strong>operational burden</strong> (who runs it at 3am?), and <strong>total cost of ownership</strong> over three years including engineering time.</p>
+
+<div class="callout-warn">
+  <strong>The hidden cost of "free" open-source:</strong> A self-hosted Kubeflow cluster requires 0.5–1.0 FTE of platform engineering to maintain at production quality. Factor this into any "free" calculation.
+</div>
+
+<h3>Company Stage Considerations</h3>
+<table>
+  <thead><tr><th>Stage</th><th>Team Size</th><th>Recommended Platform</th><th>Rationale</th></tr></thead>
+  <tbody>
+    <tr><td>Seed / Series A</td><td>1–5 ML</td><td>Colab + MLflow + simple CI/CD</td><td>Speed over rigor; no platform team</td></tr>
+    <tr><td>Series B</td><td>5–20 ML</td><td>Vertex AI or SageMaker + managed MLflow</td><td>Need reliability without ops overhead</td></tr>
+    <tr><td>Series C+</td><td>20–50 ML</td><td>Databricks or managed Kubeflow</td><td>Cost efficiency at scale; need governance</td></tr>
+    <tr><td>Enterprise</td><td>50+ ML</td><td>Internal platform + Kubeflow or Databricks</td><td>Multi-team, compliance, cost control</td></tr>
+    <tr><td>Regulated (pharma/finance)</td><td>Any</td><td>On-prem Kubeflow or Databricks on private cloud</td><td>Data sovereignty, audit trails</td></tr>
+  </tbody>
+</table>
+
+<h3>Detailed Feature Comparison Matrix</h3>
+<table>
+  <thead>
+    <tr><th>Feature</th><th>Vertex AI</th><th>SageMaker</th><th>Databricks</th><th>Kubeflow</th><th>MLflow (self-hosted)</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Experiment tracking</td><td>Vertex Experiments</td><td>Experiments</td><td>Managed MLflow</td><td>MLflow / TensorBoard</td><td>Native</td></tr>
+    <tr><td>Pipelines</td><td>Vertex Pipelines (KFP)</td><td>Pipelines (SagePipes)</td><td>Databricks Workflows</td><td>KFP v2</td><td>MLflow Projects</td></tr>
+    <tr><td>Feature Store</td><td>Vertex Feature Store</td><td>SageMaker FS</td><td>Databricks FS</td><td>Feast (external)</td><td>None built-in</td></tr>
+    <tr><td>HPO</td><td>Vertex Vizier</td><td>Automatic Model Tuning</td><td>Hyperopt / Optuna</td><td>Katib</td><td>Optuna plugin</td></tr>
+    <tr><td>Distributed training</td><td>Custom jobs / TPUs</td><td>Training jobs + P3/P4</td><td>Spark + GPU clusters</td><td>Training Operator</td><td>External (Ray/Horovod)</td></tr>
+    <tr><td>Model registry</td><td>Vertex Model Registry</td><td>Model Registry</td><td>Unity Catalog</td><td>MLflow / Seldon</td><td>MLflow Registry</td></tr>
+    <tr><td>Online serving</td><td>Vertex Endpoints</td><td>Real-time endpoints</td><td>Serverless serving</td><td>KServe</td><td>mlflow models serve</td></tr>
+    <tr><td>AutoML</td><td>Vertex AutoML</td><td>Autopilot</td><td>AutoML</td><td>Katib (NAS only)</td><td>None</td></tr>
+    <tr><td>Governance / lineage</td><td>Dataplex</td><td>SageMaker Lineage</td><td>Unity Catalog</td><td>Kubeflow metadata</td><td>MLflow lineage (basic)</td></tr>
+    <tr><td>Multi-cloud</td><td>No</td><td>No</td><td>Yes (AWS/Azure/GCP)</td><td>Yes (any K8s)</td><td>Yes</td></tr>
+    <tr><td>On-prem</td><td>No</td><td>No</td><td>Databricks on-prem</td><td>Yes</td><td>Yes</td></tr>
+    <tr><td>Vendor lock-in</td><td>High</td><td>High</td><td>Medium</td><td>Low</td><td>Low</td></tr>
+    <tr><td>Ops burden</td><td>None</td><td>None</td><td>Low</td><td>High</td><td>Medium</td></tr>
+  </tbody>
+</table>
+
+<h3>Cost Comparison by Workload Type</h3>
+<table>
+  <thead><tr><th>Workload</th><th>Vertex AI</th><th>SageMaker</th><th>Databricks</th><th>Kubeflow (self-managed)</th></tr></thead>
+  <tbody>
+    <tr><td>10k experiments/month</td><td>~$120 (metadata)</td><td>~$100</td><td>~$80 (DBU)</td><td>~$20 (storage only)</td></tr>
+    <tr><td>100hr GPU training/mo</td><td>~$1,800 (A100)</td><td>~$1,600 (p3.2xlarge)</td><td>~$2,200 (DBU + GPU)</td><td>~$900 (spot K8s nodes)</td></tr>
+    <tr><td>1M predictions/day (REST)</td><td>~$350/mo</td><td>~$400/mo</td><td>~$250/mo (serverless)</td><td>~$80/mo (K8s pods)</td></tr>
+    <tr><td>Platform engineering FTE</td><td>0</td><td>0</td><td>0.25 FTE</td><td>0.75 FTE</td></tr>
+    <tr><td>3-yr TCO (mid-size team)</td><td>~$180k</td><td>~$160k</td><td>~$210k</td><td>~$140k (incl. FTE)</td></tr>
+  </tbody>
+</table>
+
+<div class="callout-info">
+  <strong>Note:</strong> Costs are approximate list prices as of early 2026. Negotiate enterprise discounts (30–50% off list is common for Databricks and cloud providers). Kubeflow TCO heavily depends on whether you already have a K8s platform team.
+</div>
+
+<h3>Platform Selection Decision Tree</h3>
+<div class="mermaid-wrap">
+<div class="mermaid">
+flowchart TD
+  A[Start: Select ML Platform] --> B{Data must stay\non-prem?}
+  B -- Yes --> C{K8s expertise\nin-house?}
+  C -- Yes --> D[Kubeflow\non bare-metal/VMware]
+  C -- No --> E[Databricks\non private cloud]
+  B -- No --> F{Primary cloud?}
+  F -- AWS --> G{Team size?}
+  F -- GCP --> H{AutoML needed?}
+  F -- Azure --> I[Databricks on Azure\nor Azure ML]
+  F -- Multi-cloud --> J[Databricks or\nself-hosted Kubeflow]
+  G -- Small < 10 --> K[SageMaker Studio\nmanaged]
+  G -- Large 10+ --> L{Cost priority?}
+  L -- Yes --> M[SageMaker +\nself-hosted MLflow]
+  L -- No --> N[Databricks on AWS]
+  H -- Yes --> O[Vertex AI\nfull platform]
+  H -- No --> P{Spark workloads?}
+  P -- Yes --> Q[Databricks on GCP]
+  P -- No --> R[Vertex AI Pipelines\n+ KFP SDK]
+  style D fill:#fef3c7,stroke:#d97706
+  style E fill:#fef3c7,stroke:#d97706
+  style K fill:#d1fae5,stroke:#059669
+  style M fill:#d1fae5,stroke:#059669
+  style N fill:#d1fae5,stroke:#059669
+  style O fill:#dbeafe,stroke:#2563eb
+  style Q fill:#dbeafe,stroke:#2563eb
+  style R fill:#dbeafe,stroke:#2563eb
+  style I fill:#ede9fe,stroke:#7c3aed
+  style J fill:#ede9fe,stroke:#7c3aed
+</div>
+</div>
+
+<h3>Lock-in Risk Scoring</h3>
+<table>
+  <thead><tr><th>Platform</th><th>Data Lock-in</th><th>API Lock-in</th><th>Pricing Lock-in</th><th>Overall Risk</th></tr></thead>
+  <tbody>
+    <tr><td>Vertex AI</td><td>Medium (GCS portable)</td><td>High (proprietary APIs)</td><td>High</td><td>High</td></tr>
+    <tr><td>SageMaker</td><td>Low (S3 portable)</td><td>High (boto3 tightly coupled)</td><td>High</td><td>High</td></tr>
+    <tr><td>Databricks</td><td>Low (Delta OSS)</td><td>Medium (MLflow is OSS)</td><td>Medium (DBU pricing)</td><td>Medium</td></tr>
+    <tr><td>Kubeflow</td><td>None</td><td>Low (KFP SDK open)</td><td>Low (your infra)</td><td>Low</td></tr>
+    <tr><td>MLflow (self-hosted)</td><td>None</td><td>None (fully OSS)</td><td>None</td><td>Very Low</td></tr>
+  </tbody>
+</table>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SECTION 5: INTERNAL ML PLATFORM -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h2 id="internal">Section 5: Building an Internal ML Platform</h2>
+
+<h3>The Internal Developer Platform Concept</h3>
+<p>An Internal ML Platform (IMLP) is a product your platform team builds for internal ML engineers. The goal is a self-service "paved road": sensible defaults for infra, observability, and deployment that let ML engineers focus on model logic rather than K8s YAML. Think of it as a thin opinionated layer over Kubeflow, Databricks, or your cloud of choice.</p>
+
+<h3>Core Capabilities: Build vs Buy</h3>
+<table>
+  <thead><tr><th>Capability</th><th>Build</th><th>Buy / OSS</th><th>Rationale</th></tr></thead>
+  <tbody>
+    <tr><td>Experiment tracking</td><td>Never</td><td>MLflow / W&amp;B</td><td>Solved problem, high OSS quality</td></tr>
+    <tr><td>Pipeline orchestration</td><td>Rarely</td><td>Kubeflow / Airflow / Prefect</td><td>Complex scheduling is hard to build right</td></tr>
+    <tr><td>Feature Store</td><td>Sometimes</td><td>Feast / Databricks FS</td><td>Domain-specific features may need custom logic</td></tr>
+    <tr><td>Model serving gateway</td><td>Yes</td><td>KServe + custom wrapper</td><td>Auth, rate-limiting, routing = your business logic</td></tr>
+    <tr><td>ML metadata catalog</td><td>No</td><td>Unity Catalog / DataHub</td><td>Graph traversal and UI are expensive to build</td></tr>
+    <tr><td>Developer portal (IDP)</td><td>Yes</td><td>Backstage (scaffold)</td><td>Internal UX should reflect your workflows</td></tr>
+    <tr><td>Cost attribution</td><td>Yes</td><td>CloudCost / custom</td><td>Team-level showback is always org-specific</td></tr>
+  </tbody>
+</table>
+
+<h3>Developer Experience Metrics</h3>
+<p>Measure platform quality with time-based DX metrics tracked as P50/P95 across ML team runs:</p>
+<ul>
+  <li><strong>Time-to-first-experiment:</strong> New engineer runs first tracked experiment. Target P50 &lt; 30 min.</li>
+  <li><strong>Time-to-staging:</strong> Model goes from notebook to staging endpoint. Target P50 &lt; 4 hrs, P95 &lt; 1 day.</li>
+  <li><strong>Time-to-production:</strong> Full deployment including approval. Target P50 &lt; 3 days, P95 &lt; 2 weeks.</li>
+  <li><strong>Retraining cycle time:</strong> Data update to new model in production. Target P50 &lt; 6 hrs.</li>
+  <li><strong>Incident recovery time:</strong> Model degradation to rollback complete. Target P95 &lt; 30 min.</li>
+</ul>
+
+<h3>Platform Team Structure (3-Tier)</h3>
+<ul>
+  <li><strong>Tier 1 — Infra:</strong> K8s cluster management, networking, GPU drivers, storage (PVC, object store). SRE-adjacent. Owns uptime SLAs.</li>
+  <li><strong>Tier 2 — Platform:</strong> Kubeflow/Databricks configuration, MLflow server, CI/CD templates, cost tooling. The "paved road" builders.</li>
+  <li><strong>Tier 3 — ML Enablement:</strong> Embedded in ML teams. Templates, SDKs, onboarding. The "inner loop" advocates who translate platform capabilities into ML workflows.</li>
+</ul>
+
+<h3>Code: Platform API Design (Internal ML Gateway)</h3>
+<pre><code class="language-python">"""
+Internal ML Gateway — provides a unified Python SDK over
+multiple backends (Databricks, Kubeflow, local).
+Pattern: Adapter over heterogeneous infrastructure.
+"""
+from abc import ABC, abstractmethod
+from dataclasses import dataclass
+from typing import Optional
+import os
+
+@dataclass
+class TrainRequest:
+    experiment_name: str
+    git_ref: str              # commit SHA or branch
+    entry_point: str          # e.g. "train"
+    parameters: dict
+    resource_class: str       # "small" | "medium" | "gpu"
+    team: str
+    notify_on_complete: bool = True
+
+@dataclass
+class TrainResult:
+    run_id: str
+    run_url: str
+    status: str
+    metrics: Optional[dict] = None
+
+class MLBackend(ABC):
+    @abstractmethod
+    def submit_training(self, req: TrainRequest) -> TrainResult: ...
+    @abstractmethod
+    def get_status(self, run_id: str) -> str: ...
+    @abstractmethod
+    def promote_model(self, run_id: str, alias: str) -> str: ...
+
+class DatabricksBackend(MLBackend):
+    def __init__(self, host: str, token: str):
+        import requests
+        self._host = host
+        self._headers = {"Authorization": f"Bearer {token}"}
+
+    def submit_training(self, req: TrainRequest) -> TrainResult:
+        # Map resource class to Databricks node types
+        node_map = {
+            "small": ("Standard_DS3_v2", 2),
+            "medium": ("Standard_DS5_v2", 4),
+            "gpu": ("Standard_NC6s_v3", 1),
+        }
+        node_type, num_workers = node_map[req.resource_class]
+        payload = {
+            "run_name": f"{req.team}/{req.experiment_name}",
+            "new_cluster": {"node_type_id": node_type, "num_workers": num_workers,
+                            "spark_version": "15.4.x-ml-scala2.12"},
+            "notebook_task": {"notebook_path": f"/Repos/{req.team}/{req.entry_point}",
+                              "base_parameters": req.parameters},
+        }
+        import requests
+        resp = requests.post(f"{self._host}/api/2.1/runs/submit",
+                             json=payload, headers=self._headers)
+        resp.raise_for_status()
+        run_id = str(resp.json()["run_id"])
+        return TrainResult(run_id=run_id,
+                           run_url=f"{self._host}/#job/{run_id}",
+                           status="PENDING")
+
+    def get_status(self, run_id: str) -> str:
+        import requests
+        resp = requests.get(f"{self._host}/api/2.1/runs/get",
+                            params={"run_id": run_id}, headers=self._headers)
+        return resp.json()["state"]["life_cycle_state"]
+
+    def promote_model(self, run_id: str, alias: str) -> str:
+        import mlflow
+        mlflow.set_tracking_uri(f"{self._host}")
+        client = mlflow.tracking.MlflowClient()
+        # Implementation: find registered model version for run_id, set alias
+        return f"promoted run {run_id} to alias={alias}"
+
+
+class MLGateway:
+    """Unified entrypoint. Backend resolved from env or explicit override."""
+    def __init__(self, backend: Optional[MLBackend] = None):
+        if backend:
+            self._backend = backend
+        elif os.getenv("ML_BACKEND") == "databricks":
+            self._backend = DatabricksBackend(
+                os.environ["DATABRICKS_HOST"], os.environ["DATABRICKS_TOKEN"])
+        else:
+            raise ValueError("Set ML_BACKEND env var or pass backend explicitly")
+
+    def train(self, req: TrainRequest) -> TrainResult:
+        result = self._backend.submit_training(req)
+        if req.notify_on_complete:
+            self._schedule_notification(result.run_id, req.team)
+        return result
+
+    def _schedule_notification(self, run_id: str, team: str):
+        # In production: enqueue to Celery / SQS for async polling
+        pass
+
+
+# Usage by ML engineers — one-liner to submit a training job
+if __name__ == "__main__":
+    gateway = MLGateway()
+    result = gateway.train(TrainRequest(
+        experiment_name="churn-model-v4",
+        git_ref="main",
+        entry_point="train",
+        parameters={"n_estimators": "200", "env": "staging"},
+        resource_class="gpu",
+        team="ml-platform",
+    ))
+    print(f"Submitted: {result.run_id} — {result.run_url}")
+</code></pre>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SECTION 6: MIGRATION STRATEGIES -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h2 id="migration">Section 6: Migration Strategies</h2>
+
+<h3>Migrating from Jupyter Scripts to Pipelines</h3>
+<p>The most common migration path is monolithic notebook → modular pipeline steps. The key insight: don't refactor and migrate simultaneously. First <em>wrap</em> the notebook as a single pipeline step (no logic changes), then iteratively decompose it into steps as you gain confidence in the pipeline framework.</p>
+
+<ol style="list-style:decimal;padding-left:1.5rem;margin-bottom:1rem;">
+  <li><strong>Phase 0 — Baseline:</strong> Add MLflow logging to existing notebooks. Establish metric baselines before touching code structure.</li>
+  <li><strong>Phase 1 — Containerize:</strong> Wrap notebook in a Docker image, run via <code>papermill</code>. Notebook still works locally unchanged.</li>
+  <li><strong>Phase 2 — Single-step pipeline:</strong> Submit the container as one pipeline step. CI/CD now owns execution.</li>
+  <li><strong>Phase 3 — Decompose:</strong> Split into data loading, preprocessing, training, evaluation, registration steps. Each step has typed inputs/outputs.</li>
+  <li><strong>Phase 4 — Parameterize:</strong> Remove hardcoded paths and hyperparameters. Enable triggered retraining.</li>
+</ol>
+
+<h3>Migrating Between Orchestrators</h3>
+<p>Moving from Airflow to Kubeflow Pipelines, or from Kubeflow to Databricks Workflows, follows a pattern: the <em>business logic</em> (training code) is portable; only the <em>orchestration glue</em> (DAG definitions, I/O passing) needs rewriting. Factor your pipeline so operators are thin wrappers over shared library functions.</p>
+
+<div class="callout-tip">
+  <strong>Portability pattern:</strong> Define pipeline steps as Python functions that accept paths as strings and write outputs to paths. This makes each step runnable standalone (unit testable), in any orchestrator, or locally — with zero changes to the function body.
+</div>
+
+<h3>Platform Migration Roadmap</h3>
+<div class="mermaid-wrap">
+<div class="mermaid">
+gantt
+  title Platform Migration Roadmap (Jupyter → Production Kubeflow)
+  dateFormat  YYYY-MM-DD
+  section Foundation
+    Add MLflow logging to notebooks         :done, f1, 2025-01-01, 3w
+    Establish metric baselines              :done, f2, after f1, 1w
+    Set up K8s cluster + Kubeflow install   :done, f3, 2025-01-01, 4w
+  section Phase 1 - Containerize
+    Dockerize top 3 models                  :active, p1a, 2025-02-01, 3w
+    Run via papermill in CI/CD              :p1b, after p1a, 2w
+    Shadow mode validation                  :p1c, after p1b, 2w
+  section Phase 2 - Pipeline Migration
+    Migrate Model A to KFP pipeline         :p2a, 2025-03-15, 4w
+    Migrate Model B to KFP pipeline         :p2b, after p2a, 3w
+    Migrate Model C to KFP pipeline         :p2c, after p2b, 3w
+  section Phase 3 - Advanced Features
+    Enable Katib HPO                        :p3a, 2025-06-01, 3w
+    Deploy KServe endpoints                 :p3b, after p3a, 3w
+    Deprecate Jupyter-triggered deployments :p3c, after p3b, 2w
+  section Hardening
+    Load testing + SLO definition           :h1, 2025-08-01, 3w
+    Runbooks + on-call rotation             :h2, after h1, 2w
+    Cost optimization pass                  :h3, after h2, 2w
+</div>
+</div>
+
+<h3>Risk Mitigation During Migration</h3>
+<ul>
+  <li><strong>Shadow mode first:</strong> Run new pipeline in parallel with old system, compare outputs. Only cut over when P99 latency and metric parity are confirmed.</li>
+  <li><strong>Feature flags:</strong> Use a simple config flag to switch traffic between old and new inference path. Roll back in &lt;5 minutes without a code deploy.</li>
+  <li><strong>Data contract testing:</strong> Write Great Expectations or Pydantic validators at every pipeline input boundary before migrating. Data schema bugs are the #1 cause of silent model degradation post-migration.</li>
+  <li><strong>Metric continuity:</strong> Ensure business metrics (revenue, CTR, CSAT) are tracked across the migration boundary, not just model AUC. A migration that improves AUC but breaks upstream feature logic will regress silently.</li>
+  <li><strong>Rollback checkpoints:</strong> Keep the previous pipeline version operational for 30 days post-cutover. Migration is complete only when you've seen a full retraining cycle succeed end-to-end.</li>
+</ul>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SUMMARY & KEY TAKEAWAYS -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h2 id="takeaways">Summary &amp; Key Takeaways</h2>
+
+<p>Chapters 9 and 9B together cover the five dominant ML platform approaches. The right choice is context-dependent — there is no universal winner. Here are the principles that survive across all contexts:</p>
+
+<div class="grid md:grid-cols-2 gap-4 my-6">
+  <div class="takeaway-card">
+    <h4 class="font-bold text-green-800 mt-0 mb-2">1. Match platform to data architecture</h4>
+    <p class="text-sm text-gray-700 mb-0">If your data lives in Delta Lake and your teams run Spark, Databricks is the natural fit. If your data is in BigQuery, Vertex AI's integration will save weeks. Platform selection should follow data gravity.</p>
+  </div>
+  <div class="takeaway-card">
+    <h4 class="font-bold text-green-800 mt-0 mb-2">2. Kubeflow is powerful but operationally demanding</h4>
+    <p class="text-sm text-gray-700 mb-0">Start with standalone KFP, not the full Kubeflow manifest. Add components incrementally as your team builds K8s expertise. Full Kubeflow is a 0.75 FTE commitment minimum.</p>
+  </div>
+  <div class="takeaway-card">
+    <h4 class="font-bold text-green-800 mt-0 mb-2">3. MLflow is the universal connector</h4>
+    <p class="text-sm text-gray-700 mb-0">Even if you run Vertex AI or SageMaker, keeping MLflow as your experiment tracking layer gives you platform portability. Migrate the orchestrator; your experiment history travels with you.</p>
+  </div>
+  <div class="takeaway-card">
+    <h4 class="font-bold text-green-800 mt-0 mb-2">4. Lock-in is real but manageable</h4>
+    <p class="text-sm text-gray-700 mb-0">Separate your model training code from the platform's orchestration API. If your training functions accept file paths as inputs and write to file paths as outputs, you can swap orchestrators in weeks, not months.</p>
+  </div>
+  <div class="takeaway-card">
+    <h4 class="font-bold text-green-800 mt-0 mb-2">5. Internal platforms need a product owner</h4>
+    <p class="text-sm text-gray-700 mb-0">Without a PM mindset — user research, DX metrics, roadmap prioritization — internal ML platforms degrade into a collection of half-integrated tools. Treat internal users as customers.</p>
+  </div>
+  <div class="takeaway-card">
+    <h4 class="font-bold text-green-800 mt-0 mb-2">6. Migrate incrementally, validate continuously</h4>
+    <p class="text-sm text-gray-700 mb-0">Shadow mode, feature flags, and data contract tests are the migration trilogy. Never cut over without a tested rollback path. The business cost of a broken migration exceeds the cost of running both systems in parallel for 30 days.</p>
+  </div>
+</div>
+
+<div class="callout-info mt-8">
+  <strong>Chapter 9 + 9B combined platform coverage:</strong>
+  <ul class="mt-2 mb-0">
+    <li>Ch 9: Vertex AI (GCP-native, BigQuery-integrated, Kubeflow Pipelines-backed) and SageMaker (AWS-native, tightest boto3 integration, JumpStart foundation models)</li>
+    <li>Ch 9B: Databricks (Lakehouse + managed MLflow + Unity Catalog), Kubeflow (K8s-native, multi-cloud, full control), MLflow standalone, platform selection framework, internal platform design, and migration strategies</li>
+  </ul>
+</div>
+
+</main>
+
+<!-- BOTTOM NAVIGATION -->
+<footer class="border-t border-gray-200 bg-gray-50 mt-16 no-print">
+  <div class="max-w-5xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+    <a href="ch09_mlops_platforms.html" class="flex items-center gap-2 text-blue-600 hover:text-blue-800 font-medium text-sm">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+      </svg>
+      Previous: Ch 9 — Vertex AI &amp; SageMaker
+    </a>
+    <a href="index.html" class="text-gray-500 hover:text-gray-700 text-sm">Table of Contents</a>
+    <a href="ch10_ray_ecosystem.html" class="flex items-center gap-2 text-blue-600 hover:text-blue-800 font-medium text-sm">
+      Next: Ch 10 — Ray Ecosystem
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+      </svg>
+    </a>
+  </div>
+  <div class="text-center pb-6 text-xs text-gray-400">Modern MLOps Tutorial &mdash; Chapter 9B &mdash; Databricks, Kubeflow &amp; Platform Selection</div>
+</footer>
+
+</body>
+</html>

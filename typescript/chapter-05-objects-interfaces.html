@@ -1,0 +1,2694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chapter 5: Objects, Interfaces, Classes &amp; Structural Typing | TypeScript for the AI Era</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary: #4F46E5;
+      --primary-light: #EEF2FF;
+      --primary-dark: #3730A3;
+      --surface: #F9FAFB;
+      --border: #E5E7EB;
+      --text: #111827;
+      --text-muted: #6B7280;
+      --text-light: #9CA3AF;
+      --success: #059669;
+      --success-light: #ECFDF5;
+      --warning: #D97706;
+      --warning-light: #FFFBEB;
+      --danger: #DC2626;
+      --danger-light: #FEF2F2;
+      --info: #2563EB;
+      --info-light: #EFF6FF;
+      --purple: #7C3AED;
+      --purple-light: #F5F3FF;
+      --pink: #DB2777;
+      --pink-light: #FDF2F8;
+      --nav-height: 56px;
+      --sidebar-width: 240px;
+      --max-width: 1100px;
+      --code-font: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #fff;
+      color: var(--text);
+      font-size: 16px;
+      line-height: 1.7;
+    }
+
+    /* ── TOP NAV ── */
+    .top-nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: var(--nav-height);
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      z-index: 100;
+      gap: 16px;
+    }
+    .top-nav .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+    }
+    .top-nav a {
+      color: var(--primary);
+      text-decoration: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--primary-light);
+      background: var(--primary-light);
+      font-weight: 500;
+      white-space: nowrap;
+      transition: background 0.15s;
+    }
+    .top-nav a:hover { background: #E0E7FF; }
+    .top-nav .nav-center {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-weight: 500;
+      text-align: center;
+      flex: 1;
+    }
+    .top-nav .progress-badge {
+      background: var(--primary);
+      color: #fff;
+      padding: 3px 10px;
+      border-radius: 99px;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    /* ── LAYOUT ── */
+    .page-wrapper {
+      display: flex;
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding-top: var(--nav-height);
+    }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width: var(--sidebar-width);
+      min-width: var(--sidebar-width);
+      position: sticky;
+      top: var(--nav-height);
+      height: calc(100vh - var(--nav-height));
+      overflow-y: auto;
+      padding: 24px 16px;
+      border-right: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .sidebar h3 {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-light);
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    .sidebar ul { list-style: none; }
+    .sidebar ul li { margin-bottom: 2px; }
+    .sidebar ul li a {
+      display: block;
+      font-size: 13px;
+      color: var(--text-muted);
+      text-decoration: none;
+      padding: 5px 10px;
+      border-radius: 6px;
+      transition: all 0.15s;
+    }
+    .sidebar ul li a:hover {
+      color: var(--primary);
+      background: var(--primary-light);
+    }
+    .sidebar ul li a.active {
+      color: var(--primary);
+      background: var(--primary-light);
+      font-weight: 600;
+    }
+    .sidebar .section-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 12px 0;
+    }
+
+    /* ── MAIN CONTENT ── */
+    .main-content {
+      flex: 1;
+      min-width: 0;
+      padding: 48px 48px 80px;
+    }
+
+    /* ── CHAPTER HEADER ── */
+    .chapter-header {
+      margin-bottom: 48px;
+      padding-bottom: 32px;
+      border-bottom: 2px solid var(--border);
+    }
+    .chapter-label {
+      display: inline-block;
+      background: var(--primary);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 4px;
+      margin-bottom: 16px;
+    }
+    .chapter-header h1 {
+      font-size: 2.4rem;
+      font-weight: 800;
+      line-height: 1.2;
+      color: var(--text);
+      margin-bottom: 16px;
+    }
+    .chapter-meta {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      font-size: 14px;
+      color: var(--text-muted);
+      flex-wrap: wrap;
+    }
+    .chapter-meta .author {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 500;
+      color: var(--text);
+    }
+    .author-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--purple) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .chapter-intro {
+      margin-top: 24px;
+      font-size: 1.1rem;
+      color: var(--text-muted);
+      max-width: 680px;
+      line-height: 1.75;
+    }
+
+    /* ── SECTIONS ── */
+    .section { margin-bottom: 64px; }
+    .section h2 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--primary-light);
+      scroll-margin-top: calc(var(--nav-height) + 24px);
+    }
+    .section h3 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text);
+      margin: 28px 0 12px;
+    }
+    .section h4 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
+      margin: 20px 0 8px;
+    }
+    .section p { margin-bottom: 16px; }
+    .section ul, .section ol {
+      margin: 0 0 16px 24px;
+    }
+    .section li { margin-bottom: 6px; }
+
+    code {
+      font-family: var(--code-font);
+      font-size: 0.875em;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 1px 5px;
+      border-radius: 4px;
+      color: var(--primary-dark);
+    }
+
+    /* ── CODE BLOCKS ── */
+    .code-block {
+      margin: 20px 0;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    }
+    .code-block-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--surface);
+      padding: 8px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .code-lang {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .code-label {
+      font-size: 12px;
+      color: var(--text-light);
+    }
+    .code-block pre {
+      margin: 0 !important;
+      padding: 20px !important;
+      background: #fff !important;
+      font-family: var(--code-font) !important;
+      font-size: 14px !important;
+      line-height: 1.65 !important;
+      overflow-x: auto;
+    }
+    .code-block pre code {
+      background: none !important;
+      border: none !important;
+      padding: 0 !important;
+      color: inherit !important;
+    }
+
+    /* ── SIDE BY SIDE ── */
+    .side-by-side {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 20px 0;
+    }
+    .side-by-side .code-block { margin: 0; }
+    @media (max-width: 700px) {
+      .side-by-side { grid-template-columns: 1fr; }
+    }
+
+    /* ── CALLOUT BOXES ── */
+    .callout {
+      border-radius: 10px;
+      padding: 18px 20px;
+      margin: 24px 0;
+      border-left: 4px solid;
+      display: flex;
+      gap: 14px;
+    }
+    .callout-icon {
+      font-size: 20px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .callout-body { flex: 1; min-width: 0; }
+    .callout-title {
+      font-weight: 700;
+      font-size: 14px;
+      margin-bottom: 6px;
+      letter-spacing: 0.02em;
+    }
+    .callout-body p { margin-bottom: 8px; font-size: 15px; }
+    .callout-body p:last-child { margin-bottom: 0; }
+    .callout-body code {
+      font-size: 0.85em;
+    }
+
+    .callout.tip {
+      background: var(--success-light);
+      border-color: var(--success);
+    }
+    .callout.tip .callout-title { color: var(--success); }
+
+    .callout.info {
+      background: var(--info-light);
+      border-color: var(--info);
+    }
+    .callout.info .callout-title { color: var(--info); }
+
+    .callout.warning {
+      background: var(--warning-light);
+      border-color: var(--warning);
+    }
+    .callout.warning .callout-title { color: var(--warning); }
+
+    .callout.python {
+      background: var(--purple-light);
+      border-color: var(--purple);
+    }
+    .callout.python .callout-title { color: var(--purple); }
+
+    .callout.ai-era {
+      background: var(--pink-light);
+      border-color: var(--pink);
+    }
+    .callout.ai-era .callout-title { color: var(--pink); }
+
+    .callout.danger {
+      background: var(--danger-light);
+      border-color: var(--danger);
+    }
+    .callout.danger .callout-title { color: var(--danger); }
+
+    /* ── TABLES ── */
+    .table-wrapper {
+      overflow-x: auto;
+      margin: 24px 0;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    thead {
+      background: var(--surface);
+      border-bottom: 2px solid var(--border);
+    }
+    th {
+      padding: 12px 16px;
+      text-align: left;
+      font-weight: 700;
+      color: var(--text);
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+      vertical-align: top;
+    }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:nth-child(even) { background: var(--surface); }
+    td code { font-size: 13px; }
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 99px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .badge-green { background: var(--success-light); color: var(--success); }
+    .badge-blue { background: var(--info-light); color: var(--info); }
+    .badge-purple { background: var(--purple-light); color: var(--purple); }
+    .badge-amber { background: var(--warning-light); color: var(--warning); }
+    .badge-red { background: var(--danger-light); color: var(--danger); }
+
+    /* ── SVG DIAGRAMS ── */
+    .diagram-wrapper {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 32px;
+      margin: 28px 0;
+      text-align: center;
+    }
+    .diagram-caption {
+      margin-top: 16px;
+      font-size: 13px;
+      color: var(--text-muted);
+      font-style: italic;
+    }
+
+    /* ── BEFORE / AFTER ── */
+    .before-after-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 24px 0;
+    }
+    .before-after-grid .ba-block { }
+    .ba-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      padding: 6px 12px;
+      border-radius: 6px;
+    }
+    .ba-label.before { background: var(--danger-light); color: var(--danger); }
+    .ba-label.after { background: var(--success-light); color: var(--success); }
+    @media (max-width: 700px) {
+      .before-after-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ── EXERCISES ── */
+    .exercises-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 32px;
+      margin: 32px 0;
+    }
+    .exercises-section h2 {
+      border-bottom: none;
+      margin-bottom: 8px;
+    }
+    .exercise {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 24px;
+      margin: 20px 0;
+    }
+    .exercise-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
+      background: var(--primary);
+      color: #fff;
+      border-radius: 50%;
+      font-size: 14px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .exercise-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .exercise-title {
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--text);
+    }
+    .exercise-difficulty {
+      font-size: 12px;
+      padding: 2px 8px;
+      border-radius: 99px;
+      font-weight: 600;
+    }
+    .diff-easy { background: var(--success-light); color: var(--success); }
+    .diff-medium { background: var(--warning-light); color: var(--warning); }
+    .diff-hard { background: var(--danger-light); color: var(--danger); }
+
+    details { margin-top: 16px; }
+    details summary {
+      cursor: pointer;
+      color: var(--primary);
+      font-weight: 600;
+      font-size: 14px;
+      padding: 8px 12px;
+      background: var(--primary-light);
+      border-radius: 6px;
+      list-style: none;
+      user-select: none;
+    }
+    details summary::-webkit-details-marker { display: none; }
+    details summary::before { content: '+ '; }
+    details[open] summary::before { content: '- '; }
+    details .solution-content {
+      padding: 16px;
+      border: 1px solid var(--border);
+      border-top: none;
+      border-radius: 0 0 8px 8px;
+      background: #fff;
+    }
+
+    /* ── FOOTER ── */
+    .footer-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 32px 0 0;
+      margin-top: 48px;
+      border-top: 1px solid var(--border);
+      gap: 16px;
+    }
+    .footer-nav a {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 15px;
+      padding: 12px 20px;
+      border: 1px solid var(--primary-light);
+      border-radius: 8px;
+      background: var(--primary-light);
+      transition: background 0.15s;
+    }
+    .footer-nav a:hover { background: #E0E7FF; }
+    .footer-meta {
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* ── HIGHLIGHT ADJUSTMENTS ── */
+    .hljs { background: #fff !important; }
+
+    /* ── SCROLL MARGIN ── */
+    [id] { scroll-margin-top: calc(var(--nav-height) + 16px); }
+
+    /* ── KEY CONCEPT CARD ── */
+    .key-concept {
+      border: 2px solid var(--primary);
+      border-radius: 12px;
+      padding: 24px;
+      margin: 24px 0;
+      background: var(--primary-light);
+    }
+    .key-concept .kc-label {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--primary);
+      margin-bottom: 8px;
+    }
+    .key-concept p {
+      margin: 0;
+      font-size: 1.05rem;
+      font-weight: 500;
+      color: var(--primary-dark);
+    }
+
+    /* ── RULE OF THUMB BOX ── */
+    .rule-box {
+      background: linear-gradient(135deg, #F5F3FF 0%, #EEF2FF 100%);
+      border: 1px solid #C4B5FD;
+      border-radius: 10px;
+      padding: 20px 24px;
+      margin: 24px 0;
+    }
+    .rule-box .rb-title {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--purple);
+      margin-bottom: 8px;
+    }
+    .rule-box p { margin: 0; font-size: 15px; }
+  </style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="top-nav">
+  <div class="nav-links">
+    <a href="chapter-04-functions.html">← Ch 4 Functions</a>
+  </div>
+  <div class="nav-center">TypeScript for the AI Era</div>
+  <div class="nav-links">
+    <span class="progress-badge">Chapter 5 of 24</span>
+    <a href="chapter-06-advanced-types.html">Ch 6 Advanced Types →</a>
+  </div>
+</nav>
+
+<!-- PAGE WRAPPER -->
+<div class="page-wrapper">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <h3>Contents</h3>
+    <ul>
+      <li><a href="#structural-typing">1. Structural Typing</a></li>
+      <li><a href="#interfaces">2. Interfaces</a></li>
+      <li><a href="#type-aliases">3. Type Aliases</a></li>
+      <li><a href="#classes">4. Classes</a></li>
+      <li><a href="#implements">5. Implements</a></li>
+      <li><a href="#inheritance">6. Inheritance</a></li>
+      <li><a href="#enums">7. Enums</a></li>
+      <li><a href="#discriminated-unions">8. Discriminated Unions</a></li>
+      <li><a href="#advanced-patterns">9. Advanced Patterns</a></li>
+      <li><a href="#exercises">10. Exercises</a></li>
+    </ul>
+    <div class="section-divider"></div>
+    <h3>Author</h3>
+    <ul>
+      <li><a href="#" style="color:var(--text-muted);cursor:default">Boris Cherny</a></li>
+      <li><a href="#" style="color:var(--text-light);cursor:default;font-size:12px">Staff Engineer @ Meta</a></li>
+    </ul>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+
+    <!-- CHAPTER HEADER -->
+    <header class="chapter-header">
+      <div class="chapter-label">Chapter 5</div>
+      <h1>Objects, Interfaces, Classes<br>&amp; Structural Typing</h1>
+      <div class="chapter-meta">
+        <div class="author">
+          <div class="author-avatar">BC</div>
+          <div>
+            <div>Boris Cherny</div>
+            <div style="font-size:12px;color:var(--text-muted);font-weight:400">Staff Engineer @ Meta &middot; Author, <em>Programming TypeScript</em></div>
+          </div>
+        </div>
+        <span>&middot;</span>
+        <span>~75 min read</span>
+        <span>&middot;</span>
+        <span>Intermediate</span>
+      </div>
+      <p class="chapter-intro">
+        TypeScript's object system is one of the most elegant designs in any mainstream language. At its core sits <strong>structural typing</strong> — a decision that shapes everything from API design to library interoperability. In this chapter you will master interfaces, classes, enums, and discriminated unions, and understand why TypeScript's shape-based philosophy produces code that is both expressive and robust at scale.
+      </p>
+    </header>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- SECTION 1: STRUCTURAL TYPING -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <section class="section" id="structural-typing">
+      <h2>1. Structural Typing Deep Dive</h2>
+
+      <div class="key-concept">
+        <div class="kc-label">The Fundamental Rule</div>
+        <p>TypeScript cares about the <em>shape</em> of a value — the names and types of its properties and methods — not about its declared type name. If two types have the same shape, they are compatible, full stop.</p>
+      </div>
+
+      <p>In most typed languages you have two philosophies:</p>
+      <ul>
+        <li><strong>Nominal typing</strong> (Java, C#, Python's type hints): compatibility is determined by the name of the type or an explicit declaration of relationship.</li>
+        <li><strong>Structural typing</strong> (TypeScript, Go interfaces, OCaml): compatibility is determined by the structure — the actual members — of the type.</li>
+      </ul>
+
+      <p>TypeScript chose structural typing deliberately. JavaScript is a dynamically typed language where duck typing is universal. TypeScript's type system had to model that reality without breaking existing JS code.</p>
+
+      <h3>The Duck Test</h3>
+      <p>If it looks like a duck, swims like a duck, and quacks like a duck — TypeScript calls it a duck. You do not have to declare it a duck anywhere.</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-lang">TypeScript</span>
+          <span class="code-label">Structural compatibility in action</span>
+        </div>
+        <pre><code class="language-typescript">interface Duck {
+  name: string;
+  quack(): void;
+}
+
+// This object was never declared to be a Duck.
+// TypeScript doesn't care. It has the right shape.
+const donald = {
+  name: "Donald",
+  quack() { console.log("Quack!"); },
+  walksLikeDuck: true,          // extra property — fine in a variable
+};
+
+function makeItQuack(duck: Duck) {
+  console.log(duck.name, "says:");
+  duck.quack();
+}
+
+makeItQuack(donald); // OK — donald has at least all of Duck's shape</code></pre>
+      </div>
+
+      <div class="callout python">
+        <div class="callout-icon">🐍</div>
+        <div class="callout-body">
+          <div class="callout-title">Python Comparison</div>
+          <p>Python's type hints use nominal typing through the type checker (mypy, pyright). If you declare <code>def f(x: Animal): ...</code> and pass a <code>Dog</code> that isn't declared to extend <code>Animal</code>, mypy will reject it even if <code>Dog</code> has all the right methods. TypeScript would accept it based on shape alone.</p>
+          <p>Python does have duck typing at <em>runtime</em> (no explicit interface declaration needed), but the static type checker adds nominal constraints on top. TypeScript's static type checker reflects the runtime duck-typing directly.</p>
+        </div>
+      </div>
+
+      <!-- SVG DIAGRAM: Structural Typing -->
+      <div class="diagram-wrapper">
+        <svg viewBox="0 0 720 320" xmlns="http://www.w3.org/2000/svg" style="max-width:660px;width:100%;font-family:system-ui,sans-serif">
+          <defs>
+            <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+              <path d="M0,0 L8,3 L0,6 Z" fill="#4F46E5"/>
+            </marker>
+            <marker id="arrow-green" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+              <path d="M0,0 L8,3 L0,6 Z" fill="#059669"/>
+            </marker>
+          </defs>
+
+          <!-- Left box: interface Duck -->
+          <rect x="20" y="30" width="200" height="140" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2"/>
+          <rect x="20" y="30" width="200" height="36" rx="10" fill="#4F46E5"/>
+          <rect x="20" y="54" width="200" height="12" rx="0" fill="#4F46E5"/>
+          <text x="120" y="54" text-anchor="middle" fill="white" font-size="13" font-weight="700">interface Duck</text>
+          <text x="36" y="92" fill="#3730A3" font-size="13" font-family="monospace">name: string</text>
+          <text x="36" y="114" fill="#3730A3" font-size="13" font-family="monospace">quack(): void</text>
+          <text x="36" y="136" fill="#9CA3AF" font-size="12" font-style="italic">(required shape)</text>
+
+          <!-- Right box: donald object -->
+          <rect x="500" y="30" width="200" height="170" rx="10" fill="#ECFDF5" stroke="#059669" stroke-width="2"/>
+          <rect x="500" y="30" width="200" height="36" rx="10" fill="#059669"/>
+          <rect x="500" y="54" width="200" height="12" rx="0" fill="#059669"/>
+          <text x="600" y="54" text-anchor="middle" fill="white" font-size="13" font-weight="700">const donald = {…}</text>
+          <text x="516" y="92" fill="#065F46" font-size="13" font-family="monospace">name: string ✓</text>
+          <text x="516" y="114" fill="#065F46" font-size="13" font-family="monospace">quack(): void ✓</text>
+          <text x="516" y="136" fill="#059669" font-size="12" font-family="monospace">walksLikeDuck: true</text>
+          <text x="516" y="155" fill="#9CA3AF" font-size="11" font-style="italic">(extra — allowed)</text>
+
+          <!-- Arrow in middle -->
+          <line x1="225" y1="105" x2="490" y2="105" stroke="#6B7280" stroke-width="1.5" stroke-dasharray="6,4"/>
+          <polygon points="490,101 500,105 490,109" fill="#6B7280"/>
+
+          <!-- Compatible badge -->
+          <rect x="285" y="82" width="140" height="46" rx="8" fill="#fff" stroke="#059669" stroke-width="2"/>
+          <text x="355" y="101" text-anchor="middle" fill="#059669" font-size="12" font-weight="700">STRUCTURALLY</text>
+          <text x="355" y="118" text-anchor="middle" fill="#059669" font-size="12" font-weight="700">COMPATIBLE ✓</text>
+
+          <!-- Bottom label: NOMINAL TYPING example (crossed out) -->
+          <rect x="20" y="210" width="680" height="90" rx="10" fill="#FEF2F2" stroke="#DC2626" stroke-width="1.5" stroke-dasharray="6,3"/>
+          <text x="36" y="235" fill="#DC2626" font-size="13" font-weight="700">Nominal Typing (NOT how TypeScript works)</text>
+          <text x="36" y="258" fill="#6B7280" font-size="12">Java/C#/Python mypy: class Donald extends Duck { ... }  — explicit declaration required for compatibility</text>
+          <text x="36" y="278" fill="#6B7280" font-size="12">TypeScript: no declaration needed — shape match is sufficient</text>
+        </svg>
+        <div class="diagram-caption">Structural typing: TypeScript checks shape (properties + methods), not declared type names. The <code>donald</code> object is assignable to <code>Duck</code> because it has at least the required shape.</div>
+      </div>
+
+      <h3>Excess Property Checking: The One Exception</h3>
+      <p>Here is the subtlety that trips up almost every TypeScript newcomer. When you pass an <em>object literal</em> directly to a typed location, TypeScript applies <strong>excess property checking</strong> — it errors on extra properties. But when you go through an intermediate variable, that strictness disappears.</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-lang">TypeScript</span>
+          <span class="code-label">Excess property checking</span>
+        </div>
+        <pre><code class="language-typescript">interface Point { x: number; y: number; }
+
+// DIRECT LITERAL — excess property check fires
+const p1: Point = { x: 1, y: 2, z: 3 }; // Error: 'z' does not exist in type 'Point'
+
+// THROUGH VARIABLE — no excess property check
+const temp = { x: 1, y: 2, z: 3 };
+const p2: Point = temp;                   // OK — structural compatibility
+
+// FUNCTION ARGUMENT (literal) — excess property check fires
+function drawPoint(p: Point) {}
+drawPoint({ x: 1, y: 2, z: 3 });         // Error
+
+// FUNCTION ARGUMENT (variable) — OK
+const myPoint = { x: 1, y: 2, z: 3 };
+drawPoint(myPoint);                        // OK</code></pre>
+      </div>
+
+      <div class="callout info">
+        <div class="callout-icon">ℹ</div>
+        <div class="callout-body">
+          <div class="callout-title">Why does excess property checking exist?</div>
+          <p>Passing extra properties in an object literal to a typed location almost always indicates a typo or a misunderstanding. <code>{ x: 1, y: 2, colour: "red" }</code> passed where <code>Point</code> is expected almost certainly means the developer intended a different type. TypeScript catches this while still allowing the general structural flexibility that makes JavaScript interoperability work.</p>
+        </div>
+      </div>
+
+      <h3>Practical Implications</h3>
+      <p>Structural typing has profound consequences for how you design APIs:</p>
+      <ul>
+        <li><strong>Library interoperability</strong>: Two libraries that define their own <code>Logger</code> interface can be used interchangeably as long as their shapes match — no adapter needed.</li>
+        <li><strong>Testing</strong>: You can pass minimal mock objects to functions without implementing every method of a heavy interface.</li>
+        <li><strong>Composition</strong>: Types compose naturally. If a function needs a shape, any superset of that shape works.</li>
+        <li><strong>Refactoring safety</strong>: Renaming or adding properties is safe — TypeScript will catch all callsites that no longer satisfy the required shape.</li>
+      </ul>
+
+      <div class="callout ai-era">
+        <div class="callout-icon">✦</div>
+        <div class="callout-body">
+          <div class="callout-title">AI Era Relevance</div>
+          <p>When you integrate AI APIs (OpenAI, Anthropic, Bedrock) into TypeScript applications, structural typing lets you define your own <code>ChatModel</code> interface that any provider can satisfy — without vendor lock-in at the type level. You can swap providers by making sure the new client matches your interface's shape.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- SECTION 2: INTERFACES -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <section class="section" id="interfaces">
+      <h2>2. Interfaces</h2>
+
+      <p>An <strong>interface</strong> is TypeScript's primary way to name a shape. Think of it as a contract: any value that satisfies this shape is considered to implement the interface — no explicit declaration required.</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-lang">TypeScript</span>
+          <span class="code-label">Basic interface</span>
+        </div>
+        <pre><code class="language-typescript">interface User {
+  id: string;
+  name: string;
+  age: number;
+}
+
+const alice: User = { id: "u1", name: "Alice", age: 30 }; // OK</code></pre>
+      </div>
+
+      <h3>Optional Properties</h3>
+      <p>Mark a property with <code>?</code> to make it optional. Its type becomes <code>T | undefined</code>.</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">interface User {
+  id: string;
+  name: string;
+  age?: number;       // number | undefined
+  bio?: string;
+}
+
+const alice: User = { id: "u1", name: "Alice" };          // OK — age and bio omitted
+const bob: User = { id: "u2", name: "Bob", age: 25 };    // OK</code></pre>
+      </div>
+
+      <h3>Readonly Properties</h3>
+      <p>The <code>readonly</code> modifier prevents reassignment after the object is created. It's a compile-time check, not a runtime freeze.</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">interface Config {
+  readonly apiKey: string;
+  readonly baseUrl: string;
+  timeout: number;          // mutable
+}
+
+const config: Config = {
+  apiKey: "sk-abc",
+  baseUrl: "https://api.example.com",
+  timeout: 5000,
+};
+
+config.timeout = 10000;    // OK — mutable
+config.apiKey = "sk-xyz";  // Error: Cannot assign to 'apiKey' because it is a read-only property</code></pre>
+      </div>
+
+      <h3>Method Signatures</h3>
+      <p>Two syntaxes for methods in interfaces behave slightly differently:</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-lang">TypeScript</span>
+          <span class="code-label">Method syntax vs property syntax</span>
+        </div>
+        <pre><code class="language-typescript">interface Animal {
+  // Method syntax: can be overridden in subtypes more freely
+  // (bivariant parameter checking applies — more permissive)
+  speak(text: string): void;
+
+  // Property syntax: function type — stricter (contravariant params)
+  // Preferred in most modern TS code with strictFunctionTypes
+  eat: (food: string) => boolean;
+}
+
+class Dog implements Animal {
+  speak(text: string) { console.log(`Woof! ${text}`); }
+  eat(food: string) { console.log(`Eating ${food}`); return true; }
+}</code></pre>
+      </div>
+
+      <div class="callout tip">
+        <div class="callout-icon">✓</div>
+        <div class="callout-body">
+          <div class="callout-title">Recommendation</div>
+          <p>With <code>strictFunctionTypes: true</code> (included in <code>strict</code>), prefer the <strong>property syntax</strong> (<code>eat: (food: string) =&gt; boolean</code>) for callbacks and event handlers to get stricter variance checking. Use <strong>method syntax</strong> for methods you expect subclasses to override.</p>
+        </div>
+      </div>
+
+      <h3>Index Signatures</h3>
+      <p>Index signatures let you describe objects used as dictionaries with dynamic keys.</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">interface StringMap {
+  [key: string]: string;
+}
+
+const env: StringMap = {
+  NODE_ENV: "production",
+  PORT: "3000",
+  // any string key is fine, but value must be string
+};
+
+// You can mix index signatures with known properties
+// but known property types must be assignable to the index signature type
+interface FlexConfig {
+  version: string;            // string — compatible with index signature
+  [key: string]: unknown;     // catch-all for other keys
+}
+
+const cfg: FlexConfig = {
+  version: "1.0",
+  debugMode: true,            // unknown — fine
+  retries: 3,                 // unknown — fine
+};</code></pre>
+      </div>
+
+      <h3>Extending Interfaces</h3>
+      <p>Interfaces can extend one or more other interfaces. The result inherits all members from the parent(s) and adds its own.</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-lang">TypeScript</span>
+          <span class="code-label">Single and multiple extension</span>
+        </div>
+        <pre><code class="language-typescript">interface Entity {
+  id: string;
+  createdAt: Date;
+}
+
+interface User extends Entity {
+  name: string;
+  email: string;
+}
+
+interface Auditable {
+  auditLog: string[];
+  lastModifiedBy: string;
+}
+
+interface Admin extends User, Auditable {
+  role: "admin" | "superadmin";
+  permissions: string[];
+}
+
+// Admin now has: id, createdAt, name, email, auditLog, lastModifiedBy, role, permissions
+const admin: Admin = {
+  id: "a1",
+  createdAt: new Date(),
+  name: "Carol",
+  email: "carol@example.com",
+  auditLog: [],
+  lastModifiedBy: "system",
+  role: "admin",
+  permissions: ["read", "write"],
+};</code></pre>
+      </div>
+
+      <h3>Declaration Merging</h3>
+      <p>This is one of TypeScript's most distinctive features. If you declare an interface with the same name twice, TypeScript <em>merges</em> the declarations into one. This is the mechanism that allows third-party library type declarations to be extended.</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-lang">TypeScript</span>
+          <span class="code-label">Declaration merging — interface augmentation</span>
+        </div>
+        <pre><code class="language-typescript">// In some library's type definition (lib.d.ts)
+interface Window {
+  requestAnimationFrame(callback: FrameRequestCallback): number;
+}
+
+// In your application code — you ADD to the interface
+interface Window {
+  myAnalyticsId: string;      // merged into Window
+}
+
+// Now window.myAnalyticsId is typed!
+window.myAnalyticsId = "UA-12345";
+
+// A common real-world pattern: Express Request augmentation
+// In @types/express you get:
+// declare global {
+//   namespace Express {
+//     interface Request {}
+//   }
+// }
+// In your middleware type declarations:
+declare global {
+  namespace Express {
+    interface Request {
+      user?: AuthenticatedUser;  // now req.user is typed everywhere
+    }
+  }
+}</code></pre>
+      </div>
+
+      <div class="callout warning">
+        <div class="callout-icon">⚠</div>
+        <div class="callout-body">
+          <div class="callout-title">Declaration Merging Caveats</div>
+          <p>Declaration merging only works with <code>interface</code>, not <code>type</code>. If you need to augment a third-party type or a global, you must use <code>interface</code>. Type aliases that conflict with an existing name produce a compile error instead of merging.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- SECTION 3: TYPE ALIASES -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <section class="section" id="type-aliases">
+      <h2>3. Type Aliases for Objects</h2>
+
+      <p>A <strong>type alias</strong> gives a name to any type expression — not just object shapes. For objects, <code>type</code> and <code>interface</code> look almost identical, but they differ in capability and intent.</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-lang">TypeScript</span>
+          <span class="code-label">Basic type alias for an object</span>
+        </div>
+        <pre><code class="language-typescript">type User = {
+  id: string;
+  name: string;
+  age: number;
+};
+
+const alice: User = { id: "u1", name: "Alice", age: 30 };</code></pre>
+      </div>
+
+      <h3>Intersection Types for Composition</h3>
+      <p>With <code>type</code>, you compose using <code>&amp;</code> (intersection). Intersections combine all properties of both types into one.</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-lang">TypeScript</span>
+          <span class="code-label">Intersection composition</span>
+        </div>
+        <pre><code class="language-typescript">type Entity = {
+  id: string;
+  createdAt: Date;
+};
+
+type Auditable = {
+  auditLog: string[];
+  lastModifiedBy: string;
+};
+
+// Intersection — Admin has ALL properties of Entity AND Auditable AND its own
+type Admin = Entity & Auditable & {
+  name: string;
+  role: "admin" | "superadmin";
+};
+
+// Useful for layering concerns without re-declaring everything
+type ApiResponse<T> = {
+  data: T;
+  status: number;
+  message: string;
+} & { timestamp: string; requestId: string };</code></pre>
+      </div>
+
+      <div class="callout warning">
+        <div class="callout-icon">⚠</div>
+        <div class="callout-body">
+          <div class="callout-title">Conflicting intersections produce never</div>
+          <p>If two intersected types have the same property key with incompatible types, you get <code>never</code>: <code>type Bad = { x: string } &amp; { x: number }</code> — <code>x</code> becomes <code>string &amp; number</code> which is <code>never</code>. Nothing can satisfy that type. This is usually a design error.</p>
+        </div>
+      </div>
+
+      <h3>Interface vs Type: The Definitive Comparison</h3>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Feature</th>
+              <th>interface</th>
+              <th>type</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Object shapes</td>
+              <td><span class="badge badge-green">Yes</span></td>
+              <td><span class="badge badge-green">Yes</span></td>
+              <td>Both work equally well for plain object types</td>
+            </tr>
+            <tr>
+              <td>Declaration merging</td>
+              <td><span class="badge badge-green">Yes</span></td>
+              <td><span class="badge badge-red">No</span></td>
+              <td>Critical for augmenting library types</td>
+            </tr>
+            <tr>
+              <td>Extends syntax</td>
+              <td><span class="badge badge-green">extends</span></td>
+              <td><span class="badge badge-blue">&amp; intersection</span></td>
+              <td><code>extends</code> is clearer for hierarchies</td>
+            </tr>
+            <tr>
+              <td>Union types</td>
+              <td><span class="badge badge-red">No</span></td>
+              <td><span class="badge badge-green">Yes</span></td>
+              <td><code>type Foo = A | B</code> — only <code>type</code> can do this</td>
+            </tr>
+            <tr>
+              <td>Computed / mapped types</td>
+              <td><span class="badge badge-red">No</span></td>
+              <td><span class="badge badge-green">Yes</span></td>
+              <td><code>type Keys = keyof User</code>, <code>Partial&lt;T&gt;</code>, etc.</td>
+            </tr>
+            <tr>
+              <td>Tuple types</td>
+              <td><span class="badge badge-red">No</span></td>
+              <td><span class="badge badge-green">Yes</span></td>
+              <td><code>type Pair = [string, number]</code></td>
+            </tr>
+            <tr>
+              <td>Primitive aliases</td>
+              <td><span class="badge badge-red">No</span></td>
+              <td><span class="badge badge-green">Yes</span></td>
+              <td><code>type ID = string</code></td>
+            </tr>
+            <tr>
+              <td>Class can implement</td>
+              <td><span class="badge badge-green">Yes</span></td>
+              <td><span class="badge badge-green">Yes</span></td>
+              <td><code>class Foo implements Bar</code> works with both</td>
+            </tr>
+            <tr>
+              <td>Error messages</td>
+              <td><span class="badge badge-green">Better</span></td>
+              <td><span class="badge badge-amber">Sometimes verbose</span></td>
+              <td>Interface names appear in errors; type aliases sometimes get expanded</td>
+            </tr>
+            <tr>
+              <td>Performance (large codebases)</td>
+              <td><span class="badge badge-green">Slightly faster</span></td>
+              <td><span class="badge badge-amber">Can be slower</span></td>
+              <td>Interfaces are cached by identity; complex type aliases expand on every use</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="rule-box">
+        <div class="rb-title">Rule of Thumb</div>
+        <p><strong>Use <code>interface</code></strong> when you are defining the shape of an object that represents a domain entity, a class contract, or a public API surface — especially if consumers might need to extend it.<br><br>
+        <strong>Use <code>type</code></strong> for unions, computed/utility types, tuples, function signatures, or any type that isn't purely an object shape. When in doubt and either works, prefer <code>interface</code> for objects.</p>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- SECTION 4: CLASSES -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <section class="section" id="classes">
+      <h2>4. Classes in TypeScript</h2>
+
+      <p>TypeScript classes are JavaScript ES2022 classes with a typed overlay. They compile down to plain JavaScript. Everything you know from Python classes applies — but the syntax and type system integration differ significantly.</p>
+
+      <h3>Python vs TypeScript: Class Syntax Side by Side</h3>
+
+      <div class="side-by-side">
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-lang">Python</span>
+            <span class="code-label">Python class</span>
+          </div>
+          <pre><code class="language-python">from dataclasses import dataclass
+
+@dataclass
+class User:
+    name: str
+    age: int
+    _id: str = ""
+
+    def greet(self) -> str:
+        return f"Hi, I'm {self.name}"
+
+    @classmethod
+    def create(cls, name: str) -> "User":
+        return cls(name=name, age=0)</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-lang">TypeScript</span>
+            <span class="code-label">TypeScript class</span>
+          </div>
+          <pre><code class="language-typescript">class User {
+  name: string;
+  age: number;
+  private id: string;
+
+  constructor(name: string, age: number) {
+    this.name = name;
+    this.age = age;
+    this.id = crypto.randomUUID();
+  }
+
+  greet(): string {
+    return `Hi, I'm ${this.name}`;
+  }
+
+  static create(name: string): User {
+    return new User(name, 0);
+  }
+}</code></pre>
+        </div>
+      </div>
+
+      <h3>Access Modifiers</h3>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Modifier</th>
+              <th>Accessible from</th>
+              <th>Python equivalent</th>
+              <th>Compiled JS</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>public</code></td>
+              <td>Anywhere (default)</td>
+              <td>No prefix (<code>name</code>)</td>
+              <td>Regular property</td>
+            </tr>
+            <tr>
+              <td><code>private</code></td>
+              <td>Only this class</td>
+              <td><code>_name</code> (convention only)</td>
+              <td>Regular property (TS-only enforcement)</td>
+            </tr>
+            <tr>
+              <td><code>#name</code> (JS private)</td>
+              <td>Only this class</td>
+              <td><code>__name</code></td>
+              <td>True runtime private (#name)</td>
+            </tr>
+            <tr>
+              <td><code>protected</code></td>
+              <td>This class + subclasses</td>
+              <td><code>_name</code> (convention)</td>
+              <td>Regular property</td>
+            </tr>
+            <tr>
+              <td><code>readonly</code></td>
+              <td>Anywhere (read-only)</td>
+              <td><code>@property</code> (getter only)</td>
+              <td>Regular property</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-lang">TypeScript</span>
+          <span class="code-label">Access modifiers in practice</span>
+        </div>
+        <pre><code class="language-typescript">class BankAccount {
+  public readonly id: string;
+  public owner: string;
+  private balance: number;
+  protected interestRate: number;
+
+  constructor(owner: string, initialBalance: number) {
+    this.id = crypto.randomUUID();
+    this.owner = owner;
+    this.balance = initialBalance;
+    this.interestRate = 0.03;
+  }
+
+  // Public method — accessible anywhere
+  getBalance(): number {
+    return this.balance;
+  }
+
+  // Protected — accessible in subclasses
+  protected applyInterest(): void {
+    this.balance *= (1 + this.interestRate);
+  }
+
+  // Private method — only within this class
+  private audit(amount: number, op: "credit" | "debit"): void {
+    console.log(`[AUDIT] ${op} ${amount} — balance: ${this.balance}`);
+  }
+
+  deposit(amount: number): void {
+    if (amount <= 0) throw new Error("Amount must be positive");
+    this.balance += amount;
+    this.audit(amount, "credit");
+  }
+}
+
+const account = new BankAccount("Alice", 1000);
+console.log(account.getBalance()); // 1000
+account.deposit(500);
+// account.balance        // Error: 'balance' is private
+// account.interestRate   // Error: 'interestRate' is protected
+// account.id = "new"     // Error: 'id' is readonly</code></pre>
+      </div>
+
+      <h3>Constructor Shorthand</h3>
+      <p>TypeScript's most popular class ergonomic: declare and assign properties directly in the constructor parameter list. This eliminates the repetitive <code>this.x = x</code> boilerplate.</p>
+
+      <div class="before-after-grid">
+        <div class="ba-block">
+          <div class="ba-label before">Before — verbose</div>
+          <div class="code-block" style="margin:0">
+            <div class="code-block-header"><span class="code-lang">TypeScript</span></div>
+            <pre><code class="language-typescript">class Point {
+  public x: number;
+  public y: number;
+  private label: string;
+
+  constructor(
+    x: number,
+    y: number,
+    label: string,
+  ) {
+    this.x = x;
+    this.y = y;
+    this.label = label;
+  }
+}</code></pre>
+          </div>
+        </div>
+        <div class="ba-block">
+          <div class="ba-label after">After — shorthand</div>
+          <div class="code-block" style="margin:0">
+            <div class="code-block-header"><span class="code-lang">TypeScript</span></div>
+            <pre><code class="language-typescript">class Point {
+  constructor(
+    public x: number,
+    public y: number,
+    private label: string,
+  ) {
+    // Nothing needed — TS does it automatically
+  }
+}
+
+// Both produce identical behavior.
+// Shorthand is idiomatic TypeScript.</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <h3>Static Members</h3>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">class IdFactory {
+  private static counter = 0;
+  static readonly prefix = "ID";
+
+  static generate(): string {
+    return `${IdFactory.prefix}-${++IdFactory.counter}`;
+  }
+}
+
+console.log(IdFactory.generate()); // "ID-1"
+console.log(IdFactory.generate()); // "ID-2"</code></pre>
+      </div>
+
+      <h3>Abstract Classes</h3>
+      <p>Abstract classes define a template. They can have concrete methods (with implementations) and abstract methods (which subclasses must implement). You cannot instantiate an abstract class directly.</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-lang">TypeScript</span>
+          <span class="code-label">Abstract class — template pattern</span>
+        </div>
+        <pre><code class="language-typescript">abstract class DataProcessor<T, R> {
+  // Concrete method — shared behavior
+  async process(data: T): Promise<R> {
+    const validated = this.validate(data);  // hook
+    const result = await this.transform(validated);
+    return this.postProcess(result);
+  }
+
+  // Subclasses must implement these
+  protected abstract validate(data: T): T;
+  protected abstract transform(data: T): Promise<R>;
+
+  // Optional hook with default no-op
+  protected postProcess(result: R): R {
+    return result;
+  }
+}
+
+class JsonProcessor extends DataProcessor<string, object> {
+  protected validate(data: string): string {
+    if (!data.trim()) throw new Error("Empty input");
+    return data;
+  }
+
+  protected async transform(data: string): Promise<object> {
+    return JSON.parse(data);
+  }
+}
+
+// new DataProcessor()   // Error: Cannot create an instance of abstract class
+const proc = new JsonProcessor();
+await proc.process('{"name":"Alice"}'); // { name: "Alice" }</code></pre>
+      </div>
+
+      <div class="callout python">
+        <div class="callout-icon">🐍</div>
+        <div class="callout-body">
+          <div class="callout-title">Python Comparison: Abstract Classes</div>
+          <p>Python uses <code>from abc import ABC, abstractmethod</code> plus the <code>@abstractmethod</code> decorator. TypeScript's <code>abstract</code> keyword is more integrated into the class syntax and is checked at compile time. Python's ABC enforcement happens at runtime — you only discover a missing implementation when you try to instantiate.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- SECTION 5: IMPLEMENTS -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <section class="section" id="implements">
+      <h2>5. Classes Implementing Interfaces</h2>
+
+      <p>When a class uses <code>implements InterfaceName</code>, TypeScript checks at compile time that the class provides all the members specified by the interface. This is the "program to an interface" principle made concrete.</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-lang">TypeScript</span>
+          <span class="code-label">Single and multiple interface implementation</span>
+        </div>
+        <pre><code class="language-typescript">interface Serializable {
+  serialize(): string;
+  deserialize(data: string): this;
+}
+
+interface Loggable {
+  log(level: "info" | "warn" | "error", message: string): void;
+}
+
+interface Cacheable {
+  cacheKey(): string;
+  ttl(): number;
+}
+
+// A class can implement multiple interfaces
+class UserRecord implements Serializable, Loggable, Cacheable {
+  constructor(
+    private id: string,
+    public name: string,
+    private email: string,
+  ) {}
+
+  serialize(): string {
+    return JSON.stringify({ id: this.id, name: this.name, email: this.email });
+  }
+
+  deserialize(data: string): this {
+    const parsed = JSON.parse(data);
+    return Object.assign(Object.create(Object.getPrototypeOf(this)), parsed);
+  }
+
+  log(level: "info" | "warn" | "error", message: string): void {
+    console[level](`[UserRecord:${this.id}] ${message}`);
+  }
+
+  cacheKey(): string { return `user:${this.id}`; }
+  ttl(): number { return 3600; }
+}
+
+// Now UserRecord is usable wherever any of those interfaces is expected
+function saveToCache(item: Cacheable & Serializable, cache: Map<string, string>) {
+  cache.set(item.cacheKey(), item.serialize());
+}
+
+const user = new UserRecord("u1", "Alice", "alice@example.com");
+saveToCache(user, new Map()); // Works — user satisfies both Cacheable and Serializable</code></pre>
+      </div>
+
+      <h3>implements vs extends</h3>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Keyword</th>
+              <th>Relationship</th>
+              <th>Inherits implementation?</th>
+              <th>Can be multiple?</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>implements</code></td>
+              <td>Class promises to satisfy an interface/type shape</td>
+              <td>No — class writes its own implementation</td>
+              <td>Yes — comma-separated</td>
+            </tr>
+            <tr>
+              <td><code>extends</code> (class)</td>
+              <td>Class inherits from another class</td>
+              <td>Yes — inherits methods and properties</td>
+              <td>No — single parent only</td>
+            </tr>
+            <tr>
+              <td><code>extends</code> (interface)</td>
+              <td>Interface inherits from another interface</td>
+              <td>N/A — interfaces have no implementation</td>
+              <td>Yes — multiple bases</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout info">
+        <div class="callout-icon">ℹ</div>
+        <div class="callout-body">
+          <div class="callout-title">implements does not provide implementation</div>
+          <p><code>implements</code> is purely a type-level check. TypeScript verifies your class satisfies the interface's shape, but it does not add any code. You still write every method. This is unlike some languages (e.g., traits in Rust/Scala) where implementing an interface can provide default method bodies.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- SECTION 6: INHERITANCE -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <section class="section" id="inheritance">
+      <h2>6. Class Inheritance</h2>
+
+      <div class="side-by-side">
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-lang">Python</span>
+            <span class="code-label">Python inheritance</span>
+          </div>
+          <pre><code class="language-python">class Animal:
+    def __init__(self, name: str) -> None:
+        self.name = name
+
+    def speak(self) -> str:
+        raise NotImplementedError
+
+class Dog(Animal):
+    def __init__(
+        self, name: str, breed: str
+    ) -> None:
+        super().__init__(name)
+        self.breed = breed
+
+    def speak(self) -> str:
+        return f"{self.name} says Woof!"</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-lang">TypeScript</span>
+            <span class="code-label">TypeScript inheritance</span>
+          </div>
+          <pre><code class="language-typescript">abstract class Animal {
+  constructor(protected name: string) {}
+
+  abstract speak(): string;
+
+  describe(): string {
+    return `I am ${this.name}`;
+  }
+}
+
+class Dog extends Animal {
+  constructor(
+    name: string,
+    private breed: string,
+  ) {
+    super(name);   // must call super first
+  }
+
+  speak(): string {
+    return `${this.name} says Woof!`;
+  }
+}</code></pre>
+        </div>
+      </div>
+
+      <h3>Method Overriding</h3>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-lang">TypeScript</span>
+          <span class="code-label">override keyword (TS 4.3+)</span>
+        </div>
+        <pre><code class="language-typescript">class Animal {
+  speak(): string { return "..."; }
+  move(distance: number): void {
+    console.log(`Moving ${distance}m`);
+  }
+}
+
+class Snake extends Animal {
+  // 'override' keyword is optional but recommended with noImplicitOverride
+  override speak(): string {
+    return "Hiss!";
+  }
+
+  // This catches a typo at compile time (with noImplicitOverride enabled):
+  // ovveride mve(d: number) {}  // Error: Method has override modifier but does not override any base class method
+
+  override move(distance: number): void {
+    console.log("Slithering...");
+    super.move(distance); // call parent implementation
+  }
+}
+
+class Horse extends Animal {
+  override speak(): string { return "Neigh!"; }
+  override move(distance: number = 45): void {
+    console.log("Galloping...");
+    super.move(distance);
+  }
+}</code></pre>
+      </div>
+
+      <div class="callout tip">
+        <div class="callout-icon">✓</div>
+        <div class="callout-body">
+          <div class="callout-title">Enable noImplicitOverride</div>
+          <p>Add <code>"noImplicitOverride": true</code> to your <code>tsconfig.json</code>. This forces you to explicitly write <code>override</code> on any method that overrides a parent — preventing subtle bugs when parent renames a method and your "override" silently becomes a new unrelated method.</p>
+        </div>
+      </div>
+
+      <h3>Protected Members Across Hierarchy</h3>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">class Vehicle {
+  protected fuelLevel: number = 100;
+
+  protected refuel(amount: number): void {
+    this.fuelLevel = Math.min(100, this.fuelLevel + amount);
+  }
+}
+
+class Car extends Vehicle {
+  drive(km: number): void {
+    this.fuelLevel -= km * 0.1;  // OK — protected, accessible in subclass
+    if (this.fuelLevel < 20) {
+      this.refuel(50);            // OK — protected method
+    }
+  }
+}
+
+const car = new Car();
+// car.fuelLevel  // Error: 'fuelLevel' is protected
+// car.refuel(10) // Error: 'refuel' is protected</code></pre>
+      </div>
+
+      <h3>When NOT to Use Inheritance</h3>
+      <p>Inheritance is often overused. The classic rule: <strong>prefer composition over inheritance</strong>.</p>
+
+      <div class="before-after-grid">
+        <div class="ba-block">
+          <div class="ba-label before">Fragile inheritance</div>
+          <div class="code-block" style="margin:0">
+            <div class="code-block-header"><span class="code-lang">TypeScript</span></div>
+            <pre><code class="language-typescript">// Forced inheritance to share logic
+class Logger {
+  log(msg: string) {
+    console.log(`[${Date.now()}] ${msg}`);
+  }
+}
+
+// UserService IS-A Logger? No it isn't.
+class UserService extends Logger {
+  getUser(id: string) {
+    this.log(`Getting user ${id}`);
+    // ... fetch logic
+  }
+}
+// Tight coupling — UserService
+// carries all of Logger's API</code></pre>
+          </div>
+        </div>
+        <div class="ba-block">
+          <div class="ba-label after">Composition (preferred)</div>
+          <div class="code-block" style="margin:0">
+            <div class="code-block-header"><span class="code-lang">TypeScript</span></div>
+            <pre><code class="language-typescript">interface Logger {
+  log(msg: string): void;
+}
+
+class ConsoleLogger implements Logger {
+  log(msg: string) {
+    console.log(`[${Date.now()}] ${msg}`);
+  }
+}
+
+// UserService HAS-A Logger
+class UserService {
+  constructor(private logger: Logger) {}
+
+  getUser(id: string) {
+    this.logger.log(`Getting user ${id}`);
+    // ... fetch logic
+  }
+}
+// Decoupled — swap any Logger impl</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout tip">
+        <div class="callout-icon">✓</div>
+        <div class="callout-body">
+          <div class="callout-title">Use inheritance for: IS-A relationships only</div>
+          <p>Use <code>extends</code> only when the subclass truly IS a specialization of the base class — <code>Dog</code> IS-AN <code>Animal</code>, <code>HttpError</code> IS-AN <code>Error</code>. If you are inheriting mainly to reuse code, extract that code into a composable service or utility function instead.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- SECTION 7: ENUMS -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <section class="section" id="enums">
+      <h2>7. Enums</h2>
+
+      <p>Enums give names to a fixed set of values. TypeScript has three kinds, each with important trade-offs.</p>
+
+      <h3>Numeric Enums</h3>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-lang">TypeScript</span>
+          <span class="code-label">Classic numeric enum (auto-increments from 0)</span>
+        </div>
+        <pre><code class="language-typescript">enum Direction {
+  Up,      // 0
+  Down,    // 1
+  Left,    // 2
+  Right,   // 3
+}
+
+enum Direction2 {
+  Up = 10,
+  Down,    // 11
+  Left,    // 12
+  Right,   // 13
+}
+
+function move(dir: Direction) {
+  console.log(Direction[dir]); // Reverse mapping: 0 => "Up"
+}
+
+move(Direction.Up);   // OK
+move(0);              // Also OK — numeric enums accept raw numbers (a footgun)
+move(999);            // Also OK — TypeScript does NOT check this!</code></pre>
+      </div>
+
+      <h3>String Enums</h3>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-lang">TypeScript</span>
+          <span class="code-label">String enums — safer, no reverse mapping footguns</span>
+        </div>
+        <pre><code class="language-typescript">enum Status {
+  Active   = "ACTIVE",
+  Inactive = "INACTIVE",
+  Pending  = "PENDING",
+  Banned   = "BANNED",
+}
+
+function setStatus(userId: string, status: Status): void {
+  console.log(`Setting ${userId} to ${status}`);
+}
+
+setStatus("u1", Status.Active);   // OK
+setStatus("u1", "ACTIVE");        // Error — raw string not assignable to Status
+// This is GOOD — string enums are nominal, preventing accidents</code></pre>
+      </div>
+
+      <h3>Const Enums</h3>
+      <p>Const enums are fully inlined at compile time — the enum object does not exist at runtime.</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-lang">TypeScript</span>
+          <span class="code-label">Const enum — compile-time only</span>
+        </div>
+        <pre><code class="language-typescript">const enum LogLevel {
+  Debug = 0,
+  Info  = 1,
+  Warn  = 2,
+  Error = 3,
+}
+
+// TypeScript compiles:    if (level >= LogLevel.Warn)
+// to plain JavaScript:   if (level >= 2)
+// The enum itself is erased from the output.
+
+if (level >= LogLevel.Warn) {
+  console.warn("Something went wrong");
+}</code></pre>
+      </div>
+
+      <h3>The Controversy: Enums vs Union Types</h3>
+      <p>Many experienced TypeScript engineers, including members of the TypeScript team, now recommend using <strong>union types of literal strings</strong> instead of enums for most cases.</p>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Aspect</th>
+              <th>enum Status { Active = "ACTIVE" }</th>
+              <th>type Status = "ACTIVE" | "INACTIVE"</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Bundle size</td>
+              <td>Adds runtime object (unless const)</td>
+              <td>Zero runtime cost — erased entirely</td>
+            </tr>
+            <tr>
+              <td>Tree-shaking</td>
+              <td>Harder for bundlers</td>
+              <td>Trivially removed</td>
+            </tr>
+            <tr>
+              <td>Type safety</td>
+              <td>Numeric enums are leaky (accept any number)</td>
+              <td>Exact values only</td>
+            </tr>
+            <tr>
+              <td>Refactoring</td>
+              <td>Must update enum declaration</td>
+              <td>Just change the union string</td>
+            </tr>
+            <tr>
+              <td>Usage in JSON/APIs</td>
+              <td>Need to use enum value (cumbersome)</td>
+              <td>Direct string literal — natural</td>
+            </tr>
+            <tr>
+              <td>IDE autocomplete</td>
+              <td>Good</td>
+              <td>Equally good</td>
+            </tr>
+            <tr>
+              <td>Declaration merging</td>
+              <td>Yes (namespace merging)</td>
+              <td>No (use | to add)</td>
+            </tr>
+            <tr>
+              <td>Iteration</td>
+              <td>Object.values(MyEnum)</td>
+              <td>Need separate array: as const</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-lang">TypeScript</span>
+          <span class="code-label">Preferred modern pattern: const + union</span>
+        </div>
+        <pre><code class="language-typescript">// Instead of enum:
+const STATUS = {
+  Active:   "ACTIVE",
+  Inactive: "INACTIVE",
+  Pending:  "PENDING",
+} as const;
+
+type Status = typeof STATUS[keyof typeof STATUS];
+// Status = "ACTIVE" | "INACTIVE" | "PENDING"
+
+// Iterate over values — just like enum
+const allStatuses = Object.values(STATUS);
+// ["ACTIVE", "INACTIVE", "PENDING"]
+
+// Use as parameter type
+function setStatus(s: Status): void { /* ... */ }
+setStatus(STATUS.Active);  // OK
+setStatus("ACTIVE");       // Also OK — direct string literal is assignable</code></pre>
+      </div>
+
+      <div class="callout python">
+        <div class="callout-icon">🐍</div>
+        <div class="callout-body">
+          <div class="callout-title">Python Enum Comparison</div>
+          <p>Python's <code>from enum import Enum</code> creates a class with members. Like TypeScript's string enums, Python enums are nominal — passing the string <code>"ACTIVE"</code> where an <code>enum</code> is expected fails type checking. The key difference: Python enums exist at runtime and support rich features (comparison, ordering, iteration) that are ergonomic. TypeScript's enum compiles to a runtime object, but the union type alternative erases entirely — much better for frontend bundle size.</p>
+        </div>
+      </div>
+
+      <div class="rule-box">
+        <div class="rb-title">Rule of Thumb</div>
+        <p>Start with a union type (<code>type Direction = "left" | "right" | "up" | "down"</code>). Reach for <code>enum</code> only if you need runtime iteration over all members <em>without</em> a separate array, or if you're working in a codebase that already uses enums consistently. Never use numeric enums — they accept arbitrary numbers and provide weaker type safety.</p>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- SECTION 8: DISCRIMINATED UNIONS -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <section class="section" id="discriminated-unions">
+      <h2>8. Discriminated Unions (Sum Types)</h2>
+
+      <p>Discriminated unions — also called <em>tagged unions</em> or <em>sum types</em> — are one of the most powerful patterns in TypeScript. They model values that can be one of several distinct variants, each with its own set of properties.</p>
+
+      <div class="key-concept">
+        <div class="kc-label">Core Pattern</div>
+        <p>Each variant has a shared "tag" property (the discriminant) with a unique literal type. TypeScript uses that tag to narrow the type inside conditionals — giving you complete type safety per branch.</p>
+      </div>
+
+      <!-- SVG: Discriminated Union Structure -->
+      <div class="diagram-wrapper">
+        <svg viewBox="0 0 720 280" xmlns="http://www.w3.org/2000/svg" style="max-width:680px;width:100%;font-family:system-ui,sans-serif">
+          <!-- Title -->
+          <text x="360" y="30" text-anchor="middle" fill="#111827" font-size="14" font-weight="700">type Shape = Circle | Square | Triangle</text>
+
+          <!-- Root node -->
+          <rect x="285" y="44" width="150" height="40" rx="8" fill="#4F46E5"/>
+          <text x="360" y="70" text-anchor="middle" fill="white" font-size="13" font-weight="700">Shape</text>
+
+          <!-- Lines down -->
+          <line x1="360" y1="84" x2="120" y2="130" stroke="#9CA3AF" stroke-width="1.5"/>
+          <line x1="360" y1="84" x2="360" y2="130" stroke="#9CA3AF" stroke-width="1.5"/>
+          <line x1="360" y1="84" x2="600" y2="130" stroke="#9CA3AF" stroke-width="1.5"/>
+
+          <!-- Circle variant -->
+          <rect x="20" y="130" width="200" height="110" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+          <rect x="20" y="130" width="200" height="32" rx="8" fill="#6366F1"/>
+          <rect x="20" y="150" width="200" height="12" fill="#6366F1"/>
+          <text x="120" y="152" text-anchor="middle" fill="white" font-size="12" font-weight="700">{ kind: "circle" }</text>
+          <text x="36" y="182" fill="#3730A3" font-size="12" font-family="monospace">kind: "circle"</text>
+          <text x="36" y="202" fill="#3730A3" font-size="12" font-family="monospace">radius: number</text>
+          <text x="36" y="228" fill="#6366F1" font-size="11" font-style="italic">area = π × r²</text>
+
+          <!-- Square variant -->
+          <rect x="260" y="130" width="200" height="110" rx="8" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+          <rect x="260" y="130" width="200" height="32" rx="8" fill="#7C3AED"/>
+          <rect x="260" y="150" width="200" height="12" fill="#7C3AED"/>
+          <text x="360" y="152" text-anchor="middle" fill="white" font-size="12" font-weight="700">{ kind: "square" }</text>
+          <text x="276" y="182" fill="#5B21B6" font-size="12" font-family="monospace">kind: "square"</text>
+          <text x="276" y="202" fill="#5B21B6" font-size="12" font-family="monospace">side: number</text>
+          <text x="276" y="228" fill="#7C3AED" font-size="11" font-style="italic">area = side²</text>
+
+          <!-- Triangle variant -->
+          <rect x="500" y="130" width="200" height="110" rx="8" fill="#FDF2F8" stroke="#DB2777" stroke-width="1.5"/>
+          <rect x="500" y="130" width="200" height="32" rx="8" fill="#DB2777"/>
+          <rect x="500" y="150" width="200" height="12" fill="#DB2777"/>
+          <text x="600" y="152" text-anchor="middle" fill="white" font-size="12" font-weight="700">{ kind: "triangle" }</text>
+          <text x="516" y="182" fill="#9D174D" font-size="12" font-family="monospace">kind: "triangle"</text>
+          <text x="516" y="202" fill="#9D174D" font-size="12" font-family="monospace">base: number</text>
+          <text x="516" y="218" fill="#9D174D" font-size="12" font-family="monospace">height: number</text>
+          <text x="516" y="238" fill="#DB2777" font-size="11" font-style="italic">area = ½bh</text>
+
+          <!-- Discriminant label -->
+          <rect x="270" y="258" width="180" height="22" rx="5" fill="#FFF7ED" stroke="#D97706"/>
+          <text x="360" y="274" text-anchor="middle" fill="#92400E" font-size="11" font-weight="600">"kind" = discriminant property</text>
+        </svg>
+        <div class="diagram-caption">Each variant carries a unique literal <code>kind</code> value. TypeScript uses this discriminant to narrow the type in each branch of a conditional.</div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-lang">TypeScript</span>
+          <span class="code-label">Discriminated union — full example with exhaustive checking</span>
+        </div>
+        <pre><code class="language-typescript">// Define the union — each variant has a unique "kind"
+type Shape =
+  | { kind: "circle";   radius: number }
+  | { kind: "square";   side: number }
+  | { kind: "triangle"; base: number; height: number };
+
+// TypeScript narrows the type in each branch
+function area(shape: Shape): number {
+  switch (shape.kind) {
+    case "circle":
+      // shape is { kind: "circle"; radius: number } here
+      return Math.PI * shape.radius ** 2;
+
+    case "square":
+      // shape is { kind: "square"; side: number } here
+      return shape.side ** 2;
+
+    case "triangle":
+      // shape is { kind: "triangle"; base: number; height: number } here
+      return 0.5 * shape.base * shape.height;
+
+    default:
+      // Exhaustive check — if a new variant is added, this errors at compile time
+      const _exhaustive: never = shape;
+      throw new Error(`Unknown shape: ${JSON.stringify(_exhaustive)}`);
+  }
+}
+
+console.log(area({ kind: "circle", radius: 5 }));     // 78.54
+console.log(area({ kind: "square", side: 4 }));       // 16
+console.log(area({ kind: "triangle", base: 6, height: 4 })); // 12</code></pre>
+      </div>
+
+      <h3>Exhaustive Checking with never</h3>
+      <p>The <code>never</code> trick in the <code>default</code> branch is critical for maintainability. When you add a new variant to the union, the default branch receives a value that isn't <code>never</code>, causing a compile error that forces you to handle the new case.</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-lang">TypeScript</span>
+          <span class="code-label">Add a new variant — TypeScript forces you to handle it</span>
+        </div>
+        <pre><code class="language-typescript">// Add "rectangle" to Shape
+type Shape =
+  | { kind: "circle";    radius: number }
+  | { kind: "square";   side: number }
+  | { kind: "triangle"; base: number; height: number }
+  | { kind: "rectangle"; width: number; height: number }; // NEW
+
+function area(shape: Shape): number {
+  switch (shape.kind) {
+    case "circle":   return Math.PI * shape.radius ** 2;
+    case "square":   return shape.side ** 2;
+    case "triangle": return 0.5 * shape.base * shape.height;
+    // Forgot rectangle!
+    default:
+      // Error: Type '{ kind: "rectangle"; width: number; height: number }'
+      //        is not assignable to type 'never'
+      const _exhaustive: never = shape; // TypeScript catches the missing case!
+      throw new Error("Unknown shape");
+  }
+}</code></pre>
+      </div>
+
+      <h3>Real-World Example: API Response Variants</h3>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-lang">TypeScript</span>
+          <span class="code-label">Redux-style actions and API responses</span>
+        </div>
+        <pre><code class="language-typescript">// API responses — discriminated by status
+type ApiResult<T> =
+  | { status: "loading" }
+  | { status: "success"; data: T; timestamp: number }
+  | { status: "error";   error: string; code: number };
+
+function renderUser(result: ApiResult<{ name: string; email: string }>) {
+  switch (result.status) {
+    case "loading":
+      return `<Spinner />`;
+    case "success":
+      return `<UserCard name="${result.data.name}" />`;
+    case "error":
+      return `<Error message="${result.error}" code=${result.code} />`;
+  }
+}
+
+// Redux-style action types — discriminated unions are the standard pattern
+type UserAction =
+  | { type: "USER_LOADED";  payload: User }
+  | { type: "USER_UPDATED"; payload: Partial<User> }
+  | { type: "USER_DELETED"; userId: string }
+  | { type: "USER_ERROR";   error: string };
+
+function userReducer(state: User | null, action: UserAction): User | null {
+  switch (action.type) {
+    case "USER_LOADED":  return action.payload;         // action.payload: User
+    case "USER_UPDATED": return { ...state!, ...action.payload };
+    case "USER_DELETED": return null;
+    case "USER_ERROR":
+      console.error(action.error);                      // action.error: string
+      return state;
+  }
+}</code></pre>
+      </div>
+
+      <div class="callout python">
+        <div class="callout-icon">🐍</div>
+        <div class="callout-body">
+          <div class="callout-title">Python match vs TypeScript switch on discriminated unions</div>
+          <p>Python 3.10+ added structural pattern matching (<code>match</code> statement) that works similarly. TypeScript's <code>switch</code> on a discriminant property achieves the same goal with less syntax overhead. Python's match is more powerful (it can destructure, match sequences, etc.), but TypeScript's discriminated unions with <code>never</code> provide compile-time exhaustiveness that Python does not guarantee at the static checker level without plugins.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- SECTION 9: ADVANCED OBJECT PATTERNS -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <section class="section" id="advanced-patterns">
+      <h2>9. Advanced Object Patterns</h2>
+
+      <h3>Object Spread and Rest</h3>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-lang">TypeScript</span>
+          <span class="code-label">Spread for immutable updates, rest for omission</span>
+        </div>
+        <pre><code class="language-typescript">interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: "user" | "admin";
+}
+
+const user: User = { id: "u1", name: "Alice", email: "a@x.com", role: "user" };
+
+// Spread — create updated copy without mutation
+const updated: User = { ...user, name: "Alicia", role: "admin" };
+// user is unchanged, updated has new values
+
+// Rest — extract and omit
+const { id, ...userWithoutId } = user;
+// id: string
+// userWithoutId: { name: string; email: string; role: "user" | "admin" }
+
+// Merging objects
+function mergeConfig<T extends object>(defaults: T, overrides: Partial<T>): T {
+  return { ...defaults, ...overrides };
+}
+
+const config = mergeConfig(
+  { timeout: 5000, retries: 3, debug: false },
+  { debug: true },
+);
+// { timeout: 5000, retries: 3, debug: true }</code></pre>
+      </div>
+
+      <h3>Destructuring with Types</h3>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">interface Config {
+  host: string;
+  port: number;
+  credentials: { username: string; password: string };
+}
+
+// Basic destructuring — types are inferred
+const { host, port } = config;
+// host: string, port: number
+
+// Rename while destructuring
+const { host: serverHost, port: serverPort } = config;
+
+// Nested destructuring
+const { credentials: { username } } = config;
+
+// Default values
+const { host = "localhost", port = 8080 } = partialConfig;
+
+// Function parameter destructuring with types
+function connect({ host, port, credentials: { username } }: Config): string {
+  return `${username}@${host}:${port}`;
+}</code></pre>
+      </div>
+
+      <h3>Record&lt;K, V&gt;</h3>
+      <p><code>Record&lt;K, V&gt;</code> constructs a type with keys of type K and values of type V. It is the typed way to create dictionary/map types.</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">// Simple string-keyed dictionary
+type Env = Record<string, string>;
+const env: Env = { NODE_ENV: "production", PORT: "3000" };
+
+// Constrained keys — union of literals
+type UserRole = "admin" | "editor" | "viewer";
+type RolePermissions = Record<UserRole, string[]>;
+
+const permissions: RolePermissions = {
+  admin:  ["read", "write", "delete"],
+  editor: ["read", "write"],
+  viewer: ["read"],
+};
+
+// Ensures ALL keys of the union are present — compile error if you miss one</code></pre>
+      </div>
+
+      <h3>Essential Utility Types Preview</h3>
+      <p>TypeScript ships with built-in generic types that transform existing types. These are covered in depth in Chapter 6, but here is an introduction:</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-lang">TypeScript</span>
+          <span class="code-label">Partial, Required, Pick, Omit</span>
+        </div>
+        <pre><code class="language-typescript">interface User {
+  id: string;
+  name: string;
+  email: string;
+  age: number;
+  bio?: string;
+}
+
+// Partial<T> — all properties become optional (useful for update payloads)
+type UserUpdate = Partial<User>;
+// { id?: string; name?: string; email?: string; age?: number; bio?: string }
+
+// Required<T> — all properties become required (removes the ?)
+type UserComplete = Required<User>;
+// { id: string; name: string; email: string; age: number; bio: string }
+
+// Pick<T, K> — select only certain keys
+type UserPreview = Pick<User, "id" | "name">;
+// { id: string; name: string }
+
+// Omit<T, K> — remove certain keys
+type PublicUser = Omit<User, "email" | "bio">;
+// { id: string; name: string; age: number }
+
+// Practical example: API PATCH handler
+async function updateUser(id: string, patch: Omit<Partial<User>, "id">): Promise<User> {
+  // patch has all User fields optional, except id (which is in the path param)
+  const existing = await fetchUser(id);
+  return save({ ...existing, ...patch });
+}</code></pre>
+      </div>
+
+      <h3>Deep Readonly</h3>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-lang">TypeScript</span>
+          <span class="code-label">Readonly and deep readonly patterns</span>
+        </div>
+        <pre><code class="language-typescript">// Built-in Readonly<T> — shallow
+type ReadonlyUser = Readonly<User>;
+// { readonly id: string; readonly name: string; ... }
+
+// The problem: nested objects are still mutable
+type Config = Readonly<{ server: { port: number } }>;
+const config: Config = { server: { port: 3000 } };
+// config.server = {} // Error — good
+config.server.port = 9999; // OK — only shallow!
+
+// Deep readonly — recursive custom type
+type DeepReadonly<T> = T extends (infer U)[]
+  ? ReadonlyArray<DeepReadonly<U>>
+  : T extends object
+  ? { readonly [P in keyof T]: DeepReadonly<T[P]> }
+  : T;
+
+type ImmutableConfig = DeepReadonly<Config>;
+const frozenConfig: ImmutableConfig = { server: { port: 3000 } };
+// frozenConfig.server.port = 9999; // Error — deeply readonly</code></pre>
+      </div>
+
+      <div class="callout ai-era">
+        <div class="callout-icon">✦</div>
+        <div class="callout-body">
+          <div class="callout-title">AI Era Relevance: Discriminated Unions for LLM Tool Calls</div>
+          <p>When building AI agents, tool call results from LLMs are perfect candidates for discriminated unions. A tool response is either a success with data, a tool error, or a refusal. Model each as a variant: <code>type ToolResult = { kind: "success"; output: unknown } | { kind: "error"; message: string } | { kind: "refusal"; reason: string }</code>. This makes your agent's decision logic type-safe and exhaustive at compile time.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- SECTION 10: EXERCISES -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <section class="section" id="exercises">
+      <div class="exercises-section">
+        <h2>10. Exercises</h2>
+        <p style="color:var(--text-muted);margin-top:8px;margin-bottom:24px">Work through these exercises to solidify your understanding. Attempt each before revealing the solution.</p>
+
+        <!-- Exercise 1 -->
+        <div class="exercise">
+          <div class="exercise-header">
+            <div class="exercise-number">1</div>
+            <div class="exercise-title">Shape the Interface</div>
+            <span class="exercise-difficulty diff-easy">Easy</span>
+          </div>
+          <p>Define an interface <code>Repository&lt;T&gt;</code> that represents a generic data store. It should have methods: <code>findById(id: string): Promise&lt;T | null&gt;</code>, <code>findAll(): Promise&lt;T[]&gt;</code>, <code>save(item: T): Promise&lt;T&gt;</code>, and <code>delete(id: string): Promise&lt;void&gt;</code>. Then define a <code>User</code> interface with <code>id</code>, <code>name</code>, and <code>email</code>. Write a class <code>InMemoryUserRepository</code> that implements <code>Repository&lt;User&gt;</code> using a <code>Map</code> internally.</p>
+
+          <details>
+            <summary>Show Solution</summary>
+            <div class="solution-content">
+              <div class="code-block">
+                <div class="code-block-header"><span class="code-lang">TypeScript</span></div>
+                <pre><code class="language-typescript">interface Repository<T extends { id: string }> {
+  findById(id: string): Promise<T | null>;
+  findAll(): Promise<T[]>;
+  save(item: T): Promise<T>;
+  delete(id: string): Promise<void>;
+}
+
+interface User {
+  id: string;
+  name: string;
+  email: string;
+}
+
+class InMemoryUserRepository implements Repository<User> {
+  private store = new Map<string, User>();
+
+  async findById(id: string): Promise<User | null> {
+    return this.store.get(id) ?? null;
+  }
+
+  async findAll(): Promise<User[]> {
+    return Array.from(this.store.values());
+  }
+
+  async save(user: User): Promise<User> {
+    this.store.set(user.id, user);
+    return user;
+  }
+
+  async delete(id: string): Promise<void> {
+    this.store.delete(id);
+  }
+}
+
+// Test it
+const repo = new InMemoryUserRepository();
+await repo.save({ id: "u1", name: "Alice", email: "alice@example.com" });
+console.log(await repo.findById("u1")); // { id: "u1", name: "Alice", ... }
+console.log(await repo.findById("u2")); // null</code></pre>
+              </div>
+            </div>
+          </details>
+        </div>
+
+        <!-- Exercise 2 -->
+        <div class="exercise">
+          <div class="exercise-header">
+            <div class="exercise-number">2</div>
+            <div class="exercise-title">Class Hierarchy with Abstract Base</div>
+            <span class="exercise-difficulty diff-medium">Medium</span>
+          </div>
+          <p>Create an abstract class <code>Notifier</code> with: a <code>readonly channel: string</code> property, an abstract method <code>send(message: string, recipient: string): Promise&lt;void&gt;</code>, and a concrete method <code>broadcast(message: string, recipients: string[]): Promise&lt;void&gt;</code> that calls <code>send</code> for each recipient. Implement two subclasses: <code>EmailNotifier</code> (with a <code>fromAddress</code> property) and <code>SlackNotifier</code> (with a <code>webhookUrl</code> property). Use constructor shorthand where possible.</p>
+
+          <details>
+            <summary>Show Solution</summary>
+            <div class="solution-content">
+              <div class="code-block">
+                <div class="code-block-header"><span class="code-lang">TypeScript</span></div>
+                <pre><code class="language-typescript">abstract class Notifier {
+  abstract readonly channel: string;
+
+  abstract send(message: string, recipient: string): Promise<void>;
+
+  async broadcast(message: string, recipients: string[]): Promise<void> {
+    await Promise.all(recipients.map(r => this.send(message, r)));
+  }
+}
+
+class EmailNotifier extends Notifier {
+  readonly channel = "email" as const;
+
+  constructor(private fromAddress: string) {
+    super();
+  }
+
+  async send(message: string, recipient: string): Promise<void> {
+    console.log(`[Email] FROM: ${this.fromAddress} TO: ${recipient} — ${message}`);
+    // real implementation would call an email API
+  }
+}
+
+class SlackNotifier extends Notifier {
+  readonly channel = "slack" as const;
+
+  constructor(private webhookUrl: string) {
+    super();
+  }
+
+  async send(message: string, recipient: string): Promise<void> {
+    console.log(`[Slack] POST ${this.webhookUrl} — @${recipient}: ${message}`);
+    // real implementation would call Slack API
+  }
+}
+
+// Usage
+const email = new EmailNotifier("noreply@example.com");
+const slack = new SlackNotifier("https://hooks.slack.com/xxx");
+
+await email.broadcast("Deployment complete!", ["alice@x.com", "bob@x.com"]);
+await slack.send("Hello!", "channel-dev");</code></pre>
+              </div>
+            </div>
+          </details>
+        </div>
+
+        <!-- Exercise 3 -->
+        <div class="exercise">
+          <div class="exercise-header">
+            <div class="exercise-number">3</div>
+            <div class="exercise-title">Discriminated Union: Payment Processing</div>
+            <span class="exercise-difficulty diff-medium">Medium</span>
+          </div>
+          <p>Model a payment system with a discriminated union <code>PaymentMethod</code> that has three variants: <code>"card"</code> (with <code>last4: string</code>, <code>brand: string</code>, <code>expiry: string</code>), <code>"bank_transfer"</code> (with <code>accountNumber: string</code>, <code>routingNumber: string</code>), and <code>"crypto"</code> (with <code>walletAddress: string</code>, <code>currency: "BTC" | "ETH" | "USDC"</code>). Write a function <code>getPaymentDescription(method: PaymentMethod): string</code> that returns a human-readable description for each variant. Include exhaustive checking.</p>
+
+          <details>
+            <summary>Show Solution</summary>
+            <div class="solution-content">
+              <div class="code-block">
+                <div class="code-block-header"><span class="code-lang">TypeScript</span></div>
+                <pre><code class="language-typescript">type PaymentMethod =
+  | {
+      kind: "card";
+      last4: string;
+      brand: string;
+      expiry: string;
+    }
+  | {
+      kind: "bank_transfer";
+      accountNumber: string;
+      routingNumber: string;
+    }
+  | {
+      kind: "crypto";
+      walletAddress: string;
+      currency: "BTC" | "ETH" | "USDC";
+    };
+
+function getPaymentDescription(method: PaymentMethod): string {
+  switch (method.kind) {
+    case "card":
+      return `${method.brand} card ending in ${method.last4} (exp: ${method.expiry})`;
+
+    case "bank_transfer":
+      return `Bank transfer to account ***${method.accountNumber.slice(-4)} routing: ${method.routingNumber}`;
+
+    case "crypto":
+      return `${method.currency} wallet ${method.walletAddress.slice(0, 8)}...`;
+
+    default:
+      const _exhaustive: never = method;
+      throw new Error(`Unhandled payment method: ${JSON.stringify(_exhaustive)}`);
+  }
+}
+
+// Test
+console.log(getPaymentDescription({ kind: "card", last4: "4242", brand: "Visa", expiry: "12/26" }));
+// "Visa card ending in 4242 (exp: 12/26)"
+
+console.log(getPaymentDescription({ kind: "crypto", walletAddress: "0xABCDEF123456", currency: "ETH" }));
+// "ETH wallet 0xABCDEF..."</code></pre>
+              </div>
+            </div>
+          </details>
+        </div>
+
+        <!-- Exercise 4 -->
+        <div class="exercise">
+          <div class="exercise-header">
+            <div class="exercise-number">4</div>
+            <div class="exercise-title">Type vs Interface: Declaration Merging</div>
+            <span class="exercise-difficulty diff-medium">Medium</span>
+          </div>
+          <p>You are building a plugin system. Start with a base <code>interface PluginContext</code> that has <code>pluginId: string</code> and <code>version: string</code>. Then, in a separate section (simulating a plugin's own type declarations), augment <code>PluginContext</code> to add <code>metadata: Record&lt;string, unknown&gt;</code> and <code>log(message: string): void</code>. Write a function <code>initPlugin(ctx: PluginContext): void</code> that uses all four properties. Explain why you cannot do this with <code>type</code>.</p>
+
+          <details>
+            <summary>Show Solution</summary>
+            <div class="solution-content">
+              <div class="code-block">
+                <div class="code-block-header"><span class="code-lang">TypeScript</span></div>
+                <pre><code class="language-typescript">// --- core/plugin.ts ---
+interface PluginContext {
+  pluginId: string;
+  version: string;
+}
+
+// --- plugins/my-plugin/types.ts ---
+// Declaration merging — augmenting the existing interface
+interface PluginContext {
+  metadata: Record<string, unknown>;
+  log(message: string): void;
+}
+
+// Now PluginContext has all four members
+function initPlugin(ctx: PluginContext): void {
+  ctx.log(`Initializing plugin ${ctx.pluginId} v${ctx.version}`);
+  ctx.metadata["initialized"] = true;
+  ctx.metadata["startTime"] = Date.now();
+  ctx.log(`Plugin ready. Metadata: ${JSON.stringify(ctx.metadata)}`);
+}
+
+// Why type won't work:
+// type PluginContext = { pluginId: string; version: string };
+// type PluginContext = { metadata: ...; log(): void }; // Error: Duplicate identifier 'PluginContext'
+// type aliases do NOT merge — they conflict.
+// interface declarations in the same scope (or module-augmented scope) merge seamlessly.
+
+// Usage
+const ctx: PluginContext = {
+  pluginId: "my-analytics",
+  version: "2.0.0",
+  metadata: {},
+  log: (msg) => console.log(`[my-analytics] ${msg}`),
+};
+initPlugin(ctx);</code></pre>
+              </div>
+            </div>
+          </details>
+        </div>
+
+        <!-- Exercise 5 -->
+        <div class="exercise">
+          <div class="exercise-header">
+            <div class="exercise-number">5</div>
+            <div class="exercise-title">AI Tool Call Result Modeling</div>
+            <span class="exercise-difficulty diff-hard">Hard</span>
+          </div>
+          <p>Model an AI agent tool execution system. Define a discriminated union <code>ToolResult</code> with variants: <code>"success"</code> (with <code>toolName: string</code>, <code>output: unknown</code>, <code>durationMs: number</code>), <code>"error"</code> (with <code>toolName: string</code>, <code>error: string</code>, <code>retryable: boolean</code>), and <code>"timeout"</code> (with <code>toolName: string</code>, <code>limitMs: number</code>). Then create a generic class <code>ToolRunner&lt;TInput, TOutput&gt;</code> that takes a <code>name: string</code> and an <code>executor: (input: TInput) =&gt; Promise&lt;TOutput&gt;</code> in its constructor, and has a method <code>run(input: TInput, timeoutMs?: number): Promise&lt;ToolResult&gt;</code> that wraps the executor in proper error handling and timeout logic. Write a function <code>summarizeResults(results: ToolResult[]): string</code> using discriminated union narrowing.</p>
+
+          <details>
+            <summary>Show Solution</summary>
+            <div class="solution-content">
+              <div class="code-block">
+                <div class="code-block-header"><span class="code-lang">TypeScript</span></div>
+                <pre><code class="language-typescript">type ToolResult =
+  | { kind: "success"; toolName: string; output: unknown; durationMs: number }
+  | { kind: "error";   toolName: string; error: string; retryable: boolean }
+  | { kind: "timeout"; toolName: string; limitMs: number };
+
+class ToolRunner<TInput, TOutput> {
+  constructor(
+    private name: string,
+    private executor: (input: TInput) => Promise<TOutput>,
+  ) {}
+
+  async run(input: TInput, timeoutMs = 5000): Promise<ToolResult> {
+    const start = Date.now();
+
+    try {
+      const result = await Promise.race([
+        this.executor(input),
+        new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error("TIMEOUT")), timeoutMs)
+        ),
+      ]);
+
+      return {
+        kind: "success",
+        toolName: this.name,
+        output: result,
+        durationMs: Date.now() - start,
+      };
+    } catch (err) {
+      if (err instanceof Error && err.message === "TIMEOUT") {
+        return { kind: "timeout", toolName: this.name, limitMs: timeoutMs };
+      }
+      return {
+        kind: "error",
+        toolName: this.name,
+        error: err instanceof Error ? err.message : String(err),
+        retryable: !(err instanceof TypeError), // network errors are retryable
+      };
+    }
+  }
+}
+
+function summarizeResults(results: ToolResult[]): string {
+  const lines: string[] = [];
+  for (const r of results) {
+    switch (r.kind) {
+      case "success":
+        lines.push(`[OK]      ${r.toolName} (${r.durationMs}ms)`);
+        break;
+      case "error":
+        lines.push(`[ERROR]   ${r.toolName}: ${r.error} ${r.retryable ? "(retryable)" : ""}`);
+        break;
+      case "timeout":
+        lines.push(`[TIMEOUT] ${r.toolName} exceeded ${r.limitMs}ms`);
+        break;
+      default:
+        const _: never = r;
+    }
+  }
+  const successes = results.filter(r => r.kind === "success").length;
+  lines.push(`\nTotal: ${results.length} | Success: ${successes} | Failed: ${results.length - successes}`);
+  return lines.join("\n");
+}
+
+// Usage
+const weatherTool = new ToolRunner("get_weather", async (city: string) => {
+  // simulate API call
+  return { city, temp: 22, condition: "sunny" };
+});
+
+const results = await Promise.all([
+  weatherTool.run("London"),
+  weatherTool.run("Tokyo", 1), // timeout immediately
+]);
+
+console.log(summarizeResults(results));</code></pre>
+              </div>
+            </div>
+          </details>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- FOOTER NAV -->
+    <footer>
+      <div class="footer-nav">
+        <a href="chapter-04-functions.html">← Ch 4: Functions &amp; Generics</a>
+        <div class="footer-meta">
+          <div>Chapter 5 of 24</div>
+          <div style="margin-top:4px;font-size:12px">TypeScript for the AI Era</div>
+          <div style="margin-top:4px;font-size:12px">Boris Cherny &middot; Staff Engineer @ Meta</div>
+        </div>
+        <a href="chapter-06-advanced-types.html">Ch 6: Advanced Types →</a>
+      </div>
+    </footer>
+
+  </main>
+</div>
+
+<script>
+  // Initialize highlight.js
+  document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll("pre code").forEach(block => {
+      hljs.highlightElement(block);
+    });
+
+    // Sidebar active link tracking
+    const sections = document.querySelectorAll("section.section[id]");
+    const sidebarLinks = document.querySelectorAll(".sidebar ul li a");
+
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          sidebarLinks.forEach(link => link.classList.remove("active"));
+          const active = document.querySelector(`.sidebar ul li a[href="#${entry.target.id}"]`);
+          if (active) active.classList.add("active");
+        }
+      });
+    }, { rootMargin: "-20% 0px -70% 0px" });
+
+    sections.forEach(s => observer.observe(s));
+  });
+</script>
+
+</body>
+</html>

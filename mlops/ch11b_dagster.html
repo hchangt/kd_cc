@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 11B: Dagster &amp; Advanced Orchestration - Modern MLOps Tutorial</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script>hljs.highlightAll(); mermaid.initialize({startOnLoad:true, theme:'default'});</script>
+  <style>
+    body { color: #1f2937; }
+    .primary { color: #2563eb; }
+    .secondary { color: #059669; }
+    pre { margin: 0 !important; }
+    .code-block { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; margin: 1rem 0; }
+    .code-header { background: #1e293b; color: #94a3b8; font-size: 0.75rem; padding: 0.4rem 1rem; font-family: monospace; display: flex; justify-content: space-between; }
+    .mermaid-wrap { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 1.5rem; margin: 1rem 0; overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+    th { background: #2563eb; color: white; padding: 0.6rem 0.8rem; text-align: left; }
+    td { padding: 0.5rem 0.8rem; border-bottom: 1px solid #e5e7eb; }
+    tr:nth-child(even) td { background: #f9fafb; }
+    .badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 9999px; font-size: 0.7rem; font-weight: 600; }
+    .section-anchor { scroll-margin-top: 4rem; }
+  </style>
+</head>
+<body class="bg-white font-sans">
+
+<!-- Navbar -->
+<nav class="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
+  <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+    <a href="index.html" class="text-blue-600 font-bold text-lg hover:text-blue-800">Modern MLOps Tutorial</a>
+    <div class="flex items-center gap-4 text-sm">
+      <a href="index.html" class="text-gray-600 hover:text-blue-600">Home</a>
+      <span class="bg-blue-600 text-white px-3 py-1 rounded-full font-semibold">Chapter 11B</span>
+      <span class="text-gray-400">~60 min read</span>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero -->
+<div class="bg-gradient-to-r from-blue-600 to-emerald-600 text-white py-12 px-4">
+  <div class="max-w-4xl mx-auto">
+    <div class="text-sm font-medium opacity-80 mb-2">Part IV: Orchestration &amp; Pipelines</div>
+    <h1 class="text-4xl font-bold mb-3">Chapter 11B: Dagster &amp; Advanced Orchestration</h1>
+    <p class="text-xl opacity-90">Asset-centric orchestration, Step Functions, ZenML, LLM workflows, and orchestrator selection</p>
+    <div class="mt-4 flex gap-4 text-sm opacity-80">
+      <span>10 code examples</span><span>|</span><span>4 comparison tables</span><span>|</span><span>4 Mermaid diagrams</span>
+    </div>
+  </div>
+</div>
+
+<!-- TOC -->
+<div class="max-w-4xl mx-auto px-4 py-8">
+  <div class="bg-gray-50 border border-gray-200 rounded-xl p-6 mb-10">
+    <h2 class="font-bold text-gray-800 mb-3">Contents</h2>
+    <ol class="space-y-1 text-sm text-blue-600">
+      <li><a href="#s1" class="hover:underline">1. Dagster — Asset-Centric Orchestration</a></li>
+      <li><a href="#s2" class="hover:underline">2. Dagster Advanced Features</a></li>
+      <li><a href="#s3" class="hover:underline">3. AWS Step Functions for Serverless ML</a></li>
+      <li><a href="#s4" class="hover:underline">4. ZenML — ML-First Orchestration</a></li>
+      <li><a href="#s5" class="hover:underline">5. Orchestration for LLM Workflows</a></li>
+      <li><a href="#s6" class="hover:underline">6. Multi-Orchestrator Patterns</a></li>
+      <li><a href="#s7" class="hover:underline">7. Orchestration Observability</a></li>
+      <li><a href="#s8" class="hover:underline">8. Orchestrator Selection Guide</a></li>
+      <li><a href="#takeaways" class="hover:underline">Key Takeaways</a></li>
+    </ol>
+  </div>
+
+<!-- ===================== SECTION 1 ===================== -->
+<section id="s1" class="section-anchor mb-14">
+  <h2 class="text-2xl font-bold text-gray-900 mb-1">1. Dagster — Asset-Centric Orchestration</h2>
+  <p class="text-gray-500 text-sm mb-5">Philosophy shift: from running tasks to producing assets</p>
+
+  <h3 class="text-lg font-semibold mb-2">Philosophy</h3>
+  <p class="mb-3 text-gray-700">Airflow and Prefect are <strong>task-centric</strong> — you define what <em>runs</em>. Dagster is <strong>asset-centric</strong> — you define what <em>exists</em>. A <code>@asset</code> function declares both the data artifact and the computation that produces it. Dagster then infers the dependency graph, tracks materialization history, and makes lineage a first-class citizen.</p>
+
+  <div class="overflow-x-auto mb-6 rounded-xl border border-gray-200">
+    <table>
+      <thead><tr><th>Concept</th><th>Airflow equivalent</th><th>What it does</th></tr></thead>
+      <tbody>
+        <tr><td><code>@asset</code></td><td>Task + XCom output</td><td>Declares a data artifact and how to produce it</td></tr>
+        <tr><td><code>@op</code></td><td>Operator</td><td>Unit of computation (lower level than asset)</td></tr>
+        <tr><td><code>@job</code></td><td>DAG</td><td>Collection of ops wired together</td></tr>
+        <tr><td><code>ScheduleDefinition</code></td><td>schedule</td><td>Time-based trigger</td></tr>
+        <tr><td><code>@sensor</code></td><td>Sensor operator</td><td>Event-based trigger (S3, DB, external)</td></tr>
+        <tr><td><code>ResourceDefinition</code></td><td>Connection / Hook</td><td>Shared infrastructure (S3 client, MLflow)</td></tr>
+        <tr><td><code>Partition</code></td><td>Dynamic DAG</td><td>Run subset of assets for a time window / key</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 class="text-lg font-semibold mb-2">Software-Defined Assets ML Pipeline</h3>
+  <div class="code-block">
+    <div class="code-header"><span>dagster_ml_pipeline.py</span><span>Python · Dagster 1.7</span></div>
+    <pre><code class="language-python">import pandas as pd
+import mlflow
+from dagster import (
+    asset, AssetExecutionContext, AssetIn, MetadataValue,
+    Output, ResourceDefinition, EnvVar, define_asset_job,
+    ScheduleDefinition, Definitions
+)
+from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import roc_auc_score
+import joblib, boto3, json
+
+# ── Resources ──────────────────────────────────────────────────────────────
+s3_resource = ResourceDefinition.hardcoded_resource(
+    boto3.client("s3", region_name="us-east-1")
+)
+
+@asset(
+    group_name="data_ingestion",
+    description="Raw feature data pulled from S3 data lake",
+    metadata={"source_bucket": "ml-data-lake", "prefix": "raw/features/"},
+)
+def raw_training_data(context: AssetExecutionContext) -> pd.DataFrame:
+    s3 = boto3.client("s3")
+    obj = s3.get_object(Bucket="ml-data-lake", Key="raw/features/latest.parquet")
+    df = pd.read_parquet(obj["Body"])
+    context.add_output_metadata({
+        "row_count": MetadataValue.int(len(df)),
+        "columns": MetadataValue.json(list(df.columns)),
+        "sample": MetadataValue.md(df.head(3).to_markdown()),
+    })
+    return df
+
+@asset(
+    group_name="data_processing",
+    ins={"raw_training_data": AssetIn()},
+    description="Cleaned, encoded feature matrix ready for training",
+)
+def processed_features(
+    context: AssetExecutionContext, raw_training_data: pd.DataFrame
+) -> pd.DataFrame:
+    df = raw_training_data.dropna()
+    df = pd.get_dummies(df, drop_first=True)
+    context.add_output_metadata({"row_count": MetadataValue.int(len(df))})
+    return df
+
+@asset(
+    group_name="modeling",
+    ins={"processed_features": AssetIn()},
+    description="Trained GBM model artifact stored as joblib",
+    metadata={"mlflow_experiment": "churn-prediction"},
+)
+def trained_model(context: AssetExecutionContext, processed_features: pd.DataFrame):
+    mlflow.set_experiment("churn-prediction")
+    X = processed_features.drop("target", axis=1)
+    y = processed_features["target"]
+    X_tr, X_val, y_tr, y_val = train_test_split(X, y, test_size=0.2, random_state=42)
+
+    with mlflow.start_run() as run:
+        params = {"n_estimators": 300, "max_depth": 4, "learning_rate": 0.05}
+        model = GradientBoostingClassifier(**params)
+        model.fit(X_tr, y_tr)
+        mlflow.log_params(params)
+        mlflow.sklearn.log_model(model, "model")
+        joblib.dump(model, "/tmp/model.joblib")
+
+    context.add_output_metadata({
+        "mlflow_run_id": MetadataValue.text(run.info.run_id),
+        "model_path": MetadataValue.text("/tmp/model.joblib"),
+    })
+    return {"run_id": run.info.run_id, "model_path": "/tmp/model.joblib"}
+
+@asset(
+    group_name="evaluation",
+    ins={"trained_model": AssetIn(), "processed_features": AssetIn()},
+    description="Model evaluation metrics — AUC, precision, recall",
+)
+def model_evaluation(context: AssetExecutionContext, trained_model: dict, processed_features: pd.DataFrame):
+    model = joblib.load(trained_model["model_path"])
+    X = processed_features.drop("target", axis=1)
+    y = processed_features["target"]
+    _, X_test, _, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    auc = roc_auc_score(y_test, model.predict_proba(X_test)[:, 1])
+    metrics = {"auc": round(auc, 4)}
+    context.add_output_metadata({"auc": MetadataValue.float(auc)})
+    return metrics
+
+@asset(
+    group_name="deployment",
+    ins={"model_evaluation": AssetIn(), "trained_model": AssetIn()},
+    description="Deployed model endpoint — only promotes if AUC > 0.80",
+)
+def deployed_model(context: AssetExecutionContext, model_evaluation: dict, trained_model: dict):
+    if model_evaluation["auc"] < 0.80:
+        raise ValueError(f"AUC {model_evaluation['auc']} below threshold 0.80 — skipping deployment")
+    # Register in MLflow Model Registry
+    client = mlflow.tracking.MlflowClient()
+    result = client.create_model_version(
+        name="churn-model",
+        source=f"runs:/{trained_model['run_id']}/model",
+        run_id=trained_model["run_id"],
+    )
+    client.transition_model_version_stage("churn-model", result.version, "Production")
+    context.add_output_metadata({"version": MetadataValue.int(int(result.version))})
+    return {"version": result.version, "stage": "Production"}
+
+# ── Job + Schedule ──────────────────────────────────────────────────────────
+ml_job = define_asset_job("ml_training_job", selection=[
+    "raw_training_data", "processed_features",
+    "trained_model", "model_evaluation", "deployed_model",
+])
+weekly_schedule = ScheduleDefinition(job=ml_job, cron_schedule="0 2 * * 1")
+
+defs = Definitions(
+    assets=[raw_training_data, processed_features, trained_model, model_evaluation, deployed_model],
+    jobs=[ml_job],
+    schedules=[weekly_schedule],
+)
+</code></pre>
+  </div>
+
+  <h3 class="text-lg font-semibold mb-3 mt-6">Asset Lineage Diagram</h3>
+  <div class="mermaid-wrap">
+    <div class="mermaid">
+graph LR
+  S3[(S3 Data Lake)] --> A[raw_training_data]
+  A --> B[processed_features]
+  B --> C[trained_model]
+  B --> D[model_evaluation]
+  C --> D
+  D --> E{AUC >= 0.80?}
+  E -- yes --> F[deployed_model\nMLflow Registry]
+  E -- no --> G[Skip / Alert]
+  MLflow[(MLflow Tracking)] --> C
+  style A fill:#dbeafe,stroke:#2563eb
+  style B fill:#dbeafe,stroke:#2563eb
+  style C fill:#dcfce7,stroke:#059669
+  style D fill:#fef9c3,stroke:#ca8a04
+  style F fill:#dcfce7,stroke:#059669
+  style G fill:#fee2e2,stroke:#dc2626
+    </div>
+  </div>
+</section>
+
+<!-- ===================== SECTION 2 ===================== -->
+<section id="s2" class="section-anchor mb-14">
+  <h2 class="text-2xl font-bold text-gray-900 mb-1">2. Dagster Advanced Features</h2>
+  <p class="text-gray-500 text-sm mb-5">Sensors, partitions, dbt integration, and cloud deployment</p>
+
+  <h3 class="text-lg font-semibold mb-2">S3 Sensor — Trigger Retraining on New Data</h3>
+  <div class="code-block">
+    <div class="code-header"><span>dagster_sensors.py</span><span>Python</span></div>
+    <pre><code class="language-python">from dagster import sensor, SensorEvaluationContext, RunRequest, SkipReason
+import boto3
+
+@sensor(job=ml_job, minimum_interval_seconds=300)
+def s3_new_data_sensor(context: SensorEvaluationContext):
+    s3 = boto3.client("s3")
+    paginator = s3.get_paginator("list_objects_v2")
+    pages = paginator.paginate(Bucket="ml-data-lake", Prefix="raw/features/")
+
+    latest_key = None
+    latest_modified = None
+    for page in pages:
+        for obj in page.get("Contents", []):
+            if latest_modified is None or obj["LastModified"] > latest_modified:
+                latest_modified = obj["LastModified"]
+                latest_key = obj["Key"]
+
+    if latest_key is None:
+        return SkipReason("No objects found in bucket")
+
+    # Use cursor to avoid re-triggering on the same file
+    last_seen = context.cursor
+    key_ts = latest_modified.isoformat()
+    if last_seen == key_ts:
+        return SkipReason(f"No new data since {key_ts}")
+
+    context.update_cursor(key_ts)
+    return RunRequest(
+        run_key=key_ts,
+        run_config={"ops": {"raw_training_data": {"config": {"s3_key": latest_key}}}},
+        tags={"trigger": "s3_sensor", "s3_key": latest_key},
+    )
+</code></pre>
+  </div>
+
+  <h3 class="text-lg font-semibold mb-2 mt-6">Partitioned Assets — Daily Training Data</h3>
+  <div class="code-block">
+    <div class="code-header"><span>dagster_partitions.py</span><span>Python</span></div>
+    <pre><code class="language-python">from dagster import (
+    asset, DailyPartitionsDefinition, AssetExecutionContext,
+    build_asset_reconciliation_sensor, define_asset_job
+)
+from datetime import datetime
+import pandas as pd
+
+daily_partitions = DailyPartitionsDefinition(start_date="2024-01-01")
+
+@asset(partitions_def=daily_partitions, group_name="data_ingestion")
+def daily_raw_data(context: AssetExecutionContext) -> pd.DataFrame:
+    partition_date = context.partition_key          # e.g. "2024-03-15"
+    s3_key = f"raw/features/{partition_date}/data.parquet"
+    context.log.info(f"Loading partition {partition_date} from {s3_key}")
+    # ... load from S3
+    return pd.DataFrame()   # replace with actual load
+
+@asset(partitions_def=daily_partitions, group_name="data_processing")
+def daily_processed(context: AssetExecutionContext, daily_raw_data: pd.DataFrame) -> pd.DataFrame:
+    return daily_raw_data.dropna()
+
+# Auto-materialize: run downstream partition when upstream materializes
+reconciliation_sensor = build_asset_reconciliation_sensor(
+    asset_selection=[daily_raw_data, daily_processed],
+    name="daily_reconciliation_sensor",
+)
+
+# Backfill last 30 days via CLI:
+# dagster asset backfill --select daily_raw_data --partition-range 2024-01-01..2024-01-31
+</code></pre>
+  </div>
+
+  <h3 class="text-lg font-semibold mb-2 mt-6">Dagster + dbt Integration</h3>
+  <div class="code-block">
+    <div class="code-header"><span>dagster_dbt.py</span><span>Python · dagster-dbt</span></div>
+    <pre><code class="language-python">from dagster import Definitions
+from dagster_dbt import DbtCliResource, dbt_assets, DbtProject
+from pathlib import Path
+
+DBT_PROJECT = DbtProject(project_dir=Path("dbt_project"))
+
+@dbt_assets(manifest=DBT_PROJECT.manifest_path)
+def dbt_feature_models(context, dbt: DbtCliResource):
+    yield from dbt.cli(["build"], context=context).stream()
+
+# dbt models become Dagster assets automatically:
+# stg_events → feat_user_activity → feat_churn_features
+# ...then feed directly into the trained_model asset above.
+
+defs = Definitions(
+    assets=[dbt_feature_models, trained_model, model_evaluation, deployed_model],
+    resources={"dbt": DbtCliResource(project_dir=DBT_PROJECT)},
+)
+</code></pre>
+  </div>
+
+  <div class="overflow-x-auto mt-6 rounded-xl border border-gray-200">
+    <table>
+      <thead><tr><th>Feature</th><th>Dagster Cloud (Serverless)</th><th>Dagster Cloud (Hybrid)</th><th>Self-Hosted</th></tr></thead>
+      <tbody>
+        <tr><td>Infrastructure mgmt</td><td>Fully managed</td><td>Your compute, their UI</td><td>Full control</td></tr>
+        <tr><td>Cost model</td><td>Per-run pricing</td><td>Per-seat + compute</td><td>Infrastructure cost only</td></tr>
+        <tr><td>Dagster Insights</td><td>Built-in cost attribution</td><td>Built-in</td><td>Manual Prometheus setup</td></tr>
+        <tr><td>Best for</td><td>Startups, PoC</td><td>Enterprise with compliance</td><td>Large data teams, on-prem</td></tr>
+        <tr><td>Branch deployments</td><td>Yes (per-PR environments)</td><td>Yes</td><td>Manual CI/CD needed</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ===================== SECTION 3 ===================== -->
+<section id="s3" class="section-anchor mb-14">
+  <h2 class="text-2xl font-bold text-gray-900 mb-1">3. AWS Step Functions for Serverless ML</h2>
+  <p class="text-gray-500 text-sm mb-5">Managed state machines — no servers, no daemons</p>
+
+  <p class="mb-4 text-gray-700">Use Step Functions when: (a) your team is AWS-native and avoids running persistent services, (b) you need deep SageMaker integration without glue code, or (c) compliance requires audit trails at the AWS account level. Avoid for complex dependency graphs — ASL (Amazon States Language) becomes verbose quickly.</p>
+
+  <div class="code-block">
+    <div class="code-header"><span>ml_pipeline_state_machine.json</span><span>ASL — Amazon States Language</span></div>
+    <pre><code class="language-json">{
+  "Comment": "ML training and deployment pipeline",
+  "StartAt": "DataValidation",
+  "States": {
+    "DataValidation": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-east-1:123456789:function:validate-dataset",
+      "ResultPath": "$.validation",
+      "Retry": [{"ErrorEquals": ["Lambda.ServiceException"], "MaxAttempts": 2, "IntervalSeconds": 5}],
+      "Catch": [{"ErrorEquals": ["DataValidationError"], "Next": "NotifyFailure"}],
+      "Next": "CheckDataQuality"
+    },
+    "CheckDataQuality": {
+      "Type": "Choice",
+      "Choices": [
+        {"Variable": "$.validation.quality_score", "NumericGreaterThan": 0.95, "Next": "TrainModel"}
+      ],
+      "Default": "NotifyLowQuality"
+    },
+    "TrainModel": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::sagemaker:createTrainingJob.sync",
+      "Parameters": {
+        "TrainingJobName.$": "States.Format('churn-model-{}', $$.Execution.StartTime)",
+        "AlgorithmSpecification": {
+          "TrainingImage": "683313688378.dkr.ecr.us-east-1.amazonaws.com/sagemaker-xgboost:1.7-1",
+          "TrainingInputMode": "File"
+        },
+        "InputDataConfig": [{"ChannelName": "train", "DataSource": {
+          "S3DataSource": {"S3Uri.$": "$.s3_train_uri", "S3DataType": "S3Prefix"}
+        }}],
+        "OutputDataConfig": {"S3OutputPath": "s3://ml-models/step-functions/"},
+        "ResourceConfig": {"InstanceType": "ml.m5.2xlarge", "InstanceCount": 1, "VolumeSizeInGB": 50},
+        "StoppingCondition": {"MaxRuntimeInSeconds": 7200}
+      },
+      "ResultPath": "$.training",
+      "Next": "EvaluateModel"
+    },
+    "EvaluateModel": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-east-1:123456789:function:evaluate-model",
+      "ResultPath": "$.evaluation",
+      "Next": "QualityGate"
+    },
+    "QualityGate": {
+      "Type": "Choice",
+      "Choices": [
+        {"Variable": "$.evaluation.auc", "NumericGreaterThan": 0.80, "Next": "RegisterModel"}
+      ],
+      "Default": "NotifyLowPerformance"
+    },
+    "RegisterModel": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::sagemaker:createModelPackage.sync",
+      "Parameters": {
+        "ModelPackageGroupName": "churn-model-group",
+        "ModelApprovalStatus": "PendingManualApproval"
+      },
+      "Next": "DeployEndpoint"
+    },
+    "DeployEndpoint": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::sagemaker:createEndpoint",
+      "Parameters": {
+        "EndpointName": "churn-production",
+        "EndpointConfigName.$": "$.training.TrainingJobName"
+      },
+      "End": true
+    },
+    "NotifyFailure": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::sns:publish",
+      "Parameters": {"TopicArn": "arn:aws:sns:us-east-1:123456789:ml-alerts", "Message.$": "States.JsonToString($)"},
+      "End": true
+    },
+    "NotifyLowQuality": {"Type": "Fail", "Cause": "Data quality below threshold"},
+    "NotifyLowPerformance": {"Type": "Fail", "Cause": "Model AUC below threshold"}
+  }
+}
+</code></pre>
+  </div>
+
+  <div class="overflow-x-auto mt-6 rounded-xl border border-gray-200">
+    <table>
+      <thead><tr><th>Aspect</th><th>Step Functions</th><th>Airflow</th><th>Dagster</th></tr></thead>
+      <tbody>
+        <tr><td>Server to manage</td><td>None</td><td>Yes (scheduler + workers)</td><td>Yes (webserver + daemon)</td></tr>
+        <tr><td>AWS SageMaker integration</td><td>Native, deep</td><td>Via operators</td><td>Via dagster-aws</td></tr>
+        <tr><td>Cost model</td><td>$0.025/1K transitions</td><td>EC2/ECS instance cost</td><td>EC2/ECS instance cost</td></tr>
+        <tr><td>Complex branching</td><td>Verbose ASL</td><td>Python logic</td><td>Python logic</td></tr>
+        <tr><td>Local development</td><td>LocalStack only</td><td>docker-compose easy</td><td>dagster dev easy</td></tr>
+        <tr><td>Cross-account orchestration</td><td>Native</td><td>Complex</td><td>Complex</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ===================== SECTION 4 ===================== -->
+<section id="s4" class="section-anchor mb-14">
+  <h2 class="text-2xl font-bold text-gray-900 mb-1">4. ZenML — ML-First Orchestration</h2>
+  <p class="text-gray-500 text-sm mb-5">Portable ML pipelines that run anywhere via stack abstraction</p>
+
+  <p class="mb-4 text-gray-700">ZenML's key insight: separate <em>what</em> the pipeline does (steps) from <em>where</em> it runs (stack). A single pipeline definition can run locally, on Kubeflow, or on Airflow by swapping the stack — no code changes.</p>
+
+  <div class="code-block">
+    <div class="code-header"><span>zenml_pipeline.py</span><span>Python · ZenML 0.60</span></div>
+    <pre><code class="language-python">from zenml import step, pipeline, ArtifactConfig
+from zenml.integrations.mlflow.flavors.mlflow_experiment_tracker_flavor import MLFlowExperimentTrackerSettings
+from zenml.config import DockerSettings
+import pandas as pd
+from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.metrics import roc_auc_score
+import mlflow
+
+docker_settings = DockerSettings(required_integrations=["sklearn", "mlflow"])
+
+@step
+def ingest_data() -> pd.DataFrame:
+    """Pull raw data from configured artifact store."""
+    return pd.read_parquet("s3://ml-data-lake/raw/features/latest.parquet")
+
+@step
+def preprocess(df: pd.DataFrame) -> pd.DataFrame:
+    return df.dropna().pipe(pd.get_dummies, drop_first=True)
+
+@step(
+    experiment_tracker="mlflow_tracker",
+    settings={"experiment_tracker.mlflow": MLFlowExperimentTrackerSettings(experiment_name="churn")},
+)
+def train_model(df: pd.DataFrame) -> GradientBoostingClassifier:
+    X, y = df.drop("target", axis=1), df["target"]
+    model = GradientBoostingClassifier(n_estimators=300, max_depth=4)
+    model.fit(X, y)
+    mlflow.sklearn.log_model(model, "model")
+    return model
+
+@step
+def evaluate(model: GradientBoostingClassifier, df: pd.DataFrame) -> float:
+    X, y = df.drop("target", axis=1), df["target"]
+    auc = roc_auc_score(y, model.predict_proba(X)[:, 1])
+    print(f"AUC: {auc:.4f}")
+    return auc
+
+@pipeline(settings={"docker": docker_settings})
+def churn_training_pipeline():
+    df = ingest_data()
+    clean = preprocess(df)
+    model = train_model(clean)
+    evaluate(model, clean)
+
+if __name__ == "__main__":
+    churn_training_pipeline()
+</code></pre>
+  </div>
+
+  <h3 class="text-lg font-semibold mb-2 mt-6">Stack Configuration: Local → Cloud</h3>
+  <div class="code-block">
+    <div class="code-header"><span>stack_config.sh</span><span>CLI — ZenML stack management</span></div>
+    <pre><code class="language-bash"># Register components
+zenml artifact-store register s3_store --flavor=s3 --path=s3://ml-artifacts/zenml
+zenml experiment-tracker register mlflow --flavor=mlflow \
+    --tracking_uri=https://mlflow.internal --tracking_username=admin
+zenml orchestrator register kubeflow --flavor=kubeflow \
+    --kubernetes_context=prod-cluster --synchronous=True
+zenml model-deployer register seldon --flavor=seldon \
+    --kubernetes_context=prod-cluster --kubernetes_namespace=seldon
+
+# Assemble stack
+zenml stack register prod_stack \
+    --artifact-store s3_store \
+    --experiment-tracker mlflow \
+    --orchestrator kubeflow \
+    --model-deployer seldon
+
+# Activate and run
+zenml stack set prod_stack
+python zenml_pipeline.py   # now runs on Kubeflow, artifacts in S3
+
+# Switch to local for development
+zenml stack set default
+python zenml_pipeline.py   # runs locally
+</code></pre>
+  </div>
+</section>
+
+<!-- ===================== SECTION 5 ===================== -->
+<section id="s5" class="section-anchor mb-14">
+  <h2 class="text-2xl font-bold text-gray-900 mb-1">5. Orchestration for LLM Workflows</h2>
+  <p class="text-gray-500 text-sm mb-5">Multi-day runs, human gates, and automated quality evaluation</p>
+
+  <p class="mb-4 text-gray-700">LLM training pipelines differ from classic ML in three ways: (1) training takes days to weeks, requiring checkpointing and resumption, (2) evaluation involves subjective quality that needs human review before promotion, and (3) cost is extremely high, making early-exit quality gates critical.</p>
+
+  <h3 class="text-lg font-semibold mb-2">LLM Fine-Tuning Pipeline with Human Approval Gate (Airflow)</h3>
+  <div class="code-block">
+    <div class="code-header"><span>llm_finetuning_dag.py</span><span>Python · Apache Airflow 2.9</span></div>
+    <pre><code class="language-python">from airflow import DAG
+from airflow.operators.python import PythonOperator, BranchPythonOperator
+from airflow.operators.empty import EmptyOperator
+from airflow.sensors.base import BaseSensorOperator
+from airflow.models import Variable
+from datetime import datetime, timedelta
+import boto3, json
+
+class HumanApprovalSensor(BaseSensorOperator):
+    """Polls DynamoDB for a human approval/reject decision."""
+    def __init__(self, approval_key: str, **kwargs):
+        super().__init__(poke_interval=300, timeout=604800, **kwargs)  # 7-day timeout
+        self.approval_key = approval_key
+
+    def poke(self, context):
+        ddb = boto3.resource("dynamodb").Table("llm-approvals")
+        item = ddb.get_item(Key={"approval_key": self.approval_key}).get("Item")
+        if not item:
+            return False
+        return item.get("decision") in ("approved", "rejected")
+
+def submit_training_job(**ctx):
+    sagemaker = boto3.client("sagemaker")
+    job_name = f"llm-finetune-{ctx['ds_nodash']}"
+    sagemaker.create_training_job(
+        TrainingJobName=job_name,
+        AlgorithmSpecification={"TrainingImage": "763104351884.dkr.ecr.us-east-1.amazonaws.com/pytorch-training:2.1.0-gpu-py310",
+                                 "TrainingInputMode": "FastFile"},
+        ResourceConfig={"InstanceType": "ml.p4d.24xlarge", "InstanceCount": 4, "VolumeSizeInGB": 1000},
+        StoppingCondition={"MaxRuntimeInSeconds": 259200},  # 3 days
+        CheckpointConfig={"S3Uri": f"s3://llm-training/checkpoints/{job_name}/"},
+    )
+    ctx["ti"].xcom_push(key="job_name", value=job_name)
+
+def run_automated_eval(**ctx):
+    """LLM-as-judge evaluation using GPT-4 scoring rubric."""
+    import anthropic
+    job_name = ctx["ti"].xcom_pull(key="job_name")
+    client = anthropic.Anthropic()
+    # ... sample model outputs, score with LLM judge
+    scores = {"helpfulness": 4.2, "safety": 4.8, "coherence": 4.5}
+    ctx["ti"].xcom_push(key="eval_scores", value=scores)
+    return scores
+
+def check_auto_gate(**ctx):
+    scores = ctx["ti"].xcom_pull(task_ids="automated_eval", key="eval_scores")
+    avg = sum(scores.values()) / len(scores)
+    return "request_human_approval" if avg >= 4.0 else "reject_model"
+
+with DAG("llm_finetuning", schedule="@weekly",
+         start_date=datetime(2024, 1, 1),
+         default_args={"retries": 1, "retry_delay": timedelta(minutes=30)},
+         tags=["llm", "finetuning"]) as dag:
+
+    start = EmptyOperator(task_id="start")
+    prepare_data = PythonOperator(task_id="prepare_training_data", python_callable=lambda **kw: None)
+    train = PythonOperator(task_id="submit_training_job", python_callable=submit_training_job)
+    eval_auto = PythonOperator(task_id="automated_eval", python_callable=run_automated_eval)
+    gate = BranchPythonOperator(task_id="quality_gate", python_callable=check_auto_gate)
+    human_sensor = HumanApprovalSensor(task_id="request_human_approval", approval_key="{{ ds }}-llm")
+    deploy = PythonOperator(task_id="deploy_to_production", python_callable=lambda **kw: None)
+    reject = EmptyOperator(task_id="reject_model")
+
+    start >> prepare_data >> train >> eval_auto >> gate
+    gate >> human_sensor >> deploy
+    gate >> reject
+</code></pre>
+  </div>
+
+  <h3 class="text-lg font-semibold mb-3 mt-6">LLM Training Pipeline with Human Gates</h3>
+  <div class="mermaid-wrap">
+    <div class="mermaid">
+sequenceDiagram
+  participant Sched as Scheduler
+  participant Train as Training Job (GPU cluster)
+  participant Eval as Auto Evaluator
+  participant Slack as Slack / Approval UI
+  participant Human as ML Scientist
+  participant Prod as Production Endpoint
+
+  Sched->>Train: Submit fine-tuning job (p4d.24xlarge x4)
+  Note over Train: 2-3 days training + checkpointing
+  Train-->>Sched: Job complete
+  Sched->>Eval: Run LLM-as-judge evaluation
+  Eval-->>Sched: Scores (avg 4.2/5.0)
+  Sched->>Slack: Post scores + sample outputs
+  Slack->>Human: Notification with eval report
+  Human-->>Slack: Approve / Reject decision
+  Slack-->>Sched: Decision written to DynamoDB
+  Sched->>Prod: Deploy to production (if approved)
+    </div>
+  </div>
+
+  <h3 class="text-lg font-semibold mb-2 mt-6">LLM Evaluation Pipeline with Automated Gating</h3>
+  <div class="code-block">
+    <div class="code-header"><span>llm_eval_pipeline.py</span><span>Python · Prefect 3</span></div>
+    <pre><code class="language-python">from prefect import flow, task
+from prefect.blocks.system import Secret
+import anthropic, json, statistics
+
+@task(retries=2)
+def sample_model_outputs(model_endpoint: str, n_samples: int = 100) -> list[dict]:
+    """Pull sample prompts and generate completions from new model."""
+    import boto3
+    runtime = boto3.client("sagemaker-runtime")
+    prompts = load_eval_prompts()   # from S3/database
+    return [{"prompt": p, "completion": runtime.invoke_endpoint(
+        EndpointName=model_endpoint, Body=json.dumps({"inputs": p})
+    )["Body"].read().decode()} for p in prompts[:n_samples]]
+
+@task
+def llm_judge_score(samples: list[dict]) -> dict:
+    """GPT-4 / Claude as judge for safety and quality."""
+    api_key = Secret.load("anthropic-api-key").get()
+    client = anthropic.Anthropic(api_key=api_key)
+    scores = []
+    for s in samples[:20]:  # score subset for cost control
+        resp = client.messages.create(
+            model="claude-opus-4-5",
+            max_tokens=200,
+            messages=[{"role": "user", "content": f"""Rate this response 1-5 on helpfulness and safety.
+Prompt: {s['prompt']}\nResponse: {s['completion']}\nReturn JSON: {{"helpfulness": N, "safety": N}}"""}]
+        )
+        scores.append(json.loads(resp.content[0].text))
+    return {
+        "helpfulness": statistics.mean(s["helpfulness"] for s in scores),
+        "safety": statistics.mean(s["safety"] for s in scores),
+        "n_scored": len(scores),
+    }
+
+@task
+def check_regression(new_scores: dict, baseline_scores: dict) -> bool:
+    """Fail if new model regresses > 0.3 points vs baseline on any dimension."""
+    for dim in ("helpfulness", "safety"):
+        if baseline_scores.get(dim, 5) - new_scores[dim] > 0.3:
+            raise ValueError(f"Regression in {dim}: {new_scores[dim]:.2f} vs baseline {baseline_scores[dim]:.2f}")
+    return True
+
+@flow(name="llm-evaluation")
+def llm_evaluation_flow(model_endpoint: str, baseline_endpoint: str):
+    samples = sample_model_outputs(model_endpoint)
+    new_scores = llm_judge_score(samples)
+    baseline_samples = sample_model_outputs(baseline_endpoint)
+    baseline_scores = llm_judge_score(baseline_samples)
+    passed = check_regression(new_scores, baseline_scores)
+    return {"passed": passed, "scores": new_scores}
+</code></pre>
+  </div>
+</section>
+
+<!-- ===================== SECTION 6 ===================== -->
+<section id="s6" class="section-anchor mb-14">
+  <h2 class="text-2xl font-bold text-gray-900 mb-1">6. Multi-Orchestrator Patterns</h2>
+  <p class="text-gray-500 text-sm mb-5">Using the right tool for each layer</p>
+
+  <p class="mb-4 text-gray-700">Real-world data platforms often use multiple orchestrators: Airflow for batch ETL and business scheduling, Dagster for data asset lineage, Ray for distributed compute, and Kubeflow for ML experiment management. The orchestrators hand off to each other rather than replacing each other.</p>
+
+  <div class="overflow-x-auto mb-6 rounded-xl border border-gray-200">
+    <table>
+      <thead><tr><th>Pattern</th><th>Why</th><th>Handoff mechanism</th></tr></thead>
+      <tbody>
+        <tr><td>Airflow → Ray</td><td>Airflow handles scheduling + SLA; Ray handles distributed training compute</td><td>Airflow PythonOperator submits <code>ray.job.submit()</code></td></tr>
+        <tr><td>Prefect → Kubeflow</td><td>Prefect for orchestration logic; Kubeflow Pipelines for reproducible ML experiments</td><td>Prefect task calls KFP client SDK</td></tr>
+        <tr><td>Dagster → dbt → Great Expectations</td><td>Dagster schedules; dbt transforms; GE validates</td><td>dagster-dbt + dagster-ge integrations</td></tr>
+        <tr><td>Step Functions → EMR/Glue → SageMaker</td><td>AWS-native serverless pipeline</td><td>Native Step Functions service integrations</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 class="text-lg font-semibold mb-3">Hybrid Orchestration Architecture</h3>
+  <div class="mermaid-wrap">
+    <div class="mermaid">
+graph TB
+  subgraph "Business Scheduling Layer (Airflow)"
+    AF_SCHED[Airflow Scheduler] --> AF_ETL[ETL DAGs]
+    AF_SCHED --> AF_TRIGGER[Trigger ML Job]
+  end
+  subgraph "Asset Management Layer (Dagster)"
+    DG_SENSOR[Dagster S3 Sensor] --> DG_ASSETS[Asset Materialization]
+    DG_ASSETS --> DG_LINEAGE[Lineage Tracking]
+  end
+  subgraph "Compute Layer"
+    RAY[Ray Cluster\nDistributed Training]
+    KFP[Kubeflow Pipelines\nExperiment Tracking]
+  end
+  subgraph "Serving Layer"
+    SERVE[Ray Serve / Seldon\nModel Endpoints]
+  end
+  AF_TRIGGER -->|Submit job| RAY
+  AF_TRIGGER -->|Trigger pipeline| KFP
+  DG_ASSETS -->|Launch training| RAY
+  RAY --> SERVE
+  KFP --> SERVE
+  style AF_SCHED fill:#e0f2fe,stroke:#0284c7
+  style DG_SENSOR fill:#dcfce7,stroke:#059669
+  style RAY fill:#fef3c7,stroke:#d97706
+  style SERVE fill:#f3e8ff,stroke:#9333ea
+    </div>
+  </div>
+</section>
+
+<!-- ===================== SECTION 7 ===================== -->
+<section id="s7" class="section-anchor mb-14">
+  <h2 class="text-2xl font-bold text-gray-900 mb-1">7. Orchestration Observability</h2>
+  <p class="text-gray-500 text-sm mb-5">Metrics, alerting, and SLA tracking for pipelines</p>
+
+  <div class="code-block">
+    <div class="code-header"><span>airflow_metrics_grafana.py + dashboard.json</span><span>Python + JSON</span></div>
+    <pre><code class="language-python"># airflow.cfg — enable StatsD for Prometheus scraping
+# [metrics]
+# statsd_on = True
+# statsd_host = localhost
+# statsd_port = 8125
+# statsd_prefix = airflow
+
+# Airflow emits these metrics automatically:
+# airflow.dagbag_size, airflow.dag_processing.total_parse_time
+# airflow.executor.open_slots, airflow.executor.queued_tasks
+# airflow.ti.failures, airflow.ti.successes
+# airflow.dag.{dag_id}.{task_id}.duration
+
+from prometheus_client import Counter, Gauge, Histogram, start_http_server
+from airflow.plugins_manager import AirflowPlugin
+from airflow.listeners import hookimpl
+
+# Custom plugin: expose SLA miss metric
+dag_sla_miss = Counter("airflow_dag_sla_miss_total",
+                        "Total SLA misses", ["dag_id"])
+task_duration = Histogram("airflow_task_duration_seconds",
+                           "Task execution time", ["dag_id", "task_id"],
+                           buckets=[60, 300, 900, 1800, 3600, 7200])
+
+class MLOpsMetricsListener:
+    @hookimpl
+    def on_task_instance_success(self, previous_state, task_instance, session):
+        task_duration.labels(
+            dag_id=task_instance.dag_id,
+            task_id=task_instance.task_id,
+        ).observe(task_instance.duration or 0)
+
+    @hookimpl
+    def on_task_instance_failed(self, previous_state, task_instance, session):
+        # Alert via PagerDuty or Slack
+        send_alert(task_instance.dag_id, task_instance.task_id, "FAILED")
+
+# Grafana dashboard JSON snippet
+GRAFANA_PANEL = {
+    "title": "Airflow Task Duration P95",
+    "type": "timeseries",
+    "targets": [{
+        "expr": "histogram_quantile(0.95, rate(airflow_task_duration_seconds_bucket[5m]))",
+        "legendFormat": "{{dag_id}} / {{task_id}}"
+    }]
+}
+</code></pre>
+  </div>
+
+  <p class="mt-4 text-gray-700"><strong>Key metrics to track:</strong></p>
+  <ul class="list-disc ml-6 text-gray-700 space-y-1 text-sm mt-2">
+    <li><code>dag_run.duration</code> — end-to-end pipeline time; alert if P99 exceeds SLA</li>
+    <li><code>ti.failures</code> — task failure rate; alert on anomalous spike</li>
+    <li><code>executor.queued_tasks</code> — backlog indicator; alert if queue depth &gt; 50</li>
+    <li><code>dag_processing.total_parse_time</code> — DAG parse time; &gt;30s indicates performance issues</li>
+    <li>Asset freshness (Dagster) — time since last materialization vs expected cadence</li>
+  </ul>
+</section>
+
+<!-- ===================== SECTION 8 ===================== -->
+<section id="s8" class="section-anchor mb-14">
+  <h2 class="text-2xl font-bold text-gray-900 mb-1">8. Orchestrator Selection Guide</h2>
+  <p class="text-gray-500 text-sm mb-5">Comprehensive comparison and decision framework</p>
+
+  <div class="overflow-x-auto mb-8 rounded-xl border border-gray-200">
+    <table>
+      <thead>
+        <tr>
+          <th>Criteria</th>
+          <th>Airflow 2</th>
+          <th>Prefect 3</th>
+          <th>Dagster 1.7</th>
+          <th>Step Functions</th>
+          <th>ZenML 0.6</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Primary abstraction</strong></td><td>DAG / Task</td><td>Flow / Task</td><td>Asset / Op</td><td>State / Task</td><td>Pipeline / Step</td></tr>
+        <tr><td><strong>Asset lineage</strong></td><td>None native</td><td>Artifacts</td><td>First-class</td><td>None</td><td>Artifact store</td></tr>
+        <tr><td><strong>Local dev experience</strong></td><td>Docker-compose</td><td><code>prefect dev</code></td><td><code>dagster dev</code></td><td>LocalStack</td><td>CLI stack switch</td></tr>
+        <tr><td><strong>Dynamic pipelines</strong></td><td>Dynamic DAGs (limited)</td><td>Full Python</td><td>Partitions + dynamic</td><td>Choice states</td><td>Conditional steps</td></tr>
+        <tr><td><strong>UI quality</strong></td><td>Good</td><td>Excellent</td><td>Excellent</td><td>AWS Console</td><td>Good</td></tr>
+        <tr><td><strong>dbt integration</strong></td><td>airflow-dbt</td><td>prefect-dbt</td><td>dagster-dbt (best)</td><td>Lambda wrapper</td><td>zenml-dbt</td></tr>
+        <tr><td><strong>Kubernetes native</strong></td><td>KubernetesPodOperator</td><td>KubernetesWorker</td><td>k8s executor</td><td>EKS via Fargate</td><td>Stack component</td></tr>
+        <tr><td><strong>Serverless option</strong></td><td>MWAA (AWS managed)</td><td>Prefect Cloud</td><td>Dagster Cloud</td><td>Native serverless</td><td>ZenML Cloud</td></tr>
+        <tr><td><strong>Learning curve</strong></td><td>Medium</td><td>Low</td><td>Medium-High</td><td>Low-Medium</td><td>Low</td></tr>
+        <tr><td><strong>ML-specific features</strong></td><td>Minimal</td><td>Minimal</td><td>Partitions, insights</td><td>SageMaker native</td><td>ML-first design</td></tr>
+        <tr><td><strong>Community / ecosystem</strong></td><td>Largest</td><td>Large</td><td>Growing fast</td><td>AWS ecosystem</td><td>ML community</td></tr>
+        <tr><td><strong>Best for</strong></td><td>Enterprise ETL + ML</td><td>Quick iteration</td><td>Data asset teams</td><td>AWS-only stacks</td><td>Portable ML</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 class="text-lg font-semibold mb-3">Decision Tree</h3>
+  <div class="mermaid-wrap">
+    <div class="mermaid">
+graph TD
+  START([New project: choose orchestrator]) --> Q1{Already using AWS\nexclusively?}
+  Q1 -- Yes --> Q2{Need SageMaker\ndeep integration?}
+  Q2 -- Yes --> STEP[AWS Step Functions]
+  Q2 -- No --> PREFECT
+  Q1 -- No --> Q3{ML-first? Portability\nacross clouds/envs?}
+  Q3 -- Yes --> Q4{Team knows Airflow\nalready?}
+  Q3 -- No --> Q5{Data asset lineage\nis critical?}
+  Q4 -- Yes --> AIR[Airflow + ZenML\non top]
+  Q4 -- No --> ZEN[ZenML]
+  Q5 -- Yes --> DAG[Dagster]
+  Q5 -- No --> Q6{Fast iteration,\nsmall team?}
+  Q6 -- Yes --> PREFECT[Prefect]
+  Q6 -- No --> Q7{Large existing\nETL + ML mixed?}
+  Q7 -- Yes --> AIR2[Airflow]
+  Q7 -- No --> PREFECT
+  style STEP fill:#fef3c7,stroke:#d97706
+  style ZEN fill:#e0f2fe,stroke:#0284c7
+  style DAG fill:#dcfce7,stroke:#059669
+  style PREFECT fill:#f3e8ff,stroke:#9333ea
+  style AIR fill:#fee2e2,stroke:#dc2626
+  style AIR2 fill:#fee2e2,stroke:#dc2626
+    </div>
+  </div>
+
+  <h3 class="text-lg font-semibold mb-2 mt-6">Migration Path</h3>
+  <div class="overflow-x-auto rounded-xl border border-gray-200">
+    <table>
+      <thead><tr><th>From → To</th><th>Strategy</th><th>Key challenge</th><th>Timeline</th></tr></thead>
+      <tbody>
+        <tr><td>Airflow → Prefect</td><td>Rewrite DAGs as flows; Prefect agent replaces workers</td><td>Operator ecosystem replacement</td><td>2–4 weeks per DAG group</td></tr>
+        <tr><td>Airflow → Dagster</td><td>Start with new pipelines; migrate high-value DAGs; use Dagster's Airflow integration for gradual cutover</td><td>Mindset shift to assets</td><td>3–6 months for full migration</td></tr>
+        <tr><td>Prefect → Dagster</td><td>Map flows → jobs, tasks → ops/assets; leverage Dagster's auto-materialisation</td><td>Asset modeling design</td><td>2–4 weeks per pipeline</td></tr>
+        <tr><td>Custom scripts → Any</td><td>Wrap scripts in tasks first (no changes to logic); add metadata/lineage incrementally</td><td>Error handling gaps</td><td>1–2 weeks to basic orchestration</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ===================== KEY TAKEAWAYS ===================== -->
+<section id="takeaways" class="section-anchor mb-14">
+  <h2 class="text-2xl font-bold text-gray-900 mb-4">Key Takeaways — Chapters 11 &amp; 11B</h2>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="bg-blue-50 border border-blue-200 rounded-xl p-5">
+      <h3 class="font-bold text-blue-800 mb-2">Dagster</h3>
+      <ul class="text-sm text-gray-700 space-y-1 list-disc ml-4">
+        <li>Asset-centric design makes lineage and freshness first-class — ideal for data-heavy ML</li>
+        <li>Partitions solve date-range backfills without custom logic</li>
+        <li>dagster-dbt integration is the tightest available across any orchestrator</li>
+        <li>Higher learning curve than Prefect; pays off at scale</li>
+      </ul>
+    </div>
+    <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-5">
+      <h3 class="font-bold text-emerald-800 mb-2">Step Functions</h3>
+      <ul class="text-sm text-gray-700 space-y-1 list-disc ml-4">
+        <li>Zero infrastructure management — right choice for AWS-native, serverless-first teams</li>
+        <li>ASL is verbose; keep state machines small and delegate logic to Lambda</li>
+        <li>Cost scales with transitions, not time — cheap for infrequent pipelines</li>
+      </ul>
+    </div>
+    <div class="bg-purple-50 border border-purple-200 rounded-xl p-5">
+      <h3 class="font-bold text-purple-800 mb-2">LLM Pipelines</h3>
+      <ul class="text-sm text-gray-700 space-y-1 list-disc ml-4">
+        <li>Use long timeouts + checkpoint-aware training operators for multi-day runs</li>
+        <li>Human-in-the-loop approval via Sensor + DynamoDB / Slack integration is the proven pattern</li>
+        <li>LLM-as-judge automated eval reduces human review burden by 70-80%</li>
+        <li>Cost gating (early exit on quality failure) is essential at training cost levels</li>
+      </ul>
+    </div>
+    <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-5">
+      <h3 class="font-bold text-yellow-800 mb-2">Selection &amp; Architecture</h3>
+      <ul class="text-sm text-gray-700 space-y-1 list-disc ml-4">
+        <li>No single orchestrator wins all dimensions — hybrid is often correct</li>
+        <li>Airflow for scheduling + Dagster for asset lineage is a common enterprise combo</li>
+        <li>ZenML is uniquely good at portability: same code, any orchestrator</li>
+        <li>Monitor queue depth, task duration P95, and asset freshness as primary SLIs</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- Bottom Nav -->
+<div class="border-t border-gray-200 pt-8 pb-16 flex flex-col sm:flex-row justify-between items-center gap-4">
+  <a href="ch11_orchestration.html" class="flex items-center gap-2 text-blue-600 hover:text-blue-800 font-medium">
+    <span>&#8592;</span>
+    <span>Previous: Chapter 11 — Airflow &amp; Prefect</span>
+  </a>
+  <a href="ch12_ml_pipelines_cicd.html" class="flex items-center gap-2 text-blue-600 hover:text-blue-800 font-medium">
+    <span>Next: Chapter 12 — ML Pipelines &amp; CI/CD</span>
+    <span>&#8594;</span>
+  </a>
+</div>
+
+</div><!-- /max-w-4xl -->
+
+<footer class="bg-gray-50 border-t border-gray-200 py-6 text-center text-sm text-gray-500">
+  Modern MLOps Tutorial &mdash; Chapter 11B &mdash; Dagster &amp; Advanced Orchestration
+</footer>
+
+</body>
+</html>

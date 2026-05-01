@@ -1,0 +1,1201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chapter 2: Patent Eligibility in AI, ML, and Biotech — Patent Law for Technologists</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- ── Top Navigation ───────────────────────────────────────────────────── -->
+<nav class="top-nav">
+  <div class="nav-container">
+    <a class="nav-logo" href="index.html">Patent Law <span>for Technologists</span></a>
+    <div class="nav-links">
+      <a href="ch01_patent_system_overview.html">Ch 1: Overview</a>
+      <a href="ch02_patent_eligibility.html" class="active">Ch 2: Eligibility</a>
+      <a href="ch03_prior_art_research.html">Ch 3: Prior Art</a>
+      <a href="ch04_claims_drafting.html">Ch 4: Claims</a>
+      <a href="ch05_specification.html">Ch 5: Specification</a>
+      <a href="ch06_prosecution.html">Ch 6: Prosecution</a>
+      <a href="ch07_fto.html">Ch 7: FTO</a>
+      <a href="ch08_litigation.html">Ch 8: Litigation</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ── Chapter Hero ──────────────────────────────────────────────────────── -->
+<header class="chapter-hero">
+  <div class="chapter-hero-content">
+    <span class="chapter-badge">Chapter 2</span>
+    <h1>Patent Eligibility in AI, ML, and Biotech</h1>
+    <p class="subtitle">Navigating 35 U.S.C. § 101: From Abstract Ideas to Allowable Claims in Emerging Technologies</p>
+    <div class="chapter-meta">
+      <span>Prof. Arti K. Rai — NYU School of Law / Finnegan, Henderson</span>
+      <span>35 U.S.C. § 101 · Alice/Mayo · USPTO 2019 Guidance</span>
+      <span>Reading time: ~45 minutes</span>
+    </div>
+  </div>
+</header>
+
+<!-- ── Page Layout ────────────────────────────────────────────────────────── -->
+<div class="page-layout">
+
+  <!-- Sidebar TOC -->
+  <aside class="sidebar">
+    <nav class="toc">
+      <h3>In This Chapter</h3>
+      <ol>
+        <li><a href="#landscape">The § 101 Landscape</a></li>
+        <li><a href="#alice-mayo">The Alice/Mayo Two-Step</a></li>
+        <li><a href="#abstract-idea">What Counts as an Abstract Idea</a></li>
+        <li><a href="#significantly-more">The "Significantly More" Inquiry</a></li>
+        <li><a href="#ai-ml-eligibility">AI/ML-Specific Eligibility Analysis</a></li>
+        <li><a href="#biotech">Biotech Eligibility</a></li>
+        <li><a href="#drafting">Drafting for Eligibility</a></li>
+        <li><a href="#recent-guidance">Recent Case Law &amp; USPTO Guidance</a></li>
+        <li><a href="#claim-examples">Eligibility Claim Examples</a></li>
+        <li><a href="#takeaways">Key Takeaways &amp; Checklist</a></li>
+      </ol>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="chapter-content">
+
+    <!-- ══════════════════════════════════════════════════════
+         SECTION 1: THE § 101 LANDSCAPE
+         ══════════════════════════════════════════════════════ -->
+    <section id="landscape" class="section-anchor">
+      <h2>1. The § 101 Landscape</h2>
+
+      <p>Patent eligibility under <strong>35 U.S.C. § 101</strong> sits at the threshold of the entire patent system. Before a patent examiner evaluates novelty, non-obviousness, or written description, she must first determine whether the claimed invention is even the <em>type</em> of thing Congress intended to protect. For decades, § 101 was treated as a low hurdle — courts interpreted "any new and useful process, machine, manufacture, or composition of matter" broadly, consistent with the statute's plain text. That era effectively ended with the Supreme Court's decisions in <em>Mayo Collaborative Services v. Prometheus Laboratories</em> (2012) and <em>Alice Corp. v. CLS Bank International</em> (2014), which transformed § 101 from a threshold formality into a substantive and often dispositive analytical barrier.</p>
+
+      <p>The text of § 101 appears deceptively simple:</p>
+
+      <blockquote>
+        "Whoever invents or discovers any new and useful process, machine, manufacture, or composition of matter, or any new and useful improvement thereof, may obtain a patent therefor, subject to the conditions and requirements of this title."
+        <cite>35 U.S.C. § 101</cite>
+      </blockquote>
+
+      <p>The statute's four statutory categories — process, machine, manufacture, and composition of matter — are intentionally broad. Congress designed § 101 to "include anything under the sun that is made by man." <em>Diamond v. Chakrabarty</em>, 447 U.S. 303, 309 (1980). Yet the Supreme Court has long recognized three judicially created exceptions to eligibility: <span class="key-term" title="Mathematical relationships, fundamental truths, economic practices">abstract ideas</span>, <span class="key-term" title="Relationships existing in nature regardless of human action">laws of nature</span>, and <span class="key-term" title="Naturally occurring substances or phenomena">natural phenomena</span>. The rationale is that such concepts are the "basic tools of scientific and technological work" that must remain freely available. <em>Gottschalk v. Benson</em>, 409 U.S. 63, 67 (1972). To grant a patent over them would preempt the very building blocks of future innovation.</p>
+
+      <h3>1.1 Why § 101 Matters So Much for AI and ML</h3>
+
+      <p>The AI and machine learning revolution has placed § 101 at the center of patent strategy for a simple reason: almost every AI/ML invention can be characterized, at some level of abstraction, as performing mathematical computations on data. A neural network is, mathematically, a parameterized function mapping inputs to outputs. A training algorithm is, at its core, an optimization procedure over a loss landscape. A recommendation system is, abstractly, a method of organizing and classifying information.</p>
+
+      <p>Whether these characterizations render AI/ML inventions patent-ineligible under § 101 is, of course, precisely the question. But the ease with which examiners and courts can reach for abstract-idea characterizations makes § 101 analysis the first and most important hurdle for any AI/ML patent applicant. The <strong>allowance rate</strong> for software and AI-related applications dropped sharply after <em>Alice</em>, and while the USPTO's 2019 Revised Guidance has helped restore balance, the eligibility question remains contested in courts and before the Patent Trial and Appeal Board (PTAB).</p>
+
+      <div class="callout callout-info">
+        <div class="callout-icon">ℹ</div>
+        <div class="callout-body">
+          <div class="callout-title">Historical Context: The Road to Alice</div>
+          <p>The modern § 101 crisis traces back through a series of Supreme Court decisions: <em>Gottschalk v. Benson</em> (1972) held that a method for converting numerals was not patentable; <em>Parker v. Flook</em> (1978) barred a method for updating alarm limits; <em>Diamond v. Diehr</em> (1981) allowed a rubber-molding process using a mathematical formula in a physical application; <em>Bilski v. Kappos</em> (2010) rejected a hedging method as an abstract idea; <em>Mayo</em> (2012) struck down a diagnostic correlation; and <em>Alice</em> (2014) applied Mayo's two-step framework to software claims on intermediated settlement. Each decision left unanswered questions that subsequent USPTO guidance and Federal Circuit jurisprudence have struggled to resolve.</p>
+        </div>
+      </div>
+
+      <h3>1.2 The Practical Stakes</h3>
+
+      <div class="stats-row">
+        <div class="stat-item">
+          <div class="stat-number">60%</div>
+          <div class="stat-label">Estimated § 101 rejection rate for AI/software applications post-Alice (2014–2018)</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">2019</div>
+          <div class="stat-label">Year USPTO issued Revised Patent Subject Matter Eligibility Guidance, improving allowance rates</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">§ 101</div>
+          <div class="stat-label">The single most litigated validity issue in AI and software patent disputes post-Alice</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">~40%</div>
+          <div class="stat-label">Of IPR petitions asserting § 101 grounds that succeeded at PTAB in 2017–2019</div>
+        </div>
+      </div>
+
+      <p>Beyond the statistics, § 101 uncertainty imposes real costs on innovators. Startups may build entire product lines on technology they believe is proprietary, only to discover mid-litigation that their foundational patents are vulnerable. Large companies must invest heavily in claim drafting and prosecution strategy to survive § 101 challenges. And the uncertainty itself distorts investment signals — venture capitalists and corporate acquirers routinely discount AI patent portfolios precisely because of § 101 risk.</p>
+
+      <p>Understanding § 101 deeply — not just its rules, but its logic, its tensions, and its evolution — is therefore essential for any technologist who wishes to build and protect genuine competitive advantages through the patent system.</p>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════
+         SECTION 2: THE ALICE/MAYO TWO-STEP FRAMEWORK
+         ══════════════════════════════════════════════════════ -->
+    <section id="alice-mayo" class="section-anchor">
+      <h2>2. The Alice/Mayo Two-Step Framework</h2>
+
+      <p>The Supreme Court in <em>Alice Corp. v. CLS Bank International</em>, 573 U.S. 208 (2014), unified the law of patent eligibility around a two-step analytical framework drawn from <em>Mayo Collaborative Services v. Prometheus Laboratories, Inc.</em>, 566 U.S. 66 (2012). This framework — universally called the <strong>Alice/Mayo test</strong> or simply the <strong>two-step test</strong> — governs every § 101 analysis conducted by USPTO examiners, PTAB judges, and federal courts.</p>
+
+      <h3>2.1 The Legal Standard</h3>
+
+      <p>Justice Thomas, writing for a unanimous Court in <em>Alice</em>, articulated the test as follows:</p>
+
+      <blockquote>
+        "We have described the concern that drives this exclusionary principle as one of pre-emption. Laws of nature, natural phenomena, and abstract ideas are 'the basic tools of scientific and technological work.' Monopolization of those tools through the grant of a patent might tend to impede innovation more than it would tend to promote it, thereby thwarting the primary object of the patent laws. We have 'repeatedly emphasized this concern that patent law not inhibit further discovery by improperly tying up the future use of these building blocks of human ingenuity.'"
+        <cite>Alice Corp. v. CLS Bank Int'l, 573 U.S. 208, 216 (2014) (internal citations omitted)</cite>
+      </blockquote>
+
+      <p>The two steps are formally structured as follows:</p>
+
+      <ul>
+        <li><strong>Step One (Step 2A, Prong 1 in USPTO nomenclature):</strong> Determine whether the claims at issue are directed to a patent-ineligible concept — an abstract idea, a law of nature, or a natural phenomenon.</li>
+        <li><strong>Step Two (Step 2A, Prong 2 + Step 2B in USPTO nomenclature):</strong> If so, examine the elements of each claim both individually and as an ordered combination to determine whether the additional elements transform the nature of the claim into a patent-eligible application — i.e., whether there is an inventive concept consisting of "significantly more" than the judicial exception itself.</li>
+      </ul>
+
+      <h3>2.2 The Alice/Mayo Two-Step Flowchart</h3>
+
+      <div class="flowchart">
+        <div class="flow-node" style="background: var(--navy-light); min-width: 320px;">
+          Start: Analyze the Claim
+        </div>
+        <div class="flow-arrow"></div>
+        <div class="flow-node" style="background: #2e4a7a; min-width: 320px; padding: .75rem 1.25rem;">
+          <strong>Step 1 (§ 101 Threshold)</strong><br/>
+          <small style="opacity:.85;">Is the claim within a statutory category?<br/>(process, machine, manufacture, composition)</small>
+        </div>
+        <div class="flow-row" style="gap: 3rem; width: 100%; justify-content: center; margin: .5rem 0;">
+          <div style="display:flex; flex-direction:column; align-items:center;">
+            <div class="flow-arrow"></div>
+            <span style="font-size:.75rem; font-weight:700; color: var(--danger); text-transform:uppercase; letter-spacing:.06em;">No</span>
+          </div>
+          <div style="display:flex; flex-direction:column; align-items:center;">
+            <div class="flow-arrow"></div>
+            <span style="font-size:.75rem; font-weight:700; color: var(--success); text-transform:uppercase; letter-spacing:.06em;">Yes</span>
+          </div>
+        </div>
+        <div class="flow-row" style="gap: 4rem; align-items: flex-start; width: 100%;">
+          <div style="display:flex; flex-direction:column; align-items:center; min-width: 180px;">
+            <div class="flow-node warning" style="min-width:180px; font-size:.875rem; background:#922b21;">Reject: Not a statutory category</div>
+          </div>
+          <div style="display:flex; flex-direction:column; align-items:center; min-width: 260px;">
+            <div class="flow-node" style="min-width:260px; background:#2e4a7a; padding:.75rem 1.25rem;">
+              <strong>Step 2A — Prong 1</strong><br/>
+              <small style="opacity:.85;">Is the claim <em>directed to</em> an abstract idea, law of nature, or natural phenomenon?</small>
+            </div>
+            <div class="flow-row" style="gap:2.5rem; margin:.5rem 0;">
+              <div style="display:flex;flex-direction:column;align-items:center;">
+                <div class="flow-arrow"></div>
+                <span style="font-size:.75rem; font-weight:700; color: var(--success);">No</span>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center;">
+                <div class="flow-arrow"></div>
+                <span style="font-size:.75rem; font-weight:700; color: var(--danger);">Yes</span>
+              </div>
+            </div>
+            <div class="flow-row" style="gap:1.5rem; align-items:flex-start; width:100%;">
+              <div style="display:flex;flex-direction:column;align-items:center;min-width:120px;">
+                <div class="flow-node success" style="min-width:120px; font-size:.875rem;">Eligible ✓</div>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center;min-width:200px;">
+                <div class="flow-node" style="min-width:200px; background:#2e4a7a; padding:.75rem 1.25rem; font-size:.875rem;">
+                  <strong>Step 2A — Prong 2</strong><br/>
+                  <small style="opacity:.85;">Do additional elements integrate the exception into a practical application?</small>
+                </div>
+                <div class="flow-row" style="gap:2rem; margin:.5rem 0;">
+                  <div style="display:flex;flex-direction:column;align-items:center;">
+                    <div class="flow-arrow"></div>
+                    <span style="font-size:.75rem; font-weight:700; color: var(--success);">Yes</span>
+                  </div>
+                  <div style="display:flex;flex-direction:column;align-items:center;">
+                    <div class="flow-arrow"></div>
+                    <span style="font-size:.75rem; font-weight:700; color: var(--danger);">No</span>
+                  </div>
+                </div>
+                <div class="flow-row" style="gap:1rem; align-items:flex-start; width:100%;">
+                  <div style="display:flex;flex-direction:column;align-items:center;min-width:100px;">
+                    <div class="flow-node success" style="min-width:100px; font-size:.875rem;">Eligible ✓</div>
+                  </div>
+                  <div style="display:flex;flex-direction:column;align-items:center;min-width:150px;">
+                    <div class="flow-node" style="min-width:150px; background:#2e4a7a; padding:.75rem 1rem; font-size:.875rem;">
+                      <strong>Step 2B</strong><br/>
+                      <small style="opacity:.85;">Do additional elements amount to significantly more than the exception?</small>
+                    </div>
+                    <div class="flow-row" style="gap:1rem; margin:.5rem 0;">
+                      <div style="display:flex;flex-direction:column;align-items:center;">
+                        <div class="flow-arrow"></div>
+                        <span style="font-size:.75rem; font-weight:700; color: var(--success);">Yes</span>
+                      </div>
+                      <div style="display:flex;flex-direction:column;align-items:center;">
+                        <div class="flow-arrow"></div>
+                        <span style="font-size:.75rem; font-weight:700; color: var(--danger);">No</span>
+                      </div>
+                    </div>
+                    <div class="flow-row" style="gap:.75rem; align-items:flex-start; width:100%;">
+                      <div class="flow-node success" style="min-width:90px; font-size:.875rem;">Eligible ✓</div>
+                      <div class="flow-node" style="min-width:90px; font-size:.875rem; background:#922b21;">Reject § 101 ✗</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <p class="figure-caption" style="text-align:center; margin-top:.5rem;">Figure 2-1: The Alice/Mayo Two-Step Test as applied under USPTO 2019 Revised Guidance</p>
+
+      <h3>2.3 The "Directed To" Inquiry</h3>
+
+      <p>The threshold question under Step 2A, Prong 1 is whether the claim is "directed to" an ineligible concept. Courts have struggled with the verb "directed to." In <em>Enfish, LLC v. Microsoft Corp.</em>, 822 F.3d 1327 (Fed. Cir. 2016), the Federal Circuit held that a self-referential table for a database was <em>not</em> directed to an abstract idea because the improvement was to computer functionality itself. By contrast, in <em>Electric Power Group, LLC v. Alstom S.A.</em>, 830 F.3d 1350 (Fed. Cir. 2016), the court found that claims directed to collecting and analyzing information were directed to abstract ideas even though they operated on a computer network.</p>
+
+      <p>The Federal Circuit in <em>Core Wireless Licensing S.A.R.L. v. LG Electronics, Inc.</em>, 880 F.3d 1356 (Fed. Cir. 2018), articulated a helpful formulation: a claim is not directed to an abstract idea if it is instead directed to an improvement in how a computer functions — that is, if the focus of the claim is on a specific implementation that improves the functioning of the computer itself, not merely on the result achieved by the implementation.</p>
+
+      <h3>2.4 The "Significantly More" Requirement</h3>
+
+      <p>If a claim is directed to an ineligible concept, the second part of the analysis asks whether the claim recites an "inventive concept" — something "significantly more" than the exception itself. The Court in <em>Alice</em> was explicit that generic computer implementation does not supply the necessary inventive concept. Claimed activities that are "well-understood, routine, and conventional" do not transform an ineligible concept into an eligible application.</p>
+
+      <p>The significantly-more inquiry has generated enormous litigation. The Federal Circuit has attempted to identify categories of additional elements that do — and do not — satisfy the test, but the results have not always been fully predictable. The 2019 USPTO Revised Guidance represents the agency's most systematic attempt to provide workable standards, discussed further in Section 8.</p>
+
+      <div class="callout callout-warning">
+        <div class="callout-icon">⚠</div>
+        <div class="callout-body">
+          <div class="callout-title">The "Inventive Concept" Is Not Novelty</div>
+          <p>A persistent source of confusion: the "inventive concept" under Step 2B is conceptually distinct from novelty under § 102 and non-obviousness under § 103. The Supreme Court acknowledged in <em>Mayo</em> that an application may satisfy §§ 102 and 103 yet still fail § 101. Conversely, a well-known physical transformation applied to a natural phenomenon may still provide an inventive concept. The tests operate independently, and conflating them leads to analytical error — and rejected claims.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════
+         SECTION 3: WHAT COUNTS AS AN ABSTRACT IDEA
+         ══════════════════════════════════════════════════════ -->
+    <section id="abstract-idea" class="section-anchor">
+      <h2>3. What Counts as an Abstract Idea</h2>
+
+      <p>The Supreme Court has conspicuously declined to define "abstract idea" with precision, acknowledging in <em>Alice</em> that "we need not labor to delimit the precise contours of the 'abstract ideas' category in this case." 573 U.S. at 221. The 2019 USPTO Revised Guidance fills this gap, at least for examination purposes, by grouping abstract ideas into three enumerated categories:</p>
+
+      <ol>
+        <li><strong>Mathematical concepts:</strong> mathematical relationships, mathematical formulas or equations, mathematical calculations.</li>
+        <li><strong>Mental processes:</strong> concepts performed in the human mind (including an observation, evaluation, judgment, or opinion).</li>
+        <li><strong>Certain methods of organizing human activity:</strong> fundamental economic principles or practices, commercial or legal interactions, managing personal behavior or relationships.</li>
+      </ol>
+
+      <h3>3.1 Software Algorithms as Abstract Ideas</h3>
+
+      <p>Most software patent eligibility disputes turn on whether the claimed algorithm constitutes a "mathematical concept" or "mental process." Courts applying <em>Alice</em> consistently hold that claims are directed to abstract ideas when they recite nothing more than an algorithm or data-processing method that could, in principle, be performed by a human — perhaps slowly, with paper and pencil — or that is expressible as a mathematical formula without meaningful distinction from that formula.</p>
+
+      <p>The Federal Circuit applied this logic in <em>TLI Communications LLC v. AV Automotive LLC</em>, 823 F.3d 607 (Fed. Cir. 2016), invalidating claims directed to recording, administering, and archiving digital images because the concept was directed to classifying and storing digital images in an organized manner — a mental process. Similarly, in <em>Intellectual Ventures I LLC v. Capital One Financial Corp.</em>, 850 F.3d 1332 (Fed. Cir. 2017), claims directed to "tailoring information based on observed user information" were found abstract.</p>
+
+      <h3>3.2 Key Foundational Cases</h3>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Case</th>
+              <th>Year</th>
+              <th>Claim at Issue</th>
+              <th>Holding on Abstract Idea</th>
+              <th>Significance</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><em>Gottschalk v. Benson</em>, 409 U.S. 63</td>
+              <td>1972</td>
+              <td>Method for converting binary-coded decimals to pure binary numerals</td>
+              <td>Abstract idea; math formula without practical application</td>
+              <td>First holding that a computer program can be abstract; established that mathematical algorithms are not patentable in the abstract</td>
+            </tr>
+            <tr>
+              <td><em>Parker v. Flook</em>, 437 U.S. 584</td>
+              <td>1978</td>
+              <td>Method for updating alarm limits in a catalytic conversion process using a mathematical formula</td>
+              <td>Abstract idea; post-solution activity insufficient</td>
+              <td>Established that routine post-solution activity cannot render an otherwise abstract claim eligible</td>
+            </tr>
+            <tr>
+              <td><em>Diamond v. Diehr</em>, 450 U.S. 175</td>
+              <td>1981</td>
+              <td>Process for curing rubber using the Arrhenius equation with continuous temperature measurement</td>
+              <td>Not abstract; eligible process transforming material</td>
+              <td>Established that use of a mathematical formula in a physical process does not render it abstract; claims considered as a whole</td>
+            </tr>
+            <tr>
+              <td><em>Bilski v. Kappos</em>, 561 U.S. 593</td>
+              <td>2010</td>
+              <td>Method for hedging commodity risk through fixed-price contracts</td>
+              <td>Abstract idea; fundamental economic practice</td>
+              <td>Rejected the machine-or-transformation test as the <em>sole</em> eligibility test; established that business methods can be abstract ideas</td>
+            </tr>
+            <tr>
+              <td><em>Mayo v. Prometheus</em>, 566 U.S. 66</td>
+              <td>2012</td>
+              <td>Method of optimizing drug dosage based on metabolite concentration in blood</td>
+              <td>Law of nature; insufficient inventive concept</td>
+              <td>Articulated the two-step framework; held that conventional steps of "administering," "determining," and "wherein" clauses do not supply inventive concept</td>
+            </tr>
+            <tr>
+              <td><em>Alice Corp. v. CLS Bank Int'l</em>, 573 U.S. 208</td>
+              <td>2014</td>
+              <td>Method, computer system, and CRM for intermediated settlement using a third party to mitigate risk</td>
+              <td>Abstract idea; generic computer implementation insufficient</td>
+              <td>Extended Mayo framework to software; established that recitation of "a computer" does not transform an abstract method into an eligible invention</td>
+            </tr>
+            <tr>
+              <td><em>Association for Molecular Pathology v. Myriad Genetics</em>, 569 U.S. 576</td>
+              <td>2013</td>
+              <td>Isolated DNA sequences encoding BRCA1/BRCA2 proteins</td>
+              <td>Natural phenomenon; isolated genomic DNA not eligible</td>
+              <td>Distinguished naturally occurring DNA from cDNA; established that isolation alone does not render a natural product patent-eligible</td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="table-caption">Table 2-1: Foundational Supreme Court Cases Defining the Scope of Patent-Ineligible Subject Matter</p>
+      </div>
+
+      <h3>3.3 The Problem of Characterization Level</h3>
+
+      <p>Perhaps the most vexing doctrinal issue under § 101 is what level of abstraction to use when characterizing a claim. Almost any invention can be described abstractly enough to sound like an abstract idea, or concretely enough to sound like a specific practical application. Courts and commentators have recognized this problem. Judge Moore, concurring in <em>Thales Visionix Inc. v. United States</em>, 850 F.3d 1343 (Fed. Cir. 2017), noted that the level of abstraction at which one characterizes the concept "can be outcome-determinative."</p>
+
+      <p>The Federal Circuit has attempted to cabin this discretion by requiring that the characterization be drawn from the claims themselves, not from a high-altitude abstraction. In <em>McRO, Inc. v. Bandai Namco Games America Inc.</em>, 837 F.3d 1299 (Fed. Cir. 2016), the court held that claims to a specific rule-based system for automatically animating lip synchronization were not abstract because the claim specifically recited the rules used to produce the animation — the claims did not merely recite the result (synchronized animation) but the specific technical means of achieving it.</p>
+
+      <div class="callout callout-danger">
+        <div class="callout-icon">⛔</div>
+        <div class="callout-body">
+          <div class="callout-title">The Over-Abstraction Trap</div>
+          <p>When characterizing an AI/ML claim, resist the temptation to describe your invention at the level of its result ("a method for improving medical diagnosis") rather than its mechanism ("a method for training a convolutional neural network with a modified loss function that incorporates spatial attention maps to weight clinically relevant image regions"). Examiners and defendants' counsel will seize on abstract result-oriented descriptions to argue ineligibility. Claim and argue at the specific mechanism level from the outset.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════
+         SECTION 4: THE "SIGNIFICANTLY MORE" INQUIRY
+         ══════════════════════════════════════════════════════ -->
+    <section id="significantly-more" class="section-anchor">
+      <h2>4. The "Significantly More" Inquiry</h2>
+
+      <p>Even if a claim is directed to an abstract idea, law of nature, or natural phenomenon, it may still be patent-eligible if the additional elements — beyond the exception — supply an "inventive concept" that amounts to significantly more than the exception itself. The Supreme Court in <em>Alice</em> identified certain exemplary types of additional elements that do and do not satisfy this requirement.</p>
+
+      <h3>4.1 What Does NOT Supply Significantly More</h3>
+
+      <p>The Supreme Court and Federal Circuit have been consistent on what cannot save an otherwise abstract claim:</p>
+
+      <ul>
+        <li><strong>Generic computer implementation:</strong> Requiring a "processor," "computer," or "server" without more. <em>Alice</em>, 573 U.S. at 223 ("purely functional and generic" computer elements do not supply inventive concept).</li>
+        <li><strong>Well-understood, routine, conventional activity:</strong> Steps that are individually known and practiced in the art. <em>Mayo</em>, 566 U.S. at 79.</li>
+        <li><strong>Applying the abstract idea "to itself":</strong> Limiting the abstract idea to a particular technological environment (e.g., "on the Internet") or a particular field of use. <em>Alice</em>, 573 U.S. at 222.</li>
+        <li><strong>Post-solution activity:</strong> Adding insignificant pre-solution or post-solution steps that do not meaningfully transform the claim. <em>Parker v. Flook</em>, 437 U.S. at 590.</li>
+        <li><strong>Data gathering without application:</strong> Claiming steps of collecting, storing, or displaying information without a specific technical means. <em>Electric Power Group</em>, 830 F.3d at 1356.</li>
+      </ul>
+
+      <h3>4.2 What CAN Supply Significantly More</h3>
+
+      <p>The Federal Circuit and USPTO have recognized several categories of additional elements that, when properly claimed, can supply significantly more:</p>
+
+      <ul>
+        <li><strong>Specific technical improvements to computer functionality:</strong> Claims that improve the functioning, speed, or efficiency of the computer itself — not merely using a computer to implement a practice. <em>Enfish</em>, 822 F.3d at 1336; <em>Core Wireless</em>, 880 F.3d at 1362.</li>
+        <li><strong>Specific machine or transformation:</strong> While not the sole test, satisfying the machine-or-transformation test is a "useful and important clue" to eligibility. <em>Bilski</em>, 561 U.S. at 604.</li>
+        <li><strong>Unconventional claim elements or combinations:</strong> Steps or elements that are not individually conventional but are combined in a non-routine way. <em>BASCOM Global Internet Services, Inc. v. AT&amp;T Mobility LLC</em>, 827 F.3d 1341, 1350 (Fed. Cir. 2016) (unconventional arrangement of generic computer components can supply inventive concept).</li>
+        <li><strong>Specific technical implementations:</strong> Claims that recite specific technical implementations rather than results, such as specific data structures, specific hardware configurations, or specific algorithmic steps applied to a particular technical problem. <em>McRO</em>, 837 F.3d at 1314.</li>
+        <li><strong>Integration into a practical application:</strong> Under the 2019 Revised Guidance, integration of an exception into a practical application — including application to a particular machine, effecting a transformation, or using the exception in a meaningful way beyond generally linking to a technology or field — provides eligibility.</li>
+      </ul>
+
+      <h3>4.3 The BASCOM Decision: Unconventional Arrangements</h3>
+
+      <p><em>BASCOM Global Internet Services, Inc. v. AT&amp;T Mobility LLC</em>, 827 F.3d 1341 (Fed. Cir. 2016), is particularly important for AI/ML claims because it established that even if individual claim elements are conventional, an unconventional <em>arrangement</em> of those elements can supply the requisite inventive concept. The claims in <em>BASCOM</em> were directed to content filtering — an abstract idea. But the specific implementation, which installed the filtering logic at a remote ISP server rather than at individual user devices and used customizable filtering rules, was held to represent an inventive concept. The court explained that "the claim may be read to 'improve[] an existing technological process' by allowing filtering to be customized while... preserving the advantages of a remote filter."</p>
+
+      <p>For AI/ML practitioners, <em>BASCOM</em> suggests that novel architectures for deploying ML models — even if the underlying model type (e.g., a transformer, a convolutional network) is known — can supply an inventive concept if the deployment arrangement solves a specific technical problem in a non-routine way.</p>
+
+      <div class="callout callout-tip">
+        <div class="callout-icon">💡</div>
+        <div class="callout-body">
+          <div class="callout-title">Practice Tip: Berkheimer and the Factual Basis for "Conventional"</div>
+          <p>In <em>Berkheimer v. HP Inc.</em>, 881 F.3d 1360 (Fed. Cir. 2018), the Federal Circuit held that whether claim elements are "well-understood, routine, and conventional" is a question of <strong>fact</strong>, not a question of law to be decided on the pleadings alone. This means that an examiner or defendant must have evidentiary support — not merely attorney argument — to characterize claim elements as conventional. Applicants should exploit this by building a detailed specification that describes why their specific implementation choices are non-routine, and by providing declaration evidence under 37 C.F.R. § 1.132 when necessary to establish that claimed elements are not individually conventional.</p>
+        </div>
+      </div>
+
+      <h3>4.4 Practical Improvements to Technology</h3>
+
+      <p>The concept of "practical improvement to technology" has emerged as a critical touchstone. In <em>Enfish</em>, the Federal Circuit held that software can make "non-abstract improvements to computer technology" and that claims directed to such improvements are eligible. The pivotal question is whether the focus of the claim is on the specific asserted improvement in computer capabilities or, instead, on a process that qualifies as an "abstract idea" for which computers are invoked merely as a tool.</p>
+
+      <p>For AI/ML inventions, this means that claims should identify the specific technical problem being solved — latency, model accuracy, computational efficiency, memory overhead, adversarial robustness — and tie the claimed steps to the particular mechanisms that address that problem. Vague claims to "improved accuracy" without specifying the technical means of achieving it are far more vulnerable than claims to a specific modified training objective or architectural innovation that demonstrably reduces a particular class of error.</p>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════
+         SECTION 5: AI/ML-SPECIFIC ELIGIBILITY ANALYSIS
+         ══════════════════════════════════════════════════════ -->
+    <section id="ai-ml-eligibility" class="section-anchor">
+      <h2>5. AI/ML-Specific Eligibility Analysis</h2>
+
+      <p>Applying the Alice/Mayo framework to AI and machine learning inventions requires understanding how courts characterize the components of an AI system. A typical AI/ML patent application may claim one or more of: a training method, a trained model architecture, a model inference method, a data preprocessing technique, a system comprising hardware and software components for model deployment, or some combination of the above. Each category presents distinct eligibility considerations.</p>
+
+      <h3>5.1 Neural Network Architectures</h3>
+
+      <p>A neural network is a mathematical object — a parameterized function with learned weights. At the highest level of abstraction, a novel neural network architecture is a mathematical formula and therefore an abstract idea. The key question is whether the specific architectural features are tied to a concrete technical application and whether those features represent an improvement to technology, not merely an improvement to an abstract mathematical structure.</p>
+
+      <p>Claims that explicitly tie the architecture to a specific input modality (images, speech, protein sequences, financial time-series), describe specific architectural improvements that solve a concrete technical problem (e.g., attention mechanisms that reduce quadratic memory cost in processing long sequences), and are implemented in a specific hardware configuration tend to fare better under § 101.</p>
+
+      <h3>5.2 Training Methods</h3>
+
+      <p>Training methods are particularly vulnerable to abstract-idea characterizations because they consist of mathematical optimization procedures — gradient descent, backpropagation, loss function computation — that are, at bottom, sequences of arithmetic operations. A training method claim that merely recites the steps of "inputting training data," "computing a loss," "updating model parameters," and "iterating" will almost certainly be characterized as directed to a mathematical process.</p>
+
+      <p>The key to eligibility for training method claims is specificity. Claims should recite: (1) a specific training objective (e.g., a contrastive loss with specific geometric constraints); (2) specific data augmentation or preprocessing steps that produce a technical improvement; (3) a specific hardware interaction (e.g., distributed training with a novel parameter synchronization protocol); or (4) a novel combination of training techniques that addresses a specific technical problem such as catastrophic forgetting, distribution shift, or adversarial vulnerability.</p>
+
+      <h3>5.3 Eligible vs. Ineligible AI/ML Claim Language</h3>
+
+      <div class="comparison-grid">
+        <div class="comparison-item bad">
+          <h4>Likely Ineligible — Abstract Framing</h4>
+          <ul>
+            <li>A method for <strong>improving medical diagnosis</strong> comprising: receiving patient data; applying a machine learning model to the patient data; and outputting a diagnosis recommendation.</li>
+            <li>A method for <strong>classifying text</strong> comprising: tokenizing a text input; applying a neural network to the tokens; and generating a classification label.</li>
+            <li>A computer-implemented method for <strong>predicting equipment failure</strong> comprising: collecting sensor data; analyzing the sensor data using an artificial intelligence algorithm; and predicting failure based on the analysis.</li>
+            <li>A system for <strong>recommending products</strong> comprising: a processor configured to receive user data; apply a recommendation algorithm; and return product recommendations.</li>
+          </ul>
+          <p style="margin-top:1rem; font-size:.875rem; color:var(--danger); font-weight:600;">Why these fail: Result-oriented claiming, no specific technical mechanism, generic recitation of AI/ML tools, abstract organizational goals</p>
+        </div>
+        <div class="comparison-item good">
+          <h4>Likely Eligible — Specific Technical Implementation</h4>
+          <ul>
+            <li>A method for training a <strong>convolutional neural network with a modified focal loss function</strong> that dynamically down-weights well-classified examples using a modulating factor γ applied to the cross-entropy loss, thereby improving detection of rare classes without increasing false-positive rates in real-time object detection systems operating at 30 fps.</li>
+            <li>A method comprising: <strong>tokenizing text using byte-pair encoding with a domain-specific vocabulary</strong> of 50,000 tokens; applying a transformer architecture with <strong>rotary positional embeddings</strong> to address long-sequence context degradation; and classifying entities using a <strong>conditional random field layer</strong> that enforces structural consistency between adjacent labels.</li>
+            <li>A system for predicting turbine blade failure comprising: <strong>a plurality of piezoelectric vibration sensors arranged in a specific geometric pattern</strong>; a signal processor that decomposes vibration signals using a <strong>Hilbert-Huang transform</strong>; and a LSTM neural network trained to detect micro-crack signatures at a <strong>specific frequency signature between 8-15 kHz</strong>.</li>
+            <li>A product recommendation system comprising: a <strong>two-tower embedding architecture with separate item and user towers</strong> that compute embeddings in a shared 256-dimensional metric space; an <strong>approximate nearest-neighbor search index using hierarchical navigable small worlds (HNSW)</strong> for sub-10ms latency retrieval.</li>
+          </ul>
+          <p style="margin-top:1rem; font-size:.875rem; color:var(--success); font-weight:600;">Why these succeed: Specific technical mechanism, concrete hardware/implementation tie, quantified improvements, non-abstract claim language</p>
+        </div>
+      </div>
+
+      <h3>5.4 The Trained Model as a Claim Target</h3>
+
+      <p>An increasingly important strategy is to claim the <strong>trained model itself</strong> as a machine or article of manufacture, rather than (or in addition to) the training method. A trained model — a specific set of weight values stored in memory, instantiated in a specific hardware configuration — is arguably more concrete than an abstract training method. Several courts and commentators have noted that a trained neural network, like a specific physical configuration of matter, may be an article of manufacture with distinct and non-obvious properties not predictable from the training method alone.</p>
+
+      <p>However, claiming a trained model raises its own eligibility questions. The model is, at bottom, a collection of numbers stored in memory — potentially characterizable as data, which some courts have treated as abstract. The stronger framing is to claim the model as a <em>system</em> comprising: (1) a hardware component (processor, memory); (2) a specific model architecture with defined parameters; and (3) stored trained weights satisfying specific performance thresholds on defined benchmark tasks. This framing ties the claimed model to concrete physical hardware and defined functional performance, reducing the risk of abstract characterization.</p>
+
+      <div class="callout callout-info">
+        <div class="callout-icon">ℹ</div>
+        <div class="callout-body">
+          <div class="callout-title">USPTO Guidance on AI Inventorship and AI-Specific Eligibility (2024–2025)</div>
+          <p>The USPTO published a Request for Comments on Artificial Intelligence and Inventorship in February 2023, and issued updated guidance on AI-assisted inventions in February 2024 (89 Fed. Reg. 10,043). While primarily addressing inventorship, this guidance has implications for eligibility: the agency has signaled that AI-generated outputs, standing alone without significant human contribution, may raise eligibility concerns distinct from those addressed by <em>Alice/Mayo</em>. As of the date of this writing, the USPTO has not issued AI-specific § 101 guidance, but the agency's AI/Emerging Technology Partnership has committed to issuing additional guidance following public comment periods in 2024–2025. Practitioners should monitor the USPTO website and the <em>Federal Register</em> for forthcoming guidance that may supersede or supplement the 2019 Revised Guidance with respect to AI inventions specifically. <strong>This area is actively developing.</strong></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════
+         SECTION 6: BIOTECH ELIGIBILITY
+         ══════════════════════════════════════════════════════ -->
+    <section id="biotech" class="section-anchor">
+      <h2>6. Biotech Eligibility</h2>
+
+      <p>Biotechnology patent eligibility presents distinct challenges arising from the law-of-nature and natural-phenomenon exceptions. Unlike software, where the central question is usually whether a mathematical concept has been applied in a sufficiently concrete way, biotech patent eligibility often turns on the line between a natural phenomenon that exists independently of human action and a human-made invention that reflects genuine creative ingenuity — even when it operates at or near the level of naturally occurring biology.</p>
+
+      <h3>6.1 Natural Products: The Myriad Decision</h3>
+
+      <p>The Supreme Court's decision in <em>Association for Molecular Pathology v. Myriad Genetics, Inc.</em>, 569 U.S. 576 (2013), established the foundational rule for naturally occurring genetic material: genomic DNA isolated directly from the body is not patent-eligible because it is a naturally occurring product, and isolation does not create something markedly different from what exists in nature. Myriad's patents claimed isolated DNA sequences encoding the BRCA1 and BRCA2 breast cancer susceptibility genes. The Court unanimously held these claims invalid under § 101.</p>
+
+      <p>However, the Court drew a critical distinction: <strong>complementary DNA (cDNA)</strong> is patent-eligible because it does not naturally exist — it is synthetically constructed from an mRNA template, removing the introns (non-coding sequences) that are present in genomic DNA. The cDNA sequence is the product of human ingenuity, not a direct product of nature. This distinction — between something that is merely isolated from nature and something that is synthesized in a form not found in nature — has become the central organizing principle of natural-product eligibility analysis.</p>
+
+      <h3>6.2 The "Markedly Different" Standard</h3>
+
+      <p>Post-<em>Myriad</em>, the USPTO and courts apply a "markedly different" standard for natural product claims: a claimed composition is eligible if it has markedly different characteristics from any naturally occurring counterpart. "Markedly different" means something more than structural difference — it requires a difference in biological, chemical, or functional characteristics that is significant and attributable to human ingenuity rather than merely to isolation or purification.</p>
+
+      <p>For engineered biologics, this standard is generally manageable: an antibody with amino acid substitutions that are not found in any natural antibody, a modified enzyme with altered kinetics, a chimeric protein fusing two natural proteins in a configuration not found in nature — these are markedly different from natural products. The challenge arises with claims to isolated natural products that have been slightly modified, or to compositions that are close analogs of naturally occurring substances.</p>
+
+      <h3>6.3 Diagnostic Methods After Mayo</h3>
+
+      <p><em>Mayo Collaborative Services v. Prometheus Laboratories, Inc.</em>, 566 U.S. 66 (2012), extended the natural-phenomenon exception to <strong>diagnostic method claims</strong>. The claims at issue recited a method of optimizing drug dosage for patients with autoimmune diseases: administer the drug, measure the metabolite level, and adjust the dose based on whether the level is below or above defined thresholds. The Court held that the correlations between metabolite levels and drug efficacy were natural phenomena, and that the three recited steps — administering, determining, and applying the correlation — were each individually routine and conventional.</p>
+
+      <p>The impact of <em>Mayo</em> on diagnostic patents has been devastating. The Federal Circuit has applied <em>Mayo</em> to invalidate a broad range of diagnostic method claims, including claims to detecting cell-free fetal DNA in maternal blood (<em>Ariosa Diagnostics, Inc. v. Sequenom, Inc.</em>, 788 F.3d 1371 (Fed. Cir. 2015)) and claims to detecting serum albumin levels as a marker for kidney disease progression. Practitioners have struggled to find ways to frame diagnostic method claims that pass muster under <em>Mayo</em> while remaining commercially meaningful.</p>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Claim Type</th>
+              <th>Example</th>
+              <th>Typical Eligibility Outcome</th>
+              <th>Strategy</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Isolated natural DNA</td>
+              <td>Isolated BRCA1 genomic DNA</td>
+              <td>Ineligible — natural phenomenon</td>
+              <td>Claim synthetic analogs, cDNA, or modified sequences</td>
+            </tr>
+            <tr>
+              <td>cDNA / synthetic DNA</td>
+              <td>cDNA encoding BRCA1 without introns</td>
+              <td>Eligible — markedly different structure</td>
+              <td>Emphasize synthetic creation and structural distinctions from genomic DNA</td>
+            </tr>
+            <tr>
+              <td>Engineered protein</td>
+              <td>Humanized monoclonal antibody with specific CDR mutations</td>
+              <td>Eligible — non-natural sequence</td>
+              <td>Claim specific amino acid sequences; tie to functional improvements over natural counterpart</td>
+            </tr>
+            <tr>
+              <td>Natural compound isolate</td>
+              <td>Purified resveratrol extracted from grapes</td>
+              <td>Likely ineligible — purification insufficient</td>
+              <td>Claim formulation, delivery mechanism, or use method with specific technical steps</td>
+            </tr>
+            <tr>
+              <td>Diagnostic correlation</td>
+              <td>Measuring biomarker X and correlating to disease Y</td>
+              <td>Ineligible under Mayo — law of nature</td>
+              <td>Integrate into a specific treatment protocol with unconventional detection technology</td>
+            </tr>
+            <tr>
+              <td>Diagnostic with specific technique</td>
+              <td>Detecting cfDNA using digital droplet PCR with a novel probe design for allele discrimination</td>
+              <td>May be eligible — specific non-conventional technical steps</td>
+              <td>Emphasize specific, non-routine technical implementation; avoid pure correlation claims</td>
+            </tr>
+            <tr>
+              <td>Method of treatment</td>
+              <td>Administering a specific antibody in a specific dosage to a specific patient population identified by a biomarker</td>
+              <td>Generally eligible — specific treatment steps</td>
+              <td>Tie biomarker selection to specific treatment; claim therapeutic use, not mere correlation</td>
+            </tr>
+            <tr>
+              <td>Gene editing method</td>
+              <td>CRISPR-Cas9 with specific guide RNA sequences for targeted insertion at defined genomic locus</td>
+              <td>Eligible — specific engineered components and non-natural process</td>
+              <td>Claim specific guide sequences, specific Cas9 variants, and defined genomic targets</td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="table-caption">Table 2-2: Biotech Claim Types — Eligibility Outcomes and Strategies</p>
+      </div>
+
+      <h3>6.4 Framing Biotech Innovations for Eligibility</h3>
+
+      <p>The principal strategies for maintaining eligibility in the biotech context are: (1) claim the engineering, not the discovery; (2) tie diagnostic methods to specific unconventional technical implementation; and (3) when claiming methods of treatment, ensure that the claim integrates the natural-phenomenon correlation into a specific therapeutic protocol that includes administration steps and patient selection criteria beyond the correlation alone.</p>
+
+      <p>For AI-powered diagnostics — an increasingly important category — the eligibility analysis combines both the Mayo framework (natural phenomenon underlying the diagnostic correlation) and the Alice framework (abstract idea underlying the algorithmic classification). Practitioners should address both frameworks explicitly in the specification and claims.</p>
+
+      <div class="callout callout-warning">
+        <div class="callout-icon">⚠</div>
+        <div class="callout-body">
+          <div class="callout-title">Ariosa and the "Preemption" Problem in Diagnostics</div>
+          <p>The Federal Circuit in <em>Ariosa Diagnostics v. Sequenom</em> (2015) invalidated claims to detecting cell-free fetal DNA (cffDNA) in maternal plasma, a technology with enormous clinical value. The court applied <em>Mayo</em> and found that the claims were directed to the natural phenomenon of cffDNA existing in maternal blood, with only conventional detection steps. Judge Linn, concurring, expressed "grave reservations" about the result but felt bound by <em>Mayo</em>. The decision illustrates the most troubling application of § 101: genuinely novel and valuable diagnostic innovations invalidated not because they are unworthy of protection, but because the court cannot find a doctrinal path around the natural-phenomenon exception. Biotech practitioners must plan for this risk and consider patent portfolio strategies that rely on claims to specific improvements in detection technology, not merely on the diagnostic insight itself.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════
+         SECTION 7: DRAFTING FOR ELIGIBILITY
+         ══════════════════════════════════════════════════════ -->
+    <section id="drafting" class="section-anchor">
+      <h2>7. Drafting for Eligibility</h2>
+
+      <p>Effective § 101 practice begins long before the first office action. The most powerful tool available to patent counsel is a well-drafted specification and claim set that anticipates § 101 challenges and builds in the evidence and claim language necessary to overcome them. The following process articulates the key drafting strategies.</p>
+
+      <ul class="process-steps">
+        <li>
+          <div class="step-content">
+            <h4>Identify the Specific Technical Problem</h4>
+            <p>Begin the specification with a clear, technically precise statement of the problem being solved. Avoid characterizing the problem as a business problem or a data analysis problem. Frame it as a technical problem: "existing neural network architectures require O(n²) memory for attention computation, limiting their applicability to sequences longer than N tokens" — not "there is a need for better text processing."</p>
+          </div>
+        </li>
+        <li>
+          <div class="step-content">
+            <h4>Describe the Technical Solution at Multiple Levels of Specificity</h4>
+            <p>The specification should describe the claimed invention at several levels: the general inventive concept, the specific mechanism by which that concept addresses the technical problem, and specific implementation details (specific hyperparameters, specific hardware configurations, specific data structures, specific algorithm variants). This layered description supports both broad and narrow claims and provides fallback positions if broader claims face § 101 challenges.</p>
+          </div>
+        </li>
+        <li>
+          <div class="step-content">
+            <h4>Tie Claims to Specific Hardware</h4>
+            <p>Where possible, tie independent claims to specific hardware configurations. Not merely "a processor" or "a computer," but "a graphics processing unit (GPU) executing a CUDA kernel" or "a tensor processing unit (TPU) with a systolic array architecture." Hardware specificity reduces the risk of characterization as a purely abstract method and satisfies the machine prong of the machine-or-transformation test. For AI/ML inventions, the specific type of accelerator often matters — claims tied to specific hardware types that are technically required for the claimed performance characteristics are substantially more defensible.</p>
+          </div>
+        </li>
+        <li>
+          <div class="step-content">
+            <h4>Avoid Purely Functional Language</h4>
+            <p>Functional claiming — claiming the function to be performed rather than the mechanism of performing it — is particularly dangerous under § 101. Language like "configured to classify" or "adapted to predict" without specifying the technical means of classification or prediction invites abstract characterization. Replace functional language with structural language: instead of "a classifier configured to identify objects," recite "a YOLOv8-based convolutional neural network with a feature pyramid neck and anchor-free detection heads configured to output bounding boxes and class probabilities for objects in real-time video frames."</p>
+          </div>
+        </li>
+        <li>
+          <div class="step-content">
+            <h4>Claim the Trained Model, Not Just the Algorithm</h4>
+            <p>For ML inventions, file claims directed to the trained model as an article of manufacture — "a non-transitory computer-readable medium storing parameters of a trained neural network, wherein the trained neural network comprises [specific architecture] and wherein the stored parameters were obtained by [specific training procedure] such that the trained neural network achieves [specific performance on defined benchmark]." This system/product claiming approach offers a different eligibility path and different scope of protection than method claims.</p>
+          </div>
+        </li>
+        <li>
+          <div class="step-content">
+            <h4>Describe Technical Improvements, Not Just Results</h4>
+            <p>The specification must explain <em>why</em> the claimed invention is an improvement and specifically <em>how</em> it achieves that improvement. Statements like "the present invention provides improved accuracy" are legally insufficient and factually meaningless under § 101. Instead: "By replacing global attention with sliding window attention in blocks 1–6 and global attention only in the final three blocks, the present architecture reduces memory complexity from O(n²) to O(n·w) where w is the window size, enabling processing of sequences up to 16,384 tokens on hardware with 16 GB VRAM, a capability not achievable by prior transformer architectures."</p>
+          </div>
+        </li>
+        <li>
+          <div class="step-content">
+            <h4>Document Non-Conventionality in the Specification</h4>
+            <p>Following <em>Berkheimer</em>, the question of whether claim elements are "well-understood, routine, and conventional" is a factual question. Build the evidentiary record in the specification itself: "Prior to the present invention, no commercially available natural language processing system incorporated [specific technique]. The conventional approach in the field was [competing approach], which suffered from [specific technical limitation]." This language supports arguments under Step 2B that the claimed elements are not individually conventional, even if each component is known in isolation.</p>
+          </div>
+        </li>
+        <li>
+          <div class="step-content">
+            <h4>File Multiple Claim Sets for Different § 101 Arguments</h4>
+            <p>File a range of independent claims at different levels of generality and with different technical anchors: (1) a method claim focused on the specific algorithmic steps and their technical necessity; (2) a system claim tied to specific hardware; (3) a product claim directed to the trained model or data structure; and (4) a computer-readable medium claim. If one claim type faces a § 101 rejection, the others may provide alternative pathways, and the breadth of the claims signals the scope of the invention more clearly to both examiners and potential infringers.</p>
+          </div>
+        </li>
+      </ul>
+
+      <h3>7.1 Specification Language That Helps Eligibility</h3>
+
+      <p>Certain specification passages are particularly valuable in supporting § 101 eligibility arguments. The following types of language should be incorporated:</p>
+
+      <ul>
+        <li>Explicit identification of the technical problem as a technical problem (not a business problem)</li>
+        <li>Explanation of why existing technical approaches are inadequate — specific technical limitations</li>
+        <li>Description of how the claimed invention operates at a mechanistic level, not just its outcome</li>
+        <li>Quantitative data on technical improvements (speed, accuracy, memory, latency, error rates)</li>
+        <li>Comparison to prior art approaches highlighting technical distinctions</li>
+        <li>Description of specific interactions between claim elements that produce the technical improvement</li>
+        <li>Statements about the non-conventional nature of the approach relative to the state of the art at filing</li>
+      </ul>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════
+         SECTION 8: RECENT CASE LAW AND USPTO GUIDANCE
+         ══════════════════════════════════════════════════════ -->
+    <section id="recent-guidance" class="section-anchor">
+      <h2>8. Recent Case Law and USPTO Guidance</h2>
+
+      <h3>8.1 The 2019 Revised Patent Subject Matter Eligibility Guidance</h3>
+
+      <p>The most significant development in USPTO § 101 practice since <em>Alice</em> is the <strong>2019 Revised Patent Subject Matter Eligibility Guidance</strong>, published January 7, 2019 (84 Fed. Reg. 50). The 2019 Guidance restructured the Alice/Mayo two-step framework into a more workable three-prong analysis for USPTO examiners:</p>
+
+      <ul>
+        <li><strong>Step 2A, Prong 1:</strong> Does the claim recite any judicial exception (abstract idea, law of nature, natural phenomenon)?</li>
+        <li><strong>Step 2A, Prong 2:</strong> Is the judicial exception integrated into a practical application? This prong looks for claim elements that apply, rely on, or use the exception in a manner that imposes a meaningful limit on the exception — such as being applied to a particular machine, effecting a transformation, or using the exception in a way that is more than merely describing the exception and instructing practitioners to apply it.</li>
+        <li><strong>Step 2B:</strong> Only if both Prongs 1 and 2 of Step 2A are answered affirmatively does the examiner proceed to ask whether the additional claim elements provide an inventive concept (significantly more).</li>
+      </ul>
+
+      <p>Critically, the 2019 Guidance instructed examiners that weighing the advantages and disadvantages of the additional claim elements against each other — the "balancing test" approach some examiners had been using — was improper. An examiner may only find ineligibility under Step 2B if the claim elements are <em>each</em> individually well-understood, routine, and conventional, <em>and</em> their combination is also conventional. This higher burden for examiners significantly improved allowance rates for software and AI applications.</p>
+
+      <h3>8.2 The Berkheimer Memo (2018)</h3>
+
+      <p>The <strong>Berkheimer v. HP Inc. Memorandum</strong>, issued by then-Acting USPTO Director Joseph Matal in April 2018, pre-dated the 2019 Guidance but reinforced a similar theme: whether claim elements are "well-understood, routine, and conventional" under Step 2B is a question of fact. Examiners must provide actual factual evidence — not attorney argument — to support a finding that claim elements are conventional. This memo has become a powerful tool for applicants, who can challenge § 101 rejections by demanding that the examiner identify the evidentiary basis for a "conventional" finding.</p>
+
+      <h3>8.3 Key Federal Circuit Decisions</h3>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Case</th>
+              <th>Year</th>
+              <th>Technology</th>
+              <th>Holding</th>
+              <th>Key Principle</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><em>Enfish, LLC v. Microsoft Corp.</em><br/>822 F.3d 1327</td>
+              <td>2016</td>
+              <td>Database / software</td>
+              <td>Eligible — self-referential table improved computer functionality</td>
+              <td>Software can make non-abstract improvements to computer technology itself; focus on whether claims are directed to improvement in how computer functions</td>
+            </tr>
+            <tr>
+              <td><em>McRO, Inc. v. Bandai Namco</em><br/>837 F.3d 1299</td>
+              <td>2016</td>
+              <td>Computer animation</td>
+              <td>Eligible — specific rule-based system for lip-sync animation</td>
+              <td>Specific rules used to achieve a result matter; claims must be read as a whole; automation of a human process using specific new rules can be eligible</td>
+            </tr>
+            <tr>
+              <td><em>BASCOM Global v. AT&amp;T</em><br/>827 F.3d 1341</td>
+              <td>2016</td>
+              <td>Network content filtering</td>
+              <td>Eligible — unconventional arrangement of generic components</td>
+              <td>Unconventional arrangement of known components can supply inventive concept even where each element is individually conventional</td>
+            </tr>
+            <tr>
+              <td><em>Electric Power Group v. Alstom</em><br/>830 F.3d 1350</td>
+              <td>2016</td>
+              <td>Power grid monitoring</td>
+              <td>Ineligible — collecting and analyzing information is abstract</td>
+              <td>Claims directed to collection, analysis, and display of information without specific technical means are abstract; result-focused claiming is insufficient</td>
+            </tr>
+            <tr>
+              <td><em>Core Wireless v. LG Electronics</em><br/>880 F.3d 1356</td>
+              <td>2018</td>
+              <td>Mobile device UI</td>
+              <td>Eligible — improved user interface for mobile devices</td>
+              <td>Claims to specific improvements in computer interface that improve user interaction with the device can be eligible; specificity of the claimed implementation matters</td>
+            </tr>
+            <tr>
+              <td><em>Berkheimer v. HP Inc.</em><br/>881 F.3d 1360</td>
+              <td>2018</td>
+              <td>Document management</td>
+              <td>Remanded — "conventional" is a factual question</td>
+              <td>Whether additional claim elements are well-understood, routine, and conventional is a question of fact requiring evidentiary support, not bare attorney argument</td>
+            </tr>
+            <tr>
+              <td><em>Thales Visionix v. United States</em><br/>850 F.3d 1343</td>
+              <td>2017</td>
+              <td>Motion tracking</td>
+              <td>Eligible — specific sensor configuration tied to mathematical relationships</td>
+              <td>Mathematical relationships applied to specific sensor systems in a particular configuration can be eligible where claims recite specific physical implementation</td>
+            </tr>
+            <tr>
+              <td><em>American Axle v. Neapco</em><br/>967 F.3d 1285</td>
+              <td>2020</td>
+              <td>Drive shaft manufacturing</td>
+              <td>Ineligible — applying Hooke's Law to tune drive shafts was law of nature</td>
+              <td>Even in a manufacturing context, claims that are essentially applications of a natural law to achieve a desired result may be ineligible; contentious split decision highlighting ongoing doctrinal tension</td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="table-caption">Table 2-3: Key Federal Circuit § 101 Decisions (2016–2020) — Eligibility Outcomes and Doctrinal Contributions</p>
+      </div>
+
+      <h3>8.4 Pending Developments and Legislative Reform</h3>
+
+      <p>Congressional frustration with § 101 doctrine has led to several legislative proposals. The most significant was the <strong>Patent Eligibility Restoration Act</strong>, introduced in both 2022 and 2023, which would have abrogated the judicial exceptions and replaced them with a narrower, more clearly defined set of ineligible subject matter. The bill attracted support from biopharmaceutical and diagnostic companies but faced opposition from technology companies and civil society groups concerned about software patents. As of the writing of this chapter, no § 101 reform legislation has been enacted, but the legislative pressure continues to influence USPTO guidance and Federal Circuit interpretation.</p>
+
+      <p>The Supreme Court has also declined several petitions for certiorari on § 101 questions, including in <em>American Axle</em>, leaving the Federal Circuit's fractured jurisprudence largely intact. The Court's reluctance to revisit § 101 following <em>Alice</em> suggests that reform, if it comes, is more likely to come from Congress than from the judiciary.</p>
+
+      <div class="highlight-box">
+        <h4>Sidebar: Pending USPTO AI-Specific § 101 Guidance</h4>
+        <p>As of April 2026, the USPTO's AI and Emerging Technology Partnership has published multiple requests for public comment on AI-related patent issues, including § 101 eligibility for AI inventions. The agency has signaled that it is considering issuing guidance specifically addressing: (1) how to characterize neural network architectures and training methods under Step 2A; (2) how to distinguish AI-generated outputs from human-made inventions for § 101 purposes; and (3) how the 2019 Revised Guidance's categories of abstract ideas apply to the particular features of AI/ML systems. Practitioners expecting to prosecute AI patent applications in 2025–2027 should monitor the <em>Federal Register</em> and USPTO website for forthcoming guidance that may materially change examination practice. Some commentators expect the agency to issue AI-specific guidance analogous to the 2019 Revised Guidance, potentially creating a separate analytical track for AI inventions with defined eligibility safe harbors for specific categories of AI applications (e.g., inventions tied to specific hardware accelerators, specific scientific domains, or specific performance benchmarks).</p>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════
+         SECTION 9: ELIGIBILITY CLAIM EXAMPLES
+         ══════════════════════════════════════════════════════ -->
+    <section id="claim-examples" class="section-anchor">
+      <h2>9. Eligibility Claim Examples</h2>
+
+      <p>The following side-by-side examples illustrate the difference between claims likely to face § 101 rejection and claims structured for eligibility. Each pair addresses a distinct technology area within AI/ML and biotech.</p>
+
+      <h3>9.1 ML Training Method</h3>
+
+      <div class="claim-box" style="border-color: var(--danger);">
+        <div class="claim-header" style="color: var(--danger);">Example 2-A — Likely Rejected: Abstract ML Training Method</div>
+        <p><span class="claim-number">Claim 1.</span> A computer-implemented method comprising:</p>
+        <span class="claim-element">receiving training data comprising labeled examples;</span>
+        <span class="claim-element">training a machine learning model on the training data;</span>
+        <span class="claim-element">evaluating the trained model on a validation set;</span>
+        <span class="claim-element">and outputting the trained model.</span>
+        <p style="margin-top:1.25rem; font-size:.875rem; color: var(--danger);">
+          <strong>§ 101 Vulnerability:</strong> This claim recites abstract steps of receiving data, training a model (without specifying the training mechanism), evaluating performance (without specifying the evaluation technique), and outputting a result. It is entirely functional and could describe any machine learning training procedure. A court applying <em>Alice</em> Step 2A would likely find this directed to a mathematical optimization process (abstract idea), and under Step 2B, all steps are well-understood, routine, and conventional in the ML field. No inventive concept is present.
+        </p>
+      </div>
+
+      <div class="claim-box" style="border-color: var(--success);">
+        <div class="claim-header" style="color: var(--success);">Example 2-B — Allowable: Specific ML Training Method</div>
+        <p><span class="claim-number">Claim 1.</span> A computer-implemented method for training a neural network to detect anomalies in industrial sensor data, the method comprising:</p>
+        <span class="claim-element">receiving, by a processor, a plurality of multivariate time-series sensor readings from a plurality of industrial sensors, each reading comprising a timestamp, a sensor identifier, and a floating-point measurement value;</span>
+        <span class="claim-element">generating, from the plurality of sensor readings, a set of training sequences by applying a sliding window of configurable length W and stride S over temporally ordered sensor readings, wherein each training sequence is labeled as normal or anomalous based on ground-truth maintenance records;</span>
+        <span class="claim-element">training a bidirectional long short-term memory (Bi-LSTM) neural network having an encoder-decoder architecture on the training sequences using a modified reconstruction loss function that combines mean squared error with a dynamic weighting term that assigns higher loss weight to anomalous training examples in proportion to the inter-class imbalance ratio;</span>
+        <span class="claim-element">evaluating the trained Bi-LSTM network on a held-out validation set using area under the precision-recall curve (AUPRC) as the primary metric, wherein training is terminated when AUPRC fails to improve by at least δ over a patience window of P epochs; and</span>
+        <span class="claim-element">storing, in a non-transitory computer-readable medium, the trained Bi-LSTM network weights and the normalization parameters derived from the training data.</span>
+        <p style="margin-top:1.25rem; font-size:.875rem; color: var(--success);">
+          <strong>§ 101 Strength:</strong> This claim recites specific technical mechanisms: a specific neural network architecture (Bi-LSTM with encoder-decoder structure), a specific modified loss function addressing a known technical problem (class imbalance in anomaly detection), specific evaluation criteria, and specific technical outputs stored in hardware. The claim describes a specific practical application (industrial sensor anomaly detection) and the specific technical mechanism of achieving improved performance. This claim is directed to a specific improvement in computer-implemented anomaly detection technology, not merely to the abstract concept of anomaly detection.
+        </p>
+      </div>
+
+      <h3>9.2 Neural Network Architecture</h3>
+
+      <div class="claim-box" style="border-color: var(--danger);">
+        <div class="claim-header" style="color: var(--danger);">Example 2-C — Likely Rejected: Abstract Neural Network Architecture</div>
+        <p><span class="claim-number">Claim 1.</span> A system comprising:</p>
+        <span class="claim-element">one or more processors; and</span>
+        <span class="claim-element">one or more non-transitory computer-readable media storing instructions that, when executed, cause the processors to:</span>
+        <span class="claim-element" style="padding-left: 3.5rem;">implement a neural network having an attention mechanism;</span>
+        <span class="claim-element" style="padding-left: 3.5rem;">receive input data;</span>
+        <span class="claim-element" style="padding-left: 3.5rem;">apply the neural network to the input data; and</span>
+        <span class="claim-element" style="padding-left: 3.5rem;">generate an output based on the application of the neural network to the input data.</span>
+        <p style="margin-top:1.25rem; font-size:.875rem; color: var(--danger);">
+          <strong>§ 101 Vulnerability:</strong> The recitation of "a neural network having an attention mechanism" is at a level of abstraction that essentially describes any transformer-based model. The system claim uses purely functional language ("apply," "generate an output") without specifying the technical mechanism. "One or more processors" and "non-transitory computer-readable media" are generic hardware that the Supreme Court in <em>Alice</em> held cannot transform an abstract idea into an eligible application.
+        </p>
+      </div>
+
+      <div class="claim-box" style="border-color: var(--success);">
+        <div class="claim-header" style="color: var(--success);">Example 2-D — Allowable: Specific Neural Network Architecture</div>
+        <p><span class="claim-number">Claim 1.</span> A system for processing long-context protein sequences, comprising:</p>
+        <span class="claim-element">a plurality of tensor processing units (TPUs) arranged in a mesh topology with inter-chip interconnects providing at least 100 Gbps bidirectional bandwidth;</span>
+        <span class="claim-element">a non-transitory computer-readable medium storing parameters of a trained protein language model comprising:</span>
+        <span class="claim-element" style="padding-left: 3.5rem;">an embedding layer configured to map amino acid tokens to a 1280-dimensional vector space using rotary position embeddings (RoPE) that encode relative positions without a fixed maximum sequence length,</span>
+        <span class="claim-element" style="padding-left: 3.5rem;">a plurality of transformer blocks, wherein each transformer block implements a sparse axial attention pattern comprising row-wise attention across the sequence dimension followed by column-wise attention across a multi-sequence alignment dimension, replacing the full O(n²) attention matrix with a block-sparse attention pattern of O(n · √n) non-zero elements, and</span>
+        <span class="claim-element" style="padding-left: 3.5rem;">a contact prediction head comprising a symmetric outer product mean of the attention maps from the final six transformer layers, coupled to a ResNet module that produces a probability matrix representing predicted pairwise residue contacts;</span>
+        <span class="claim-element">wherein the system processes protein sequences of up to 16,384 amino acids with sub-100-millisecond inference latency and achieves at least 72% precision at the top-L/5 long-range contact prediction metric on the CASP14 benchmark.</span>
+        <p style="margin-top:1.25rem; font-size:.875rem; color: var(--success);">
+          <strong>§ 101 Strength:</strong> This claim recites specific hardware (TPU mesh with defined bandwidth), a specific model architecture (rotary position embeddings, sparse axial attention with defined mathematical properties, outer product mean contact prediction head), specific performance thresholds, and a specific benchmark. The claim is directed to a specific improvement in the technical capability of protein structure prediction systems — addressing the concrete technical problem of quadratic attention complexity for long biological sequences — using specific non-generic implementations.
+        </p>
+      </div>
+
+      <h3>9.3 Biotech Diagnostic</h3>
+
+      <div class="claim-box" style="border-color: var(--danger);">
+        <div class="claim-header" style="color: var(--danger);">Example 2-E — Likely Rejected: Diagnostic Correlation Claim (Post-Mayo)</div>
+        <p><span class="claim-number">Claim 1.</span> A method of diagnosing pancreatic cancer in a human patient, comprising:</p>
+        <span class="claim-element">obtaining a blood sample from the patient;</span>
+        <span class="claim-element">measuring the level of CA 19-9 in the blood sample; and</span>
+        <span class="claim-element">diagnosing the patient as having pancreatic cancer when the CA 19-9 level exceeds 37 U/mL.</span>
+        <p style="margin-top:1.25rem; font-size:.875rem; color: var(--danger);">
+          <strong>§ 101 Vulnerability:</strong> Under <em>Mayo</em>, the correlation between CA 19-9 levels and pancreatic cancer is a law of nature/natural phenomenon. The additional steps — obtaining a blood sample, measuring CA 19-9, and applying the threshold — are conventional laboratory and clinical steps that do not supply an inventive concept. This is precisely the type of claim invalidated by the Supreme Court.
+        </p>
+      </div>
+
+      <div class="claim-box" style="border-color: var(--success);">
+        <div class="claim-header" style="color: var(--success);">Example 2-F — Stronger Framing: Diagnostic with Specific Technical Implementation</div>
+        <p><span class="claim-number">Claim 1.</span> A method for early detection of pancreatic ductal adenocarcinoma (PDAC) in asymptomatic high-risk subjects comprising:</p>
+        <span class="claim-element">isolating circulating tumor DNA (ctDNA) from a plasma sample obtained from the subject using a size-selective magnetic bead extraction protocol that preferentially captures DNA fragments of 140–167 base pairs, which are characteristic of nucleosomal footprints from tumor-derived cells;</span>
+        <span class="claim-element">performing targeted next-generation sequencing of the isolated ctDNA using a panel of 94 PDAC-associated genomic loci comprising hotspot mutations in KRAS codon 12, CDKN2A, SMAD4, and TP53, using unique molecular identifier (UMI)-based error correction to achieve a variant allele frequency (VAF) detection limit of 0.01%;</span>
+        <span class="claim-element">applying a machine learning classifier trained on a cohort of 2,400 subjects with histologically confirmed PDAC and 4,800 matched controls, wherein the classifier integrates (i) the mutational profile from the targeted sequencing, (ii) a nucleosome positioning score derived from the fragment length distribution of the isolated ctDNA, and (iii) a methylation signature derived from bisulfite sequencing of CpG islands at 18 PDAC-specific loci, to output a composite risk score;</span>
+        <span class="claim-element">and administering an endoscopic ultrasound examination to subjects with a composite risk score exceeding a predefined threshold value, thereby directing diagnostic imaging to subjects with elevated ctDNA-based evidence of PDAC.</span>
+        <p style="margin-top:1.25rem; font-size:.875rem; color: var(--success);">
+          <strong>§ 101 Strength:</strong> This claim integrates the natural phenomenon (ctDNA/genomic correlations) into a specific practical application with multiple non-conventional technical steps: size-selective magnetic bead extraction (specific technique), UMI-based error correction at a specific sensitivity threshold (specific non-routine technique), integration of multiple data types through a trained ML classifier (specific implementation), and an actionable treatment step (directing endoscopic ultrasound). The claim is directed to a specific, novel technical method of performing early detection, not merely to the correlation between ctDNA markers and PDAC.
+        </p>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════
+         SECTION 10: KEY TAKEAWAYS AND CHECKLIST
+         ══════════════════════════════════════════════════════ -->
+    <section id="takeaways" class="section-anchor">
+      <h2>10. Key Takeaways and Eligibility Checklist</h2>
+
+      <p>Patent eligibility under § 101 is the foundational threshold for any AI/ML or biotech patent strategy. The Alice/Mayo two-step framework, as interpreted by the Federal Circuit and structured by the 2019 USPTO Revised Guidance, requires careful claim drafting and specification strategy from the earliest stages of patent preparation. The following checklist summarizes the key actions and considerations for practitioners navigating § 101.</p>
+
+      <h3>Pre-Filing Eligibility Checklist</h3>
+
+      <ul class="checklist">
+        <li>Identify the specific technical problem the invention solves — framed as a technical (not business) problem with measurable technical consequences</li>
+        <li>Identify the specific mechanism by which the invention solves the problem — not the result, but the technical means</li>
+        <li>Determine whether any claim element recites a law of nature, natural phenomenon, or mathematical concept — if so, identify the additional elements that integrate the exception into a practical application</li>
+        <li>Verify that the additional elements are not individually well-understood, routine, and conventional — gather evidentiary support (prior art, technical literature) to support a "non-conventional" argument under Berkheimer</li>
+        <li>Draft independent claims at multiple levels of specificity — from broader to narrower — each tied to specific technical implementations, specific hardware, or specific quantitative performance criteria</li>
+        <li>Include at least one claim directed to a specific hardware system (not "a processor" but the specific type of processor or accelerator relevant to the claimed performance)</li>
+        <li>Include at least one product or article of manufacture claim for ML inventions (trained model stored on specific medium, with specific architecture and performance parameters)</li>
+        <li>For biotech claims, ensure diagnostic method claims include specific non-conventional technical steps beyond the correlation — specific detection technology, specific data integration, specific treatment direction</li>
+        <li>Draft the specification with explicit statements of the non-conventional nature of the claimed approach relative to the art at the time of filing</li>
+        <li>Include quantitative data in the specification demonstrating the technical improvement achieved by the claimed approach over prior approaches</li>
+        <li>Avoid purely functional language in independent claims — replace functions with mechanisms</li>
+        <li>Identify the Alice/Mayo step at which the claim is most likely to succeed (Step 2A Prong 2 practical application or Step 2B inventive concept) and ensure the specification and claims are written to support arguments at both steps</li>
+        <li>For natural product claims, document the structural differences between the claimed composition and any naturally occurring counterpart — emphasize "markedly different" characteristics under the Myriad standard</li>
+        <li>Review recent Federal Circuit decisions and USPTO eligibility guidance updates before filing — § 101 law continues to evolve and pre-filing research should include the most current case law</li>
+      </ul>
+
+      <h3>During Prosecution</h3>
+
+      <ul class="checklist">
+        <li>When an examiner issues a § 101 rejection, demand that the examiner identify the specific abstract idea, law of nature, or natural phenomenon in the claim — vague "abstract idea" rejections that merely repeat the claim language are procedurally deficient</li>
+        <li>Under Berkheimer, challenge the examiner's finding that additional claim elements are "well-understood, routine, and conventional" by demanding the evidentiary basis for that finding</li>
+        <li>Argue integration into a practical application under Step 2A, Prong 2 before proceeding to the inventive concept argument — a successful Prong 2 argument avoids the need to demonstrate inventive concept</li>
+        <li>Use declarations under 37 C.F.R. § 1.132 from technical experts to establish the non-conventional nature of claimed elements when examiner arguments are based on unsupported assertions of conventionality</li>
+        <li>Consider amending claims to add specificity if needed — but analyze the scope-of-protection tradeoff carefully before narrowing independent claims</li>
+        <li>Appeal § 101 rejections to the PTAB when appropriate — PTAB has reversed § 101 rejections based on inadequate examiner analysis of the 2019 Revised Guidance in a significant number of cases</li>
+      </ul>
+
+      <h3>Summary: The Three Questions Every AI/ML and Biotech Claim Must Answer</h3>
+
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-icon">①</div>
+          <h3>What Is the Technical Problem?</h3>
+          <p>State it precisely, quantitatively, and as a problem in computer science, engineering, or biology — not in business terms. The technical problem frames the entire § 101 analysis.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">②</div>
+          <h3>What Is the Specific Mechanism?</h3>
+          <p>Identify the specific technical implementation — the specific algorithm variant, the specific architectural choice, the specific hardware interaction, the specific biological modification — that solves the problem. Not the result, but the mechanism.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">③</div>
+          <h3>Is the Mechanism Non-Conventional?</h3>
+          <p>Can you establish, with evidence, that the specific mechanism was not well-understood, routine, and conventional at the time of filing? This is the Berkheimer question, and the answer must be grounded in technical evidence, not attorney argument.</p>
+        </div>
+      </div>
+
+      <h3>§ 101 Risk Assessment by AI/ML Claim Category</h3>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>AI/ML Claim Category</th>
+              <th>Typical § 101 Risk</th>
+              <th>Primary Vulnerability</th>
+              <th>Key Mitigation Strategy</th>
+              <th>Post-2019 Guidance Trend</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Generic ML training method (any model, any data)</td>
+              <td><span class="badge badge-danger">Very High</span></td>
+              <td>Mathematical process; entirely routine and conventional</td>
+              <td>Specify architecture, loss function, data type, and hardware; tie to concrete technical problem</td>
+              <td>Remains difficult; examiner scrutiny unchanged</td>
+            </tr>
+            <tr>
+              <td>Specific training method for a defined technical problem</td>
+              <td><span class="badge badge-warning">Moderate</span></td>
+              <td>Abstract idea characterization if steps are individually routine</td>
+              <td>Berkheimer argument on non-conventional combination; BASCOM unconventional arrangement</td>
+              <td>Improved; 2019 Guidance Prong 2 helps with specific technical applications</td>
+            </tr>
+            <tr>
+              <td>Novel neural network architecture (generic)</td>
+              <td><span class="badge badge-danger">High</span></td>
+              <td>Mathematical formula; abstract without hardware tie</td>
+              <td>Claim as system with specific hardware; tie architecture to specific performance improvement</td>
+              <td>Hardware-tied system claims fare better post-2019 Guidance</td>
+            </tr>
+            <tr>
+              <td>Trained ML model as article of manufacture</td>
+              <td><span class="badge badge-warning">Moderate</span></td>
+              <td>May be characterized as "data" or abstract mathematical parameters</td>
+              <td>Claim as system with hardware + stored weights + specific performance thresholds</td>
+              <td>Developing; no definitive Federal Circuit guidance yet</td>
+            </tr>
+            <tr>
+              <td>ML-based optimization for physical system control</td>
+              <td><span class="badge badge-success">Lower</span></td>
+              <td>Abstract idea if physical control step is routine</td>
+              <td>Emphasize specific physical transformation; transformation prong of M-or-T test</td>
+              <td>Generally favorable when physical transformation is non-trivial</td>
+            </tr>
+            <tr>
+              <td>AI-based recommendation or personalization</td>
+              <td><span class="badge badge-danger">Very High</span></td>
+              <td>Organizing human activity; abstract economic/commercial practice</td>
+              <td>Tie to specific technical infrastructure improvement; avoid purely commercial framing</td>
+              <td>Consistently difficult; Electric Power Group pattern applies</td>
+            </tr>
+            <tr>
+              <td>Federated learning protocol</td>
+              <td><span class="badge badge-warning">Moderate</span></td>
+              <td>Abstract distributed computation without specific technical differentiator</td>
+              <td>Claim specific aggregation/compression/privacy mechanisms; tie to hardware topology</td>
+              <td>Improving as specific technical implementations become well-defined</td>
+            </tr>
+            <tr>
+              <td>AI-driven drug discovery (computational)</td>
+              <td><span class="badge badge-danger">High</span></td>
+              <td>Combined abstract idea + natural phenomenon; terminates at data output</td>
+              <td>Include physical synthesis/assay steps; claim specific molecular generation mechanism tied to defined target class</td>
+              <td>Requires physical integration step; pure computation insufficient</td>
+            </tr>
+            <tr>
+              <td>AI diagnostic (medical imaging + correlation)</td>
+              <td><span class="badge badge-danger">High</span></td>
+              <td>Mayo natural-phenomenon + Alice abstract-idea dual challenge</td>
+              <td>Integrate into specific treatment step; claim novel image processing pipeline, not just correlation</td>
+              <td>Remains most challenging category; legislative reform may help</td>
+            </tr>
+            <tr>
+              <td>Autonomous vehicle perception/planning</td>
+              <td><span class="badge badge-success">Lower</span></td>
+              <td>Potential abstract idea if framed as pure information processing</td>
+              <td>Claim specific sensor fusion, specific actuator control, specific real-time hardware constraints</td>
+              <td>Generally favorable; strong physical system integration is natural</td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="table-caption">Table 2-4: § 101 Risk Assessment by AI/ML Claim Category — Practitioner Reference Guide</p>
+      </div>
+
+      <h3>Litigation Risk Posture: What to Expect Post-Grant</h3>
+
+      <p>Even after a patent survives § 101 examination and issues, eligibility challenges remain a constant risk. <strong>Inter partes review (IPR)</strong> petitions may assert § 101 grounds, though PTAB's jurisdiction over § 101 in IPR has been limited in some respects. More commonly, defendants in district court patent litigation file motions to dismiss under Federal Rule of Civil Procedure 12(b)(6), arguing § 101 invalidity as a question of law on the face of the complaint and the patent. The Federal Circuit has upheld some Rule 12(b)(6) dismissals where the patent's ineligibility was clear from the face of the claims without requiring factual development.</p>
+
+      <p>To mitigate post-grant § 101 risk, applicants should: (1) ensure that the prosecution history includes robust § 101 arguments supporting eligibility, which will be admissible evidence in litigation; (2) ensure that the specification contains the factual predicate for Berkheimer arguments about the non-conventional nature of claim elements; and (3) avoid claim language that closely tracks the language of cases like <em>Alice</em>, <em>Mayo</em>, and <em>Electric Power Group</em> that courts have found directed to ineligible subject matter.</p>
+
+      <div class="callout callout-tip">
+        <div class="callout-icon">💡</div>
+        <div class="callout-body">
+          <div class="callout-title">Final Counsel: The Specification Is Your Best § 101 Defense</div>
+          <p>The most common and most avoidable § 101 mistake is drafting a specification that reads like a press release — heavy on results ("revolutionary performance improvements") and light on technical mechanisms. A well-drafted specification that carefully describes the specific technical problem, the specific non-obvious mechanism of solving it, and the specific evidence of improvement will survive § 101 scrutiny at every stage. The claims can only be as strong as the specification supports. Draft the specification first; draft the claims from the specification; and review both together through a § 101 lens before filing.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════
+         SECTION 10.5: AUTHOR'S PERSPECTIVE ON REFORM
+         ══════════════════════════════════════════════════════ -->
+    <section id="author-perspective" class="section-anchor">
+      <h2>10.5 Author's Perspective: The Case for Legislative Reform</h2>
+
+      <p>Having litigated § 101 issues extensively and studied the doctrine from the perspectives of both patent law scholarship and practice, I believe the current state of § 101 law is, in important respects, dysfunctional — not because the judicial exceptions are wrong in principle, but because the <em>Alice/Mayo</em> framework as applied by the Federal Circuit has produced an unpredictable, inconsistent, and in some cases innovation-suppressive body of law that ill-serves the patent system's core constitutional and statutory purposes.</p>
+
+      <p>The fundamental problem is what I have called the "characterization problem": because virtually any technological invention can be re-described at a level of abstraction sufficient to implicate a judicial exception, the two-step test provides insufficient guidance to constrain how courts and examiners characterize claims. The result is a body of doctrine that is difficult for practitioners to apply predictably, difficult for courts to apply consistently, and difficult for innovators to navigate when making investment decisions.</p>
+
+      <p>Several reforms would substantially improve the situation without abandoning the legitimate concern about over-patenting foundational concepts:</p>
+
+      <ol>
+        <li><strong>Replace the "abstract idea" exception with a defined list of ineligible claim types.</strong> Congress, not courts, should define the categories of ineligible subject matter with the specificity that the statute's application to modern technology requires. The Patent Eligibility Restoration Act of 2023 attempted this; a refined version, developed with input from both the AI/ML and biopharmaceutical communities, could resolve much of the current uncertainty.</li>
+        <li><strong>Restore § 101 to a threshold gatekeeping function, not a merits analysis.</strong> The overlap between § 101 and § 103 — particularly the use of "well-understood, routine, and conventional" analysis that resembles obviousness — creates analytical redundancy that benefits neither applicants nor the public. If a claim is novel and non-obvious, it should generally be patent-eligible unless it literally claims only mathematical formulas or biological products with no human modification.</li>
+        <li><strong>Issue robust, technology-specific guidance for AI inventions.</strong> The 2019 Revised Guidance was an improvement but remains insufficiently specific for the rapidly evolving AI landscape. AI-specific guidance, developed in consultation with the AI research community and updated regularly, would provide the kind of examination certainty that the current framework lacks.</li>
+      </ol>
+
+      <p>Until such reforms are enacted, the strategies outlined in this chapter represent the best available tools for protecting genuine AI and biotech innovations within the framework that exists. But practitioners and their clients should advocate actively for reform, both through the USPTO's public comment processes and through appropriate engagement with Congress. The patent system works only when it provides reliable, predictable protection for genuine innovation — and the current § 101 framework falls short of that standard in too many cases involving AI and biotechnology.</p>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════
+         SECTION 11: PRACTICAL APPLICATION DOCTRINE AND EDGE CASES
+         ══════════════════════════════════════════════════════ -->
+    <section id="practical-application" class="section-anchor">
+      <h2>11. The "Practical Application" Doctrine and Edge Cases</h2>
+
+      <p>Under the 2019 Revised Guidance, the concept of "practical application" occupies a pivotal role in Step 2A, Prong 2. A claim that integrates an abstract idea, law of nature, or natural phenomenon into a practical application is eligible regardless of whether the additional elements supply an inventive concept under Step 2B. This represents a significant departure from the pure two-step framing of <em>Alice</em> and provides a workable middle ground for claims that apply an exception in a technically meaningful way even if each individual implementation step is known.</p>
+
+      <h3>11.1 Indicators of Practical Application</h3>
+
+      <p>The 2019 Revised Guidance and subsequent USPTO examples identify several indicators that a claim integrates an exception into a practical application:</p>
+
+      <ul>
+        <li><strong>Application to a particular machine:</strong> The claim applies the exception using a particular machine or apparatus that is integral to the claimed method — not merely "a computer" but a defined machine performing a defined function in the claimed sequence.</li>
+        <li><strong>Particular transformation:</strong> The claim effects a particular transformation of an article to a different state or thing — the classic "transformation" prong of the machine-or-transformation test.</li>
+        <li><strong>Particular treatment or prophylaxis:</strong> For biotech and medical claims, the claimed method applies the natural phenomenon as part of a defined treatment, diagnostic, or prophylactic step that goes beyond merely identifying the phenomenon.</li>
+        <li><strong>Improvement in the functioning of a computer or another technology or technical field:</strong> The claim improves the way a computer or technological system functions — not just what task is accomplished, but how the system performs the task.</li>
+        <li><strong>Application with meaningful limits:</strong> The additional claim elements impose meaningful limits on the claim's scope, preventing it from covering all possible applications of the exception — addressing the preemption concern that underlies the § 101 exceptions.</li>
+      </ul>
+
+      <h3>11.2 The Preemption Concern in AI/ML</h3>
+
+      <p>The Supreme Court has consistently identified <strong>preemption</strong> as the animating concern behind the patent-ineligibility exceptions. The fear is that a patent on an abstract idea, law of nature, or natural phenomenon would effectively foreclose all uses of that concept, not just the specific applications described in the specification. While the Court has clarified that preemption analysis does not substitute for the two-step test, evidence of broad preemption (or its absence) remains relevant to the Prong 2 analysis.</p>
+
+      <p>For AI/ML inventors, preemption analysis cuts both ways. Overly broad claims — "a method of using machine learning to improve healthcare outcomes" — effectively preempt a vast field of AI application and will be held ineligible. But narrowly drawn claims — "a method of training a gradient-boosted decision tree ensemble on a defined feature set derived from electronic health records to predict 30-day hospital readmission in patients with congestive heart failure, validated against the MIMIC-III benchmark" — apply the abstract idea (machine learning) only in a specific, defined context with specific technical mechanisms, reducing preemption concerns substantially.</p>
+
+      <h3>11.3 Frequently Contested Edge Cases</h3>
+
+      <details class="accordion">
+        <summary>Large Language Models (LLMs) and Generative AI</summary>
+        <div class="accordion-content">
+          <p>Claims directed to large language models (LLMs) and generative AI systems present particular challenges. The core of an LLM — next-token prediction using transformer attention — is a mathematical process. Claims to <em>training</em> an LLM on a generic corpus using standard RLHF (Reinforcement Learning from Human Feedback) will face strong § 101 headwinds because the training procedure is increasingly routine. Stronger claims focus on: (1) novel fine-tuning architectures (e.g., parameter-efficient fine-tuning with specific adapter configurations); (2) novel safety-alignment techniques with specific technical implementations that address defined failure modes; (3) novel inference-time compute strategies (e.g., chain-of-thought scaffolding with specific verification steps) tied to specific hardware; and (4) novel multi-modal architectures that integrate modalities in a technically specific way.</p>
+          <p>As generative AI training methods become increasingly well-known and routinely practiced, the "significantly more" bar rises correspondingly. Practitioners should expect that claims to generic instruction-following fine-tuning, generic RLHF, or generic retrieval-augmented generation (RAG) will face heightened scrutiny under Berkheimer's "well-understood, routine, conventional" analysis.</p>
+        </div>
+      </details>
+
+      <details class="accordion">
+        <summary>Federated Learning and Privacy-Preserving ML</summary>
+        <div class="accordion-content">
+          <p>Federated learning — distributing model training across multiple devices without centralizing raw data — and privacy-preserving ML techniques (differential privacy, secure multi-party computation, homomorphic encryption) present interesting eligibility profiles. The abstract mathematical core of federated learning (distributed gradient aggregation) is well-characterized, but the specific engineering challenges of federated systems — non-IID data distributions across clients, communication efficiency, Byzantine fault tolerance, differential privacy noise calibration — create opportunities for claiming specific technical solutions to concrete technical problems.</p>
+          <p>Claims that recite a specific aggregation protocol (e.g., federated averaging with momentum and adaptive learning rate scaling for heterogeneous client hardware), specific privacy accounting mechanisms (Rényi differential privacy with specific composition theorems), or specific communication compression techniques (gradient sparsification with error feedback at defined compression ratios) are significantly more defensible than claims to "a method of training a machine learning model across multiple devices while preserving privacy."</p>
+        </div>
+      </details>
+
+      <details class="accordion">
+        <summary>AI-Driven Drug Discovery and Molecular Design</summary>
+        <div class="accordion-content">
+          <p>AI-driven drug discovery claims combine the § 101 challenges of both AI/ML and biotech. A claim to "using a generative model to design drug candidates" faces abstract-idea characterization (the generative model is a mathematical object) and potentially natural-phenomenon characterization (the drug-target interaction is a natural phenomenon). The strongest claims in this space recite: (1) a specific generative model architecture (e.g., a 3D equivariant graph neural network with specific geometric invariance properties for molecular generation); (2) specific training data and objective (e.g., trained on a defined set of protein-ligand co-crystal structures to optimize for binding affinity to a defined target pocket, with a specific reward function); (3) specific screening steps that implement the model output in a physical wet-lab process; and (4) specific performance criteria linking the computational output to measurable biological activity.</p>
+          <p>The critical integration step — connecting the computational generation to a physical assay or synthesis step — is essential. A claim that terminates at the generation of a candidate structure (a set of numbers) is more vulnerable than a claim that recites the subsequent synthesis and assay of the candidate, even if that synthesis and assay are themselves conventional, because the physical steps transform the claim from a purely computational process into a method with physical, real-world consequences.</p>
+        </div>
+      </details>
+
+      <details class="accordion">
+        <summary>Computer Vision and Medical Imaging AI</summary>
+        <div class="accordion-content">
+          <p>Computer vision claims for medical imaging diagnostics are among the most litigated § 101 battlegrounds, sitting at the intersection of the Alice abstract-idea exception and the Mayo natural-phenomenon exception. A claim to "detecting cancer in a medical image using a convolutional neural network" is directed to both an abstract mathematical process (the CNN computation) and a natural-phenomenon correlation (the relationship between image features and cancer presence).</p>
+          <p>The most successful claims in this space have moved beyond the detection result to recite specific technical innovations in how medical images are processed: novel data augmentation strategies specific to the physics of image acquisition (accounting for scanner variability, stain normalization, or imaging artifact patterns); novel attention mechanisms that produce human-interpretable saliency maps as part of the claimed output; novel loss functions that incorporate clinical prior knowledge (e.g., anatomical constraints, co-occurrence statistics from clinical ontologies); or novel multi-scale architectures that process images at multiple resolutions simultaneously with specific cross-scale fusion mechanisms. Each of these framings locates the invention in the technical domain of image processing rather than in the abstract domain of mathematical correlation.</p>
+        </div>
+      </details>
+
+      <h3>11.4 A Note on International Comparison</h3>
+
+      <h3>11.5 The Role of Claim Preambles and Functional Recitations</h3>
+
+      <p>A recurring debate in § 101 litigation concerns the weight given to claim preambles and functional recitations. Preambles that describe a practical application ("a method for controlling an autonomous vehicle," "a system for detecting fraud in financial transactions in real time") can provide contextual support for a practical-application argument under Step 2A, Prong 2. However, courts have held that a preamble's practical-application language does not rescue an otherwise abstract claim if the body of the claim is directed to abstract steps. <em>Two-Way Media Ltd. v. Comcast Cable Communications, LLC</em>, 874 F.3d 1329, 1337 (Fed. Cir. 2017) ("[T]he claims must do more than simply instruct the practitioner to implement the abstract idea with routine, conventional activity.").</p>
+
+      <p>Functional recitations in claim bodies — "configured to," "adapted to," "operable to" — present similar issues. While such language is common in system and apparatus claims and serves the legitimate purpose of defining the functional capabilities of claimed components, it can invite abstract characterization when the claimed component is generic ("a processor configured to classify data"). The solution is not to eliminate functional language but to ensure it is tied to a specific structural implementation: "a tensor processing unit (TPU) configured to execute a sequence of matrix multiplication operations using a systolic array architecture to implement forward passes through a 12-layer transformer model at a throughput of at least 1,000 tokens per second."</p>
+
+      <p>United States § 101 doctrine is notably more restrictive than the patent eligibility regimes of other major patent systems with respect to software and diagnostic inventions. The European Patent Convention (EPC) Article 52 excludes "mathematical methods," "mental acts," and "programs for computers" as such from patentability — but the "as such" limitation is interpreted to mean that software inventions with a "technical character" and a "technical effect" are eligible. In practice, many AI and software inventions that face § 101 rejections in the United States obtain protection in Europe under the EPC technical-character standard.</p>
+
+      <p>Japan's patent law similarly requires that an invention be "the highly advanced creation of technical ideas utilizing natural laws," but Japanese Patent Office guidelines on AI-related inventions, revised in 2019, take a relatively permissive approach: AI inventions that use natural laws and have technical character are generally eligible, and the guidelines specifically acknowledge that AI-based processing methods that achieve a concrete technical result are patentable. China's patent law excludes rules and methods of mental activities "as such" but has similarly developed examination guidelines that treat AI inventions relatively favorably when they produce a "technical solution" to a "technical problem."</p>
+
+      <p>This international divergence creates strategic opportunities for applicants. Claims that face § 101 rejections in the United States may be allowed in Europe and Asia using claim language that emphasizes technical character, and the allowed foreign claims can sometimes be used to anchor arguments about the technical nature of the invention in U.S. prosecution. Conversely, applicants should be aware that claim strategies designed for U.S. § 101 compliance — e.g., heavy reliance on specific hardware recitations — may be unnecessary and potentially limiting in foreign filings.</p>
+
+      <h3>11.6 The Machine-or-Transformation Test in the AI Era</h3>
+
+      <p>The <span class="key-term" title="A claim may be eligible if it is tied to a particular machine or transforms an article into a different state or thing">machine-or-transformation (MoT) test</span>, articulated in <em>In re Bilski</em>, 545 F.3d 943 (Fed. Cir. 2008) and endorsed by the Supreme Court as a "useful and important clue" in <em>Bilski v. Kappos</em>, 561 U.S. at 604, retains practical significance for AI/ML and biotech claims even though it is not the exclusive test for eligibility. For AI/ML inventions, satisfying the MoT test provides a strong affirmative argument under Step 2A, Prong 2 that the claim integrates the abstract idea into a practical application.</p>
+
+      <p><strong>Machine prong:</strong> An AI/ML claim is tied to a particular machine when the specific machine is integral to the claimed method — i.e., the claim cannot be performed without the specific machine, and the machine imposes meaningful limits on the claim's scope. Generic recitations of "a computer" or "a processor" are insufficient. Specific machine recitations that satisfy the machine prong include: a specific GPU architecture (e.g., NVIDIA A100 with a specified memory configuration), a specific ASIC designed for neural network inference, a specific robotic system with defined actuators, or a specific sequencing instrument performing a biological detection step.</p>
+
+      <p><strong>Transformation prong:</strong> For biotech claims, the transformation prong is often more directly applicable. A method that transforms a biological sample — extracting nucleic acids, amplifying specific sequences, synthesizing a protein — effects a real transformation of an article (the biological sample) to a different state. For AI/ML claims, the transformation prong is satisfied when the claimed method transforms a physical system's state: a method of controlling a manufacturing process that transforms raw materials into a finished product, a method of adjusting a patient's drug dosage based on a model's output, or a method of directing an autonomous vehicle's motion based on real-time sensor-fed model inference.</p>
+
+      <div class="callout callout-info">
+        <div class="callout-icon">ℹ</div>
+        <div class="callout-body">
+          <div class="callout-title">Strategic Portfolio Tip: Claim Differentiation Across Jurisdictions</div>
+          <p>Leading AI companies routinely file different claim sets in different jurisdictions, taking advantage of the relatively permissive European and Japanese standards for software/AI inventions. A PCT application should be drafted with an eye toward multiple national-phase strategies: the U.S. independent claims may emphasize specific hardware and non-conventional arrangements, while European claims may emphasize the technical character and technical effect of the invention without the hardware-specificity required in the U.S. These are not different inventions — they are different claim framings of the same disclosure that optimize for the legal standard of each jurisdiction. Work with foreign associates from the outset to ensure the specification adequately supports the claim framings needed in each target jurisdiction.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════
+         FURTHER READING
+         ══════════════════════════════════════════════════════ -->
+    <section id="further-reading" class="section-anchor">
+      <h2>Further Reading</h2>
+
+      <p>The following cases, USPTO materials, and secondary sources provide the most important primary and secondary authority for § 101 analysis in AI/ML and biotech contexts. Practitioners should maintain a current reading list as this area of law evolves rapidly.</p>
+
+      <h3>Essential Cases</h3>
+      <ul>
+        <li><em>Alice Corp. v. CLS Bank International</em>, 573 U.S. 208 (2014) — The foundational two-step framework for software and method claims</li>
+        <li><em>Mayo Collaborative Services v. Prometheus Laboratories</em>, 566 U.S. 66 (2012) — The law-of-nature exception and its application to diagnostic methods</li>
+        <li><em>Association for Molecular Pathology v. Myriad Genetics</em>, 569 U.S. 576 (2013) — Natural product exclusion and the cDNA/genomic DNA distinction</li>
+        <li><em>Enfish, LLC v. Microsoft Corp.</em>, 822 F.3d 1327 (Fed. Cir. 2016) — Software improvements to computer functionality are eligible</li>
+        <li><em>McRO, Inc. v. Bandai Namco Games America Inc.</em>, 837 F.3d 1299 (Fed. Cir. 2016) — Specific rule-based systems distinguishable from abstract ideas</li>
+        <li><em>BASCOM Global Internet Services, Inc. v. AT&amp;T Mobility LLC</em>, 827 F.3d 1341 (Fed. Cir. 2016) — Unconventional arrangement as inventive concept</li>
+        <li><em>Berkheimer v. HP Inc.</em>, 881 F.3d 1360 (Fed. Cir. 2018) — "Conventional" is a question of fact requiring evidentiary support</li>
+        <li><em>Ariosa Diagnostics, Inc. v. Sequenom, Inc.</em>, 788 F.3d 1371 (Fed. Cir. 2015) — Application of Mayo to liquid biopsy diagnostic claims</li>
+        <li><em>American Axle &amp; Manufacturing, Inc. v. Neapco Holdings LLC</em>, 967 F.3d 1285 (Fed. Cir. 2020) — Law-of-nature exception applied to manufacturing method</li>
+        <li><em>Thales Visionix Inc. v. United States</em>, 850 F.3d 1343 (Fed. Cir. 2017) — Mathematical relationships applied to specific sensor systems</li>
+      </ul>
+
+      <h3>USPTO Materials</h3>
+      <ul>
+        <li>USPTO 2019 Revised Patent Subject Matter Eligibility Guidance, 84 Fed. Reg. 50 (Jan. 7, 2019)</li>
+        <li>USPTO October 2019 Update: Subject Matter Eligibility, with additional examples for computer-implemented functional claim limitations and nature-based products</li>
+        <li>Berkheimer v. HP Inc. Memorandum (Apr. 19, 2018) — Robert Bahr, Deputy Commissioner for Patent Examination Policy</li>
+        <li>USPTO February 2024 Guidance on AI-Assisted Inventions, 89 Fed. Reg. 10,043 (Feb. 13, 2024)</li>
+        <li>USPTO AI and Emerging Technology Partnership — public comment records and issued examples (available at <em>uspto.gov/initiatives/artificial-intelligence</em>)</li>
+      </ul>
+
+      <h3>Scholarly and Practitioner Commentary</h3>
+      <ul>
+        <li>Arti K. Rai &amp; Robert Cook-Deegan, <em>Moving Beyond "Isolated" Gene Patents</em>, 341 Science 137 (2013)</li>
+        <li>Mark A. Lemley, Michael Risch, Ted M. Sichelman &amp; R. Polk Wagner, <em>Life After Bilski</em>, 63 Stanford L. Rev. 1315 (2011)</li>
+        <li>Peter S. Menell &amp; Tonia Sutherland, <em>Restoring the Promise of Patent Eligibility</em>, 34 Berkeley Tech. L.J. (2019)</li>
+        <li>Robert Merges &amp; Jeffrey Lefstin, <em>The Patent Law of Nature: The Relationship Between § 101 Exclusions and § 103 Non-Obviousness</em>, 98 B.U. L. Rev. 919 (2018)</li>
+      </ul>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════
+         CHAPTER NAVIGATION
+         ══════════════════════════════════════════════════════ -->
+    <nav class="chapter-nav" aria-label="Chapter navigation">
+      <a class="chapter-nav-btn" href="ch01_patent_system_overview.html">
+        <span class="nav-label">← Previous Chapter</span>
+        <span class="nav-title">Chapter 1: The Patent System</span>
+      </a>
+      <a class="chapter-nav-btn nav-next" href="ch03_prior_art_research.html">
+        <span class="nav-label">Next Chapter →</span>
+        <span class="nav-title">Chapter 3: Prior Art Research</span>
+      </a>
+    </nav>
+
+  </main>
+</div>
+
+<!-- ── Footer ─────────────────────────────────────────────────────────────── -->
+<footer>
+  <div class="footer-content">
+    <p><strong>Patent Law for Technologists — A Practical Guide for AI, ML, and Biotech Innovators</strong></p>
+    <p>Written by a committee of partners from Fish &amp; Richardson, Finnegan, Henderson, Farabow, Garrett &amp; Dunner, Kirkland &amp; Ellis, Cooley, Morrison Foerster, and professors from Stanford and NYU Law Schools.</p>
+    <p style="margin-top:1rem; opacity:.55; font-size:.8125rem;">
+      This material is provided for educational purposes only and does not constitute legal advice. Patent law is highly fact-specific; consult qualified patent counsel for advice on particular matters.
+      35 U.S.C. § 101 doctrine is subject to ongoing development through USPTO guidance and Federal Circuit case law.
+    </p>
+    <p style="margin-top:.75rem; opacity:.55; font-size:.8125rem;">Chapter 2 — Prof. Arti K. Rai, NYU School of Law / Finnegan, Henderson, Farabow, Garrett &amp; Dunner &copy; 2026</p>
+  </div>
+</footer>
+
+</body>
+</html>

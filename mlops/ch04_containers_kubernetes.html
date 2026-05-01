@@ -1,0 +1,2101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 4: Containers & Kubernetes for ML - Modern MLOps Tutorial</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script>hljs.highlightAll(); mermaid.initialize({startOnLoad:true, theme:'default'});</script>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --secondary: #059669;
+      --text: #1f2937;
+    }
+    body { color: var(--text); font-family: 'Inter', system-ui, sans-serif; }
+    .callout-tip    { border-left: 4px solid #059669; background: #f0fdf4; }
+    .callout-warn   { border-left: 4px solid #d97706; background: #fffbeb; }
+    .callout-danger { border-left: 4px solid #dc2626; background: #fef2f2; }
+    .callout-info   { border-left: 4px solid #2563eb; background: #eff6ff; }
+    pre { margin: 0 !important; }
+    .mermaid { background: #f8fafc; border-radius: 8px; padding: 1rem; }
+    table { border-collapse: collapse; width: 100%; }
+    th { background: #2563eb; color: white; padding: 10px 14px; text-align: left; font-size: 0.85rem; }
+    td { padding: 9px 14px; font-size: 0.85rem; border-bottom: 1px solid #e5e7eb; }
+    tr:nth-child(even) td { background: #f9fafb; }
+    .section-badge { display: inline-block; background: #dbeafe; color: #1d4ed8; border-radius: 9999px; padding: 2px 12px; font-size: 0.75rem; font-weight: 600; }
+    h2 { border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; }
+    code.inline { background: #f1f5f9; padding: 1px 6px; border-radius: 4px; font-size: 0.875rem; font-family: monospace; }
+  </style>
+</head>
+<body class="bg-gray-50">
+
+<!-- NAVBAR -->
+<nav class="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-14">
+    <a href="index.html" class="flex items-center gap-2 text-blue-600 font-bold text-lg hover:text-blue-800">
+      &#8592; MLOps Tutorial
+    </a>
+    <div class="flex items-center gap-4 text-sm text-gray-600">
+      <span class="bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-semibold">Chapter 4</span>
+      <span>&#128337; ~90 min read</span>
+      <a href="ch03_iac_terraform.html" class="hover:text-blue-600">&#8592; Ch 3</a>
+      <a href="ch05_cicd_mlops.html" class="hover:text-blue-600">Ch 5 &#8594;</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="bg-gradient-to-br from-blue-700 to-blue-900 text-white py-16 px-4">
+  <div class="max-w-4xl mx-auto">
+    <div class="text-blue-300 text-sm font-semibold mb-2">CHAPTER 4</div>
+    <h1 class="text-4xl font-extrabold mb-4">Containers &amp; Kubernetes for ML</h1>
+    <p class="text-blue-100 text-lg leading-relaxed max-w-3xl">
+      From a single Dockerfile to a production GPU cluster serving billions of requests.
+      This chapter covers the full container and orchestration stack as deployed at Google,
+      AWS, and hyperscalers running the world's largest ML workloads.
+    </p>
+    <div class="mt-6 flex flex-wrap gap-3 text-sm">
+      <span class="bg-blue-600 px-3 py-1 rounded-full">Docker</span>
+      <span class="bg-blue-600 px-3 py-1 rounded-full">NVIDIA Container Toolkit</span>
+      <span class="bg-blue-600 px-3 py-1 rounded-full">Kubernetes</span>
+      <span class="bg-blue-600 px-3 py-1 rounded-full">EKS</span>
+      <span class="bg-blue-600 px-3 py-1 rounded-full">GKE</span>
+      <span class="bg-blue-600 px-3 py-1 rounded-full">Helm</span>
+      <span class="bg-blue-600 px-3 py-1 rounded-full">Karpenter</span>
+      <span class="bg-blue-600 px-3 py-1 rounded-full">MIG</span>
+    </div>
+  </div>
+</header>
+
+<!-- TABLE OF CONTENTS -->
+<div class="max-w-4xl mx-auto mt-8 px-4">
+  <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+    <h2 class="text-lg font-bold text-gray-800 mb-4">Table of Contents</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-1 text-sm">
+      <a href="#s1" class="text-blue-600 hover:underline py-1">1. Containers for ML</a>
+      <a href="#s2" class="text-blue-600 hover:underline py-1">2. GPU Docker Setup</a>
+      <a href="#s3" class="text-blue-600 hover:underline py-1">3. Kubernetes Fundamentals</a>
+      <a href="#s4" class="text-blue-600 hover:underline py-1">4. Kubernetes for ML Workloads</a>
+      <a href="#s5" class="text-blue-600 hover:underline py-1">5. GPU Resource Management</a>
+      <a href="#s6" class="text-blue-600 hover:underline py-1">6. EKS Deep Dive (AWS)</a>
+      <a href="#s7" class="text-blue-600 hover:underline py-1">7. GKE Deep Dive (GCP)</a>
+      <a href="#s8" class="text-blue-600 hover:underline py-1">8. Helm for ML Packaging</a>
+      <a href="#s9" class="text-blue-600 hover:underline py-1">9. Advanced K8s Patterns</a>
+      <a href="#s10" class="text-blue-600 hover:underline py-1">10. Cluster Networking</a>
+      <a href="#s11" class="text-blue-600 hover:underline py-1">11. Observability</a>
+      <a href="#summary" class="text-blue-600 hover:underline py-1">Summary &amp; Key Takeaways</a>
+    </div>
+  </div>
+</div>
+
+<main class="max-w-4xl mx-auto px-4 py-10 space-y-16">
+
+<!-- ============================================================ -->
+<!-- SECTION 1: CONTAINERS FOR ML                                 -->
+<!-- ============================================================ -->
+<section id="s1">
+  <div class="flex items-center gap-3 mb-4">
+    <span class="section-badge">Section 1</span>
+    <h2 class="text-2xl font-bold text-gray-900">Containers for ML</h2>
+  </div>
+
+  <h3 class="text-xl font-semibold mt-6 mb-3 text-gray-800">The Reproducibility Crisis in ML</h3>
+  <p class="text-gray-700 leading-relaxed mb-4">
+    Before containers, "it works on my machine" was the defining problem of ML engineering.
+    A model trained on Python 3.9 + CUDA 11.3 + PyTorch 1.10 would silently produce different
+    results — or simply crash — on a colleague's machine running Python 3.11 + CUDA 12.1 + PyTorch 2.1.
+    This is not a minor inconvenience: it is the difference between a reproducible research result
+    and a published paper that nobody can replicate.
+  </p>
+  <p class="text-gray-700 leading-relaxed mb-4">
+    Containers solve this by packaging not just your code, but the entire userspace: Python interpreter,
+    system libraries, CUDA runtime, cuDNN, and your model weights. The environment is immutable and
+    portable across every machine that runs a compatible container runtime.
+  </p>
+
+  <div class="callout-info p-4 rounded-lg mb-6">
+    <strong class="text-blue-700">From the Borg team:</strong>
+    <span class="text-gray-700"> Google has run virtually every production workload inside containers
+    since ~2013. ML training jobs are first-class citizens of this system. The Borg scheduler that
+    inspired Kubernetes treats each job as a containerized unit of work — guaranteed resource
+    isolation, repeatable execution, and portable artifacts.</span>
+  </div>
+
+  <h3 class="text-xl font-semibold mt-8 mb-3 text-gray-800">Docker Fundamentals</h3>
+  <p class="text-gray-700 leading-relaxed mb-3">
+    Docker is the dominant container runtime for development. Understanding its core primitives is
+    essential before moving to Kubernetes.
+  </p>
+  <ul class="list-disc list-inside text-gray-700 space-y-2 mb-6 ml-2">
+    <li><strong>Image:</strong> A read-only, layered filesystem snapshot. Built from a Dockerfile.</li>
+    <li><strong>Container:</strong> A running instance of an image with an isolated PID/net/mount namespace.</li>
+    <li><strong>Registry:</strong> A content-addressable store for images (Docker Hub, ECR, GCR, Artifact Registry).</li>
+    <li><strong>Layer:</strong> Each <code class="inline">RUN</code>/<code class="inline">COPY</code>/<code class="inline">ADD</code> instruction creates a new layer. Layers are cached and shared.</li>
+    <li><strong>Build context:</strong> The directory sent to the Docker daemon on <code class="inline">docker build</code>. Keep it small.</li>
+  </ul>
+
+  <h3 class="text-xl font-semibold mt-8 mb-3 text-gray-800">Dockerfile Best Practices for ML</h3>
+
+  <p class="text-gray-700 mb-3">The following Dockerfile embeds every best practice you need for production ML images:</p>
+
+  <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-6">
+    <div class="bg-gray-800 text-gray-300 text-xs px-4 py-2 font-mono">Dockerfile — Optimized PyTorch + CUDA image</div>
+    <pre><code class="language-dockerfile"># ─── STAGE 1: build dependencies ────────────────────────────────────────────
+# Use an official CUDA base — never build CUDA from scratch
+FROM nvcr.io/nvidia/pytorch:24.01-py3 AS builder
+
+# Avoid interactive prompts in apt
+ENV DEBIAN_FRONTEND=noninteractive
+
+# System deps — pin versions, clean up in the same layer to keep it small
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        build-essential=12.9ubuntu3 \
+        git=1:2.39.2-1ubuntu1 \
+        libgl1=1.6.0-1 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create a virtual env so we can copy it to the runtime stage cleanly
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Pin ALL Python deps — never use loose version ranges in production
+COPY requirements.txt /tmp/requirements.txt
+RUN pip install --no-cache-dir --upgrade pip==24.0 \
+    && pip install --no-cache-dir -r /tmp/requirements.txt
+
+# ─── STAGE 2: runtime image ──────────────────────────────────────────────────
+# Reuse the same CUDA base so driver compatibility is guaranteed
+FROM nvcr.io/nvidia/pytorch:24.01-py3 AS runtime
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PATH="/opt/venv/bin:$PATH"
+
+# Copy only the venv from the build stage — not the build tools
+COPY --from=builder /opt/venv /opt/venv
+
+# Non-root user: critical for security in shared clusters
+RUN groupadd --gid 1001 mluser \
+    && useradd --uid 1001 --gid mluser --shell /bin/bash --create-home mluser
+
+WORKDIR /app
+
+# Copy application code — put this LAST to maximise layer cache reuse
+COPY --chown=mluser:mluser src/ /app/src/
+COPY --chown=mluser:mluser config/ /app/config/
+
+USER mluser
+
+# Health check for Kubernetes readiness probe
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD python -c "import torch; assert torch.cuda.is_available()" || exit 1
+
+ENTRYPOINT ["python", "-m", "src.train"]
+CMD ["--config", "/app/config/default.yaml"]</code></pre>
+  </div>
+
+  <div class="callout-warn p-4 rounded-lg mb-6">
+    <strong class="text-yellow-700">Warning — Build context size:</strong>
+    <span class="text-gray-700"> Always create a <code class="inline">.dockerignore</code> file.
+    Without it, Docker sends your entire working directory — including model checkpoints, datasets,
+    and <code class="inline">.git</code> — to the daemon on every build. A 50 GB dataset directory
+    will make every build take minutes before a single instruction runs.</span>
+  </div>
+
+  <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-6">
+    <div class="bg-gray-800 text-gray-300 text-xs px-4 py-2 font-mono">.dockerignore</div>
+    <pre><code class="language-bash">.git
+__pycache__
+*.pyc
+*.pyo
+.pytest_cache
+.mypy_cache
+.venv
+data/
+checkpoints/
+*.ckpt
+*.pt
+*.bin
+wandb/
+mlruns/
+*.egg-info
+dist/
+build/
+.env
+.env.*
+secrets/</code></pre>
+  </div>
+
+  <h3 class="text-xl font-semibold mt-8 mb-3 text-gray-800">Docker Compose for Local ML Development</h3>
+
+  <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-6">
+    <div class="bg-gray-800 text-gray-300 text-xs px-4 py-2 font-mono">docker-compose.yml — Local ML dev stack</div>
+    <pre><code class="language-yaml">version: "3.9"
+
+services:
+  trainer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    image: my-ml-project:dev
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1          # request 1 GPU
+              capabilities: [gpu]
+    volumes:
+      - ./src:/app/src          # live-reload code changes
+      - ./config:/app/config
+      - ./data:/data:ro         # mount dataset read-only
+      - ./outputs:/outputs      # write checkpoints here
+    environment:
+      - WANDB_API_KEY=${WANDB_API_KEY}
+      - CUDA_VISIBLE_DEVICES=0
+      - TORCH_CUDA_ARCH_LIST=8.0  # A100
+    ports:
+      - "6006:6006"             # TensorBoard
+    command: ["--config", "/app/config/experiment.yaml"]
+
+  tensorboard:
+    image: tensorflow/tensorflow:2.15.0
+    ports:
+      - "6007:6006"
+    volumes:
+      - ./outputs:/logs:ro
+    command: tensorboard --logdir=/logs --bind_all
+
+  jupyter:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    image: my-ml-project:dev
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./notebooks:/notebooks
+      - ./data:/data:ro
+    command: >
+      jupyter lab --ip=0.0.0.0 --port=8888
+      --no-browser --allow-root
+      --NotebookApp.token=''
+      --notebook-dir=/notebooks
+
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:v2.11.1
+    ports:
+      - "5000:5000"
+    volumes:
+      - mlflow_data:/mlflow
+    command: >
+      mlflow server
+      --host 0.0.0.0
+      --port 5000
+      --backend-store-uri sqlite:///mlflow/mlflow.db
+      --default-artifact-root /mlflow/artifacts
+
+volumes:
+  mlflow_data:</code></pre>
+  </div>
+
+  <h3 class="text-xl font-semibold mt-8 mb-4 text-gray-800">Container Registry Comparison</h3>
+  <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm mb-6">
+    <table>
+      <thead>
+        <tr>
+          <th>Registry</th>
+          <th>Provider</th>
+          <th>Free Tier</th>
+          <th>Private Repos</th>
+          <th>Best For</th>
+          <th>IAM Integration</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Docker Hub</strong></td><td>Docker Inc.</td><td>1 private repo</td><td>Paid plans</td><td>Public OSS images</td><td>Basic tokens</td></tr>
+        <tr><td><strong>ECR</strong></td><td>AWS</td><td>500 MB/month</td><td>Unlimited</td><td>AWS-native ML pipelines</td><td>IAM roles/policies</td></tr>
+        <tr><td><strong>GCR / Artifact Registry</strong></td><td>GCP</td><td>Storage-based pricing</td><td>Unlimited</td><td>GKE / Vertex AI</td><td>Workload Identity</td></tr>
+        <tr><td><strong>GHCR</strong></td><td>GitHub</td><td>500 MB public</td><td>With GitHub plan</td><td>OSS projects + CI/CD</td><td>GITHUB_TOKEN</td></tr>
+        <tr><td><strong>Azure ACR</strong></td><td>Microsoft</td><td>No</td><td>Unlimited</td><td>Azure AKS workloads</td><td>Azure AD / Managed Identity</td></tr>
+        <tr><td><strong>nvcr.io</strong></td><td>NVIDIA NGC</td><td>Yes (public)</td><td>NGC org accounts</td><td>CUDA/PyTorch base images</td><td>NGC API key</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 class="text-xl font-semibold mt-8 mb-4 text-gray-800">Dockerfile Anti-patterns vs Best Practices</h3>
+  <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm mb-6">
+    <table>
+      <thead>
+        <tr><th>Anti-pattern</th><th>Problem</th><th>Best Practice</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code class="inline">pip install torch</code></td>
+          <td>Unpinned; breaks on next release</td>
+          <td><code class="inline">pip install torch==2.2.1+cu121</code> with exact hash in requirements.txt</td>
+        </tr>
+        <tr>
+          <td><code class="inline">FROM ubuntu:latest</code></td>
+          <td>"latest" changes; non-reproducible builds</td>
+          <td><code class="inline">FROM ubuntu:22.04</code> with explicit digest</td>
+        </tr>
+        <tr>
+          <td>Running as root</td>
+          <td>Container escape = full host access</td>
+          <td>Create a non-root user; <code class="inline">USER mluser</code></td>
+        </tr>
+        <tr>
+          <td><code class="inline">COPY . .</code> early in Dockerfile</td>
+          <td>Invalidates all downstream cache layers on any code change</td>
+          <td>Copy requirements first, install deps, then copy source code last</td>
+        </tr>
+        <tr>
+          <td>Multiple <code class="inline">RUN apt-get</code> layers</td>
+          <td>Bloated image; old package lists in cache layers</td>
+          <td>Single chained <code class="inline">RUN</code> with <code class="inline">&amp;&amp; rm -rf /var/lib/apt/lists/*</code></td>
+        </tr>
+        <tr>
+          <td>Storing secrets in ENV or ARG</td>
+          <td>Visible in <code class="inline">docker history</code> and registry manifests</td>
+          <td>Inject at runtime via K8s Secrets or Vault agent sidecar</td>
+        </tr>
+        <tr>
+          <td>Single-stage builds for ML</td>
+          <td>Build tools (gcc, cmake) end up in the final 10 GB image</td>
+          <td>Multi-stage: builder stage compiles, runtime stage copies artifacts</td>
+        </tr>
+        <tr>
+          <td>No <code class="inline">.dockerignore</code></td>
+          <td>Sends entire repo (datasets, checkpoints) to Docker daemon</td>
+          <td>Always include a comprehensive <code class="inline">.dockerignore</code></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 2: GPU DOCKER SETUP                                  -->
+<!-- ============================================================ -->
+<section id="s2">
+  <div class="flex items-center gap-3 mb-4">
+    <span class="section-badge">Section 2</span>
+    <h2 class="text-2xl font-bold text-gray-900">GPU Docker Setup</h2>
+  </div>
+
+  <h3 class="text-xl font-semibold mt-6 mb-3 text-gray-800">NVIDIA Container Toolkit</h3>
+  <p class="text-gray-700 leading-relaxed mb-4">
+    The NVIDIA Container Toolkit (formerly nvidia-docker2) allows Docker containers to access the
+    host's GPU hardware without bundling the kernel driver inside the image. The architecture is:
+    the host installs the NVIDIA driver once; the toolkit injects the driver userspace libraries
+    into each container at runtime via a container device interface (CDI) hook.
+  </p>
+
+  <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-6">
+    <div class="bg-gray-800 text-gray-300 text-xs px-4 py-2 font-mono">bash — Install NVIDIA Container Toolkit on Ubuntu 22.04</div>
+    <pre><code class="language-bash"># Add the NVIDIA GPG key and repository
+curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey \
+    | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
+
+curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list \
+    | sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' \
+    | sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
+
+sudo apt-get update
+sudo apt-get install -y nvidia-container-toolkit
+
+# Configure the Docker runtime to use the NVIDIA CDI
+sudo nvidia-ctk runtime configure --runtime=docker
+sudo systemctl restart docker
+
+# Verify — should print your GPU info
+docker run --rm --gpus all nvidia/cuda:12.3.2-base-ubuntu22.04 nvidia-smi</code></pre>
+  </div>
+
+  <h3 class="text-xl font-semibold mt-8 mb-4 text-gray-800">CUDA Version Compatibility Matrix</h3>
+  <div class="callout-danger p-4 rounded-lg mb-4">
+    <strong class="text-red-700">Critical rule:</strong>
+    <span class="text-gray-700"> The CUDA version in your Docker image must be <em>less than or equal to</em>
+    the CUDA version supported by the host driver. You cannot run a CUDA 12.4 container on a host with
+    a driver that only supports CUDA 11.8. This is the single most common cause of GPU container failures.</span>
+  </div>
+  <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm mb-6">
+    <table>
+      <thead>
+        <tr>
+          <th>NVIDIA Driver Version</th>
+          <th>Max CUDA Runtime</th>
+          <th>Typical GPU Generation</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>&#8805; 570.x</td><td>CUDA 12.8</td><td>H200, B200</td><td>Latest; required for Blackwell</td></tr>
+        <tr><td>&#8805; 550.x</td><td>CUDA 12.4</td><td>H100, L40S</td><td>Recommended for production H100 clusters</td></tr>
+        <tr><td>&#8805; 535.x</td><td>CUDA 12.2</td><td>A100, A10G</td><td>Common in AWS p4d/p4de, p3</td></tr>
+        <tr><td>&#8805; 525.x</td><td>CUDA 12.0</td><td>A100, V100</td><td>EKS AMI default for older node groups</td></tr>
+        <tr><td>&#8805; 510.x</td><td>CUDA 11.6</td><td>V100, T4</td><td>Legacy; avoid for new workloads</td></tr>
+        <tr><td>&#8805; 450.x</td><td>CUDA 11.0</td><td>V100, T4</td><td>EOL — upgrade immediately</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 class="text-xl font-semibold mt-8 mb-3 text-gray-800">GPU-enabled Dockerfile</h3>
+  <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-6">
+    <div class="bg-gray-800 text-gray-300 text-xs px-4 py-2 font-mono">Dockerfile.gpu — Production GPU training image</div>
+    <pre><code class="language-dockerfile"># NVIDIA provides optimized PyTorch containers at nvcr.io/nvidia/pytorch
+# Always prefer these over building from scratch — they include:
+#   cuBLAS, cuDNN, NCCL, Apex, TransformerEngine, and flash-attention
+ARG BASE_IMAGE=nvcr.io/nvidia/pytorch:24.01-py3
+FROM ${BASE_IMAGE}
+
+LABEL maintainer="ml-platform@company.com" \
+      cuda.version="12.3" \
+      pytorch.version="2.2.0" \
+      description="Production GPU training container"
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    # Needed for NCCL multi-GPU communication
+    NCCL_DEBUG=INFO \
+    NCCL_SOCKET_IFNAME=eth0 \
+    # Optimise for A100 Tensor Cores
+    TORCH_CUDA_ARCH_LIST="8.0;8.6;9.0" \
+    CUDA_DEVICE_ORDER=PCI_BUS_ID
+
+# Install additional system libraries for distributed training
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        libopenmpi-dev \
+        openmpi-bin \
+        libibverbs-dev \
+        librdmacm-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python packages on top of the NGC base
+COPY requirements-gpu.txt /tmp/
+RUN pip install --no-cache-dir -r /tmp/requirements-gpu.txt
+
+# Non-root user
+RUN groupadd -g 1001 trainer && useradd -u 1001 -g trainer -m trainer
+WORKDIR /workspace
+COPY --chown=trainer:trainer . /workspace/
+
+USER trainer
+
+# Verify GPU is accessible at build time (optional, useful for CI)
+# RUN python -c "import torch; assert torch.cuda.is_available(), 'No CUDA!'"
+
+ENTRYPOINT ["torchrun", "--standalone"]
+CMD ["--nproc_per_node=auto", "src/train_distributed.py"]</code></pre>
+  </div>
+
+  <h3 class="text-xl font-semibold mt-8 mb-3 text-gray-800">Testing GPU in Containers</h3>
+  <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-6">
+    <div class="bg-gray-800 text-gray-300 text-xs px-4 py-2 font-mono">bash — Validate GPU access</div>
+    <pre><code class="language-bash"># Quick GPU sanity check
+docker run --rm --gpus all nvcr.io/nvidia/pytorch:24.01-py3 python -c "
+import torch
+print(f'PyTorch: {torch.__version__}')
+print(f'CUDA available: {torch.cuda.is_available()}')
+print(f'GPU count: {torch.cuda.device_count()}')
+for i in range(torch.cuda.device_count()):
+    print(f'  GPU {i}: {torch.cuda.get_device_name(i)}')
+    props = torch.cuda.get_device_properties(i)
+    print(f'    VRAM: {props.total_memory / 1e9:.1f} GB')
+    print(f'    SM count: {props.multi_processor_count}')
+"
+
+# Run with specific GPU(s)
+docker run --rm --gpus '"device=0,1"' my-training-image:latest
+
+# Run with all GPUs
+docker run --rm --gpus all my-training-image:latest
+
+# Check NCCL multi-GPU communication
+docker run --rm --gpus all --ipc=host \
+    nvcr.io/nvidia/pytorch:24.01-py3 \
+    python -m torch.distributed.launch \
+    --nproc_per_node=2 \
+    -c "import torch.distributed as dist; dist.init_process_group('nccl'); print('NCCL OK')"</code></pre>
+  </div>
+
+  <div class="callout-tip p-4 rounded-lg mb-6">
+    <strong class="text-green-700">Pro tip — --ipc=host:</strong>
+    <span class="text-gray-700"> For multi-GPU workloads using shared memory (PyTorch DataLoader with
+    <code class="inline">num_workers&gt;0</code>), always pass <code class="inline">--ipc=host</code>
+    or set <code class="inline">--shm-size=8g</code>. The default Docker shared memory of 64 MB causes
+    mysterious worker crashes that are very hard to debug.</span>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 3: KUBERNETES FUNDAMENTALS                           -->
+<!-- ============================================================ -->
+<section id="s3">
+  <div class="flex items-center gap-3 mb-4">
+    <span class="section-badge">Section 3</span>
+    <h2 class="text-2xl font-bold text-gray-900">Kubernetes Fundamentals</h2>
+  </div>
+
+  <p class="text-gray-700 leading-relaxed mb-4">
+    Kubernetes (K8s) is the container orchestration system that Google open-sourced in 2014,
+    distilling 15 years of internal experience running Borg and Omega. It is now the
+    de-facto standard for running ML workloads at scale, from single-node dev clusters to
+    thousands of GPU nodes.
+  </p>
+
+  <h3 class="text-xl font-semibold mt-6 mb-4 text-gray-800">Architecture Overview</h3>
+  <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-4 mb-6">
+    <div class="mermaid">
+graph TB
+    subgraph "Control Plane"
+        API[API Server<br/>kube-apiserver]
+        ETCD[(etcd<br/>Cluster State)]
+        SCHED[Scheduler<br/>kube-scheduler]
+        CM[Controller Manager<br/>kube-controller-manager]
+        CCM[Cloud Controller Manager]
+    end
+    subgraph "Worker Node 1 — CPU"
+        KL1[kubelet]
+        KP1[kube-proxy]
+        CR1[Container Runtime<br/>containerd]
+        P1[Pod: API Service]
+        P2[Pod: Model Server]
+    end
+    subgraph "Worker Node 2 — GPU"
+        KL2[kubelet]
+        KP2[kube-proxy]
+        CR2[Container Runtime<br/>containerd]
+        P3[Pod: Training Job]
+        DP[NVIDIA Device Plugin]
+    end
+    subgraph "Storage"
+        PV[PersistentVolume<br/>EBS / GCE PD / NFS]
+    end
+
+    API <--> ETCD
+    API --> SCHED
+    API --> CM
+    API --> CCM
+    KL1 --> API
+    KL2 --> API
+    P3 --> DP
+    P3 -.-> PV
+
+    style API fill:#2563eb,color:#fff
+    style ETCD fill:#7c3aed,color:#fff
+    style SCHED fill:#059669,color:#fff
+    style CM fill:#059669,color:#fff
+    style DP fill:#d97706,color:#fff
+    </div>
+  </div>
+
+  <h3 class="text-xl font-semibold mt-8 mb-3 text-gray-800">Core Kubernetes Objects</h3>
+  <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm mb-6">
+    <table>
+      <thead>
+        <tr><th>Object</th><th>Purpose</th><th>ML Use Case</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Pod</strong></td><td>Smallest deployable unit; one or more containers sharing network/storage</td><td>Single training process, inference replica</td></tr>
+        <tr><td><strong>Deployment</strong></td><td>Declarative updates for stateless pods; rolling rollout</td><td>Model inference server (stateless)</td></tr>
+        <tr><td><strong>StatefulSet</strong></td><td>Ordered, stable pod identity and storage</td><td>Distributed training with stable hostnames</td></tr>
+        <tr><td><strong>Job</strong></td><td>Runs pods to completion; retries on failure</td><td>Batch training, preprocessing, evaluation</td></tr>
+        <tr><td><strong>CronJob</strong></td><td>Schedules Jobs on a cron expression</td><td>Nightly retraining, scheduled scoring</td></tr>
+        <tr><td><strong>Service</strong></td><td>Stable network endpoint for a set of pods</td><td>Load balance inference traffic</td></tr>
+        <tr><td><strong>ConfigMap</strong></td><td>Key-value configuration data</td><td>Model hyperparameters, environment config</td></tr>
+        <tr><td><strong>Secret</strong></td><td>Base64-encoded sensitive data (use Vault in prod)</td><td>API keys, registry pull credentials</td></tr>
+        <tr><td><strong>Namespace</strong></td><td>Virtual cluster isolation within a cluster</td><td>Separate training/serving/dev environments</td></tr>
+        <tr><td><strong>PersistentVolume (PV)</strong></td><td>Cluster-wide storage resource</td><td>Shared dataset storage</td></tr>
+        <tr><td><strong>PersistentVolumeClaim (PVC)</strong></td><td>A pod's request for a PV</td><td>Training job mounts dataset via PVC</td></tr>
+        <tr><td><strong>ResourceQuota</strong></td><td>Limit total resources per namespace</td><td>GPU budget per team</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 class="text-xl font-semibold mt-8 mb-3 text-gray-800">kubectl Quick Reference</h3>
+  <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-6">
+    <div class="bg-gray-800 text-gray-300 text-xs px-4 py-2 font-mono">bash — Essential kubectl commands</div>
+    <pre><code class="language-bash"># ── Cluster info ──────────────────────────────────────────────────────────────
+kubectl cluster-info
+kubectl get nodes -o wide              # Show nodes with IP + OS image
+kubectl describe node gpu-node-1       # Check GPU allocations on a node
+
+# ── Namespaces ────────────────────────────────────────────────────────────────
+kubectl create namespace ml-training
+kubectl config set-context --current --namespace=ml-training
+
+# ── Apply manifests ───────────────────────────────────────────────────────────
+kubectl apply -f manifest.yaml         # Create or update resources
+kubectl apply -f ./k8s/                # Apply entire directory
+kubectl delete -f manifest.yaml        # Delete resources
+
+# ── Inspect resources ─────────────────────────────────────────────────────────
+kubectl get pods -n ml-training -o wide           # List pods with node placement
+kubectl get pods --field-selector=status.phase=Running
+kubectl describe pod training-job-abc123          # Detailed pod info + events
+kubectl get events --sort-by='.metadata.creationTimestamp'
+
+# ── Logs ──────────────────────────────────────────────────────────────────────
+kubectl logs training-job-abc123 -f               # Follow logs
+kubectl logs training-job-abc123 -c init-container  # Specific container
+kubectl logs -l app=model-server --tail=100       # All pods matching label
+
+# ── Exec into pods ────────────────────────────────────────────────────────────
+kubectl exec -it training-job-abc123 -- bash
+kubectl exec -it training-job-abc123 -- nvidia-smi
+
+# ── Resource usage ────────────────────────────────────────────────────────────
+kubectl top pods -n ml-training
+kubectl top nodes
+
+# ── Port forwarding (dev only) ────────────────────────────────────────────────
+kubectl port-forward svc/model-server 8080:80
+kubectl port-forward pod/jupyter-0 8888:8888
+
+# ── Rollout ───────────────────────────────────────────────────────────────────
+kubectl rollout status deployment/model-server
+kubectl rollout history deployment/model-server
+kubectl rollout undo deployment/model-server</code></pre>
+  </div>
+
+  <h3 class="text-xl font-semibold mt-8 mb-3 text-gray-800">Basic Pod / Deployment / Service YAML</h3>
+  <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-6">
+    <div class="bg-gray-800 text-gray-300 text-xs px-4 py-2 font-mono">k8s/model-server.yaml</div>
+    <pre><code class="language-yaml">---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ml-serving
+  labels:
+    team: ml-platform
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: model-server
+  namespace: ml-serving
+  labels:
+    app: model-server
+    version: v1.2.3
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: model-server
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0          # Zero-downtime deploys
+  template:
+    metadata:
+      labels:
+        app: model-server
+        version: v1.2.3
+    spec:
+      serviceAccountName: model-server-sa
+      containers:
+        - name: server
+          image: 123456789.dkr.ecr.us-east-1.amazonaws.com/model-server:1.2.3
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+              name: http
+          env:
+            - name: MODEL_PATH
+              value: "/models/bert-base"
+            - name: MAX_BATCH_SIZE
+              valueFrom:
+                configMapKeyRef:
+                  name: model-server-config
+                  key: max_batch_size
+            - name: HUGGINGFACE_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: hf-credentials
+                  key: token
+          resources:
+            requests:
+              cpu: "2"
+              memory: "4Gi"
+            limits:
+              cpu: "4"
+              memory: "8Gi"
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /health/live
+              port: 8080
+            initialDelaySeconds: 60
+            periodSeconds: 30
+          volumeMounts:
+            - name: model-store
+              mountPath: /models
+      volumes:
+        - name: model-store
+          persistentVolumeClaim:
+            claimName: model-store-pvc
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: topology.kubernetes.io/zone
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector:
+            matchLabels:
+              app: model-server
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: model-server
+  namespace: ml-serving
+  annotations:
+    # AWS Load Balancer Controller — internal NLB
+    service.beta.kubernetes.io/aws-load-balancer-type: "external"
+    service.beta.kubernetes.io/aws-load-balancer-scheme: "internal"
+spec:
+  type: LoadBalancer
+  selector:
+    app: model-server
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8080
+      protocol: TCP</code></pre>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 4: KUBERNETES FOR ML WORKLOADS                       -->
+<!-- ============================================================ -->
+<section id="s4">
+  <div class="flex items-center gap-3 mb-4">
+    <span class="section-badge">Section 4</span>
+    <h2 class="text-2xl font-bold text-gray-900">Kubernetes for ML Workloads</h2>
+  </div>
+
+  <h3 class="text-xl font-semibold mt-6 mb-3 text-gray-800">Why Kubernetes for ML?</h3>
+  <ul class="list-disc list-inside text-gray-700 space-y-2 mb-6 ml-2">
+    <li><strong>GPU scheduling:</strong> K8s tracks available GPU capacity cluster-wide and places workloads optimally</li>
+    <li><strong>Resource isolation:</strong> Each job gets guaranteed CPU/memory/GPU — no noisy neighbors</li>
+    <li><strong>Fault tolerance:</strong> Failed pods are automatically restarted; Jobs retry to completion</li>
+    <li><strong>Multi-tenancy:</strong> Namespaces + ResourceQuotas enforce per-team budgets</li>
+    <li><strong>Portability:</strong> Same YAML works on EKS, GKE, AKS, or on-prem</li>
+    <li><strong>Ecosystem:</strong> Kubeflow, MLflow, Argo Workflows, Volcano all run natively on K8s</li>
+  </ul>
+
+  <h3 class="text-xl font-semibold mt-8 mb-3 text-gray-800">Resource Requests and Limits</h3>
+  <div class="callout-warn p-4 rounded-lg mb-4">
+    <strong class="text-yellow-700">GPU limits == GPU requests:</strong>
+    <span class="text-gray-700"> Unlike CPU (which can be throttled), GPUs are non-divisible resources.
+    For GPUs, <code class="inline">requests</code> must equal <code class="inline">limits</code>.
+    K8s will reject pods where they differ.</span>
+  </div>
+
+  <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-6">
+    <div class="bg-gray-800 text-gray-300 text-xs px-4 py-2 font-mono">k8s/gpu-training-job.yaml — Complete GPU pod spec</div>
+    <pre><code class="language-yaml">apiVersion: batch/v1
+kind: Job
+metadata:
+  name: gpt2-finetuning-run-042
+  namespace: ml-training
+  labels:
+    experiment: gpt2-finetune
+    run-id: "042"
+    team: nlp
+spec:
+  completions: 1
+  parallelism: 1
+  backoffLimit: 2           # Retry up to 2 times on failure
+  ttlSecondsAfterFinished: 86400   # Clean up after 24h
+  template:
+    metadata:
+      labels:
+        experiment: gpt2-finetune
+        run-id: "042"
+    spec:
+      restartPolicy: OnFailure
+
+      # ── Node selection: schedule ONLY on GPU nodes ───────────────────────
+      nodeSelector:
+        nvidia.com/gpu.present: "true"
+        node.kubernetes.io/instance-type: p4d.24xlarge
+
+      # ── Toleration: GPU nodes are tainted to prevent CPU pods landing there
+      tolerations:
+        - key: nvidia.com/gpu
+          operator: Exists
+          effect: NoSchedule
+        - key: dedicated
+          value: gpu-training
+          effect: NoSchedule
+
+      # ── Priority: don't let low-priority experiments starve prod serving ──
+      priorityClassName: training-priority
+
+      # ── Init container: stage data from S3 before training starts ─────────
+      initContainers:
+        - name: data-sync
+          image: amazon/aws-cli:2.15.0
+          command:
+            - aws
+            - s3
+            - sync
+            - s3://my-ml-data/datasets/openwebtext/
+            - /data/openwebtext/
+            - --no-progress
+          env:
+            - name: AWS_DEFAULT_REGION
+              value: us-east-1
+          volumeMounts:
+            - name: training-data
+              mountPath: /data
+
+      containers:
+        - name: trainer
+          image: 123456789.dkr.ecr.us-east-1.amazonaws.com/gpt2-trainer:1.0.0
+          command: ["torchrun"]
+          args:
+            - "--nproc_per_node=8"
+            - "--nnodes=1"
+            - "src/train.py"
+            - "--config=/config/training.yaml"
+            - "--output_dir=/checkpoints/run-042"
+
+          # ── GPU resource request ───────────────────────────────────────────
+          resources:
+            requests:
+              cpu: "32"
+              memory: "128Gi"
+              nvidia.com/gpu: "8"       # Request 8 GPUs (full p4d.24xlarge)
+            limits:
+              cpu: "64"
+              memory: "256Gi"
+              nvidia.com/gpu: "8"       # Must match requests for GPU
+
+          # ── Environment ───────────────────────────────────────────────────
+          env:
+            - name: NCCL_DEBUG
+              value: "WARN"
+            - name: NCCL_SOCKET_IFNAME
+              value: "eth0"
+            - name: OMP_NUM_THREADS
+              value: "8"
+            - name: WANDB_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: wandb-credentials
+                  key: api_key
+            - name: HF_HOME
+              value: /cache/huggingface
+
+          # ── Volume mounts ─────────────────────────────────────────────────
+          volumeMounts:
+            - name: training-data
+              mountPath: /data
+              readOnly: true
+            - name: checkpoints
+              mountPath: /checkpoints
+            - name: hf-cache
+              mountPath: /cache/huggingface
+            - name: training-config
+              mountPath: /config
+            - name: dshm                # Shared memory for DataLoader workers
+              mountPath: /dev/shm
+
+          # ── Liveness probe (training stall detection) ─────────────────────
+          livenessProbe:
+            exec:
+              command:
+                - python
+                - -c
+                - "import os, time; assert time.time() - os.path.getmtime('/checkpoints/run-042/.heartbeat') < 600"
+            initialDelaySeconds: 300
+            periodSeconds: 120
+            failureThreshold: 3
+
+      volumes:
+        - name: training-data
+          persistentVolumeClaim:
+            claimName: openwebtext-dataset-pvc
+        - name: checkpoints
+          persistentVolumeClaim:
+            claimName: training-checkpoints-pvc
+        - name: hf-cache
+          emptyDir: {}
+        - name: training-config
+          configMap:
+            name: gpt2-training-config
+        - name: dshm
+          emptyDir:
+            medium: Memory
+            sizeLimit: 32Gi</code></pre>
+  </div>
+
+  <h3 class="text-xl font-semibold mt-8 mb-3 text-gray-800">K8s Cluster Layout for ML Platform</h3>
+  <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-4 mb-6">
+    <div class="mermaid">
+graph LR
+    subgraph "Kubernetes Cluster"
+        subgraph "ns: ml-serving"
+            IS[Inference<br/>Deployment]
+            GW[Gateway / Ingress]
+        end
+        subgraph "ns: ml-training"
+            TJ[Training Jobs<br/>Volcano BatchQueue]
+            PP[Preprocessing<br/>CronJobs]
+        end
+        subgraph "ns: ml-platform"
+            MLF[MLflow<br/>StatefulSet]
+            AW[Argo Workflows]
+            JUP[JupyterHub]
+        end
+        subgraph "ns: monitoring"
+            PROM[Prometheus]
+            GRAF[Grafana]
+            DCGM[DCGM Exporter]
+        end
+        subgraph "Node Pools"
+            CPU_NP[CPU Node Pool<br/>m5.4xlarge x 10]
+            GPU_NP[GPU Node Pool<br/>p4d.24xlarge x 4]
+            SPOT_NP[Spot GPU Pool<br/>g5.12xlarge auto-scale]
+        end
+    end
+
+    IS --> CPU_NP
+    TJ --> GPU_NP
+    TJ --> SPOT_NP
+    DCGM --> GPU_NP
+    GW --> IS
+
+    style GPU_NP fill:#f59e0b,color:#1f2937
+    style SPOT_NP fill:#10b981,color:#fff
+    style CPU_NP fill:#6366f1,color:#fff
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 5: GPU RESOURCE MANAGEMENT                           -->
+<!-- ============================================================ -->
+<section id="s5">
+  <div class="flex items-center gap-3 mb-4">
+    <span class="section-badge">Section 5</span>
+    <h2 class="text-2xl font-bold text-gray-900">GPU Resource Management on K8s</h2>
+  </div>
+
+  <h3 class="text-xl font-semibold mt-6 mb-3 text-gray-800">NVIDIA GPU Operator</h3>
+  <p class="text-gray-700 leading-relaxed mb-4">
+    The GPU Operator automates the setup of every NVIDIA software component on K8s worker nodes:
+    the kernel driver, CUDA toolkit, container runtime, device plugin, DCGM exporter, and MIG manager.
+    Without it, every GPU node must be manually bootstrapped — a maintenance nightmare at scale.
+  </p>
+  <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-6">
+    <div class="bg-gray-800 text-gray-300 text-xs px-4 py-2 font-mono">bash — Install GPU Operator via Helm</div>
+    <pre><code class="language-bash">helm repo add nvidia https://helm.ngc.nvidia.com/nvidia
+helm repo update
+
+# Install GPU Operator — it handles driver + device plugin + DCGM automatically
+helm install --wait gpu-operator \
+    -n gpu-operator --create-namespace \
+    nvidia/gpu-operator \
+    --version v24.3.0 \
+    --set driver.enabled=true \
+    --set driver.version="550.54.15" \
+    --set mig.strategy=mixed \
+    --set devicePlugin.enabled=true \
+    --set dcgm.enabled=true \
+    --set dcgmExporter.enabled=true \
+    --set toolkit.enabled=true
+
+# Verify all pods are running
+kubectl get pods -n gpu-operator
+# Expected: operator, driver-daemonset, device-plugin-daemonset,
+#           dcgm-exporter-daemonset, container-toolkit-daemonset
+
+# Check GPU is visible to scheduler
+kubectl describe node gpu-node-1 | grep -A5 "Allocatable"
+# Should show:  nvidia.com/gpu: 8</code></pre>
+  </div>
+
+  <h3 class="text-xl font-semibold mt-8 mb-3 text-gray-800">MIG — Multi-Instance GPU</h3>
+  <p class="text-gray-700 leading-relaxed mb-4">
+    NVIDIA A100/H100 support MIG (Multi-Instance GPU), which partitions a physical GPU into up to 7
+    isolated GPU instances. Each instance has dedicated memory, compute, and cache — true hardware
+    isolation, not time-sharing. This is invaluable for running multiple smaller experiments
+    simultaneously without interference.
+  </p>
+
+  <h3 class="text-xl font-semibold mt-4 mb-4 text-gray-800">A100 (80 GB) MIG Profiles</h3>
+  <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm mb-6">
+    <table>
+      <thead>
+        <tr>
+          <th>MIG Profile</th>
+          <th>GPU Slices</th>
+          <th>VRAM</th>
+          <th>Compute (SMs)</th>
+          <th>Max Instances per A100</th>
+          <th>Typical Use Case</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><code class="inline">1g.10gb</code></td><td>1</td><td>10 GB</td><td>14</td><td>7</td><td>Small inference, prototyping</td></tr>
+        <tr><td><code class="inline">2g.20gb</code></td><td>2</td><td>20 GB</td><td>28</td><td>3</td><td>BERT-base fine-tuning</td></tr>
+        <tr><td><code class="inline">3g.40gb</code></td><td>3</td><td>40 GB</td><td>42</td><td>2</td><td>GPT-2 medium training</td></tr>
+        <tr><td><code class="inline">4g.40gb</code></td><td>4</td><td>40 GB</td><td>56</td><td>1</td><td>Large model fine-tuning</td></tr>
+        <tr><td><code class="inline">7g.80gb</code></td><td>7</td><td>80 GB</td><td>98</td><td>1</td><td>Full A100 — LLM pre-training</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-6">
+    <div class="bg-gray-800 text-gray-300 text-xs px-4 py-2 font-mono">k8s/mig-pod.yaml — Using a specific MIG slice</div>
+    <pre><code class="language-yaml">apiVersion: v1
+kind: Pod
+metadata:
+  name: bert-finetune-mig
+  namespace: ml-training
+spec:
+  restartPolicy: Never
+  containers:
+    - name: trainer
+      image: nvcr.io/nvidia/pytorch:24.01-py3
+      command: ["python", "finetune_bert.py"]
+      resources:
+        limits:
+          # Request a specific MIG profile — not the full GPU
+          nvidia.com/mig-2g.20gb: "1"
+      env:
+        - name: CUDA_VISIBLE_DEVICES
+          value: "MIG-GPU-abc123/2g.20gb/0"
+  nodeSelector:
+    nvidia.com/gpu.product: A100-SXM4-80GB-MIG-2g.20gb</code></pre>
+  </div>
+
+  <h3 class="text-xl font-semibold mt-8 mb-3 text-gray-800">GPU Scheduling Strategies</h3>
+  <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm mb-6">
+    <table>
+      <thead>
+        <tr><th>Strategy</th><th>Description</th><th>Best For</th><th>Risk</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Bin Packing</strong></td>
+          <td>Fill each node to capacity before using the next</td>
+          <td>Minimizing cluster cost; fewer spot node interruptions</td>
+          <td>Single node failure takes many jobs</td>
+        </tr>
+        <tr>
+          <td><strong>Spread</strong></td>
+          <td>Distribute pods evenly across nodes/zones</td>
+          <td>Inference availability; fault tolerance</td>
+          <td>Higher cost; more idle GPU nodes</td>
+        </tr>
+        <tr>
+          <td><strong>Topology-aware</strong></td>
+          <td>Place multi-GPU jobs on nodes sharing NVLink or same rack</td>
+          <td>Distributed training communication performance</td>
+          <td>Requires cluster topology labeling</td>
+        </tr>
+        <tr>
+          <td><strong>Gang scheduling</strong></td>
+          <td>All pods in a job start simultaneously or not at all</td>
+          <td>Multi-node training (Volcano BatchJob)</td>
+          <td>Deadlock risk if cluster is fragmented</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout-tip p-4 rounded-lg mb-6">
+    <strong class="text-green-700">DCGM Monitoring:</strong>
+    <span class="text-gray-700"> The Data Center GPU Manager (DCGM) exposes 200+ GPU metrics via
+    Prometheus. Critical ones for ML: <code class="inline">DCGM_FI_DEV_GPU_UTIL</code> (utilization),
+    <code class="inline">DCGM_FI_DEV_FB_USED</code> (VRAM usage), <code class="inline">DCGM_FI_DEV_NVLINK_BANDWIDTH_TOTAL</code>,
+    and <code class="inline">DCGM_FI_DEV_POWER_USAGE</code>. Alert if GPU util &lt; 80% during training.</span>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 6: EKS DEEP DIVE                                     -->
+<!-- ============================================================ -->
+<section id="s6">
+  <div class="flex items-center gap-3 mb-4">
+    <span class="section-badge">Section 6</span>
+    <h2 class="text-2xl font-bold text-gray-900">EKS Deep Dive (AWS)</h2>
+  </div>
+
+  <h3 class="text-xl font-semibold mt-6 mb-3 text-gray-800">EKS Architecture</h3>
+  <p class="text-gray-700 leading-relaxed mb-4">
+    Amazon EKS is a managed Kubernetes service where AWS runs and manages the control plane
+    (API server, etcd, scheduler) across three Availability Zones. You pay $0.10/hour for the
+    control plane and standard EC2 pricing for worker nodes. The control plane is not visible
+    or accessible to you directly — only the API endpoint is.
+  </p>
+
+  <h3 class="text-xl font-semibold mt-6 mb-3 text-gray-800">Karpenter — The Right Autoscaler for ML</h3>
+  <p class="text-gray-700 leading-relaxed mb-4">
+    Cluster Autoscaler works with static node groups and can take 2-5 minutes to add a node.
+    Karpenter directly calls EC2 APIs, provisions heterogeneous instance types, and can have
+    a GPU node running in under 60 seconds. For ML, where a training queue can have 100 pending
+    pods waiting for GPUs, this difference is enormous.
+  </p>
+
+  <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-6">
+    <div class="bg-gray-800 text-gray-300 text-xs px-4 py-2 font-mono">k8s/karpenter-nodepool-gpu.yaml — Karpenter NodePool for GPU</div>
+    <pre><code class="language-yaml">apiVersion: karpenter.sh/v1
+kind: NodePool
+metadata:
+  name: gpu-training-pool
+spec:
+  template:
+    metadata:
+      labels:
+        workload-type: gpu-training
+      annotations:
+        # Custom annotation for cost allocation
+        team: ml-platform
+    spec:
+      taints:
+        # Only GPU-aware pods will land here
+        - key: nvidia.com/gpu
+          effect: NoSchedule
+      requirements:
+        - key: karpenter.sh/capacity-type
+          operator: In
+          values: ["spot", "on-demand"]   # Try spot first, fall back to OD
+        - key: kubernetes.io/arch
+          operator: In
+          values: ["amd64"]
+        - key: node.kubernetes.io/instance-type
+          operator: In
+          values:
+            # A100 instances
+            - p4d.24xlarge      # 8x A100 40GB + 400 Gbps EFA
+            - p4de.24xlarge     # 8x A100 80GB
+            # H100 instances
+            - p5.48xlarge       # 8x H100 80GB + 3200 Gbps EFA
+            # Cheaper GPU instances for small experiments
+            - g5.xlarge
+            - g5.2xlarge
+            - g5.4xlarge
+            - g5.12xlarge       # 4x A10G
+            - g5.48xlarge       # 8x A10G
+        - key: topology.kubernetes.io/zone
+          operator: In
+          values: ["us-east-1a", "us-east-1b", "us-east-1c"]
+      nodeClassRef:
+        group: karpenter.k8s.aws
+        kind: EC2NodeClass
+        name: gpu-node-class
+  limits:
+    nvidia.com/gpu: 256          # Hard cluster-wide GPU limit (cost safety)
+  disruption:
+    consolidationPolicy: WhenEmpty      # Only remove empty GPU nodes
+    consolidateAfter: 10m               # Wait 10 min after last pod exits
+    expireAfter: 24h                    # Force-recycle nodes after 24h (security)
+---
+apiVersion: karpenter.k8s.aws/v1
+kind: EC2NodeClass
+metadata:
+  name: gpu-node-class
+spec:
+  amiSelectorTerms:
+    - alias: al2023@latest          # Amazon Linux 2023 with EKS optimized AMI
+  role: "KarpenterNodeRole-my-cluster"
+  subnetSelectorTerms:
+    - tags:
+        karpenter.sh/discovery: my-cluster
+  securityGroupSelectorTerms:
+    - tags:
+        karpenter.sh/discovery: my-cluster
+  instanceStorePolicy: RAID0      # Stripe NVMe SSDs for fast local I/O
+  blockDeviceMappings:
+    - deviceName: /dev/xvda
+      ebs:
+        volumeSize: 200Gi
+        volumeType: gp3
+        iops: 6000
+        throughput: 750           # MB/s — important for large checkpoint writes
+  userData: |
+    #!/bin/bash
+    # Pre-pull large base images to reduce job startup time
+    ctr images pull nvcr.io/nvidia/pytorch:24.01-py3</code></pre>
+  </div>
+
+  <h3 class="text-xl font-semibold mt-8 mb-3 text-gray-800">eksctl Cluster Configuration</h3>
+  <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-6">
+    <div class="bg-gray-800 text-gray-300 text-xs px-4 py-2 font-mono">eksctl-cluster.yaml</div>
+    <pre><code class="language-yaml">apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: ml-platform-prod
+  region: us-east-1
+  version: "1.29"
+  tags:
+    team: ml-platform
+    env: production
+
+iam:
+  withOIDC: true          # Required for IRSA (IAM Roles for Service Accounts)
+  serviceAccounts:
+    - metadata:
+        name: karpenter
+        namespace: karpenter
+      roleName: KarpenterControllerRole-ml-platform-prod
+      attachPolicyARNs:
+        - arn:aws:iam::123456789:policy/KarpenterControllerPolicy
+    - metadata:
+        name: ebs-csi-controller-sa
+        namespace: kube-system
+      wellKnownPolicies:
+        ebsCSIController: true
+    - metadata:
+        name: aws-load-balancer-controller
+        namespace: kube-system
+      wellKnownPolicies:
+        awsLoadBalancerController: true
+
+vpc:
+  cidr: "10.0.0.0/16"
+  clusterEndpoints:
+    publicAccess: true
+    privateAccess: true
+
+# Static node group for always-on CPU workloads (platform services)
+managedNodeGroups:
+  - name: system-nodes
+    instanceType: m5.2xlarge
+    minSize: 3
+    maxSize: 10
+    desiredCapacity: 3
+    labels:
+      workload-type: system
+    taints:
+      - key: CriticalAddonsOnly
+        value: "true"
+        effect: NoSchedule
+    iam:
+      attachPolicyARNs:
+        - arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy
+        - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
+        - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
+
+addons:
+  - name: vpc-cni
+    version: latest
+    configurationValues: '{"enableNetworkPolicy": "true"}'
+  - name: coredns
+    version: latest
+  - name: kube-proxy
+    version: latest
+  - name: aws-ebs-csi-driver
+    version: latest</code></pre>
+  </div>
+
+  <div class="callout-info p-4 rounded-lg mb-6">
+    <strong class="text-blue-700">EKS Add-ons to always install:</strong>
+    <ul class="list-disc list-inside text-gray-700 mt-2 space-y-1 ml-2">
+      <li><strong>VPC CNI:</strong> AWS-native pod networking — better performance than flannel/calico on AWS</li>
+      <li><strong>EBS CSI driver:</strong> Required for PersistentVolumeClaims backed by EBS</li>
+      <li><strong>EFS CSI driver:</strong> For shared ReadWriteMany volumes across training pods</li>
+      <li><strong>AWS Load Balancer Controller:</strong> Creates ALB/NLB from Ingress/Service objects</li>
+      <li><strong>ADOT (OpenTelemetry):</strong> Sends K8s metrics to CloudWatch</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 7: GKE DEEP DIVE                                     -->
+<!-- ============================================================ -->
+<section id="s7">
+  <div class="flex items-center gap-3 mb-4">
+    <span class="section-badge">Section 7</span>
+    <h2 class="text-2xl font-bold text-gray-900">GKE Deep Dive (GCP)</h2>
+  </div>
+
+  <h3 class="text-xl font-semibold mt-6 mb-3 text-gray-800">GKE Autopilot vs Standard for ML</h3>
+  <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm mb-6">
+    <table>
+      <thead>
+        <tr><th>Feature</th><th>GKE Autopilot</th><th>GKE Standard</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Node management</td><td>Fully managed by Google</td><td>You manage node pools</td></tr>
+        <tr><td>GPU support</td><td>Limited (T4, L4, A100)</td><td>Full (TPU, A100, H100, L4)</td></tr>
+        <tr><td>TPU pods</td><td>No</td><td>Yes</td></tr>
+        <tr><td>MIG</td><td>No</td><td>Yes (with NVIDIA GPU Operator)</td></tr>
+        <tr><td>Pricing</td><td>Per pod resource (no idle cost)</td><td>Per node (pay for idle capacity)</td></tr>
+        <tr><td>DaemonSets</td><td>Restricted</td><td>Full control</td></tr>
+        <tr><td>Best for</td><td>Inference, small experiments</td><td>Large-scale training, research</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout-info p-4 rounded-lg mb-4">
+    <strong class="text-blue-700">GKE + TPU:</strong>
+    <span class="text-gray-700"> GKE Standard is the only managed K8s offering with native TPU v4/v5 node pool support.
+    TPU pods can have up to 4096 chips connected via dedicated inter-chip interconnect (ICI) — the
+    same infrastructure that powers Google's internal model training.</span>
+  </div>
+
+  <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-6">
+    <div class="bg-gray-800 text-gray-300 text-xs px-4 py-2 font-mono">bash — GKE cluster with GPU and TPU node pools</div>
+    <pre><code class="language-bash"># Create GKE Standard cluster
+gcloud container clusters create ml-platform-prod \
+    --region us-central1 \
+    --cluster-version "1.29" \
+    --num-nodes 3 \
+    --machine-type n2-standard-8 \
+    --disk-size 100GB \
+    --disk-type pd-ssd \
+    --workload-pool "my-project.svc.id.goog" \  # Required for Workload Identity
+    --enable-dataplane-v2 \
+    --enable-ip-alias \
+    --enable-autoscaling \
+    --min-nodes 1 \
+    --max-nodes 10
+
+# Add an A100 GPU node pool
+gcloud container node-pools create a100-pool \
+    --cluster ml-platform-prod \
+    --region us-central1 \
+    --machine-type a2-highgpu-8g \     # 8x A100 40GB
+    --accelerator type=nvidia-tesla-a100,count=8 \
+    --num-nodes 0 \
+    --min-nodes 0 \
+    --max-nodes 8 \
+    --enable-autoscaling \
+    --disk-size 500GB \
+    --disk-type pd-ssd \
+    --node-labels workload-type=training \
+    --node-taints nvidia.com/gpu=present:NoSchedule \
+    --scopes cloud-platform
+
+# Add an L4 GPU node pool for inference (cost-effective)
+gcloud container node-pools create l4-inference-pool \
+    --cluster ml-platform-prod \
+    --region us-central1 \
+    --machine-type g2-standard-24 \     # 2x L4 GPUs
+    --accelerator type=nvidia-l4,count=2 \
+    --num-nodes 2 \
+    --min-nodes 2 \
+    --max-nodes 20 \
+    --enable-autoscaling \
+    --node-labels workload-type=inference
+
+# Install NVIDIA drivers via DaemonSet (GKE provides this)
+kubectl apply -f https://raw.githubusercontent.com/GoogleCloudPlatform/container-engine-accelerators/master/nvidia-driver-installer/cos/daemonset-preloaded.yaml
+
+# Get credentials
+gcloud container clusters get-credentials ml-platform-prod --region us-central1</code></pre>
+  </div>
+
+  <h3 class="text-xl font-semibold mt-8 mb-3 text-gray-800">Workload Identity for GKE</h3>
+  <p class="text-gray-700 leading-relaxed mb-3">
+    Workload Identity is GKE's equivalent of AWS IRSA — it maps a Kubernetes ServiceAccount to
+    a GCP Service Account, so pods get GCP IAM credentials without needing to store keys in Secrets.
+  </p>
+  <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-6">
+    <div class="bg-gray-800 text-gray-300 text-xs px-4 py-2 font-mono">bash — Configure Workload Identity</div>
+    <pre><code class="language-bash"># 1. Create GCP Service Account
+gcloud iam service-accounts create ml-training-sa \
+    --project my-project \
+    --display-name "ML Training Service Account"
+
+# 2. Grant GCS permissions
+gcloud projects add-iam-policy-binding my-project \
+    --member="serviceAccount:ml-training-sa@my-project.iam.gserviceaccount.com" \
+    --role="roles/storage.objectViewer"
+
+# 3. Allow the K8s ServiceAccount to impersonate the GCP SA
+gcloud iam service-accounts add-iam-policy-binding \
+    ml-training-sa@my-project.iam.gserviceaccount.com \
+    --role=roles/iam.workloadIdentityUser \
+    --member="serviceAccount:my-project.svc.id.goog[ml-training/training-sa]"
+
+# 4. Annotate the K8s ServiceAccount
+kubectl annotate serviceaccount training-sa \
+    --namespace ml-training \
+    iam.gke.io/gcp-service-account=ml-training-sa@my-project.iam.gserviceaccount.com</code></pre>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 8: HELM                                              -->
+<!-- ============================================================ -->
+<section id="s8">
+  <div class="flex items-center gap-3 mb-4">
+    <span class="section-badge">Section 8</span>
+    <h2 class="text-2xl font-bold text-gray-900">Helm for ML Application Packaging</h2>
+  </div>
+
+  <p class="text-gray-700 leading-relaxed mb-4">
+    Helm is the package manager for Kubernetes. It templates YAML manifests with Go templating,
+    manages releases (versioned deployments), and handles upgrades and rollbacks. Think of it as
+    <code class="inline">apt</code> for Kubernetes.
+  </p>
+
+  <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-6">
+    <div class="bg-gray-800 text-gray-300 text-xs px-4 py-2 font-mono">bash — Helm chart structure for an ML inference service</div>
+    <pre><code class="language-bash">model-server/
+├── Chart.yaml                  # Chart metadata
+├── values.yaml                 # Default configuration values
+├── values-production.yaml      # Production overrides
+├── values-staging.yaml         # Staging overrides
+└── templates/
+    ├── _helpers.tpl            # Template helper macros
+    ├── deployment.yaml
+    ├── service.yaml
+    ├── ingress.yaml
+    ├── hpa.yaml                # HorizontalPodAutoscaler
+    ├── pdb.yaml                # PodDisruptionBudget
+    ├── serviceaccount.yaml
+    ├── configmap.yaml
+    └── NOTES.txt               # Post-install instructions</code></pre>
+  </div>
+
+  <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-6">
+    <div class="bg-gray-800 text-gray-300 text-xs px-4 py-2 font-mono">model-server/values.yaml</div>
+    <pre><code class="language-yaml">replicaCount: 2
+
+image:
+  repository: 123456789.dkr.ecr.us-east-1.amazonaws.com/model-server
+  tag: ""               # Set at deploy time with --set image.tag=v1.2.3
+  pullPolicy: IfNotPresent
+
+model:
+  name: bert-base-uncased
+  version: "1.0.0"
+  s3Path: s3://my-models/bert-base-uncased/
+
+resources:
+  requests:
+    cpu: "2"
+    memory: "4Gi"
+    nvidia.com/gpu: "0"      # 0 for CPU-only inference
+  limits:
+    cpu: "4"
+    memory: "8Gi"
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 20
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+ingress:
+  enabled: true
+  className: alb
+  annotations:
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+  hosts:
+    - host: api.mlplatform.company.com
+      paths:
+        - path: /v1/predict
+          pathType: Prefix
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+metrics:
+  enabled: true
+  port: 9090</code></pre>
+  </div>
+
+  <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-6">
+    <div class="bg-gray-800 text-gray-300 text-xs px-4 py-2 font-mono">bash — Helm deploy commands</div>
+    <pre><code class="language-bash"># Install a release
+helm install model-server ./model-server \
+    --namespace ml-serving \
+    --create-namespace \
+    --values ./model-server/values-production.yaml \
+    --set image.tag=v1.2.3 \
+    --set replicaCount=5
+
+# Upgrade an existing release
+helm upgrade model-server ./model-server \
+    --namespace ml-serving \
+    --values ./model-server/values-production.yaml \
+    --set image.tag=v1.3.0 \
+    --atomic \                  # Roll back automatically if upgrade fails
+    --timeout 5m
+
+# Roll back to previous release
+helm rollback model-server 1 --namespace ml-serving
+
+# List releases
+helm list --namespace ml-serving
+
+# Install popular ML charts
+helm repo add jupyterhub https://jupyterhub.github.io/helm-chart/
+helm install jupyterhub jupyterhub/jupyterhub \
+    --namespace ml-platform \
+    --values jupyterhub-values.yaml
+
+helm repo add mlflow https://community-charts.github.io/helm-charts
+helm install mlflow mlflow/mlflow \
+    --namespace ml-platform \
+    --set backendStore.s3.bucket=my-mlflow-bucket</code></pre>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 9: ADVANCED K8S PATTERNS                             -->
+<!-- ============================================================ -->
+<section id="s9">
+  <div class="flex items-center gap-3 mb-4">
+    <span class="section-badge">Section 9</span>
+    <h2 class="text-2xl font-bold text-gray-900">Advanced Kubernetes Patterns for ML</h2>
+  </div>
+
+  <h3 class="text-xl font-semibold mt-6 mb-3 text-gray-800">Volcano Batch Scheduler</h3>
+  <p class="text-gray-700 leading-relaxed mb-4">
+    The default Kubernetes scheduler is designed for long-running services, not ML batch jobs.
+    Volcano adds gang scheduling (all pods start or none do), queue management, fair-share policies,
+    and job priorities. It is the scheduler of choice for production ML training platforms.
+  </p>
+
+  <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-6">
+    <div class="bg-gray-800 text-gray-300 text-xs px-4 py-2 font-mono">k8s/volcano-job.yaml — Multi-node distributed training</div>
+    <pre><code class="language-yaml">apiVersion: batch.volcano.sh/v1alpha1
+kind: Job
+metadata:
+  name: llm-pretraining-run-001
+  namespace: ml-training
+spec:
+  minAvailable: 16          # Need ALL 16 workers or don't start (gang scheduling)
+  schedulerName: volcano
+  priorityClassName: high-priority-training
+  queue: ml-training-queue
+
+  plugins:
+    ssh: []                 # Auto-generate SSH keys for MPI
+    svc: []                 # Auto-create headless service for hostname resolution
+    env: []                 # Inject VK_TASK_INDEX env var
+
+  policies:
+    - event: PodEvicted
+      action: RestartJob    # Restart all pods if any is evicted
+
+  tasks:
+    - replicas: 1
+      name: master
+      policies:
+        - event: TaskCompleted
+          action: CompleteJob
+      template:
+        spec:
+          containers:
+            - name: trainer
+              image: my-llm-trainer:latest
+              command: ["torchrun"]
+              args:
+                - "--nproc_per_node=8"
+                - "--nnodes=16"
+                - "--node_rank=$(VK_TASK_INDEX)"
+                - "--master_addr=llm-pretraining-run-001-master-0"
+                - "--master_port=23456"
+                - "train_llm.py"
+              resources:
+                requests:
+                  nvidia.com/gpu: "8"
+                limits:
+                  nvidia.com/gpu: "8"
+              env:
+                - name: NCCL_IB_DISABLE
+                  value: "0"               # Enable InfiniBand
+                - name: NCCL_DEBUG
+                  value: "WARN"
+          tolerations:
+            - key: nvidia.com/gpu
+              effect: NoSchedule
+          nodeSelector:
+            node.kubernetes.io/instance-type: p4d.24xlarge
+
+    - replicas: 15          # 15 additional workers = 16 total nodes
+      name: worker
+      template:
+        spec:
+          containers:
+            - name: trainer
+              image: my-llm-trainer:latest
+              command: ["torchrun"]
+              args:
+                - "--nproc_per_node=8"
+                - "--nnodes=16"
+                - "--node_rank=$(VK_TASK_INDEX)"
+                - "--master_addr=llm-pretraining-run-001-master-0"
+                - "--master_port=23456"
+                - "train_llm.py"
+              resources:
+                requests:
+                  nvidia.com/gpu: "8"
+                limits:
+                  nvidia.com/gpu: "8"
+          tolerations:
+            - key: nvidia.com/gpu
+              effect: NoSchedule
+          nodeSelector:
+            node.kubernetes.io/instance-type: p4d.24xlarge</code></pre>
+  </div>
+
+  <h3 class="text-xl font-semibold mt-8 mb-3 text-gray-800">Multi-GPU Distributed Training Topology</h3>
+  <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-4 mb-6">
+    <div class="mermaid">
+graph TB
+    subgraph "Node 0 — p4d.24xlarge"
+        W00[Worker 0<br/>GPU 0]
+        W01[Worker 1<br/>GPU 1]
+        W02[Worker 2<br/>GPU 2]
+        W03[Worker 3<br/>GPU 3]
+        W04[Worker 4<br/>GPU 4]
+        W05[Worker 5<br/>GPU 5]
+        W06[Worker 6<br/>GPU 6]
+        W07[Worker 7<br/>GPU 7]
+        NVS0[NVSwitch<br/>600 GB/s all-to-all]
+        W00 & W01 & W02 & W03 & W04 & W05 & W06 & W07 --- NVS0
+    end
+    subgraph "Node 1 — p4d.24xlarge"
+        W10[Worker 8<br/>GPU 0]
+        W11[Worker 9<br/>GPU 1]
+        W17[Worker 15<br/>GPU 7]
+        NVS1[NVSwitch<br/>600 GB/s all-to-all]
+        W10 & W11 & W17 --- NVS1
+    end
+    subgraph "Inter-Node"
+        EFA[EFA Network<br/>400 Gbps / node<br/>NCCL AllReduce]
+    end
+    NVS0 <--> EFA
+    NVS1 <--> EFA
+    subgraph "K8s Control"
+        MASTER[Volcano Job<br/>Gang Scheduler]
+    end
+    MASTER --> W00
+    MASTER --> W10
+
+    style NVS0 fill:#f59e0b,color:#1f2937
+    style NVS1 fill:#f59e0b,color:#1f2937
+    style EFA fill:#2563eb,color:#fff
+    style MASTER fill:#059669,color:#fff
+    </div>
+  </div>
+
+  <h3 class="text-xl font-semibold mt-8 mb-3 text-gray-800">KEDA for Async Inference Scaling</h3>
+  <p class="text-gray-700 leading-relaxed mb-4">
+    HPA scales on CPU/memory. KEDA (Kubernetes Event-Driven Autoscaler) scales on external
+    metrics — SQS queue depth, Kafka lag, Prometheus metrics. For async inference (requests
+    queued in SQS), KEDA ensures the right number of GPU workers are running.
+  </p>
+  <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-6">
+    <div class="bg-gray-800 text-gray-300 text-xs px-4 py-2 font-mono">k8s/keda-scaled-object.yaml — Scale inference on SQS queue depth</div>
+    <pre><code class="language-yaml">apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: inference-worker-scaler
+  namespace: ml-serving
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: inference-worker
+  minReplicaCount: 0          # Scale to zero when queue is empty!
+  maxReplicaCount: 50
+  pollingInterval: 15         # Check queue every 15 seconds
+  cooldownPeriod: 300         # Wait 5 min before scaling down
+  advanced:
+    restoreToOriginalReplicaCount: false
+    horizontalPodAutoscalerConfig:
+      behavior:
+        scaleUp:
+          stabilizationWindowSeconds: 0   # Scale up immediately
+          policies:
+            - type: Percent
+              value: 100
+              periodSeconds: 15
+        scaleDown:
+          stabilizationWindowSeconds: 300
+          policies:
+            - type: Pods
+              value: 5
+              periodSeconds: 60
+  triggers:
+    - type: aws-sqs-queue
+      authenticationRef:
+        name: keda-aws-credentials
+      metadata:
+        queueURL: https://sqs.us-east-1.amazonaws.com/123456789/inference-requests
+        queueLength: "10"       # 1 replica per 10 messages in queue
+        awsRegion: us-east-1
+        identityOwner: pod      # Use IRSA pod identity
+    # Also scale on GPU utilization (don't let GPUs sit idle)
+    - type: prometheus
+      metadata:
+        serverAddress: http://prometheus.monitoring.svc.cluster.local:9090
+        metricName: gpu_utilization_avg
+        query: avg(DCGM_FI_DEV_GPU_UTIL{namespace="ml-serving"})
+        threshold: "70"         # Scale up if avg GPU util > 70%</code></pre>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 10: CLUSTER NETWORKING                               -->
+<!-- ============================================================ -->
+<section id="s10">
+  <div class="flex items-center gap-3 mb-4">
+    <span class="section-badge">Section 10</span>
+    <h2 class="text-2xl font-bold text-gray-900">Cluster Networking for Distributed Training</h2>
+  </div>
+
+  <h3 class="text-xl font-semibold mt-6 mb-3 text-gray-800">RDMA: InfiniBand vs EFA</h3>
+  <p class="text-gray-700 leading-relaxed mb-4">
+    Multi-node distributed training is bottlenecked by inter-node bandwidth during AllReduce
+    gradient synchronization. Standard Ethernet (even 100 GbE) adds kernel overhead that
+    makes large-scale training inefficient. RDMA (Remote Direct Memory Access) bypasses the
+    kernel and transfers data directly between GPU memory on different nodes.
+  </p>
+  <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm mb-6">
+    <table>
+      <thead>
+        <tr>
+          <th>Technology</th>
+          <th>Bandwidth</th>
+          <th>Latency</th>
+          <th>Provider</th>
+          <th>K8s Support</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>InfiniBand HDR</strong></td><td>200 Gbps/port</td><td>&lt;1 µs</td><td>On-prem / OCI</td><td>SR-IOV device plugin</td><td>Gold standard; used by HPC clusters</td></tr>
+        <tr><td><strong>InfiniBand NDR</strong></td><td>400 Gbps/port</td><td>&lt;1 µs</td><td>On-prem</td><td>SR-IOV device plugin</td><td>H100 DGX systems</td></tr>
+        <tr><td><strong>AWS EFA</strong></td><td>400 Gbps (p4d)</td><td>~10 µs</td><td>AWS</td><td>EFA device plugin</td><td>Cloud-friendly RDMA; no special switch</td></tr>
+        <tr><td><strong>AWS EFA v2</strong></td><td>3200 Gbps (p5)</td><td>~10 µs</td><td>AWS</td><td>EFA device plugin</td><td>H100 instances; enormous bandwidth</td></tr>
+        <tr><td><strong>GCP GPUDirect-TCPXO</strong></td><td>200+ Gbps</td><td>~20 µs</td><td>GCP</td><td>GKE native</td><td>A3 mega instances with H100</td></tr>
+        <tr><td><strong>Standard Ethernet</strong></td><td>10-100 Gbps</td><td>50-200 µs</td><td>Any</td><td>Standard CNI</td><td>Fine for small jobs; bottleneck at scale</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 class="text-xl font-semibold mt-8 mb-3 text-gray-800">Pod Affinity and Anti-Affinity</h3>
+  <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-6">
+    <div class="bg-gray-800 text-gray-300 text-xs px-4 py-2 font-mono">k8s/affinity-rules.yaml</div>
+    <pre><code class="language-yaml">apiVersion: v1
+kind: Pod
+metadata:
+  name: distributed-trainer
+  namespace: ml-training
+spec:
+  affinity:
+    # ── Node affinity: prefer p4d nodes with EFA ─────────────────────────────
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: node.kubernetes.io/instance-type
+                operator: In
+                values: ["p4d.24xlarge", "p4de.24xlarge", "p5.48xlarge"]
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          preference:
+            matchExpressions:
+              - key: topology.kubernetes.io/zone
+                operator: In
+                values: ["us-east-1a"]    # Keep all pods in same AZ = lower latency
+
+    # ── Pod affinity: co-locate workers in same placement group ──────────────
+    podAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 80
+          podAffinityTerm:
+            labelSelector:
+              matchLabels:
+                job-name: distributed-trainer
+            topologyKey: topology.kubernetes.io/zone
+
+    # ── Pod anti-affinity: spread inference pods across nodes ────────────────
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchLabels:
+              app: model-server
+          topologyKey: kubernetes.io/hostname   # 1 server pod per physical node
+
+  containers:
+    - name: trainer
+      image: my-trainer:latest
+      resources:
+        limits:
+          nvidia.com/gpu: "8"
+          # Request EFA network device for RDMA
+          vpc.amazonaws.com/efa: "1"
+      env:
+        - name: FI_PROVIDER
+          value: efa
+        - name: FI_EFA_USE_DEVICE_RDMA
+          value: "1"
+        - name: NCCL_ALGO
+          value: Ring</code></pre>
+  </div>
+
+  <div class="callout-tip p-4 rounded-lg mb-6">
+    <strong class="text-green-700">Bandwidth test before training:</strong>
+    <span class="text-gray-700"> Always run NCCL's built-in bandwidth test before starting
+    a multi-day pretraining run. A degraded link in a placement group can cut throughput by 10x
+    and waste enormous compute budget.</span>
+    <pre class="mt-2 text-xs bg-gray-100 p-2 rounded"><code>kubectl run nccl-test --image=nvcr.io/nvidia/pytorch:24.01-py3 \
+  --overrides='{"spec":{"nodeSelector":{"node.kubernetes.io/instance-type":"p4d.24xlarge"}}}' \
+  -- /opt/conda/lib/python3.10/site-packages/torch/distributed/launch.py \
+  nccl-tests/all_reduce_perf -b 1G -e 4G -f 2 -g 8</code></pre>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 11: OBSERVABILITY                                    -->
+<!-- ============================================================ -->
+<section id="s11">
+  <div class="flex items-center gap-3 mb-4">
+    <span class="section-badge">Section 11</span>
+    <h2 class="text-2xl font-bold text-gray-900">Observability</h2>
+  </div>
+
+  <p class="text-gray-700 leading-relaxed mb-4">
+    Without observability, a GPU node running at 30% utilization looks the same as one at 95%.
+    The standard K8s observability stack for ML combines Prometheus (metrics), Grafana (dashboards),
+    and DCGM Exporter (GPU-specific telemetry).
+  </p>
+
+  <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-6">
+    <div class="bg-gray-800 text-gray-300 text-xs px-4 py-2 font-mono">bash — Deploy kube-prometheus-stack + DCGM Exporter</div>
+    <pre><code class="language-bash"># Install the full Prometheus + Grafana + Alertmanager stack
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+
+helm install kube-prometheus-stack \
+    prometheus-community/kube-prometheus-stack \
+    --namespace monitoring \
+    --create-namespace \
+    --set prometheus.prometheusSpec.retention=30d \
+    --set prometheus.prometheusSpec.retentionSize="50GB" \
+    --set prometheus.prometheusSpec.storageSpec.volumeClaimTemplate.spec.resources.requests.storage=100Gi \
+    --set grafana.adminPassword="$(openssl rand -base64 20)" \
+    --set grafana.persistence.enabled=true \
+    --set grafana.persistence.size=20Gi
+
+# Install DCGM Exporter — exposes 200+ GPU metrics to Prometheus
+helm install dcgm-exporter \
+    nvidia/dcgm-exporter \
+    --namespace monitoring \
+    --set serviceMonitor.enabled=true \      # Auto-register with Prometheus
+    --set serviceMonitor.labels.release=kube-prometheus-stack</code></pre>
+  </div>
+
+  <h3 class="text-xl font-semibold mt-8 mb-3 text-gray-800">Prometheus Scrape Config for GPU Metrics</h3>
+  <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-6">
+    <div class="bg-gray-800 text-gray-300 text-xs px-4 py-2 font-mono">prometheus/additional-scrape-configs.yaml</div>
+    <pre><code class="language-yaml">- job_name: dcgm-exporter
+  scrape_interval: 15s
+  honor_labels: true
+  kubernetes_sd_configs:
+    - role: endpoints
+      namespaces:
+        names: [monitoring]
+  relabel_configs:
+    - source_labels: [__meta_kubernetes_service_name]
+      action: keep
+      regex: dcgm-exporter
+    - source_labels: [__meta_kubernetes_pod_node_name]
+      target_label: node
+    - source_labels: [__meta_kubernetes_namespace]
+      target_label: namespace
+  metric_relabel_configs:
+    # Drop metrics we don't care about (reduce cardinality)
+    - source_labels: [__name__]
+      regex: 'DCGM_FI_DEV_XID_ERRORS'
+      action: drop
+
+# Key GPU metrics to alert on:
+# DCGM_FI_DEV_GPU_UTIL          — GPU compute utilization (%)
+# DCGM_FI_DEV_MEM_COPY_UTIL     — GPU memory bandwidth utilization (%)
+# DCGM_FI_DEV_FB_USED           — Framebuffer (VRAM) used (MiB)
+# DCGM_FI_DEV_FB_FREE           — Framebuffer free (MiB)
+# DCGM_FI_DEV_POWER_USAGE       — Power draw (W) — alert if near TDP
+# DCGM_FI_DEV_GPU_TEMP          — Temperature (C) — alert if > 85C
+# DCGM_FI_DEV_NVLINK_BANDWIDTH_TOTAL — NVLink throughput
+# DCGM_FI_DEV_PCIE_TX_THROUGHPUT — PCIe TX (identify CPU-GPU bottleneck)</code></pre>
+  </div>
+
+  <h3 class="text-xl font-semibold mt-8 mb-4 text-gray-800">Key Grafana Dashboards for ML Clusters</h3>
+  <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm mb-6">
+    <table>
+      <thead>
+        <tr><th>Dashboard</th><th>What It Shows</th><th>Key Alert Conditions</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>GPU Utilization Overview</strong></td>
+          <td>Per-node/pod GPU util, VRAM usage, power draw</td>
+          <td>GPU util &lt; 60% during training; VRAM &gt; 95%</td>
+        </tr>
+        <tr>
+          <td><strong>Training Job Health</strong></td>
+          <td>Job status, throughput (samples/sec), loss curves via Prometheus</td>
+          <td>Stalled loss; throughput drop &gt; 20%</td>
+        </tr>
+        <tr>
+          <td><strong>Inference SLO</strong></td>
+          <td>P50/P95/P99 latency, error rate, queue depth</td>
+          <td>P99 latency &gt; SLO; error rate &gt; 0.1%</td>
+        </tr>
+        <tr>
+          <td><strong>Cluster Capacity</strong></td>
+          <td>Requested vs allocatable GPU/CPU/mem by namespace</td>
+          <td>GPU utilization &lt; 50% cluster-wide (waste); &gt; 95% (starvation)</td>
+        </tr>
+        <tr>
+          <td><strong>Node Health</strong></td>
+          <td>GPU temperatures, NVLink errors, ECC errors, PCIe throughput</td>
+          <td>Any ECC double-bit error; temp &gt; 85C; XID error codes</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-4 mb-6">
+    <div class="mermaid">
+graph LR
+    subgraph "GPU Nodes"
+        DCGM_EXP[DCGM Exporter<br/>DaemonSet]
+        CADV[cAdvisor<br/>embedded in kubelet]
+    end
+    subgraph "Monitoring Stack"
+        PROM[Prometheus<br/>Time Series DB]
+        AM[Alertmanager]
+        GRAF[Grafana<br/>Dashboards]
+    end
+    subgraph "Alerts"
+        SLACK[Slack]
+        PAGE[PagerDuty]
+    end
+    subgraph "ML Teams"
+        OPS[MLOps Engineer]
+        DS[Data Scientist]
+    end
+
+    DCGM_EXP -->|scrape /metrics| PROM
+    CADV -->|scrape /metrics/cadvisor| PROM
+    PROM --> AM
+    PROM --> GRAF
+    AM --> SLACK
+    AM --> PAGE
+    SLACK --> OPS
+    PAGE --> OPS
+    GRAF --> DS
+    GRAF --> OPS
+
+    style PROM fill:#e05d20,color:#fff
+    style GRAF fill:#f46800,color:#fff
+    style AM fill:#e05d20,color:#fff
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SUMMARY                                                      -->
+<!-- ============================================================ -->
+<section id="summary">
+  <div class="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl p-8">
+    <h2 class="text-2xl font-bold text-blue-900 mb-6">Key Takeaways</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
+        <h3 class="font-semibold text-gray-800 mb-3">Containers</h3>
+        <ul class="space-y-2 text-sm text-gray-700">
+          <li class="flex gap-2"><span class="text-blue-600 font-bold mt-0.5">&#10003;</span> Always use multi-stage builds to keep ML images under 10 GB</li>
+          <li class="flex gap-2"><span class="text-blue-600 font-bold mt-0.5">&#10003;</span> Pin all dependencies; never use floating versions in production</li>
+          <li class="flex gap-2"><span class="text-blue-600 font-bold mt-0.5">&#10003;</span> Run as non-root; always provide a <code class="inline">.dockerignore</code></li>
+          <li class="flex gap-2"><span class="text-blue-600 font-bold mt-0.5">&#10003;</span> Use nvcr.io NGC base images for GPU workloads — they include cuDNN, NCCL, and flash-attention</li>
+          <li class="flex gap-2"><span class="text-blue-600 font-bold mt-0.5">&#10003;</span> CUDA in image must be &le; max CUDA supported by host driver</li>
+        </ul>
+      </div>
+      <div>
+        <h3 class="font-semibold text-gray-800 mb-3">Kubernetes</h3>
+        <ul class="space-y-2 text-sm text-gray-700">
+          <li class="flex gap-2"><span class="text-green-600 font-bold mt-0.5">&#10003;</span> GPU limits must equal GPU requests — they are non-divisible</li>
+          <li class="flex gap-2"><span class="text-green-600 font-bold mt-0.5">&#10003;</span> Use tolerations + nodeSelectors to isolate GPU nodes from CPU workloads</li>
+          <li class="flex gap-2"><span class="text-green-600 font-bold mt-0.5">&#10003;</span> Volcano is the right batch scheduler for gang-scheduled training jobs</li>
+          <li class="flex gap-2"><span class="text-green-600 font-bold mt-0.5">&#10003;</span> Karpenter dramatically outperforms Cluster Autoscaler for GPU provisioning</li>
+          <li class="flex gap-2"><span class="text-green-600 font-bold mt-0.5">&#10003;</span> KEDA enables scale-to-zero for async inference — critical for cost control</li>
+        </ul>
+      </div>
+      <div>
+        <h3 class="font-semibold text-gray-800 mb-3">GPU Management</h3>
+        <ul class="space-y-2 text-sm text-gray-700">
+          <li class="flex gap-2"><span class="text-purple-600 font-bold mt-0.5">&#10003;</span> Deploy GPU Operator — it automates driver, device plugin, and DCGM setup</li>
+          <li class="flex gap-2"><span class="text-purple-600 font-bold mt-0.5">&#10003;</span> MIG partitions A100/H100 for multi-tenant GPU sharing with true isolation</li>
+          <li class="flex gap-2"><span class="text-purple-600 font-bold mt-0.5">&#10003;</span> Monitor DCGM_FI_DEV_GPU_UTIL; alert if util &lt; 60% during training runs</li>
+          <li class="flex gap-2"><span class="text-purple-600 font-bold mt-0.5">&#10003;</span> EFA (AWS) or InfiniBand is mandatory for efficient multi-node training</li>
+        </ul>
+      </div>
+      <div>
+        <h3 class="font-semibold text-gray-800 mb-3">Platform</h3>
+        <ul class="space-y-2 text-sm text-gray-700">
+          <li class="flex gap-2"><span class="text-orange-600 font-bold mt-0.5">&#10003;</span> Use Helm to package ML services — enables versioned, reproducible deploys</li>
+          <li class="flex gap-2"><span class="text-orange-600 font-bold mt-0.5">&#10003;</span> EKS + Karpenter on AWS; GKE Standard for TPU; both are excellent choices</li>
+          <li class="flex gap-2"><span class="text-orange-600 font-bold mt-0.5">&#10003;</span> Use IRSA (AWS) or Workload Identity (GCP) — never mount static credentials</li>
+          <li class="flex gap-2"><span class="text-orange-600 font-bold mt-0.5">&#10003;</span> Prometheus + Grafana + DCGM Exporter is the required observability stack</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- BOTTOM NAV -->
+<footer class="max-w-4xl mx-auto px-4 py-10 mt-4">
+  <div class="flex justify-between items-center border-t border-gray-200 pt-6">
+    <a href="ch03_iac_terraform.html"
+       class="flex items-center gap-2 text-blue-600 hover:text-blue-800 font-medium">
+      &#8592; Chapter 3: IaC &amp; Terraform
+    </a>
+    <a href="index.html" class="text-gray-500 hover:text-gray-700 text-sm">&#8962; Index</a>
+    <a href="ch05_cicd_mlops.html"
+       class="flex items-center gap-2 text-blue-600 hover:text-blue-800 font-medium">
+      Chapter 5: CI/CD for MLOps &#8594;
+    </a>
+  </div>
+  <p class="text-center text-gray-400 text-xs mt-6">
+    Modern MLOps Tutorial &mdash; Chapter 4 &mdash; Containers &amp; Kubernetes for ML
+  </p>
+</footer>
+
+</body>
+</html>

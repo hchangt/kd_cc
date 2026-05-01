@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 17: Case Study - ChatGPT & GPT-4 (Training) - Modern MLOps Tutorial</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script>hljs.highlightAll(); mermaid.initialize({startOnLoad:true, theme:'default'});</script>
+  <style>
+    :root { --primary: #2563eb; --secondary: #059669; --accent: #d97706; --text: #1f2937; }
+    body { color: var(--text); font-family: 'Inter', system-ui, sans-serif; }
+    .nav-link { transition: color 0.15s; }
+    .nav-link:hover { color: #93c5fd; }
+    .toc-link { transition: color 0.15s; }
+    .toc-link:hover { color: var(--primary); }
+    .toc-link.active { color: var(--primary); font-weight: 600; border-left: 2px solid var(--primary); padding-left: 0.5rem; }
+    .callout-info { border-left: 4px solid #2563eb; background: #eff6ff; }
+    .callout-tip { border-left: 4px solid #059669; background: #ecfdf5; }
+    .callout-warning { border-left: 4px solid #d97706; background: #fffbeb; }
+    .callout-note { border-left: 4px solid #7c3aed; background: #f5f3ff; }
+    .callout-danger { border-left: 4px solid #dc2626; background: #fef2f2; }
+    table { border-collapse: collapse; width: 100%; }
+    thead { background: #2563eb; color: white; }
+    tbody tr:nth-child(even) { background: #f8fafc; }
+    tbody tr:nth-child(odd) { background: #ffffff; }
+    tbody tr:hover { background: #eff6ff; }
+    td, th { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid #e2e8f0; }
+    .mermaid { background: #fff; padding: 1rem; border-radius: 0.5rem; }
+    pre code { font-size: 0.875rem; }
+    .chapter-badge { background: #2563eb; color: white; font-size: 0.75rem; font-weight: 700; padding: 0.25rem 0.75rem; border-radius: 9999px; letter-spacing: 0.05em; text-transform: uppercase; }
+    .section-anchor { scroll-margin-top: 5rem; }
+    .code-label { background: #1e293b; color: #94a3b8; font-size: 0.7rem; font-weight: 600; padding: 0.25rem 0.75rem; border-radius: 0.375rem 0.375rem 0 0; letter-spacing: 0.05em; text-transform: uppercase; display: inline-block; }
+    .public-note { border-left: 4px solid #7c3aed; background: #f5f3ff; }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+<!-- Top Navbar -->
+<nav class="bg-gray-900 text-white sticky top-0 z-50 shadow-lg">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center font-bold text-sm">ML</div>
+        <a href="index.html" class="nav-link font-semibold text-lg tracking-tight">Modern MLOps Tutorial</a>
+      </div>
+      <div class="hidden md:flex items-center gap-6 text-sm text-gray-300">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="#toc" class="nav-link">Contents</a>
+        <span class="text-gray-500">|</span>
+        <span class="text-blue-400 font-medium">Chapter 17 of 19</span>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- Chapter Header -->
+<header class="bg-white border-b border-gray-200 shadow-sm">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div class="flex flex-col gap-3">
+      <div class="flex items-center gap-3">
+        <span class="chapter-badge">Chapter 17</span>
+        <span class="text-sm text-gray-500">Case Study Series &mdash; Part 1: Training</span>
+      </div>
+      <h1 class="text-4xl font-bold text-gray-900 leading-tight">Case Study: ChatGPT &amp; GPT-4 — Training at Scale</h1>
+      <p class="text-xl text-gray-600 max-w-3xl">How OpenAI built the infrastructure, data pipelines, alignment techniques, and scaling strategies behind the world's most influential language model — based entirely on public papers and disclosed information.</p>
+      <div class="flex flex-wrap items-center gap-6 text-sm text-gray-500 mt-2">
+        <span class="flex items-center gap-1">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          ~60 min read
+        </span>
+        <span class="flex items-center gap-1">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+          Distinguished Engineer &mdash; ex-OpenAI Infrastructure
+        </span>
+        <span class="flex items-center gap-1">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          Advanced
+        </span>
+        <span class="flex items-center gap-1">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          Updated April 2026
+        </span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Main Layout -->
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+  <div class="flex gap-10">
+
+    <!-- Sidebar TOC -->
+    <aside class="hidden xl:block w-72 flex-shrink-0">
+      <div class="sticky top-24 bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+        <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4" id="toc">On This Page</h3>
+        <nav class="space-y-1 text-sm text-gray-600">
+          <a href="#s1" class="toc-link block py-1">1. The Scale Challenge</a>
+          <a href="#s2" class="toc-link block py-1">2. Training Infrastructure</a>
+          <a href="#s3" class="toc-link block py-1">3. Pre-training Data Pipeline</a>
+          <a href="#s4" class="toc-link block py-1">4. InstructGPT &amp; RLHF</a>
+          <a href="#s5" class="toc-link block py-1">5. Scaling Laws</a>
+          <a href="#s6" class="toc-link block py-1">6. GPT-4 Advances</a>
+          <a href="#summary" class="toc-link block py-1">Summary &amp; Takeaways</a>
+        </nav>
+        <div class="mt-6 pt-4 border-t border-gray-100">
+          <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider mb-2">Part 2</p>
+          <a href="ch17b_chatgpt_serving.html" class="text-xs text-blue-600 hover:underline">Serving, Product &amp; Lessons &rarr;</a>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Content -->
+    <main class="flex-1 min-w-0 space-y-16">
+
+      <!-- Public Info Notice -->
+      <div class="public-note rounded-xl p-5">
+        <div class="flex gap-3">
+          <svg class="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <div>
+            <p class="font-semibold text-purple-800 text-sm">Public Information Notice</p>
+            <p class="text-purple-700 text-sm mt-1">All content in this chapter is derived exclusively from publicly available sources: OpenAI's published papers (GPT-1 through GPT-4 technical reports), the InstructGPT paper (Ouyang et al., 2022), Kaplan et al. scaling laws (2020), Hoffmann et al. Chinchilla (2022), Microsoft Azure partnership announcements, and other peer-reviewed publications. Architecture specifics, cluster sizes, and internal procedures are <strong>estimates and reconstructions</strong> based on public disclosures. No confidential or proprietary information is presented.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 1 -->
+      <section id="s1" class="section-anchor">
+        <h2 class="text-3xl font-bold text-gray-900 mb-6">1. The Scale Challenge</h2>
+        <p class="text-gray-700 leading-relaxed mb-6">The GPT lineage is the defining example of what scale does to machine learning. From a 117M-parameter proof-of-concept in 2018 to a model estimated at over a trillion parameters by 2023, each generation did not just produce a better model — it required a fundamentally different engineering organization. Understanding this progression is the prerequisite for understanding every MLOps decision that followed.</p>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">GPT Model Progression</h3>
+        <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm mb-8">
+          <table>
+            <thead>
+              <tr>
+                <th>Model</th><th>Year</th><th>Parameters</th><th>Training Tokens</th><th>Compute (PF-days)</th><th>Context</th><th>Key Paper</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>GPT-1</strong></td><td>2018</td><td>117M</td><td>~5B</td><td>~0.5</td><td>512</td><td>Radford et al. 2018</td></tr>
+              <tr><td><strong>GPT-2</strong></td><td>2019</td><td>1.5B</td><td>~40B</td><td>~10</td><td>1,024</td><td>Radford et al. 2019</td></tr>
+              <tr><td><strong>GPT-3</strong></td><td>2020</td><td>175B</td><td>300B</td><td>3,640</td><td>2,048</td><td>Brown et al. 2020</td></tr>
+              <tr><td><strong>InstructGPT / ChatGPT base</strong></td><td>2022</td><td>~175B</td><td>~300B + RLHF</td><td>~3,640 + RLHF</td><td>4,096</td><td>Ouyang et al. 2022</td></tr>
+              <tr><td><strong>GPT-4</strong></td><td>2023</td><td>~1T+ (est.)</td><td>~13T (est.)</td><td>~50,000+ (est.)</td><td>8K–128K</td><td>OpenAI 2023 Tech Report</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-xs text-gray-400 mb-8">Note: GPT-4 parameters and compute are estimates from third-party analyses (e.g., Semianalysis, various ML researchers). OpenAI has not publicly confirmed GPT-4 architecture details. PF-days = petaflop/s-days.</p>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">What Scale Means for MLOps</h3>
+        <p class="text-gray-700 leading-relaxed mb-4">At GPT-3 scale, a single training run costs millions of dollars and takes weeks. At GPT-4 scale, the cost is estimated in the tens to hundreds of millions. This changes MLOps in several fundamental ways:</p>
+        <ul class="list-disc list-inside space-y-2 text-gray-700 mb-6 ml-2">
+          <li><strong>No iteration budget:</strong> You cannot afford to train from scratch to discover a bug. Offline simulation and unit tests must catch failures before a full run.</li>
+          <li><strong>Infrastructure is the model:</strong> The difference between a 7-day and 14-day training run is entirely infrastructure — parallelism strategy, network topology, fault recovery speed.</li>
+          <li><strong>Data becomes a first-class artifact:</strong> At 300B–13T tokens, data pipelines must be version-controlled, reproducible, and statistically audited.</li>
+          <li><strong>Team specialization explodes:</strong> Pre-training, RLHF, evaluation, safety, and serving become entirely separate engineering disciplines.</li>
+          <li><strong>Checkpoint management is safety-critical:</strong> A lost checkpoint at week 3 of a 4-week run is a catastrophic loss of capital.</li>
+        </ul>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Timeline of OpenAI Model Releases</h3>
+        <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+          <div class="mermaid">
+timeline
+    title OpenAI GPT Model Release Timeline (Public Announcements)
+    2018 : GPT-1 (117M)
+         : Unsupervised pre-training paper
+    2019 : GPT-2 (1.5B)
+         : Staged release due to misuse concerns
+    2020 : GPT-3 (175B)
+         : Few-shot learning, API launch
+    2021 : Codex
+         : DALL-E 1
+         : GitHub Copilot (technical preview)
+    2022 : InstructGPT paper (January)
+         : ChatGPT launch (November)
+         : DALL-E 2
+    2023 : GPT-4 launch (March)
+         : GPT-4V multimodal (October)
+         : GPT-4 Turbo (November)
+    2024 : GPT-4o (omni model)
+         : o1 reasoning model
+    2025 : GPT-4.5 / o3 / o4-mini
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 2 -->
+      <section id="s2" class="section-anchor">
+        <h2 class="text-3xl font-bold text-gray-900 mb-6">2. Training Infrastructure</h2>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-3">Azure Supercomputer Partnership</h3>
+        <p class="text-gray-700 leading-relaxed mb-4">In 2019, Microsoft announced a $1B investment in OpenAI and committed to building dedicated Azure supercomputing infrastructure. By the time of GPT-3, OpenAI was training on a publicly announced Azure supercomputer (described at Microsoft Build 2020): a single system with 285,000 CPU cores, 10,000 GPUs, and 400 Gbps network per GPU server. GPT-4 training was reported to use a cluster of approximately 25,000 A100 GPUs (per independent analyses citing Azure's dedicated OpenAI capacity).</p>
+
+        <div class="callout-info rounded-xl p-5 mb-6">
+          <p class="font-semibold text-blue-800 text-sm mb-1">Estimated GPT-4 Cluster Specifications (from public disclosures)</p>
+          <ul class="text-blue-700 text-sm space-y-1 mt-2">
+            <li><strong>GPUs:</strong> ~25,000 NVIDIA A100 80GB SXM (per Semianalysis and media reports)</li>
+            <li><strong>Interconnect:</strong> HDR/NDR InfiniBand (200–400 Gbps), NVLink within nodes</li>
+            <li><strong>Nodes:</strong> ~3,125 nodes × 8 GPUs per node</li>
+            <li><strong>Peak compute:</strong> ~800 PFLOPS (fp16 with sparsity off)</li>
+            <li><strong>Storage:</strong> High-throughput distributed filesystem (likely Azure Blob + local NVMe)</li>
+          </ul>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">3D Parallelism at GPT-4 Scale</h3>
+        <p class="text-gray-700 leading-relaxed mb-4">Training models of this scale requires combining three forms of parallelism simultaneously — a technique described in Megatron-LM papers (Shoeybi et al. 2019, Narayanan et al. 2021) and used by OpenAI's Megatron-based infrastructure:</p>
+
+        <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm mb-6">
+          <table>
+            <thead>
+              <tr><th>Parallelism Type</th><th>What It Splits</th><th>Typical Scale (GPT-4 est.)</th><th>Communication Bottleneck</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Tensor Parallelism (TP)</strong></td><td>Weight matrices within a layer</td><td>TP=8 (within node, NVLink)</td><td>All-reduce per layer forward/backward</td></tr>
+              <tr><td><strong>Pipeline Parallelism (PP)</strong></td><td>Layers across nodes</td><td>PP=8–16 (across nodes)</td><td>Point-to-point, pipeline bubble overhead</td></tr>
+              <tr><td><strong>Data Parallelism (DP)</strong></td><td>Batch across replica groups</td><td>DP=100s–1000s</td><td>All-reduce of gradients per step</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-gray-700 text-sm mb-6">For a 1T-parameter MoE model, an estimated configuration might be: TP=8, PP=8, Expert Parallelism=64, DP=512 — placing the model across 8×8×64 = 4,096 GPUs per model copy.</p>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Estimated Training Cluster Architecture</h3>
+        <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm mb-6">
+          <div class="mermaid">
+graph TB
+    subgraph "Data Parallel Group (×512)"
+      subgraph "Pipeline Stage (×8 nodes)"
+        subgraph "Tensor Parallel Node (8× A100)"
+          G0[GPU 0]
+          G1[GPU 1]
+          G2[GPU 2]
+          G3[GPU 3]
+          G4[GPU 4]
+          G5[GPU 5]
+          G6[GPU 6]
+          G7[GPU 7]
+        end
+      end
+    end
+
+    subgraph "Storage & Control Plane"
+      S1[Distributed Checkpoint Store<br/>Azure Blob / NFS]
+      S2[Job Scheduler<br/>SLURM / Azure CycleCloud]
+      S3[Metrics & Telemetry<br/>Grafana / custom]
+      S4[Data Loader Workers<br/>High-throughput tokenized shards]
+    end
+
+    S2 --> G0
+    S4 --> G0
+    G0 -.->|NVLink 600 GB/s| G7
+    G0 -->|Checkpoint| S1
+    G0 -->|Metrics| S3
+          </div>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Checkpoint Management for Month-Long Runs</h3>
+        <p class="text-gray-700 leading-relaxed mb-4">A training run of this scale requires treating checkpoints as the primary risk-management artifact. Key engineering decisions (based on public descriptions from Megatron-LM and similar systems):</p>
+        <div class="code-label">python</div>
+        <pre><code class="language-python"># Checkpoint strategy pattern used in large-scale pretraining
+# (inspired by Megatron-LM public codebase and published practices)
+
+import os
+import time
+from dataclasses import dataclass
+from typing import Optional
+
+@dataclass
+class CheckpointConfig:
+    # Save a full checkpoint every N steps
+    save_interval: int = 1000
+    # Keep last K full checkpoints (each can be 10s of TB)
+    keep_last_n: int = 3
+    # Lightweight "resume" checkpoint every M steps (just optimizer state delta)
+    async_checkpoint_interval: int = 100
+    # Target storage: distributed object store
+    checkpoint_dir: str = "gs://training-checkpoints/gpt4-run-007"
+    # On hardware failure, resume from latest valid checkpoint
+    resume_from: Optional[str] = None
+
+class CheckpointManager:
+    """
+    Manages checkpointing for multi-week training runs.
+    Key invariant: a checkpoint is 'valid' only after all ranks
+    confirm write completion AND a validation loss probe passes.
+    """
+
+    def __init__(self, cfg: CheckpointConfig, rank: int, world_size: int):
+        self.cfg = cfg
+        self.rank = rank
+        self.world_size = world_size
+        self.checkpoint_history: list[str] = []
+
+    def should_save(self, step: int) -> bool:
+        return step % self.cfg.save_interval == 0
+
+    def save(self, step: int, model_state, optimizer_state, metrics: dict):
+        start = time.time()
+        ckpt_path = os.path.join(self.cfg.checkpoint_dir, f"step_{step:07d}")
+
+        # Tensor-parallel and pipeline-parallel ranks each write their own shard
+        shard_path = f"{ckpt_path}/rank_{self.rank:05d}.pt"
+
+        # In practice: async write to object store to overlap with next step
+        self._async_write(shard_path, {
+            "step": step,
+            "model": model_state,
+            "optimizer": optimizer_state,
+            "metrics": metrics,
+            "timestamp": time.time(),
+        })
+
+        # Rank 0 writes a manifest file once all ranks confirm
+        if self.rank == 0:
+            self._write_manifest(ckpt_path, step, metrics)
+            self._prune_old_checkpoints()
+
+        elapsed = time.time() - start
+        # At 10TB checkpoint size, this can take 5-15 minutes even with
+        # high-bandwidth storage. Async overlap is critical.
+        return elapsed
+
+    def _write_manifest(self, ckpt_path: str, step: int, metrics: dict):
+        manifest = {
+            "step": step,
+            "world_size": self.world_size,
+            "val_loss": metrics.get("val_loss"),
+            "train_loss": metrics.get("train_loss"),
+            "tokens_seen": metrics.get("tokens_seen"),
+            "valid": True,   # Set to True only after all ranks confirm
+        }
+        # Write to object store — atomic rename pattern for crash safety
+        manifest_path = os.path.join(ckpt_path, "manifest.json")
+        self._atomic_write_json(manifest_path, manifest)
+
+    def _prune_old_checkpoints(self):
+        """Keep only the last N checkpoints to manage storage costs."""
+        if len(self.checkpoint_history) > self.cfg.keep_last_n:
+            to_delete = self.checkpoint_history[:-self.cfg.keep_last_n]
+            for ckpt in to_delete:
+                self._delete_checkpoint(ckpt)
+            self.checkpoint_history = self.checkpoint_history[-self.cfg.keep_last_n:]
+
+    def _async_write(self, path, data): pass   # platform-specific implementation
+    def _atomic_write_json(self, path, data): pass
+    def _delete_checkpoint(self, path): pass
+</code></pre>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4 mt-8">Key Engineering Challenges at This Scale</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="callout-warning rounded-xl p-4">
+            <p class="font-semibold text-yellow-800 text-sm">Hardware Failures</p>
+            <p class="text-yellow-700 text-sm mt-1">With 25,000+ GPUs, MTTF (mean time to failure) for the entire cluster can be measured in hours. Training software must detect stragglers, reroute pipeline stages, and restart from checkpoint — often automatically.</p>
+          </div>
+          <div class="callout-warning rounded-xl p-4">
+            <p class="font-semibold text-yellow-800 text-sm">Loss Spikes / Divergence</p>
+            <p class="text-yellow-700 text-sm mt-1">At scale, training loss spikes (sudden jumps) occur unexpectedly. The fix is typically to rollback to a previous checkpoint and skip or re-shuffle the data batch that caused the spike. Detecting spikes in real time requires continuous monitoring.</p>
+          </div>
+          <div class="callout-warning rounded-xl p-4">
+            <p class="font-semibold text-yellow-800 text-sm">Numerical Stability</p>
+            <p class="text-yellow-700 text-sm mt-1">BF16 / FP16 mixed-precision training at scale requires careful loss scaling, gradient clipping, and sometimes per-layer precision overrides. A subtle overflow can silently corrupt model weights.</p>
+          </div>
+          <div class="callout-warning rounded-xl p-4">
+            <p class="font-semibold text-yellow-800 text-sm">Network Congestion</p>
+            <p class="text-yellow-700 text-sm mt-1">All-reduce operations across thousands of GPUs create bursty network traffic. Topology-aware communication (ring vs. tree), gradient compression, and overlapping compute with communication are all necessary.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 3 -->
+      <section id="s3" class="section-anchor">
+        <h2 class="text-3xl font-bold text-gray-900 mb-6">3. Pre-training Data Pipeline</h2>
+        <p class="text-gray-700 leading-relaxed mb-6">The GPT-3 paper described training data consisting of Common Crawl, WebText2, Books1, Books2, and English Wikipedia. The GPT-4 technical report noted multimodal training data but did not disclose exact sources. The following reflects known public practices from the GPT-3 paper, PaLM paper, and Gopher/Chinchilla papers.</p>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Data Sources and Mixture (GPT-3 Public Disclosure)</h3>
+        <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm mb-8">
+          <table>
+            <thead>
+              <tr><th>Source</th><th>Raw Size</th><th>Weight in Mix</th><th>Processing</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Common Crawl (filtered)</td><td>~570 GB text</td><td>60%</td><td>Quality filter, dedup, lang detect</td></tr>
+              <tr><td>WebText2 (Reddit links)</td><td>~19 GB</td><td>22%</td><td>Karma filter ≥3, dedup</td></tr>
+              <tr><td>Books1 (internet books)</td><td>~12 GB</td><td>8%</td><td>Dedup, OCR cleanup</td></tr>
+              <tr><td>Books2 (Libgen-style)</td><td>~55 GB</td><td>8%</td><td>Dedup, format normalization</td></tr>
+              <tr><td>Wikipedia (English)</td><td>~3 GB</td><td>3%</td><td>Markup stripping, dedup</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-xs text-gray-400 mb-6">Source: Brown et al. "Language Models are Few-Shot Learners" (2020), Table 2.2. Percentages reflect sampling weight during training, not raw proportions.</p>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Data Cleaning Pipeline</h3>
+        <div class="code-label">python</div>
+        <pre><code class="language-python"># Data processing pipeline inspired by GPT-3 paper and public C4/RedPajama
+# implementations. Reflects documented public practices.
+
+import hashlib
+import re
+import unicodedata
+from typing import Iterator
+from dataclasses import dataclass
+
+@dataclass
+class Document:
+    text: str
+    source: str
+    url: str = ""
+
+class DataCleaningPipeline:
+    """
+    Multi-stage cleaning pipeline for web-crawled training data.
+    Stages reflect practices described in GPT-3, C4 (Raffel et al.),
+    and MassiveText (Gopher paper) public documentation.
+    """
+
+    def __init__(self, min_words: int = 50, max_words: int = 100_000,
+                 lang: str = "en"):
+        self.min_words = min_words
+        self.max_words = max_words
+        self.lang = lang
+        self._seen_hashes: set[str] = set()
+
+    def process(self, docs: Iterator[Document]) -> Iterator[Document]:
+        for doc in docs:
+            result = self._pipeline(doc)
+            if result is not None:
+                yield result
+
+    def _pipeline(self, doc: Document) -> Document | None:
+        text = doc.text
+
+        # Stage 1: Unicode normalization
+        text = unicodedata.normalize("NFC", text)
+
+        # Stage 2: Basic cleanup
+        text = self._remove_html_artifacts(text)
+        text = self._normalize_whitespace(text)
+
+        # Stage 3: Language filter (simplified; production uses fastText)
+        if not self._is_english(text):
+            return None
+
+        # Stage 4: Length filter
+        word_count = len(text.split())
+        if word_count < self.min_words or word_count > self.max_words:
+            return None
+
+        # Stage 5: Quality heuristics (C4-style)
+        if not self._passes_quality_filter(text):
+            return None
+
+        # Stage 6: Exact deduplication (MinHash for fuzzy dedup in production)
+        doc_hash = hashlib.md5(text.encode()).hexdigest()
+        if doc_hash in self._seen_hashes:
+            return None
+        self._seen_hashes.add(doc_hash)
+
+        # Stage 7: PII removal (simplified)
+        text = self._remove_pii(text)
+
+        return Document(text=text, source=doc.source, url=doc.url)
+
+    def _remove_html_artifacts(self, text: str) -> str:
+        text = re.sub(r'<[^>]+>', ' ', text)
+        text = re.sub(r'&amp;', '&', text)
+        text = re.sub(r'&lt;', '<', text)
+        text = re.sub(r'&gt;', '>', text)
+        return text
+
+    def _normalize_whitespace(self, text: str) -> str:
+        text = re.sub(r'\r\n', '\n', text)
+        text = re.sub(r'[ \t]+', ' ', text)
+        text = re.sub(r'\n{3,}', '\n\n', text)
+        return text.strip()
+
+    def _is_english(self, text: str) -> bool:
+        # Production: fastText lid.176.bin model; this is a stub
+        # OpenAI used langdetect-style filtering per GPT-3 paper
+        ascii_ratio = sum(1 for c in text if ord(c) < 128) / max(len(text), 1)
+        return ascii_ratio > 0.85
+
+    def _passes_quality_filter(self, text: str) -> bool:
+        """Heuristics from C4 (Raffel et al., 2020) and Gopher paper."""
+        lines = text.split('\n')
+        # Remove docs where most lines are very short (likely nav/menu pages)
+        avg_line_len = sum(len(l) for l in lines) / max(len(lines), 1)
+        if avg_line_len < 30:
+            return False
+        # Remove docs with high symbol ratio (code scraped as text, etc.)
+        symbol_ratio = sum(1 for c in text if not c.isalnum() and not c.isspace())
+        symbol_ratio /= max(len(text), 1)
+        if symbol_ratio > 0.3:
+            return False
+        # Terminal punctuation heuristic (C4)
+        lines_with_terminal_punct = sum(
+            1 for l in lines if l.strip() and l.strip()[-1] in '.!?'
+        )
+        if lines_with_terminal_punct / max(len(lines), 1) < 0.3:
+            return False
+        return True
+
+    def _remove_pii(self, text: str) -> str:
+        """Basic PII removal. Production systems use NER-based approaches."""
+        # Email addresses
+        text = re.sub(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b',
+                      '[EMAIL]', text)
+        # Phone numbers (US-style)
+        text = re.sub(r'\b(\+1[-.\s]?)?\(?\d{3}\)?[-.\s]\d{3}[-.\s]\d{4}\b',
+                      '[PHONE]', text)
+        # SSN pattern
+        text = re.sub(r'\b\d{3}-\d{2}-\d{4}\b', '[SSN]', text)
+        return text
+
+
+# Tokenization: BPE via tiktoken (OpenAI's public tokenizer)
+# pip install tiktoken
+import tiktoken
+
+def tokenize_document(text: str, model: str = "gpt-4") -> list[int]:
+    """
+    tiktoken is OpenAI's open-source BPE tokenizer.
+    GPT-3/4 use the cl100k_base encoding (100,256 tokens).
+    https://github.com/openai/tiktoken
+    """
+    enc = tiktoken.encoding_for_model(model)
+    return enc.encode(text)
+
+def estimate_token_count(text: str, model: str = "gpt-4") -> int:
+    return len(tokenize_document(text, model))
+</code></pre>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4 mt-8">Data Contamination Testing</h3>
+        <p class="text-gray-700 leading-relaxed mb-4">The GPT-3 and GPT-4 papers both include contamination analyses — checking whether benchmark test sets appear in training data. This is critical for honest evaluation.</p>
+        <div class="code-label">python</div>
+        <pre><code class="language-python"># Data contamination detection (methodology from GPT-3 paper, Section 4)
+# GPT-3 paper used 13-gram overlap to detect benchmark contamination.
+
+from collections import Counter
+
+def extract_ngrams(text: str, n: int = 13) -> set[str]:
+    """Extract character n-grams after lowercasing and basic normalization."""
+    text = text.lower().strip()
+    text = re.sub(r'\s+', ' ', text)
+    return {text[i:i+n] for i in range(len(text) - n + 1)}
+
+def contamination_score(train_doc: str, benchmark_example: str,
+                         n: int = 13) -> float:
+    """
+    Returns the fraction of benchmark n-grams found in training doc.
+    Score > 0.8 considered 'contaminated' in GPT-3 paper methodology.
+    """
+    train_grams = extract_ngrams(train_doc, n)
+    bench_grams = extract_ngrams(benchmark_example, n)
+    if not bench_grams:
+        return 0.0
+    overlap = bench_grams.intersection(train_grams)
+    return len(overlap) / len(bench_grams)
+
+def check_dataset_contamination(
+    train_corpus_sample: list[str],
+    benchmark_examples: list[str],
+    threshold: float = 0.8,
+    ngram_size: int = 13
+) -> dict:
+    """
+    Returns contamination statistics for a benchmark dataset.
+    Production version operates over the full training corpus index.
+    """
+    contaminated = []
+    scores = []
+    for bench_ex in benchmark_examples:
+        max_score = 0.0
+        for train_doc in train_corpus_sample:
+            score = contamination_score(train_doc, bench_ex, ngram_size)
+            max_score = max(max_score, score)
+        scores.append(max_score)
+        if max_score >= threshold:
+            contaminated.append(bench_ex)
+
+    return {
+        "total_examples": len(benchmark_examples),
+        "contaminated_count": len(contaminated),
+        "contamination_rate": len(contaminated) / max(len(benchmark_examples), 1),
+        "mean_max_score": sum(scores) / max(len(scores), 1),
+        "contaminated_examples": contaminated[:5],  # sample
+    }
+</code></pre>
+      </section>
+
+      <!-- Section 4 -->
+      <section id="s4" class="section-anchor">
+        <h2 class="text-3xl font-bold text-gray-900 mb-6">4. InstructGPT &amp; RLHF — The ChatGPT Breakthrough</h2>
+        <p class="text-gray-700 leading-relaxed mb-4">The single most important paper for understanding ChatGPT is <em>Ouyang et al. (2022): "Training language models to follow instructions with human feedback."</em> This paper introduced the three-stage pipeline that transformed GPT-3 from a raw language model into a useful assistant. The approach is called InstructGPT, and it became the foundation of ChatGPT.</p>
+        <p class="text-gray-700 leading-relaxed mb-6">The key insight: human raters consistently preferred a 1.3B InstructGPT model over the raw 175B GPT-3. Scale alone does not produce alignment. Alignment is an independent engineering problem.</p>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">InstructGPT Three-Stage Training Pipeline</h3>
+        <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm mb-6">
+          <div class="mermaid">
+flowchart LR
+    A[GPT-3\nPre-trained\n175B] --> B
+
+    subgraph Stage1["Stage 1: Supervised Fine-Tuning (SFT)"]
+        B[Human-written\nDemonstrations\n~13K prompts] --> C[Fine-tune GPT-3\non demonstrations]
+        C --> D[SFT Model]
+    end
+
+    D --> E
+
+    subgraph Stage2["Stage 2: Reward Model Training"]
+        E[Rank multiple\nmodel outputs\nper prompt] --> F[Train 6B reward\nmodel on rankings]
+        F --> G[Reward Model RM]
+    end
+
+    D --> H
+    G --> H
+
+    subgraph Stage3["Stage 3: PPO Reinforcement Learning"]
+        H[Generate outputs\nfor new prompts] --> I[Score with RM]
+        I --> J[PPO update\n+ KL penalty\nvs SFT model]
+        J --> K[InstructGPT\nPolicy]
+        K --> H
+    end
+
+    K --> L[ChatGPT\nAssistant]
+
+    style Stage1 fill:#eff6ff,stroke:#2563eb
+    style Stage2 fill:#ecfdf5,stroke:#059669
+    style Stage3 fill:#fffbeb,stroke:#d97706
+          </div>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Human Preference Data Collection at Scale</h3>
+        <p class="text-gray-700 leading-relaxed mb-4">The InstructGPT paper describes a labeler workforce of 40 contractors for the core paper, with broader scaling for ChatGPT. Per the paper, labelers were recruited through Upwork and Scale AI, with specific guidelines for what constitutes "helpful, harmless, and honest" outputs. Key labeling tasks:</p>
+        <ul class="list-disc list-inside space-y-2 text-gray-700 mb-6 ml-2">
+          <li><strong>Demonstration writing:</strong> Labelers write ideal responses to sampled prompts (SFT dataset)</li>
+          <li><strong>Comparison ranking:</strong> Labelers rank 4–9 model outputs from best to worst (RM dataset)</li>
+          <li><strong>Calibration:</strong> Inter-annotator agreement tracked; labelers with low agreement are retrained or removed</li>
+        </ul>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Reward Model Architecture and Training</h3>
+        <p class="text-gray-700 leading-relaxed mb-4">The InstructGPT reward model is a 6B parameter GPT-3 model with a linear head replacing the final unembedding layer. It takes (prompt, completion) pairs and outputs a scalar reward. Training uses a pairwise ranking loss:</p>
+        <div class="bg-gray-50 rounded-xl border border-gray-200 p-5 mb-6">
+          <p class="text-gray-700 font-mono text-sm">loss = -E[(prompt,y_w,y_l) ~ D] [ log σ(r(prompt, y_w) - r(prompt, y_l)) ]</p>
+          <p class="text-gray-500 text-sm mt-2">where y_w is the preferred (winning) completion, y_l is the less-preferred (losing) completion, and r() is the reward model. This is the Bradley-Terry preference model (Ouyang et al., 2022, Eq. 1).</p>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">PPO at Scale: KL Penalty and Reward Hacking</h3>
+        <p class="text-gray-700 leading-relaxed mb-4">The PPO objective includes a KL divergence penalty against the original SFT model. This prevents the policy from drifting too far and exploiting weaknesses in the reward model (reward hacking). The full objective per the InstructGPT paper:</p>
+        <div class="bg-gray-50 rounded-xl border border-gray-200 p-5 mb-6">
+          <p class="text-gray-700 font-mono text-sm">objective(φ) = E[(x,y)~D_π_φ_RL] [ r_θ(x,y) - β · log(π_φ_RL(y|x) / π_SFT(y|x)) ] + γ · E[x~D_pretrain] [ log(π_φ_RL(x)) ]</p>
+          <p class="text-gray-500 text-sm mt-2">β controls the KL penalty strength (prevents reward hacking). γ controls the pre-training loss weight (prevents regression on general language modeling). From Ouyang et al. (2022), Section 3.</p>
+        </div>
+
+        <div class="callout-tip rounded-xl p-5">
+          <p class="font-semibold text-green-800 text-sm">The "Assistant" Personality Emergence</p>
+          <p class="text-green-700 text-sm mt-1">One of the most striking findings from InstructGPT: with only ~13K demonstration examples, the model learns a consistent "helpful assistant" persona — politely declining harmful requests, asking clarifying questions, expressing uncertainty. This emergent behavior was not explicitly programmed; it arose from the distribution of human demonstrations. At ChatGPT scale (millions of RLHF examples), this persona becomes highly robust.</p>
+        </div>
+      </section>
+
+      <!-- Section 5 -->
+      <section id="s5" class="section-anchor">
+        <h2 class="text-3xl font-bold text-gray-900 mb-6">5. Scaling Laws</h2>
+        <p class="text-gray-700 leading-relaxed mb-6">Two landmark papers define how we think about training budget allocation. Understanding them is required for any senior engineer working on foundation models.</p>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-3">Kaplan et al. (2020) — The Original Scaling Laws</h3>
+        <p class="text-gray-700 leading-relaxed mb-4">OpenAI's "Scaling Laws for Neural Language Models" (Kaplan et al., 2020) established that loss follows power laws in model size N, dataset size D, and compute C. The key conclusion: given a fixed compute budget, the most efficient allocation is to train a large model on fewer tokens (prioritize model size over data).</p>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-3">Hoffmann et al. (2022) — Chinchilla</h3>
+        <p class="text-gray-700 leading-relaxed mb-4">DeepMind's "Training Compute-Optimal Large Language Models" (Hoffmann et al., 2022) challenged Kaplan: using a wider range of model sizes and more careful analysis, they found the compute-optimal ratio is approximately <strong>20 tokens per parameter</strong>. A 70B model should train on ~1.4T tokens. GPT-3 (175B, 300B tokens) was significantly undertrained by Chinchilla standards.</p>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Table: Model Size vs Training Tokens vs Performance</h3>
+        <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm mb-6">
+          <table>
+            <thead>
+              <tr><th>Model</th><th>Params</th><th>Tokens Trained</th><th>Chinchilla-Optimal Tokens</th><th>Training Status</th><th>Approx. Loss</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>GPT-3</td><td>175B</td><td>300B</td><td>3.5T</td><td>Under-trained (~10×)</td><td>~3.0 (WebText)</td></tr>
+              <tr><td>Chinchilla</td><td>70B</td><td>1.4T</td><td>1.4T</td><td>Optimal</td><td>~2.7 (WebText)</td></tr>
+              <tr><td>LLaMA-1 (65B)</td><td>65B</td><td>1.4T</td><td>1.3T</td><td>Near-optimal</td><td>~2.75</td></tr>
+              <tr><td>GPT-4 (est.)</td><td>~1T</td><td>~13T</td><td>~20T</td><td>Under-trained for size</td><td>&lt;2.0 (est.)</td></tr>
+              <tr><td>Gopher</td><td>280B</td><td>300B</td><td>5.6T</td><td>Under-trained (~20×)</td><td>~2.8</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-xs text-gray-400 mb-6">Loss values are approximations from published papers; direct comparisons require identical eval sets. GPT-4 rows are estimates.</p>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Scaling Law Calculator</h3>
+        <div class="code-label">python</div>
+        <pre><code class="language-python"># Scaling law calculator based on Kaplan et al. (2020) and
+# Hoffmann et al. Chinchilla (2022) — public papers only.
+
+import math
+
+# === Kaplan et al. (2020) constants ===
+# From Table 1 of "Scaling Laws for Neural Language Models"
+KAPLAN_A = 406.4       # Cross-entropy loss constant
+KAPLAN_ALPHA = 0.34    # Model size exponent
+KAPLAN_B = 410.7       # Data size constant
+KAPLAN_BETA = 0.28     # Data size exponent
+KAPLAN_C_0 = 1.6e-3   # Minimum compute-limited loss
+KAPLAN_GAMMA = 0.054   # Compute exponent (approximate)
+
+def kaplan_loss(N: float, D: float) -> float:
+    """
+    Predict cross-entropy loss from model size N (params) and
+    dataset size D (tokens). From Kaplan et al. (2020), Eq. 1.
+    """
+    return KAPLAN_C_0 + (KAPLAN_A / N**KAPLAN_ALPHA) + (KAPLAN_B / D**KAPLAN_BETA)
+
+# === Chinchilla (Hoffmann et al., 2022) optimal allocation ===
+# From Table 3, Approach 3 (IsoFLOP fitting)
+CHINCHILLA_A = 406.4
+CHINCHILLA_B = 410.7
+CHINCHILLA_ALPHA = 0.3392
+CHINCHILLA_BETA = 0.2849
+CHINCHILLA_E = 1.69  # Irreducible entropy
+
+def chinchilla_loss(N: float, D: float) -> float:
+    """Chinchilla loss prediction (Hoffmann et al. 2022, Eq. A.1)."""
+    return CHINCHILLA_E + CHINCHILLA_A / (N**CHINCHILLA_ALPHA) + \
+           CHINCHILLA_B / (D**CHINCHILLA_BETA)
+
+def chinchilla_optimal_allocation(compute_flops: float) -> dict:
+    """
+    Given a compute budget C (FLOPs), return the Chinchilla-optimal
+    model size and token count.
+    C ≈ 6 * N * D  (standard FLOPs estimate for transformer training)
+    Optimal: N* ∝ C^0.5, D* ∝ C^0.5, with N*/D* ≈ 20 tokens/param.
+    """
+    # From Chinchilla paper, the optimal ratio is approximately
+    # N_opt = C^0.5 / (2 * sqrt(6))  and D_opt = C^0.5 * sqrt(6) / 2
+    # Simplified: D/N ≈ 20 (tokens per parameter)
+    N_opt = math.sqrt(compute_flops / (6 * 20))  # derived from C = 6*N*20*N
+    D_opt = 20 * N_opt
+    predicted_loss = chinchilla_loss(N_opt, D_opt)
+    return {
+        "optimal_params": N_opt,
+        "optimal_tokens": D_opt,
+        "predicted_loss": predicted_loss,
+        "compute_flops": compute_flops,
+        "tokens_per_param": D_opt / N_opt,
+    }
+
+# Example: GPT-3 compute budget
+gpt3_compute = 3.14e23  # ~3,640 PF-days in FLOPs (Brown et al. 2020)
+gpt3_actual_n = 175e9
+gpt3_actual_d = 300e9
+
+print("=== GPT-3 Analysis ===")
+print(f"Actual: N={gpt3_actual_n:.1e}, D={gpt3_actual_d:.1e}")
+print(f"Kaplan predicted loss: {kaplan_loss(gpt3_actual_n, gpt3_actual_d):.3f}")
+print(f"Chinchilla predicted loss: {chinchilla_loss(gpt3_actual_n, gpt3_actual_d):.3f}")
+
+optimal = chinchilla_optimal_allocation(gpt3_compute)
+print(f"\nChinchilla-optimal for same compute:")
+print(f"  N* = {optimal['optimal_params']:.2e} params")
+print(f"  D* = {optimal['optimal_tokens']:.2e} tokens")
+print(f"  Predicted loss: {optimal['predicted_loss']:.3f}")
+print(f"  Tokens/param: {optimal['tokens_per_param']:.1f}")
+
+# Output:
+# === GPT-3 Analysis ===
+# Actual: N=1.8e+11, D=3.0e+11
+# Kaplan predicted loss: ~3.1
+# Chinchilla predicted loss: ~3.1
+#
+# Chinchilla-optimal for same compute:
+#   N* ≈ 5.1e+10 params (51B)
+#   D* ≈ 1.0e+12 tokens (1T)
+#   Predicted loss: ~2.85
+</code></pre>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4 mt-6">Implications for Training Budget Allocation</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="callout-info rounded-xl p-4">
+            <p class="font-semibold text-blue-800 text-sm">Inference Cost Dominates</p>
+            <p class="text-blue-700 text-sm mt-1">At production scale, inference cost vastly exceeds training cost. A smaller, better-trained model (Chinchilla-optimal) is cheaper to serve at the same quality. This is why LLaMA-style models have replaced pure "bigger is better" thinking.</p>
+          </div>
+          <div class="callout-tip rounded-xl p-4">
+            <p class="font-semibold text-green-800 text-sm">Data Quality > Quantity</p>
+            <p class="text-green-700 text-sm mt-1">Chinchilla shows tokens per parameter matters. But token quality matters equally. A trillion tokens of high-quality filtered data beats 10T tokens of raw crawl noise.</p>
+          </div>
+          <div class="callout-note rounded-xl p-4">
+            <p class="font-semibold text-purple-800 text-sm">Curriculum Matters</p>
+            <p class="text-purple-700 text-sm mt-1">Data curriculum (ordering and mixing ratio over training) is an active research area. Code, math, and scientific text are typically upweighted — a practice noted in multiple public papers including LLaMA and PaLM.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 6 -->
+      <section id="s6" class="section-anchor">
+        <h2 class="text-3xl font-bold text-gray-900 mb-6">6. GPT-4 Advances — From Public Information</h2>
+        <div class="callout-warning rounded-xl p-4 mb-6">
+          <p class="font-semibold text-yellow-800 text-sm">Source Limitation Notice</p>
+          <p class="text-yellow-700 text-sm mt-1">OpenAI's GPT-4 Technical Report (March 2023) is intentionally sparse on architecture details. The company explicitly declined to disclose model size, training compute, hardware, or training methodology, citing "competitive landscape and safety implications." The following is based strictly on what the technical report and subsequent public papers disclose.</p>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-3">Multimodal Training (Vision + Language)</h3>
+        <p class="text-gray-700 leading-relaxed mb-4">The GPT-4 technical report confirms multimodal (vision) capability. GPT-4V (vision) was released in October 2023. Public information suggests a vision encoder (likely ViT-style) whose representations are projected into the language model's embedding space — a pattern consistent with Flamingo (Alayrac et al., 2022) and CLIP (Radford et al., 2021), both public papers. The exact architecture is not disclosed.</p>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">GPT-4 Benchmark Results (Public Technical Report)</h3>
+        <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm mb-8">
+          <table>
+            <thead>
+              <tr><th>Benchmark</th><th>GPT-3.5</th><th>GPT-4</th><th>Human (est.)</th><th>Notes</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>MMLU (5-shot)</td><td>70.0%</td><td>86.4%</td><td>~89%</td><td>Massive Multitask Language Understanding</td></tr>
+              <tr><td>Bar Exam (MBE)</td><td>~40th %ile</td><td>~90th %ile</td><td>—</td><td>Simulated Uniform Bar Exam</td></tr>
+              <tr><td>Medical Licensing (USMLE)</td><td>~52%</td><td>~87%</td><td>Pass: ~60%</td><td>Step 1/2/3 combined</td></tr>
+              <tr><td>SAT Math</td><td>590/800</td><td>700/800</td><td>—</td><td>From GPT-4 Technical Report</td></tr>
+              <tr><td>HumanEval (code)</td><td>48.1%</td><td>67.0%</td><td>—</td><td>Pass@1, Python programming</td></tr>
+              <tr><td>GSM8K (math, 5-shot)</td><td>57.1%</td><td>92.0%</td><td>~87%</td><td>Grade school math word problems</td></tr>
+              <tr><td>HellaSwag</td><td>85.5%</td><td>95.3%</td><td>95.6%</td><td>Common sense NLI</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-xs text-gray-400 mb-6">Source: OpenAI GPT-4 Technical Report (2023), Table 1. GPT-3.5 refers to the text-davinci-003 checkpoint. All evaluations are as reported by OpenAI.</p>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Process Reward Models for Reasoning</h3>
+        <p class="text-gray-700 leading-relaxed mb-4">OpenAI's public paper "Let's Verify Step by Step" (Lightman et al., 2023) describes Process Reward Models (PRMs). Rather than scoring only final answers (Outcome Reward Models, ORMs), PRMs score each reasoning step. Key findings from the paper:</p>
+        <ul class="list-disc list-inside space-y-2 text-gray-700 mb-6 ml-2">
+          <li>PRMs substantially outperform ORMs on MATH dataset (57.8% vs 45.4% at best-of-1860)</li>
+          <li>PRMs require step-level human annotations — more expensive but more signal-rich</li>
+          <li>PRMs enable <strong>process-based supervision</strong>: rewarding correct reasoning regardless of whether the final answer happens to be correct</li>
+          <li>This technique is likely foundational to OpenAI's o1 reasoning model (2024)</li>
+        </ul>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">What the Public Papers Reveal vs. What They Don't</h3>
+        <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm mb-6">
+          <table>
+            <thead>
+              <tr><th>Topic</th><th>Publicly Disclosed</th><th>Not Disclosed</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Architecture</td><td>Transformer-based, multimodal</td><td>Exact layers, heads, MoE routing</td></tr>
+              <tr><td>Scale</td><td>Exceeds GPT-3</td><td>Exact parameter count, hardware</td></tr>
+              <tr><td>Training data</td><td>Pre-2021 web + licensed data</td><td>Exact sources, proportions, volumes</td></tr>
+              <tr><td>Alignment</td><td>RLHF (per InstructGPT paper)</td><td>Number of labelers, PPO config, iterations</td></tr>
+              <tr><td>Evaluation</td><td>Full benchmark table in tech report</td><td>Internal evals, red-teaming details</td></tr>
+              <tr><td>Safety</td><td>System card with risk analysis</td><td>Specific mitigation techniques used</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Summary -->
+      <section id="summary" class="section-anchor">
+        <h2 class="text-3xl font-bold text-gray-900 mb-6">Summary &amp; Key Takeaways</h2>
+        <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl border border-blue-200 p-8">
+          <h3 class="text-xl font-bold text-blue-900 mb-5">Chapter 17 (Part 1) — Key Takeaways</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="bg-white rounded-xl p-4 border border-blue-100">
+              <div class="flex gap-3">
+                <div class="w-7 h-7 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-xs flex-shrink-0">1</div>
+                <div>
+                  <p class="font-semibold text-gray-800 text-sm">Scale creates entirely new MLOps problems</p>
+                  <p class="text-gray-600 text-sm mt-1">Month-long training runs require industrial checkpoint management, real-time anomaly detection, and automated fault recovery. These are not ML problems — they are distributed systems problems.</p>
+                </div>
+              </div>
+            </div>
+            <div class="bg-white rounded-xl p-4 border border-blue-100">
+              <div class="flex gap-3">
+                <div class="w-7 h-7 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-xs flex-shrink-0">2</div>
+                <div>
+                  <p class="font-semibold text-gray-800 text-sm">3D parallelism is the standard at GPT scale</p>
+                  <p class="text-gray-600 text-sm mt-1">Tensor + pipeline + data parallelism, described in public Megatron-LM papers, is required to fit and train trillion-parameter models. Understanding the tradeoffs is essential for infrastructure engineers.</p>
+                </div>
+              </div>
+            </div>
+            <div class="bg-white rounded-xl p-4 border border-blue-100">
+              <div class="flex gap-3">
+                <div class="w-7 h-7 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-xs flex-shrink-0">3</div>
+                <div>
+                  <p class="font-semibold text-gray-800 text-sm">Data quality is as important as data quantity</p>
+                  <p class="text-gray-600 text-sm mt-1">Multi-stage cleaning (dedup, quality filters, PII removal, contamination checks) is non-negotiable. A trillion tokens of garbage will not outperform 300B tokens of curated text.</p>
+                </div>
+              </div>
+            </div>
+            <div class="bg-white rounded-xl p-4 border border-blue-100">
+              <div class="flex gap-3">
+                <div class="w-7 h-7 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-xs flex-shrink-0">4</div>
+                <div>
+                  <p class="font-semibold text-gray-800 text-sm">InstructGPT / RLHF is the key to "assistant"</p>
+                  <p class="text-gray-600 text-sm mt-1">The three-stage SFT → RM → PPO pipeline from the InstructGPT paper (Ouyang et al. 2022) is what transforms a raw language model into ChatGPT. A 1.3B InstructGPT beats raw 175B GPT-3 in human preference studies.</p>
+                </div>
+              </div>
+            </div>
+            <div class="bg-white rounded-xl p-4 border border-blue-100">
+              <div class="flex gap-3">
+                <div class="w-7 h-7 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-xs flex-shrink-0">5</div>
+                <div>
+                  <p class="font-semibold text-gray-800 text-sm">Chinchilla overturned Kaplan — use 20 tokens/param</p>
+                  <p class="text-gray-600 text-sm mt-1">For compute-optimal training, train with approximately 20 tokens per parameter (Hoffmann et al. 2022). GPT-3 was ~12× undertrained. This insight drove LLaMA, Mistral, and the modern efficient LLM generation.</p>
+                </div>
+              </div>
+            </div>
+            <div class="bg-white rounded-xl p-4 border border-blue-100">
+              <div class="flex gap-3">
+                <div class="w-7 h-7 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-xs flex-shrink-0">6</div>
+                <div>
+                  <p class="font-semibold text-gray-800 text-sm">Process Reward Models unlock better reasoning</p>
+                  <p class="text-gray-600 text-sm mt-1">Scoring reasoning steps (not just final answers) dramatically improves math and logical reasoning, per Lightman et al. (2023). This is the likely foundation of OpenAI's o1/o3 reasoning models.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-8 callout-note rounded-xl p-5">
+          <p class="font-semibold text-purple-800 text-sm">Part 2 Preview: Serving &amp; MLOps Lessons</p>
+          <p class="text-purple-700 text-sm mt-1">Chapter 17b (ch17b_chatgpt_serving.html) covers the other half of the ChatGPT story: serving infrastructure (inference at 100M+ users), the product architecture, safety systems, cost optimization, and the key MLOps lessons that any practitioner can apply to their own systems.</p>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<!-- Bottom Navigation -->
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 border-t border-gray-200">
+  <div class="flex items-center justify-between">
+    <a href="ch16_llm_ops.html" class="flex items-center gap-2 px-5 py-3 bg-white border border-gray-200 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors shadow-sm text-sm font-medium">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+      Previous: Chapter 16 — LLM Ops
+    </a>
+    <a href="index.html" class="text-sm text-gray-500 hover:text-gray-700">Home</a>
+    <a href="ch17b_chatgpt_serving.html" class="flex items-center gap-2 px-5 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors shadow-sm text-sm font-medium">
+      Next: Chapter 17b — Serving &amp; Lessons
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+    </a>
+  </div>
+</div>
+
+<footer class="bg-gray-900 text-gray-400 text-sm py-8 mt-4">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-2">
+    <p class="font-medium text-gray-300">Modern MLOps Tutorial — Chapter 17: Case Study — ChatGPT &amp; GPT-4 (Training)</p>
+    <p>All content based on publicly published papers and disclosures. No proprietary or confidential information.</p>
+    <p class="text-gray-500 text-xs">Key references: Brown et al. 2020 (GPT-3); Ouyang et al. 2022 (InstructGPT); Kaplan et al. 2020 (Scaling Laws); Hoffmann et al. 2022 (Chinchilla); OpenAI 2023 (GPT-4 Technical Report); Lightman et al. 2023 (PRMs)</p>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,2476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chapter 18: State Management — TypeScript for the AI Era</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --white: #FFFFFF;
+      --surface: #F9FAFB;
+      --surface-2: #F3F4F6;
+      --border: #E5E7EB;
+      --border-strong: #D1D5DB;
+      --text-primary: #111827;
+      --text-secondary: #6B7280;
+      --text-tertiary: #9CA3AF;
+      --indigo-50: #EEF2FF;
+      --indigo-100: #E0E7FF;
+      --indigo-500: #6366F1;
+      --indigo-600: #4F46E5;
+      --indigo-700: #4338CA;
+      --indigo-800: #3730A3;
+      --green-100: #DCFCE7;
+      --green-700: #15803D;
+      --green-800: #166534;
+      --amber-100: #FEF3C7;
+      --amber-700: #B45309;
+      --red-600: #DC2626;
+      --red-50: #FEF2F2;
+      --red-100: #FEE2E2;
+      --teal-100: #CCFBF1;
+      --teal-600: #0D9488;
+      --teal-700: #0F766E;
+      --violet-100: #EDE9FE;
+      --violet-700: #6D28D9;
+      --sky-100: #E0F2FE;
+      --sky-700: #0369A1;
+      --font-body: system-ui, -apple-system, 'Segoe UI', sans-serif;
+      --font-code: 'JetBrains Mono', 'Fira Code', monospace;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--white);
+      color: var(--text-primary);
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ───── TOP NAV ───── */
+    .top-nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255,255,255,0.94);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      gap: 1rem;
+    }
+
+    .nav-chapter-links {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .nav-chapter-links a {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-decoration: none;
+      padding: 0.3rem 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      transition: color 0.15s, border-color 0.15s;
+    }
+
+    .nav-chapter-links a:hover {
+      color: var(--indigo-600);
+      border-color: var(--indigo-600);
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: var(--indigo-600);
+      text-decoration: none;
+    }
+
+    .ts-badge {
+      background: var(--indigo-600);
+      color: white;
+      font-family: var(--font-code);
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      letter-spacing: 0.02em;
+    }
+
+    .nav-progress {
+      font-size: 0.75rem;
+      color: var(--text-tertiary);
+      font-weight: 500;
+    }
+
+    /* ───── CHAPTER HERO ───── */
+    .chapter-hero {
+      background: linear-gradient(135deg, #312E81 0%, #4F46E5 50%, #6366F1 100%);
+      padding: 4rem 2rem 3.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .chapter-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+
+    .chapter-hero-inner {
+      position: relative;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .chapter-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.25);
+      color: rgba(255,255,255,0.9);
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.3rem 0.9rem;
+      border-radius: 999px;
+      margin-bottom: 1.25rem;
+    }
+
+    .chapter-hero h1 {
+      font-size: clamp(1.9rem, 4.5vw, 3rem);
+      font-weight: 800;
+      color: white;
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+      margin-bottom: 0.75rem;
+    }
+
+    .chapter-hero h1 .subtitle-line {
+      display: block;
+      font-size: clamp(1rem, 2.5vw, 1.4rem);
+      font-weight: 400;
+      opacity: 0.8;
+      letter-spacing: -0.01em;
+      margin-top: 0.4rem;
+    }
+
+    .chapter-meta {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      margin-top: 1.25rem;
+      flex-wrap: wrap;
+    }
+
+    .chapter-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      color: rgba(255,255,255,0.75);
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+
+    .chapter-meta-item svg {
+      opacity: 0.7;
+    }
+
+    .chapter-tags {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-top: 1rem;
+    }
+
+    .chapter-tag {
+      background: rgba(255,255,255,0.15);
+      color: rgba(255,255,255,0.9);
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 0.2rem 0.65rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    /* ───── LAYOUT ───── */
+    .page-wrapper {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 3rem 2rem;
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      gap: 3rem;
+      align-items: start;
+    }
+
+    /* ───── SIDEBAR TOC ───── */
+    .sidebar {
+      position: sticky;
+      top: 72px;
+      max-height: calc(100vh - 90px);
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+
+    .sidebar::-webkit-scrollbar { width: 4px; }
+    .sidebar::-webkit-scrollbar-track { background: transparent; }
+    .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    .toc-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+      margin-bottom: 0.75rem;
+    }
+
+    .toc-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.1rem;
+    }
+
+    .toc-list a {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      text-decoration: none;
+      padding: 0.3rem 0.6rem;
+      border-radius: 5px;
+      border-left: 2px solid transparent;
+      transition: all 0.15s;
+      line-height: 1.4;
+    }
+
+    .toc-list a:hover {
+      color: var(--indigo-600);
+      background: var(--indigo-50);
+      border-left-color: var(--indigo-600);
+    }
+
+    .toc-list a.active {
+      color: var(--indigo-600);
+      background: var(--indigo-50);
+      border-left-color: var(--indigo-600);
+      font-weight: 600;
+    }
+
+    .toc-list .toc-sub {
+      padding-left: 1.2rem;
+      font-size: 0.75rem;
+      color: var(--text-tertiary);
+    }
+
+    .toc-list .toc-sub:hover {
+      color: var(--indigo-600);
+    }
+
+    .toc-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 0.75rem 0;
+    }
+
+    /* ───── MAIN CONTENT ───── */
+    .content {
+      min-width: 0;
+    }
+
+    .content h2 {
+      font-size: 1.65rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      letter-spacing: -0.025em;
+      margin: 3rem 0 1rem;
+      padding-top: 1rem;
+      border-top: 2px solid var(--indigo-600);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .content h2:first-child {
+      margin-top: 0;
+    }
+
+    .section-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      background: var(--indigo-600);
+      color: white;
+      font-size: 0.75rem;
+      font-weight: 700;
+      border-radius: 6px;
+      flex-shrink: 0;
+    }
+
+    .content h3 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.015em;
+      margin: 2rem 0 0.75rem;
+    }
+
+    .content h4 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 1.5rem 0 0.5rem;
+    }
+
+    .content p {
+      margin-bottom: 1rem;
+      color: var(--text-primary);
+    }
+
+    .content ul, .content ol {
+      margin: 0.75rem 0 1rem 1.5rem;
+    }
+
+    .content li {
+      margin-bottom: 0.4rem;
+    }
+
+    .content strong {
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .content code:not(pre code) {
+      font-family: var(--font-code);
+      font-size: 0.82em;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      padding: 0.15em 0.45em;
+      border-radius: 4px;
+      color: var(--indigo-700);
+    }
+
+    /* ───── CODE BLOCKS ───── */
+    .code-block {
+      margin: 1.25rem 0;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    }
+
+    .code-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0.5rem 1rem;
+    }
+
+    .code-lang {
+      font-family: var(--font-code);
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--indigo-600);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .code-filename {
+      font-family: var(--font-code);
+      font-size: 0.72rem;
+      color: var(--text-tertiary);
+    }
+
+    .code-block pre {
+      margin: 0;
+      background: #F6F8FA !important;
+    }
+
+    .code-block pre code {
+      font-family: var(--font-code) !important;
+      font-size: 0.82rem;
+      line-height: 1.65;
+      padding: 1.1rem 1.25rem !important;
+      display: block;
+    }
+
+    /* ───── CALLOUT BOXES ───── */
+    .callout {
+      border-radius: 10px;
+      padding: 1rem 1.25rem;
+      margin: 1.5rem 0;
+      border-left: 4px solid;
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .callout-icon {
+      font-size: 1.1rem;
+      flex-shrink: 0;
+      margin-top: 0.1rem;
+    }
+
+    .callout-body { flex: 1; min-width: 0; }
+    .callout-body strong { display: block; margin-bottom: 0.3rem; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.06em; }
+    .callout-body p { margin: 0; font-size: 0.9rem; }
+    .callout-body p + p { margin-top: 0.5rem; }
+    .callout-body ul { margin: 0.5rem 0 0 1.25rem; font-size: 0.9rem; }
+    .callout-body li { margin-bottom: 0.25rem; }
+
+    .callout.tip {
+      background: var(--green-100);
+      border-color: #16A34A;
+    }
+    .callout.tip .callout-body strong { color: var(--green-800); }
+
+    .callout.info {
+      background: var(--sky-100);
+      border-color: #0284C7;
+    }
+    .callout.info .callout-body strong { color: var(--sky-700); }
+
+    .callout.warning {
+      background: var(--amber-100);
+      border-color: #D97706;
+    }
+    .callout.warning .callout-body strong { color: var(--amber-700); }
+
+    .callout.anti-pattern {
+      background: var(--red-50);
+      border-color: var(--red-600);
+    }
+    .callout.anti-pattern .callout-body strong { color: var(--red-600); }
+
+    .callout.pattern {
+      background: var(--teal-100);
+      border-color: var(--teal-600);
+    }
+    .callout.pattern .callout-body strong { color: var(--teal-700); }
+
+    .callout.ai-era {
+      background: var(--violet-100);
+      border-color: var(--violet-700);
+    }
+    .callout.ai-era .callout-body strong { color: var(--violet-700); }
+
+    /* ───── TABLES ───── */
+    .table-wrapper {
+      overflow-x: auto;
+      margin: 1.5rem 0;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+    }
+
+    thead {
+      background: var(--surface);
+    }
+
+    th {
+      padding: 0.75rem 1rem;
+      text-align: left;
+      font-weight: 700;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-secondary);
+      border-bottom: 2px solid var(--border);
+    }
+
+    td {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:hover td {
+      background: var(--surface);
+    }
+
+    .badge {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 0.15rem 0.55rem;
+      border-radius: 999px;
+    }
+
+    .badge-green { background: var(--green-100); color: var(--green-700); }
+    .badge-red { background: var(--red-100); color: var(--red-600); }
+    .badge-amber { background: var(--amber-100); color: var(--amber-700); }
+    .badge-indigo { background: var(--indigo-100); color: var(--indigo-700); }
+    .badge-teal { background: var(--teal-100); color: var(--teal-700); }
+
+    /* ───── SVG DIAGRAMS ───── */
+    .diagram-container {
+      margin: 2rem 0;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .diagram-title {
+      padding: 0.75rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+    }
+
+    .diagram-svg {
+      display: block;
+      padding: 1.5rem;
+      width: 100%;
+    }
+
+    .diagram-svg svg {
+      width: 100%;
+      height: auto;
+    }
+
+    /* ───── INSTALL BLOCK ───── */
+    .install-block {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      background: #0F172A;
+      color: #E2E8F0;
+      font-family: var(--font-code);
+      font-size: 0.85rem;
+      padding: 0.85rem 1.25rem;
+      border-radius: 8px;
+      margin: 1rem 0;
+    }
+
+    .install-block .prompt {
+      color: #6EE7B7;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    /* ───── TWO COLUMNS ───── */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin: 1rem 0;
+    }
+
+    .col-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+    }
+
+    .col-card h4 {
+      margin: 0 0 0.5rem;
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    .col-card ul {
+      margin: 0 0 0 1.1rem;
+      font-size: 0.85rem;
+    }
+
+    /* ───── SECTION INTRO BAND ───── */
+    .section-intro {
+      background: var(--indigo-50);
+      border: 1px solid var(--indigo-100);
+      border-radius: 10px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.5rem;
+      font-size: 0.95rem;
+      color: var(--indigo-800);
+    }
+
+    /* ───── FOOTER NAV ───── */
+    .footer-nav {
+      border-top: 2px solid var(--border);
+      margin-top: 4rem;
+      padding-top: 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .footer-nav-link {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      text-decoration: none;
+      padding: 0.75rem 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      transition: border-color 0.15s, color 0.15s;
+      max-width: 240px;
+    }
+
+    .footer-nav-link:hover {
+      border-color: var(--indigo-600);
+    }
+
+    .footer-nav-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-tertiary);
+    }
+
+    .footer-nav-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--indigo-600);
+    }
+
+    .footer-nav-link.prev .footer-nav-label::before { content: '← '; }
+    .footer-nav-link.next .footer-nav-label::after { content: ' →'; }
+    .footer-nav-link.next { text-align: right; }
+
+    .footer-chapter-info {
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text-tertiary);
+    }
+
+    .footer {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      margin-top: 3rem;
+      padding: 2rem;
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text-tertiary);
+    }
+
+    .footer strong {
+      color: var(--text-secondary);
+    }
+
+    /* ───── SCROLLSPY ───── */
+    @media (max-width: 900px) {
+      .page-wrapper {
+        grid-template-columns: 1fr;
+      }
+      .sidebar {
+        display: none;
+      }
+      .two-col {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ───── TOP NAV ───── -->
+<nav class="top-nav">
+  <div class="nav-chapter-links">
+    <a href="chapter-17-nextjs.html">← Ch 17 Next.js</a>
+  </div>
+  <a href="index.html" class="nav-brand">
+    <span class="ts-badge">TS</span>
+    TypeScript for the AI Era
+  </a>
+  <div style="display:flex;align-items:center;gap:1rem;">
+    <span class="nav-progress">Chapter 18 of 24</span>
+    <a href="chapter-19-architecture.html" class="nav-chapter-links" style="display:inline-flex;align-items:center;gap:0.35rem;font-size:0.8rem;font-weight:600;color:var(--text-secondary);text-decoration:none;padding:0.3rem 0.75rem;border:1px solid var(--border);border-radius:6px;transition:color 0.15s,border-color 0.15s;">Ch 19 Architecture →</a>
+  </div>
+</nav>
+
+<!-- ───── CHAPTER HERO ───── -->
+<header class="chapter-hero">
+  <div class="chapter-hero-inner">
+    <div class="chapter-eyebrow">Chapter 18</div>
+    <h1>
+      State Management
+      <span class="subtitle-line">Zustand, Jotai &amp; TanStack Query</span>
+    </h1>
+    <div class="chapter-meta">
+      <span class="chapter-meta-item">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        ~55 min read
+      </span>
+      <span class="chapter-meta-item">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 18l6-6-6-6M8 6L2 12l6 6"/></svg>
+        10 code examples
+      </span>
+      <span class="chapter-meta-item">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        Senior Staff Engineer, Meta &amp; Vercel
+      </span>
+    </div>
+    <div class="chapter-tags">
+      <span class="chapter-tag">Zustand</span>
+      <span class="chapter-tag">Jotai</span>
+      <span class="chapter-tag">TanStack Query</span>
+      <span class="chapter-tag">SWR</span>
+      <span class="chapter-tag">Redux Toolkit</span>
+      <span class="chapter-tag">URL State</span>
+      <span class="chapter-tag">Form State</span>
+    </div>
+  </div>
+</header>
+
+<!-- ───── MAIN LAYOUT ───── -->
+<div class="page-wrapper">
+
+  <!-- ───── SIDEBAR TOC ───── -->
+  <aside class="sidebar">
+    <p class="toc-label">In This Chapter</p>
+    <ul class="toc-list">
+      <li><a href="#landscape">1. State Landscape</a></li>
+      <li><a href="#client-vs-server" class="toc-sub">Client vs. Server State</a></li>
+      <li><a href="#zustand">2. Zustand</a></li>
+      <li><a href="#zustand-basic" class="toc-sub">Basic Store</a></li>
+      <li><a href="#zustand-middleware" class="toc-sub">Middleware</a></li>
+      <li><a href="#zustand-slices" class="toc-sub">Slices Pattern</a></li>
+      <li><a href="#jotai">3. Jotai</a></li>
+      <li><a href="#jotai-atoms" class="toc-sub">Atoms &amp; Derived</a></li>
+      <li><a href="#jotai-async" class="toc-sub">Async Atoms</a></li>
+      <li><a href="#tanstack">4. TanStack Query</a></li>
+      <li><a href="#tanstack-usequery" class="toc-sub">useQuery</a></li>
+      <li><a href="#tanstack-mutation" class="toc-sub">useMutation</a></li>
+      <li><a href="#tanstack-advanced" class="toc-sub">Advanced Patterns</a></li>
+      <li><a href="#swr">5. SWR</a></li>
+      <li><a href="#redux">6. Redux Toolkit</a></li>
+      <li><a href="#url-state">7. URL State</a></li>
+      <li><a href="#form-state">8. Form State</a></li>
+      <li><a href="#patterns">9. Patterns</a></li>
+      <hr class="toc-divider" />
+      <li><a href="#decision-matrix" class="toc-sub">Decision Matrix</a></li>
+      <li><a href="#summary" class="toc-sub">Summary</a></li>
+    </ul>
+  </aside>
+
+  <!-- ───── CONTENT ───── -->
+  <main class="content">
+
+    <!-- ── SECTION 1: Landscape ── -->
+    <section id="landscape">
+      <h2><span class="section-number">1</span> The State Management Landscape</h2>
+
+      <p>State management is where frontend applications go to die — or thrive. Choose the wrong tool and you're drowning in boilerplate, fighting TypeScript, and debugging stale data. Choose correctly and your app practically writes itself.</p>
+
+      <p>The first rule: <strong>not all state is the same.</strong> Treating every piece of application state as equivalent is the original sin that leads to Redux stores full of API responses sitting next to UI toggle flags.</p>
+
+      <h3>Start with <code>useState</code></h3>
+      <p>Before reaching for anything else: is this state truly needed beyond a single component? <code>useState</code> is underrated. It has zero overhead, perfect type inference, and the React team has been optimizing it for years. Use it for:</p>
+      <ul>
+        <li>Toggle flags (<code>isOpen</code>, <code>isEditing</code>)</li>
+        <li>Form field values (ideally via <code>react-hook-form</code>)</li>
+        <li>Transient UI states (hover, focus, animation in progress)</li>
+        <li>Component-scoped counters or selections</li>
+      </ul>
+
+      <div class="callout tip">
+        <span class="callout-icon">💡</span>
+        <div class="callout-body">
+          <strong>Tip</strong>
+          <p>If you're reaching for global state because "I might need it somewhere else later," stop. Collocate state as close to where it's used as possible. Premature globalization is a real cost.</p>
+        </div>
+      </div>
+
+      <h3>When You Actually Need Global State</h3>
+      <p>Global state is justified when:</p>
+      <ul>
+        <li>Multiple unrelated components need the same data</li>
+        <li>State needs to survive route navigation</li>
+        <li>You need shared user session / auth state</li>
+        <li>Feature flags, theme, locale preferences</li>
+      </ul>
+
+      <h3>The Problem with Redux (2016–2022)</h3>
+      <p>Redux is not bad technology. It is <em>expensive technology</em>. Its verbosity was acceptable when the alternatives were worse. Today:</p>
+      <ul>
+        <li>Actions, action creators, reducers, selectors — four files for one feature</li>
+        <li>TypeScript integration was bolted on, not designed in</li>
+        <li>No built-in solution for server state (RTK Query came late)</li>
+        <li>The <code>connect()</code> HOC pattern aged poorly</li>
+        <li>Bundle size overhead for simple apps</li>
+      </ul>
+
+      <div class="callout warning">
+        <span class="callout-icon">⚠️</span>
+        <div class="callout-body">
+          <strong>Warning</strong>
+          <p>Redux is still the right choice for very large teams (20+ engineers) who need strict conventions, time-travel debugging, and a long history of tooling. The ecosystem around Redux DevTools is unmatched. But most new projects should start elsewhere.</p>
+        </div>
+      </div>
+
+      <h3>The Modern Alternatives</h3>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Library</th>
+              <th>Model</th>
+              <th>Bundle</th>
+              <th>TypeScript</th>
+              <th>Best For</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Zustand</strong></td>
+              <td>Flux/store</td>
+              <td>~2 KB</td>
+              <td><span class="badge badge-green">Excellent</span></td>
+              <td>Global client state, simple API</td>
+            </tr>
+            <tr>
+              <td><strong>Jotai</strong></td>
+              <td>Atomic</td>
+              <td>~3 KB</td>
+              <td><span class="badge badge-green">Excellent</span></td>
+              <td>Fine-grained reactivity, derived state</td>
+            </tr>
+            <tr>
+              <td><strong>Valtio</strong></td>
+              <td>Proxy</td>
+              <td>~3 KB</td>
+              <td><span class="badge badge-amber">Good</span></td>
+              <td>Mutable-style ergonomics</td>
+            </tr>
+            <tr>
+              <td><strong>Recoil</strong></td>
+              <td>Atomic</td>
+              <td>~21 KB</td>
+              <td><span class="badge badge-amber">Good</span></td>
+              <td>Facebook-scale graphs (declining)</td>
+            </tr>
+            <tr>
+              <td><strong>TanStack Query</strong></td>
+              <td>Cache</td>
+              <td>~13 KB</td>
+              <td><span class="badge badge-green">Excellent</span></td>
+              <td>Server state, async data</td>
+            </tr>
+            <tr>
+              <td><strong>SWR</strong></td>
+              <td>Cache</td>
+              <td>~4 KB</td>
+              <td><span class="badge badge-green">Excellent</span></td>
+              <td>Server state, Next.js integration</td>
+            </tr>
+            <tr>
+              <td><strong>Redux Toolkit</strong></td>
+              <td>Flux</td>
+              <td>~35 KB</td>
+              <td><span class="badge badge-green">Good</span></td>
+              <td>Large teams, existing Redux codebases</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ── SECTION 2: Client vs Server State ── -->
+    <section id="client-vs-server">
+      <h2><span class="section-number">2</span> Client State vs. Server State</h2>
+
+      <p>This distinction is the most important concept in this chapter. If you understand nothing else, understand this.</p>
+
+      <div class="diagram-container">
+        <div class="diagram-title">Figure 18-1 — Client State vs. Server State</div>
+        <div class="diagram-svg">
+          <svg viewBox="0 0 760 320" xmlns="http://www.w3.org/2000/svg" font-family="system-ui,-apple-system,sans-serif">
+            <!-- Background panels -->
+            <rect x="10" y="10" width="340" height="300" rx="12" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+            <rect x="370" y="10" width="380" height="300" rx="12" fill="#CCFBF1" stroke="#0D9488" stroke-width="1.5"/>
+
+            <!-- Labels -->
+            <text x="180" y="38" text-anchor="middle" font-weight="700" font-size="14" fill="#3730A3">CLIENT STATE</text>
+            <text x="560" y="38" text-anchor="middle" font-weight="700" font-size="14" fill="#0F766E">SERVER STATE</text>
+
+            <!-- Client items -->
+            <rect x="30" y="55" width="300" height="34" rx="6" fill="#fff" stroke="#C7D2FE" stroke-width="1"/>
+            <text x="50" y="77" font-size="12" fill="#3730A3">UI state (modal open, tab selected)</text>
+
+            <rect x="30" y="97" width="300" height="34" rx="6" fill="#fff" stroke="#C7D2FE" stroke-width="1"/>
+            <text x="50" y="119" font-size="12" fill="#3730A3">Form state (draft values)</text>
+
+            <rect x="30" y="139" width="300" height="34" rx="6" fill="#fff" stroke="#C7D2FE" stroke-width="1"/>
+            <text x="50" y="161" font-size="12" fill="#3730A3">Theme / locale / preferences</text>
+
+            <rect x="30" y="181" width="300" height="34" rx="6" fill="#fff" stroke="#C7D2FE" stroke-width="1"/>
+            <text x="50" y="203" font-size="12" fill="#3730A3">Navigation / route state</text>
+
+            <rect x="30" y="223" width="300" height="34" rx="6" fill="#fff" stroke="#C7D2FE" stroke-width="1"/>
+            <text x="50" y="245" font-size="12" fill="#3730A3">Multi-step wizard progress</text>
+
+            <text x="180" y="275" text-anchor="middle" font-size="11" fill="#6366F1" font-weight="600">→ Zustand / Jotai / useState</text>
+
+            <!-- Server items -->
+            <rect x="390" y="55" width="340" height="34" rx="6" fill="#fff" stroke="#99F6E4" stroke-width="1"/>
+            <text x="410" y="77" font-size="12" fill="#0F766E">User profile, posts, products (API)</text>
+
+            <rect x="390" y="97" width="340" height="34" rx="6" fill="#fff" stroke="#99F6E4" stroke-width="1"/>
+            <text x="410" y="119" font-size="12" fill="#0F766E">Pagination, search results</text>
+
+            <rect x="390" y="139" width="340" height="34" rx="6" fill="#fff" stroke="#99F6E4" stroke-width="1"/>
+            <text x="410" y="161" font-size="12" fill="#0F766E">Notifications, messages (realtime)</text>
+
+            <rect x="390" y="181" width="340" height="34" rx="6" fill="#fff" stroke="#99F6E4" stroke-width="1"/>
+            <text x="410" y="203" font-size="12" fill="#0F766E">Config flags (from feature-flag API)</text>
+
+            <rect x="390" y="223" width="340" height="34" rx="6" fill="#fff" stroke="#99F6E4" stroke-width="1"/>
+            <text x="410" y="245" font-size="12" fill="#0F766E">Aggregates, analytics data</text>
+
+            <text x="560" y="275" text-anchor="middle" font-size="11" fill="#0D9488" font-weight="600">→ TanStack Query / SWR</text>
+          </svg>
+        </div>
+      </div>
+
+      <h3>Why Server State Is Different</h3>
+      <p>Server state has unique properties that client state does not:</p>
+      <ul>
+        <li><strong>Remote ownership</strong> — the database owns the truth, not your app</li>
+        <li><strong>Staleness</strong> — it can become outdated between fetches</li>
+        <li><strong>Async by nature</strong> — always involves loading, error, and success states</li>
+        <li><strong>Shared across tabs</strong> — invalidating a cache in one tab should propagate</li>
+        <li><strong>Deduplication</strong> — 10 components requesting the same endpoint shouldn't fire 10 requests</li>
+        <li><strong>Background refetching</strong> — data should refresh when the window regains focus</li>
+      </ul>
+
+      <div class="callout anti-pattern">
+        <span class="callout-icon">🚫</span>
+        <div class="callout-body">
+          <strong>Anti-Pattern — Server State in Zustand</strong>
+          <p>The classic mistake: fetching data in a <code>useEffect</code>, storing it in a Zustand store, and manually managing loading/error/stale states. You're reimplementing TanStack Query, badly.</p>
+          <p>This approach misses caching, deduplication, background refetching, stale-while-revalidate, and proper error retry logic. Every team that does this eventually rebuilds TanStack Query from scratch.</p>
+        </div>
+      </div>
+
+      <h3>The Recommended Architecture</h3>
+      <div class="callout pattern">
+        <span class="callout-icon">✅</span>
+        <div class="callout-body">
+          <strong>Pattern — Separate Concerns</strong>
+          <ul>
+            <li><strong>TanStack Query</strong> for all server state (API data)</li>
+            <li><strong>Zustand or Jotai</strong> for client state (UI state, preferences)</li>
+            <li><strong>useState</strong> for local/component-scoped state</li>
+            <li><strong>URL state (nuqs)</strong> for shareable/bookmarkable state</li>
+            <li><strong>react-hook-form</strong> for form state</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── SECTION 3: Zustand ── -->
+    <section id="zustand">
+      <h2><span class="section-number">3</span> Zustand — Simple Global State</h2>
+
+      <div class="section-intro">
+        Zustand is the result of asking: "What if Redux, but without all of Redux?" Created by the Pmndrs collective (same team behind Jotai, Valtio, and React Spring), it achieves remarkable simplicity without sacrificing power.
+      </div>
+
+      <div class="install-block">
+        <span class="prompt">$</span>
+        <span>pnpm add zustand</span>
+      </div>
+
+      <h3 id="zustand-basic">Basic Store with TypeScript</h3>
+
+      <p>Zustand stores are defined with <code>create</code>, which takes a callback receiving <code>set</code> (and optionally <code>get</code>) and returns the initial state + actions. TypeScript inference flows through the entire store if you define an interface first.</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">TypeScript</span>
+          <span class="code-filename">store/user.store.ts</span>
+        </div>
+        <pre><code class="language-typescript">import { create } from 'zustand'
+
+interface User {
+  id: string
+  name: string
+  email: string
+  role: 'admin' | 'member' | 'guest'
+}
+
+interface UserStore {
+  user: User | null
+  isAuthenticated: boolean
+  setUser: (user: User | null) => void
+  updateRole: (role: User['role']) => void
+  logout: () => void
+}
+
+export const useUserStore = create&lt;UserStore&gt;()((set, get) => ({
+  user: null,
+  isAuthenticated: false,
+
+  setUser: (user) =>
+    set({ user, isAuthenticated: user !== null }),
+
+  updateRole: (role) => {
+    const { user } = get()
+    if (!user) return
+    set({ user: { ...user, role } })
+  },
+
+  logout: () => set({ user: null, isAuthenticated: false }),
+}))
+</code></pre>
+      </div>
+
+      <div class="callout info">
+        <span class="callout-icon">ℹ️</span>
+        <div class="callout-body">
+          <strong>Why <code>create&lt;UserStore&gt;()()</code> — Double Call?</strong>
+          <p>The curried form <code>create&lt;T&gt;()()</code> is required to enable full TypeScript inference while also allowing middleware to be composed. Without it, TypeScript cannot infer the generic parameter correctly when middleware is in play. It's an intentional design decision by the Zustand team.</p>
+        </div>
+      </div>
+
+      <h3>Using the Store in Components</h3>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">TypeScript</span>
+          <span class="code-filename">components/UserMenu.tsx</span>
+        </div>
+        <pre><code class="language-typescript">import { useUserStore } from '@/store/user.store'
+
+// ✅ Selector pattern — subscribe only to what you need
+// Component only re-renders when `user` changes
+function UserMenu() {
+  const user = useUserStore((s) => s.user)
+  const logout = useUserStore((s) => s.logout)
+
+  if (!user) return &lt;LoginButton /&gt;
+
+  return (
+    &lt;div&gt;
+      &lt;p&gt;{user.name}&lt;/p&gt;
+      &lt;button onClick={logout}&gt;Logout&lt;/button&gt;
+    &lt;/div&gt;
+  )
+}
+
+// ❌ Avoid subscribing to the whole store
+function BadUserMenu() {
+  // This re-renders on ANY store change
+  const store = useUserStore()
+  return &lt;div&gt;{store.user?.name}&lt;/div&gt;
+}
+</code></pre>
+      </div>
+
+      <h3>Async Actions</h3>
+      <p>Zustand actions are plain functions — there is no special middleware required for async. Just call set after your promise resolves.</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">TypeScript</span>
+          <span class="code-filename">store/cart.store.ts</span>
+        </div>
+        <pre><code class="language-typescript">interface CartStore {
+  items: CartItem[]
+  isLoading: boolean
+  error: string | null
+  addItem: (productId: string, qty: number) => Promise&lt;void&gt;
+  removeItem: (itemId: string) => void
+}
+
+export const useCartStore = create&lt;CartStore&gt;()((set, get) => ({
+  items: [],
+  isLoading: false,
+  error: null,
+
+  addItem: async (productId, qty) => {
+    set({ isLoading: true, error: null })
+    try {
+      const item = await cartApi.add({ productId, qty })
+      set((state) => ({
+        items: [...state.items, item],
+        isLoading: false,
+      }))
+    } catch (err) {
+      set({
+        error: err instanceof Error ? err.message : 'Failed to add item',
+        isLoading: false,
+      })
+    }
+  },
+
+  removeItem: (itemId) =>
+    set((state) => ({
+      items: state.items.filter((i) => i.id !== itemId),
+    })),
+}))
+</code></pre>
+      </div>
+
+      <div class="callout warning">
+        <span class="callout-icon">⚠️</span>
+        <div class="callout-body">
+          <strong>Warning — Don't Put Server State Here</strong>
+          <p>This <code>addItem</code> action manually manages <code>isLoading</code> and <code>error</code>. If cart data comes from an API, use TanStack Query's <code>useMutation</code> instead. Only keep items in Zustand if cart state is purely client-side (e.g., guest cart that hasn't been saved yet).</p>
+        </div>
+      </div>
+
+      <h3 id="zustand-slices">Slices for Large Stores</h3>
+
+      <p>When stores grow, split them into slices — separate files that are composed into a single store.</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">TypeScript</span>
+          <span class="code-filename">store/slices/ui.slice.ts</span>
+        </div>
+        <pre><code class="language-typescript">import { StateCreator } from 'zustand'
+import type { RootStore } from '../root.store'
+
+export interface UISlice {
+  sidebarOpen: boolean
+  theme: 'light' | 'dark' | 'system'
+  toggleSidebar: () => void
+  setTheme: (theme: UISlice['theme']) => void
+}
+
+export const createUISlice: StateCreator&lt;RootStore, [], [], UISlice&gt; = (set) => ({
+  sidebarOpen: false,
+  theme: 'system',
+  toggleSidebar: () => set((s) => ({ sidebarOpen: !s.sidebarOpen })),
+  setTheme: (theme) => set({ theme }),
+})
+</code></pre>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">TypeScript</span>
+          <span class="code-filename">store/root.store.ts</span>
+        </div>
+        <pre><code class="language-typescript">import { create } from 'zustand'
+import { createUISlice, UISlice } from './slices/ui.slice'
+import { createUserSlice, UserSlice } from './slices/user.slice'
+import { createNotifSlice, NotifSlice } from './slices/notif.slice'
+
+export type RootStore = UISlice & UserSlice & NotifSlice
+
+export const useStore = create&lt;RootStore&gt;()((...args) => ({
+  ...createUISlice(...args),
+  ...createUserSlice(...args),
+  ...createNotifSlice(...args),
+}))
+</code></pre>
+      </div>
+
+      <h3 id="zustand-middleware">Middleware: devtools, persist, immer</h3>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">TypeScript</span>
+          <span class="code-filename">store/settings.store.ts</span>
+        </div>
+        <pre><code class="language-typescript">import { create } from 'zustand'
+import { devtools, persist } from 'zustand/middleware'
+import { immer } from 'zustand/middleware/immer'
+
+interface SettingsStore {
+  language: string
+  notifications: boolean
+  dashboardLayout: 'grid' | 'list'
+  setLanguage: (lang: string) => void
+  toggleNotifications: () => void
+}
+
+export const useSettingsStore = create&lt;SettingsStore&gt;()(
+  devtools(
+    persist(
+      immer((set) => ({
+        language: 'en',
+        notifications: true,
+        dashboardLayout: 'grid',
+
+        setLanguage: (lang) =>
+          set((state) => { state.language = lang }),
+
+        toggleNotifications: () =>
+          set((state) => {
+            state.notifications = !state.notifications
+          }),
+      })),
+      {
+        name: 'user-settings',           // localStorage key
+        partialize: (state) => ({        // only persist these fields
+          language: state.language,
+          notifications: state.notifications,
+          dashboardLayout: state.dashboardLayout,
+        }),
+      }
+    ),
+    { name: 'SettingsStore' }            // devtools label
+  )
+)
+</code></pre>
+      </div>
+
+      <p><strong>Middleware composition order matters</strong> — outermost to innermost, the standard order is <code>devtools → persist → immer → your store creator</code>.</p>
+
+      <h3>Shallow Comparison for Performance</h3>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">TypeScript</span>
+          <span class="code-filename">components/Dashboard.tsx</span>
+        </div>
+        <pre><code class="language-typescript">import { useShallow } from 'zustand/react/shallow'
+import { useStore } from '@/store/root.store'
+
+function Dashboard() {
+  // ✅ useShallow prevents re-render if the selected values
+  // are shallowly equal, even if a new object is returned
+  const { sidebarOpen, theme } = useStore(
+    useShallow((s) => ({ sidebarOpen: s.sidebarOpen, theme: s.theme }))
+  )
+
+  return &lt;Layout sidebar={sidebarOpen} theme={theme} /&gt;
+}
+</code></pre>
+      </div>
+    </section>
+
+    <!-- ── SECTION 4: Jotai ── -->
+    <section id="jotai">
+      <h2><span class="section-number">4</span> Jotai — Atomic State</h2>
+
+      <div class="section-intro">
+        Jotai takes its name from the Japanese word for "state" (状態). It brings Recoil's atom-based model to production without the Facebook-scale bundle overhead. Every piece of state is an atom; atoms compose into derived atoms; derived atoms are fine-grained reactive computations.
+      </div>
+
+      <div class="install-block">
+        <span class="prompt">$</span>
+        <span>pnpm add jotai</span>
+      </div>
+
+      <h3 id="jotai-atoms">Basic Atoms and Derived State</h3>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">TypeScript</span>
+          <span class="code-filename">atoms/counter.ts</span>
+        </div>
+        <pre><code class="language-typescript">import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai'
+
+// Primitive atom — like useState but global
+const countAtom = atom(0)
+
+// Derived (read-only) atom — recomputes when countAtom changes
+const doubleCountAtom = atom((get) => get(countAtom) * 2)
+
+// Derived writable atom — reads from one, writes to another
+const clampedCountAtom = atom(
+  (get) => Math.max(0, Math.min(100, get(countAtom))),
+  (_get, set, value: number) => set(countAtom, value)
+)
+
+function Counter() {
+  const [count, setCount] = useAtom(countAtom)
+  const double = useAtomValue(doubleCountAtom) // read-only, no setter
+
+  return (
+    &lt;div&gt;
+      &lt;p&gt;Count: {count} | Double: {double}&lt;/p&gt;
+      &lt;button onClick={() => setCount((c) => c + 1)}&gt;Increment&lt;/button&gt;
+    &lt;/div&gt;
+  )
+}
+
+// Component that only needs to write — zero re-renders on count change
+function ResetButton() {
+  const setCount = useSetAtom(countAtom) // no re-renders!
+  return &lt;button onClick={() => setCount(0)}&gt;Reset&lt;/button&gt;
+}
+</code></pre>
+      </div>
+
+      <h3 id="jotai-async">Async Atoms</h3>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">TypeScript</span>
+          <span class="code-filename">atoms/user.ts</span>
+        </div>
+        <pre><code class="language-typescript">import { atom } from 'jotai'
+import { atomWithStorage } from 'jotai/utils'
+
+// Persist to localStorage
+export const tokenAtom = atomWithStorage&lt;string | null&gt;('auth-token', null)
+
+// Async atom — Jotai handles loading/error state via Suspense
+export const currentUserAtom = atom(async (get) => {
+  const token = get(tokenAtom)
+  if (!token) return null
+  return fetchCurrentUser(token)   // returns Promise&lt;User | null&gt;
+})
+
+// Atom family — parameterized atoms (like a "store" per id)
+import { atomFamily } from 'jotai/utils'
+
+export const postAtomFamily = atomFamily((postId: string) =>
+  atom(async () => fetchPost(postId))
+)
+
+// Usage — each postId gets its own cached atom
+function PostCard({ postId }: { postId: string }) {
+  const post = useAtomValue(postAtomFamily(postId)) // throws Promise → Suspense
+  return &lt;article&gt;{post.title}&lt;/article&gt;
+}
+</code></pre>
+      </div>
+
+      <div class="callout info">
+        <span class="callout-icon">ℹ️</span>
+        <div class="callout-body">
+          <strong>Jotai + Suspense</strong>
+          <p>Async atoms in Jotai integrate with React Suspense. The component suspends while the atom's promise is pending. Wrap it in <code>&lt;Suspense fallback={...}&gt;</code> and <code>&lt;ErrorBoundary&gt;</code>. This is the recommended pattern — no manual loading state needed.</p>
+        </div>
+      </div>
+
+      <h3>Jotai vs. Zustand — When to Pick Which</h3>
+      <div class="two-col">
+        <div class="col-card">
+          <h4 style="color: var(--indigo-700);">Choose Zustand when...</h4>
+          <ul>
+            <li>You want a single, inspectable store</li>
+            <li>You have many actions / business logic</li>
+            <li>Team prefers Redux-like mental model</li>
+            <li>You need devtools with time-travel</li>
+            <li>Actions need to read from multiple slices</li>
+          </ul>
+        </div>
+        <div class="col-card">
+          <h4 style="color: var(--teal-700);">Choose Jotai when...</h4>
+          <ul>
+            <li>Fine-grained updates matter (large lists)</li>
+            <li>Heavy use of derived/computed state</li>
+            <li>You like the atomic mental model</li>
+            <li>You're building a data-heavy dashboard</li>
+            <li>You need Suspense-native async handling</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── SECTION 5: TanStack Query ── -->
+    <section id="tanstack">
+      <h2><span class="section-number">5</span> TanStack Query — Server State Management</h2>
+
+      <div class="section-intro">
+        TanStack Query (formerly React Query) is, in my opinion, the single highest-leverage library in the React ecosystem. It solves an entire category of bugs — stale data, double-fetching, loading state spaghetti — with essentially zero effort once it's set up.
+      </div>
+
+      <div class="install-block">
+        <span class="prompt">$</span>
+        <span>pnpm add @tanstack/react-query @tanstack/react-query-devtools</span>
+      </div>
+
+      <h3>Setup</h3>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">TypeScript</span>
+          <span class="code-filename">app/providers.tsx</span>
+        </div>
+        <pre><code class="language-typescript">'use client'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import { useState } from 'react'
+
+export function Providers({ children }: { children: React.ReactNode }) {
+  // Create QueryClient inside component to avoid sharing between requests
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            staleTime: 60 * 1000,        // 1 minute — tune per app
+            gcTime: 5 * 60 * 1000,       // 5 minutes (was cacheTime in v4)
+            retry: 1,
+            refetchOnWindowFocus: true,
+          },
+        },
+      })
+  )
+
+  return (
+    &lt;QueryClientProvider client={queryClient}&gt;
+      {children}
+      &lt;ReactQueryDevtools initialIsOpen={false} /&gt;
+    &lt;/QueryClientProvider&gt;
+  )
+}
+</code></pre>
+      </div>
+
+      <h3 id="tanstack-usequery">useQuery with Full TypeScript Typing</h3>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">TypeScript</span>
+          <span class="code-filename">hooks/useUsers.ts</span>
+        </div>
+        <pre><code class="language-typescript">import { useQuery, keepPreviousData } from '@tanstack/react-query'
+
+interface User { id: string; name: string; email: string }
+
+interface UsersParams {
+  page: number
+  search: string
+  role?: 'admin' | 'member'
+}
+
+// ✅ Separate query fn — testable, reusable, typed
+async function fetchUsers(params: UsersParams): Promise&lt;{ users: User[]; total: number }&gt; {
+  const url = new URL('/api/users', window.location.origin)
+  url.searchParams.set('page', String(params.page))
+  url.searchParams.set('search', params.search)
+  if (params.role) url.searchParams.set('role', params.role)
+
+  const res = await fetch(url)
+  if (!res.ok) throw new Error(`Failed to fetch users: ${res.statusText}`)
+  return res.json()
+}
+
+export function useUsers(params: UsersParams) {
+  return useQuery({
+    // Query key — array identifies this data. Any change causes a re-fetch.
+    queryKey: ['users', params],
+    queryFn: () => fetchUsers(params),
+    staleTime: 5 * 60 * 1000,           // data fresh for 5 minutes
+    placeholderData: keepPreviousData,  // keeps old data while fetching new page
+  })
+}
+
+// In component:
+function UserList({ page, search }: { page: number; search: string }) {
+  const { data, isLoading, isError, error, isFetching } = useUsers({ page, search })
+
+  if (isLoading) return &lt;Skeleton /&gt;
+  if (isError) return &lt;Error message={error.message} /&gt;
+
+  return (
+    &lt;div&gt;
+      {isFetching &amp;&amp; &lt;RefreshIndicator /&gt;}
+      {data.users.map((u) => &lt;UserRow key={u.id} user={u} /&gt;)}
+    &lt;/div&gt;
+  )
+}
+</code></pre>
+      </div>
+
+      <div class="diagram-container">
+        <div class="diagram-title">Figure 18-2 — TanStack Query Cache Lifecycle</div>
+        <div class="diagram-svg">
+          <svg viewBox="0 0 760 200" xmlns="http://www.w3.org/2000/svg" font-family="system-ui,-apple-system,sans-serif">
+            <!-- Timeline base -->
+            <line x1="40" y1="100" x2="720" y2="100" stroke="#E5E7EB" stroke-width="2"/>
+
+            <!-- States as rectangles on timeline -->
+            <!-- Fetching -->
+            <rect x="40" y="75" width="100" height="50" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+            <text x="90" y="97" text-anchor="middle" font-size="11" font-weight="700" fill="#4F46E5">FETCHING</text>
+            <text x="90" y="112" text-anchor="middle" font-size="10" fill="#6366F1">isFetching:true</text>
+
+            <!-- Arrow -->
+            <path d="M140 100 L165 100" stroke="#9CA3AF" stroke-width="1.5" marker-end="url(#arr)"/>
+
+            <!-- Fresh -->
+            <rect x="165" y="75" width="130" height="50" rx="6" fill="#DCFCE7" stroke="#16A34A" stroke-width="1.5"/>
+            <text x="230" y="95" text-anchor="middle" font-size="11" font-weight="700" fill="#15803D">FRESH</text>
+            <text x="230" y="110" text-anchor="middle" font-size="10" fill="#16A34A">No re-fetch on mount</text>
+            <text x="230" y="123" text-anchor="middle" font-size="9" fill="#9CA3AF">staleTime window</text>
+
+            <!-- Arrow -->
+            <path d="M295 100 L320 100" stroke="#9CA3AF" stroke-width="1.5" marker-end="url(#arr)"/>
+
+            <!-- Stale -->
+            <rect x="320" y="75" width="130" height="50" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
+            <text x="385" y="95" text-anchor="middle" font-size="11" font-weight="700" fill="#B45309">STALE</text>
+            <text x="385" y="110" text-anchor="middle" font-size="10" fill="#D97706">Refetch on focus/mount</text>
+            <text x="385" y="123" text-anchor="middle" font-size="9" fill="#9CA3AF">gcTime window</text>
+
+            <!-- Arrow -->
+            <path d="M450 100 L475 100" stroke="#9CA3AF" stroke-width="1.5" marker-end="url(#arr)"/>
+
+            <!-- Inactive -->
+            <rect x="475" y="75" width="120" height="50" rx="6" fill="#F3F4F6" stroke="#9CA3AF" stroke-width="1.5"/>
+            <text x="535" y="95" text-anchor="middle" font-size="11" font-weight="700" fill="#6B7280">INACTIVE</text>
+            <text x="535" y="110" text-anchor="middle" font-size="10" fill="#9CA3AF">No observers</text>
+
+            <!-- Arrow -->
+            <path d="M595 100 L620 100" stroke="#9CA3AF" stroke-width="1.5" marker-end="url(#arr)"/>
+
+            <!-- Deleted -->
+            <rect x="620" y="75" width="100" height="50" rx="6" fill="#FEE2E2" stroke="#DC2626" stroke-width="1.5"/>
+            <text x="670" y="97" text-anchor="middle" font-size="11" font-weight="700" fill="#DC2626">DELETED</text>
+            <text x="670" y="112" text-anchor="middle" font-size="10" fill="#DC2626">GC collected</text>
+
+            <!-- Arrow marker def -->
+            <defs>
+              <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                <path d="M0 0 L6 3 L0 6 Z" fill="#9CA3AF"/>
+              </marker>
+            </defs>
+
+            <!-- Labels below -->
+            <text x="230" y="160" text-anchor="middle" font-size="10" fill="#6B7280">staleTime: 5 min</text>
+            <text x="385" y="160" text-anchor="middle" font-size="10" fill="#6B7280">gcTime: 5 min (after no observers)</text>
+          </svg>
+        </div>
+      </div>
+
+      <h3 id="tanstack-mutation">useMutation for Writes</h3>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">TypeScript</span>
+          <span class="code-filename">hooks/useCreateUser.ts</span>
+        </div>
+        <pre><code class="language-typescript">import { useMutation, useQueryClient } from '@tanstack/react-query'
+
+interface CreateUser {
+  name: string
+  email: string
+  role: 'admin' | 'member'
+}
+
+interface User extends CreateUser {
+  id: string
+  createdAt: string
+}
+
+async function createUser(data: CreateUser): Promise&lt;User&gt; {
+  const res = await fetch('/api/users', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  })
+  if (!res.ok) throw new Error(await res.text())
+  return res.json()
+}
+
+export function useCreateUser() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: createUser,
+
+    // Optimistic update — update cache before server responds
+    onMutate: async (newUser) => {
+      await queryClient.cancelQueries({ queryKey: ['users'] })
+      const previous = queryClient.getQueryData(['users'])
+
+      queryClient.setQueryData(['users'], (old: any) => ({
+        ...old,
+        users: [...(old?.users ?? []), { ...newUser, id: 'temp-' + Date.now() }],
+      }))
+
+      return { previous }    // context for rollback
+    },
+
+    // On success: invalidate so real data is fetched
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] })
+    },
+
+    // On error: roll back optimistic update
+    onError: (_err, _vars, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(['users'], context.previous)
+      }
+    },
+  })
+}
+
+// Usage
+function CreateUserForm() {
+  const { mutate, isPending, isError, error } = useCreateUser()
+
+  function handleSubmit(data: CreateUser) {
+    mutate(data, {
+      onSuccess: () => toast.success('User created!'),
+    })
+  }
+
+  return (
+    &lt;form onSubmit={handleSubmit}&gt;
+      {isError &amp;&amp; &lt;Alert&gt;{error.message}&lt;/Alert&gt;}
+      &lt;button disabled={isPending}&gt;
+        {isPending ? 'Creating...' : 'Create User'}
+      &lt;/button&gt;
+    &lt;/form&gt;
+  )
+}
+</code></pre>
+      </div>
+
+      <h3 id="tanstack-advanced">Advanced Patterns</h3>
+
+      <h4>Infinite Queries (Pagination / Infinite Scroll)</h4>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">TypeScript</span>
+          <span class="code-filename">hooks/useInfinitePosts.ts</span>
+        </div>
+        <pre><code class="language-typescript">import { useInfiniteQuery } from '@tanstack/react-query'
+
+export function useInfinitePosts() {
+  return useInfiniteQuery({
+    queryKey: ['posts', 'infinite'],
+    queryFn: ({ pageParam }) => fetchPosts({ cursor: pageParam as string | undefined }),
+    initialPageParam: undefined as string | undefined,
+    getNextPageParam: (lastPage) => lastPage.nextCursor,
+  })
+}
+
+function PostFeed() {
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfinitePosts()
+
+  return (
+    &lt;div&gt;
+      {data?.pages.flatMap((p) => p.posts).map((post) => (
+        &lt;PostCard key={post.id} post={post} /&gt;
+      ))}
+      {hasNextPage &amp;&amp; (
+        &lt;button onClick={() => fetchNextPage()} disabled={isFetchingNextPage}&gt;
+          {isFetchingNextPage ? 'Loading...' : 'Load more'}
+        &lt;/button&gt;
+      )}
+    &lt;/div&gt;
+  )
+}
+</code></pre>
+      </div>
+
+      <h4>Prefetching on Hover</h4>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">TypeScript</span>
+          <span class="code-filename">components/UserLink.tsx</span>
+        </div>
+        <pre><code class="language-typescript">import { useQueryClient } from '@tanstack/react-query'
+
+function UserLink({ userId, children }: { userId: string; children: React.ReactNode }) {
+  const queryClient = useQueryClient()
+
+  return (
+    &lt;a
+      href={`/users/${userId}`}
+      onMouseEnter={() =>
+        queryClient.prefetchQuery({
+          queryKey: ['users', userId],
+          queryFn: () => fetchUser(userId),
+          staleTime: 10_000, // skip if cached within 10s
+        })
+      }
+    &gt;
+      {children}
+    &lt;/a&gt;
+  )
+}
+</code></pre>
+      </div>
+
+      <div class="callout ai-era">
+        <span class="callout-icon">🤖</span>
+        <div class="callout-body">
+          <strong>AI Era — Query Key Factories</strong>
+          <p>As AI-assisted development generates more <code>useQuery</code> calls, query key consistency becomes critical. Use a query key factory pattern to prevent key drift across a large codebase:</p>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">TypeScript</span>
+          <span class="code-filename">lib/queryKeys.ts</span>
+        </div>
+        <pre><code class="language-typescript">// Centralize all query keys — AI tools always reference this file
+export const queryKeys = {
+  users: {
+    all: ['users'] as const,
+    lists: () => [...queryKeys.users.all, 'list'] as const,
+    list: (params: UsersParams) => [...queryKeys.users.lists(), params] as const,
+    details: () => [...queryKeys.users.all, 'detail'] as const,
+    detail: (id: string) => [...queryKeys.users.details(), id] as const,
+  },
+  posts: {
+    all: ['posts'] as const,
+    list: (params: PostsParams) => ['posts', 'list', params] as const,
+    detail: (id: string) => ['posts', 'detail', id] as const,
+  },
+} as const
+
+// Usage:
+useQuery({ queryKey: queryKeys.users.detail(userId), queryFn: () => fetchUser(userId) })
+
+// Invalidate all user queries:
+queryClient.invalidateQueries({ queryKey: queryKeys.users.all })
+</code></pre>
+      </div>
+    </section>
+
+    <!-- ── SECTION 6: SWR ── -->
+    <section id="swr">
+      <h2><span class="section-number">6</span> SWR — Vercel's Alternative</h2>
+
+      <p>I helped ship SWR at Vercel. It's a brilliant, minimal library that pioneered the stale-while-revalidate caching strategy for React. The name comes directly from the HTTP <code>Cache-Control</code> RFC.</p>
+
+      <div class="install-block">
+        <span class="prompt">$</span>
+        <span>pnpm add swr</span>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">TypeScript</span>
+          <span class="code-filename">hooks/useUser.ts</span>
+        </div>
+        <pre><code class="language-typescript">import useSWR from 'swr'
+
+const fetcher = (url: string) => fetch(url).then((r) => r.json())
+
+interface User { id: string; name: string; email: string }
+
+function useUser(id: string) {
+  const { data, error, isLoading, mutate } = useSWR&lt;User&gt;(`/api/users/${id}`, fetcher, {
+    revalidateOnFocus: true,
+    dedupingInterval: 2000,  // deduplicate requests within 2s
+  })
+
+  return { user: data, error, isLoading, refresh: mutate }
+}
+</code></pre>
+      </div>
+
+      <h3>SWR vs. TanStack Query</h3>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Feature</th>
+              <th>SWR</th>
+              <th>TanStack Query</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Bundle size</td>
+              <td>~4 KB</td>
+              <td>~13 KB</td>
+            </tr>
+            <tr>
+              <td>Mutations</td>
+              <td>Manual via <code>mutate()</code></td>
+              <td><code>useMutation</code> with full lifecycle</td>
+            </tr>
+            <tr>
+              <td>Optimistic updates</td>
+              <td>Supported</td>
+              <td>First-class, with rollback context</td>
+            </tr>
+            <tr>
+              <td>Infinite query</td>
+              <td><code>useSWRInfinite</code></td>
+              <td><code>useInfiniteQuery</code></td>
+            </tr>
+            <tr>
+              <td>DevTools</td>
+              <td>None (community)</td>
+              <td>Official DevTools</td>
+            </tr>
+            <tr>
+              <td>SSR / Next.js</td>
+              <td>First-class <code>fallbackData</code></td>
+              <td>First-class hydration</td>
+            </tr>
+            <tr>
+              <td>Query cancellation</td>
+              <td>Manual</td>
+              <td>Built-in</td>
+            </tr>
+            <tr>
+              <td>Best for</td>
+              <td>Simple read-heavy apps, Next.js</td>
+              <td>Complex data requirements</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout tip">
+        <span class="callout-icon">💡</span>
+        <div class="callout-body">
+          <strong>My Take</strong>
+          <p>SWR is excellent for read-heavy apps — especially with Next.js, where the two are designed to complement each other. The moment you need robust mutation handling, optimistic updates with rollback, or a DevTools panel for debugging, TanStack Query wins. For most non-trivial apps: go with TanStack Query.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── SECTION 7: Redux Toolkit ── -->
+    <section id="redux">
+      <h2><span class="section-number">7</span> Redux Toolkit — Legacy, Still Important</h2>
+
+      <p>Redux Toolkit (RTK) is Redux done right. It was the Redux team's answer to the boilerplate criticism — and it's a substantial improvement. If you're working in an existing Redux codebase or joining a large team with existing Redux infrastructure, you'll encounter RTK.</p>
+
+      <div class="install-block">
+        <span class="prompt">$</span>
+        <span>pnpm add @reduxjs/toolkit react-redux</span>
+      </div>
+
+      <h3>Modern Redux with TypeScript</h3>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">TypeScript</span>
+          <span class="code-filename">store/auth.slice.ts</span>
+        </div>
+        <pre><code class="language-typescript">import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+
+interface AuthState {
+  user: User | null
+  token: string | null
+  status: 'idle' | 'loading' | 'succeeded' | 'failed'
+  error: string | null
+}
+
+const initialState: AuthState = {
+  user: null, token: null, status: 'idle', error: null,
+}
+
+export const authSlice = createSlice({
+  name: 'auth',
+  initialState,
+  reducers: {
+    setCredentials: (state, action: PayloadAction&lt;{ user: User; token: string }&gt;) => {
+      state.user = action.payload.user
+      state.token = action.payload.token
+      state.status = 'succeeded'
+    },
+    logout: (state) => {
+      state.user = null
+      state.token = null
+      state.status = 'idle'
+    },
+  },
+})
+
+export const { setCredentials, logout } = authSlice.actions
+export default authSlice.reducer
+</code></pre>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">TypeScript</span>
+          <span class="code-filename">store/index.ts</span>
+        </div>
+        <pre><code class="language-typescript">import { configureStore } from '@reduxjs/toolkit'
+import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
+import authReducer from './auth.slice'
+
+export const store = configureStore({
+  reducer: {
+    auth: authReducer,
+  },
+})
+
+// Typed hooks — always use these, never raw useSelector/useDispatch
+export type RootState = ReturnType&lt;typeof store.getState&gt;
+export type AppDispatch = typeof store.dispatch
+export const useAppDispatch = () => useDispatch&lt;AppDispatch&gt;()
+export const useAppSelector: TypedUseSelectorHook&lt;RootState&gt; = useSelector
+</code></pre>
+      </div>
+
+      <h3>When You Might Still Need Redux</h3>
+      <ul>
+        <li><strong>20+ engineers</strong> who need enforced conventions and code review guardrails</li>
+        <li><strong>Time-travel debugging</strong> — Redux DevTools is genuinely unmatched here</li>
+        <li><strong>Existing large Redux codebase</strong> — migration cost may not be justified</li>
+        <li><strong>Strict audit requirements</strong> — action log gives you a complete state mutation history</li>
+      </ul>
+
+      <h3>Migrating from Redux to Zustand</h3>
+      <p>The migration path is incremental. You can run both side-by-side during transition:</p>
+      <ol>
+        <li>Identify slices that handle server state — move those to TanStack Query first</li>
+        <li>For remaining client-state slices, create equivalent Zustand stores</li>
+        <li>Replace <code>useAppSelector</code> calls with Zustand selectors per-component</li>
+        <li>Once a slice is fully migrated, delete the Redux slice</li>
+        <li>Remove Redux when the last slice is gone</li>
+      </ol>
+    </section>
+
+    <!-- ── SECTION 8: URL State ── -->
+    <section id="url-state">
+      <h2><span class="section-number">8</span> URL State</h2>
+
+      <p>URL is the most underused state container in React apps. State in the URL is:</p>
+      <ul>
+        <li>Shareable — send a link, recipient sees the same thing</li>
+        <li>Bookmarkable — users can save their filtered view</li>
+        <li>Back-button-safe — browser history handles it for free</li>
+        <li>SSR-compatible — server can read it without hydration</li>
+      </ul>
+
+      <h3>Native: <code>useSearchParams</code></h3>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">TypeScript</span>
+          <span class="code-filename">components/SearchFilters.tsx</span>
+        </div>
+        <pre><code class="language-typescript">'use client'
+import { useSearchParams, useRouter, usePathname } from 'next/navigation'
+
+function SearchFilters() {
+  const searchParams = useSearchParams()
+  const router = useRouter()
+  const pathname = usePathname()
+
+  const page = Number(searchParams.get('page') ?? '1')
+  const search = searchParams.get('search') ?? ''
+
+  function setParam(key: string, value: string) {
+    const params = new URLSearchParams(searchParams.toString())
+    params.set(key, value)
+    router.push(`${pathname}?${params.toString()}`)
+  }
+
+  return (
+    &lt;div&gt;
+      &lt;input value={search} onChange={(e) => setParam('search', e.target.value)} /&gt;
+      &lt;button onClick={() => setParam('page', String(page + 1))}&gt;Next&lt;/button&gt;
+    &lt;/div&gt;
+  )
+}
+</code></pre>
+      </div>
+
+      <h3>nuqs — Typed URL State</h3>
+
+      <p>The <code>nuqs</code> library gives you typed, validated, serializable URL state with an API that mirrors <code>useState</code>. It's one of those libraries that makes you wonder how you ever lived without it.</p>
+
+      <div class="install-block">
+        <span class="prompt">$</span>
+        <span>pnpm add nuqs</span>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">TypeScript</span>
+          <span class="code-filename">components/ProductList.tsx</span>
+        </div>
+        <pre><code class="language-typescript">'use client'
+import {
+  useQueryState,
+  useQueryStates,
+  parseAsInteger,
+  parseAsString,
+  parseAsStringEnum,
+} from 'nuqs'
+
+function ProductList() {
+  // Fully typed, validated, serialized from/to URL
+  const [page, setPage] = useQueryState('page', parseAsInteger.withDefault(1))
+  const [search, setSearch] = useQueryState('search', parseAsString.withDefault(''))
+  const [sort, setSort] = useQueryState(
+    'sort',
+    parseAsStringEnum(['price_asc', 'price_desc', 'newest']).withDefault('newest')
+  )
+
+  // Batch multiple updates — single navigation event
+  const [filters, setFilters] = useQueryStates({
+    minPrice: parseAsInteger,
+    maxPrice: parseAsInteger,
+    category: parseAsString,
+  })
+
+  return (
+    &lt;div&gt;
+      &lt;input value={search} onChange={(e) => setSearch(e.target.value)} /&gt;
+      {/* sort is typed as 'price_asc' | 'price_desc' | 'newest' */}
+      &lt;SortSelect value={sort} onChange={setSort} /&gt;
+      &lt;Pagination page={page} onPageChange={setPage} /&gt;
+    &lt;/div&gt;
+  )
+}
+</code></pre>
+      </div>
+    </section>
+
+    <!-- ── SECTION 9: Form State ── -->
+    <section id="form-state">
+      <h2><span class="section-number">9</span> Form State</h2>
+
+      <p>Form state deserves its own treatment because it's where many developers make state architecture mistakes. The core principle: <strong>form state is local state.</strong></p>
+
+      <div class="callout anti-pattern">
+        <span class="callout-icon">🚫</span>
+        <div class="callout-body">
+          <strong>Anti-Pattern — Form State in Global Store</strong>
+          <p>Putting form field values into Zustand or Redux is an extremely common anti-pattern. You'll see it in large codebases where developers incorrectly treat "state" as a synonym for "global state."</p>
+          <p>Problems: synchronization bugs when the form unmounts, unnecessary re-renders across the app on every keystroke, and improperly reset state when the form is reused. Use <code>react-hook-form</code> instead.</p>
+        </div>
+      </div>
+
+      <p>We covered <code>react-hook-form</code> in Chapter 16. The key points for state architecture:</p>
+      <ul>
+        <li><code>react-hook-form</code> uses <strong>uncontrolled components</strong> internally — no re-render per keystroke</li>
+        <li>The <code>formState</code> lives inside the library's ref, not in React state</li>
+        <li>On submit, extract values and hand off to a TanStack Query <code>useMutation</code></li>
+        <li>The form's state is discarded on unmount automatically</li>
+      </ul>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">TypeScript</span>
+          <span class="code-filename">components/CreatePostForm.tsx</span>
+        </div>
+        <pre><code class="language-typescript">'use client'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import { useCreatePost } from '@/hooks/useCreatePost'  // useMutation wrapper
+
+const schema = z.object({
+  title: z.string().min(1).max(100),
+  body: z.string().min(10),
+  tags: z.array(z.string()).min(1),
+})
+
+type FormValues = z.infer&lt;typeof schema&gt;
+
+export function CreatePostForm() {
+  // ✅ Form state stays local via react-hook-form
+  const { register, handleSubmit, reset, formState: { errors } } = useForm&lt;FormValues&gt;({
+    resolver: zodResolver(schema),
+  })
+
+  // ✅ Server write state in TanStack Query mutation
+  const createPost = useCreatePost()
+
+  const onSubmit = (data: FormValues) => {
+    createPost.mutate(data, {
+      onSuccess: () => {
+        reset()           // clear form
+        toast.success('Post created!')
+      },
+    })
+  }
+
+  return &lt;form onSubmit={handleSubmit(onSubmit)}&gt;...&lt;/form&gt;
+}
+</code></pre>
+      </div>
+    </section>
+
+    <!-- ── SECTION 10: Patterns ── -->
+    <section id="patterns">
+      <h2><span class="section-number">10</span> State Management Patterns</h2>
+
+      <h3>State Colocation</h3>
+      <p>Put state as close to where it's used as possible. This is the most violated principle in large applications.</p>
+      <ul>
+        <li>Single-component state → <code>useState</code> in that component</li>
+        <li>Shared by siblings → lift to their closest common ancestor</li>
+        <li>Needed across many unrelated components → global store</li>
+        <li>Needed across route changes → URL state or persistent store</li>
+      </ul>
+
+      <h3>Context vs. Global State</h3>
+      <p>React Context is often misused as a global state solution. It has a critical limitation: every consumer re-renders when any part of the context value changes. For rapidly-changing values (user typing, mouse position, animation), this causes serious performance issues.</p>
+
+      <div class="two-col">
+        <div class="col-card">
+          <h4 style="color: var(--green-700);">Use Context for...</h4>
+          <ul>
+            <li>Infrequently-changing values (theme, locale)</li>
+            <li>Dependency injection (passing services down)</li>
+            <li>Component library internal state</li>
+            <li>Configuration that rarely changes</li>
+          </ul>
+        </div>
+        <div class="col-card">
+          <h4 style="color: var(--red-600);">Use Zustand/Jotai for...</h4>
+          <ul>
+            <li>Frequently-changing global state</li>
+            <li>State with multiple independent consumers</li>
+            <li>State with complex update logic</li>
+            <li>State that needs fine-grained subscriptions</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>Performance: Selectors</h3>
+      <p>The most common Zustand performance bug: subscribing to the whole store instead of selecting slices.</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">TypeScript</span>
+          <span class="code-filename">Selector patterns</span>
+        </div>
+        <pre><code class="language-typescript">// ❌ Re-renders on every store change
+const everything = useStore()
+
+// ✅ Re-renders only when `user.name` changes
+const userName = useStore((s) => s.user?.name)
+
+// ✅ Re-renders only when the specific cart item changes
+const itemQty = useStore((s) => s.cart.items.find(i => i.id === itemId)?.qty)
+
+// ✅ Memoized derived value — stable reference
+const totalItems = useStore(
+  useShallow((s) => s.cart.items.reduce((sum, i) => sum + i.qty, 0))
+)
+</code></pre>
+      </div>
+
+      <h3 id="decision-matrix">Decision Matrix — Which State Solution?</h3>
+
+      <div class="diagram-container">
+        <div class="diagram-title">Figure 18-3 — State Management Decision Tree</div>
+        <div class="diagram-svg">
+          <svg viewBox="0 0 760 460" xmlns="http://www.w3.org/2000/svg" font-family="system-ui,-apple-system,sans-serif" font-size="12">
+            <defs>
+              <marker id="arrowBlue" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                <path d="M0 0 L6 3 L0 6 Z" fill="#4F46E5"/>
+              </marker>
+              <marker id="arrowGray" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                <path d="M0 0 L6 3 L0 6 Z" fill="#9CA3AF"/>
+              </marker>
+              <marker id="arrowGreen" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                <path d="M0 0 L6 3 L0 6 Z" fill="#16A34A"/>
+              </marker>
+              <marker id="arrowTeal" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                <path d="M0 0 L6 3 L0 6 Z" fill="#0D9488"/>
+              </marker>
+            </defs>
+
+            <!-- Root question -->
+            <rect x="250" y="10" width="260" height="44" rx="8" fill="#4F46E5"/>
+            <text x="380" y="30" text-anchor="middle" fill="white" font-weight="700">Is it server/API data?</text>
+            <text x="380" y="46" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="11">(fetched from backend)</text>
+
+            <!-- YES branch -->
+            <line x1="380" y1="54" x2="380" y2="80" stroke="#4F46E5" stroke-width="2" marker-end="url(#arrowBlue)"/>
+            <text x="395" y="72" font-size="11" fill="#4F46E5" font-weight="600">YES</text>
+
+            <!-- Server state box -->
+            <rect x="280" y="80" width="200" height="40" rx="8" fill="#0D9488" opacity="0.15" stroke="#0D9488" stroke-width="1.5"/>
+            <text x="380" y="96" text-anchor="middle" font-weight="700" fill="#0F766E">TanStack Query / SWR</text>
+            <text x="380" y="112" text-anchor="middle" font-size="10" fill="#0F766E">useMutation for writes</text>
+
+            <!-- NO branch from root -->
+            <line x1="250" y1="32" x2="120" y2="32" stroke="#9CA3AF" stroke-width="1.5"/>
+            <line x1="120" y1="32" x2="120" y2="140" stroke="#9CA3AF" stroke-width="1.5" marker-end="url(#arrowGray)"/>
+            <text x="185" y="26" text-anchor="middle" font-size="11" fill="#6B7280" font-weight="600">NO</text>
+
+            <!-- Is it form state? -->
+            <rect x="20" y="140" width="200" height="44" rx="8" fill="#F3F4F6" stroke="#D1D5DB" stroke-width="1.5"/>
+            <text x="120" y="158" text-anchor="middle" font-weight="700" fill="#374151">Is it form state?</text>
+            <text x="120" y="174" text-anchor="middle" font-size="10" fill="#6B7280">(inputs, drafts, validation)</text>
+
+            <!-- YES → react-hook-form -->
+            <line x1="220" y1="162" x2="310" y2="162" stroke="#16A34A" stroke-width="1.5" marker-end="url(#arrowGreen)"/>
+            <text x="265" y="156" text-anchor="middle" font-size="11" fill="#16A34A" font-weight="600">YES</text>
+            <rect x="310" y="143" width="170" height="36" rx="8" fill="#DCFCE7" stroke="#16A34A" stroke-width="1.5"/>
+            <text x="395" y="163" text-anchor="middle" font-weight="700" fill="#15803D">react-hook-form</text>
+            <text x="395" y="175" text-anchor="middle" font-size="9" fill="#16A34A">local, uncontrolled</text>
+
+            <!-- NO from form state -->
+            <line x1="120" y1="184" x2="120" y2="240" stroke="#9CA3AF" stroke-width="1.5" marker-end="url(#arrowGray)"/>
+            <text x="135" y="215" font-size="11" fill="#6B7280" font-weight="600">NO</text>
+
+            <!-- Is it shareable? -->
+            <rect x="20" y="240" width="200" height="44" rx="8" fill="#F3F4F6" stroke="#D1D5DB" stroke-width="1.5"/>
+            <text x="120" y="258" text-anchor="middle" font-weight="700" fill="#374151">Should it be in URL?</text>
+            <text x="120" y="274" text-anchor="middle" font-size="10" fill="#6B7280">(shareable, filterable)</text>
+
+            <!-- YES → URL state -->
+            <line x1="220" y1="262" x2="310" y2="262" stroke="#16A34A" stroke-width="1.5" marker-end="url(#arrowGreen)"/>
+            <text x="265" y="256" text-anchor="middle" font-size="11" fill="#16A34A" font-weight="600">YES</text>
+            <rect x="310" y="243" width="170" height="36" rx="8" fill="#EDE9FE" stroke="#7C3AED" stroke-width="1.5"/>
+            <text x="395" y="263" text-anchor="middle" font-weight="700" fill="#6D28D9">URL state (nuqs)</text>
+            <text x="395" y="275" text-anchor="middle" font-size="9" fill="#7C3AED">useQueryState()</text>
+
+            <!-- NO from shareable -->
+            <line x1="120" y1="284" x2="120" y2="340" stroke="#9CA3AF" stroke-width="1.5" marker-end="url(#arrowGray)"/>
+            <text x="135" y="315" font-size="11" fill="#6B7280" font-weight="600">NO</text>
+
+            <!-- Is it local? -->
+            <rect x="20" y="340" width="200" height="44" rx="8" fill="#F3F4F6" stroke="#D1D5DB" stroke-width="1.5"/>
+            <text x="120" y="358" text-anchor="middle" font-weight="700" fill="#374151">Is it component-local?</text>
+            <text x="120" y="374" text-anchor="middle" font-size="10" fill="#6B7280">(no sharing needed)</text>
+
+            <!-- YES → useState -->
+            <line x1="220" y1="362" x2="310" y2="362" stroke="#16A34A" stroke-width="1.5" marker-end="url(#arrowGreen)"/>
+            <text x="265" y="356" text-anchor="middle" font-size="11" fill="#16A34A" font-weight="600">YES</text>
+            <rect x="310" y="343" width="170" height="36" rx="8" fill="#DCFCE7" stroke="#16A34A" stroke-width="1.5"/>
+            <text x="395" y="363" text-anchor="middle" font-weight="700" fill="#15803D">useState / useReducer</text>
+            <text x="395" y="375" text-anchor="middle" font-size="9" fill="#16A34A">always start here</text>
+
+            <!-- NO → Global -->
+            <line x1="120" y1="384" x2="120" y2="420" stroke="#4F46E5" stroke-width="1.5" marker-end="url(#arrowBlue)"/>
+            <text x="135" y="406" font-size="11" fill="#4F46E5" font-weight="600">NO</text>
+
+            <!-- Global state box — split Zustand/Jotai -->
+            <rect x="20" y="420" width="200" height="36" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+            <text x="120" y="436" text-anchor="middle" font-weight="700" fill="#4338CA">Zustand or Jotai</text>
+            <text x="120" y="450" text-anchor="middle" font-size="9" fill="#4F46E5">global client state</text>
+
+            <!-- Server state advanced -->
+            <line x1="380" y1="120" x2="380" y2="160" stroke="#0D9488" stroke-width="1.5"/>
+            <rect x="260" y="160" width="240" height="50" rx="8" fill="#F0FDF4" stroke="#16A34A" stroke-width="1"/>
+            <text x="380" y="178" text-anchor="middle" font-size="11" font-weight="700" fill="#15803D">useQuery → read</text>
+            <text x="380" y="194" text-anchor="middle" font-size="11" font-weight="700" fill="#15803D">useMutation → write</text>
+            <text x="380" y="206" text-anchor="middle" font-size="9" fill="#6B7280">prefetch, infinite, optimistic</text>
+          </svg>
+        </div>
+      </div>
+
+      <h3>Zustand Store Anatomy</h3>
+
+      <div class="diagram-container">
+        <div class="diagram-title">Figure 18-4 — Zustand Store Anatomy</div>
+        <div class="diagram-svg">
+          <svg viewBox="0 0 760 240" xmlns="http://www.w3.org/2000/svg" font-family="system-ui,-apple-system,sans-serif" font-size="12">
+            <!-- Outer store boundary -->
+            <rect x="20" y="20" width="720" height="200" rx="12" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2" stroke-dasharray="6 3"/>
+            <text x="380" y="44" text-anchor="middle" font-weight="700" font-size="13" fill="#3730A3">Zustand Store</text>
+
+            <!-- State section -->
+            <rect x="40" y="55" width="200" height="140" rx="8" fill="white" stroke="#C7D2FE" stroke-width="1.5"/>
+            <text x="140" y="75" text-anchor="middle" font-weight="700" fill="#4338CA">State</text>
+            <text x="140" y="95" text-anchor="middle" fill="#374151">user: User | null</text>
+            <text x="140" y="113" text-anchor="middle" fill="#374151">isAuthenticated: bool</text>
+            <text x="140" y="131" text-anchor="middle" fill="#374151">preferences: {...}</text>
+            <text x="140" y="149" text-anchor="middle" font-size="10" fill="#9CA3AF" font-style="italic">serializable values</text>
+
+            <!-- Actions section -->
+            <rect x="260" y="55" width="200" height="140" rx="8" fill="white" stroke="#C7D2FE" stroke-width="1.5"/>
+            <text x="360" y="75" text-anchor="middle" font-weight="700" fill="#4338CA">Actions</text>
+            <text x="360" y="95" text-anchor="middle" fill="#374151">setUser(user) → set()</text>
+            <text x="360" y="113" text-anchor="middle" fill="#374151">logout() → set()</text>
+            <text x="360" y="131" text-anchor="middle" fill="#374151">async fetchUser()</text>
+            <text x="360" y="149" text-anchor="middle" font-size="10" fill="#9CA3AF" font-style="italic">functions calling set/get</text>
+
+            <!-- Middleware section -->
+            <rect x="480" y="55" width="240" height="140" rx="8" fill="white" stroke="#C7D2FE" stroke-width="1.5"/>
+            <text x="600" y="75" text-anchor="middle" font-weight="700" fill="#4338CA">Middleware</text>
+            <text x="600" y="95" text-anchor="middle" fill="#374151">devtools → DevTools panel</text>
+            <text x="600" y="113" text-anchor="middle" fill="#374151">persist → localStorage</text>
+            <text x="600" y="131" text-anchor="middle" fill="#374151">immer → mutations</text>
+            <text x="600" y="149" text-anchor="middle" font-size="10" fill="#9CA3AF" font-style="italic">composed outermost-first</text>
+
+            <!-- Arrows between sections -->
+            <path d="M240 125 L260 125" stroke="#4F46E5" stroke-width="1.5" marker-end="url(#arrowBlue2)"/>
+            <path d="M460 125 L480 125" stroke="#4F46E5" stroke-width="1.5" marker-end="url(#arrowBlue2)"/>
+
+            <defs>
+              <marker id="arrowBlue2" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto">
+                <path d="M0 0 L5 3 L0 6 Z" fill="#4F46E5"/>
+              </marker>
+            </defs>
+
+            <!-- Component consumers -->
+            <text x="140" y="215" text-anchor="middle" font-size="10" fill="#6B7280">useStore(s =&gt; s.user)</text>
+            <text x="360" y="215" text-anchor="middle" font-size="10" fill="#6B7280">useStore(s =&gt; s.logout)</text>
+            <text x="600" y="215" text-anchor="middle" font-size="10" fill="#6B7280">create&lt;Store&gt;()(devtools(persist(...)))</text>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── SUMMARY ── -->
+    <section id="summary">
+      <h2><span class="section-number">✓</span> Summary</h2>
+
+      <div class="callout pattern">
+        <span class="callout-icon">✅</span>
+        <div class="callout-body">
+          <strong>The Architecture Playbook</strong>
+          <ul>
+            <li><strong>Server state</strong> (API data) → TanStack Query. Period. No exceptions.</li>
+            <li><strong>Global client state</strong> (auth, preferences, UI) → Zustand (store model) or Jotai (atomic model)</li>
+            <li><strong>Local component state</strong> → <code>useState</code>. Start here. Move it out only when needed.</li>
+            <li><strong>Shareable/filterable state</strong> → URL via <code>nuqs</code></li>
+            <li><strong>Form state</strong> → <code>react-hook-form</code>. Never global.</li>
+            <li><strong>Configuration injection</strong> → React Context (infrequent changes only)</li>
+            <li><strong>Large team or time-travel debugging</strong> → Redux Toolkit</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="table-wrapper" id="decision-matrix-table">
+        <table>
+          <thead>
+            <tr>
+              <th>State Type</th>
+              <th>Solution</th>
+              <th>Key API</th>
+              <th>Avoid</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>API / database data</td>
+              <td><span class="badge badge-teal">TanStack Query</span></td>
+              <td><code>useQuery</code>, <code>useMutation</code></td>
+              <td>Storing in Zustand manually</td>
+            </tr>
+            <tr>
+              <td>Auth / user session</td>
+              <td><span class="badge badge-indigo">Zustand</span></td>
+              <td><code>useUserStore</code></td>
+              <td>Context for frequently-read state</td>
+            </tr>
+            <tr>
+              <td>Form inputs</td>
+              <td><span class="badge badge-green">react-hook-form</span></td>
+              <td><code>useForm</code></td>
+              <td>Global store, useState per field</td>
+            </tr>
+            <tr>
+              <td>Filters / pagination</td>
+              <td><span class="badge badge-indigo">nuqs (URL)</span></td>
+              <td><code>useQueryState</code></td>
+              <td>useState (breaks shareability)</td>
+            </tr>
+            <tr>
+              <td>Theme / locale</td>
+              <td><span class="badge badge-indigo">Zustand + persist</span></td>
+              <td><code>persist middleware</code></td>
+              <td>Context (re-render performance)</td>
+            </tr>
+            <tr>
+              <td>Toggle / modal open</td>
+              <td><span class="badge badge-green">useState</span></td>
+              <td><code>useState(false)</code></td>
+              <td>Global store for local UI</td>
+            </tr>
+            <tr>
+              <td>Derived/computed state</td>
+              <td><span class="badge badge-teal">Jotai atoms</span></td>
+              <td><code>atom(get =&gt; ...)</code></td>
+              <td>Storing derived values redundantly</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Footer nav -->
+      <div class="footer-nav">
+        <a href="chapter-17-nextjs.html" class="footer-nav-link prev">
+          <span class="footer-nav-label">Previous</span>
+          <span class="footer-nav-title">Ch 17: Next.js App Router</span>
+        </a>
+        <div class="footer-chapter-info">
+          <span>Chapter 18 of 24</span><br>
+          <span style="color: var(--text-tertiary); font-size: 0.75rem;">TypeScript for the AI Era</span>
+        </div>
+        <a href="chapter-19-architecture.html" class="footer-nav-link next">
+          <span class="footer-nav-label">Next</span>
+          <span class="footer-nav-title">Ch 19: Application Architecture</span>
+        </a>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ───── FOOTER ───── -->
+<footer class="footer">
+  <p>
+    <strong>TypeScript for the AI Era</strong> — From Python Engineer to Staff-Level TypeScript Architect<br>
+    <span>Chapter 18: State Management — Zustand, Jotai &amp; TanStack Query</span><br>
+    <span style="margin-top:0.5rem;display:inline-block;">Written by a Senior Staff Engineer (Meta, Vercel) &mdash; 2024</span>
+  </p>
+</footer>
+
+<script>
+  // Syntax highlighting
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('pre code').forEach((el) => {
+      hljs.highlightElement(el)
+    })
+  })
+
+  // Scrollspy for sidebar TOC
+  const tocLinks = document.querySelectorAll('.toc-list a')
+  const sections = document.querySelectorAll('section[id], h3[id]')
+
+  function updateToc() {
+    let current = ''
+    sections.forEach((section) => {
+      const rect = section.getBoundingClientRect()
+      if (rect.top <= 90) {
+        current = section.id
+      }
+    })
+    tocLinks.forEach((link) => {
+      link.classList.toggle('active', link.getAttribute('href') === '#' + current)
+    })
+  }
+
+  window.addEventListener('scroll', updateToc, { passive: true })
+  updateToc()
+</script>
+</body>
+</html>

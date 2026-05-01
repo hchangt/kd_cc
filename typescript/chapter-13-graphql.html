@@ -1,0 +1,2301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chapter 13: GraphQL APIs with TypeScript — TypeScript for the AI Era</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/graphql.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --white: #FFFFFF;
+      --surface: #F9FAFB;
+      --surface-2: #F3F4F6;
+      --border: #E5E7EB;
+      --border-strong: #D1D5DB;
+      --text-primary: #111827;
+      --text-secondary: #6B7280;
+      --text-tertiary: #9CA3AF;
+      --indigo-50: #EEF2FF;
+      --indigo-100: #E0E7FF;
+      --indigo-200: #C7D2FE;
+      --indigo-500: #6366F1;
+      --indigo-600: #4F46E5;
+      --indigo-700: #4338CA;
+      --indigo-800: #3730A3;
+      --sky-400: #38BDF8;
+      --sky-500: #0EA5E9;
+      --sky-100: #E0F2FE;
+      --sky-700: #0369A1;
+      --green-500: #22C55E;
+      --green-100: #DCFCE7;
+      --green-700: #15803D;
+      --amber-500: #F59E0B;
+      --amber-100: #FEF3C7;
+      --amber-700: #B45309;
+      --rose-500: #F43F5E;
+      --rose-100: #FFE4E6;
+      --rose-700: #BE123C;
+      --violet-500: #8B5CF6;
+      --violet-100: #EDE9FE;
+      --violet-700: #6D28D9;
+      --teal-500: #14B8A6;
+      --teal-100: #CCFBF1;
+      --teal-700: #0F766E;
+      --orange-500: #F97316;
+      --orange-100: #FFEDD5;
+      --orange-700: #C2410C;
+      --font-body: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+      --font-code: 'JetBrains Mono', 'Fira Code', monospace;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--white);
+      color: var(--text-primary);
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ───── TOP NAV ───── */
+    .top-nav {
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      background: rgba(255,255,255,0.94);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1.75rem;
+    }
+
+    .top-nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 0.875rem;
+      color: var(--indigo-600);
+    }
+
+    .ts-badge {
+      background: var(--indigo-600);
+      color: white;
+      font-family: var(--font-code);
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 4px;
+      letter-spacing: 0.02em;
+    }
+
+    .top-nav-chapter-links {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      font-size: 0.825rem;
+    }
+
+    .top-nav-chapter-links a {
+      text-decoration: none;
+      color: var(--text-secondary);
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      transition: color 0.15s;
+    }
+
+    .top-nav-chapter-links a:hover { color: var(--indigo-600); }
+
+    .chapter-progress-pill {
+      background: var(--indigo-50);
+      border: 1px solid var(--indigo-100);
+      color: var(--indigo-700);
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0.2rem 0.7rem;
+      border-radius: 999px;
+      letter-spacing: 0.04em;
+    }
+
+    /* ───── CHAPTER HERO ───── */
+    .chapter-hero {
+      background: linear-gradient(135deg, #3730A3 0%, #4F46E5 45%, #6366F1 75%, #38BDF8 100%);
+      padding: 4rem 2rem 3.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .chapter-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+
+    .chapter-hero-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(255,255,255,0.16);
+      border: 1px solid rgba(255,255,255,0.28);
+      color: white;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.3rem 0.9rem;
+      border-radius: 999px;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-eyebrow .dot {
+      width: 6px; height: 6px;
+      background: #A5F3FC;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.35; }
+    }
+
+    .chapter-hero h1 {
+      font-size: clamp(2rem, 5vw, 3.25rem);
+      font-weight: 800;
+      color: white;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      margin-bottom: 1rem;
+    }
+
+    .chapter-hero h1 .chapter-num {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 600;
+      opacity: 0.7;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 0.4rem;
+    }
+
+    .chapter-hero-sub {
+      font-size: 1.1rem;
+      color: rgba(255,255,255,0.82);
+      max-width: 650px;
+      margin-bottom: 2rem;
+      line-height: 1.65;
+    }
+
+    .hero-meta {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .hero-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      color: rgba(255,255,255,0.75);
+      font-size: 0.82rem;
+      font-weight: 500;
+    }
+
+    .hero-meta-item svg { opacity: 0.8; }
+
+    .hero-tag {
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.25);
+      color: white;
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 0.2rem 0.6rem;
+      border-radius: 5px;
+      letter-spacing: 0.04em;
+    }
+
+    /* ───── PAGE LAYOUT ───── */
+    .page-body {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 3rem 1.75rem;
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      gap: 3.5rem;
+      align-items: start;
+    }
+
+    /* ───── SIDEBAR TOC ───── */
+    .sidebar {
+      position: sticky;
+      top: 72px;
+      max-height: calc(100vh - 88px);
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+
+    .sidebar::-webkit-scrollbar { width: 4px; }
+    .sidebar::-webkit-scrollbar-track { background: transparent; }
+    .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+    .toc-title {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-tertiary);
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .toc-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.1rem;
+    }
+
+    .toc-list li a {
+      display: block;
+      text-decoration: none;
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      padding: 0.3rem 0.5rem;
+      border-radius: 5px;
+      line-height: 1.45;
+      transition: background 0.12s, color 0.12s;
+    }
+
+    .toc-list li a:hover {
+      background: var(--indigo-50);
+      color: var(--indigo-700);
+    }
+
+    .toc-list li.toc-h3 a {
+      padding-left: 1.1rem;
+      font-size: 0.75rem;
+      color: var(--text-tertiary);
+    }
+
+    .toc-list li.toc-h3 a:hover { color: var(--indigo-600); }
+
+    .toc-list li.active a {
+      background: var(--indigo-50);
+      color: var(--indigo-700);
+      font-weight: 600;
+    }
+
+    .toc-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 0.75rem 0;
+    }
+
+    .toc-chapter-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .toc-chapter-nav a {
+      display: block;
+      text-decoration: none;
+      font-size: 0.75rem;
+      color: var(--indigo-600);
+      font-weight: 600;
+      padding: 0.35rem 0.5rem;
+      border-radius: 5px;
+      background: var(--indigo-50);
+      border: 1px solid var(--indigo-100);
+      transition: background 0.12s;
+    }
+
+    .toc-chapter-nav a:hover { background: var(--indigo-100); }
+
+    /* ───── CONTENT ───── */
+    .content h2 {
+      font-size: 1.7rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      letter-spacing: -0.025em;
+      line-height: 1.2;
+      margin: 3rem 0 1rem;
+      padding-top: 1rem;
+      border-top: 2px solid var(--border);
+    }
+
+    .content h2:first-child {
+      margin-top: 0;
+      padding-top: 0;
+      border-top: none;
+    }
+
+    .content h3 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.015em;
+      margin: 2rem 0 0.75rem;
+    }
+
+    .content h4 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 1.5rem 0 0.5rem;
+    }
+
+    .content p {
+      margin-bottom: 1rem;
+      color: var(--text-primary);
+      font-size: 0.975rem;
+    }
+
+    .content ul, .content ol {
+      margin: 0.75rem 0 1rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .content li {
+      font-size: 0.975rem;
+      color: var(--text-primary);
+    }
+
+    .content a {
+      color: var(--indigo-600);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
+    .content code {
+      font-family: var(--font-code);
+      font-size: 0.82em;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+      color: var(--indigo-700);
+    }
+
+    /* ───── CODE BLOCKS ───── */
+    .code-block {
+      margin: 1.25rem 0;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    }
+
+    .code-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--surface-2);
+      border-bottom: 1px solid var(--border);
+      padding: 0.5rem 1rem;
+    }
+
+    .code-lang {
+      font-family: var(--font-code);
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-secondary);
+    }
+
+    .code-filename {
+      font-family: var(--font-code);
+      font-size: 0.72rem;
+      color: var(--text-tertiary);
+    }
+
+    .code-block pre {
+      margin: 0;
+      overflow-x: auto;
+      background: #F8FAFC !important;
+    }
+
+    .code-block pre code {
+      font-family: var(--font-code) !important;
+      font-size: 0.825rem !important;
+      background: transparent !important;
+      border: none !important;
+      padding: 1.1rem 1.25rem !important;
+      color: inherit !important;
+      display: block;
+      line-height: 1.65;
+    }
+
+    /* ───── CALLOUTS ───── */
+    .callout {
+      border-radius: 10px;
+      padding: 1.1rem 1.25rem;
+      margin: 1.5rem 0;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 0.65rem 0.85rem;
+      align-items: start;
+      border: 1px solid;
+    }
+
+    .callout-icon {
+      font-size: 1.15rem;
+      line-height: 1.4;
+      grid-row: 1 / 3;
+    }
+
+    .callout-title {
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.2rem;
+    }
+
+    .callout-body {
+      font-size: 0.9rem;
+      line-height: 1.6;
+      grid-column: 2;
+    }
+
+    .callout-body p { margin-bottom: 0.5rem; }
+    .callout-body p:last-child { margin-bottom: 0; }
+    .callout-body code {
+      font-size: 0.8em;
+    }
+
+    .callout.tip      { background: var(--green-100);  border-color: #86EFAC; }
+    .callout.tip .callout-title    { color: var(--green-700); }
+    .callout.tip .callout-body     { color: #166534; }
+
+    .callout.info     { background: var(--sky-100);   border-color: #7DD3FC; }
+    .callout.info .callout-title   { color: var(--sky-700); }
+    .callout.info .callout-body    { color: #075985; }
+
+    .callout.warning  { background: var(--amber-100); border-color: #FCD34D; }
+    .callout.warning .callout-title { color: var(--amber-700); }
+    .callout.warning .callout-body  { color: #92400E; }
+
+    .callout.python   { background: var(--teal-100);  border-color: #5EEAD4; }
+    .callout.python .callout-title  { color: var(--teal-700); }
+    .callout.python .callout-body   { color: #134E4A; }
+
+    .callout.ai-era   { background: var(--violet-100); border-color: #C4B5FD; }
+    .callout.ai-era .callout-title  { color: var(--violet-700); }
+    .callout.ai-era .callout-body   { color: #4C1D95; }
+
+    .callout.gql-concept { background: var(--indigo-50); border-color: var(--indigo-200); }
+    .callout.gql-concept .callout-title { color: var(--indigo-700); }
+    .callout.gql-concept .callout-body  { color: var(--indigo-800); }
+
+    /* ───── TABLES ───── */
+    .table-wrap {
+      overflow-x: auto;
+      margin: 1.5rem 0;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+    }
+
+    thead {
+      background: var(--surface-2);
+      border-bottom: 2px solid var(--border-strong);
+    }
+
+    thead th {
+      padding: 0.75rem 1rem;
+      text-align: left;
+      font-weight: 700;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-secondary);
+      white-space: nowrap;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background 0.1s;
+    }
+
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: var(--surface); }
+
+    tbody td {
+      padding: 0.7rem 1rem;
+      vertical-align: top;
+      color: var(--text-primary);
+      font-size: 0.875rem;
+      line-height: 1.5;
+    }
+
+    tbody td:first-child { font-weight: 600; }
+
+    .cell-good  { color: var(--green-700); font-weight: 600; }
+    .cell-warn  { color: var(--amber-700); font-weight: 600; }
+    .cell-bad   { color: var(--rose-700);  font-weight: 600; }
+    .cell-code  { font-family: var(--font-code); font-size: 0.78rem; color: var(--indigo-700); }
+
+    /* ───── SVG DIAGRAMS ───── */
+    .diagram-wrap {
+      margin: 2rem 0;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.75rem;
+      overflow-x: auto;
+    }
+
+    .diagram-title {
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-secondary);
+      margin-bottom: 1.25rem;
+      text-align: center;
+    }
+
+    svg text { font-family: var(--font-body); }
+
+    /* ───── SECTION ANCHOR LINKS ───── */
+    .section-anchor {
+      scroll-margin-top: 72px;
+    }
+
+    /* ───── FOOTER NAV ───── */
+    .footer-nav {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 2rem 1.75rem;
+      margin-top: 4rem;
+    }
+
+    .footer-nav-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .footer-nav a {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      text-decoration: none;
+      padding: 0.85rem 1.25rem;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--white);
+      transition: border-color 0.15s, box-shadow 0.15s;
+      min-width: 200px;
+    }
+
+    .footer-nav a:hover {
+      border-color: var(--indigo-200);
+      box-shadow: 0 2px 12px rgba(79,70,229,0.1);
+    }
+
+    .footer-nav-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-tertiary);
+    }
+
+    .footer-nav-title {
+      font-size: 0.875rem;
+      font-weight: 700;
+      color: var(--indigo-600);
+    }
+
+    .footer-nav .next { text-align: right; }
+
+    .footer-center {
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text-tertiary);
+    }
+
+    /* ───── RESPONSIVE ───── */
+    @media (max-width: 860px) {
+      .page-body {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+      .sidebar {
+        position: static;
+        max-height: none;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 1.25rem;
+        margin-bottom: 0.5rem;
+      }
+      .top-nav-chapter-links .hide-mobile { display: none; }
+    }
+
+    @media (max-width: 560px) {
+      .chapter-hero { padding: 2.5rem 1.25rem 2rem; }
+      .page-body { padding: 1.5rem 1.25rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══════════════ TOP NAV ═══════════════ -->
+  <nav class="top-nav">
+    <a href="index.html" class="top-nav-brand">
+      <span class="ts-badge">TS</span>
+      TypeScript for the AI Era
+    </a>
+    <div class="top-nav-chapter-links">
+      <a href="chapter-12-rest.html">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+        <span class="hide-mobile">Ch 12 REST APIs</span>
+        <span style="display:none;" class="show-mobile">Prev</span>
+      </a>
+      <span class="chapter-progress-pill">Chapter 13 of 24</span>
+      <a href="chapter-14-databases.html">
+        <span class="hide-mobile">Ch 14 Databases</span>
+        <span style="display:none;" class="show-mobile">Next</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+      </a>
+    </div>
+  </nav>
+
+  <!-- ═══════════════ HERO ═══════════════ -->
+  <header class="chapter-hero">
+    <div class="chapter-hero-inner">
+      <div class="hero-eyebrow">
+        <span class="dot"></span>
+        Part IV — API Design
+      </div>
+      <h1>
+        <span class="chapter-num">Chapter 13</span>
+        GraphQL APIs with TypeScript
+      </h1>
+      <p class="chapter-hero-sub">
+        From Facebook's internal tool to the industry standard for flexible APIs — master GraphQL schema design,
+        type-safe resolvers, DataLoader batching, real-time subscriptions, and the full client/server stack in TypeScript.
+      </p>
+      <div class="hero-meta">
+        <span class="hero-meta-item">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          ~95 min read
+        </span>
+        <span class="hero-meta-item">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Senior Staff Engineer — Meta (GraphQL's birthplace)
+        </span>
+        <span class="hero-tag">Advanced</span>
+        <span class="hero-tag">Pothos</span>
+        <span class="hero-tag">Apollo</span>
+        <span class="hero-tag">tRPC</span>
+        <span class="hero-tag">DataLoader</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ═══════════════ PAGE BODY ═══════════════ -->
+  <div class="page-body">
+
+    <!-- ───── SIDEBAR ───── -->
+    <aside class="sidebar">
+      <p class="toc-title">Contents</p>
+      <ul class="toc-list">
+        <li><a href="#what-is-graphql">1. What is GraphQL?</a></li>
+        <li class="toc-h3"><a href="#the-rest-problem">The REST Problem</a></li>
+        <li class="toc-h3"><a href="#when-to-use">REST vs GraphQL</a></li>
+        <li><a href="#graphql-concepts">2. GraphQL Concepts</a></li>
+        <li class="toc-h3"><a href="#sdl">Schema Definition Language</a></li>
+        <li class="toc-h3"><a href="#resolvers">Resolvers</a></li>
+        <li class="toc-h3"><a href="#dataloaders">DataLoaders</a></li>
+        <li><a href="#pothos">3. Building with Pothos</a></li>
+        <li class="toc-h3"><a href="#pothos-setup">SchemaBuilder Setup</a></li>
+        <li class="toc-h3"><a href="#pothos-types">Defining Types</a></li>
+        <li class="toc-h3"><a href="#pothos-plugins">Plugins</a></li>
+        <li><a href="#codegen">4. Code Generation Approach</a></li>
+        <li><a href="#apollo-server">5. Apollo Server</a></li>
+        <li><a href="#resolvers-deep">6. Resolvers Deep Dive</a></li>
+        <li class="toc-h3"><a href="#resolver-sig">Signature &amp; Types</a></li>
+        <li class="toc-h3"><a href="#resolver-errors">Error Handling</a></li>
+        <li><a href="#clients">7. GraphQL Clients</a></li>
+        <li class="toc-h3"><a href="#urql">urql</a></li>
+        <li class="toc-h3"><a href="#apollo-client">Apollo Client</a></li>
+        <li><a href="#dataloader">8. DataLoader: Solving N+1</a></li>
+        <li><a href="#subscriptions">9. Subscriptions</a></li>
+        <li><a href="#trpc">10. tRPC Alternative</a></li>
+        <li><a href="#decision-guide">11. Decision Guide</a></li>
+        <hr class="toc-divider" />
+        <li style="list-style:none; padding: 0 0.5rem;">
+          <div class="toc-chapter-nav">
+            <a href="chapter-12-rest.html">← Ch 12: REST APIs</a>
+            <a href="chapter-14-databases.html">Ch 14: Databases →</a>
+          </div>
+        </li>
+      </ul>
+    </aside>
+
+    <!-- ───── MAIN CONTENT ───── -->
+    <main class="content">
+
+      <!-- ═══ SECTION 1: WHAT IS GRAPHQL ═══ -->
+      <h2 id="what-is-graphql" class="section-anchor">1. What is GraphQL?</h2>
+
+      <p>
+        I joined Facebook's infrastructure team in 2012. The mobile apps were in trouble. The existing REST APIs
+        were designed for the web — they returned enormous JSON blobs that made Android and iOS engineers furious.
+        Every new feature required a new endpoint, a new team meeting, and at least two weeks of back-and-forth
+        on what the response shape should be. The real-time News Feed alone had dozens of overlapping endpoints
+        that nobody fully understood.
+      </p>
+
+      <p>
+        Lee Byron, Nick Schrock, and Dan Schafer set out to fix this. They built a query language that let clients
+        ask for exactly the data they needed — no more, no less. Internally it shipped in 2012. By 2015 it was
+        open-sourced under the name <strong>GraphQL</strong>.
+      </p>
+
+      <div class="callout info">
+        <span class="callout-icon">ℹ️</span>
+        <span class="callout-title">The GraphQL Specification</span>
+        <div class="callout-body">
+          <p>GraphQL is a <em>specification</em>, not an implementation. The spec defines the type system, query language, and execution model. Any language can implement it. The spec lives at <code>spec.graphql.org</code> and is governed by the GraphQL Foundation (Linux Foundation).</p>
+        </div>
+      </div>
+
+      <h3 id="the-rest-problem" class="section-anchor">The Problem with REST</h3>
+
+      <p>REST APIs suffer from two structural problems:</p>
+
+      <ul>
+        <li><strong>Over-fetching:</strong> <code>GET /users/42</code> returns 40 fields. You only need <code>name</code> and <code>avatar</code>. The rest is wasted bandwidth and parsing.</li>
+        <li><strong>Under-fetching (N+1 at the HTTP layer):</strong> You fetch a user, then fetch their posts, then fetch each post's comments. Three waterfall round trips for data that is logically connected.</li>
+      </ul>
+
+      <p>GraphQL solves both with a single mechanism: the client declares a <em>query</em>.</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">GraphQL</span>
+          <span class="code-filename">A single GraphQL query vs three REST calls</span>
+        </div>
+        <pre><code class="language-graphql"># Instead of GET /users/42 + GET /users/42/posts + GET /posts/1/comments
+query GetUserWithContent {
+  user(id: "42") {
+    name
+    avatar
+    posts(limit: 5) {
+      title
+      publishedAt
+      comments(limit: 3) {
+        body
+        author { name }
+      }
+    }
+  }
+}</code></pre>
+      </div>
+
+      <h3 id="the-query-language" class="section-anchor">The Query Language</h3>
+
+      <p>GraphQL has three operation types:</p>
+
+      <ul>
+        <li><strong>Query</strong> — read-only data fetching. Analogous to <code>GET</code>.</li>
+        <li><strong>Mutation</strong> — data writes and side effects. Analogous to <code>POST</code>/<code>PUT</code>/<code>DELETE</code>.</li>
+        <li><strong>Subscription</strong> — long-lived connection for real-time data. Typically WebSocket-backed.</li>
+      </ul>
+
+      <div class="callout gql-concept">
+        <span class="callout-icon">◈</span>
+        <span class="callout-title">GraphQL Concept: Schema-First vs Code-First</span>
+        <div class="callout-body">
+          <p><strong>Schema-first:</strong> You write SDL (<code>.graphql</code> files), then generate types and wire up resolvers. Tools like <code>graphql-codegen</code> generate TypeScript from your SDL.</p>
+          <p><strong>Code-first:</strong> You write TypeScript/JavaScript that <em>produces</em> the schema at runtime. Tools like <strong>Pothos</strong> and <strong>Nexus</strong> do this. The SDL is a derived artifact.</p>
+          <p>Both approaches produce an identical runtime schema. The choice is about developer workflow. This chapter covers both — Pothos for code-first (recommended for TypeScript), codegen for schema-first.</p>
+        </div>
+      </div>
+
+      <h3 id="when-to-use" class="section-anchor">REST vs GraphQL: When to Use Which</h3>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Criterion</th>
+              <th>REST</th>
+              <th>GraphQL</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Multiple client types (web, mobile, IoT)</td>
+              <td class="cell-warn">Painful — different payload needs</td>
+              <td class="cell-good">Excellent — each client queries what it needs</td>
+            </tr>
+            <tr>
+              <td>Simple CRUD API</td>
+              <td class="cell-good">Simple, well-understood</td>
+              <td class="cell-warn">Overhead not worth it</td>
+            </tr>
+            <tr>
+              <td>Public/third-party API</td>
+              <td class="cell-good">HTTP caching, CDN, familiarity</td>
+              <td class="cell-warn">POST-based, harder to cache publicly</td>
+            </tr>
+            <tr>
+              <td>Complex, graph-shaped data</td>
+              <td class="cell-bad">Waterfall requests</td>
+              <td class="cell-good">First-class traversal</td>
+            </tr>
+            <tr>
+              <td>Real-time needs</td>
+              <td class="cell-warn">SSE/WebSocket bolted on</td>
+              <td class="cell-good">Native subscriptions</td>
+            </tr>
+            <tr>
+              <td>File uploads</td>
+              <td class="cell-good">Multipart, battle-tested</td>
+              <td class="cell-warn">Requires separate spec (<code>graphql-multipart-request-spec</code>)</td>
+            </tr>
+            <tr>
+              <td>Rapid iteration, product teams</td>
+              <td class="cell-warn">Versioning friction</td>
+              <td class="cell-good">Add fields, deprecate old — no versions</td>
+            </tr>
+            <tr>
+              <td>Microservices / federation</td>
+              <td class="cell-warn">API gateway complexity</td>
+              <td class="cell-good">Apollo Federation, schema stitching</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ═══ SECTION 2: CONCEPTS ═══ -->
+      <h2 id="graphql-concepts" class="section-anchor">2. GraphQL Concepts</h2>
+
+      <h3 id="sdl" class="section-anchor">Schema Definition Language (SDL)</h3>
+
+      <p>The SDL is the lingua franca of GraphQL. Even if you use a code-first approach, understanding SDL is essential for reading documentation, debugging, and communicating with other teams.</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">GraphQL SDL</span>
+          <span class="code-filename">schema.graphql — a blog API</span>
+        </div>
+        <pre><code class="language-graphql"># Scalars: Int, Float, String, Boolean, ID (built-in)
+# Custom scalar
+scalar DateTime
+
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+type User {
+  id: ID!
+  name: String!
+  email: String!
+  posts: [Post!]!
+  createdAt: DateTime!
+}
+
+type Post {
+  id: ID!
+  title: String!
+  body: String!
+  status: PostStatus!
+  author: User!
+  tags: [String!]!
+  publishedAt: DateTime
+}
+
+# Input type — used in mutations
+input CreatePostInput {
+  title: String!
+  body: String!
+  tags: [String!]
+}
+
+# Root Query type — all read operations
+type Query {
+  me: User
+  user(id: ID!): User
+  posts(status: PostStatus, limit: Int = 10): [Post!]!
+  post(id: ID!): Post
+}
+
+# Root Mutation type
+type Mutation {
+  createPost(input: CreatePostInput!): Post!
+  publishPost(id: ID!): Post!
+  deletePost(id: ID!): Boolean!
+}
+
+# Real-time
+type Subscription {
+  postPublished: Post!
+}</code></pre>
+      </div>
+
+      <h3 id="resolvers" class="section-anchor">Resolvers</h3>
+
+      <p>
+        A resolver is a function that returns the data for a single field. Every field in a GraphQL schema
+        can have a resolver. If it doesn't, GraphQL falls back to a default resolver that reads the property
+        with the same name from the parent object.
+      </p>
+
+      <div class="callout gql-concept">
+        <span class="callout-icon">◈</span>
+        <span class="callout-title">GraphQL Concept: The Resolver Chain</span>
+        <div class="callout-body">
+          <p>GraphQL executes a query by walking the selection set depth-first. For a query like <code>user { posts { author { name } } }</code>, it calls:</p>
+          <ol style="margin: 0.5rem 0 0 1.25rem; gap: 0.25rem;">
+            <li><code>Query.user</code> resolver → returns a User object</li>
+            <li><code>User.posts</code> resolver (parent = User) → returns Post[]</li>
+            <li><code>Post.author</code> resolver (parent = Post) → returns User</li>
+            <li><code>User.name</code> → default resolver reads <code>parent.name</code></li>
+          </ol>
+          <p style="margin-top: 0.5rem;">Each resolver receives: <code>(parent, args, context, info)</code>.</p>
+        </div>
+      </div>
+
+      <h3 id="context" class="section-anchor">Context</h3>
+
+      <p>
+        Context is a plain object created once per request and passed to every resolver. It is the correct
+        place for: authenticated user, database connections, DataLoader instances, and request-scoped caches.
+        <strong>Never put mutable global state in context.</strong>
+      </p>
+
+      <h3 id="dataloaders" class="section-anchor">DataLoaders — Preview</h3>
+
+      <p>
+        DataLoader batches and caches calls to data sources within a single request. It is the primary
+        solution to the N+1 resolver problem. Full coverage in <a href="#dataloader">Section 8</a>.
+      </p>
+
+      <!-- ═══ SECTION 3: POTHOS ═══ -->
+      <h2 id="pothos" class="section-anchor">3. Building a GraphQL Server with Pothos</h2>
+
+      <p>
+        Pothos is the library I reach for first when building a new GraphQL server in TypeScript. It is
+        code-first, requires zero code generation, and achieves full end-to-end type safety using TypeScript's
+        type system alone. Your schema definition <em>is</em> the type definition.
+      </p>
+
+      <div class="callout tip">
+        <span class="callout-icon">✅</span>
+        <span class="callout-title">Why Pothos over SDL + codegen for new projects</span>
+        <div class="callout-body">
+          <p>With code generation, your types are always one <code>pnpm codegen</code> away from being stale. With Pothos, the TypeScript compiler enforces correctness at every keystroke. Refactoring a field name is a compile error, not a silent mismatch between SDL and resolver.</p>
+        </div>
+      </div>
+
+      <h3 id="pothos-setup" class="section-anchor">Installation and SchemaBuilder Setup</h3>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">shell</span>
+        </div>
+        <pre><code class="language-bash">pnpm add @pothos/core graphql graphql-yoga
+pnpm add -D @types/node typescript</code></pre>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">TypeScript</span>
+          <span class="code-filename">src/schema/builder.ts</span>
+        </div>
+        <pre><code class="language-typescript">import SchemaBuilder from '@pothos/core';
+
+// The generic parameter defines types available throughout the schema:
+// - Context: the per-request context object shape
+// - Objects: a map from object type name to its backing TypeScript type
+interface SchemaTypes {
+  Context: {
+    userId: string | null;
+    db: PrismaClient;
+  };
+  Objects: {
+    User: User;
+    Post: Post;
+  };
+  Scalars: {
+    DateTime: { Input: Date; Output: Date };
+  };
+}
+
+export const builder = new SchemaBuilder&lt;SchemaTypes&gt;({});</code></pre>
+      </div>
+
+      <h3 id="pothos-types" class="section-anchor">Defining Object Types, Queries, and Mutations</h3>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">TypeScript</span>
+          <span class="code-filename">src/schema/user.ts</span>
+        </div>
+        <pre><code class="language-typescript">import { builder } from './builder';
+
+// Register the User object type.
+// Pothos links this to the `User` backing type from SchemaTypes.Objects.
+builder.objectType('User', {
+  description: 'A registered user in the system',
+  fields: (t) => ({
+    id: t.exposeID('id'),
+    name: t.exposeString('name'),
+    email: t.exposeString('email'),
+    // Computed field — not on the DB model
+    displayName: t.string({
+      resolve: (user) => `${user.name} (${user.email})`,
+    }),
+    // Nested type with its own resolver
+    posts: t.field({
+      type: ['Post'],
+      resolve: async (user, _args, ctx) => {
+        return ctx.db.post.findMany({
+          where: { authorId: user.id },
+        });
+      },
+    }),
+  }),
+});
+
+// Root-level Query fields for User
+builder.queryFields((t) => ({
+  me: t.field({
+    type: 'User',
+    nullable: true,
+    resolve: (_root, _args, ctx) => {
+      if (!ctx.userId) return null;
+      return ctx.db.user.findUnique({ where: { id: ctx.userId } });
+    },
+  }),
+
+  user: t.field({
+    type: 'User',
+    nullable: true,
+    args: { id: t.arg.id({ required: true }) },
+    resolve: (_root, args, ctx) =>
+      ctx.db.user.findUnique({ where: { id: args.id } }),
+  }),
+}));</code></pre>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">TypeScript</span>
+          <span class="code-filename">src/schema/post.ts — mutations with input types</span>
+        </div>
+        <pre><code class="language-typescript">import { builder } from './builder';
+import { GraphQLError } from 'graphql';
+
+// Input type — reusable in multiple mutations
+const CreatePostInput = builder.inputType('CreatePostInput', {
+  fields: (t) => ({
+    title: t.string({ required: true }),
+    body: t.string({ required: true }),
+    tags: t.stringList({ required: false }),
+  }),
+});
+
+builder.objectType('Post', {
+  fields: (t) => ({
+    id: t.exposeID('id'),
+    title: t.exposeString('title'),
+    body: t.exposeString('body'),
+    publishedAt: t.expose('publishedAt', { type: 'DateTime', nullable: true }),
+    author: t.field({
+      type: 'User',
+      resolve: (post, _args, ctx) =>
+        ctx.db.user.findUniqueOrThrow({ where: { id: post.authorId } }),
+    }),
+  }),
+});
+
+builder.mutationFields((t) => ({
+  createPost: t.field({
+    type: 'Post',
+    args: { input: t.arg({ type: CreatePostInput, required: true }) },
+    resolve: async (_root, { input }, ctx) => {
+      if (!ctx.userId) {
+        throw new GraphQLError('Not authenticated', {
+          extensions: { code: 'UNAUTHENTICATED' },
+        });
+      }
+      return ctx.db.post.create({
+        data: {
+          title: input.title,
+          body: input.body,
+          tags: input.tags ?? [],
+          authorId: ctx.userId,
+        },
+      });
+    },
+  }),
+
+  publishPost: t.field({
+    type: 'Post',
+    args: { id: t.arg.id({ required: true }) },
+    resolve: async (_root, { id }, ctx) => {
+      if (!ctx.userId) throw new GraphQLError('Not authenticated');
+      const post = await ctx.db.post.findUnique({ where: { id } });
+      if (!post || post.authorId !== ctx.userId) {
+        throw new GraphQLError('Not found or not authorized', {
+          extensions: { code: 'FORBIDDEN' },
+        });
+      }
+      return ctx.db.post.update({
+        where: { id },
+        data: { publishedAt: new Date() },
+      });
+    },
+  }),
+}));</code></pre>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">TypeScript</span>
+          <span class="code-filename">src/server.ts — wiring with graphql-yoga</span>
+        </div>
+        <pre><code class="language-typescript">import { createYoga } from 'graphql-yoga';
+import { createServer } from 'http';
+import { builder } from './schema/builder';
+import './schema/user';  // side-effect: registers types on builder
+import './schema/post';
+
+// Build the schema — Pothos emits a GraphQLSchema object
+const schema = builder.toSchema();
+
+const yoga = createYoga({
+  schema,
+  context: async ({ request }) => {
+    // Parse JWT from Authorization header
+    const token = request.headers.get('authorization')?.replace('Bearer ', '');
+    const userId = token ? verifyJwt(token) : null;
+    return { userId, db: prisma };
+  },
+});
+
+const server = createServer(yoga);
+server.listen(4000, () => {
+  console.log('GraphQL server running at http://localhost:4000/graphql');
+});</code></pre>
+      </div>
+
+      <h3 id="pothos-plugins" class="section-anchor">Pothos Plugins</h3>
+
+      <p>Pothos has a rich plugin ecosystem that extends the type system:</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Plugin</th>
+              <th>Package</th>
+              <th>What it does</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Prisma</td>
+              <td class="cell-code">@pothos/plugin-prisma</td>
+              <td>Generates Pothos types directly from Prisma schema. Zero boilerplate.</td>
+            </tr>
+            <tr>
+              <td>Zod</td>
+              <td class="cell-code">@pothos/plugin-zod</td>
+              <td>Validate mutation inputs with Zod schemas. Validation errors surface as field errors.</td>
+            </tr>
+            <tr>
+              <td>Auth</td>
+              <td class="cell-code">@pothos/plugin-scope-auth</td>
+              <td>Declarative field-level authorization with scopes. No resolver clutter.</td>
+            </tr>
+            <tr>
+              <td>Relay</td>
+              <td class="cell-code">@pothos/plugin-relay</td>
+              <td>Global IDs, node interface, connections (pagination) — Relay spec out of the box.</td>
+            </tr>
+            <tr>
+              <td>DataLoader</td>
+              <td class="cell-code">@pothos/plugin-dataloader</td>
+              <td>First-class DataLoader integration with automatic batching on object types.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">TypeScript</span>
+          <span class="code-filename">Pothos Prisma plugin — near-zero boilerplate</span>
+        </div>
+        <pre><code class="language-typescript">import SchemaBuilder from '@pothos/core';
+import PrismaPlugin from '@pothos/plugin-prisma';
+import type PrismaTypes from '@pothos/plugin-prisma/generated';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
+
+const builder = new SchemaBuilder&lt;{
+  PrismaTypes: PrismaTypes;
+  Context: { db: PrismaClient; userId: string | null };
+}&gt;({
+  plugins: [PrismaPlugin],
+  prisma: { client: prisma },
+});
+
+// ONE LINE to register an entire Prisma model as a GraphQL type
+builder.prismaObject('User', {
+  fields: (t) => ({
+    id: t.exposeID('id'),
+    name: t.exposeString('name'),
+    email: t.exposeString('email'),
+    // Prisma relation — fully typed
+    posts: t.relation('posts'),
+  }),
+});</code></pre>
+      </div>
+
+      <!-- ═══ SECTION 4: CODEGEN ═══ -->
+      <h2 id="codegen" class="section-anchor">4. Alternative: Code Generation Approach</h2>
+
+      <p>
+        If your team is already invested in SDL-first workflows, or you're working with an existing schema
+        maintained by a different team, the code generation approach is the right tool.
+      </p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">shell</span>
+        </div>
+        <pre><code class="language-bash">pnpm add graphql-yoga graphql
+pnpm add -D @graphql-codegen/cli @graphql-codegen/typescript \
+             @graphql-codegen/typescript-resolvers</code></pre>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">YAML</span>
+          <span class="code-filename">codegen.yml</span>
+        </div>
+        <pre><code class="language-yaml">overwrite: true
+schema: "./src/schema.graphql"
+generates:
+  ./src/generated/types.ts:
+    plugins:
+      - typescript
+      - typescript-resolvers
+    config:
+      # Map SDL scalars to TypeScript types
+      scalars:
+        DateTime: Date
+      # Map SDL object names to your backing model types
+      mappers:
+        User: "../models#UserModel"
+        Post: "../models#PostModel"
+      # Makes context available in every resolver
+      contextType: "../context#Context"</code></pre>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">TypeScript</span>
+          <span class="code-filename">src/resolvers/user.ts — using generated types</span>
+        </div>
+        <pre><code class="language-typescript">// Generated by graphql-codegen — DO NOT EDIT
+import type { Resolvers } from '../generated/types';
+
+// The `Resolvers` type is fully typed against your SDL.
+// TypeScript will error if you return the wrong shape.
+export const userResolvers: Resolvers = {
+  Query: {
+    me: (_root, _args, ctx) => {
+      if (!ctx.userId) return null;
+      return ctx.db.user.findUnique({ where: { id: ctx.userId } });
+    },
+    user: (_root, { id }, ctx) =>
+      ctx.db.user.findUnique({ where: { id } }),
+  },
+
+  User: {
+    posts: (user, _args, ctx) =>
+      ctx.db.post.findMany({ where: { authorId: user.id } }),
+  },
+
+  Mutation: {
+    createPost: (_root, { input }, ctx) => {
+      if (!ctx.userId) throw new Error('Unauthenticated');
+      return ctx.db.post.create({
+        data: { ...input, authorId: ctx.userId },
+      });
+    },
+  },
+};</code></pre>
+      </div>
+
+      <div class="callout info">
+        <span class="callout-icon">ℹ️</span>
+        <span class="callout-title">When codegen beats Pothos</span>
+        <div class="callout-body">
+          <p>Use SDL + codegen when: (1) your schema is maintained by a dedicated platform team and shared via a schema registry, (2) you're generating client types from the same schema, (3) your team uses multiple languages and SDL is the shared contract, or (4) you're working with Apollo Federation where the SDL is the federation boundary.</p>
+        </div>
+      </div>
+
+      <!-- ═══ SECTION 5: APOLLO SERVER ═══ -->
+      <h2 id="apollo-server" class="section-anchor">5. Apollo Server (The Industry Standard)</h2>
+
+      <p>
+        Apollo Server is the most widely deployed GraphQL server in production. At Meta we built our own;
+        at most companies, Apollo is what you'll find. Apollo Server 4 has a clean TypeScript-first API
+        and integrates with Express, Fastify, and Lambda.
+      </p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">shell</span>
+        </div>
+        <pre><code class="language-bash">pnpm add @apollo/server graphql
+# With Express middleware
+pnpm add express @as-integrations/express cors body-parser</code></pre>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">TypeScript</span>
+          <span class="code-filename">src/server.ts — Apollo Server 4 with Express</span>
+        </div>
+        <pre><code class="language-typescript">import { ApolloServer } from '@apollo/server';
+import { expressMiddleware } from '@as-integrations/express';
+import express from 'express';
+import cors from 'cors';
+import { json } from 'body-parser';
+import { typeDefs } from './schema';
+import { resolvers } from './resolvers';
+import type { Context } from './context';
+
+interface MyContext extends Context {}
+
+const app = express();
+
+const server = new ApolloServer&lt;MyContext&gt;({ typeDefs, resolvers });
+
+// Apollo Server 4: must call start() before applying middleware
+await server.start();
+
+app.use(
+  '/graphql',
+  cors&lt;cors.CorsRequest&gt;(),
+  json(),
+  expressMiddleware(server, {
+    context: async ({ req }): Promise&lt;MyContext&gt; => ({
+      userId: extractUserId(req.headers.authorization),
+      db: prisma,
+    }),
+  }),
+);
+
+app.listen(4000, () => console.log('Apollo Server at http://localhost:4000/graphql'));</code></pre>
+      </div>
+
+      <div class="callout tip">
+        <span class="callout-icon">✅</span>
+        <span class="callout-title">Apollo Studio</span>
+        <div class="callout-body">
+          <p>Apollo Studio (<code>studio.apollographql.com</code>) provides a free schema explorer, query inspector, and performance analytics. Register your server with <code>APOLLO_KEY</code> and <code>APOLLO_GRAPH_REF</code> env vars. For production, schema checks catch breaking changes before deployment.</p>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Server</th>
+              <th>Best for</th>
+              <th>TypeScript DX</th>
+              <th>Subscriptions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Apollo Server 4</td>
+              <td>Enterprise, Federation, large teams</td>
+              <td class="cell-good">Excellent</td>
+              <td class="cell-warn">Separate <code>graphql-ws</code> setup</td>
+            </tr>
+            <tr>
+              <td>graphql-yoga</td>
+              <td>New projects, edge runtimes, modern stack</td>
+              <td class="cell-good">Excellent</td>
+              <td class="cell-good">Built-in SSE + WS</td>
+            </tr>
+            <tr>
+              <td>Mercurius (Fastify)</td>
+              <td>High-throughput, Fastify ecosystem</td>
+              <td class="cell-good">Good</td>
+              <td class="cell-good">Built-in</td>
+            </tr>
+            <tr>
+              <td>express-graphql</td>
+              <td>Legacy projects</td>
+              <td class="cell-warn">Dated, minimal</td>
+              <td class="cell-bad">Not supported</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ═══ SECTION 6: RESOLVERS DEEP DIVE ═══ -->
+      <h2 id="resolvers-deep" class="section-anchor">6. Resolvers Deep Dive</h2>
+
+      <h3 id="resolver-sig" class="section-anchor">Resolver Signature and Types</h3>
+
+      <p>Every resolver has the same four-argument signature:</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">// The canonical resolver type
+type Resolver&lt;Parent, Args, Context, Return&gt; = (
+  parent: Parent,    // Return value of the parent resolver
+  args: Args,        // Arguments passed to this field in the query
+  context: Context,  // Per-request shared object (auth user, DB, etc.)
+  info: GraphQLResolveInfo  // Field metadata, AST, path — rarely needed
+) => Return | Promise&lt;Return&gt;;
+
+// Example: typed resolver for Query.user
+const userResolver: Resolver&lt;{}, { id: string }, AppContext, User | null&gt; =
+  (_parent, { id }, ctx) => ctx.db.user.findUnique({ where: { id } });
+
+// Field-level resolver — parent IS the User object
+const postsResolver: Resolver&lt;User, { limit?: number }, AppContext, Post[]&gt; =
+  (user, { limit = 10 }, ctx) =>
+    ctx.db.post.findMany({
+      where: { authorId: user.id },
+      take: limit,
+      orderBy: { createdAt: 'desc' },
+    });</code></pre>
+      </div>
+
+      <h3 id="async-resolvers" class="section-anchor">Async Resolvers and Parallel Execution</h3>
+
+      <div class="callout gql-concept">
+        <span class="callout-icon">◈</span>
+        <span class="callout-title">GraphQL Concept: Parallel vs Serial Execution</span>
+        <div class="callout-body">
+          <p>By default, GraphQL executes sibling fields in a query <strong>in parallel</strong>. If your query asks for <code>posts</code> and <code>followers</code> on a User, both resolvers run concurrently via <code>Promise.all</code> semantics.</p>
+          <p><strong>Exception:</strong> The fields of the root <code>Mutation</code> type execute <strong>serially</strong>, in document order, to ensure safe state mutation. This is mandated by the GraphQL spec.</p>
+        </div>
+      </div>
+
+      <h3 id="resolver-errors" class="section-anchor">Error Handling in Resolvers</h3>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">TypeScript</span>
+          <span class="code-filename">Structured errors with GraphQLError</span>
+        </div>
+        <pre><code class="language-typescript">import { GraphQLError } from 'graphql';
+
+// GraphQLError lets you attach machine-readable error codes
+// and additional extensions visible to the client
+function assertAuthenticated(ctx: AppContext): asserts ctx is AuthContext {
+  if (!ctx.userId) {
+    throw new GraphQLError('You must be signed in to do that.', {
+      extensions: {
+        code: 'UNAUTHENTICATED',
+        http: { status: 401 },
+      },
+    });
+  }
+}
+
+function assertOwner(post: Post, ctx: AuthContext): void {
+  if (post.authorId !== ctx.userId) {
+    throw new GraphQLError('You do not have permission to modify this post.', {
+      extensions: {
+        code: 'FORBIDDEN',
+        http: { status: 403 },
+      },
+    });
+  }
+}
+
+// Usage in a resolver
+const deletePost: MutationResolvers['deletePost'] = async (_root, { id }, ctx) => {
+  assertAuthenticated(ctx);
+  const post = await ctx.db.post.findUnique({ where: { id } });
+  if (!post) throw new GraphQLError('Post not found', { extensions: { code: 'NOT_FOUND' } });
+  assertOwner(post, ctx);
+  await ctx.db.post.delete({ where: { id } });
+  return true;
+};</code></pre>
+      </div>
+
+      <div class="callout warning">
+        <span class="callout-icon">⚠️</span>
+        <span class="callout-title">Error Masking in Production</span>
+        <div class="callout-body">
+          <p>Apollo Server and graphql-yoga both mask unexpected errors in production — they replace the message with "Internal server error" and log the original. <strong>Only <code>GraphQLError</code> instances propagate their message to clients.</strong> Unhandled <code>Error</code> throws are masked. This is the correct behavior — never expose stack traces to clients.</p>
+        </div>
+      </div>
+
+      <!-- ═══ SECTION 7: CLIENTS ═══ -->
+      <h2 id="clients" class="section-anchor">7. GraphQL Clients: URQL and Apollo Client</h2>
+
+      <h3 id="urql" class="section-anchor">urql — Lightweight and Modern</h3>
+
+      <p>
+        urql is my preference for new React projects. It's small (~20kB gzipped), has a clean exchange-based
+        architecture, and first-class support for Suspense and Server Components.
+      </p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">shell</span>
+        </div>
+        <pre><code class="language-bash">pnpm add urql graphql
+# For type-safe queries (recommended — see codegen below)
+pnpm add -D @graphql-codegen/client-preset</code></pre>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">TypeScript</span>
+          <span class="code-filename">src/graphql/queries.ts — typed with codegen client preset</span>
+        </div>
+        <pre><code class="language-typescript">// graphql() is generated by @graphql-codegen/client-preset.
+// It returns a TypedDocumentNode — the query document tagged with its result type.
+import { graphql } from '../generated/gql';
+
+export const GET_USERS_QUERY = graphql(`
+  query GetUsers($limit: Int) {
+    posts(limit: $limit) {
+      id
+      title
+      publishedAt
+      author {
+        name
+        avatar
+      }
+    }
+  }
+`);
+
+export const CREATE_POST_MUTATION = graphql(`
+  mutation CreatePost($input: CreatePostInput!) {
+    createPost(input: $input) {
+      id
+      title
+    }
+  }
+`);</code></pre>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">TypeScript</span>
+          <span class="code-filename">src/components/PostList.tsx</span>
+        </div>
+        <pre><code class="language-typescript">import { useQuery, useMutation } from 'urql';
+import { GET_USERS_QUERY, CREATE_POST_MUTATION } from '../graphql/queries';
+
+export function PostList() {
+  // data is fully typed — TypeScript knows exactly what fields exist
+  const [{ data, fetching, error }] = useQuery({
+    query: GET_USERS_QUERY,
+    variables: { limit: 10 },
+  });
+
+  const [createResult, createPost] = useMutation(CREATE_POST_MUTATION);
+
+  if (fetching) return &lt;p&gt;Loading...&lt;/p&gt;;
+  if (error) return &lt;p&gt;Error: {error.message}&lt;/p&gt;;
+
+  return (
+    &lt;ul&gt;
+      {data?.posts.map((post) =&gt; (
+        // TypeScript infers post.title, post.author.name, etc.
+        &lt;li key={post.id}&gt;
+          {post.title} — by {post.author.name}
+        &lt;/li&gt;
+      ))}
+    &lt;/ul&gt;
+  );
+}</code></pre>
+      </div>
+
+      <h3 id="apollo-client" class="section-anchor">Apollo Client — Full-Featured</h3>
+
+      <p>Apollo Client is the industry workhorse. Its normalized cache is powerful for apps with complex, interconnected data. The tradeoff is size (~38kB gzipped) and a steeper learning curve for cache management.</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">TypeScript</span>
+          <span class="code-filename">Apollo Client setup</span>
+        </div>
+        <pre><code class="language-typescript">import { ApolloClient, InMemoryCache, ApolloProvider, gql, useQuery } from '@apollo/client';
+
+const client = new ApolloClient({
+  uri: '/graphql',
+  cache: new InMemoryCache({
+    typePolicies: {
+      // Teach Apollo how to identify Post objects for normalized caching
+      Post: { keyFields: ['id'] },
+      // Merge paginated results
+      Query: {
+        fields: {
+          posts: {
+            keyArgs: false,
+            merge(existing = [], incoming) {
+              return [...existing, ...incoming];
+            },
+          },
+        },
+      },
+    },
+  }),
+  // Include credentials for cookie-based auth
+  credentials: 'include',
+});</code></pre>
+      </div>
+
+      <div class="callout python">
+        <span class="callout-icon">🐍</span>
+        <span class="callout-title">Coming from Python + requests/httpx</span>
+        <div class="callout-body">
+          <p>In Python you'd make a GraphQL request as a plain POST:</p>
+          <p><code>requests.post("/graphql", json={"query": "{ me { name } }"})</code></p>
+          <p>In TypeScript, clients like urql and Apollo add: automatic caching, deduplication of identical in-flight queries, normalized cache updates after mutations, and React hooks. You <em>can</em> still use <code>fetch</code> directly — GraphQL is just HTTP+JSON — but the clients handle a lot of production concerns for you.</p>
+        </div>
+      </div>
+
+      <!-- ═══ SECTION 8: DATALOADER ═══ -->
+      <h2 id="dataloader" class="section-anchor">8. DataLoader: Solving N+1</h2>
+
+      <p>
+        The N+1 problem is the most common performance pitfall in GraphQL. It occurs when a list resolver
+        returns N items, and a field resolver on each item makes an individual database call — resulting
+        in 1 (list) + N (field) = N+1 database queries.
+      </p>
+
+      <!-- N+1 Visualization SVG -->
+      <div class="diagram-wrap">
+        <p class="diagram-title">The N+1 Problem — Without DataLoader</p>
+        <svg viewBox="0 0 740 320" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; display:block; margin:0 auto;">
+          <defs>
+            <marker id="arrow-n1" markerWidth="8" markerHeight="8" refX="7" refY="3.5" orient="auto">
+              <polygon points="0 0, 8 3.5, 0 7" fill="#6B7280"/>
+            </marker>
+            <marker id="arrow-dl" markerWidth="8" markerHeight="8" refX="7" refY="3.5" orient="auto">
+              <polygon points="0 0, 8 3.5, 0 7" fill="#4F46E5"/>
+            </marker>
+          </defs>
+
+          <!-- LEFT: N+1 PROBLEM -->
+          <text x="175" y="22" text-anchor="middle" font-size="12" font-weight="700" fill="#BE123C">Without DataLoader — N+1 Queries</text>
+
+          <!-- Client box -->
+          <rect x="30" y="35" width="90" height="36" rx="6" fill="#FEE2E2" stroke="#FECACA" stroke-width="1.5"/>
+          <text x="75" y="57" text-anchor="middle" font-size="11" font-weight="600" fill="#BE123C">Query</text>
+
+          <!-- Resolver box -->
+          <rect x="165" y="35" width="90" height="36" rx="6" fill="#FEF3C7" stroke="#FDE68A" stroke-width="1.5"/>
+          <text x="210" y="57" text-anchor="middle" font-size="11" font-weight="600" fill="#92400E">Resolver</text>
+
+          <!-- Arrow client → resolver -->
+          <line x1="120" y1="53" x2="163" y2="53" stroke="#6B7280" stroke-width="1.5" marker-end="url(#arrow-n1)"/>
+
+          <!-- DB box -->
+          <rect x="300" y="35" width="75" height="36" rx="6" fill="#E0E7FF" stroke="#C7D2FE" stroke-width="1.5"/>
+          <text x="337" y="57" text-anchor="middle" font-size="11" font-weight="600" fill="#3730A3">DB</text>
+
+          <!-- Query 1: posts -->
+          <line x1="255" y1="53" x2="298" y2="53" stroke="#6B7280" stroke-width="1.5" marker-end="url(#arrow-n1)"/>
+          <text x="277" y="46" text-anchor="middle" font-size="9" fill="#6B7280">1 query</text>
+
+          <!-- N individual queries -->
+          <text x="210" y="105" text-anchor="middle" font-size="10" fill="#92400E">For each post, fetch author:</text>
+
+          <!-- Individual DB calls -->
+          <rect x="165" y="118" width="90" height="24" rx="5" fill="#FEF3C7" stroke="#FDE68A" stroke-width="1"/>
+          <text x="210" y="134" text-anchor="middle" font-size="9.5" font-weight="500" fill="#92400E">author(id=1)</text>
+          <line x1="255" y1="130" x2="298" y2="130" stroke="#EF4444" stroke-width="1.2" marker-end="url(#arrow-n1)"/>
+
+          <rect x="165" y="150" width="90" height="24" rx="5" fill="#FEF3C7" stroke="#FDE68A" stroke-width="1"/>
+          <text x="210" y="166" text-anchor="middle" font-size="9.5" font-weight="500" fill="#92400E">author(id=2)</text>
+          <line x1="255" y1="162" x2="298" y2="162" stroke="#EF4444" stroke-width="1.2" marker-end="url(#arrow-n1)"/>
+
+          <rect x="165" y="182" width="90" height="24" rx="5" fill="#FEF3C7" stroke="#FDE68A" stroke-width="1"/>
+          <text x="210" y="198" text-anchor="middle" font-size="9.5" font-weight="500" fill="#92400E">author(id=3)</text>
+          <line x1="255" y1="194" x2="298" y2="194" stroke="#EF4444" stroke-width="1.2" marker-end="url(#arrow-n1)"/>
+
+          <text x="210" y="225" text-anchor="middle" font-size="10" fill="#BE123C">... N more queries</text>
+
+          <!-- Rect for DB on right side for N queries -->
+          <rect x="300" y="118" width="75" height="110" rx="6" fill="#E0E7FF" stroke="#C7D2FE" stroke-width="1.5"/>
+          <text x="337" y="178" text-anchor="middle" font-size="10" font-weight="600" fill="#3730A3">DB</text>
+          <text x="337" y="194" text-anchor="middle" font-size="9" fill="#4338CA">N hits</text>
+
+          <text x="175" y="260" text-anchor="middle" font-size="11" font-weight="700" fill="#BE123C">1 + N database queries ❌</text>
+
+          <!-- DIVIDER -->
+          <line x1="395" y1="20" x2="395" y2="280" stroke="#E5E7EB" stroke-width="1.5" stroke-dasharray="4 4"/>
+
+          <!-- RIGHT: DATALOADER -->
+          <text x="565" y="22" text-anchor="middle" font-size="12" font-weight="700" fill="#15803D">With DataLoader — 2 Queries Total</text>
+
+          <rect x="420" y="35" width="90" height="36" rx="6" fill="#DCFCE7" stroke="#86EFAC" stroke-width="1.5"/>
+          <text x="465" y="57" text-anchor="middle" font-size="11" font-weight="600" fill="#15803D">Query</text>
+
+          <rect x="555" y="35" width="90" height="36" rx="6" fill="#EDE9FE" stroke="#C4B5FD" stroke-width="1.5"/>
+          <text x="600" y="57" text-anchor="middle" font-size="11" font-weight="600" fill="#5B21B6">DataLoader</text>
+
+          <line x1="510" y1="53" x2="553" y2="53" stroke="#4F46E5" stroke-width="1.5" marker-end="url(#arrow-dl)"/>
+
+          <rect x="688" y="35" width="50" height="36" rx="6" fill="#E0E7FF" stroke="#C7D2FE" stroke-width="1.5"/>
+          <text x="713" y="57" text-anchor="middle" font-size="11" font-weight="600" fill="#3730A3">DB</text>
+
+          <line x1="645" y1="53" x2="686" y2="53" stroke="#4F46E5" stroke-width="1.5" marker-end="url(#arrow-dl)"/>
+          <text x="665" y="46" text-anchor="middle" font-size="9" fill="#4F46E5">1 query</text>
+
+          <!-- DataLoader collects -->
+          <text x="600" y="105" text-anchor="middle" font-size="10" fill="#5B21B6">Collects IDs: [1, 2, 3, ...]</text>
+          <text x="600" y="120" text-anchor="middle" font-size="10" fill="#5B21B6">Batches into single query:</text>
+
+          <rect x="510" y="130" width="175" height="28" rx="5" fill="#EDE9FE" stroke="#C4B5FD" stroke-width="1"/>
+          <text x="597" y="148" text-anchor="middle" font-size="9.5" font-weight="600" fill="#5B21B6">WHERE id IN (1, 2, 3, ...)</text>
+
+          <line x1="685" y1="144" x2="710" y2="144" stroke="#4F46E5" stroke-width="1.5" marker-end="url(#arrow-dl)"/>
+
+          <rect x="688" y="118" width="50" height="60" rx="6" fill="#E0E7FF" stroke="#C7D2FE" stroke-width="1.5"/>
+          <text x="713" y="152" text-anchor="middle" font-size="10" font-weight="600" fill="#3730A3">DB</text>
+          <text x="713" y="166" text-anchor="middle" font-size="9" fill="#4338CA">1 hit</text>
+
+          <!-- Caching annotation -->
+          <rect x="510" y="175" width="175" height="28" rx="5" fill="#CCFBF1" stroke="#5EEAD4" stroke-width="1"/>
+          <text x="597" y="193" text-anchor="middle" font-size="9.5" font-weight="500" fill="#134E4A">Cached within request scope</text>
+
+          <text x="565" y="260" text-anchor="middle" font-size="11" font-weight="700" fill="#15803D">Always 2 database queries ✓</text>
+        </svg>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">TypeScript</span>
+          <span class="code-filename">src/loaders/userLoader.ts</span>
+        </div>
+        <pre><code class="language-typescript">import DataLoader from 'dataloader';
+import type { PrismaClient } from '@prisma/client';
+import type { User } from '@prisma/client';
+
+// DataLoader&lt;Key, Value&gt;
+// Key: the type of IDs we pass to .load()
+// Value: what we get back for each key
+export function createUserLoader(db: PrismaClient): DataLoader&lt;string, User | null&gt; {
+  return new DataLoader&lt;string, User | null&gt;(
+    async (ids) => {
+      // DataLoader calls this function once per tick with all queued IDs
+      const users = await db.user.findMany({
+        where: { id: { in: [...ids] } },
+      });
+
+      // CRITICAL: Return values in the SAME ORDER as input keys.
+      // DataLoader maps results by position, not by value.
+      const userMap = new Map(users.map((u) => [u.id, u]));
+      return ids.map((id) => userMap.get(id) ?? null);
+    },
+    {
+      // Cache within a single request — avoids re-fetching the same user
+      // DataLoader creates a new instance per request, so cache is request-scoped
+      cache: true,
+      // Batch within the same tick of the event loop
+      batchScheduleFn: (callback) => setTimeout(callback, 0),
+    },
+  );
+}
+
+// Create loaders per-request in context:
+// context: () => ({ db: prisma, loaders: { user: createUserLoader(prisma) } })</code></pre>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">TypeScript</span>
+          <span class="code-filename">Using the loader in a resolver</span>
+        </div>
+        <pre><code class="language-typescript">// Without DataLoader: Post.author fires N queries for N posts
+// With DataLoader: all author IDs are batched into one query
+
+const postResolvers: Resolvers = {
+  Post: {
+    // ctx.loaders.user.load() returns a Promise.
+    // DataLoader batches all .load() calls made in the same tick.
+    author: (post, _args, ctx) => ctx.loaders.user.load(post.authorId),
+  },
+};</code></pre>
+      </div>
+
+      <div class="callout warning">
+        <span class="callout-icon">⚠️</span>
+        <span class="callout-title">Always Create DataLoaders Per-Request</span>
+        <div class="callout-body">
+          <p>DataLoader caches by key. If you create a single DataLoader instance at startup (module level), it will cache stale data across requests. <strong>Always instantiate DataLoaders inside your context factory</strong> — one fresh instance per incoming request.</p>
+        </div>
+      </div>
+
+      <!-- ═══ SECTION 9: SUBSCRIPTIONS ═══ -->
+      <h2 id="subscriptions" class="section-anchor">9. Subscriptions with WebSockets</h2>
+
+      <p>
+        GraphQL subscriptions push data to clients over a persistent connection. The most common transport
+        is WebSocket via the <code>graphql-ws</code> protocol (newer) or the legacy
+        <code>subscriptions-transport-ws</code>.
+      </p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">shell</span>
+        </div>
+        <pre><code class="language-bash">pnpm add graphql-ws ws</code></pre>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">TypeScript</span>
+          <span class="code-filename">src/subscriptions.ts — server-side with graphql-ws</span>
+        </div>
+        <pre><code class="language-typescript">import { useServer } from 'graphql-ws/lib/use/ws';
+import { WebSocketServer } from 'ws';
+import { PubSub } from 'graphql-subscriptions';
+import { schema } from './schema';
+
+export const pubsub = new PubSub();
+
+// Subscription resolver
+const subscriptionResolvers = {
+  Subscription: {
+    postPublished: {
+      // subscribe returns an AsyncIterator — GraphQL polls it
+      subscribe: () => pubsub.asyncIterator(['POST_PUBLISHED']),
+      resolve: (payload: { postPublished: Post }) => payload.postPublished,
+    },
+  },
+};
+
+// After HTTP server is created:
+const wss = new WebSocketServer({ server: httpServer, path: '/graphql' });
+useServer(
+  {
+    schema,
+    context: async (ctx) => ({
+      // ctx.connectionParams contains initial WS handshake params (e.g., auth token)
+      userId: verifyToken(ctx.connectionParams?.token as string | undefined),
+      db: prisma,
+    }),
+  },
+  wss,
+);
+
+// Publishing an event (in a mutation resolver, after DB write):
+// await pubsub.publish('POST_PUBLISHED', { postPublished: newPost });</code></pre>
+      </div>
+
+      <div class="callout info">
+        <span class="callout-icon">ℹ️</span>
+        <span class="callout-title">Server-Sent Events as an Alternative</span>
+        <div class="callout-body">
+          <p>graphql-yoga supports subscriptions over Server-Sent Events (SSE) out of the box, with no WebSocket server needed. SSE works over standard HTTP, passes through proxies and load balancers more reliably, and is simpler to scale. The tradeoff: SSE is server-to-client only (no client-to-server messages over the same connection). For most subscription use cases — feed updates, notifications — SSE is the better default.</p>
+        </div>
+      </div>
+
+      <!-- ═══ SECTION 10: tRPC ═══ -->
+      <h2 id="trpc" class="section-anchor">10. tRPC — The TypeScript-Only Alternative</h2>
+
+      <p>
+        tRPC is not GraphQL. It does not use SDL, resolvers, or a query language. Instead, it exposes
+        TypeScript functions directly as API endpoints, inferring types end-to-end without any code
+        generation step. If your clients are all TypeScript (Next.js, React Native), tRPC can eliminate
+        an entire layer of abstraction.
+      </p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">shell</span>
+        </div>
+        <pre><code class="language-bash">pnpm add @trpc/server @trpc/client @trpc/react-query @tanstack/react-query zod</code></pre>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">TypeScript</span>
+          <span class="code-filename">server/trpc/router.ts — server definition</span>
+        </div>
+        <pre><code class="language-typescript">import { initTRPC, TRPCError } from '@trpc/server';
+import { z } from 'zod';
+
+interface Context {
+  userId: string | null;
+  db: PrismaClient;
+}
+
+const t = initTRPC.context&lt;Context&gt;().create();
+
+// Reusable middleware
+const isAuthenticated = t.middleware(({ ctx, next }) => {
+  if (!ctx.userId) throw new TRPCError({ code: 'UNAUTHORIZED' });
+  return next({ ctx: { ...ctx, userId: ctx.userId } });
+});
+
+const protectedProcedure = t.procedure.use(isAuthenticated);
+
+export const appRouter = t.router({
+  user: t.router({
+    me: protectedProcedure.query(({ ctx }) =>
+      ctx.db.user.findUnique({ where: { id: ctx.userId } })
+    ),
+
+    byId: t.procedure
+      .input(z.object({ id: z.string().cuid() }))
+      .query(({ input, ctx }) =>
+        ctx.db.user.findUnique({ where: { id: input.id } })
+      ),
+  }),
+
+  post: t.router({
+    list: t.procedure
+      .input(z.object({ limit: z.number().min(1).max(100).default(10) }))
+      .query(({ input, ctx }) =>
+        ctx.db.post.findMany({
+          where: { publishedAt: { not: null } },
+          take: input.limit,
+          orderBy: { publishedAt: 'desc' },
+        })
+      ),
+
+    create: protectedProcedure
+      .input(z.object({
+        title: z.string().min(1).max(200),
+        body: z.string().min(1),
+        tags: z.array(z.string()).optional(),
+      }))
+      .mutation(({ input, ctx }) =>
+        ctx.db.post.create({
+          data: { ...input, authorId: ctx.userId },
+        })
+      ),
+  }),
+});
+
+// Export the router TYPE — this is what the client imports
+export type AppRouter = typeof appRouter;</code></pre>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">TypeScript</span>
+          <span class="code-filename">client/src/trpc.ts — client-side, zero codegen</span>
+        </div>
+        <pre><code class="language-typescript">import { createTRPCReact } from '@trpc/react-query';
+import type { AppRouter } from '../../server/trpc/router'; // ← just a type import
+
+// The client is fully typed against the server router.
+// No codegen. No schema files. Just TypeScript.
+export const trpc = createTRPCReact&lt;AppRouter&gt;();
+
+// In a component:
+function PostList() {
+  // TypeScript knows: data is { id: string; title: string; body: string; ... }[]
+  const { data, isLoading } = trpc.post.list.useQuery({ limit: 20 });
+
+  const createPost = trpc.post.create.useMutation({
+    onSuccess: () => trpc.useContext().post.list.invalidate(),
+  });
+
+  return (
+    &lt;button onClick={() => createPost.mutate({ title: 'Hello', body: 'World' })}&gt;
+      Create Post
+    &lt;/button&gt;
+  );
+}</code></pre>
+      </div>
+
+      <div class="callout ai-era">
+        <span class="callout-icon">✦</span>
+        <span class="callout-title">AI Era: tRPC + AI Agents</span>
+        <div class="callout-body">
+          <p>tRPC is increasingly used as the internal API layer for AI agent backends. Because every procedure is a typed TypeScript function, you can automatically generate tool definitions for function-calling LLMs from your router using <code>zod-to-json-schema</code> on the procedure inputs. The same input validation that protects your API from bad user input also validates LLM outputs before they hit your database.</p>
+        </div>
+      </div>
+
+      <!-- ═══ SECTION 11: DECISION GUIDE ═══ -->
+      <h2 id="decision-guide" class="section-anchor">11. REST vs GraphQL vs tRPC Decision Guide</h2>
+
+      <!-- GraphQL Lifecycle Diagram -->
+      <div class="diagram-wrap">
+        <p class="diagram-title">GraphQL Query Lifecycle</p>
+        <svg viewBox="0 0 720 140" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; display:block; margin:0 auto;">
+          <defs>
+            <marker id="arrow-lc" markerWidth="8" markerHeight="8" refX="7" refY="3.5" orient="auto">
+              <polygon points="0 0, 8 3.5, 0 7" fill="#6B7280"/>
+            </marker>
+          </defs>
+
+          <!-- Nodes -->
+          <!-- 1. Client -->
+          <rect x="10" y="47" width="100" height="46" rx="8" fill="#EEF2FF" stroke="#C7D2FE" stroke-width="1.5"/>
+          <text x="60" y="67" text-anchor="middle" font-size="11" font-weight="700" fill="#4338CA">Client</text>
+          <text x="60" y="83" text-anchor="middle" font-size="9" fill="#6366F1">Query / Mutation</text>
+
+          <!-- arrow 1→2 -->
+          <line x1="110" y1="70" x2="148" y2="70" stroke="#6B7280" stroke-width="1.5" marker-end="url(#arrow-lc)"/>
+          <text x="129" y="63" text-anchor="middle" font-size="8.5" fill="#6B7280">HTTP POST</text>
+
+          <!-- 2. Parse & Validate -->
+          <rect x="150" y="47" width="110" height="46" rx="8" fill="#FEF3C7" stroke="#FDE68A" stroke-width="1.5"/>
+          <text x="205" y="67" text-anchor="middle" font-size="11" font-weight="700" fill="#92400E">Parse</text>
+          <text x="205" y="83" text-anchor="middle" font-size="9" fill="#B45309">+ Validate vs Schema</text>
+
+          <!-- arrow 2→3 -->
+          <line x1="260" y1="70" x2="298" y2="70" stroke="#6B7280" stroke-width="1.5" marker-end="url(#arrow-lc)"/>
+
+          <!-- 3. Execute -->
+          <rect x="300" y="47" width="110" height="46" rx="8" fill="#DCFCE7" stroke="#86EFAC" stroke-width="1.5"/>
+          <text x="355" y="67" text-anchor="middle" font-size="11" font-weight="700" fill="#15803D">Execute</text>
+          <text x="355" y="83" text-anchor="middle" font-size="9" fill="#166534">Resolver chain</text>
+
+          <!-- arrow 3→4 -->
+          <line x1="410" y1="70" x2="448" y2="70" stroke="#6B7280" stroke-width="1.5" marker-end="url(#arrow-lc)"/>
+
+          <!-- 4. Data Sources -->
+          <rect x="450" y="35" width="110" height="70" rx="8" fill="#EDE9FE" stroke="#C4B5FD" stroke-width="1.5"/>
+          <text x="505" y="58" text-anchor="middle" font-size="11" font-weight="700" fill="#5B21B6">Data Sources</text>
+          <text x="505" y="74" text-anchor="middle" font-size="9" fill="#6D28D9">DB / REST APIs</text>
+          <text x="505" y="88" text-anchor="middle" font-size="9" fill="#6D28D9">Cache / gRPC</text>
+
+          <!-- arrow 4→5 -->
+          <line x1="560" y1="70" x2="598" y2="70" stroke="#6B7280" stroke-width="1.5" marker-end="url(#arrow-lc)"/>
+
+          <!-- 5. Serialize -->
+          <rect x="600" y="47" width="110" height="46" rx="8" fill="#E0F2FE" stroke="#7DD3FC" stroke-width="1.5"/>
+          <text x="655" y="67" text-anchor="middle" font-size="11" font-weight="700" fill="#0369A1">Serialize</text>
+          <text x="655" y="83" text-anchor="middle" font-size="9" fill="#075985">JSON Response</text>
+
+          <!-- Return arrow bottom -->
+          <path d="M 655 93 Q 655 125 355 125 Q 60 125 60 93" fill="none" stroke="#4F46E5" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arrow-lc)"/>
+          <text x="355" y="138" text-anchor="middle" font-size="9" fill="#4F46E5">Response flows back to client</text>
+        </svg>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Criterion</th>
+              <th>REST</th>
+              <th>GraphQL</th>
+              <th>tRPC</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Client flexibility (mobile, web, etc.)</td>
+              <td class="cell-warn">Needs versioning or BFF</td>
+              <td class="cell-good">First-class — query what you need</td>
+              <td class="cell-warn">TypeScript clients only</td>
+            </tr>
+            <tr>
+              <td>End-to-end type safety</td>
+              <td class="cell-warn">Manual or codegen required</td>
+              <td class="cell-good">With Pothos or codegen</td>
+              <td class="cell-good">Automatic — no codegen step</td>
+            </tr>
+            <tr>
+              <td>Public API / third-party consumers</td>
+              <td class="cell-good">Universally understood</td>
+              <td class="cell-good">With good schema docs</td>
+              <td class="cell-bad">TypeScript only — not viable</td>
+            </tr>
+            <tr>
+              <td>HTTP caching (CDN, ETags)</td>
+              <td class="cell-good">Native, works out of the box</td>
+              <td class="cell-warn">POST-based; persisted queries help</td>
+              <td class="cell-warn">POST-based; limited</td>
+            </tr>
+            <tr>
+              <td>Real-time (subscriptions)</td>
+              <td class="cell-warn">Bolt-on (SSE, WebSocket)</td>
+              <td class="cell-good">Native subscriptions</td>
+              <td class="cell-warn">Via <code>.subscription()</code>, experimental</td>
+            </tr>
+            <tr>
+              <td>Learning curve</td>
+              <td class="cell-good">Low — widely known</td>
+              <td class="cell-warn">Moderate — resolvers, N+1, schema</td>
+              <td class="cell-good">Low for TS devs</td>
+            </tr>
+            <tr>
+              <td>Tooling maturity</td>
+              <td class="cell-good">Decades of tooling</td>
+              <td class="cell-good">Apollo Studio, Playground, codegen</td>
+              <td class="cell-warn">Growing rapidly, newer</td>
+            </tr>
+            <tr>
+              <td>Federated / multi-service graph</td>
+              <td class="cell-warn">API gateway complexity</td>
+              <td class="cell-good">Apollo Federation, schema stitching</td>
+              <td class="cell-bad">Not designed for this</td>
+            </tr>
+            <tr>
+              <td>Team size</td>
+              <td class="cell-good">Any size</td>
+              <td class="cell-good">Large teams — clear contract</td>
+              <td class="cell-good">Small–medium TS teams</td>
+            </tr>
+            <tr>
+              <td>File uploads</td>
+              <td class="cell-good">Standard multipart</td>
+              <td class="cell-warn">Requires extra spec</td>
+              <td class="cell-warn">Via separate endpoint</td>
+            </tr>
+            <tr>
+              <td>Migration path</td>
+              <td>—</td>
+              <td>REST → GQL: wrap REST resolvers</td>
+              <td>Can coexist alongside REST</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>The Decision Flowchart</h3>
+
+      <ul>
+        <li><strong>Multiple non-TypeScript client types?</strong> GraphQL wins. The schema is your contract regardless of client language.</li>
+        <li><strong>Internal TypeScript monorepo, Next.js app router?</strong> tRPC is likely the fastest path to production with the least overhead.</li>
+        <li><strong>Public API consumed by third-party developers?</strong> REST — familiar, cacheable, universally tooled.</li>
+        <li><strong>Complex graph-shaped data with many relationships?</strong> GraphQL — the traversal model is purpose-built for this.</li>
+        <li><strong>Real-time is a core feature, not an afterthought?</strong> GraphQL subscriptions or a dedicated WebSocket layer.</li>
+        <li><strong>Enterprise, multiple teams, federated microservices?</strong> Apollo Federation with GraphQL.</li>
+      </ul>
+
+      <div class="callout ai-era">
+        <span class="callout-icon">✦</span>
+        <span class="callout-title">AI Era: GraphQL as an Agent Interface</span>
+        <div class="callout-body">
+          <p>LLM agents need structured, discoverable APIs. GraphQL's introspection makes your API self-describing — an agent can query <code>__schema</code> to understand all available types and operations, then construct valid queries dynamically. This is harder to do reliably with REST (OpenAPI helps) and impossible with tRPC (no runtime reflection). For AI-powered backends where agents interact with your data, GraphQL's introspection is a genuine advantage.</p>
+        </div>
+      </div>
+
+      <div class="callout tip">
+        <span class="callout-icon">✅</span>
+        <span class="callout-title">My Recommendation as of 2026</span>
+        <div class="callout-body">
+          <p><strong>New full-stack TypeScript product:</strong> Start with <strong>tRPC</strong>. Add GraphQL if you need multiple client types or expose a public API.</p>
+          <p><strong>API consumed by mobile apps + web:</strong> <strong>Pothos + graphql-yoga</strong>. Deploy to a Node.js runtime or Cloudflare Workers.</p>
+          <p><strong>Large enterprise with multiple teams:</strong> <strong>Apollo Federation</strong>. The schema registry and schema checks are worth the operational cost at scale.</p>
+          <p><strong>Legacy REST migration:</strong> Don't rewrite — wrap existing REST endpoints as GraphQL resolvers. Ship incrementally.</p>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ═══════════════ FOOTER NAV ═══════════════ -->
+  <footer class="footer-nav">
+    <div class="footer-nav-inner">
+      <a href="chapter-12-rest.html" class="prev">
+        <span class="footer-nav-label">← Previous Chapter</span>
+        <span class="footer-nav-title">Ch 12: REST APIs with TypeScript</span>
+      </a>
+      <div class="footer-center">
+        <div style="font-weight:700; color: var(--text-primary); margin-bottom:0.2rem;">TypeScript for the AI Era</div>
+        <div>Chapter 13 of 24</div>
+      </div>
+      <a href="chapter-14-databases.html" class="next">
+        <span class="footer-nav-label">Next Chapter →</span>
+        <span class="footer-nav-title">Ch 14: Databases &amp; Prisma</span>
+      </a>
+    </div>
+  </footer>
+
+  <script>
+    // Syntax highlighting
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('pre code').forEach((el) => {
+        hljs.highlightElement(el);
+      });
+    });
+
+    // Active TOC tracking
+    const sections = document.querySelectorAll('.section-anchor');
+    const tocLinks = document.querySelectorAll('.toc-list li');
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const id = entry.target.getAttribute('id');
+            tocLinks.forEach((li) => {
+              const a = li.querySelector('a');
+              if (a && a.getAttribute('href') === `#${id}`) {
+                li.classList.add('active');
+              } else {
+                li.classList.remove('active');
+              }
+            });
+          }
+        });
+      },
+      { rootMargin: '-60px 0px -70% 0px', threshold: 0 }
+    );
+
+    sections.forEach((s) => observer.observe(s));
+  </script>
+</body>
+</html>

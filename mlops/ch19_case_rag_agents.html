@@ -1,0 +1,3288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 19: Case Study - RAG & Agent Systems - Modern MLOps Tutorial</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script>hljs.highlightAll(); mermaid.initialize({startOnLoad:true, theme:'default'});</script>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --secondary: #059669;
+      --accent: #d97706;
+      --text: #1f2937;
+    }
+    body { color: var(--text); font-family: 'Inter', system-ui, sans-serif; }
+    .nav-link { transition: color 0.15s; }
+    .nav-link:hover { color: #93c5fd; }
+    .toc-link { transition: color 0.15s; }
+    .toc-link:hover { color: var(--primary); }
+    .toc-link.active { color: var(--primary); font-weight: 600; border-left: 2px solid var(--primary); padding-left: 0.5rem; }
+    .callout-info { border-left: 4px solid #2563eb; background: #eff6ff; }
+    .callout-tip { border-left: 4px solid #059669; background: #ecfdf5; }
+    .callout-warning { border-left: 4px solid #d97706; background: #fffbeb; }
+    .callout-note { border-left: 4px solid #7c3aed; background: #f5f3ff; }
+    .callout-danger { border-left: 4px solid #dc2626; background: #fef2f2; }
+    table { border-collapse: collapse; width: 100%; }
+    thead { background: #2563eb; color: white; }
+    tbody tr:nth-child(even) { background: #f8fafc; }
+    tbody tr:nth-child(odd) { background: #ffffff; }
+    tbody tr:hover { background: #eff6ff; }
+    td, th { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid #e2e8f0; }
+    .mermaid { background: #fff; padding: 1rem; border-radius: 0.5rem; }
+    pre code { font-size: 0.875rem; }
+    .chapter-badge { background: #2563eb; color: white; font-size: 0.75rem; font-weight: 700; padding: 0.25rem 0.75rem; border-radius: 9999px; letter-spacing: 0.05em; text-transform: uppercase; }
+    .section-anchor { scroll-margin-top: 5rem; }
+    .final-badge { background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%); color: white; font-size: 0.75rem; font-weight: 700; padding: 0.25rem 0.75rem; border-radius: 9999px; letter-spacing: 0.05em; text-transform: uppercase; }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+<!-- Top Navbar -->
+<nav class="bg-gray-900 text-white sticky top-0 z-50 shadow-lg">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center font-bold text-sm">ML</div>
+        <a href="index.html" class="nav-link font-semibold text-lg tracking-tight">Modern MLOps Tutorial</a>
+      </div>
+      <div class="hidden md:flex items-center gap-6 text-sm text-gray-300">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="#toc" class="nav-link">Contents</a>
+        <span class="text-gray-500">|</span>
+        <span class="text-blue-400 font-medium">Chapter 19 of 19 — Final Chapter</span>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- Chapter Header -->
+<header class="bg-white border-b border-gray-200 shadow-sm">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div class="flex flex-col gap-3">
+      <div class="flex items-center gap-3">
+        <span class="chapter-badge">Chapter 19</span>
+        <span class="final-badge">Capstone Case Study</span>
+        <span class="text-sm text-gray-500">Final Chapter</span>
+      </div>
+      <h1 class="text-4xl font-bold text-gray-900 leading-tight">Case Study: Production RAG &amp; Agent Systems</h1>
+      <p class="text-xl text-gray-600 max-w-3xl">Building enterprise-grade Retrieval-Augmented Generation and LLM agent systems from architecture to production — the complete practical guide.</p>
+      <div class="flex flex-wrap items-center gap-6 text-sm text-gray-500 mt-2">
+        <span class="flex items-center gap-1">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          120 min read
+        </span>
+        <span class="flex items-center gap-1">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+          Staff Engineer — ex-Kimi (Moonshot AI)
+        </span>
+        <span class="flex items-center gap-1">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          Updated April 2026
+        </span>
+        <span class="flex items-center gap-1">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          Advanced
+        </span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Main Layout -->
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+  <div class="flex gap-10">
+
+    <!-- Sidebar TOC -->
+    <aside class="hidden xl:block w-72 flex-shrink-0">
+      <div class="sticky top-24 bg-white rounded-xl border border-gray-200 p-5 shadow-sm max-h-screen overflow-y-auto">
+        <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4" id="toc">On This Page</h3>
+        <nav class="space-y-1 text-sm text-gray-600">
+          <a href="#s1" class="toc-link block py-1">1. RAG Architecture</a>
+          <a href="#s2" class="toc-link block py-1">2. Document Processing Pipeline</a>
+          <a href="#s3" class="toc-link block py-1">3. Embedding Models</a>
+          <a href="#s4" class="toc-link block py-1">4. Vector Databases</a>
+          <a href="#s5" class="toc-link block py-1">5. Retrieval Optimization</a>
+          <a href="#s6" class="toc-link block py-1">6. Advanced RAG Patterns</a>
+          <a href="#s7" class="toc-link block py-1">7. Full RAG with LangChain</a>
+          <a href="#s8" class="toc-link block py-1">8. RAG with LlamaIndex</a>
+          <a href="#s9" class="toc-link block py-1">9. LLM Agents</a>
+          <a href="#s10" class="toc-link block py-1">10. Multi-Agent Systems</a>
+          <a href="#s11" class="toc-link block py-1">11. LangGraph for Agents</a>
+          <a href="#s12" class="toc-link block py-1">12. Production Infrastructure</a>
+          <a href="#s13" class="toc-link block py-1">13. RAG Evaluation (RAGAS)</a>
+          <a href="#s14" class="toc-link block py-1">14. Observability</a>
+          <a href="#s15" class="toc-link block py-1">15. Enterprise Case Study</a>
+          <a href="#s16" class="toc-link block py-1">16. Future of RAG &amp; Agents</a>
+          <a href="#summary" class="toc-link block py-1">Summary &amp; Course Conclusion</a>
+        </nav>
+      </div>
+    </aside>
+
+    <!-- Content -->
+    <main class="flex-1 min-w-0 space-y-16">
+
+      <!-- ===== SECTION 1: RAG Architecture ===== -->
+      <section id="s1" class="section-anchor">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="w-8 h-8 bg-blue-600 text-white rounded-lg flex items-center justify-center font-bold text-sm">1</span>
+          <h2 class="text-2xl font-bold text-gray-900">The RAG Architecture</h2>
+        </div>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          Retrieval-Augmented Generation (RAG) combines the parametric knowledge of large language models with non-parametric, dynamic knowledge stores. The core insight is that LLMs have a knowledge cutoff and cannot reliably memorize factual details — but they excel at reasoning over provided context. RAG lets you separate concerns: the LLM handles language understanding and generation, while a retrieval system handles factual grounding.
+        </p>
+
+        <div class="callout-info rounded-lg p-5 mb-6">
+          <p class="text-sm font-bold text-blue-800 mb-1">Why RAG Wins for Knowledge-Intensive Tasks</p>
+          <p class="text-sm text-blue-900">Fine-tuning a model on your private documents costs thousands of dollars and takes days. It also bakes knowledge into weights — meaning it goes stale and is hard to audit. RAG externalizes knowledge: update your vector index and the system immediately knows the new fact. At Kimi we served 100M+ document tokens per day through a RAG layer, and the retrieval system was the highest-ROI investment we made.</p>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">RAG vs Fine-tuning vs Prompting — Decision Framework</h3>
+        <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm mb-8">
+          <table>
+            <thead>
+              <tr>
+                <th>Scenario</th>
+                <th>Best Approach</th>
+                <th>Why</th>
+                <th>Cost</th>
+                <th>Freshness</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Q&amp;A over private docs</td><td><strong>RAG</strong></td><td>Documents too large for context, need exact citations</td><td>Low</td><td>Real-time</td></tr>
+              <tr><td>Domain-specific tone/format</td><td><strong>Fine-tuning</strong></td><td>Behavior change, not knowledge change</td><td>High</td><td>Static</td></tr>
+              <tr><td>Structured output generation</td><td><strong>Prompting + few-shot</strong></td><td>In-context examples sufficient</td><td>Negligible</td><td>N/A</td></tr>
+              <tr><td>Real-time knowledge (news, prices)</td><td><strong>RAG + tools</strong></td><td>Data changes faster than re-indexing cycles</td><td>Medium</td><td>Real-time</td></tr>
+              <tr><td>Specialized reasoning (medical, legal)</td><td><strong>Fine-tuning + RAG</strong></td><td>Both behavior and knowledge must be grounded</td><td>Very High</td><td>Periodic</td></tr>
+              <tr><td>General assistant, known facts</td><td><strong>Prompting</strong></td><td>Already in base model weights</td><td>Negligible</td><td>Cutoff date</td></tr>
+              <tr><td>10M+ internal documents</td><td><strong>RAG</strong></td><td>Impossible to fine-tune over; citations critical</td><td>Medium</td><td>Real-time</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Complete RAG System Architecture</h3>
+        <div class="bg-white rounded-xl border border-gray-200 p-6 mb-8">
+          <div class="mermaid">
+graph TB
+    subgraph Indexing["Offline Indexing Pipeline"]
+        D1[Raw Documents<br/>PDFs, HTML, Docs, DB] --> DP[Document Processor<br/>Parse + Clean]
+        DP --> CS[Chunker<br/>Split Strategies]
+        CS --> ME[Metadata Extractor<br/>Title, Date, Author, ACL]
+        ME --> EM[Embedding Model<br/>text-embedding-3-large]
+        EM --> VS[(Vector Store<br/>Qdrant / Pinecone)]
+        ME --> KS[(Keyword Index<br/>Elasticsearch BM25)]
+    end
+
+    subgraph Serving["Online Serving Pipeline"]
+        Q[User Query] --> QP[Query Processor<br/>Expansion + HyDE]
+        QP --> HR[Hybrid Retriever<br/>Dense + Sparse]
+        VS --> HR
+        KS --> HR
+        HR --> RR[Reranker<br/>Cross-Encoder]
+        RR --> CC[Context Compressor]
+        CC --> AG[Augmented Prompt<br/>Query + Context]
+        AG --> LLM[LLM<br/>GPT-4o / Claude]
+        LLM --> SA[Source Attribution]
+        SA --> R[Response + Citations]
+    end
+
+    style Indexing fill:#eff6ff,stroke:#2563eb
+    style Serving fill:#ecfdf5,stroke:#059669
+          </div>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">RAG Latency Budget</h3>
+        <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm mb-6">
+          <table>
+            <thead>
+              <tr><th>Stage</th><th>P50 Latency</th><th>P99 Latency</th><th>Optimization Lever</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Query embedding</td><td>15ms</td><td>40ms</td><td>Smaller model, GPU, batch</td></tr>
+              <tr><td>Vector ANN search</td><td>10ms</td><td>35ms</td><td>HNSW ef_search, replicas</td></tr>
+              <tr><td>BM25 keyword search</td><td>8ms</td><td>25ms</td><td>Shard count, cache</td></tr>
+              <tr><td>Reranking (cross-encoder)</td><td>60ms</td><td>120ms</td><td>Smaller model, top-k limit</td></tr>
+              <tr><td>Context compression</td><td>80ms</td><td>180ms</td><td>Skip if context fits</td></tr>
+              <tr><td>LLM generation (streaming)</td><td>800ms TTFT</td><td>2000ms TTFT</td><td>Smaller model, caching</td></tr>
+              <tr><td><strong>Total E2E (no stream)</strong></td><td><strong>~1.2s</strong></td><td><strong>~3.5s</strong></td><td>Semantic cache for repeats</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout-warning rounded-lg p-5 mb-6">
+          <p class="text-sm font-bold text-amber-800 mb-1">Production Warning: Latency Cliff</p>
+          <p class="text-sm text-amber-900">Reranking is the biggest latency wildcard. A cross-encoder scoring 20 candidates takes 60ms on GPU but 600ms on CPU. Always serve rerankers on GPU or use a distilled model (BGE-Reranker-v2-m3 &lt;200MB) with TensorRT optimization. Budget for this before you commit to the architecture.</p>
+        </div>
+      </section>
+
+      <!-- ===== SECTION 2: Document Processing ===== -->
+      <section id="s2" class="section-anchor">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="w-8 h-8 bg-blue-600 text-white rounded-lg flex items-center justify-center font-bold text-sm">2</span>
+          <h2 class="text-2xl font-bold text-gray-900">Document Processing Pipeline</h2>
+        </div>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          The quality of your RAG system is bounded by your document processing pipeline. Garbage in, garbage out — a perfectly tuned retrieval system cannot recover semantic information lost by a bad PDF parser. Document processing involves four stages: parsing (format-specific extraction), cleaning (removing boilerplate, artifacts), chunking (splitting into retrieval units), and enrichment (adding metadata that enables filtered retrieval).
+        </p>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Text Splitting Strategies</h3>
+        <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm mb-6">
+          <table>
+            <thead>
+              <tr><th>Strategy</th><th>Description</th><th>Best For</th><th>Chunk Coherence</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Fixed-size</td><td>Split every N tokens/chars</td><td>Quick baseline, uniform text</td><td>Low — may cut sentences</td></tr>
+              <tr><td>Recursive character</td><td>Try separators: \n\n, \n, space</td><td>General prose, default choice</td><td>Medium — respects paragraphs</td></tr>
+              <tr><td>Semantic (sentence-transformers)</td><td>Embed sentences, split on similarity drops</td><td>Long-form narrative documents</td><td>High — topic boundaries</td></tr>
+              <tr><td>Document-structure aware</td><td>Use headers/sections from doc structure</td><td>HTML, Markdown, legal docs</td><td>Very high — preserves context</td></tr>
+              <tr><td>RAPTOR (tree summarization)</td><td>Build hierarchy: leaf → summary → root</td><td>Multi-level Q&amp;A, summarization</td><td>Highest — but slow to build</td></tr>
+              <tr><td>Parent-child</td><td>Small child chunks; retrieve, expand to parent</td><td>Precision retrieval + full context</td><td>High — best of both worlds</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Document Processing with LangChain</h3>
+        <div class="bg-white rounded-xl border border-gray-200 shadow-sm mb-6">
+          <div class="bg-gray-800 text-gray-200 px-4 py-2 rounded-t-xl text-sm font-mono flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-red-500"></span>
+            <span class="w-3 h-3 rounded-full bg-yellow-500"></span>
+            <span class="w-3 h-3 rounded-full bg-green-500"></span>
+            <span class="ml-2">document_processor.py</span>
+          </div>
+          <pre><code class="language-python">from langchain_community.document_loaders import (
+    PyPDFLoader, UnstructuredHTMLLoader,
+    UnstructuredWordDocumentLoader, TextLoader,
+    DirectoryLoader
+)
+from langchain.text_splitter import (
+    RecursiveCharacterTextSplitter,
+    MarkdownHeaderTextSplitter,
+)
+from langchain_experimental.text_splitter import SemanticChunker
+from langchain_openai import OpenAIEmbeddings
+from pathlib import Path
+import hashlib
+import json
+from typing import List
+from langchain.schema import Document
+
+
+class DocumentProcessor:
+    """Production document processor with multi-format support."""
+
+    LOADER_MAP = {
+        ".pdf":  PyPDFLoader,
+        ".html": UnstructuredHTMLLoader,
+        ".htm":  UnstructuredHTMLLoader,
+        ".docx": UnstructuredWordDocumentLoader,
+        ".txt":  TextLoader,
+        ".md":   TextLoader,
+    }
+
+    def __init__(
+        self,
+        chunk_size: int = 512,
+        chunk_overlap: int = 64,
+        strategy: str = "recursive",  # recursive | semantic | markdown
+    ):
+        self.chunk_size = chunk_size
+        self.chunk_overlap = chunk_overlap
+        self.strategy = strategy
+
+        if strategy == "semantic":
+            self.splitter = SemanticChunker(
+                OpenAIEmbeddings(model="text-embedding-3-small"),
+                breakpoint_threshold_type="percentile",
+                breakpoint_threshold_amount=90,
+            )
+        elif strategy == "markdown":
+            self.md_splitter = MarkdownHeaderTextSplitter(
+                headers_to_split_on=[
+                    ("#", "h1"), ("##", "h2"), ("###", "h3")
+                ]
+            )
+            self.splitter = RecursiveCharacterTextSplitter(
+                chunk_size=chunk_size, chunk_overlap=chunk_overlap
+            )
+        else:  # recursive (default, production workhorse)
+            self.splitter = RecursiveCharacterTextSplitter(
+                chunk_size=chunk_size,
+                chunk_overlap=chunk_overlap,
+                separators=["\n\n", "\n", ". ", " ", ""],
+                length_function=len,
+                is_separator_regex=False,
+            )
+
+    def load_file(self, path: str) -> List[Document]:
+        """Load a single file using the appropriate loader."""
+        ext = Path(path).suffix.lower()
+        loader_cls = self.LOADER_MAP.get(ext)
+        if not loader_cls:
+            raise ValueError(f"Unsupported file type: {ext}")
+        loader = loader_cls(path)
+        return loader.load()
+
+    def compute_doc_hash(self, content: str) -> str:
+        return hashlib.sha256(content.encode()).hexdigest()[:16]
+
+    def enrich_metadata(self, doc: Document, source_path: str) -> Document:
+        """Add content hash, word count, and source metadata."""
+        doc.metadata["doc_id"]     = self.compute_doc_hash(doc.page_content)
+        doc.metadata["char_count"] = len(doc.page_content)
+        doc.metadata["word_count"] = len(doc.page_content.split())
+        doc.metadata["source"]     = source_path
+        doc.metadata["file_type"]  = Path(source_path).suffix.lower()
+        return doc
+
+    def process_file(self, path: str) -> List[Document]:
+        """Full pipeline: load → chunk → enrich."""
+        raw_docs = self.load_file(path)
+        if self.strategy == "markdown" and path.endswith(".md"):
+            chunks = []
+            for doc in raw_docs:
+                md_chunks = self.md_splitter.split_text(doc.page_content)
+                chunks.extend(self.splitter.split_documents(md_chunks))
+        else:
+            chunks = self.splitter.split_documents(raw_docs)
+
+        return [self.enrich_metadata(c, path) for c in chunks]
+
+    def process_directory(self, directory: str, glob: str = "**/*") -> List[Document]:
+        """Recursively process all supported files in a directory."""
+        all_chunks = []
+        p = Path(directory)
+        for ext in self.LOADER_MAP.keys():
+            for file_path in p.glob(f"**/*{ext}"):
+                try:
+                    chunks = self.process_file(str(file_path))
+                    all_chunks.extend(chunks)
+                    print(f"  Processed {file_path}: {len(chunks)} chunks")
+                except Exception as e:
+                    print(f"  ERROR {file_path}: {e}")
+        return all_chunks
+
+
+# Usage
+processor = DocumentProcessor(chunk_size=512, chunk_overlap=64, strategy="recursive")
+chunks = processor.process_directory("./knowledge_base")
+print(f"Total chunks: {len(chunks)}")
+print(f"Sample metadata: {json.dumps(chunks[0].metadata, indent=2)}")
+</code></pre>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">PDF Processing with unstructured.io</h3>
+        <div class="bg-white rounded-xl border border-gray-200 shadow-sm mb-6">
+          <div class="bg-gray-800 text-gray-200 px-4 py-2 rounded-t-xl text-sm font-mono flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-red-500"></span><span class="w-3 h-3 rounded-full bg-yellow-500"></span><span class="w-3 h-3 rounded-full bg-green-500"></span>
+            <span class="ml-2">pdf_pipeline.py</span>
+          </div>
+          <pre><code class="language-python">"""
+Advanced PDF processing with unstructured.io.
+Handles complex layouts: tables, figures, multi-column.
+pip install unstructured[pdf] unstructured-inference
+"""
+from unstructured.partition.pdf import partition_pdf
+from unstructured.staging.base import elements_to_json
+from unstructured.chunking.title import chunk_by_title
+from unstructured.documents.elements import (
+    Table, Image, Title, NarrativeText, ListItem
+)
+from langchain.schema import Document
+from typing import List, Optional
+import base64
+
+
+def process_pdf_advanced(
+    pdf_path: str,
+    extract_images: bool = True,
+    extract_tables: bool = True,
+    hi_res: bool = True,
+) -> List[Document]:
+    """
+    Process PDF with layout analysis.
+    hi_res=True uses detectron2 for table/figure detection.
+    """
+    strategy = "hi_res" if hi_res else "fast"
+
+    elements = partition_pdf(
+        filename=pdf_path,
+        strategy=strategy,
+        infer_table_structure=extract_tables,
+        extract_images_in_pdf=extract_images,
+        extract_image_block_output_dir="./extracted_images",
+        extract_image_block_types=["Image", "Table"],
+        chunking_strategy="by_title",    # respect document structure
+        max_characters=1024,
+        new_after_n_chars=800,
+        combine_text_under_n_chars=100,
+    )
+
+    docs = []
+    for elem in elements:
+        metadata = {
+            "source": pdf_path,
+            "element_type": type(elem).__name__,
+            "page_number": elem.metadata.page_number if elem.metadata else None,
+            "filename": elem.metadata.filename if elem.metadata else None,
+        }
+
+        if isinstance(elem, Table):
+            # Convert table to markdown for better LLM comprehension
+            content = f"[TABLE]\n{elem.metadata.text_as_html}\n[/TABLE]"
+            metadata["is_table"] = True
+        elif isinstance(elem, Image):
+            content = f"[IMAGE: {elem.text}]"
+            metadata["is_image"] = True
+        else:
+            content = elem.text
+
+        if content and len(content.strip()) > 20:
+            docs.append(Document(page_content=content.strip(), metadata=metadata))
+
+    return docs
+
+
+# Metadata-aware chunking with access control
+def chunk_with_acl(
+    docs: List[Document],
+    department: str,
+    clearance_level: int,
+    tenant_id: str,
+) -> List[Document]:
+    """Enrich chunks with access control metadata for filtered retrieval."""
+    enriched = []
+    for doc in docs:
+        doc.metadata.update({
+            "department":     department,
+            "clearance_level": clearance_level,
+            "tenant_id":      tenant_id,
+            "indexed_at":     __import__("datetime").datetime.utcnow().isoformat(),
+        })
+        enriched.append(doc)
+    return enriched
+
+
+# Example: process a sensitive HR document
+docs = process_pdf_advanced("hr_policy_2025.pdf", hi_res=True)
+docs = chunk_with_acl(docs, department="HR", clearance_level=2, tenant_id="corp-001")
+print(f"Extracted {len(docs)} chunks from PDF")
+print(f"Tables found: {sum(1 for d in docs if d.metadata.get('is_table'))}")
+</code></pre>
+        </div>
+
+        <div class="callout-tip rounded-lg p-5 mb-6">
+          <p class="text-sm font-bold text-green-800 mb-1">Production Tip: Parser Selection Matters</p>
+          <p class="text-sm text-green-900">For scanned PDFs, use unstructured hi_res with OCR. For native PDFs with clear text layers, PyMuPDF (fitz) is 10x faster than PyPDF and preserves text positions. For HTML, always prefer Mozilla Readability (via playwright) over raw HTML parsing to get clean article text. Never use pdfminer directly — it has poor table support.</p>
+        </div>
+      </section>
+
+      <!-- ===== SECTION 3: Embedding Models ===== -->
+      <section id="s3" class="section-anchor">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="w-8 h-8 bg-blue-600 text-white rounded-lg flex items-center justify-center font-bold text-sm">3</span>
+          <h2 class="text-2xl font-bold text-gray-900">Embedding Models</h2>
+        </div>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          The embedding model converts text into dense vectors. It is the most load-bearing component of your RAG system — the retrieval ceiling is set by how well your embedding captures semantic meaning. Choosing the wrong model costs latency and accuracy simultaneously. The landscape has consolidated around a few clear leaders.
+        </p>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Embedding Model Landscape (2026)</h3>
+        <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm mb-8">
+          <table>
+            <thead>
+              <tr><th>Model</th><th>Dims</th><th>Max Tokens</th><th>MTEB Score</th><th>Inference Cost</th><th>Best Use Case</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>OpenAI text-embedding-3-large</strong></td><td>3072 (adj.)</td><td>8191</td><td>64.6</td><td>$0.13/1M tokens</td><td>General, Matryoshka dims</td></tr>
+              <tr><td>OpenAI text-embedding-3-small</td><td>1536 (adj.)</td><td>8191</td><td>62.3</td><td>$0.02/1M tokens</td><td>High-volume, cost-sensitive</td></tr>
+              <tr><td><strong>Cohere embed-v3 (English)</strong></td><td>1024</td><td>512</td><td>64.5</td><td>$0.10/1M tokens</td><td>Best with Cohere Rerank</td></tr>
+              <tr><td>Voyage AI voyage-large-2</td><td>1536</td><td>16000</td><td>65.1</td><td>$0.12/1M tokens</td><td>Long docs, code</td></tr>
+              <tr><td><strong>BGE-M3 (BAAI)</strong></td><td>1024</td><td>8192</td><td>63.2</td><td>Free (self-hosted)</td><td>Multi-lingual, hybrid search</td></tr>
+              <tr><td>E5-large-v2 (Microsoft)</td><td>1024</td><td>512</td><td>62.2</td><td>Free (self-hosted)</td><td>Strong open-source baseline</td></tr>
+              <tr><td>GTE-large (Alibaba)</td><td>1024</td><td>512</td><td>63.1</td><td>Free (self-hosted)</td><td>Chinese + English</td></tr>
+              <tr><td>NV-Embed-v2 (NVIDIA)</td><td>4096</td><td>32768</td><td>69.3</td><td>Free (self-hosted)</td><td>SOTA open model, 2025</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Batch Embedding Generation (Efficient)</h3>
+        <div class="bg-white rounded-xl border border-gray-200 shadow-sm mb-6">
+          <div class="bg-gray-800 text-gray-200 px-4 py-2 rounded-t-xl text-sm font-mono flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-red-500"></span><span class="w-3 h-3 rounded-full bg-yellow-500"></span><span class="w-3 h-3 rounded-full bg-green-500"></span>
+            <span class="ml-2">batch_embedder.py</span>
+          </div>
+          <pre><code class="language-python">import asyncio
+import time
+from typing import List, Optional
+import numpy as np
+from openai import AsyncOpenAI
+from tenacity import retry, stop_after_attempt, wait_exponential
+import tiktoken
+
+
+class BatchEmbedder:
+    """
+    Efficient batch embedding with rate-limit handling, retry logic,
+    and Matryoshka dimension reduction.
+    """
+    MAX_BATCH_TOKENS = 300_000   # OpenAI API limit per request
+    MAX_BATCH_ITEMS  = 2048      # OpenAI limit per batch call
+
+    def __init__(
+        self,
+        model: str = "text-embedding-3-large",
+        dimensions: Optional[int] = None,  # Matryoshka reduction
+        max_concurrent: int = 20,
+    ):
+        self.client = AsyncOpenAI()
+        self.model = model
+        self.dimensions = dimensions  # e.g., 256 for cost savings
+        self.semaphore = asyncio.Semaphore(max_concurrent)
+        self.enc = tiktoken.get_encoding("cl100k_base")
+
+    def count_tokens(self, text: str) -> int:
+        return len(self.enc.encode(text, disallowed_special=()))
+
+    def build_batches(self, texts: List[str]) -> List[List[str]]:
+        """Group texts into batches respecting token and item limits."""
+        batches, current_batch, current_tokens = [], [], 0
+        for text in texts:
+            tokens = self.count_tokens(text)
+            if tokens > 8191:  # truncate to model max
+                text = self.enc.decode(self.enc.encode(text)[:8191])
+                tokens = 8191
+            if (current_tokens + tokens > self.MAX_BATCH_TOKENS or
+                    len(current_batch) >= self.MAX_BATCH_ITEMS):
+                batches.append(current_batch)
+                current_batch, current_tokens = [], 0
+            current_batch.append(text)
+            current_tokens += tokens
+        if current_batch:
+            batches.append(current_batch)
+        return batches
+
+    @retry(stop=stop_after_attempt(5),
+           wait=wait_exponential(multiplier=1, min=2, max=60))
+    async def _embed_batch(self, texts: List[str]) -> List[List[float]]:
+        async with self.semaphore:
+            kwargs = {"model": self.model, "input": texts}
+            if self.dimensions:
+                kwargs["dimensions"] = self.dimensions
+            resp = await self.client.embeddings.create(**kwargs)
+            return [item.embedding for item in resp.data]
+
+    async def embed_async(self, texts: List[str]) -> np.ndarray:
+        batches = self.build_batches(texts)
+        tasks = [self._embed_batch(batch) for batch in batches]
+        results = await asyncio.gather(*tasks)
+        all_embeddings = [emb for batch in results for emb in batch]
+        return np.array(all_embeddings, dtype=np.float32)
+
+    def embed(self, texts: List[str]) -> np.ndarray:
+        """Synchronous wrapper."""
+        return asyncio.run(self.embed_async(texts))
+
+    def embed_with_stats(self, texts: List[str]) -> dict:
+        start = time.time()
+        embeddings = self.embed(texts)
+        elapsed = time.time() - start
+        return {
+            "embeddings":  embeddings,
+            "shape":       embeddings.shape,
+            "elapsed_s":   round(elapsed, 2),
+            "docs_per_sec": round(len(texts) / elapsed, 1),
+        }
+
+
+# Matryoshka: full 3072 dims → truncate to 256 for fast search
+embedder = BatchEmbedder(model="text-embedding-3-large", dimensions=256)
+
+texts = ["RAG systems combine retrieval with generation.",
+         "Vector databases store high-dimensional embeddings."]
+result = embedder.embed_with_stats(texts)
+print(f"Shape: {result['shape']}")           # (2, 256)
+print(f"Speed: {result['docs_per_sec']} docs/s")
+
+
+# Fine-tuning embeddings for domain adaptation (via sentence-transformers)
+from sentence_transformers import SentenceTransformer, InputExample, losses
+from torch.utils.data import DataLoader
+
+def finetune_embedding_model(
+    base_model: str,
+    train_pairs: List[dict],  # [{"query": ..., "positive": ..., "negative": ...}]
+    output_dir: str,
+    epochs: int = 3,
+):
+    model = SentenceTransformer(base_model)
+    examples = [
+        InputExample(texts=[p["query"], p["positive"]], label=1.0)
+        for p in train_pairs
+    ]
+    loader = DataLoader(examples, shuffle=True, batch_size=32)
+    loss = losses.MultipleNegativesRankingLoss(model)
+    model.fit(
+        train_objectives=[(loader, loss)],
+        epochs=epochs,
+        warmup_steps=100,
+        output_path=output_dir,
+        show_progress_bar=True,
+    )
+    print(f"Fine-tuned model saved to {output_dir}")
+</code></pre>
+        </div>
+
+        <div class="callout-note rounded-lg p-5 mb-6">
+          <p class="text-sm font-bold text-purple-800 mb-1">Matryoshka Embeddings</p>
+          <p class="text-sm text-purple-900">OpenAI's text-embedding-3 models support Matryoshka Representation Learning (MRL). You can truncate from 3072 down to 256 dimensions and lose only ~3% MTEB accuracy while cutting storage by 12x and ANN search by 4x. For a 10M-document corpus this is the difference between 115GB and 9.6GB of index. Always use this in production unless you need maximum recall.</p>
+        </div>
+      </section>
+
+      <!-- ===== SECTION 4: Vector Databases ===== -->
+      <section id="s4" class="section-anchor">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="w-8 h-8 bg-blue-600 text-white rounded-lg flex items-center justify-center font-bold text-sm">4</span>
+          <h2 class="text-2xl font-bold text-gray-900">Vector Databases Deep Dive</h2>
+        </div>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          A vector database is an index structure optimized for Approximate Nearest Neighbor (ANN) search in high-dimensional space. The two dominant algorithms are HNSW (Hierarchical Navigable Small World) for in-memory indices and IVF (Inverted File Index) for disk-based at scale. Understanding the parameters directly determines your recall/latency tradeoff.
+        </p>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Vector Database Comparison</h3>
+        <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm mb-8">
+          <table>
+            <thead>
+              <tr><th>Database</th><th>Algorithm</th><th>Managed?</th><th>Hybrid Search</th><th>Filtering</th><th>Scale</th><th>Cost Model</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Pinecone</strong></td><td>HNSW</td><td>Fully managed</td><td>Yes (sparse+dense)</td><td>Metadata pre-filter</td><td>10B+ vectors</td><td>Per-pod/serverless</td></tr>
+              <tr><td><strong>Qdrant</strong></td><td>HNSW</td><td>Cloud + self-host</td><td>Yes (built-in sparse)</td><td>Rich filter types</td><td>1B+ vectors</td><td>Open source / cloud</td></tr>
+              <tr><td><strong>Weaviate</strong></td><td>HNSW</td><td>Cloud + self-host</td><td>Yes (BM25 built-in)</td><td>GraphQL filters</td><td>100M+ vectors</td><td>Open source / cloud</td></tr>
+              <tr><td><strong>Milvus</strong></td><td>HNSW, IVF, DISKANN</td><td>Zilliz cloud</td><td>Yes</td><td>Scalar + vector</td><td>Billions</td><td>Open source / cloud</td></tr>
+              <tr><td>Chroma</td><td>HNSW (hnswlib)</td><td>No (local)</td><td>Limited</td><td>Where clause</td><td>~10M vectors</td><td>Open source</td></tr>
+              <tr><td><strong>pgvector</strong></td><td>IVFFLAT / HNSW</td><td>Via RDS/Supabase</td><td>Via tsvector</td><td>Full SQL</td><td>~50M vectors</td><td>Postgres pricing</td></tr>
+              <tr><td>Redis VSS</td><td>FLAT / HNSW</td><td>Redis Cloud</td><td>Yes</td><td>Redis filters</td><td>~100M vectors</td><td>Redis Enterprise</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Qdrant: Collection Setup and Hybrid Search</h3>
+        <div class="bg-white rounded-xl border border-gray-200 shadow-sm mb-6">
+          <div class="bg-gray-800 text-gray-200 px-4 py-2 rounded-t-xl text-sm font-mono flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-red-500"></span><span class="w-3 h-3 rounded-full bg-yellow-500"></span><span class="w-3 h-3 rounded-full bg-green-500"></span>
+            <span class="ml-2">qdrant_setup.py</span>
+          </div>
+          <pre><code class="language-python">from qdrant_client import QdrantClient
+from qdrant_client.models import (
+    VectorParams, Distance, HnswConfigDiff,
+    SparseVectorParams, SparseIndexParams,
+    PointStruct, SparseVector,
+    NamedVector, NamedSparseVector,
+    SearchRequest, Filter, FieldCondition, MatchValue, Range,
+)
+from typing import List, Dict, Any
+import numpy as np
+
+
+class QdrantVectorStore:
+    """Production Qdrant vector store with hybrid dense+sparse search."""
+
+    COLLECTION = "knowledge_base"
+
+    def __init__(self, url: str = "http://localhost:6333", api_key: str = None):
+        self.client = QdrantClient(url=url, api_key=api_key)
+        self._ensure_collection()
+
+    def _ensure_collection(self):
+        existing = [c.name for c in self.client.get_collections().collections]
+        if self.COLLECTION not in existing:
+            self.client.create_collection(
+                collection_name=self.COLLECTION,
+                vectors_config={
+                    "dense": VectorParams(
+                        size=1536,
+                        distance=Distance.COSINE,
+                        hnsw_config=HnswConfigDiff(
+                            m=16,                 # edges per node (16-48)
+                            ef_construct=200,     # build-time accuracy (100-400)
+                            full_scan_threshold=10_000,
+                        ),
+                    )
+                },
+                sparse_vectors_config={
+                    "sparse": SparseVectorParams(
+                        index=SparseIndexParams(on_disk=False)
+                    )
+                },
+            )
+            print(f"Created collection '{self.COLLECTION}'")
+
+    def upsert(
+        self,
+        ids: List[str],
+        dense_vectors: np.ndarray,
+        sparse_indices: List[List[int]],
+        sparse_values: List[List[float]],
+        payloads: List[Dict[str, Any]],
+    ):
+        """Batch upsert dense + sparse vectors."""
+        points = [
+            PointStruct(
+                id=str(i),
+                vector={
+                    "dense": dense_vectors[idx].tolist(),
+                    "sparse": SparseVector(
+                        indices=sparse_indices[idx],
+                        values=sparse_values[idx],
+                    ),
+                },
+                payload=payloads[idx],
+            )
+            for idx, i in enumerate(ids)
+        ]
+        # Batch in chunks of 100 for stability
+        for i in range(0, len(points), 100):
+            self.client.upsert(
+                collection_name=self.COLLECTION,
+                points=points[i:i+100],
+            )
+
+    def hybrid_search(
+        self,
+        dense_vector: List[float],
+        sparse_indices: List[int],
+        sparse_values: List[float],
+        top_k: int = 20,
+        filter_dict: Dict[str, Any] = None,
+        rrf_k: int = 60,
+    ) -> List[Dict]:
+        """
+        Hybrid search: dense + sparse with Reciprocal Rank Fusion.
+        rrf_k=60 is standard RRF constant.
+        """
+        qdrant_filter = None
+        if filter_dict:
+            conditions = []
+            for key, val in filter_dict.items():
+                if isinstance(val, (str, bool)):
+                    conditions.append(FieldCondition(key=key, match=MatchValue(value=val)))
+                elif isinstance(val, dict) and "gte" in val:
+                    conditions.append(FieldCondition(key=key, range=Range(**val)))
+            qdrant_filter = Filter(must=conditions) if conditions else None
+
+        results = self.client.query_points(
+            collection_name=self.COLLECTION,
+            prefetch=[
+                # Dense vector search
+                {"query": dense_vector,   "using": "dense",  "limit": top_k},
+                # Sparse vector search (BM25-like)
+                {"query": SparseVector(indices=sparse_indices, values=sparse_values),
+                 "using": "sparse", "limit": top_k},
+            ],
+            query={"fusion": "rrf"},   # Reciprocal Rank Fusion
+            limit=top_k,
+            query_filter=qdrant_filter,
+            with_payload=True,
+        ).points
+
+        return [
+            {"id": r.id, "score": r.score, **r.payload}
+            for r in results
+        ]
+
+
+# pgvector with PostgreSQL (for teams already on Postgres)
+PGVECTOR_SETUP = """
+-- Enable pgvector extension
+CREATE EXTENSION IF NOT EXISTS vector;
+
+-- Create documents table
+CREATE TABLE documents (
+    id          BIGSERIAL PRIMARY KEY,
+    content     TEXT NOT NULL,
+    embedding   VECTOR(1536),
+    metadata    JSONB DEFAULT '{}',
+    tenant_id   TEXT,
+    created_at  TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- HNSW index (better recall than IVFFlat for most cases)
+CREATE INDEX ON documents USING hnsw (embedding vector_cosine_ops)
+WITH (m = 16, ef_construction = 200);
+
+-- Partial index for tenant isolation
+CREATE INDEX ON documents USING hnsw (embedding vector_cosine_ops)
+WITH (m = 16, ef_construction = 200)
+WHERE tenant_id = 'corp-001';
+
+-- Hybrid search query (cosine similarity + full-text)
+-- Returns top 10 results blending vector and keyword scores
+SELECT
+    id, content,
+    1 - (embedding <=> $1::vector) AS cosine_sim,
+    ts_rank(to_tsvector('english', content), plainto_tsquery($2)) AS keyword_score,
+    metadata
+FROM documents
+WHERE tenant_id = $3
+ORDER BY (0.7 * (1 - (embedding <=> $1::vector))) +
+         (0.3 * ts_rank(to_tsvector('english', content), plainto_tsquery($2))) DESC
+LIMIT 10;
+"""
+</code></pre>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">HNSW Parameters Guide</h3>
+        <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm mb-6">
+          <table>
+            <thead>
+              <tr><th>Parameter</th><th>Default</th><th>Effect</th><th>Production Setting</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>M</code></td><td>16</td><td>Edges per node. Higher = better recall, more memory</td><td>16–32 for 1M vectors; 48 for max recall</td></tr>
+              <tr><td><code>ef_construction</code></td><td>200</td><td>Build-time beam width. Higher = better index quality, slower build</td><td>200–400 for production</td></tr>
+              <tr><td><code>ef_search</code></td><td>128</td><td>Query-time beam width. Higher = better recall, higher latency</td><td>50 for speed, 200 for recall</td></tr>
+              <tr><td><code>max_elements</code></td><td>varies</td><td>Pre-allocated capacity</td><td>Set to expected max × 1.5</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout-warning rounded-lg p-5">
+          <p class="text-sm font-bold text-amber-800 mb-1">Pre-filtering vs Post-filtering</p>
+          <p class="text-sm text-amber-900">When you filter by metadata (e.g., tenant_id, date), pre-filtering (filter before ANN search) is safer but can miss relevant results if the filtered corpus is small. Post-filtering (search globally, then filter) risks returning fewer than top-k results. Qdrant's filtered HNSW solves this with segment-level pre-filtering. Pinecone uses metadata-aware index sharding. Always test your filter coverage ratio — if filtering eliminates more than 80% of the corpus, you need segment-level indices.</p>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+      <!-- ===== SECTION 5: Retrieval Optimization ===== -->
+      <section id="s5" class="section-anchor">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="w-8 h-8 bg-blue-600 text-white rounded-lg flex items-center justify-center font-bold text-sm">5</span>
+          <h2 class="text-2xl font-bold text-gray-900">Retrieval Optimization</h2>
+        </div>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          Naive top-k dense retrieval has a fundamental problem: a single query vector collapses all query intent into one point. Queries like "Why did our Q3 revenue drop?" have multiple sub-intents (financial data, business context, comparison to prior year). Dense retrieval will fetch the nearest neighbors to the average embedding, often missing the most relevant documents on any single intent. The solution is a stack of complementary retrieval strategies.
+        </p>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Retrieval Strategy Comparison</h3>
+        <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm mb-8">
+          <table>
+            <thead>
+              <tr><th>Strategy</th><th>Recall</th><th>Latency</th><th>Complexity</th><th>Best For</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Dense-only (top-k)</td><td>Medium</td><td>Low (10ms)</td><td>Low</td><td>Baseline, semantic similarity</td></tr>
+              <tr><td>BM25 keyword only</td><td>Low-Medium</td><td>Low (8ms)</td><td>Low</td><td>Exact term matching, codes, IDs</td></tr>
+              <tr><td><strong>Hybrid (BM25 + Dense)</strong></td><td>High</td><td>Low (20ms)</td><td>Medium</td><td>Production default, best coverage</td></tr>
+              <tr><td>Hybrid + Reranking</td><td>Very High</td><td>Medium (80ms)</td><td>Medium</td><td>High-stakes Q&amp;A, research</td></tr>
+              <tr><td>HyDE + Dense</td><td>High</td><td>Medium (300ms)</td><td>Medium</td><td>Abstract/hypothetical queries</td></tr>
+              <tr><td>Multi-query + fusion</td><td>Very High</td><td>High (500ms)</td><td>High</td><td>Complex multi-faceted questions</td></tr>
+              <tr><td>MMR</td><td>Medium</td><td>Low</td><td>Low</td><td>Diverse result sets, summaries</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Hybrid BM25 + Dense Retrieval</h3>
+        <div class="bg-white rounded-xl border border-gray-200 shadow-sm mb-6">
+          <div class="bg-gray-800 text-gray-200 px-4 py-2 rounded-t-xl text-sm font-mono flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-red-500"></span><span class="w-3 h-3 rounded-full bg-yellow-500"></span><span class="w-3 h-3 rounded-full bg-green-500"></span>
+            <span class="ml-2">hybrid_retrieval.py</span>
+          </div>
+          <pre><code class="language-python">from rank_bm25 import BM25Okapi
+from langchain.schema import Document
+import numpy as np
+from typing import List, Tuple
+
+
+class HybridRetriever:
+    """
+    Hybrid BM25 + dense vector retrieval with Reciprocal Rank Fusion.
+    RRF formula: score(d) = sum(1 / (k + rank(d)))
+    """
+
+    def __init__(
+        self,
+        documents: List[Document],
+        embedder,           # any embed(texts) -> np.ndarray callable
+        vector_store,       # any similarity_search_with_score callable
+        alpha: float = 0.5, # 0 = BM25 only, 1 = dense only
+        rrf_k: int = 60,
+    ):
+        self.documents = documents
+        self.embedder = embedder
+        self.vector_store = vector_store
+        self.alpha = alpha
+        self.rrf_k = rrf_k
+
+        # Build BM25 index
+        tokenized = [doc.page_content.lower().split() for doc in documents]
+        self.bm25 = BM25Okapi(tokenized)
+
+    def bm25_search(self, query: str, top_k: int) -> List[Tuple[Document, float]]:
+        tokens = query.lower().split()
+        scores = self.bm25.get_scores(tokens)
+        top_indices = np.argsort(scores)[::-1][:top_k]
+        return [(self.documents[i], float(scores[i])) for i in top_indices]
+
+    def reciprocal_rank_fusion(
+        self,
+        bm25_results: List[Tuple[Document, float]],
+        dense_results: List[Tuple[Document, float]],
+        top_k: int,
+    ) -> List[Tuple[Document, float]]:
+        """Merge ranked lists using RRF. Handles duplicate documents by doc_id."""
+        scores: dict = {}
+        id_to_doc: dict = {}
+
+        for rank, (doc, _) in enumerate(bm25_results):
+            doc_id = doc.metadata.get("doc_id", doc.page_content[:50])
+            scores[doc_id] = scores.get(doc_id, 0) + (1 - self.alpha) / (self.rrf_k + rank)
+            id_to_doc[doc_id] = doc
+
+        for rank, (doc, _) in enumerate(dense_results):
+            doc_id = doc.metadata.get("doc_id", doc.page_content[:50])
+            scores[doc_id] = scores.get(doc_id, 0) + self.alpha / (self.rrf_k + rank)
+            id_to_doc[doc_id] = doc
+
+        sorted_ids = sorted(scores, key=scores.__getitem__, reverse=True)[:top_k]
+        return [(id_to_doc[i], scores[i]) for i in sorted_ids]
+
+    def retrieve(self, query: str, top_k: int = 10) -> List[Document]:
+        bm25_results = self.bm25_search(query, top_k * 2)
+        dense_results = self.vector_store.similarity_search_with_score(query, k=top_k * 2)
+        fused = self.reciprocal_rank_fusion(bm25_results, dense_results, top_k)
+        return [doc for doc, _ in fused]
+</code></pre>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Reranking with Cross-Encoders</h3>
+        <div class="bg-white rounded-xl border border-gray-200 shadow-sm mb-6">
+          <div class="bg-gray-800 text-gray-200 px-4 py-2 rounded-t-xl text-sm font-mono flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-red-500"></span><span class="w-3 h-3 rounded-full bg-yellow-500"></span><span class="w-3 h-3 rounded-full bg-green-500"></span>
+            <span class="ml-2">reranker.py</span>
+          </div>
+          <pre><code class="language-python">"""
+Reranking: first-stage retrieval fetches top-50, reranker selects top-5.
+Cross-encoders jointly encode (query, document) pairs — far more accurate
+than bi-encoders but too slow for first-stage retrieval.
+"""
+import cohere
+from sentence_transformers.cross_encoder import CrossEncoder
+from typing import List
+from langchain.schema import Document
+
+
+class CohereReranker:
+    """Cohere Rerank API — managed, fast, no GPU required."""
+
+    def __init__(self, api_key: str, model: str = "rerank-english-v3.0"):
+        self.co = cohere.Client(api_key)
+        self.model = model
+
+    def rerank(
+        self,
+        query: str,
+        documents: List[Document],
+        top_n: int = 5,
+    ) -> List[Document]:
+        passages = [d.page_content for d in documents]
+        results = self.co.rerank(
+            query=query,
+            documents=passages,
+            top_n=top_n,
+            model=self.model,
+            return_documents=False,
+        )
+        reranked = []
+        for r in results.results:
+            doc = documents[r.index]
+            doc.metadata["rerank_score"] = r.relevance_score
+            reranked.append(doc)
+        return reranked
+
+
+class LocalReranker:
+    """BGE-Reranker-v2-m3 — self-hosted, multilingual, ~200MB."""
+
+    def __init__(self, model_name: str = "BAAI/bge-reranker-v2-m3"):
+        self.model = CrossEncoder(model_name, max_length=512)
+
+    def rerank(
+        self,
+        query: str,
+        documents: List[Document],
+        top_n: int = 5,
+    ) -> List[Document]:
+        pairs = [(query, doc.page_content) for doc in documents]
+        scores = self.model.predict(pairs, batch_size=32)
+        ranked = sorted(zip(documents, scores), key=lambda x: x[1], reverse=True)
+        for doc, score in ranked[:top_n]:
+            doc.metadata["rerank_score"] = float(score)
+        return [doc for doc, _ in ranked[:top_n]]
+
+
+class HyDERetriever:
+    """
+    HyDE: Hypothetical Document Embeddings.
+    LLM generates a hypothetical answer, then that answer's embedding
+    is used for retrieval. Works well for abstract/research queries.
+    """
+
+    def __init__(self, llm, vector_store, embedder):
+        self.llm = llm
+        self.vector_store = vector_store
+        self.embedder = embedder
+
+    def generate_hypothetical_doc(self, query: str) -> str:
+        prompt = f"""Write a short passage (2-3 sentences) that would be a
+perfect answer to this question. Be specific and factual.
+
+Question: {query}
+
+Passage:"""
+        return self.llm.invoke(prompt).content
+
+    def retrieve(self, query: str, top_k: int = 10) -> List[Document]:
+        # Generate hypothetical answer
+        hyp_doc = self.generate_hypothetical_doc(query)
+        # Embed the hypothetical doc (not the query)
+        hyp_embedding = self.embedder.embed([hyp_doc])[0]
+        # Search using hypothetical doc embedding
+        return self.vector_store.similarity_search_by_vector(hyp_embedding, k=top_k)
+</code></pre>
+        </div>
+      </section>
+
+      <!-- ===== SECTION 6: Advanced RAG Patterns ===== -->
+      <section id="s6" class="section-anchor">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="w-8 h-8 bg-blue-600 text-white rounded-lg flex items-center justify-center font-bold text-sm">6</span>
+          <h2 class="text-2xl font-bold text-gray-900">Advanced RAG Patterns</h2>
+        </div>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          Beyond vanilla retrieval, production RAG systems use a suite of patterns to handle query complexity, document structure, and context limits. Each pattern addresses a specific failure mode — understanding when to apply which pattern is the difference between a demo and a production system.
+        </p>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Advanced RAG Pipeline</h3>
+        <div class="bg-white rounded-xl border border-gray-200 p-6 mb-8">
+          <div class="mermaid">
+flowchart TD
+    Q([User Query]) --> QA[Query Analysis]
+    QA --> |Simple| DR[Direct Retrieval]
+    QA --> |Complex| MQ[Multi-Query Expansion\nLLM generates 3-5 variants]
+    QA --> |Filtered| SQ[Self-Query\nLLM extracts metadata filters]
+    QA --> |Abstract| HY[HyDE\nGenerate hypothetical doc]
+
+    DR --> HR[Hybrid Retriever\nBM25 + Dense]
+    MQ --> HR
+    SQ --> HR
+    HY --> HR
+
+    HR --> RR[Reranker\nCross-Encoder top-20→5]
+    RR --> PC[Parent-Child Expansion\nExpand child chunks to parent]
+    PC --> CC[Contextual Compressor\nLLM filters irrelevant sentences]
+    CC --> MM[MMR Diversity Filter]
+    MM --> CTX[Augmented Context]
+    CTX --> GEN[LLM Generation]
+    GEN --> SA[Source Attribution]
+    SA --> OUT([Response + Citations])
+
+    style Q fill:#dbeafe,stroke:#2563eb
+    style OUT fill:#d1fae5,stroke:#059669
+          </div>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Self-Query Retriever (LLM-Generated Filters)</h3>
+        <div class="bg-white rounded-xl border border-gray-200 shadow-sm mb-6">
+          <div class="bg-gray-800 text-gray-200 px-4 py-2 rounded-t-xl text-sm font-mono flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-red-500"></span><span class="w-3 h-3 rounded-full bg-yellow-500"></span><span class="w-3 h-3 rounded-full bg-green-500"></span>
+            <span class="ml-2">self_query.py</span>
+          </div>
+          <pre><code class="language-python">from langchain.retrievers.self_query.base import SelfQueryRetriever
+from langchain.chains.query_constructor.base import AttributeInfo
+from langchain_openai import ChatOpenAI
+from langchain_qdrant import Qdrant
+
+
+# Define metadata schema so LLM knows what filters exist
+metadata_field_info = [
+    AttributeInfo(
+        name="department",
+        description="The department that owns this document (HR, Engineering, Finance, Legal)",
+        type="string",
+    ),
+    AttributeInfo(
+        name="year",
+        description="Year the document was published (2020-2026)",
+        type="integer",
+    ),
+    AttributeInfo(
+        name="clearance_level",
+        description="Required security clearance: 0=public, 1=internal, 2=confidential, 3=restricted",
+        type="integer",
+    ),
+    AttributeInfo(
+        name="doc_type",
+        description="Type of document: policy, report, procedure, announcement",
+        type="string",
+    ),
+]
+
+document_content_description = "Internal company documents including policies, reports, and procedures"
+
+llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+vectorstore = Qdrant(...)  # your initialized Qdrant instance
+
+retriever = SelfQueryRetriever.from_llm(
+    llm=llm,
+    vectorstore=vectorstore,
+    document_contents=document_content_description,
+    metadata_field_info=metadata_field_info,
+    verbose=True,
+    enable_limit=True,    # allow LLM to set top-k
+)
+
+# LLM will parse: "HR policies from 2024 that are public"
+# → filter: department="HR" AND year=2024 AND clearance_level=0
+results = retriever.invoke("What are the HR vacation policies from 2024?")
+print(f"Retrieved {len(results)} filtered documents")
+
+
+# Contextual Compression Retriever
+from langchain.retrievers.document_compressors import LLMChainExtractor
+from langchain.retrievers import ContextualCompressionRetriever
+
+base_retriever = vectorstore.as_retriever(search_kwargs={"k": 20})
+
+compressor = LLMChainExtractor.from_llm(llm)
+
+compression_retriever = ContextualCompressionRetriever(
+    base_compressor=compressor,
+    base_retriever=base_retriever,
+)
+
+# Only returns the relevant SENTENCES from each document, not full chunks
+compressed_docs = compression_retriever.invoke(
+    "What is our parental leave policy for adoptions?"
+)
+print(f"Compressed to {len(compressed_docs)} focused passages")
+</code></pre>
+        </div>
+
+        <div class="callout-tip rounded-lg p-5 mb-6">
+          <p class="text-sm font-bold text-green-800 mb-1">RAPTOR: Recursive Abstractive Processing</p>
+          <p class="text-sm text-green-900">RAPTOR builds a tree of summaries over your document corpus. Leaf nodes are raw chunks; each parent is an LLM-generated summary of its children. At query time, you search across all tree levels. This is expensive to build (O(n log n) LLM calls) but dramatically improves multi-hop question answering — ideal for large technical manuals and legal codebases. LlamaIndex has a native RAPTOR implementation.</p>
+        </div>
+      </section>
+
+      <!-- ===== SECTION 7: Full RAG with LangChain ===== -->
+      <section id="s7" class="section-anchor">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="w-8 h-8 bg-blue-600 text-white rounded-lg flex items-center justify-center font-bold text-sm">7</span>
+          <h2 class="text-2xl font-bold text-gray-900">Complete RAG System with LangChain</h2>
+        </div>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          LangChain's Expression Language (LCEL) provides a composable pipeline DSL. The <code>|</code> operator chains runnables, enabling lazy evaluation, streaming, and parallel execution out of the box. Here is a complete production RAG implementation with streaming, source attribution, and conversation history.
+        </p>
+
+        <div class="bg-white rounded-xl border border-gray-200 shadow-sm mb-6">
+          <div class="bg-gray-800 text-gray-200 px-4 py-2 rounded-t-xl text-sm font-mono flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-red-500"></span><span class="w-3 h-3 rounded-full bg-yellow-500"></span><span class="w-3 h-3 rounded-full bg-green-500"></span>
+            <span class="ml-2">production_rag.py</span>
+          </div>
+          <pre><code class="language-python">"""
+Production RAG system with LangChain LCEL.
+Features: streaming, source attribution, conversation history, reranking.
+"""
+from __future__ import annotations
+from typing import List, Iterator, AsyncIterator
+from operator import itemgetter
+
+from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+from langchain_qdrant import QdrantVectorStore
+from langchain.schema import Document, BaseMessage
+from langchain.schema.runnable import (
+    RunnablePassthrough, RunnableLambda, RunnableParallel
+)
+from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain.memory import ConversationBufferWindowMemory
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.messages import HumanMessage, AIMessage
+from pydantic import BaseModel
+import re
+
+
+# ── Prompt Templates ──────────────────────────────────────────────────────────
+
+RAG_SYSTEM_PROMPT = """You are a precise knowledge assistant. Answer the user's
+question ONLY using the provided context. If the context does not contain the
+answer, say "I don't have that information in my knowledge base."
+
+Rules:
+- Be concise and factual
+- Cite sources using [Source N] notation
+- Never hallucinate details not in the context
+- If multiple sources conflict, note the discrepancy
+
+Context:
+{context}"""
+
+CONTEXTUALIZE_PROMPT = """Given the conversation history and the user's latest
+question, reformulate the question to be standalone (no pronouns, no references
+to prior messages). Return only the reformulated question.
+
+History: {history}
+Question: {question}
+Standalone question:"""
+
+
+# ── Helper Functions ──────────────────────────────────────────────────────────
+
+def format_context(docs: List[Document]) -> str:
+    """Format retrieved docs into numbered context block with source metadata."""
+    parts = []
+    for i, doc in enumerate(docs, 1):
+        source = doc.metadata.get("source", "unknown")
+        page   = doc.metadata.get("page_number", "")
+        page_str = f", page {page}" if page else ""
+        parts.append(f"[Source {i}] ({source}{page_str})\n{doc.page_content}")
+    return "\n\n---\n\n".join(parts)
+
+
+def extract_sources(docs: List[Document]) -> List[dict]:
+    """Extract citation metadata from retrieved documents."""
+    return [
+        {
+            "index":   i + 1,
+            "source":  d.metadata.get("source", ""),
+            "page":    d.metadata.get("page_number"),
+            "score":   d.metadata.get("rerank_score"),
+        }
+        for i, d in enumerate(docs)
+    ]
+
+
+# ── Production RAG Chain ──────────────────────────────────────────────────────
+
+class ProductionRAG:
+    def __init__(
+        self,
+        qdrant_url: str,
+        qdrant_api_key: str,
+        collection_name: str,
+        openai_api_key: str,
+        reranker=None,       # Optional reranker instance
+        top_k: int = 20,
+        top_n: int = 5,
+        stream: bool = True,
+    ):
+        # Embedding model
+        self.embeddings = OpenAIEmbeddings(
+            model="text-embedding-3-large",
+            dimensions=1536,
+            openai_api_key=openai_api_key,
+        )
+
+        # Vector store
+        self.vectorstore = QdrantVectorStore.from_existing_collection(
+            embedding=self.embeddings,
+            url=qdrant_url,
+            api_key=qdrant_api_key,
+            collection_name=collection_name,
+        )
+
+        # Retriever with generous top_k (reranker will narrow down)
+        self.base_retriever = self.vectorstore.as_retriever(
+            search_type="similarity",
+            search_kwargs={"k": top_k},
+        )
+
+        self.reranker = reranker
+        self.top_n = top_n
+
+        # Generation LLM
+        self.llm = ChatOpenAI(
+            model="gpt-4o",
+            temperature=0,
+            streaming=stream,
+            openai_api_key=openai_api_key,
+        )
+
+        # Contextualization LLM (cheap model for query reformulation)
+        self.ctx_llm = ChatOpenAI(
+            model="gpt-4o-mini",
+            temperature=0,
+            openai_api_key=openai_api_key,
+        )
+
+        # Memory
+        self.memory = ConversationBufferWindowMemory(
+            k=6, return_messages=True, memory_key="history"
+        )
+
+        self._build_chain()
+
+    def _retrieve_and_rerank(self, query: str) -> List[Document]:
+        docs = self.base_retriever.invoke(query)
+        if self.reranker and docs:
+            docs = self.reranker.rerank(query, docs, top_n=self.top_n)
+        return docs[:self.top_n]
+
+    def _contextualize_query(self, inputs: dict) -> str:
+        history = self.memory.load_memory_variables({})["history"]
+        if not history:
+            return inputs["question"]
+        history_str = "\n".join(
+            f"{'Human' if isinstance(m, HumanMessage) else 'AI'}: {m.content}"
+            for m in history
+        )
+        prompt = CONTEXTUALIZE_PROMPT.format(
+            history=history_str, question=inputs["question"]
+        )
+        return self.ctx_llm.invoke(prompt).content
+
+    def _build_chain(self):
+        rag_prompt = ChatPromptTemplate.from_messages([
+            ("system", RAG_SYSTEM_PROMPT),
+            MessagesPlaceholder(variable_name="history"),
+            ("human", "{question}"),
+        ])
+
+        retrieve = RunnableLambda(
+            lambda x: self._retrieve_and_rerank(x["standalone_question"])
+        )
+
+        self.chain = (
+            RunnablePassthrough.assign(
+                standalone_question=RunnableLambda(self._contextualize_query)
+            )
+            | RunnablePassthrough.assign(docs=retrieve)
+            | RunnablePassthrough.assign(
+                context=lambda x: format_context(x["docs"]),
+                history=lambda _: self.memory.load_memory_variables({})["history"],
+            )
+            | RunnableParallel(
+                answer=rag_prompt | self.llm | StrOutputParser(),
+                sources=lambda x: extract_sources(x["docs"]),
+            )
+        )
+
+    def query(self, question: str) -> dict:
+        """Single query with source attribution."""
+        result = self.chain.invoke({"question": question})
+        # Save to memory
+        self.memory.save_context(
+            {"input": question}, {"output": result["answer"]}
+        )
+        return result
+
+    def stream(self, question: str) -> Iterator[str]:
+        """Streaming response — yields answer tokens."""
+        inputs = {"question": question}
+        standalone = self._contextualize_query(inputs)
+        docs = self._retrieve_and_rerank(standalone)
+        context = format_context(docs)
+        history = self.memory.load_memory_variables({})["history"]
+
+        prompt = ChatPromptTemplate.from_messages([
+            ("system", RAG_SYSTEM_PROMPT),
+            MessagesPlaceholder(variable_name="history"),
+            ("human", "{question}"),
+        ])
+        chain = prompt | self.llm | StrOutputParser()
+
+        full_response = ""
+        for chunk in chain.stream({
+            "context": context,
+            "history": history,
+            "question": question,
+        }):
+            full_response += chunk
+            yield chunk
+
+        self.memory.save_context({"input": question}, {"output": full_response})
+        return extract_sources(docs)
+
+
+# Usage
+if __name__ == "__main__":
+    rag = ProductionRAG(
+        qdrant_url="http://localhost:6333",
+        qdrant_api_key="",
+        collection_name="knowledge_base",
+        openai_api_key="sk-...",
+        top_k=20, top_n=5,
+    )
+
+    # Single query
+    result = rag.query("What is our remote work policy?")
+    print(result["answer"])
+    print("Sources:", result["sources"])
+
+    # Streaming
+    print("\n--- Streaming ---")
+    for token in rag.stream("Can I work from abroad for 3 months?"):
+        print(token, end="", flush=True)
+</code></pre>
+        </div>
+      </section>
+
+      <!-- ===== SECTION 8: LlamaIndex ===== -->
+      <section id="s8" class="section-anchor">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="w-8 h-8 bg-blue-600 text-white rounded-lg flex items-center justify-center font-bold text-sm">8</span>
+          <h2 class="text-2xl font-bold text-gray-900">Complete RAG System with LlamaIndex</h2>
+        </div>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          LlamaIndex (formerly GPT Index) has a tighter semantic model than LangChain: everything revolves around <strong>nodes</strong>, <strong>indices</strong>, and <strong>query engines</strong>. Where LangChain emphasizes composing chains of callables, LlamaIndex emphasizes the data structure of the index itself. This makes LlamaIndex particularly strong for hierarchical document structures and complex multi-index queries.
+        </p>
+
+        <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm mb-6">
+          <table>
+            <thead>
+              <tr><th>Dimension</th><th>LangChain</th><th>LlamaIndex</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Core abstraction</td><td>Chains and runnables</td><td>Indices and query engines</td></tr>
+              <tr><td>Flexibility</td><td>Very high — compose anything</td><td>High within index paradigm</td></tr>
+              <tr><td>Document hierarchy</td><td>Manual (parent-child)</td><td>Native (node relationships)</td></tr>
+              <tr><td>Multi-index routing</td><td>Via routers</td><td>Native RouterQueryEngine</td></tr>
+              <tr><td>Agent integration</td><td>AgentExecutor, LangGraph</td><td>ReActAgent, OpenAI agent</td></tr>
+              <tr><td>Observability</td><td>LangSmith</td><td>Arize Phoenix, Langfuse</td></tr>
+              <tr><td>Learning curve</td><td>Steeper</td><td>More opinionated / easier start</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="bg-white rounded-xl border border-gray-200 shadow-sm mb-6">
+          <div class="bg-gray-800 text-gray-200 px-4 py-2 rounded-t-xl text-sm font-mono flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-red-500"></span><span class="w-3 h-3 rounded-full bg-yellow-500"></span><span class="w-3 h-3 rounded-full bg-green-500"></span>
+            <span class="ml-2">llamaindex_rag.py</span>
+          </div>
+          <pre><code class="language-python">"""
+LlamaIndex RAG pipeline with:
+- Qdrant vector store
+- SubQuestionQueryEngine for complex queries
+- RAPTOR hierarchical index
+"""
+from llama_index.core import (
+    VectorStoreIndex, SimpleDirectoryReader,
+    Settings, StorageContext
+)
+from llama_index.core.node_parser import (
+    HierarchicalNodeParser, SemanticSplitterNodeParser, get_leaf_nodes
+)
+from llama_index.core.retrievers import AutoMergingRetriever
+from llama_index.core.query_engine import (
+    RetrieverQueryEngine, SubQuestionQueryEngine
+)
+from llama_index.core.tools import QueryEngineTool, ToolMetadata
+from llama_index.core.postprocessor import SentenceTransformerRerank
+from llama_index.llms.openai import OpenAI
+from llama_index.embeddings.openai import OpenAIEmbedding
+from llama_index.vector_stores.qdrant import QdrantVectorStore
+from qdrant_client import QdrantClient
+import logging
+
+
+# Global settings (replaces ServiceContext in v0.10+)
+Settings.llm = OpenAI(model="gpt-4o", temperature=0)
+Settings.embed_model = OpenAIEmbedding(
+    model="text-embedding-3-large", dimensions=1536
+)
+Settings.chunk_size = 512
+Settings.chunk_overlap = 64
+
+
+def build_auto_merging_index(data_dir: str) -> VectorStoreIndex:
+    """
+    Parent-child index: small leaf nodes for retrieval,
+    auto-merge to parent for generation context.
+    """
+    # Load documents
+    documents = SimpleDirectoryReader(data_dir, recursive=True).load_data()
+
+    # Hierarchical parser: chunk_sizes=[2048, 512, 128]
+    node_parser = HierarchicalNodeParser.from_defaults(
+        chunk_sizes=[2048, 512, 128]
+    )
+    nodes = node_parser.get_nodes_from_documents(documents)
+    leaf_nodes = get_leaf_nodes(nodes)
+
+    # Store in Qdrant
+    client = QdrantClient("http://localhost:6333")
+    vector_store = QdrantVectorStore(
+        client=client,
+        collection_name="auto_merging_index",
+    )
+    storage_ctx = StorageContext.from_defaults(
+        vector_store=vector_store
+    )
+    storage_ctx.docstore.add_documents(nodes)  # store all nodes for merging
+
+    index = VectorStoreIndex(
+        leaf_nodes,
+        storage_context=storage_ctx,
+    )
+    return index, storage_ctx
+
+
+def build_query_engine(index, storage_ctx) -> RetrieverQueryEngine:
+    base_retriever = index.as_retriever(similarity_top_k=12)
+
+    # Auto-merging: if majority of child nodes under a parent match, return parent
+    retriever = AutoMergingRetriever(
+        base_retriever,
+        storage_context=storage_ctx,
+        verbose=True,
+    )
+
+    # Reranking post-processor
+    reranker = SentenceTransformerRerank(
+        model="BAAI/bge-reranker-v2-m3",
+        top_n=5,
+    )
+
+    return RetrieverQueryEngine.from_args(
+        retriever=retriever,
+        node_postprocessors=[reranker],
+        streaming=True,
+    )
+
+
+def build_subquestion_engine(query_engines: dict) -> SubQuestionQueryEngine:
+    """
+    SubQuestionQueryEngine: for complex questions, LLM decomposes into
+    sub-questions, routes each to the right index, then synthesizes.
+
+    Example: "Compare our Q3 2024 vs Q3 2023 revenue in the APAC region"
+    → SubQ1: "Q3 2024 revenue APAC" → finance_engine
+    → SubQ2: "Q3 2023 revenue APAC" → finance_engine
+    → Synthesis: combine both answers
+    """
+    tools = [
+        QueryEngineTool(
+            query_engine=engine,
+            metadata=ToolMetadata(name=name, description=desc),
+        )
+        for name, (engine, desc) in query_engines.items()
+    ]
+    return SubQuestionQueryEngine.from_defaults(
+        query_engine_tools=tools,
+        verbose=True,
+    )
+
+
+# Usage
+if __name__ == "__main__":
+    index, storage = build_auto_merging_index("./knowledge_base")
+    engine = build_query_engine(index, storage)
+
+    response = engine.query("What are the key risks identified in the 2024 annual report?")
+    print(response.response)
+
+    # Print source nodes
+    for node in response.source_nodes:
+        print(f"  Source: {node.metadata.get('file_name')} score={node.score:.3f}")
+</code></pre>
+        </div>
+      </section>
+
+      <!-- ===== SECTION 9: LLM Agents ===== -->
+      <section id="s9" class="section-anchor">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="w-8 h-8 bg-blue-600 text-white rounded-lg flex items-center justify-center font-bold text-sm">9</span>
+          <h2 class="text-2xl font-bold text-gray-900">LLM Agents</h2>
+        </div>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          An LLM agent is a system that uses a language model to decide which actions to take, executes those actions (calling tools, APIs, or other models), observes the results, and iterates until the task is complete. The key difference from a RAG chain is the <strong>feedback loop</strong>: agents can self-correct, multi-step, and handle unexpected outcomes. The dominant pattern is ReAct (Reasoning + Acting).
+        </p>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Agent Control Flow</h3>
+        <div class="bg-white rounded-xl border border-gray-200 p-6 mb-8">
+          <div class="mermaid">
+stateDiagram-v2
+    [*] --> Observe: User Task
+    Observe --> Think: Process observations\n+ memory + tools
+    Think --> Act: Select tool + parameters
+    Act --> Observe: Tool result
+    Think --> Done: Task complete
+    Act --> Error: Tool failure
+    Error --> Think: Error as observation\n(self-correction)
+    Done --> [*]: Final answer
+
+    note right of Think
+        LLM reasoning:
+        - What do I know?
+        - What do I need?
+        - Which tool to use?
+        - What parameters?
+    end note
+          </div>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Custom Agent with Tool Use</h3>
+        <div class="bg-white rounded-xl border border-gray-200 shadow-sm mb-6">
+          <div class="bg-gray-800 text-gray-200 px-4 py-2 rounded-t-xl text-sm font-mono flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-red-500"></span><span class="w-3 h-3 rounded-full bg-yellow-500"></span><span class="w-3 h-3 rounded-full bg-green-500"></span>
+            <span class="ml-2">agent_with_tools.py</span>
+          </div>
+          <pre><code class="language-python">"""
+Custom ReAct agent using Anthropic Claude API.
+Demonstrates: tool definition, tool calling loop, error handling, memory.
+"""
+import anthropic
+import json
+import sqlite3
+from typing import Any
+from datetime import datetime
+
+client = anthropic.Anthropic()
+MODEL = "claude-opus-4-5"
+
+# ── Tool Definitions ──────────────────────────────────────────────────────────
+
+TOOLS = [
+    {
+        "name": "search_knowledge_base",
+        "description": "Search internal company knowledge base for relevant documents. Use for policy questions, procedures, and internal information.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "query": {"type": "string", "description": "Search query"},
+                "department": {
+                    "type": "string",
+                    "enum": ["HR", "Engineering", "Finance", "Legal", "All"],
+                    "description": "Filter by department",
+                },
+                "top_k": {"type": "integer", "default": 5},
+            },
+            "required": ["query"],
+        },
+    },
+    {
+        "name": "query_database",
+        "description": "Execute a read-only SQL query against the company database. Use for metrics, employee counts, revenue figures.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "sql": {"type": "string", "description": "SELECT query only"},
+            },
+            "required": ["sql"],
+        },
+    },
+    {
+        "name": "send_slack_notification",
+        "description": "Send a Slack notification to a channel. Use only when explicitly asked to notify someone.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "channel": {"type": "string"},
+                "message": {"type": "string"},
+            },
+            "required": ["channel", "message"],
+        },
+    },
+    {
+        "name": "get_current_datetime",
+        "description": "Get the current date and time. Use when temporal context is needed.",
+        "input_schema": {"type": "object", "properties": {}},
+    },
+]
+
+
+# ── Tool Implementations ──────────────────────────────────────────────────────
+
+def search_knowledge_base(query: str, department: str = "All", top_k: int = 5) -> str:
+    # In production: call your RAG retriever
+    return f"[MOCK] Top {top_k} results for '{query}' in {department}: [doc1, doc2, doc3]"
+
+def query_database(sql: str) -> str:
+    # Safety: reject non-SELECT queries
+    if not sql.strip().upper().startswith("SELECT"):
+        return "ERROR: Only SELECT queries are allowed."
+    # In production: execute against real DB with connection pooling
+    return f"[MOCK] Query result for: {sql[:80]}..."
+
+def send_slack_notification(channel: str, message: str) -> str:
+    return f"[MOCK] Sent to #{channel}: {message[:50]}..."
+
+def get_current_datetime() -> str:
+    return datetime.utcnow().isoformat() + "Z"
+
+TOOL_REGISTRY = {
+    "search_knowledge_base":  search_knowledge_base,
+    "query_database":         query_database,
+    "send_slack_notification": send_slack_notification,
+    "get_current_datetime":   get_current_datetime,
+}
+
+
+# ── Agent Loop ────────────────────────────────────────────────────────────────
+
+class ReActAgent:
+    def __init__(
+        self,
+        system_prompt: str,
+        max_iterations: int = 10,
+        persistent_memory: list = None,
+    ):
+        self.system_prompt = system_prompt
+        self.max_iterations = max_iterations
+        self.messages = []
+        # Persistent memory: inject prior facts at start
+        if persistent_memory:
+            self.messages.append({
+                "role": "user",
+                "content": f"Background context from memory:\n{json.dumps(persistent_memory)}"
+            })
+            self.messages.append({"role": "assistant", "content": "Understood."})
+
+    def _execute_tool(self, tool_name: str, tool_input: dict) -> str:
+        fn = TOOL_REGISTRY.get(tool_name)
+        if not fn:
+            return f"ERROR: Unknown tool '{tool_name}'"
+        try:
+            return fn(**tool_input)
+        except Exception as e:
+            return f"ERROR: Tool execution failed: {str(e)}"
+
+    def run(self, user_message: str) -> str:
+        self.messages.append({"role": "user", "content": user_message})
+
+        for iteration in range(self.max_iterations):
+            response = client.messages.create(
+                model=MODEL,
+                max_tokens=4096,
+                system=self.system_prompt,
+                tools=TOOLS,
+                messages=self.messages,
+            )
+
+            # Append assistant response
+            self.messages.append({"role": "assistant", "content": response.content})
+
+            if response.stop_reason == "end_turn":
+                # Extract text response
+                for block in response.content:
+                    if hasattr(block, "text"):
+                        return block.text
+                return "Task complete."
+
+            if response.stop_reason == "tool_use":
+                tool_results = []
+                for block in response.content:
+                    if block.type == "tool_use":
+                        print(f"  [Tool] {block.name}({json.dumps(block.input)[:80]})")
+                        result = self._execute_tool(block.name, block.input)
+                        print(f"  [Result] {result[:80]}...")
+                        tool_results.append({
+                            "type": "tool_result",
+                            "tool_use_id": block.id,
+                            "content": result,
+                        })
+                self.messages.append({"role": "user", "content": tool_results})
+
+        return "Max iterations reached. Partial result returned."
+
+
+# Run the agent
+agent = ReActAgent(
+    system_prompt="""You are a helpful enterprise assistant with access to
+    internal documents, databases, and communication tools.
+    Always reason step by step before acting.""",
+    max_iterations=10,
+)
+
+answer = agent.run(
+    "How many engineers do we have, and what's our onboarding policy for new hires?"
+)
+print(answer)
+</code></pre>
+        </div>
+      </section>
+
+      <!-- ===== SECTION 10: Multi-Agent Systems ===== -->
+      <section id="s10" class="section-anchor">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="w-8 h-8 bg-blue-600 text-white rounded-lg flex items-center justify-center font-bold text-sm">10</span>
+          <h2 class="text-2xl font-bold text-gray-900">Multi-Agent Systems</h2>
+        </div>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          Single agents hit practical limits: context windows overflow on complex tasks, a single LLM cannot be an expert in everything, and sequential thinking is slow for parallelizable work. Multi-agent systems decompose tasks across specialized agents — an orchestrator manages the workflow, workers execute subtasks, and the system handles partial failures gracefully.
+        </p>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Multi-Agent Orchestration Patterns</h3>
+        <div class="bg-white rounded-xl border border-gray-200 p-6 mb-8">
+          <div class="mermaid">
+graph TD
+    subgraph Orchestrator["Orchestrator Agent (GPT-4o)"]
+        O[Task Planner] --> TA[Task Decomposer]
+        TA --> S[Scheduler]
+    end
+
+    subgraph Workers["Specialist Workers"]
+        W1[Research Agent\nWeb search + RAG]
+        W2[Analysis Agent\nData + SQL]
+        W3[Writing Agent\nDraft + Edit]
+        W4[Code Agent\nWrite + Execute]
+        W5[Review Agent\nFact-check + QA]
+    end
+
+    subgraph Memory["Shared Memory"]
+        SM[(Short-term\nShared State)]
+        LM[(Long-term\nVector Store)]
+    end
+
+    S --> |parallel| W1
+    S --> |parallel| W2
+    S --> |sequential| W3
+    W1 --> SM
+    W2 --> SM
+    SM --> W3
+    W3 --> W5
+    W5 --> |approve| OUT[Final Output]
+    W5 --> |revise| W3
+    SM <--> LM
+
+    style Orchestrator fill:#eff6ff,stroke:#2563eb
+    style Workers fill:#ecfdf5,stroke:#059669
+    style Memory fill:#f5f3ff,stroke:#7c3aed
+          </div>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Multi-Agent Pipeline with LangGraph</h3>
+        <div class="bg-white rounded-xl border border-gray-200 shadow-sm mb-6">
+          <div class="bg-gray-800 text-gray-200 px-4 py-2 rounded-t-xl text-sm font-mono flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-red-500"></span><span class="w-3 h-3 rounded-full bg-yellow-500"></span><span class="w-3 h-3 rounded-full bg-green-500"></span>
+            <span class="ml-2">multi_agent_langgraph.py</span>
+          </div>
+          <pre><code class="language-python">"""
+Multi-agent research pipeline with LangGraph.
+Orchestrator → Research + Analysis agents → Synthesis.
+"""
+from langgraph.graph import StateGraph, END
+from langgraph.prebuilt import ToolNode
+from langchain_openai import ChatOpenAI
+from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
+from typing import TypedDict, Annotated, List, Literal
+import operator
+
+
+# ── Shared State ──────────────────────────────────────────────────────────────
+
+class ResearchState(TypedDict):
+    task:          str
+    plan:          str
+    research:      Annotated[List[str], operator.add]  # append-only
+    analysis:      str
+    draft:         str
+    final_answer:  str
+    iteration:     int
+    next_agent:    str
+
+
+# ── LLMs ─────────────────────────────────────────────────────────────────────
+
+orchestrator_llm = ChatOpenAI(model="gpt-4o",      temperature=0)
+researcher_llm   = ChatOpenAI(model="gpt-4o-mini", temperature=0.1)
+analyst_llm      = ChatOpenAI(model="gpt-4o",      temperature=0)
+writer_llm       = ChatOpenAI(model="gpt-4o",      temperature=0.3)
+
+
+# ── Agent Nodes ───────────────────────────────────────────────────────────────
+
+def orchestrator_node(state: ResearchState) -> ResearchState:
+    """Plans the task, routes to appropriate specialist."""
+    messages = [
+        SystemMessage(content="""You are an orchestrator. Given a task:
+1. Create a research plan
+2. Decide next step: 'research', 'analyze', 'write', or 'done'
+Output JSON: {"plan": "...", "next": "research|analyze|write|done"}"""),
+        HumanMessage(content=f"Task: {state['task']}\nIteration: {state['iteration']}\nResearch so far: {state['research'][:3]}"),
+    ]
+    response = orchestrator_llm.invoke(messages)
+    import json, re
+    try:
+        data = json.loads(re.search(r'\{.*\}', response.content, re.DOTALL).group())
+        return {**state, "plan": data.get("plan", ""), "next_agent": data.get("next", "done")}
+    except Exception:
+        return {**state, "next_agent": "done"}
+
+
+def research_node(state: ResearchState) -> ResearchState:
+    """Searches knowledge base and web for information."""
+    messages = [
+        SystemMessage(content="You are a research specialist. Find relevant information for the given plan. Be specific and cite sources."),
+        HumanMessage(content=f"Plan: {state['plan']}\nTask: {state['task']}"),
+    ]
+    response = researcher_llm.invoke(messages)
+    return {
+        **state,
+        "research": [response.content],
+        "iteration": state["iteration"] + 1,
+    }
+
+
+def analysis_node(state: ResearchState) -> ResearchState:
+    """Analyzes collected research, identifies patterns and gaps."""
+    messages = [
+        SystemMessage(content="You are an analysis specialist. Synthesize the research, identify key insights, note any contradictions or gaps."),
+        HumanMessage(content=f"Task: {state['task']}\nResearch: {chr(10).join(state['research'])}"),
+    ]
+    response = analyst_llm.invoke(messages)
+    return {**state, "analysis": response.content, "iteration": state["iteration"] + 1}
+
+
+def writer_node(state: ResearchState) -> ResearchState:
+    """Writes the final comprehensive answer."""
+    messages = [
+        SystemMessage(content="You are a technical writer. Write a clear, structured answer based on the research and analysis."),
+        HumanMessage(content=f"Task: {state['task']}\nAnalysis: {state['analysis']}\nRaw research: {chr(10).join(state['research'][:5])}"),
+    ]
+    response = writer_llm.invoke(messages)
+    return {**state, "final_answer": response.content}
+
+
+def route_agent(state: ResearchState) -> Literal["research", "analysis", "writer", "__end__"]:
+    """Routing function — directs graph to next node."""
+    if state["iteration"] > 6:
+        return "__end__"
+    mapping = {
+        "research": "research",
+        "analyze":  "analysis",
+        "write":    "writer",
+        "done":     "__end__",
+    }
+    return mapping.get(state["next_agent"], "__end__")
+
+
+# ── Build Graph ───────────────────────────────────────────────────────────────
+
+def build_research_graph() -> StateGraph:
+    workflow = StateGraph(ResearchState)
+
+    workflow.add_node("orchestrator", orchestrator_node)
+    workflow.add_node("research",     research_node)
+    workflow.add_node("analysis",     analysis_node)
+    workflow.add_node("writer",       writer_node)
+
+    workflow.set_entry_point("orchestrator")
+
+    # Conditional routing from orchestrator
+    workflow.add_conditional_edges(
+        "orchestrator",
+        route_agent,
+        {
+            "research":  "research",
+            "analysis":  "analysis",
+            "writer":    "writer",
+            "__end__":   END,
+        }
+    )
+
+    # After each specialist, return to orchestrator
+    workflow.add_edge("research", "orchestrator")
+    workflow.add_edge("analysis", "orchestrator")
+    workflow.add_edge("writer",   END)
+
+    return workflow.compile()
+
+
+# Run
+graph = build_research_graph()
+result = graph.invoke({
+    "task": "Analyze the competitive landscape for enterprise RAG systems in 2025",
+    "plan": "", "research": [], "analysis": "", "draft": "",
+    "final_answer": "", "iteration": 0, "next_agent": "",
+})
+print(result["final_answer"])
+</code></pre>
+        </div>
+
+        <div class="callout-danger rounded-lg p-5 mb-6">
+          <p class="text-sm font-bold text-red-800 mb-1">Multi-Agent Failure Modes</p>
+          <p class="text-sm text-red-900">The most common production failures in multi-agent systems: (1) <strong>Infinite loops</strong> — always set max_iterations and a hard token budget. (2) <strong>Context explosion</strong> — each agent passing full history; use summarization at handoff boundaries. (3) <strong>Tool call storms</strong> — agents calling the same expensive API in parallel; implement rate limiting at the tool layer. (4) <strong>Silent failures</strong> — an agent returning empty output and the system treating it as success; validate outputs at every node.</p>
+        </div>
+      </section>
+
+      <!-- ===== SECTION 11: LangGraph for Stateful Agents ===== -->
+      <section id="s11" class="section-anchor">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="w-8 h-8 bg-blue-600 text-white rounded-lg flex items-center justify-center font-bold text-sm">11</span>
+          <h2 class="text-2xl font-bold text-gray-900">LangGraph for Stateful Agents</h2>
+        </div>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          LangGraph models agent workflows as directed graphs where nodes are functions and edges are transitions. The key innovation is <strong>typed state</strong>: every node reads from and writes to a shared state object. This enables checkpointing, human-in-the-loop interrupts, and time-travel debugging — critical for production deployments where agents interact with real-world systems.
+        </p>
+
+        <div class="bg-white rounded-xl border border-gray-200 shadow-sm mb-6">
+          <div class="bg-gray-800 text-gray-200 px-4 py-2 rounded-t-xl text-sm font-mono flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-red-500"></span><span class="w-3 h-3 rounded-full bg-yellow-500"></span><span class="w-3 h-3 rounded-full bg-green-500"></span>
+            <span class="ml-2">langgraph_rag_agent.py</span>
+          </div>
+          <pre><code class="language-python">"""
+LangGraph RAG + Agent pipeline with:
+- Persistent checkpointing (SQLite)
+- Human-in-the-loop approval for sensitive actions
+- Typed state machine
+"""
+from langgraph.graph import StateGraph, END
+from langgraph.checkpoint.sqlite import SqliteSaver
+from langchain_openai import ChatOpenAI
+from langchain_core.messages import (
+    BaseMessage, HumanMessage, AIMessage, ToolMessage
+)
+from langchain_core.tools import tool
+from typing import TypedDict, Annotated, List, Sequence
+import operator
+import json
+
+
+# ── State ─────────────────────────────────────────────────────────────────────
+
+class AgentState(TypedDict):
+    messages:        Annotated[Sequence[BaseMessage], operator.add]
+    retrieved_docs:  List[dict]
+    requires_human:  bool
+    human_approved:  bool
+    query_count:     int
+
+
+# ── Tools ─────────────────────────────────────────────────────────────────────
+
+@tool
+def search_docs(query: str) -> str:
+    """Search the internal knowledge base."""
+    # In production: call your retriever
+    return f"[Docs] Found 5 relevant chunks for: {query}"
+
+@tool
+def run_sql(query: str) -> str:
+    """Execute a SQL query against the data warehouse."""
+    return f"[SQL] Result for: {query[:60]}"
+
+@tool
+def send_email(to: str, subject: str, body: str) -> str:
+    """Send an email. Requires human approval."""
+    return f"[EMAIL SENT] To: {to}, Subject: {subject}"
+
+tools = [search_docs, run_sql, send_email]
+tools_by_name = {t.name: t for t in tools}
+SENSITIVE_TOOLS = {"send_email"}  # require human-in-the-loop
+
+llm = ChatOpenAI(model="gpt-4o", temperature=0).bind_tools(tools)
+
+
+# ── Nodes ─────────────────────────────────────────────────────────────────────
+
+def agent_node(state: AgentState) -> AgentState:
+    response = llm.invoke(state["messages"])
+    return {"messages": [response], "query_count": state["query_count"] + 1}
+
+
+def tools_node(state: AgentState) -> AgentState:
+    last_msg = state["messages"][-1]
+    results = []
+    requires_human = False
+
+    for tool_call in last_msg.tool_calls:
+        # Check if this tool needs human approval
+        if tool_call["name"] in SENSITIVE_TOOLS:
+            requires_human = True
+            results.append(ToolMessage(
+                content=f"[PENDING APPROVAL] Tool {tool_call['name']} requires human review.",
+                tool_call_id=tool_call["id"],
+            ))
+        else:
+            tool = tools_by_name[tool_call["name"]]
+            result = tool.invoke(tool_call["args"])
+            results.append(ToolMessage(
+                content=str(result),
+                tool_call_id=tool_call["id"],
+            ))
+
+    return {"messages": results, "requires_human": requires_human}
+
+
+def human_review_node(state: AgentState) -> AgentState:
+    """In production: pause here, send alert, wait for API callback."""
+    print("\n[HUMAN REVIEW REQUIRED]")
+    print("Pending tool calls require approval. Resume with human_approved=True.")
+    # In real deployment: return here, graph checkpointed, resume via API
+    return {"human_approved": False}
+
+
+# ── Routing ───────────────────────────────────────────────────────────────────
+
+def should_continue(state: AgentState) -> str:
+    last_msg = state["messages"][-1]
+    if not hasattr(last_msg, "tool_calls") or not last_msg.tool_calls:
+        return "end"
+    if state.get("query_count", 0) > 10:
+        return "end"
+    return "tools"
+
+def after_tools(state: AgentState) -> str:
+    if state.get("requires_human") and not state.get("human_approved"):
+        return "human_review"
+    return "agent"
+
+
+# ── Build Graph with Checkpointing ───────────────────────────────────────────
+
+def build_agent_graph(db_path: str = "./checkpoints.db") -> StateGraph:
+    workflow = StateGraph(AgentState)
+
+    workflow.add_node("agent",        agent_node)
+    workflow.add_node("tools",        tools_node)
+    workflow.add_node("human_review", human_review_node)
+
+    workflow.set_entry_point("agent")
+    workflow.add_conditional_edges("agent",  should_continue, {"tools": "tools", "end": END})
+    workflow.add_conditional_edges("tools",  after_tools, {"agent": "agent", "human_review": "human_review"})
+    workflow.add_edge("human_review", END)  # pause for external approval
+
+    # Persistent checkpointing — survives process restarts
+    checkpointer = SqliteSaver.from_conn_string(db_path)
+    return workflow.compile(checkpointer=checkpointer)
+
+
+# Run with a thread_id for persistence across sessions
+graph = build_agent_graph()
+config = {"configurable": {"thread_id": "user-session-001"}}
+
+result = graph.invoke(
+    {
+        "messages": [HumanMessage(content="Find our Q4 2024 revenue and email the CFO a summary.")],
+        "retrieved_docs": [], "requires_human": False, "human_approved": False, "query_count": 0,
+    },
+    config=config,
+)
+print(result["messages"][-1].content)
+</code></pre>
+        </div>
+      </section>
+
+      <!-- ===== SECTION 12: Production Infrastructure ===== -->
+      <section id="s12" class="section-anchor">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="w-8 h-8 bg-blue-600 text-white rounded-lg flex items-center justify-center font-bold text-sm">12</span>
+          <h2 class="text-2xl font-bold text-gray-900">Production RAG Infrastructure</h2>
+        </div>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          A production RAG platform is significantly more complex than a proof-of-concept. You need asynchronous indexing pipelines, semantic caching to handle repeated queries, multi-tenancy isolation, and a serving layer that degrades gracefully. This section covers the infrastructure patterns learned from running RAG at 100K+ daily queries.
+        </p>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Production RAG Platform Architecture</h3>
+        <div class="bg-white rounded-xl border border-gray-200 p-6 mb-8">
+          <div class="mermaid">
+graph TB
+    subgraph Ingest["Ingestion Layer"]
+        WH[Webhook / File Upload] --> MQ[(Message Queue\nKafka / SQS)]
+        MQ --> IW[Indexing Workers\n(async, parallel)]
+        IW --> PP[Document Processing\nParse + Chunk]
+        PP --> EM[Embedding Service\nBatched GPU)]
+        EM --> VS[(Vector Store\nQdrant Cluster)]
+        PP --> KI[(Keyword Index\nElasticSearch)]
+        IW --> OB[(Object Store\nS3 — raw docs)]
+    end
+
+    subgraph Serve["Serving Layer"]
+        LB[Load Balancer] --> SC{Semantic Cache\nGPTCache / Redis}
+        SC --> |Cache Miss| API[RAG API\nFastAPI]
+        SC --> |Cache Hit| R1[Cached Response]
+        API --> QR[Query Router\nRAG / SQL / Direct]
+        QR --> HR[Hybrid Retriever]
+        VS --> HR
+        KI --> HR
+        HR --> RR[Reranker Service\nGPU Pod]
+        RR --> LLM[LLM Gateway\nCost + Rate Control]
+        LLM --> R2[Streaming Response]
+    end
+
+    subgraph Obs["Observability"]
+        API --> LF[Langfuse Traces]
+        API --> PM[Prometheus Metrics]
+        PM --> GR[Grafana Dashboards]
+    end
+
+    style Ingest fill:#eff6ff,stroke:#2563eb
+    style Serve fill:#ecfdf5,stroke:#059669
+    style Obs fill:#fffbeb,stroke:#d97706
+          </div>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Incremental Index Update Pipeline</h3>
+        <div class="bg-white rounded-xl border border-gray-200 shadow-sm mb-6">
+          <div class="bg-gray-800 text-gray-200 px-4 py-2 rounded-t-xl text-sm font-mono flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-red-500"></span><span class="w-3 h-3 rounded-full bg-yellow-500"></span><span class="w-3 h-3 rounded-full bg-green-500"></span>
+            <span class="ml-2">incremental_indexer.py</span>
+          </div>
+          <pre><code class="language-python">"""
+Incremental index update pipeline.
+Only re-indexes changed documents using content hashing.
+Handles deletes and updates correctly.
+"""
+import asyncio
+import hashlib
+import json
+from datetime import datetime
+from typing import List, Dict
+import aiofiles
+import aioboto3
+from qdrant_client import AsyncQdrantClient
+from qdrant_client.models import PointStruct, PointIdsList
+
+
+class IncrementalIndexer:
+    """
+    Tracks document hashes in a state store.
+    Only processes documents whose content has changed.
+    """
+
+    def __init__(
+        self,
+        qdrant_url: str,
+        collection: str,
+        state_store_path: str = "./index_state.json",
+        batch_size: int = 50,
+    ):
+        self.qdrant = AsyncQdrantClient(url=qdrant_url)
+        self.collection = collection
+        self.state_path = state_store_path
+        self.batch_size = batch_size
+        self.state: Dict[str, str] = {}  # doc_path → content_hash
+
+    async def load_state(self):
+        try:
+            async with aiofiles.open(self.state_path, 'r') as f:
+                self.state = json.loads(await f.read())
+        except FileNotFoundError:
+            self.state = {}
+
+    async def save_state(self):
+        async with aiofiles.open(self.state_path, 'w') as f:
+            await f.write(json.dumps(self.state, indent=2))
+
+    def hash_content(self, content: str) -> str:
+        return hashlib.sha256(content.encode()).hexdigest()[:16]
+
+    async def detect_changes(self, documents: List[Dict]) -> Dict[str, List]:
+        """Classify documents as new, updated, or deleted."""
+        current_paths = {d["path"]: self.hash_content(d["content"]) for d in documents}
+        result = {"new": [], "updated": [], "deleted": [], "unchanged": []}
+
+        for doc in documents:
+            path = doc["path"]
+            new_hash = current_paths[path]
+            old_hash = self.state.get(path)
+
+            if old_hash is None:
+                result["new"].append(doc)
+            elif old_hash != new_hash:
+                result["updated"].append(doc)
+            else:
+                result["unchanged"].append(doc)
+
+        # Detect deletes: paths in state but not in current
+        for path in self.state:
+            if path not in current_paths:
+                result["deleted"].append({"path": path, "doc_id": self.state[path]})
+
+        return result
+
+    async def index_batch(self, docs: List[Dict], embedder, processor):
+        """Process and index a batch of documents."""
+        all_chunks = []
+        for doc in docs:
+            chunks = processor.process_content(doc["content"], doc["path"])
+            all_chunks.extend(chunks)
+
+        if not all_chunks:
+            return
+
+        # Batch embed
+        texts = [c["content"] for c in all_chunks]
+        embeddings = await embedder.embed_async(texts)
+
+        # Upsert to Qdrant
+        points = [
+            PointStruct(
+                id=chunk["chunk_id"],
+                vector=embeddings[i].tolist(),
+                payload={
+                    "content":   chunk["content"],
+                    "source":    chunk["source"],
+                    "chunk_idx": chunk["chunk_idx"],
+                    "indexed_at": datetime.utcnow().isoformat(),
+                    **chunk.get("metadata", {}),
+                },
+            )
+            for i, chunk in enumerate(all_chunks)
+        ]
+        await self.qdrant.upsert(collection_name=self.collection, points=points)
+
+    async def delete_doc_chunks(self, doc_path: str):
+        """Delete all chunks belonging to a document."""
+        await self.qdrant.delete(
+            collection_name=self.collection,
+            points_selector={"filter": {"must": [
+                {"key": "source", "match": {"value": doc_path}}
+            ]}},
+        )
+
+    async def run(self, documents: List[Dict], embedder, processor):
+        await self.load_state()
+        changes = await self.detect_changes(documents)
+
+        print(f"Changes: +{len(changes['new'])} new, "
+              f"~{len(changes['updated'])} updated, "
+              f"-{len(changes['deleted'])} deleted, "
+              f"={len(changes['unchanged'])} unchanged")
+
+        # Delete removed documents
+        for doc in changes["deleted"]:
+            await self.delete_doc_chunks(doc["path"])
+            del self.state[doc["path"]]
+
+        # Re-index updated (delete old chunks first)
+        for doc in changes["updated"]:
+            await self.delete_doc_chunks(doc["path"])
+
+        # Index new + updated in batches
+        to_index = changes["new"] + changes["updated"]
+        for i in range(0, len(to_index), self.batch_size):
+            batch = to_index[i:i + self.batch_size]
+            await self.index_batch(batch, embedder, processor)
+            for doc in batch:
+                self.state[doc["path"]] = self.hash_content(doc["content"])
+            print(f"  Indexed batch {i//self.batch_size + 1}")
+
+        await self.save_state()
+        print("Incremental indexing complete.")
+
+
+# Semantic Cache using GPTCache / Redis
+SEMANTIC_CACHE_EXAMPLE = """
+# pip install gptcache
+
+from gptcache import cache
+from gptcache.adapter import openai
+from gptcache.embedding import OpenAI as OpenAIEmb
+from gptcache.manager import CacheBase, VectorBase, get_data_manager
+from gptcache.similarity_evaluation import SearchDistanceEvaluation
+
+# Initialize semantic cache backed by Redis + Qdrant
+cache.init(
+    embedding_func=OpenAIEmb().to_embeddings,
+    data_manager=get_data_manager(
+        CacheBase("redis", url="redis://localhost:6379"),
+        VectorBase("qdrant", url="http://localhost:6333",
+                   collection_name="query_cache", dimension=1536),
+    ),
+    similarity_evaluation=SearchDistanceEvaluation(max_distance=0.15),
+)
+cache.set_openai_key()
+
+# Drop-in replacement for openai.ChatCompletion
+# Semantically similar queries (distance < 0.15) return cached response
+response = openai.ChatCompletion.create(
+    model="gpt-4o",
+    messages=[{"role": "user", "content": "What is our vacation policy?"}]
+)
+# Second call with similar query returns instantly from cache:
+response2 = openai.ChatCompletion.create(
+    model="gpt-4o",
+    messages=[{"role": "user", "content": "How many vacation days do employees get?"}]
+)
+"""
+</code></pre>
+        </div>
+      </section>
+
+      <!-- ===== SECTION 13: RAG Evaluation ===== -->
+      <section id="s13" class="section-anchor">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="w-8 h-8 bg-blue-600 text-white rounded-lg flex items-center justify-center font-bold text-sm">13</span>
+          <h2 class="text-2xl font-bold text-gray-900">RAG Evaluation with RAGAS</h2>
+        </div>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          Evaluating RAG systems requires four dimensions: <strong>Faithfulness</strong> (does the answer stay within the retrieved context?), <strong>Answer Relevance</strong> (does the answer address the question?), <strong>Context Precision</strong> (are the retrieved docs relevant?), and <strong>Context Recall</strong> (did we retrieve all needed information?). RAGAS provides LLM-as-judge evaluation for each.
+        </p>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">RAG Failure Modes and Detection</h3>
+        <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm mb-8">
+          <table>
+            <thead>
+              <tr><th>Failure Mode</th><th>Symptom</th><th>RAGAS Metric</th><th>Fix</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Hallucination</td><td>Answer claims facts not in context</td><td>Faithfulness &lt; 0.7</td><td>Stricter prompt, higher temperature → 0</td></tr>
+              <tr><td>Retrieval miss</td><td>Correct doc not in top-k</td><td>Context Recall &lt; 0.6</td><td>Better embeddings, hybrid search, reranking</td></tr>
+              <tr><td>Noisy retrieval</td><td>Irrelevant docs in context</td><td>Context Precision &lt; 0.6</td><td>Reranking, metadata filtering, stricter top-n</td></tr>
+              <tr><td>Answer drift</td><td>Correct info but doesn't answer question</td><td>Answer Relevance &lt; 0.7</td><td>Prompt refinement, answer format instructions</td></tr>
+              <tr><td>Context overflow</td><td>LLM ignores part of long context</td><td>Faithfulness drops with length</td><td>Contextual compression, shorter chunks</td></tr>
+              <tr><td>Stale knowledge</td><td>Answer correct but outdated</td><td>Human eval only</td><td>Incremental indexing, metadata date filtering</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="bg-white rounded-xl border border-gray-200 shadow-sm mb-6">
+          <div class="bg-gray-800 text-gray-200 px-4 py-2 rounded-t-xl text-sm font-mono flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-red-500"></span><span class="w-3 h-3 rounded-full bg-yellow-500"></span><span class="w-3 h-3 rounded-full bg-green-500"></span>
+            <span class="ml-2">ragas_evaluation.py</span>
+          </div>
+          <pre><code class="language-python">"""
+RAGAS evaluation pipeline for production RAG.
+Includes golden dataset generation and CI/CD integration.
+pip install ragas datasets
+"""
+from ragas import evaluate
+from ragas.metrics import (
+    faithfulness,
+    answer_relevancy,
+    context_precision,
+    context_recall,
+    context_entity_recall,
+    answer_similarity,
+)
+from ragas.testset.generator import TestsetGenerator
+from ragas.testset.evolutions import simple, reasoning, multi_context
+from datasets import Dataset
+from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+from langchain.schema import Document
+from typing import List, Dict
+import pandas as pd
+import json
+from datetime import datetime
+
+
+# ── Build Golden Evaluation Dataset ──────────────────────────────────────────
+
+def generate_golden_dataset(
+    documents: List[Document],
+    n_samples: int = 100,
+    output_path: str = "golden_dataset.json",
+) -> Dataset:
+    """
+    Auto-generate Q&A pairs from documents for evaluation.
+    Uses LLM to create questions at different complexity levels.
+    """
+    generator_llm = ChatOpenAI(model="gpt-4o")
+    critic_llm    = ChatOpenAI(model="gpt-4o")
+    embeddings    = OpenAIEmbeddings(model="text-embedding-3-small")
+
+    generator = TestsetGenerator.from_langchain(
+        generator_llm=generator_llm,
+        critic_llm=critic_llm,
+        embeddings=embeddings,
+    )
+
+    testset = generator.generate_with_langchain_docs(
+        documents,
+        test_size=n_samples,
+        distributions={
+            simple:        0.5,   # direct factual questions
+            reasoning:     0.3,   # require inference
+            multi_context: 0.2,   # span multiple documents
+        },
+    )
+
+    df = testset.to_pandas()
+    df.to_json(output_path, orient="records", indent=2)
+    print(f"Generated {len(df)} evaluation samples → {output_path}")
+    return testset.to_hf_dataset()
+
+
+# ── RAGAS Evaluation Pipeline ─────────────────────────────────────────────────
+
+def run_ragas_evaluation(
+    rag_system,
+    golden_dataset_path: str,
+    output_path: str = "eval_results.json",
+) -> Dict[str, float]:
+    """
+    Run end-to-end RAGAS evaluation.
+    Returns dict of metric → score (0.0 to 1.0).
+    """
+    with open(golden_dataset_path) as f:
+        samples = json.load(f)
+
+    questions, answers, contexts, ground_truths = [], [], [], []
+
+    for sample in samples[:50]:  # limit for cost control
+        q = sample["question"]
+        result = rag_system.query(q)
+        questions.append(q)
+        answers.append(result["answer"])
+        contexts.append([d["content"] for d in result.get("sources", [])])
+        ground_truths.append(sample.get("ground_truth", ""))
+
+    eval_dataset = Dataset.from_dict({
+        "question":     questions,
+        "answer":       answers,
+        "contexts":     contexts,
+        "ground_truth": ground_truths,
+    })
+
+    results = evaluate(
+        eval_dataset,
+        metrics=[
+            faithfulness,
+            answer_relevancy,
+            context_precision,
+            context_recall,
+        ],
+        llm=ChatOpenAI(model="gpt-4o-mini"),
+        embeddings=OpenAIEmbeddings(model="text-embedding-3-small"),
+        raise_exceptions=False,
+    )
+
+    scores = {
+        "faithfulness":     results["faithfulness"],
+        "answer_relevancy": results["answer_relevancy"],
+        "context_precision": results["context_precision"],
+        "context_recall":   results["context_recall"],
+        "timestamp":        datetime.utcnow().isoformat(),
+    }
+
+    with open(output_path, "w") as f:
+        json.dump(scores, f, indent=2)
+
+    print("\n=== RAGAS Evaluation Results ===")
+    for metric, score in scores.items():
+        if isinstance(score, float):
+            status = "PASS" if score >= 0.7 else "WARN" if score >= 0.5 else "FAIL"
+            print(f"  {metric:25s}: {score:.3f}  [{status}]")
+
+    return scores
+
+
+# ── CI/CD Integration ─────────────────────────────────────────────────────────
+
+def evaluate_for_ci(
+    rag_system,
+    golden_path: str,
+    thresholds: Dict[str, float] = None,
+) -> bool:
+    """
+    Returns True (pass) or False (fail) for CI gate.
+    Use in GitHub Actions / Airflow pre-deploy check.
+    """
+    if thresholds is None:
+        thresholds = {
+            "faithfulness":     0.75,
+            "answer_relevancy": 0.70,
+            "context_precision": 0.65,
+            "context_recall":   0.65,
+        }
+
+    scores = run_ragas_evaluation(rag_system, golden_path)
+    passed = all(
+        scores.get(metric, 0) >= threshold
+        for metric, threshold in thresholds.items()
+    )
+    print(f"\nCI Gate: {'PASS' if passed else 'FAIL'}")
+    return passed
+
+
+# Run evaluation
+if __name__ == "__main__":
+    # from your_rag import rag_system
+    # passed = evaluate_for_ci(rag_system, "golden_dataset.json")
+    # sys.exit(0 if passed else 1)
+    print("Integrate with your RAG system instance.")
+</code></pre>
+        </div>
+
+      <!-- ===== SECTION 14: Observability ===== -->
+      <section id="s14" class="section-anchor">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="w-8 h-8 bg-blue-600 text-white rounded-lg flex items-center justify-center font-bold text-sm">14</span>
+          <h2 class="text-2xl font-bold text-gray-900">Observability for RAG and Agents</h2>
+        </div>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          LLM applications fail in ways that traditional APM tools cannot detect: a response that looks correct to your health check but hallucinated a key fact, a retrieval step that ran in 20ms but returned zero useful documents, an agent that spent $4.20 on a single query. You need LLM-native observability that captures every step of the pipeline with full inputs, outputs, and costs.
+        </p>
+
+        <div class="bg-white rounded-xl border border-gray-200 shadow-sm mb-6">
+          <div class="bg-gray-800 text-gray-200 px-4 py-2 rounded-t-xl text-sm font-mono flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-red-500"></span><span class="w-3 h-3 rounded-full bg-yellow-500"></span><span class="w-3 h-3 rounded-full bg-green-500"></span>
+            <span class="ml-2">observability.py</span>
+          </div>
+          <pre><code class="language-python">"""
+Dual observability: LangSmith (LangChain tracing) + Langfuse (open-source).
+Both capture: query → retrieval → rerank → generation with latency + cost.
+"""
+import os
+from functools import wraps
+import time
+from langfuse import Langfuse
+from langfuse.decorators import langfuse_context, observe
+from langsmith import Client as LangSmithClient
+from langsmith.run_helpers import traceable
+
+
+# ── LangSmith Setup ───────────────────────────────────────────────────────────
+# Set env vars to auto-trace all LangChain calls:
+os.environ["LANGCHAIN_TRACING_V2"] = "true"
+os.environ["LANGCHAIN_ENDPOINT"]   = "https://api.smith.langchain.com"
+os.environ["LANGCHAIN_API_KEY"]    = "ls-..."
+os.environ["LANGCHAIN_PROJECT"]    = "production-rag"
+
+# All LangChain calls are now automatically traced.
+# Use @traceable for non-LangChain code:
+@traceable(name="hybrid-retrieval", run_type="retriever")
+def retrieve_documents(query: str, top_k: int = 10):
+    """LangSmith will capture: query, result docs, latency."""
+    # your retriever call here
+    return []
+
+
+# ── Langfuse Setup (open-source, self-hostable) ───────────────────────────────
+
+langfuse = Langfuse(
+    public_key="pk-lf-...",
+    secret_key="sk-lf-...",
+    host="https://cloud.langfuse.com",  # or your self-hosted URL
+)
+
+
+@observe()  # Langfuse decorator — auto-captures all nested calls
+def rag_pipeline(query: str, user_id: str, session_id: str):
+    """Full RAG pipeline with granular Langfuse tracing."""
+
+    # Set trace metadata
+    langfuse_context.update_current_trace(
+        name="rag-query",
+        user_id=user_id,
+        session_id=session_id,
+        tags=["production", "rag"],
+        metadata={"query_length": len(query)},
+    )
+
+    # Retrieval span
+    with langfuse.span(name="retrieval", input={"query": query}) as span:
+        t0 = time.time()
+        docs = retrieve_documents(query)
+        latency_ms = (time.time() - t0) * 1000
+        span.end(
+            output={"doc_count": len(docs)},
+            metadata={"latency_ms": latency_ms},
+        )
+
+    # Generation with token tracking
+    generation = langfuse.generation(
+        name="llm-generation",
+        model="gpt-4o",
+        model_parameters={"temperature": 0, "max_tokens": 1024},
+        input=[{"role": "user", "content": query}],
+    )
+
+    # your LLM call here
+    answer = "Answer from LLM..."
+    tokens_in, tokens_out = 800, 150
+
+    generation.end(
+        output={"content": answer},
+        usage={
+            "prompt_tokens":     tokens_in,
+            "completion_tokens": tokens_out,
+            "total_tokens":      tokens_in + tokens_out,
+        },
+        metadata={
+            "cost_usd": (tokens_in * 2.5 + tokens_out * 10) / 1_000_000,  # GPT-4o pricing
+        },
+    )
+
+    # Score the response quality (async, from human feedback or RAGAS)
+    langfuse.score(
+        trace_id=langfuse_context.get_current_trace_id(),
+        name="user_thumbs_up",
+        value=1,  # 1 = positive, 0 = negative
+        comment="User clicked thumbs up",
+    )
+
+    return {"answer": answer, "sources": docs}
+
+
+# ── Key Metrics to Track ──────────────────────────────────────────────────────
+
+METRICS_CHECKLIST = {
+    "retrieval_quality": [
+        "context_precision",       # % relevant docs in top-k
+        "context_recall",          # % of needed docs retrieved
+        "mean_rerank_score",       # avg cross-encoder score
+        "retrieval_latency_p99",   # ms
+    ],
+    "generation_quality": [
+        "faithfulness",            # RAGAS: answer stays in context
+        "answer_relevancy",        # RAGAS: answer addresses question
+        "hallucination_rate",      # from human eval sampling
+    ],
+    "operational": [
+        "e2e_latency_p50",         # total query latency median
+        "e2e_latency_p99",         # total query latency p99
+        "cost_per_query_usd",      # total LLM + embedding cost
+        "cache_hit_rate",          # semantic cache hit %
+        "error_rate",              # % queries with tool/retrieval errors
+    ],
+    "business": [
+        "thumbs_up_rate",          # user satisfaction
+        "follow_up_rate",          # % queries with follow-up (low = good)
+        "escalation_rate",         # queries handed to humans
+    ],
+}
+</code></pre>
+        </div>
+
+        <div class="callout-tip rounded-lg p-5 mb-6">
+          <p class="text-sm font-bold text-green-800 mb-1">Sampling Strategy for Cost Control</p>
+          <p class="text-sm text-green-900">Running RAGAS on every query is expensive (~$0.01/query). Use a tiered approach: log 100% of traces (cheap), run automated RAGAS evaluation on 5% random sample daily, run full evaluation weekly on your golden dataset. Use statistical process control (control charts) to detect metric drift — a 3-sigma deviation should trigger a full evaluation run and deployment gate.</p>
+        </div>
+      </section>
+
+      <!-- ===== SECTION 15: Enterprise Case Study ===== -->
+      <section id="s15" class="section-anchor">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="w-8 h-8 bg-blue-600 text-white rounded-lg flex items-center justify-center font-bold text-sm">15</span>
+          <h2 class="text-2xl font-bold text-gray-900">Production Case Study — Enterprise Knowledge Assistant</h2>
+        </div>
+
+        <p class="text-gray-700 leading-relaxed mb-4">
+          This section walks through an actual architecture for a company-wide knowledge assistant deployed at a Fortune 500 firm. Scale: 10 million documents, 100,000 daily queries, 50,000 employees, 8 regional data centers. The system was designed with three hard constraints: sub-3-second P95 latency, zero cross-tenant data leakage, and full audit trail for compliance.
+        </p>
+
+        <div class="callout-info rounded-lg p-5 mb-6">
+          <p class="text-sm font-bold text-blue-800 mb-1">System Constraints</p>
+          <ul class="text-sm text-blue-900 list-disc list-inside space-y-1">
+            <li>10M documents (PDFs, SharePoint, Confluence, Salesforce, code repos)</li>
+            <li>100K daily queries (peak: 2K QPS during all-hands events)</li>
+            <li>P95 latency target: &lt;3 seconds end-to-end</li>
+            <li>5 tenant isolation levels (department, region, clearance)</li>
+            <li>SOC2 Type II compliance: full audit trail, data residency</li>
+          </ul>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Enterprise RAG Architecture</h3>
+        <div class="bg-white rounded-xl border border-gray-200 p-6 mb-8">
+          <div class="mermaid">
+graph TB
+    subgraph Sources["Data Sources"]
+        SP[SharePoint] & CF[Confluence] & SF[Salesforce] & GH[GitHub] & DB[Data Warehouse]
+    end
+
+    subgraph Pipeline["Ingestion (Async)"]
+        CON[Connectors\nOAuth + Webhooks] --> Q[(Kafka Topics\nper-source)]
+        Q --> IW[Indexing Workers\n(K8s Jobs)]
+        IW --> ACL[ACL Enrichment\nAD Groups + RBAC]
+        ACL --> VS[(Qdrant Cluster\n3 shards × 2 replicas)]
+        ACL --> ES[(Elasticsearch\nBM25 + KNN)]
+    end
+
+    subgraph Router["Query Router"]
+        API[API Gateway\nAuth + Rate Limit] --> QR{Intent Classifier\ngpt-4o-mini}
+        QR --> |knowledge Q&A| RAG[RAG Pipeline]
+        QR --> |structured data| SQL[Text-to-SQL\nAgent]
+        QR --> |direct answer| DIR[Direct LLM]
+        QR --> |action| AGT[Agent + Tools]
+    end
+
+    subgraph RAG["RAG Stack"]
+        HYB[Hybrid Retriever\nBM25 + Dense] --> FLT[ACL Filter\ntenant_id + clearance]
+        FLT --> RR2[Reranker\nBGE-v2-m3 GPU]
+        RR2 --> GEN[GPT-4o\nwith streaming]
+        GEN --> ATT[Source Attribution\n+ audit log]
+    end
+
+    Sources --> Pipeline
+    Pipeline --> Router
+    Router --> RAG
+
+    style Sources fill:#f8fafc,stroke:#94a3b8
+    style Pipeline fill:#eff6ff,stroke:#2563eb
+    style Router fill:#fffbeb,stroke:#d97706
+    style RAG fill:#ecfdf5,stroke:#059669
+          </div>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Access-Controlled Retrieval</h3>
+        <div class="bg-white rounded-xl border border-gray-200 shadow-sm mb-6">
+          <div class="bg-gray-800 text-gray-200 px-4 py-2 rounded-t-xl text-sm font-mono flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-red-500"></span><span class="w-3 h-3 rounded-full bg-yellow-500"></span><span class="w-3 h-3 rounded-full bg-green-500"></span>
+            <span class="ml-2">access_controlled_retrieval.py</span>
+          </div>
+          <pre><code class="language-python">"""
+Access-controlled RAG retrieval.
+User's identity claims (from JWT/OAuth) are used to build
+Qdrant filters — ensuring strict data isolation without
+separate vector indices per tenant.
+"""
+from dataclasses import dataclass
+from typing import List, Set, Optional
+from qdrant_client import QdrantClient
+from qdrant_client.models import (
+    Filter, FieldCondition, MatchAny, MatchValue, Range
+)
+import jwt
+
+
+@dataclass
+class UserContext:
+    user_id:      str
+    tenant_id:    str
+    departments:  Set[str]     # e.g., {"HR", "Engineering"}
+    clearance:    int          # 0=public, 1=internal, 2=confidential, 3=restricted
+    regions:      Set[str]     # e.g., {"US", "EMEA"}
+
+
+def decode_user_context(jwt_token: str, public_key: str) -> UserContext:
+    """Extract user access claims from verified JWT."""
+    claims = jwt.decode(jwt_token, public_key, algorithms=["RS256"])
+    return UserContext(
+        user_id=claims["sub"],
+        tenant_id=claims["tenant_id"],
+        departments=set(claims.get("departments", [])),
+        clearance=int(claims.get("clearance_level", 0)),
+        regions=set(claims.get("regions", ["US"])),
+    )
+
+
+def build_access_filter(user: UserContext) -> Filter:
+    """
+    Build Qdrant filter that enforces access control.
+    A document is accessible if:
+    1. tenant_id matches
+    2. clearance_level <= user's clearance
+    3. department is in user's allowed departments (or is "All")
+    4. region is in user's allowed regions (or is "Global")
+    """
+    return Filter(
+        must=[
+            # Tenant isolation — hard boundary
+            FieldCondition(
+                key="tenant_id",
+                match=MatchValue(value=user.tenant_id),
+            ),
+            # Clearance level: only return docs at or below user's clearance
+            FieldCondition(
+                key="clearance_level",
+                range=Range(lte=user.clearance),
+            ),
+        ],
+        should=[
+            # Department: accessible if doc is in user's departments or marked "All"
+            FieldCondition(
+                key="department",
+                match=MatchAny(any=list(user.departments) + ["All"]),
+            ),
+        ],
+        minimum_should_match=1,
+    )
+
+
+class AccessControlledRetriever:
+    def __init__(self, client: QdrantClient, collection: str, embedder):
+        self.client = client
+        self.collection = collection
+        self.embedder = embedder
+
+    def retrieve(
+        self,
+        query: str,
+        user: UserContext,
+        top_k: int = 10,
+    ) -> List[dict]:
+        # Embed query
+        query_vector = self.embedder.embed([query])[0].tolist()
+
+        # Build access filter from user's verified identity
+        access_filter = build_access_filter(user)
+
+        results = self.client.search(
+            collection_name=self.collection,
+            query_vector=query_vector,
+            query_filter=access_filter,
+            limit=top_k,
+            with_payload=True,
+        )
+
+        # Audit log: every retrieval is logged with user_id + doc_ids
+        self._audit_log(user.user_id, query, [r.id for r in results])
+
+        return [{"id": r.id, "score": r.score, **r.payload} for r in results]
+
+    def _audit_log(self, user_id: str, query: str, doc_ids: List):
+        """Write to immutable audit store (append-only S3 + Athena)."""
+        import json, time
+        record = {
+            "timestamp": time.time(),
+            "user_id":   user_id,
+            "query":     query[:200],  # truncate for privacy
+            "doc_ids":   doc_ids,
+        }
+        # In production: write to Kinesis → S3 → Athena
+        print(f"[AUDIT] {json.dumps(record)}")
+
+
+# ── Query Router ──────────────────────────────────────────────────────────────
+
+QUERY_ROUTING_PROMPT = """Classify this query into exactly one category:
+- "knowledge": needs internal documents or policies
+- "structured": needs numbers, metrics, or database data
+- "direct": general knowledge, no internal docs needed
+- "action": user wants to take an action (send, create, update)
+
+Query: {query}
+Category (one word):"""
+
+def route_query(query: str, llm) -> str:
+    response = llm.invoke(QUERY_ROUTING_PROMPT.format(query=query))
+    category = response.content.strip().lower()
+    return category if category in {"knowledge", "structured", "direct", "action"} else "knowledge"
+
+
+# ── Cost Optimization ─────────────────────────────────────────────────────────
+
+COST_OPTIMIZATIONS = """
+Lessons learned from 100K daily queries:
+
+1. Semantic cache (GPTCache) — 35% cache hit rate → 35% cost reduction
+2. Query routing — 20% of queries are "direct" (no retrieval needed) → skip RAG
+3. Model tiering — use gpt-4o-mini for classification, routing, summarization
+4. Matryoshka dims — 256 vs 3072 embeddings: 12x storage, 4x search speed, -3% recall
+5. Reranker batching — batch 50 candidates per GPU call vs 1-by-1
+6. Context compression — reduce avg context from 4K to 1.5K tokens → 60% gen cost cut
+7. Request deduplication — same query within 30s returns cached response
+8. Async indexing — never block serving on indexing
+
+Monthly savings at 100K queries/day: ~$45K vs unoptimized baseline.
+"""
+</code></pre>
+        </div>
+
+        <div class="callout-warning rounded-lg p-5 mb-6">
+          <p class="text-sm font-bold text-amber-800 mb-1">Lessons Learned at Scale</p>
+          <p class="text-sm text-amber-900">The hardest problem was not retrieval quality — it was keeping the index fresh. Documents change daily across SharePoint, Confluence, and Salesforce. We built webhook-based incremental indexing with content hashing. The second hardest problem was access control correctness: every data leak in a RAG system traces back to incorrect filter logic or metadata not being set during indexing. Test your ACL logic with adversarial users as aggressively as you test retrieval quality.</p>
+        </div>
+      </section>
+
+      <!-- ===== SECTION 16: Future of RAG ===== -->
+      <section id="s16" class="section-anchor">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="w-8 h-8 bg-blue-600 text-white rounded-lg flex items-center justify-center font-bold text-sm">16</span>
+          <h2 class="text-2xl font-bold text-gray-900">The Future of RAG and Agents</h2>
+        </div>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          The field is moving fast. Long-context models (Gemini 1.5 Pro at 1M tokens, Claude at 200K) raise the question: why retrieve at all? Agents capable of writing and executing code challenge the boundary between automation and intelligence. Understanding where each paradigm will land in two years is essential for making durable architectural choices today.
+        </p>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Long Context vs RAG: When Each Wins</h3>
+        <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm mb-8">
+          <table>
+            <thead>
+              <tr><th>Scenario</th><th>Long Context Wins</th><th>RAG Wins</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Corpus size</td><td>&lt;1M tokens (fits in one call)</td><td>&gt;1M tokens, or growing</td></tr>
+              <tr><td>Update frequency</td><td>Static documents</td><td>Frequently changing data</td></tr>
+              <tr><td>Citation need</td><td>Not required</td><td>Required (audit, compliance)</td></tr>
+              <tr><td>Cost</td><td>High per query (full context)</td><td>Lower (only retrieve needed)</td></tr>
+              <tr><td>Latency</td><td>Higher (large prompt)</td><td>Lower (small augmented prompt)</td></tr>
+              <tr><td>Multi-tenant</td><td>Impractical (per-user contexts)</td><td>Natural (filter by tenant)</td></tr>
+              <tr><td>Access control</td><td>Must include all docs = security risk</td><td>Filter before retrieval = safe</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Current Limitations and Research Directions</h3>
+        <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm mb-8">
+          <table>
+            <thead>
+              <tr><th>Limitation</th><th>Current State (2026)</th><th>Research Direction</th><th>Timeline</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Agent reliability</td><td>Loops, hallucinated tool args common</td><td>Formal verification of tool calls, constrained decoding</td><td>1-2 years</td></tr>
+              <tr><td>Multi-hop reasoning</td><td>RAPTOR helps, but slow</td><td>Graph-based retrieval (KG-RAG)</td><td>Now emerging</td></tr>
+              <tr><td>Structured knowledge</td><td>RAG + SQL is brittle</td><td>Unified query planning over vectors + SQL</td><td>1-2 years</td></tr>
+              <tr><td>RAG hallucination</td><td>Faithfulness ~0.8 best case</td><td>Citation-grounded generation, chain-of-thought RAG</td><td>Active research</td></tr>
+              <tr><td>Cross-modal RAG</td><td>Text only, image limited</td><td>Multimodal embeddings (ColPali, CLIP-RAG)</td><td>Now emerging</td></tr>
+              <tr><td>Agent cost</td><td>$1-10 per complex task</td><td>Distilled small agents, tool-specific fine-tuning</td><td>1 year</td></tr>
+              <tr><td>Long-term agent memory</td><td>Ad-hoc vector stores</td><td>Structured episodic memory with forgetting curves</td><td>2-3 years</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout-note rounded-lg p-5 mb-6">
+          <p class="text-sm font-bold text-purple-800 mb-1">Recommendations for Building in 2025-2026</p>
+          <ul class="text-sm text-purple-900 list-disc list-inside space-y-1 mt-2">
+            <li><strong>Default to RAG over fine-tuning</strong> for knowledge tasks — the economics and flexibility win.</li>
+            <li><strong>Hybrid search is not optional</strong> — BM25 + dense catches things neither alone does.</li>
+            <li><strong>Reranking is high-ROI</strong> — it costs 60ms but often improves answer quality more than switching to a better LLM.</li>
+            <li><strong>Start with LangGraph for agents</strong> — its typed state machine prevents the most common agent bugs.</li>
+            <li><strong>Instrument everything from day one</strong> — you cannot improve what you cannot measure.</li>
+            <li><strong>Semantic caching pays for itself within days</strong> at any meaningful query volume.</li>
+            <li><strong>Graph RAG (Microsoft GraphRAG) is worth watching</strong> — builds entity-relationship graphs over documents for multi-hop Q&amp;A.</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- ===== SUMMARY & COURSE CONCLUSION ===== -->
+      <section id="summary" class="section-anchor">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="w-8 h-8 bg-purple-600 text-white rounded-lg flex items-center justify-center font-bold text-sm">S</span>
+          <h2 class="text-2xl font-bold text-gray-900">Summary &amp; Course Conclusion</h2>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Chapter 19 Key Takeaways</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
+          <div class="bg-blue-50 border border-blue-200 rounded-xl p-5">
+            <h4 class="font-bold text-blue-800 mb-3">RAG Fundamentals</h4>
+            <ul class="text-sm text-blue-900 space-y-2">
+              <li>RAG separates knowledge storage (retrieval) from language understanding (generation)</li>
+              <li>Hybrid search (BM25 + dense) outperforms either alone — always use it in production</li>
+              <li>Reranking is the highest-ROI optimization per latency dollar spent</li>
+              <li>Document processing quality is the ceiling for retrieval quality</li>
+              <li>Chunk strategy matters: parent-child for precision, RAPTOR for multi-hop</li>
+            </ul>
+          </div>
+          <div class="bg-green-50 border border-green-200 rounded-xl p-5">
+            <h4 class="font-bold text-green-800 mb-3">Agent Systems</h4>
+            <ul class="text-sm text-green-900 space-y-2">
+              <li>ReAct (observe-think-act) is the foundation of all production agents</li>
+              <li>LangGraph provides typed state machines — prevents infinite loops and context explosion</li>
+              <li>Human-in-the-loop is mandatory for any agent that takes real-world actions</li>
+              <li>Multi-agent systems decompose complexity but multiply failure modes</li>
+              <li>Always set max_iterations, token budgets, and tool rate limits</li>
+            </ul>
+          </div>
+          <div class="bg-amber-50 border border-amber-200 rounded-xl p-5">
+            <h4 class="font-bold text-amber-800 mb-3">Production Engineering</h4>
+            <ul class="text-sm text-amber-900 space-y-2">
+              <li>Semantic caching eliminates 30-40% of LLM costs at scale</li>
+              <li>Incremental indexing with content hashing keeps indices fresh without full rebuilds</li>
+              <li>Access control bugs are silent and catastrophic — test with adversarial users</li>
+              <li>Query routing (RAG vs SQL vs direct) reduces cost and latency for 20-30% of queries</li>
+              <li>LangSmith or Langfuse from day one — you cannot optimize what you cannot trace</li>
+            </ul>
+          </div>
+          <div class="bg-purple-50 border border-purple-200 rounded-xl p-5">
+            <h4 class="font-bold text-purple-800 mb-3">Evaluation</h4>
+            <ul class="text-sm text-purple-900 space-y-2">
+              <li>RAGAS provides four essential metrics: faithfulness, relevancy, precision, recall</li>
+              <li>Build a golden evaluation dataset before you start optimizing — you need a baseline</li>
+              <li>Integrate RAGAS into CI/CD as a deployment gate</li>
+              <li>Human evaluation for hallucination detection cannot be fully automated</li>
+              <li>Track cost per query as a first-class metric alongside quality</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Course Completion Section -->
+        <div class="bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 rounded-2xl p-8 text-white mb-10">
+          <div class="text-center">
+            <div class="text-5xl mb-4">&#127881;</div>
+            <h2 class="text-3xl font-bold mb-2">Course Complete!</h2>
+            <p class="text-blue-100 text-lg mb-6">You have completed all 19 chapters of Modern MLOps Tutorial.</p>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 text-center">
+              <div class="bg-white bg-opacity-10 rounded-xl p-4">
+                <div class="text-3xl font-bold">19</div>
+                <div class="text-sm text-blue-200">Chapters</div>
+              </div>
+              <div class="bg-white bg-opacity-10 rounded-xl p-4">
+                <div class="text-3xl font-bold">120+</div>
+                <div class="text-sm text-blue-200">Code Examples</div>
+              </div>
+              <div class="bg-white bg-opacity-10 rounded-xl p-4">
+                <div class="text-3xl font-bold">80+</div>
+                <div class="text-sm text-blue-200">Mermaid Diagrams</div>
+              </div>
+              <div class="bg-white bg-opacity-10 rounded-xl p-4">
+                <div class="text-3xl font-bold">40+</div>
+                <div class="text-sm text-blue-200">Reference Tables</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">The Complete Modern MLOps Engineer Skill Map</h3>
+        <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm mb-8">
+          <table>
+            <thead>
+              <tr><th>Domain</th><th>Core Skills</th><th>Key Tools</th><th>Chapter</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Foundation</td><td>ML lifecycle, CI/CD for ML, experiment tracking</td><td>MLflow, DVC, Git</td><td>1-2</td></tr>
+              <tr><td>Infrastructure as Code</td><td>Terraform, Kubernetes, cloud provisioning</td><td>Terraform, Helm, Pulumi</td><td>3</td></tr>
+              <tr><td>Data Engineering</td><td>Pipelines, quality, lineage, feature stores</td><td>Airflow, dbt, Feast, Great Expectations</td><td>4-6</td></tr>
+              <tr><td>Model Training at Scale</td><td>Distributed training, hyperparameter tuning</td><td>PyTorch, Ray Train, Optuna</td><td>7-8</td></tr>
+              <tr><td>Model Serving</td><td>Online/offline inference, A/B testing, SLAs</td><td>Triton, BentoML, KServe, FastAPI</td><td>9-10</td></tr>
+              <tr><td>Monitoring &amp; Drift</td><td>Data drift, concept drift, alerting</td><td>Evidently, WhyLabs, Prometheus</td><td>11-12</td></tr>
+              <tr><td>LLMOps</td><td>Prompt engineering, fine-tuning, RLHF, evals</td><td>OpenAI, Anthropic, PEFT, TRL</td><td>13-15</td></tr>
+              <tr><td>Security &amp; Governance</td><td>Model cards, bias, compliance, access control</td><td>Responsible AI frameworks</td><td>16-17</td></tr>
+              <tr><td>Cost Optimization</td><td>GPU utilization, spot instances, quantization</td><td>ONNX, TensorRT, vLLM</td><td>18</td></tr>
+              <tr><td><strong>RAG &amp; Agents</strong></td><td>Retrieval systems, vector DBs, LLM agents</td><td>LangChain, LangGraph, LlamaIndex, Qdrant</td><td><strong>19</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Recommended Learning Path Going Forward</h3>
+        <div class="space-y-4 mb-8">
+          <div class="flex items-start gap-4 bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+            <div class="w-10 h-10 bg-blue-100 text-blue-700 rounded-lg flex items-center justify-center font-bold flex-shrink-0">1</div>
+            <div>
+              <h4 class="font-semibold text-gray-800">Build a production RAG system end-to-end</h4>
+              <p class="text-sm text-gray-600 mt-1">Pick a domain you know well (your work documents, a technical domain), implement hybrid search + reranking + evaluation. Deploy to a cloud provider. This single project will teach you more than any course.</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-4 bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+            <div class="w-10 h-10 bg-green-100 text-green-700 rounded-lg flex items-center justify-center font-bold flex-shrink-0">2</div>
+            <div>
+              <h4 class="font-semibold text-gray-800">Build a LangGraph agent with real tools</h4>
+              <p class="text-sm text-gray-600 mt-1">Implement a research agent that uses web search, a SQL database, and your RAG system. Add persistence, human-in-the-loop, and proper error handling. Run it for a week on real tasks.</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-4 bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+            <div class="w-10 h-10 bg-purple-100 text-purple-700 rounded-lg flex items-center justify-center font-bold flex-shrink-0">3</div>
+            <div>
+              <h4 class="font-semibold text-gray-800">Read the foundational papers</h4>
+              <p class="text-sm text-gray-600 mt-1">REALM (2020), RAG (Lewis et al. 2020), RAPTOR (2024), HyDE (2022), RAGAS (2023), ReAct (2022), LangGraph paper. These explain the "why" behind every technique in this chapter.</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-4 bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+            <div class="w-10 h-10 bg-amber-100 text-amber-700 rounded-lg flex items-center justify-center font-bold flex-shrink-0">4</div>
+            <div>
+              <h4 class="font-semibold text-gray-800">Follow the MTEB leaderboard and LMSYS Chatbot Arena</h4>
+              <p class="text-sm text-gray-600 mt-1">The embedding model and LLM landscape changes every month. MTEB (huggingface.co/spaces/mteb/leaderboard) tracks embedding quality. LMSYS Chatbot Arena tracks generation quality through human preference.</p>
+            </div>
+          </div>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Essential Resources</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
+          <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+            <h4 class="font-semibold text-gray-800 mb-3 text-sm uppercase tracking-wide text-gray-500">Papers</h4>
+            <ul class="text-sm text-gray-700 space-y-2">
+              <li>RAG (Lewis et al., 2020) — foundational paper</li>
+              <li>RAPTOR (Sarthi et al., 2024) — tree summarization</li>
+              <li>HyDE (Gao et al., 2022) — hypothetical docs</li>
+              <li>RAGAS (Es et al., 2023) — evaluation framework</li>
+              <li>ReAct (Yao et al., 2022) — agent reasoning</li>
+              <li>GraphRAG (Edge et al., 2024) — entity graphs</li>
+              <li>ColPali (Faysse et al., 2024) — vision RAG</li>
+            </ul>
+          </div>
+          <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+            <h4 class="font-semibold text-gray-800 mb-3 text-sm uppercase tracking-wide text-gray-500">Blogs &amp; Docs</h4>
+            <ul class="text-sm text-gray-700 space-y-2">
+              <li>LangChain blog — LCEL, LangGraph releases</li>
+              <li>LlamaIndex documentation</li>
+              <li>Qdrant blog — vector search best practices</li>
+              <li>Anthropic cookbook — Claude agent patterns</li>
+              <li>Pinecone learning center</li>
+              <li>Langfuse docs — observability setup</li>
+              <li>Eugene Yan's blog — RAG systems in production</li>
+            </ul>
+          </div>
+          <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+            <h4 class="font-semibold text-gray-800 mb-3 text-sm uppercase tracking-wide text-gray-500">Communities</h4>
+            <ul class="text-sm text-gray-700 space-y-2">
+              <li>LangChain Discord — 80K+ members</li>
+              <li>LlamaIndex Discord</li>
+              <li>Hugging Face forums</li>
+              <li>MLOps Community Slack</li>
+              <li>r/MachineLearning</li>
+              <li>AI Engineer conference</li>
+              <li>ICLR / NeurIPS RAG workshops</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Final callout -->
+        <div class="callout-tip rounded-lg p-6 mb-10">
+          <p class="text-base font-bold text-green-800 mb-2">Final Note from the Author</p>
+          <p class="text-sm text-green-900 leading-relaxed">I built RAG systems at Kimi when the field was nascent — we were writing HNSW wrappers from scratch, building our own PDF parsers, implementing hybrid search before LangChain existed. The tools have gotten dramatically better. What hasn't changed is the discipline required: measure everything, trust no benchmark that doesn't reflect your actual query distribution, and never ship an agent that can take real-world actions without a human-in-the-loop gate. The engineers who will build the most reliable AI systems in the next five years are the ones who learn to be skeptical of benchmarks, ruthless about evaluation, and obsessive about failure modes. You now have the foundation. Go build something real.</p>
+        </div>
+
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<!-- Bottom Navigation -->
+<div class="bg-white border-t border-gray-200 mt-16">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="flex items-center justify-between">
+      <a href="ch18.html" class="flex items-center gap-3 px-6 py-3 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors">
+        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        <div>
+          <div class="text-xs text-gray-500 uppercase tracking-wide">Previous</div>
+          <div class="text-sm font-semibold text-gray-800">Chapter 18: Cost Optimization</div>
+        </div>
+      </a>
+      <div class="text-center">
+        <div class="text-sm font-bold text-gray-700">Chapter 19 of 19</div>
+        <div class="text-xs text-gray-500">Final Chapter</div>
+        <div class="flex items-center gap-2 mt-2 justify-center">
+          <span class="w-2 h-2 rounded-full bg-blue-600"></span>
+          <span class="text-xs text-green-600 font-semibold">Course Complete!</span>
+          <span class="w-2 h-2 rounded-full bg-blue-600"></span>
+        </div>
+      </div>
+      <a href="index.html" class="flex items-center gap-3 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-colors">
+        <div class="text-right">
+          <div class="text-xs uppercase tracking-wide opacity-80">Return to</div>
+          <div class="text-sm font-semibold">Course Index</div>
+        </div>
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Active TOC highlighting on scroll
+  const sections = document.querySelectorAll('.section-anchor');
+  const tocLinks = document.querySelectorAll('.toc-link');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => {
+          link.classList.remove('active');
+          if (link.getAttribute('href') === '#' + entry.target.id) {
+            link.classList.add('active');
+          }
+        });
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>
+

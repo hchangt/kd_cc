@@ -1,0 +1,1654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chapter 17: Next.js — TypeScript for the AI Era</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --white: #FFFFFF;
+      --surface: #F9FAFB;
+      --surface-2: #F3F4F6;
+      --border: #E5E7EB;
+      --border-strong: #D1D5DB;
+      --text-primary: #111827;
+      --text-secondary: #6B7280;
+      --text-tertiary: #9CA3AF;
+      --indigo-50: #EEF2FF;
+      --indigo-100: #E0E7FF;
+      --indigo-200: #C7D2FE;
+      --indigo-500: #6366F1;
+      --indigo-600: #4F46E5;
+      --indigo-700: #4338CA;
+      --indigo-800: #3730A3;
+      --green-50: #ECFDF5;
+      --green-100: #D1FAE5;
+      --green-600: #10B981;
+      --green-700: #059669;
+      --amber-50: #FFFBEB;
+      --amber-100: #FEF3C7;
+      --amber-600: #F59E0B;
+      --amber-700: #B45309;
+      --rose-50: #FFF1F2;
+      --rose-100: #FFE4E6;
+      --rose-600: #E11D48;
+      --rose-700: #BE123C;
+      --sky-50: #EFF6FF;
+      --sky-100: #DBEAFE;
+      --sky-600: #3B82F6;
+      --sky-700: #1D4ED8;
+      --violet-50: #F5F3FF;
+      --violet-100: #EDE9FE;
+      --violet-600: #8B5CF6;
+      --violet-700: #6D28D9;
+      --pink-50: #FDF2F8;
+      --pink-100: #FCE7F3;
+      --pink-600: #EC4899;
+      --pink-700: #BE185D;
+      --font-body: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+      --font-code: 'JetBrains Mono', 'Fira Code', monospace;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--white);
+      color: var(--text-primary);
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ───── TOP NAV ───── */
+    .top-nav {
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1.5rem;
+      gap: 1rem;
+    }
+
+    .nav-prev, .nav-next {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--indigo-600);
+      text-decoration: none;
+      padding: 0.35rem 0.75rem;
+      border: 1px solid var(--indigo-200);
+      border-radius: 6px;
+      background: var(--indigo-50);
+      transition: background 0.15s;
+      white-space: nowrap;
+    }
+    .nav-prev:hover, .nav-next:hover { background: var(--indigo-100); }
+
+    .nav-center {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.1rem;
+    }
+    .nav-book-title {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .nav-chapter-title {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .nav-progress {
+      font-size: 0.7rem;
+      color: var(--text-tertiary);
+      font-weight: 500;
+    }
+
+    /* ───── HERO ───── */
+    .chapter-hero {
+      background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 35%, #312e81 65%, #4F46E5 100%);
+      padding: 4rem 2rem 3.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .chapter-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+    .chapter-hero-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      position: relative;
+    }
+    .chapter-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: rgba(255,255,255,0.9);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.3rem 0.9rem;
+      border-radius: 999px;
+      margin-bottom: 1.25rem;
+    }
+    .chapter-hero h1 {
+      font-size: clamp(2rem, 5vw, 3.25rem);
+      font-weight: 800;
+      color: white;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      margin-bottom: 1rem;
+    }
+    .chapter-hero h1 .accent { color: #A5B4FC; }
+    .chapter-subtitle {
+      font-size: 1.1rem;
+      color: rgba(255,255,255,0.78);
+      max-width: 640px;
+      line-height: 1.65;
+      margin-bottom: 2rem;
+    }
+    .chapter-meta {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .chapter-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.82rem;
+      color: rgba(255,255,255,0.7);
+    }
+    .chapter-meta-item strong { color: rgba(255,255,255,0.95); font-weight: 600; }
+    .chapter-tag {
+      background: rgba(99,102,241,0.4);
+      border: 1px solid rgba(165,180,252,0.3);
+      color: #A5B4FC;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+    }
+
+    /* ───── LAYOUT ───── */
+    .page-layout {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 3rem 2rem 5rem;
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      gap: 3rem;
+      align-items: start;
+    }
+    @media (max-width: 900px) {
+      .page-layout { grid-template-columns: 1fr; }
+      .sidebar { display: none; }
+    }
+
+    /* ───── SIDEBAR ───── */
+    .sidebar {
+      position: sticky;
+      top: 72px;
+      max-height: calc(100vh - 80px);
+      overflow-y: auto;
+    }
+    .toc-header {
+      font-size: 0.7rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-tertiary);
+      margin-bottom: 0.75rem;
+    }
+    .toc-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.1rem;
+    }
+    .toc-list li a {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      text-decoration: none;
+      padding: 0.3rem 0.6rem;
+      border-radius: 5px;
+      transition: background 0.12s, color 0.12s;
+      line-height: 1.4;
+    }
+    .toc-list li a:hover { background: var(--indigo-50); color: var(--indigo-600); }
+    .toc-list li a.active { background: var(--indigo-50); color: var(--indigo-600); font-weight: 600; }
+
+    /* ───── MAIN CONTENT ───── */
+    .chapter-content { min-width: 0; }
+
+    .section { margin-bottom: 4.5rem; }
+
+    .section-anchor {
+      position: relative;
+      top: -80px;
+      visibility: hidden;
+    }
+
+    .section-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      background: var(--indigo-600);
+      color: white;
+      font-size: 0.72rem;
+      font-weight: 800;
+      border-radius: 6px;
+      margin-bottom: 0.75rem;
+    }
+
+    .section h2 {
+      font-size: 1.65rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+      margin-bottom: 1rem;
+      line-height: 1.25;
+    }
+    .section h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.01em;
+      margin-top: 2rem;
+      margin-bottom: 0.75rem;
+    }
+    .section p {
+      font-size: 0.975rem;
+      color: var(--text-secondary);
+      margin-bottom: 1rem;
+      line-height: 1.7;
+    }
+    .section ul, .section ol {
+      padding-left: 1.4rem;
+      margin-bottom: 1rem;
+    }
+    .section li {
+      font-size: 0.975rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.4rem;
+      line-height: 1.65;
+    }
+    .section li strong { color: var(--text-primary); }
+    .section-divider { border: none; border-top: 1px solid var(--border); margin: 4rem 0; }
+
+    /* ───── CODE BLOCKS ───── */
+    .code-block {
+      margin: 1.5rem 0;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+    }
+    .code-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #f6f8fa;
+      border-bottom: 1px solid var(--border);
+      padding: 0.55rem 1rem;
+    }
+    .code-filename {
+      font-family: var(--font-code);
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+    .code-lang {
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--indigo-600);
+      background: var(--indigo-50);
+      border: 1px solid var(--indigo-100);
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+    }
+    .code-block pre {
+      margin: 0;
+      padding: 1.25rem;
+      overflow-x: auto;
+      background: #f6f8fa;
+      font-size: 0.845rem;
+      line-height: 1.65;
+    }
+    .code-block code {
+      font-family: var(--font-code);
+      background: none;
+      padding: 0;
+      font-size: inherit;
+    }
+    .section p code, .section li code, td code, th code {
+      font-family: var(--font-code);
+      font-size: 0.82em;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      padding: 0.1em 0.4em;
+      border-radius: 4px;
+      color: var(--indigo-700);
+    }
+
+    /* ───── CALLOUTS ───── */
+    .callout {
+      border-radius: 10px;
+      padding: 1.1rem 1.25rem;
+      margin: 1.5rem 0;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 0.75rem;
+      align-items: start;
+    }
+    .callout-icon { font-size: 1.1rem; line-height: 1; margin-top: 0.1rem; }
+    .callout-label {
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.35rem;
+    }
+    .callout-body p { font-size: 0.9rem; margin-bottom: 0; line-height: 1.6; }
+    .callout-body p + p { margin-top: 0.5rem; }
+    .callout-body code {
+      font-family: var(--font-code);
+      font-size: 0.82em;
+      padding: 0.1em 0.4em;
+      border-radius: 4px;
+    }
+
+    .callout-tip { background: var(--green-50); border: 1px solid var(--green-100); }
+    .callout-tip .callout-label { color: var(--green-600); }
+    .callout-tip .callout-body p { color: #065f46; }
+    .callout-tip .callout-body code { background: #a7f3d0; color: #064e3b; }
+
+    .callout-info { background: var(--sky-50); border: 1px solid var(--sky-100); }
+    .callout-info .callout-label { color: var(--sky-600); }
+    .callout-info .callout-body p { color: #1e3a5f; }
+    .callout-info .callout-body code { background: #bfdbfe; color: #1e3a5f; }
+
+    .callout-warning { background: var(--amber-50); border: 1px solid var(--amber-100); }
+    .callout-warning .callout-label { color: var(--amber-600); }
+    .callout-warning .callout-body p { color: #78350f; }
+    .callout-warning .callout-body code { background: #fde68a; color: #78350f; }
+
+    .callout-ai { background: var(--pink-50); border: 1px solid var(--pink-100); }
+    .callout-ai .callout-label { color: var(--pink-600); }
+    .callout-ai .callout-body p { color: #831843; }
+    .callout-ai .callout-body code { background: #fbcfe8; color: #831843; }
+
+    .callout-new { background: var(--violet-50); border: 1px solid var(--violet-100); }
+    .callout-new .callout-label { color: var(--violet-600); }
+    .callout-new .callout-body p { color: #3b0764; }
+    .callout-new .callout-body code { background: #ddd6fe; color: #3b0764; }
+
+    /* ───── DIAGRAMS ───── */
+    .diagram-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 1.75rem 0;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--text-tertiary);
+      margin-bottom: 1.25rem;
+      text-align: center;
+    }
+
+    /* ───── TABLES ───── */
+    .table-wrap {
+      overflow-x: auto;
+      margin: 1.5rem 0;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+    thead { background: var(--surface-2); }
+    thead th {
+      padding: 0.7rem 1rem;
+      text-align: left;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--text-secondary);
+      border-bottom: 1px solid var(--border);
+    }
+    tbody td {
+      padding: 0.7rem 1rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-secondary);
+      vertical-align: top;
+      line-height: 1.5;
+    }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover td { background: var(--surface); }
+    td:first-child { font-weight: 600; color: var(--text-primary); }
+
+    .badge {
+      display: inline-block;
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 0.15rem 0.45rem;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .badge-green { background: var(--green-100); color: var(--green-700); }
+    .badge-amber { background: var(--amber-100); color: var(--amber-700); }
+    .badge-indigo { background: var(--indigo-100); color: var(--indigo-700); }
+    .badge-violet { background: var(--violet-100); color: var(--violet-700); }
+
+    /* ───── DIR TREE ───── */
+    .dir-tree {
+      background: #f6f8fa;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem 1.5rem;
+      margin: 1.5rem 0;
+      font-family: var(--font-code);
+      font-size: 0.845rem;
+      line-height: 1.8;
+      color: var(--text-primary);
+    }
+    .dir-tree .dir { color: var(--indigo-600); font-weight: 600; }
+    .dir-tree .file { color: var(--text-secondary); }
+    .dir-tree .comment { color: var(--text-tertiary); font-style: italic; }
+
+    /* ───── FOOTER ───── */
+    .chapter-footer {
+      border-top: 1px solid var(--border);
+      padding: 3rem 2rem;
+      background: var(--surface);
+    }
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .footer-nav-btn {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      text-decoration: none;
+      padding: 0.85rem 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--white);
+      transition: border-color 0.15s, box-shadow 0.15s;
+      min-width: 180px;
+    }
+    .footer-nav-btn:hover {
+      border-color: var(--indigo-200);
+      box-shadow: 0 2px 12px rgba(79,70,229,0.08);
+    }
+    .footer-nav-direction {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-tertiary);
+    }
+    .footer-nav-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--indigo-600);
+    }
+    .footer-center { text-align: center; }
+    .footer-author { font-size: 0.82rem; font-weight: 600; color: var(--text-primary); }
+    .footer-byline { font-size: 0.75rem; color: var(--text-tertiary); margin-top: 0.2rem; }
+    .progress-bar-wrap {
+      margin-top: 0.75rem;
+      background: var(--border);
+      border-radius: 999px;
+      height: 4px;
+      width: 160px;
+      margin-left: auto;
+      margin-right: auto;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      width: 70.8%; /* 17/24 */
+      background: linear-gradient(90deg, var(--indigo-600), #818cf8);
+      border-radius: 999px;
+    }
+
+    @media (max-width: 640px) {
+      .chapter-hero { padding: 2.5rem 1.25rem 2rem; }
+      .page-layout { padding: 2rem 1.25rem 4rem; gap: 2rem; }
+      .top-nav { padding: 0 1rem; }
+      .nav-center { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════ TOP NAV -->
+<nav class="top-nav">
+  <a href="chapter-16-react.html" class="nav-prev">← Ch 16 React</a>
+  <div class="nav-center">
+    <span class="nav-book-title">TypeScript for the AI Era</span>
+    <span class="nav-chapter-title">Chapter 17 — Next.js</span>
+    <span class="nav-progress">Chapter 17 of 24</span>
+  </div>
+  <a href="chapter-18-state.html" class="nav-next">Ch 18 State →</a>
+</nav>
+
+<!-- ═══════════════════ HERO -->
+<header class="chapter-hero">
+  <div class="chapter-hero-inner">
+    <div class="chapter-eyebrow">Chapter 17 &nbsp;·&nbsp; Part IV: The Frontend</div>
+    <h1>Next.js: The <span class="accent">Full-Stack</span><br />TypeScript Framework</h1>
+    <p class="chapter-subtitle">
+      Next.js collapses the frontend/backend divide. Server Components, Server Actions, and the
+      App Router give you end-to-end type safety from database to browser — with zero boilerplate.
+      This chapter is your production guide.
+    </p>
+    <div class="chapter-meta">
+      <span class="chapter-meta-item"><strong>Senior Staff Engineer</strong> &nbsp;·&nbsp; Vercel</span>
+      <span class="chapter-meta-item">~65 min read</span>
+      <span class="chapter-tag">Next.js 15</span>
+      <span class="chapter-tag">App Router</span>
+      <span class="chapter-tag">TypeScript 5.x</span>
+    </div>
+  </div>
+</header>
+
+<!-- ═══════════════════ BODY -->
+<div class="page-layout">
+
+  <!-- SIDEBAR TOC -->
+  <aside class="sidebar">
+    <div class="toc-header">In this chapter</div>
+    <ul class="toc-list">
+      <li><a href="#s1">1. What is Next.js?</a></li>
+      <li><a href="#s2">2. Project Structure</a></li>
+      <li><a href="#s3">3. App Router File Conventions</a></li>
+      <li><a href="#s4">4. Server vs Client Components</a></li>
+      <li><a href="#s5">5. Data Fetching</a></li>
+      <li><a href="#s6">6. Server Actions</a></li>
+      <li><a href="#s7">7. Route Handlers</a></li>
+      <li><a href="#s8">8. Middleware</a></li>
+      <li><a href="#s9">9. Performance Features</a></li>
+      <li><a href="#s10">10. Deployment</a></li>
+      <li><a href="#s11">11. Complete Example: Blog App</a></li>
+    </ul>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="chapter-content">
+
+    <!-- ─── SECTION 1 ─── -->
+    <section class="section">
+      <span id="s1" class="section-anchor"></span>
+      <div class="section-number">1</div>
+      <h2>What is Next.js?</h2>
+      <p>
+        Next.js is the React framework from Vercel. It handles routing, rendering, data fetching,
+        bundling, and deployment — everything you'd otherwise wire together yourself. The key insight:
+        <strong>your frontend and backend live in one TypeScript codebase</strong>, sharing types from
+        database to component.
+      </p>
+
+      <h3>App Router vs Pages Router</h3>
+      <p>
+        Next.js 13 introduced the App Router, a ground-up rethink based on React Server Components.
+        It is the present and the future. The Pages Router still works and won't be removed, but all
+        new features land in the App Router first.
+      </p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Feature</th>
+              <th>App Router</th>
+              <th>Pages Router</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Server Components</td>
+              <td><span class="badge badge-green">Default</span></td>
+              <td><span class="badge badge-amber">No</span></td>
+            </tr>
+            <tr>
+              <td>Nested Layouts</td>
+              <td><span class="badge badge-green">Native</span></td>
+              <td><span class="badge badge-amber">Manual</span></td>
+            </tr>
+            <tr>
+              <td>Server Actions</td>
+              <td><span class="badge badge-green">Yes</span></td>
+              <td><span class="badge badge-amber">No</span></td>
+            </tr>
+            <tr>
+              <td>Streaming / Suspense</td>
+              <td><span class="badge badge-green">Native</span></td>
+              <td><span class="badge badge-amber">Limited</span></td>
+            </tr>
+            <tr>
+              <td>Data fetching</td>
+              <td>async/await in components</td>
+              <td>getServerSideProps / getStaticProps</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Getting started</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">terminal</span>
+          <span class="code-lang">bash</span>
+        </div>
+        <pre><code class="language-bash">pnpm create next-app@latest my-app --typescript --tailwind --app --src-dir
+cd my-app && pnpm dev</code></pre>
+      </div>
+
+      <div class="callout callout-tip">
+        <span class="callout-icon">💡</span>
+        <div class="callout-body">
+          <div class="callout-label">Tip</div>
+          <p>Always pass <code>--typescript</code>. Next.js ships with a built-in TypeScript plugin that provides type-checking in the editor for Next.js-specific APIs like <code>generateMetadata</code>, params, and searchParams.</p>
+        </div>
+      </div>
+    </section>
+
+    <hr class="section-divider" />
+
+    <!-- ─── SECTION 2 ─── -->
+    <section class="section">
+      <span id="s2" class="section-anchor"></span>
+      <div class="section-number">2</div>
+      <h2>Project Structure</h2>
+
+      <div class="dir-tree">
+        <span class="dir">my-app/</span><br>
+        ├── <span class="dir">app/</span>           <span class="comment"># App Router root</span><br>
+        │   ├── <span class="file">layout.tsx</span>  <span class="comment"># Root layout (required)</span><br>
+        │   ├── <span class="file">page.tsx</span>    <span class="comment"># / route</span><br>
+        │   ├── <span class="dir">blog/</span><br>
+        │   │   ├── <span class="file">page.tsx</span>  <span class="comment"># /blog</span><br>
+        │   │   └── <span class="dir">[slug]/</span><br>
+        │   │       └── <span class="file">page.tsx</span> <span class="comment"># /blog/:slug</span><br>
+        │   └── <span class="dir">api/</span><br>
+        │       └── <span class="dir">users/</span><br>
+        │           └── <span class="file">route.ts</span> <span class="comment"># /api/users</span><br>
+        ├── <span class="dir">components/</span>    <span class="comment"># Shared React components</span><br>
+        ├── <span class="dir">lib/</span>           <span class="comment"># Utilities, db clients</span><br>
+        ├── <span class="dir">public/</span>        <span class="comment"># Static assets</span><br>
+        └── <span class="file">next.config.ts</span> <span class="comment"># Typed config</span>
+      </div>
+
+      <h3>Typed configuration</h3>
+      <p><code>next.config.ts</code> (note: <code>.ts</code>, not <code>.js</code>) gives you full IntelliSense on config options.</p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">next.config.ts</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">import type { NextConfig } from 'next';
+
+const config: NextConfig = {
+  images: {
+    remotePatterns: [{ hostname: 'images.unsplash.com' }],
+  },
+  experimental: {
+    typedRoutes: true, // type-safe href strings
+  },
+};
+
+export default config;</code></pre>
+      </div>
+
+      <h3>Environment variables</h3>
+      <p>Variables prefixed <code>NEXT_PUBLIC_</code> are bundled into the client. Everything else is server-only.</p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">.env.local</span>
+          <span class="code-lang">env</span>
+        </div>
+        <pre><code class="language-bash">DATABASE_URL=postgres://localhost/myapp     # server only
+NEXT_PUBLIC_API_URL=https://api.example.com # exposed to browser</code></pre>
+      </div>
+
+      <div class="callout callout-warning">
+        <span class="callout-icon">⚠️</span>
+        <div class="callout-body">
+          <div class="callout-label">Warning</div>
+          <p>TypeScript does not know which env vars exist. Use a validation library like <code>@t3-oss/env-nextjs</code> to parse and type your environment at startup — this catches missing secrets at build time instead of runtime.</p>
+        </div>
+      </div>
+    </section>
+
+    <hr class="section-divider" />
+
+    <!-- ─── SECTION 3 ─── -->
+    <section class="section">
+      <span id="s3" class="section-anchor"></span>
+      <div class="section-number">3</div>
+      <h2>App Router File Conventions</h2>
+      <p>
+        The App Router uses special filenames within route directories to control rendering. Each file
+        exports a React component with a specific signature enforced by TypeScript.
+      </p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>File</th>
+              <th>Purpose</th>
+              <th>Key Props</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>page.tsx</code></td>
+              <td>Unique UI for a route — makes the route publicly accessible</td>
+              <td><code>params</code>, <code>searchParams</code></td>
+            </tr>
+            <tr>
+              <td><code>layout.tsx</code></td>
+              <td>Shared UI that wraps child routes, persists on navigation</td>
+              <td><code>children: React.ReactNode</code></td>
+            </tr>
+            <tr>
+              <td><code>loading.tsx</code></td>
+              <td>Suspense fallback shown while the page streams in</td>
+              <td>—</td>
+            </tr>
+            <tr>
+              <td><code>error.tsx</code></td>
+              <td>Error boundary for the route segment — must be <code>'use client'</code></td>
+              <td><code>error: Error</code>, <code>reset()</code></td>
+            </tr>
+            <tr>
+              <td><code>not-found.tsx</code></td>
+              <td>Rendered when <code>notFound()</code> is called</td>
+              <td>—</td>
+            </tr>
+            <tr>
+              <td><code>route.ts</code></td>
+              <td>HTTP endpoint (API route) — no UI</td>
+              <td><code>GET</code>, <code>POST</code>, … exports</td>
+            </tr>
+            <tr>
+              <td><code>middleware.ts</code></td>
+              <td>Runs before every request (root-level only)</td>
+              <td><code>NextRequest</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Dynamic routes &amp; route groups</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">app/users/[id]/page.tsx</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">// Dynamic segment: [id] → params.id is typed as string
+type Props = {
+  params: Promise&lt;{ id: string }&gt;;      // Next.js 15: params is a Promise
+  searchParams: Promise&lt;{ tab?: string }&gt;;
+};
+
+export default async function UserPage({ params }: Props) {
+  const { id } = await params;
+  const user = await fetchUser(id);
+  return &lt;UserProfile user={user} /&gt;;
+}</code></pre>
+      </div>
+
+      <div class="callout callout-new">
+        <span class="callout-icon">✨</span>
+        <div class="callout-body">
+          <div class="callout-label">New in Next.js 15</div>
+          <p><code>params</code> and <code>searchParams</code> are now <code>Promise</code>s. Await them before use. The TypeScript plugin will flag synchronous access as a type error.</p>
+        </div>
+      </div>
+
+      <p>Route groups with <code>(auth)</code> — parentheses exclude the segment from the URL but allow a shared layout:</p>
+      <div class="dir-tree">
+        <span class="dir">app/</span><br>
+        ├── <span class="dir">(marketing)/</span>   <span class="comment"># URL: /  — shared marketing layout</span><br>
+        │   ├── <span class="file">layout.tsx</span><br>
+        │   └── <span class="file">page.tsx</span><br>
+        └── <span class="dir">(auth)/</span>         <span class="comment"># URL: /login, /register</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;├── <span class="file">layout.tsx</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;├── <span class="dir">login/page.tsx</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;└── <span class="dir">register/page.tsx</span>
+      </div>
+    </section>
+
+    <hr class="section-divider" />
+
+    <!-- ─── SECTION 4 ─── -->
+    <section class="section">
+      <span id="s4" class="section-anchor"></span>
+      <div class="section-number">4</div>
+      <h2>Server Components vs Client Components</h2>
+
+      <p>
+        This is the most important mental model in Next.js. Every component in the App Router is a
+        <strong>Server Component by default</strong>. Server Components render on the server and send
+        HTML — zero JavaScript shipped to the client. Use <code>'use client'</code> only when you
+        need interactivity.
+      </p>
+
+      <!-- SVG DIAGRAM -->
+      <div class="diagram-wrap">
+        <div class="diagram-title">Server / Client Component Boundary</div>
+        <svg viewBox="0 0 720 280" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:700px;display:block;margin:0 auto;" font-family="Inter,system-ui,sans-serif">
+          <!-- Server side -->
+          <rect x="10" y="20" width="330" height="240" rx="12" fill="#EEF2FF" stroke="#C7D2FE" stroke-width="1.5"/>
+          <text x="30" y="48" font-size="11" font-weight="700" fill="#4338CA" letter-spacing="0.08em" text-transform="uppercase">SERVER</text>
+
+          <!-- Root layout box -->
+          <rect x="30" y="60" width="290" height="50" rx="8" fill="#4F46E5" opacity="0.15" stroke="#4F46E5" stroke-width="1"/>
+          <text x="175" y="82" font-size="12" font-weight="700" fill="#3730A3" text-anchor="middle">RootLayout (SC)</text>
+          <text x="175" y="98" font-size="10" fill="#4338CA" text-anchor="middle">async — can await DB / fetch</text>
+
+          <!-- Page box -->
+          <rect x="30" y="125" width="140" height="50" rx="8" fill="#4F46E5" opacity="0.12" stroke="#4F46E5" stroke-width="1"/>
+          <text x="100" y="147" font-size="12" font-weight="700" fill="#3730A3" text-anchor="middle">PostList (SC)</text>
+          <text x="100" y="162" font-size="10" fill="#4338CA" text-anchor="middle">zero JS sent</text>
+
+          <!-- Arrow down -->
+          <line x1="175" y1="110" x2="175" y2="122" stroke="#818cf8" stroke-width="1.5" marker-end="url(#arr)"/>
+
+          <!-- Client boundary -->
+          <rect x="185" y="125" width="130" height="50" rx="8" fill="#FDF2F8" stroke="#EC4899" stroke-width="1.5" stroke-dasharray="5,3"/>
+          <text x="250" y="147" font-size="12" font-weight="700" fill="#9D174D" text-anchor="middle">SearchBar</text>
+          <text x="250" y="162" font-size="10" fill="#DB2777" text-anchor="middle">'use client'</text>
+
+          <!-- Client side -->
+          <rect x="360" y="20" width="350" height="240" rx="12" fill="#FDF2F8" stroke="#FBCFE8" stroke-width="1.5"/>
+          <text x="380" y="48" font-size="11" font-weight="700" fill="#BE185D" letter-spacing="0.08em">BROWSER</text>
+
+          <rect x="380" y="60" width="310" height="185" rx="8" fill="#EC4899" opacity="0.07" stroke="#F9A8D4" stroke-width="1"/>
+          <text x="535" y="90" font-size="12" font-weight="700" fill="#9D174D" text-anchor="middle">SearchBar (CC)</text>
+          <text x="535" y="108" font-size="10" fill="#BE185D" text-anchor="middle">useState, useEffect, event handlers</text>
+
+          <rect x="400" y="120" width="270" height="40" rx="6" fill="#FDF2F8" stroke="#F9A8D4"/>
+          <text x="535" y="145" font-size="11" fill="#9D174D" text-anchor="middle">const [q, setQ] = useState('')</text>
+
+          <rect x="400" y="170" width="270" height="40" rx="6" fill="#FDF2F8" stroke="#F9A8D4"/>
+          <text x="535" y="195" font-size="11" fill="#9D174D" text-anchor="middle">onClick, onChange handlers</text>
+
+          <!-- Boundary arrow -->
+          <defs>
+            <marker id="arr" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
+              <path d="M0,0 L0,8 L8,4 z" fill="#818cf8"/>
+            </marker>
+            <marker id="arr2" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
+              <path d="M0,0 L0,8 L8,4 z" fill="#EC4899"/>
+            </marker>
+          </defs>
+          <line x1="320" y1="150" x2="378" y2="150" stroke="#EC4899" stroke-width="2" stroke-dasharray="6,3" marker-end="url(#arr2)"/>
+          <text x="340" y="143" font-size="9" fill="#BE185D" text-anchor="middle">boundary</text>
+        </svg>
+      </div>
+
+      <h3>Server Component — async data fetching</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">app/blog/page.tsx</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">// No 'use client' = Server Component
+import { db } from '@/lib/db';
+
+export default async function BlogPage() {
+  // Direct DB access — runs server-side, never exposed to client
+  const posts = await db.post.findMany({ orderBy: { createdAt: 'desc' } });
+
+  return (
+    &lt;ul&gt;
+      {posts.map(post =&gt; (
+        &lt;li key={post.id}&gt;&lt;a href={`/blog/${post.slug}`}&gt;{post.title}&lt;/a&gt;&lt;/li&gt;
+      ))}
+    &lt;/ul&gt;
+  );
+}</code></pre>
+      </div>
+
+      <h3>Client Component — hooks &amp; events</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">components/like-button.tsx</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">'use client';
+
+import { useState } from 'react';
+
+export function LikeButton({ initialCount }: { initialCount: number }) {
+  const [count, setCount] = useState(initialCount);
+  return (
+    &lt;button onClick={() =&gt; setCount(c =&gt; c + 1)}&gt;
+      ♥ {count}
+    &lt;/button&gt;
+  );
+}</code></pre>
+      </div>
+
+      <div class="callout callout-info">
+        <span class="callout-icon">ℹ️</span>
+        <div class="callout-body">
+          <div class="callout-label">Key Rule</div>
+          <p>Server Components can import Client Components, but not vice versa. Pass Server Component data to Client Components via props. You can also pass Server Components as <code>children</code> to Client Components — they still run on the server.</p>
+        </div>
+      </div>
+    </section>
+
+    <hr class="section-divider" />
+
+    <!-- ─── SECTION 5 ─── -->
+    <section class="section">
+      <span id="s5" class="section-anchor"></span>
+      <div class="section-number">5</div>
+      <h2>Data Fetching Patterns</h2>
+
+      <h3>fetch() with caching in Server Components</h3>
+      <p>Next.js extends the native <code>fetch</code> API with caching semantics controlled by the <code>cache</code> and <code>next</code> options.</p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">lib/api.ts</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">type Post = { id: string; title: string; body: string };
+
+// Static: cached indefinitely (like getStaticProps)
+export async function getPosts(): Promise&lt;Post[]&gt; {
+  const res = await fetch('https://api.example.com/posts', {
+    next: { revalidate: 3600 }, // ISR: revalidate every hour
+  });
+  if (!res.ok) throw new Error('Failed to fetch posts');
+  return res.json();
+}
+
+// Dynamic: never cached (like getServerSideProps)
+export async function getPost(id: string): Promise&lt;Post&gt; {
+  const res = await fetch(`https://api.example.com/posts/${id}`, {
+    cache: 'no-store',
+  });
+  if (!res.ok) notFound();
+  return res.json();
+}</code></pre>
+      </div>
+
+      <h3>Streaming with Suspense</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">app/dashboard/page.tsx</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">import { Suspense } from 'react';
+import { RevenueChart } from './revenue-chart';
+import { RecentOrders } from './recent-orders';
+
+export default function DashboardPage() {
+  return (
+    &lt;main&gt;
+      &lt;h1&gt;Dashboard&lt;/h1&gt;
+      {/* Each Suspense boundary streams independently */}
+      &lt;Suspense fallback={&lt;ChartSkeleton /&gt;}&gt;
+        &lt;RevenueChart /&gt;      {/* async Server Component */}
+      &lt;/Suspense&gt;
+      &lt;Suspense fallback={&lt;OrdersSkeleton /&gt;}&gt;
+        &lt;RecentOrders /&gt;
+      &lt;/Suspense&gt;
+    &lt;/main&gt;
+  );
+}</code></pre>
+      </div>
+
+      <h3>Client-side fetching with TanStack Query</h3>
+      <p>For real-time or user-specific data that changes after initial load, TanStack Query is the standard.</p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">components/user-profile.tsx</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">'use client';
+
+import { useQuery } from '@tanstack/react-query';
+
+type User = { id: string; name: string; email: string };
+
+export function UserProfile({ userId }: { userId: string }) {
+  const { data, isPending } = useQuery({
+    queryKey: ['user', userId],
+    queryFn: (): Promise&lt;User&gt; =&gt;
+      fetch(`/api/users/${userId}`).then(r =&gt; r.json()),
+  });
+
+  if (isPending) return &lt;Spinner /&gt;;
+  return &lt;div&gt;{data?.name}&lt;/div&gt;;
+}</code></pre>
+      </div>
+    </section>
+
+    <hr class="section-divider" />
+
+    <!-- ─── SECTION 6 ─── -->
+    <section class="section">
+      <span id="s6" class="section-anchor"></span>
+      <div class="section-number">6</div>
+      <h2>Server Actions</h2>
+
+      <p>
+        Server Actions are async functions that run on the server, triggered from a form or client
+        event. They eliminate the need for a dedicated API route for most mutations. The
+        <code>'use server'</code> directive marks a function (or entire module) as a Server Action.
+      </p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">app/posts/actions.ts</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">'use server';
+
+import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
+import { db } from '@/lib/db';
+import { z } from 'zod';
+
+const CreatePostSchema = z.object({
+  title: z.string().min(3).max(100),
+  body: z.string().min(10),
+});
+
+export async function createPost(formData: FormData) {
+  const parsed = CreatePostSchema.safeParse({
+    title: formData.get('title'),
+    body: formData.get('body'),
+  });
+
+  if (!parsed.success) {
+    return { error: parsed.error.flatten().fieldErrors };
+  }
+
+  const post = await db.post.create({ data: parsed.data });
+  revalidatePath('/posts');        // bust the cache for /posts
+  redirect(`/posts/${post.id}`);  // navigate to new post
+}</code></pre>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">app/posts/new/page.tsx</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">import { createPost } from '../actions';
+
+export default function NewPostPage() {
+  return (
+    &lt;form action={createPost}&gt;  {/* action takes a Server Action directly */}
+      &lt;input name="title" placeholder="Title" required /&gt;
+      &lt;textarea name="body" placeholder="Content" required /&gt;
+      &lt;button type="submit"&gt;Publish&lt;/button&gt;
+    &lt;/form&gt;
+  );
+}</code></pre>
+      </div>
+
+      <div class="callout callout-ai">
+        <span class="callout-icon">🤖</span>
+        <div class="callout-body">
+          <div class="callout-label">AI Era</div>
+          <p>Server Actions are ideal for AI-powered mutations: call an LLM, stream the response, write to the DB, and revalidate the cache — all in a single typed function with no API surface to maintain. Pair with the Vercel AI SDK's <code>streamText</code> for streaming responses.</p>
+        </div>
+      </div>
+    </section>
+
+    <hr class="section-divider" />
+
+    <!-- ─── SECTION 7 ─── -->
+    <section class="section">
+      <span id="s7" class="section-anchor"></span>
+      <div class="section-number">7</div>
+      <h2>Route Handlers (API Routes)</h2>
+
+      <p>
+        Route Handlers live in <code>route.ts</code> files inside the <code>app</code> directory.
+        Named exports match HTTP methods: <code>GET</code>, <code>POST</code>, <code>PUT</code>,
+        <code>DELETE</code>, etc.
+      </p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">app/api/users/route.ts</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">import { NextRequest, NextResponse } from 'next/server';
+import { db } from '@/lib/db';
+import { z } from 'zod';
+
+export async function GET() {
+  const users = await db.user.findMany({ select: { id: true, name: true } });
+  return NextResponse.json(users);
+}
+
+const CreateUserBody = z.object({ name: z.string(), email: z.string().email() });
+
+export async function POST(req: NextRequest) {
+  const body = await req.json();
+  const parsed = CreateUserBody.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
+  }
+  const user = await db.user.create({ data: parsed.data });
+  return NextResponse.json(user, { status: 201 });
+}</code></pre>
+      </div>
+
+      <h3>Dynamic route handlers</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">app/api/users/[id]/route.ts</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">import { NextRequest, NextResponse } from 'next/server';
+
+type Context = { params: Promise&lt;{ id: string }&gt; };
+
+export async function GET(req: NextRequest, { params }: Context) {
+  const { id } = await params;
+  const user = await db.user.findUnique({ where: { id } });
+  if (!user) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+  return NextResponse.json(user);
+}
+
+export async function DELETE(req: NextRequest, { params }: Context) {
+  const { id } = await params;
+  await db.user.delete({ where: { id } });
+  return new NextResponse(null, { status: 204 });
+}</code></pre>
+      </div>
+
+      <div class="callout callout-tip">
+        <span class="callout-icon">💡</span>
+        <div class="callout-body">
+          <div class="callout-label">Tip</div>
+          <p>Prefer Server Actions over Route Handlers for form mutations. Use Route Handlers when you need a public REST/JSON API consumed by third-party clients or mobile apps.</p>
+        </div>
+      </div>
+    </section>
+
+    <hr class="section-divider" />
+
+    <!-- ─── SECTION 8 ─── -->
+    <section class="section">
+      <span id="s8" class="section-anchor"></span>
+      <div class="section-number">8</div>
+      <h2>Middleware</h2>
+
+      <p>
+        <code>middleware.ts</code> sits at the project root and runs on the Edge Runtime before every
+        matched request. It's the right place for auth checks, redirects, and A/B testing — anything
+        that must happen before a page renders.
+      </p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">middleware.ts</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">import { NextRequest, NextResponse } from 'next/server';
+import { getToken } from 'next-auth/jwt';
+
+export async function middleware(req: NextRequest) {
+  const token = await getToken({ req, secret: process.env.AUTH_SECRET });
+
+  // Protect /dashboard and all nested routes
+  if (req.nextUrl.pathname.startsWith('/dashboard') && !token) {
+    const loginUrl = new URL('/login', req.url);
+    loginUrl.searchParams.set('callbackUrl', req.url);
+    return NextResponse.redirect(loginUrl);
+  }
+
+  return NextResponse.next();
+}
+
+// Only run middleware on matched paths — avoid running on static files
+export const config = {
+  matcher: ['/dashboard/:path*', '/api/protected/:path*'],
+};</code></pre>
+      </div>
+
+      <div class="callout callout-warning">
+        <span class="callout-icon">⚠️</span>
+        <div class="callout-body">
+          <div class="callout-label">Warning</div>
+          <p>Middleware runs on the Edge Runtime — a subset of Node.js APIs. You cannot use Prisma, native Node modules, or large npm packages. Keep it lightweight: read cookies/headers, decode JWTs, redirect.</p>
+        </div>
+      </div>
+    </section>
+
+    <hr class="section-divider" />
+
+    <!-- ─── SECTION 9 ─── -->
+    <section class="section">
+      <span id="s9" class="section-anchor"></span>
+      <div class="section-number">9</div>
+      <h2>Performance Features</h2>
+
+      <h3>next/image — automatic optimization</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">components/avatar.tsx</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">import Image from 'next/image';
+
+export function Avatar({ src, name }: { src: string; name: string }) {
+  return (
+    &lt;Image
+      src={src}
+      alt={name}
+      width={48}
+      height={48}
+      className="rounded-full"
+      // Automatically: WebP/AVIF conversion, lazy loading, layout shift prevention
+    /&gt;
+  );
+}</code></pre>
+      </div>
+
+      <h3>next/font — zero layout shift fonts</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">app/layout.tsx</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">import { Inter } from 'next/font/google';
+
+// Font is downloaded at build time — no external requests at runtime
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    &lt;html lang="en" className={inter.variable}&gt;
+      &lt;body&gt;{children}&lt;/body&gt;
+    &lt;/html&gt;
+  );
+}</code></pre>
+      </div>
+
+      <h3>Static vs dynamic rendering</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Trigger</th><th>Rendering Mode</th><th>Cached?</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>No dynamic APIs, no <code>cache: 'no-store'</code></td><td>Static (SSG)</td><td><span class="badge badge-green">Yes</span></td></tr>
+            <tr><td><code>cookies()</code>, <code>headers()</code>, <code>searchParams</code></td><td>Dynamic (SSR)</td><td><span class="badge badge-amber">No</span></td></tr>
+            <tr><td><code>next: { revalidate: N }</code></td><td>ISR</td><td><span class="badge badge-indigo">TTL</span></td></tr>
+            <tr><td><code>export const dynamic = 'force-dynamic'</code></td><td>Always dynamic</td><td><span class="badge badge-amber">No</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Bundle analysis</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">terminal</span>
+          <span class="code-lang">bash</span>
+        </div>
+        <pre><code class="language-bash">pnpm add -D @next/bundle-analyzer
+
+# next.config.ts
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+  enabled: process.env.ANALYZE === 'true',
+});
+export default withBundleAnalyzer(config);
+
+# Run analysis
+ANALYZE=true pnpm build</code></pre>
+      </div>
+    </section>
+
+    <hr class="section-divider" />
+
+    <!-- ─── SECTION 10 ─── -->
+    <section class="section">
+      <span id="s10" class="section-anchor"></span>
+      <div class="section-number">10</div>
+      <h2>Deployment</h2>
+
+      <h3>Vercel — zero config</h3>
+      <p>
+        Push to GitHub. Connect the repo in the Vercel dashboard. Done. Vercel auto-detects Next.js,
+        builds on every push, manages preview deployments per branch, and sets production domains.
+        Environment variables are managed in the Vercel dashboard and injected at build time.
+      </p>
+
+      <div class="callout callout-tip">
+        <span class="callout-icon">💡</span>
+        <div class="callout-body">
+          <div class="callout-label">Tip</div>
+          <p>Use <code>vercel env pull .env.local</code> to sync Vercel environment variables to your local machine, keeping secrets in sync without manual copy-paste.</p>
+        </div>
+      </div>
+
+      <h3>Docker — self-hosted</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">Dockerfile</span>
+          <span class="code-lang">dockerfile</span>
+        </div>
+        <pre><code class="language-dockerfile">FROM node:22-alpine AS base
+
+FROM base AS deps
+WORKDIR /app
+COPY package.json pnpm-lock.yaml ./
+RUN corepack enable && pnpm install --frozen-lockfile
+
+FROM base AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+RUN pnpm build
+
+FROM base AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
+EXPOSE 3000
+CMD ["node", "server.js"]</code></pre>
+      </div>
+
+      <p>Enable the standalone output in <code>next.config.ts</code>:</p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">next.config.ts</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">const config: NextConfig = {
+  output: 'standalone', // bundles only the files needed to run
+};</code></pre>
+      </div>
+    </section>
+
+    <hr class="section-divider" />
+
+    <!-- ─── SECTION 11 ─── -->
+    <section class="section">
+      <span id="s11" class="section-anchor"></span>
+      <div class="section-number">11</div>
+      <h2>Complete Example: Blog App</h2>
+
+      <p>
+        Let's put it all together. A minimal blog with a post listing page, a dynamic post page,
+        and a Server Action to create posts — no separate backend required.
+      </p>
+
+      <h3>Database types (shared)</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">lib/types.ts</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">export type Post = {
+  id: string;
+  slug: string;
+  title: string;
+  body: string;
+  publishedAt: Date;
+};</code></pre>
+      </div>
+
+      <h3>Post listing — Server Component</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">app/blog/page.tsx</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">import Link from 'next/link';
+import { db } from '@/lib/db';
+
+export const metadata = { title: 'Blog' };
+
+export default async function BlogPage() {
+  const posts = await db.post.findMany({
+    select: { slug: true, title: true, publishedAt: true },
+    orderBy: { publishedAt: 'desc' },
+  });
+
+  return (
+    &lt;div className="max-w-2xl mx-auto py-16 px-4"&gt;
+      &lt;h1 className="text-3xl font-bold mb-8"&gt;Blog&lt;/h1&gt;
+      &lt;ul className="space-y-4"&gt;
+        {posts.map(post =&gt; (
+          &lt;li key={post.slug}&gt;
+            &lt;Link href={`/blog/${post.slug}`} className="text-lg font-medium hover:underline"&gt;
+              {post.title}
+            &lt;/Link&gt;
+            &lt;p className="text-sm text-gray-500"&gt;
+              {post.publishedAt.toLocaleDateString()}
+            &lt;/p&gt;
+          &lt;/li&gt;
+        ))}
+      &lt;/ul&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+      </div>
+
+      <h3>Individual post — dynamic route</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">app/blog/[slug]/page.tsx</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">import { notFound } from 'next/navigation';
+import { db } from '@/lib/db';
+import type { Metadata } from 'next';
+
+type Props = { params: Promise&lt;{ slug: string }&gt; };
+
+export async function generateMetadata({ params }: Props): Promise&lt;Metadata&gt; {
+  const { slug } = await params;
+  const post = await db.post.findUnique({ where: { slug } });
+  return { title: post?.title ?? 'Not found' };
+}
+
+// Pre-render all known slugs at build time
+export async function generateStaticParams() {
+  const posts = await db.post.findMany({ select: { slug: true } });
+  return posts.map(p =&gt; ({ slug: p.slug }));
+}
+
+export default async function PostPage({ params }: Props) {
+  const { slug } = await params;
+  const post = await db.post.findUnique({ where: { slug } });
+  if (!post) notFound();
+
+  return (
+    &lt;article className="max-w-2xl mx-auto py-16 px-4 prose"&gt;
+      &lt;h1&gt;{post.title}&lt;/h1&gt;
+      &lt;p&gt;{post.body}&lt;/p&gt;
+    &lt;/article&gt;
+  );
+}</code></pre>
+      </div>
+
+      <h3>Create post — Server Action</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">app/blog/new/page.tsx</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
+import { db } from '@/lib/db';
+
+async function createPost(formData: FormData) {
+  'use server';
+  const title = formData.get('title') as string;
+  const body = formData.get('body') as string;
+  const slug = title.toLowerCase().replace(/\s+/g, '-');
+
+  await db.post.create({
+    data: { title, body, slug, publishedAt: new Date() },
+  });
+
+  revalidatePath('/blog');
+  redirect(`/blog/${slug}`);
+}
+
+export default function NewPostPage() {
+  return (
+    &lt;form action={createPost} className="max-w-2xl mx-auto py-16 px-4 space-y-4"&gt;
+      &lt;h1 className="text-2xl font-bold"&gt;New Post&lt;/h1&gt;
+      &lt;input name="title" placeholder="Title" required className="w-full border p-2 rounded" /&gt;
+      &lt;textarea name="body" placeholder="Content" rows={10} required className="w-full border p-2 rounded" /&gt;
+      &lt;button type="submit" className="bg-indigo-600 text-white px-4 py-2 rounded"&gt;
+        Publish
+      &lt;/button&gt;
+    &lt;/form&gt;
+  );
+}</code></pre>
+      </div>
+
+      <div class="callout callout-ai">
+        <span class="callout-icon">🤖</span>
+        <div class="callout-body">
+          <div class="callout-label">AI Era</div>
+          <p>This same pattern powers AI-first apps. Replace the DB write with an LLM call. The Server Action receives the form, calls <code>streamText()</code> from the Vercel AI SDK, and the result streams back to the browser via <code>useActionState</code> — no API routes, no separate backend, full type safety end-to-end.</p>
+        </div>
+      </div>
+
+      <h3>File structure recap</h3>
+      <div class="dir-tree">
+        <span class="dir">app/</span><br>
+        ├── <span class="file">layout.tsx</span>       <span class="comment"># Root layout + fonts</span><br>
+        ├── <span class="dir">blog/</span><br>
+        │   ├── <span class="file">page.tsx</span>     <span class="comment"># Post list (SC)</span><br>
+        │   ├── <span class="file">loading.tsx</span>  <span class="comment"># Skeleton while streaming</span><br>
+        │   ├── <span class="dir">[slug]/</span><br>
+        │   │   ├── <span class="file">page.tsx</span> <span class="comment"># Post detail (SC)</span><br>
+        │   │   └── <span class="file">not-found.tsx</span><br>
+        │   └── <span class="dir">new/</span><br>
+        │       └── <span class="file">page.tsx</span>   <span class="comment"># Create form + Server Action</span><br>
+        └── <span class="dir">api/</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;└── <span class="dir">og/route.tsx</span>  <span class="comment"># OG image generation</span>
+      </div>
+    </section>
+
+    <!-- ─── SUMMARY ─── -->
+    <div style="background: var(--indigo-50); border: 1px solid var(--indigo-100); border-radius: 12px; padding: 1.75rem; margin-top: 2rem;">
+      <div style="font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: var(--indigo-600); margin-bottom: 1rem;">Chapter Summary</div>
+      <ul style="list-style: none; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 0.5rem;">
+        <li style="font-size: 0.875rem; color: #3730a3; display: flex; gap: 0.5rem;"><span>→</span><span>App Router is the future — use it for all new projects</span></li>
+        <li style="font-size: 0.875rem; color: #3730a3; display: flex; gap: 0.5rem;"><span>→</span><span>Server Components are the default; <code style="background:#e0e7ff;padding:0.1em 0.3em;border-radius:3px;font-family:monospace;">'use client'</code> is opt-in</span></li>
+        <li style="font-size: 0.875rem; color: #3730a3; display: flex; gap: 0.5rem;"><span>→</span><span>Server Actions replace API routes for mutations</span></li>
+        <li style="font-size: 0.875rem; color: #3730a3; display: flex; gap: 0.5rem;"><span>→</span><span>Fetch with <code style="background:#e0e7ff;padding:0.1em 0.3em;border-radius:3px;font-family:monospace;">next: { revalidate }</code> for ISR caching</span></li>
+        <li style="font-size: 0.875rem; color: #3730a3; display: flex; gap: 0.5rem;"><span>→</span><span>Middleware runs on Edge — keep it lightweight</span></li>
+        <li style="font-size: 0.875rem; color: #3730a3; display: flex; gap: 0.5rem;"><span>→</span><span>Vercel deploys zero-config; Docker needs <code style="background:#e0e7ff;padding:0.1em 0.3em;border-radius:3px;font-family:monospace;">output: 'standalone'</code></span></li>
+      </ul>
+    </div>
+
+  </main>
+</div>
+
+<!-- ═══════════════════ FOOTER -->
+<footer class="chapter-footer">
+  <div class="footer-inner">
+    <a href="chapter-16-react.html" class="footer-nav-btn">
+      <span class="footer-nav-direction">← Previous</span>
+      <span class="footer-nav-title">Ch 16: React &amp; TypeScript</span>
+    </a>
+    <div class="footer-center">
+      <div class="footer-author">TypeScript for the AI Era</div>
+      <div class="footer-byline">Senior Staff Engineer @ Vercel</div>
+      <div class="progress-bar-wrap">
+        <div class="progress-bar-fill"></div>
+      </div>
+      <div style="font-size:0.7rem;color:var(--text-tertiary);margin-top:0.4rem;">Chapter 17 of 24</div>
+    </div>
+    <a href="chapter-18-state.html" class="footer-nav-btn" style="align-items:flex-end;">
+      <span class="footer-nav-direction">Next →</span>
+      <span class="footer-nav-title">Ch 18: State Management</span>
+    </a>
+  </div>
+</footer>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Syntax highlight
+    document.querySelectorAll('pre code').forEach(el => hljs.highlightElement(el));
+
+    // Active TOC link on scroll
+    const sections = document.querySelectorAll('.section-anchor');
+    const links = document.querySelectorAll('.toc-list a');
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          links.forEach(l => l.classList.remove('active'));
+          const id = entry.target.id;
+          const active = document.querySelector(`.toc-list a[href="#${id}"]`);
+          if (active) active.classList.add('active');
+        }
+      });
+    }, { rootMargin: '-20% 0px -70% 0px' });
+
+    sections.forEach(s => observer.observe(s));
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 18: Case Study - DeepSeek Architecture - Modern MLOps Tutorial</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script>hljs.highlightAll(); mermaid.initialize({startOnLoad:true, theme:'default'});</script>
+  <style>
+    :root { --primary: #2563eb; --secondary: #059669; --accent: #d97706; --text: #1f2937; }
+    body { color: var(--text); font-family: 'Inter', system-ui, sans-serif; }
+    .nav-link { transition: color 0.15s; }
+    .nav-link:hover { color: #93c5fd; }
+    .toc-link { transition: color 0.15s; }
+    .toc-link:hover { color: var(--primary); }
+    .toc-link.active { color: var(--primary); font-weight: 600; border-left: 2px solid var(--primary); padding-left: 0.5rem; }
+    .callout-info { border-left: 4px solid #2563eb; background: #eff6ff; }
+    .callout-tip { border-left: 4px solid #059669; background: #ecfdf5; }
+    .callout-warning { border-left: 4px solid #d97706; background: #fffbeb; }
+    .callout-note { border-left: 4px solid #7c3aed; background: #f5f3ff; }
+    .callout-danger { border-left: 4px solid #dc2626; background: #fef2f2; }
+    table { border-collapse: collapse; width: 100%; }
+    thead { background: #2563eb; color: white; }
+    tbody tr:nth-child(even) { background: #f8fafc; }
+    tbody tr:nth-child(odd) { background: #ffffff; }
+    tbody tr:hover { background: #eff6ff; }
+    td, th { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid #e2e8f0; }
+    .mermaid { background: #fff; padding: 1rem; border-radius: 0.5rem; }
+    pre code { font-size: 0.875rem; }
+    .chapter-badge { background: #2563eb; color: white; font-size: 0.75rem; font-weight: 700; padding: 0.25rem 0.75rem; border-radius: 9999px; letter-spacing: 0.05em; text-transform: uppercase; }
+    .section-anchor { scroll-margin-top: 5rem; }
+    .code-label { background: #1e293b; color: #94a3b8; font-size: 0.7rem; font-weight: 600; padding: 0.25rem 0.75rem; border-radius: 0.375rem 0.375rem 0 0; letter-spacing: 0.05em; text-transform: uppercase; display: inline-block; }
+    .cite { background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 0.375rem; font-size: 0.8rem; color: #475569; padding: 0.15rem 0.5rem; font-style: italic; }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+<!-- Top Navbar -->
+<nav class="bg-gray-900 text-white sticky top-0 z-50 shadow-lg">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center font-bold text-sm">ML</div>
+        <a href="index.html" class="nav-link font-semibold text-lg tracking-tight">Modern MLOps Tutorial</a>
+      </div>
+      <div class="hidden md:flex items-center gap-6 text-sm text-gray-300">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="#toc" class="nav-link">Contents</a>
+        <span class="text-gray-500">|</span>
+        <span class="text-blue-400 font-medium">Chapter 18 of 19</span>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- Chapter Header -->
+<header class="bg-white border-b border-gray-200 shadow-sm">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div class="flex flex-col gap-3">
+      <div class="flex items-center gap-3">
+        <span class="chapter-badge">Chapter 18</span>
+        <span class="text-sm text-gray-500">Case Study Series — Part 1 of 2</span>
+      </div>
+      <h1 class="text-4xl font-bold text-gray-900 leading-tight">Case Study: DeepSeek — Architecture &amp; Training Infrastructure</h1>
+      <p class="text-xl text-gray-600 max-w-3xl">How DeepSeek built GPT-4-class models for $5.5M using MoE, novel attention compression, and aggressive training efficiency innovations.</p>
+      <div class="flex flex-wrap items-center gap-6 text-sm text-gray-500 mt-2">
+        <span class="flex items-center gap-1">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          60 min read
+        </span>
+        <span class="flex items-center gap-1">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          Advanced
+        </span>
+        <span class="flex items-center gap-1">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          Updated April 2026
+        </span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Paper Citation Banner -->
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+  <div class="callout-note rounded-lg p-4">
+    <p class="text-sm font-semibold text-purple-800 mb-1">Primary Sources</p>
+    <p class="text-sm text-purple-700">All technical content in this chapter is derived from three peer-reviewed papers:</p>
+    <ul class="text-sm text-purple-700 mt-1 space-y-1 list-disc list-inside">
+      <li><strong>[V2]</strong> DeepSeek-AI. "DeepSeek-V2: A Strong, Economical, and Efficient Mixture-of-Experts Language Model." arXiv:2405.04434 (2024).</li>
+      <li><strong>[V3]</strong> DeepSeek-AI. "DeepSeek-V3 Technical Report." arXiv:2412.19437 (2024).</li>
+      <li><strong>[R1]</strong> DeepSeek-AI. "DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning." arXiv:2501.12948 (2025). <em>(covered in ch18b)</em></li>
+    </ul>
+  </div>
+</div>
+
+<!-- Main Layout -->
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="flex gap-10">
+
+    <!-- Sidebar TOC -->
+    <aside class="hidden xl:block w-64 flex-shrink-0">
+      <div class="sticky top-24 bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+        <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4" id="toc">On This Page</h3>
+        <nav class="space-y-1 text-sm text-gray-600">
+          <a href="#s1" class="toc-link block py-1">1. DeepSeek Overview</a>
+          <a href="#s2" class="toc-link block py-1">2. DeepSeekMoE Architecture</a>
+          <a href="#s3" class="toc-link block py-1">3. V3 Training Innovations</a>
+          <a href="#s4" class="toc-link block py-1">4. Training Infrastructure</a>
+          <a href="#s5" class="toc-link block py-1">5. Data Pipeline</a>
+          <a href="#takeaways" class="toc-link block py-1">Key Takeaways</a>
+        </nav>
+        <div class="mt-4 pt-4 border-t border-gray-100">
+          <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider mb-2">Part 2</p>
+          <a href="ch18b_deepseek_r1.html" class="text-xs text-blue-600 hover:underline">Ch18b: R1, Reasoning &amp; Cost Analysis</a>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 min-w-0 space-y-12">
+
+      <!-- Section 1: DeepSeek Overview -->
+      <section id="s1" class="section-anchor">
+        <h2 class="text-3xl font-bold text-gray-900 mb-4 flex items-center gap-3">
+          <span class="w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center text-lg font-bold flex-shrink-0">1</span>
+          DeepSeek Overview
+        </h2>
+
+        <p class="text-gray-700 leading-relaxed mb-4">DeepSeek AI, a research lab founded in 2023 under High-Flyer Capital Management, stunned the ML community in early 2025 by demonstrating that frontier-class LLMs could be trained at a fraction of Western lab costs. Their publication strategy — open weights plus detailed technical reports — provided an unprecedented look into the engineering decisions behind cost-efficient pre-training at scale.</p>
+
+        <div class="callout-info rounded-lg p-4 mb-6">
+          <p class="font-semibold text-blue-800 mb-1">The $5.5M Headline</p>
+          <p class="text-sm text-blue-700">DeepSeek-V3 required approximately 2.788M H800 GPU-hours for its 14.8T token pre-training run. At a spot price of roughly $2/GPU-hour, the compute cost was approximately <strong>$5.576M</strong> — an order of magnitude cheaper than estimated GPT-4 training costs <span class="cite">[V3, §4.3]</span>. This figure excludes exploratory experiments, ablations, and staff costs, but the raw compute efficiency is real and reproducible.</p>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-900 mb-3 mt-6">Model Family</h3>
+        <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm mb-6">
+          <table>
+            <thead><tr><th>Model</th><th>Total Params</th><th>Active Params</th><th>Architecture</th><th>Pre-train Tokens</th><th>GPU-Hours</th><th>MMLU</th></tr></thead>
+            <tbody>
+              <tr><td class="font-medium">DeepSeek-V2</td><td>236B</td><td>21B</td><td>MoE (160 experts)</td><td>8.1T</td><td>~1.1M A100</td><td>78.5</td></tr>
+              <tr><td class="font-medium">DeepSeek-V3</td><td>671B</td><td>37B</td><td>MoE (256 experts)</td><td>14.8T</td><td>2.788M H800</td><td>88.5</td></tr>
+              <tr><td class="font-medium">DeepSeek-R1</td><td>671B</td><td>37B</td><td>MoE + RL (GRPO)</td><td>V3 base + RL</td><td>~360K H800</td><td>90.8</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-xs text-gray-500 mb-6">Sources: <span class="cite">[V2, Table 1]</span> <span class="cite">[V3, Table 1]</span> <span class="cite">[R1, §2]</span>. GPU-hours are author-reported estimates for primary pre-training runs only.</p>
+
+        <h3 class="text-xl font-semibold text-gray-900 mb-3">Model Timeline</h3>
+        <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm mb-2">
+          <div class="mermaid">
+timeline
+    title DeepSeek Model Releases (2024–2025)
+    section 2024 Q2
+        DeepSeek-V2 : 236B MoE, 21B active
+                    : MLA + DeepSeekMoE
+                    : 8.1T tokens, arXiv May 2024
+    section 2024 Q4
+        DeepSeek-V3 : 671B MoE, 37B active
+                    : DualPipe + FP8 training
+                    : 14.8T tokens, arXiv Dec 2024
+    section 2025 Q1
+        DeepSeek-R1 : Reasoning via pure RL
+                    : GRPO, chain-of-thought
+                    : Matches o1 on math/code
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 2: DeepSeekMoE Architecture -->
+      <section id="s2" class="section-anchor">
+        <h2 class="text-3xl font-bold text-gray-900 mb-4 flex items-center gap-3">
+          <span class="w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center text-lg font-bold flex-shrink-0">2</span>
+          DeepSeekMoE Architecture <span class="cite text-base font-normal">[V2]</span>
+        </h2>
+
+        <h3 class="text-xl font-semibold text-gray-900 mb-3">MoE Fundamentals</h3>
+        <p class="text-gray-700 leading-relaxed mb-4">A Mixture-of-Experts layer replaces a standard dense FFN with <em>N</em> expert FFNs, activating only a top-<em>K</em> subset per token via a learned router. The router assigns each token a probability distribution over experts; only the top-K highest-scoring experts compute outputs, which are weighted-summed. The key benefit: total parameters scale as N×E (where E is expert size) but FLOPs per forward pass scale as K×E — enabling a large-capacity model at inference cost equivalent to a much smaller dense model.</p>
+
+        <p class="text-gray-700 leading-relaxed mb-4"><strong>Load balancing</strong> is the central MoE challenge. Without it, a few expert slots become overloaded ("expert collapse") while others are underutilized. DeepSeek-V2 addresses this with an auxiliary load-balancing loss plus a device-level balancing constraint <span class="cite">[V2, §2.1]</span>.</p>
+
+        <h3 class="text-xl font-semibold text-gray-900 mb-3 mt-6">Fine-Grained MoE with Shared Experts</h3>
+        <p class="text-gray-700 leading-relaxed mb-4">DeepSeek's key architectural innovation over standard MoE (e.g., GShard, Switch Transformer) is two-fold <span class="cite">[V2, §2.1]</span>:</p>
+        <ul class="list-disc list-inside text-gray-700 mb-4 space-y-2">
+          <li><strong>Fine-grained experts:</strong> Each expert is smaller (1/m of standard size), and the total activated expert count is K×m. This provides finer-grained specialization with the same compute budget — more routing options reduce "knowledge redundancy" where multiple experts learn the same representations.</li>
+          <li><strong>Shared experts (always-active):</strong> K_s experts are activated for <em>every</em> token regardless of routing. These capture universal knowledge (syntax, common facts) that would otherwise be redundantly replicated across many routed experts. V2 uses K_s=2 shared experts with 160 routed experts, selecting top-6 per token.</li>
+        </ul>
+
+        <div class="callout-tip rounded-lg p-4 mb-6">
+          <p class="font-semibold text-green-800 mb-1">Why Shared Experts Matter</p>
+          <p class="text-sm text-green-700">Without shared experts, knowledge common to all tokens (stop words, basic syntax) must be replicated across many routed experts, wasting capacity. Shared experts decouple "universal" from "specialized" knowledge, improving parameter utilization efficiency by an estimated 8–12% in ablations <span class="cite">[V2, Table 4]</span>.</p>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-900 mb-3 mt-6">MLA: Multi-head Latent Attention</h3>
+        <p class="text-gray-700 leading-relaxed mb-4">Standard Multi-Head Attention (MHA) requires caching K and V tensors for all previous tokens at inference. For a model with <em>n_h</em> heads of dimension <em>d_h</em>, the KV cache per token is 2 × n_h × d_h × num_layers bytes — a dominant memory cost at long context. MLA compresses this by projecting into a low-rank latent space <span class="cite">[V2, §2.2]</span>:</p>
+
+        <div class="bg-gray-50 rounded-xl border border-gray-200 p-5 mb-4 font-mono text-sm">
+          <p class="font-semibold text-gray-700 mb-3">MLA KV Compression (from [V2, Eq. 3–7]):</p>
+          <p class="text-gray-800 mb-1">Down-projection: <code class="bg-white px-1 rounded">c_KV = W_DKV · h_t</code> &nbsp;&nbsp;&nbsp; (c_KV ∈ R<sup>d_c</sup>, d_c &lt;&lt; n_h·d_h)</p>
+          <p class="text-gray-800 mb-1">Up-projection:&nbsp; <code class="bg-white px-1 rounded">K = W_UK · c_KV</code> &nbsp;&nbsp;&nbsp; <code class="bg-white px-1 rounded">V = W_UV · c_KV</code></p>
+          <p class="text-gray-800 mt-3">Cache only: <code class="bg-white px-1 rounded">c_KV</code> of size <strong>d_c = 512</strong> (vs. n_h·d_h = 128×128 = 16,384 in MHA)</p>
+          <p class="text-green-700 mt-2 font-semibold">KV cache reduction: ~32× vs. MHA at equivalent model size</p>
+        </div>
+
+        <p class="text-gray-700 leading-relaxed mb-4">For queries, MLA also uses a decoupled RoPE formulation to preserve positional encoding while keeping queries in compressed form during prefill <span class="cite">[V2, §2.2]</span>. Only the compressed latent c_KV is stored in the KV cache — the full K/V tensors are reconstructed on the fly during decoding.</p>
+
+        <h3 class="text-xl font-semibold text-gray-900 mb-3 mt-6">Dense vs MoE Comparison</h3>
+        <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm mb-4">
+          <table>
+            <thead><tr><th>Property</th><th>Dense 7B (LLaMA-style)</th><th>DeepSeek-V2 MoE (236B total)</th><th>Ratio</th></tr></thead>
+            <tbody>
+              <tr><td>Total parameters</td><td>7B</td><td>236B</td><td>33.7×</td></tr>
+              <tr><td>Active parameters (per token)</td><td>7B</td><td>21B</td><td>3×</td></tr>
+              <tr><td>FLOPs per forward token</td><td>~14T FLOPs/token</td><td>~42T FLOPs/token</td><td>3×</td></tr>
+              <tr><td>KV cache (4K context, FP16)</td><td>~512 MB</td><td>~96 MB (MLA)</td><td>0.19× (5× smaller)</td></tr>
+              <tr><td>MMLU score</td><td>~63</td><td>78.5</td><td>+15.5 pts</td></tr>
+              <tr><td>Training cost (tokens)</td><td>$~1M / 1T tokens</td><td>$~1.4M / 1T tokens</td><td>1.4× (capacity 33×)</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-xs text-gray-500 mb-6">Derived from <span class="cite">[V2, Table 1, Table 8]</span>. FLOPs estimated from active parameters; KV cache computed from MLA d_c=512 vs MHA n_h=128, d_h=128.</p>
+
+        <h3 class="text-xl font-semibold text-gray-900 mb-3 mt-6">DeepSeek-V2 Architecture Diagram</h3>
+        <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm mb-4">
+          <div class="mermaid">
+graph TB
+    subgraph Input["Token Input"]
+        TOK[Token Embedding]
+    end
+    subgraph TransformerBlock["Transformer Block (×60 layers)"]
+        direction TB
+        LN1[RMSNorm]
+        MLA_BOX["MLA: Multi-head Latent Attention
+        ── Down-project h_t → c_KV (512-dim)
+        ── Cache only c_KV (32× smaller KV cache)
+        ── Up-project c_KV → K, V at decode time
+        ── Decoupled RoPE for queries"]
+        LN2[RMSNorm]
+        subgraph MoE_Layer["DeepSeekMoE FFN Layer"]
+            SHARED["Shared Experts (K_s=2)
+            Always active — universal knowledge"]
+            ROUTER["Token Router
+            Softmax over N=160 routed experts
+            Select top-K=6"]
+            ROUTED["Routed Experts (top-6 of 160)
+            Fine-grained: 160 × smaller experts
+            Specialized knowledge"]
+            COMBINE["Weighted Sum
+            shared_out + Σ(gate_i × expert_i)"]
+        end
+    end
+    subgraph Output["Output"]
+        LM_HEAD[LM Head + Softmax]
+    end
+
+    TOK --> LN1 --> MLA_BOX --> LN2
+    LN2 --> SHARED
+    LN2 --> ROUTER --> ROUTED
+    SHARED --> COMBINE
+    ROUTED --> COMBINE
+    COMBINE --> LM_HEAD
+          </div>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-900 mb-3 mt-6">MLA Attention: Simplified Implementation</h3>
+        <div class="code-label">Python — MLA attention (simplified, from [V2])</div>
+        <pre><code class="language-python">import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+class MultiHeadLatentAttention(nn.Module):
+    """
+    Simplified MLA as described in DeepSeek-V2 [arXiv:2405.04434, §2.2].
+    Key innovation: compress KV into low-rank latent c_KV (d_c dims)
+    instead of caching full K/V (n_h * d_h dims per token).
+    """
+    def __init__(self, d_model=5120, n_heads=128, d_head=128,
+                 d_c=512, d_c_q=1536):
+        super().__init__()
+        self.n_heads = n_heads
+        self.d_head = d_head
+        self.d_c = d_c          # KV compression dim (512 << 16384)
+        self.d_c_q = d_c_q      # Q compression dim
+
+        # KV down-projection: h_t -> c_KV  (the only thing cached)
+        self.W_DKV = nn.Linear(d_model, d_c, bias=False)
+        # KV up-projections: c_KV -> K, V
+        self.W_UK = nn.Linear(d_c, n_heads * d_head, bias=False)
+        self.W_UV = nn.Linear(d_c, n_heads * d_head, bias=False)
+
+        # Query: also compressed to reduce activation memory
+        self.W_DQ = nn.Linear(d_model, d_c_q, bias=False)
+        self.W_UQ = nn.Linear(d_c_q, n_heads * d_head, bias=False)
+
+        self.W_O = nn.Linear(n_heads * d_head, d_model, bias=False)
+        self.scale = d_head ** -0.5
+
+    def forward(self, x, kv_cache=None):
+        """
+        x: (batch, seq_len, d_model)
+        kv_cache: list of cached c_KV tensors from prior tokens
+        Returns: output tensor + updated c_KV for caching
+        """
+        B, T, _ = x.shape
+
+        # --- Compress KV into latent (THIS is what gets cached) ---
+        c_KV = self.W_DKV(x)                        # (B, T, d_c=512)
+
+        # Append to cache if provided (autoregressive decode)
+        if kv_cache is not None:
+            c_KV_full = torch.cat([kv_cache, c_KV], dim=1)  # (B, T_total, d_c)
+        else:
+            c_KV_full = c_KV
+
+        # Reconstruct K, V from compressed latent
+        K = self.W_UK(c_KV_full)                    # (B, T_total, n_h * d_h)
+        V = self.W_UV(c_KV_full)                    # (B, T_total, n_h * d_h)
+
+        # Compress then reconstruct Q
+        c_Q = self.W_DQ(x)
+        Q = self.W_UQ(c_Q)                          # (B, T, n_h * d_h)
+
+        # Reshape for multi-head attention
+        def split_heads(t, T_len):
+            return t.view(B, T_len, self.n_heads, self.d_head).transpose(1, 2)
+
+        T_full = c_KV_full.shape[1]
+        Q = split_heads(Q, T)
+        K = split_heads(K, T_full)
+        V = split_heads(V, T_full)
+
+        # Scaled dot-product attention
+        attn = torch.matmul(Q, K.transpose(-2, -1)) * self.scale
+        attn = F.softmax(attn, dim=-1)
+        out = torch.matmul(attn, V)
+
+        # Merge heads and project
+        out = out.transpose(1, 2).reshape(B, T, -1)
+        return self.W_O(out), c_KV   # return c_KV for caching
+
+# Memory comparison at context=4096, layers=60, FP16:
+# MHA  cache: 2 * 128 * 128 * 60 * 4096 * 2 bytes = 10.7 GB
+# MLA  cache: 512 * 60 * 4096 * 2 bytes             = 0.25 GB  (~43x smaller)
+</code></pre>
+      </section>
+
+      <!-- Section 3: DeepSeek-V3 Training Innovations -->
+      <section id="s3" class="section-anchor">
+        <h2 class="text-3xl font-bold text-gray-900 mb-4 flex items-center gap-3">
+          <span class="w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center text-lg font-bold flex-shrink-0">3</span>
+          DeepSeek-V3 Training Innovations <span class="cite text-base font-normal">[V3]</span>
+        </h2>
+
+        <p class="text-gray-700 leading-relaxed mb-4">DeepSeek-V3 scaled to 671B total parameters trained on 14.8T tokens — yet introduced three key algorithmic innovations that dramatically improved hardware utilization and reduced cost vs. naive scaling <span class="cite">[V3, §3]</span>.</p>
+
+        <h3 class="text-xl font-semibold text-gray-900 mb-3">DualPipe Pipeline Parallelism</h3>
+        <p class="text-gray-700 leading-relaxed mb-4">Standard pipeline parallelism (GPipe, 1F1B) suffers from "pipeline bubbles" — GPU idle time while waiting for activations from prior stages. With a large number of pipeline stages (V3 uses 16 pipeline stages), bubble fraction grows to ~6% of total compute with 1F1B <span class="cite">[V3, §3.2]</span>.</p>
+
+        <p class="text-gray-700 leading-relaxed mb-4">DualPipe addresses this by simultaneously feeding <em>two</em> micro-batches through the pipeline in opposite directions. The key insight: MoE layers have a natural computation-communication overlap window because expert dispatch (all-to-all) can be overlapped with attention computation in the opposite direction micro-batch. This reduces bubble fraction to near zero <span class="cite">[V3, §3.2]</span>.</p>
+
+        <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm mb-4">
+          <div class="mermaid">
+gantt
+    title DualPipe: Two micro-batches fill pipeline bubbles [V3, Fig. 3]
+    dateFormat X
+    axisFormat %s
+    section GPU Stage 0
+    Fwd μB-A (layers 0-3)   :active, a1, 0, 4
+    Bwd μB-B (layers 0-3)   :active, a2, 4, 8
+    Fwd μB-B (layers 0-3)   :active, a3, 8, 12
+    Bwd μB-A (layers 0-3)   :active, a4, 12, 16
+    section GPU Stage 1
+    Expert Dispatch (all2all):crit, b0, 0, 2
+    Fwd μB-A (layers 4-7)   :active, b1, 2, 6
+    Expert Dispatch (all2all):crit, b2, 6, 8
+    Bwd μB-B (layers 4-7)   :active, b3, 8, 12
+    Fwd μB-B (layers 4-7)   :active, b4, 12, 14
+    Bwd μB-A (layers 4-7)   :active, b5, 14, 16
+    section GPU Stage 2
+    Expert Dispatch (all2all):crit, c0, 2, 4
+    Fwd μB-A (layers 8-11)  :active, c1, 4, 8
+    Expert Dispatch (all2all):crit, c2, 8, 10
+    Bwd μB-B (layers 8-11)  :active, c3, 10, 14
+    Bwd μB-A (layers 8-11)  :active, c4, 14, 16
+          </div>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-900 mb-3 mt-6">FP8 Mixed-Precision Training</h3>
+        <p class="text-gray-700 leading-relaxed mb-4">DeepSeek-V3 pioneered FP8 training at this scale, reducing memory and compute significantly. The key challenges — and their solutions <span class="cite">[V3, §3.3]</span>:</p>
+        <ul class="list-disc list-inside text-gray-700 mb-4 space-y-2">
+          <li><strong>Quantization granularity:</strong> Tile-wise quantization (128×128 tiles for GEMM operands) rather than per-tensor, preventing outlier activations from dominating scale factors.</li>
+          <li><strong>Accumulation precision:</strong> FP8 GEMM accumulates into FP32 rather than FP16 to prevent underflow in gradient accumulation.</li>
+          <li><strong>High-precision master weights:</strong> Optimizer states (Adam m/v) and master weights remain in BF16/FP32; only forward/backward GEMMs use FP8.</li>
+          <li><strong>Online quantization:</strong> Scale factors computed per-tile per-step on the fly — no static calibration needed for training.</li>
+        </ul>
+
+        <h3 class="text-xl font-semibold text-gray-900 mb-3 mt-6">Multi-Token Prediction (MTP)</h3>
+        <p class="text-gray-700 leading-relaxed mb-4">Standard next-token prediction trains the model to predict one future token per position. MTP adds auxiliary prediction heads that predict tokens at offsets 2, 3, ..., D simultaneously from the same hidden state <span class="cite">[V3, §2.3]</span>. This serves two purposes:</p>
+        <ul class="list-disc list-inside text-gray-700 mb-4 space-y-2">
+          <li><strong>Richer training signal:</strong> Each forward pass provides D times more gradient signal, improving data efficiency — particularly important for code and structured outputs where future tokens are highly predictable.</li>
+          <li><strong>Speculative decoding at inference:</strong> The auxiliary heads can propose candidate tokens that the main model verifies, achieving inference speedups of 1.8× with D=1 additional head <span class="cite">[V3, §4.4]</span>.</li>
+        </ul>
+
+        <div class="code-label">Python — Multi-Token Prediction head (simplified, from [V3, §2.3])</div>
+        <pre><code class="language-python">import torch
+import torch.nn as nn
+
+class MultiTokenPredictionHead(nn.Module):
+    """
+    MTP auxiliary training objective from DeepSeek-V3 [arXiv:2412.19437, §2.3].
+    Adds D extra prediction heads at offsets [1..D] from each position.
+    During inference, head[0] provides speculative draft tokens.
+    """
+    def __init__(self, d_model: int, vocab_size: int, depth: int = 1):
+        super().__init__()
+        self.depth = depth  # D=1 in V3 (one additional head)
+
+        # Each depth level has its own projection + RMSNorm
+        self.norms = nn.ModuleList([nn.RMSNorm(d_model) for _ in range(depth)])
+        # Transformer sub-block to integrate causal context
+        self.transformers = nn.ModuleList([
+            nn.TransformerEncoderLayer(d_model, nhead=8, dim_feedforward=d_model*4,
+                                       batch_first=True, norm_first=True)
+            for _ in range(depth)
+        ])
+        # Shared embedding matrix (tied to main model vocab embedding)
+        self.lm_heads = nn.ModuleList([
+            nn.Linear(d_model, vocab_size, bias=False) for _ in range(depth)
+        ])
+
+    def forward(self, hidden_states: torch.Tensor,
+                target_ids: torch.Tensor) -> dict:
+        """
+        hidden_states: (B, T, d_model) from main model's last layer
+        target_ids:    (B, T) ground-truth token IDs
+        Returns dict with auxiliary losses for each depth.
+        """
+        losses = {}
+        h = hidden_states
+
+        for d in range(self.depth):
+            # Normalize and apply transformer sub-block
+            h = self.norms[d](h)
+            h = self.transformers[d](h)
+
+            # Predict token at offset (d+2) from each position
+            logits = self.lm_heads[d](h)         # (B, T, vocab_size)
+
+            # Shift targets: position i predicts target[i + d + 2]
+            shift = d + 2
+            if shift < target_ids.shape[1]:
+                pred_logits = logits[:, :-shift, :].contiguous()
+                pred_targets = target_ids[:, shift:].contiguous()
+                loss = nn.functional.cross_entropy(
+                    pred_logits.view(-1, pred_logits.size(-1)),
+                    pred_targets.view(-1),
+                    ignore_index=-100
+                )
+                losses[f"mtp_depth_{d+1}"] = loss
+
+        return losses
+
+def total_loss(main_loss, mtp_losses, lambda_mtp=0.3):
+    """V3 uses λ=0.3 for MTP auxiliary weight [V3, §2.3]."""
+    aux = sum(mtp_losses.values()) / max(len(mtp_losses), 1)
+    return main_loss + lambda_mtp * aux
+</code></pre>
+
+        <h3 class="text-xl font-semibold text-gray-900 mb-3 mt-8">Training Efficiency Metrics</h3>
+        <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm mb-4">
+          <table>
+            <thead><tr><th>Metric</th><th>DeepSeek-V3 (reported)</th><th>Notes</th></tr></thead>
+            <tbody>
+              <tr><td>Total GPU-hours</td><td>2.788M H800-hours</td><td>Primary pre-training run only <span class="cite">[V3, §4.3]</span></td></tr>
+              <tr><td>Hardware MFU</td><td>~38.6% (FP8 peak)</td><td>FP8 theoretical peak for H800 = 3.958 PFLOPS <span class="cite">[V3, §3.3]</span></td></tr>
+              <tr><td>Pipeline bubble fraction</td><td>&lt;1% (DualPipe)</td><td>vs. ~6% with standard 1F1B <span class="cite">[V3, §3.2]</span></td></tr>
+              <tr><td>Tokens per second (training)</td><td>~60K tokens/step (2048 GPUs)</td><td>Micro-batch=1, GBS=2048 <span class="cite">[V3, §4.1]</span></td></tr>
+              <tr><td>All-to-all bandwidth utilization</td><td>>90% IB bandwidth</td><td>Node-limited routing + overlap <span class="cite">[V3, §3.1]</span></td></tr>
+              <tr><td>Inference speedup (MTP)</td><td>1.8× vs. greedy decode</td><td>1 speculative head, acceptance rate ~80% <span class="cite">[V3, §4.4]</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-xs text-gray-500 mb-2">Source: <span class="cite">[V3, §3-4]</span>.</p>
+      </section>
+
+      <!-- Section 4: Training Infrastructure -->
+      <section id="s4" class="section-anchor">
+        <h2 class="text-3xl font-bold text-gray-900 mb-4 flex items-center gap-3">
+          <span class="w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center text-lg font-bold flex-shrink-0">4</span>
+          Training Infrastructure
+        </h2>
+
+        <h3 class="text-xl font-semibold text-gray-900 mb-3">H800 GPU Cluster</h3>
+        <p class="text-gray-700 leading-relaxed mb-4">DeepSeek used NVIDIA H800 GPUs rather than H100s due to US export restrictions. The H800 has identical compute specs to H100 SXM5 (3,958 TFLOPS FP8 dense) but with NVLink bandwidth reduced from 900 GB/s to 400 GB/s <span class="cite">[V3, §3.1]</span>. This bandwidth reduction makes intra-node all-to-all communication significantly more expensive — a critical constraint for MoE expert dispatch.</p>
+
+        <p class="text-gray-700 leading-relaxed mb-4">The cluster topology is 8 H800 per node with NVLink intra-node, connected by 3.2 Tbps InfiniBand inter-node. MoE expert parallelism (EP=64, each expert group on 8 nodes) requires inter-node all-to-all at each MoE layer, making IB bandwidth the primary bottleneck <span class="cite">[V3, §3.1]</span>.</p>
+
+        <div class="callout-warning rounded-lg p-4 mb-6">
+          <p class="font-semibold text-amber-800 mb-1">Export Restriction Engineering</p>
+          <p class="text-sm text-amber-700">The H800's reduced NVLink bandwidth forced DeepSeek to innovate aggressively on communication scheduling. Their solution — limiting each token to dispatch to experts on at most M=4 nodes — reduces all-to-all traffic by restricting the routing fanout. Combined with IB/NVLink overlap in DualPipe, they recovered most of the lost bandwidth <span class="cite">[V3, §3.1]</span>.</p>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-900 mb-3 mt-6">MoE All-to-All Communication</h3>
+        <p class="text-gray-700 leading-relaxed mb-4">Each MoE layer requires two all-to-all communication phases: dispatch (send tokens to their selected experts on remote GPUs) and combine (receive computed results back). With 256 experts across 64 expert parallel ranks, each device must exchange data with up to 63 other devices per MoE layer.</p>
+
+        <div class="code-label">Python — NCCL all-to-all for MoE expert dispatch (V3-style)</div>
+        <pre><code class="language-python">import torch
+import torch.distributed as dist
+
+def moe_all_to_all_dispatch(tokens: torch.Tensor,
+                             expert_ids: torch.Tensor,
+                             ep_group: dist.ProcessGroup,
+                             max_nodes: int = 4) -> tuple:
+    """
+    MoE expert dispatch using all-to-all as described in [V3, §3.1].
+
+    Key optimization: limit each token to experts on at most `max_nodes` nodes
+    to bound inter-node traffic (node-constrained routing).
+
+    Args:
+        tokens:     (local_tokens, d_model) — tokens on this rank
+        expert_ids: (local_tokens, top_k)   — selected expert global IDs
+        ep_group:   expert parallel process group (EP=64 in V3)
+        max_nodes:  max distinct nodes a token can dispatch to (M=4 in V3)
+
+    Returns:
+        recv_tokens:    tokens dispatched to this rank's experts
+        routing_info:   metadata needed for combine step
+    """
+    world_size = dist.get_world_size(ep_group)
+    rank = dist.get_rank(ep_group)
+    local_tokens, d_model = tokens.shape
+    top_k = expert_ids.shape[1]
+
+    # Count how many tokens each rank sends to each other rank
+    # expert_id -> rank mapping (each rank owns world_size//EP experts)
+    experts_per_rank = 256 // world_size  # 4 in V3 (256 experts / 64 ranks)
+    dest_ranks = expert_ids // experts_per_rank  # (local_tokens, top_k)
+
+    # Build send count tensor for all-to-all metadata
+    send_counts = torch.zeros(world_size, dtype=torch.long, device=tokens.device)
+    for r in range(world_size):
+        send_counts[r] = (dest_ranks == r).sum()
+
+    # Exchange send counts so each rank knows how many to receive
+    recv_counts = torch.zeros_like(send_counts)
+    dist.all_to_all_single(recv_counts, send_counts, group=ep_group)
+
+    # Sort tokens by destination rank for contiguous all-to-all send buffer
+    flat_dest = dest_ranks.view(-1)  # (local_tokens * top_k,)
+    sort_idx = torch.argsort(flat_dest)
+    token_idx = sort_idx // top_k
+    sorted_tokens = tokens[token_idx]         # (local_tokens*top_k, d_model)
+
+    # All-to-all: exchange token data
+    recv_total = recv_counts.sum().item()
+    recv_buffer = torch.empty(recv_total, d_model, device=tokens.device,
+                              dtype=tokens.dtype)
+
+    send_splits = send_counts.tolist()
+    recv_splits = recv_counts.tolist()
+
+    # This is the core all-to-all — overlapped with attention in DualPipe
+    dist.all_to_all(
+        list(recv_buffer.split(recv_splits)),
+        list(sorted_tokens.split(send_splits)),
+        group=ep_group
+    )
+
+    routing_info = {"sort_idx": sort_idx, "send_counts": send_counts,
+                    "recv_counts": recv_counts, "original_shape": tokens.shape}
+    return recv_buffer, routing_info
+
+
+def moe_all_to_all_combine(expert_outputs: torch.Tensor,
+                            routing_info: dict,
+                            gates: torch.Tensor,
+                            ep_group: dist.ProcessGroup) -> torch.Tensor:
+    """Reverse all-to-all to return expert outputs to originating ranks."""
+    send_counts = routing_info["recv_counts"]  # now we send back what we received
+    recv_counts = routing_info["send_counts"]
+    sort_idx = routing_info["sort_idx"]
+    B, d = routing_info["original_shape"]
+
+    recv_total = recv_counts.sum().item()
+    recv_buffer = torch.empty(recv_total, expert_outputs.shape[-1],
+                              device=expert_outputs.device,
+                              dtype=expert_outputs.dtype)
+    dist.all_to_all(
+        list(recv_buffer.split(recv_counts.tolist())),
+        list(expert_outputs.split(send_counts.tolist())),
+        group=ep_group
+    )
+
+    # Unsort and apply gating weights
+    out = torch.zeros(B, expert_outputs.shape[-1], device=expert_outputs.device,
+                      dtype=expert_outputs.dtype)
+    unsort_idx = torch.argsort(sort_idx)
+    out.scatter_add_(0, (unsort_idx // gates.shape[1]).unsqueeze(-1).expand_as(recv_buffer),
+                     recv_buffer * gates.view(-1, 1)[unsort_idx])
+    return out
+</code></pre>
+
+        <h3 class="text-xl font-semibold text-gray-900 mb-3 mt-6">Training Stability Choices</h3>
+        <p class="text-gray-700 leading-relaxed mb-4">Training 671B parameters on 14.8T tokens requires careful stability engineering. DeepSeek-V3's key choices <span class="cite">[V3, §4.1-4.2]</span>:</p>
+        <ul class="list-disc list-inside text-gray-700 mb-4 space-y-2">
+          <li><strong>No dropout:</strong> Consistent with findings that large models trained on diverse data do not benefit from dropout.</li>
+          <li><strong>Gradient clipping at 1.0</strong> with warmup learning rate schedule (2000 steps, cosine decay to 10% of peak).</li>
+          <li><strong>Auxiliary loss weight tuning:</strong> Load balancing loss coefficient α=0.001, carefully tuned to prevent expert collapse without degrading task loss.</li>
+          <li><strong>Loss spike recovery:</strong> One documented instability at ~4T tokens required rollback and restart with reduced LR; full training had zero data corruption events <span class="cite">[V3, §4.2]</span>.</li>
+        </ul>
+      </section>
+
+      <!-- Section 5: Data Pipeline -->
+      <section id="s5" class="section-anchor">
+        <h2 class="text-3xl font-bold text-gray-900 mb-4 flex items-center gap-3">
+          <span class="w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center text-lg font-bold flex-shrink-0">5</span>
+          Data Pipeline for DeepSeek
+        </h2>
+
+        <p class="text-gray-700 leading-relaxed mb-4">DeepSeek-V3 was trained on 14.8T tokens drawn from a multilingual web corpus with significant Chinese content — reflecting DeepSeek's target market. The data pipeline emphasizes quality filtering and deduplication over raw scale <span class="cite">[V3, §2.4]</span>.</p>
+
+        <h3 class="text-xl font-semibold text-gray-900 mb-3 mt-4">Data Mixture</h3>
+        <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm mb-4">
+          <table>
+            <thead><tr><th>Domain</th><th>Approx. Share</th><th>Notes</th></tr></thead>
+            <tbody>
+              <tr><td>Chinese web (filtered)</td><td>~25%</td><td>CommonCrawl Chinese + curated sources <span class="cite">[V3, §2.4]</span></td></tr>
+              <tr><td>English web (filtered)</td><td>~45%</td><td>CommonCrawl English, news, Wikipedia</td></tr>
+              <tr><td>Code</td><td>~17%</td><td>GitHub + curated code datasets; major uplift in coding benchmarks</td></tr>
+              <tr><td>Math</td><td>~5%</td><td>ArXiv, math forums, textbooks</td></tr>
+              <tr><td>Multilingual (other)</td><td>~8%</td><td>Japanese, Korean, European languages</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-xs text-gray-500 mb-6">Approximate splits derived from <span class="cite">[V3, §2.4]</span>; exact breakdown not disclosed. V2 used ~8.1T tokens with similar proportions <span class="cite">[V2, §3.1]</span>.</p>
+
+        <h3 class="text-xl font-semibold text-gray-900 mb-3 mt-2">Data Quality Filtering Pipeline</h3>
+        <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm mb-6">
+          <div class="mermaid">
+flowchart LR
+    RAW["Raw Web Crawl\n(CommonCrawl + partners)"]
+    LANG["Language ID\n(fastText classifier)"]
+    DEDUP_URL["URL Deduplication\n(exact URL match)"]
+    DEDUP_MIN["MinHash LSH\nFuzzy Deduplication\n(n-gram shingles, 13-gram)"]
+    QUAL["Quality Filters\n- Heuristic rules (length, punct ratio)\n- Perplexity filter (KenLM)\n- ML classifier (trained on curated data)"]
+    PII["PII Removal\n(regex: email, phone, ID numbers)"]
+    CODE["Code Processing\n- Language detection\n- License filtering\n- AST validation"]
+    FINAL["Final Corpus\n14.8T tokens"]
+
+    RAW --> LANG --> DEDUP_URL --> DEDUP_MIN --> QUAL --> PII
+    PII --> FINAL
+    CODE --> FINAL
+          </div>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-900 mb-3">Tokenizer Design</h3>
+        <p class="text-gray-700 leading-relaxed mb-4">DeepSeek uses a custom BPE tokenizer trained on a representative corpus sample <span class="cite">[V2, §3.1]</span>:</p>
+        <ul class="list-disc list-inside text-gray-700 mb-4 space-y-2">
+          <li><strong>Vocabulary size: 102,400 tokens</strong> — larger than LLaMA-2 (32K) to improve Chinese/code coverage.</li>
+          <li><strong>Byte-level fallback:</strong> All bytes representable, ensuring no OOV tokens for any UTF-8 input.</li>
+          <li><strong>Pre-tokenization:</strong> Digits split individually (each digit = separate token) for improved arithmetic generalization — a technique also used in GPT-4 and LLaMA-3.</li>
+          <li><strong>No whitespace merging across sentences</strong> for Chinese text (no natural word boundaries).</li>
+        </ul>
+
+        <div class="code-label">Python — Data quality filter (simplified pipeline stage)</div>
+        <pre><code class="language-python">import re
+import hashlib
+from dataclasses import dataclass
+from typing import Optional
+
+@dataclass
+class DocumentFilter:
+    """
+    Heuristic quality filter approximating DeepSeek's pipeline [V3, §2.4].
+    Applied per-document before MinHash deduplication.
+    """
+    min_chars: int = 200
+    max_chars: int = 100_000
+    min_mean_word_len: float = 3.0
+    max_mean_word_len: float = 10.0
+    max_symbol_ratio: float = 0.1    # fraction of non-alphanumeric chars
+    max_repeated_line_ratio: float = 0.3
+
+    # PII patterns
+    _EMAIL_RE = re.compile(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b')
+    _PHONE_RE = re.compile(r'\b\d{3}[-.\s]?\d{3}[-.\s]?\d{4}\b')
+
+    def filter(self, text: str) -> Optional[str]:
+        """Returns cleaned text if document passes filters, else None."""
+        if not (self.min_chars <= len(text) <= self.max_chars):
+            return None
+
+        words = text.split()
+        if not words:
+            return None
+
+        mean_word_len = sum(len(w) for w in words) / len(words)
+        if not (self.min_mean_word_len <= mean_word_len <= self.max_mean_word_len):
+            return None
+
+        symbol_ratio = sum(1 for c in text if not c.isalnum() and not c.isspace()) / len(text)
+        if symbol_ratio > self.max_symbol_ratio:
+            return None
+
+        lines = text.splitlines()
+        if len(lines) > 10:
+            unique_lines = len(set(lines))
+            if 1 - unique_lines / len(lines) > self.max_repeated_line_ratio:
+                return None  # boilerplate / repeated content
+
+        # PII removal (replace, not discard)
+        text = self._EMAIL_RE.sub('[EMAIL]', text)
+        text = self._PHONE_RE.sub('[PHONE]', text)
+
+        return text
+
+    @staticmethod
+    def minhash_signature(text: str, num_hashes: int = 128) -> list[int]:
+        """
+        Simplified MinHash for fuzzy dedup (13-gram shingles).
+        Real implementation uses datasketch or custom C++ for scale.
+        """
+        shingles = set()
+        tokens = text.lower().split()
+        for i in range(len(tokens) - 12):
+            shingle = ' '.join(tokens[i:i+13])
+            shingles.add(shingle.encode())
+
+        signature = []
+        for seed in range(num_hashes):
+            min_hash = float('inf')
+            for s in shingles:
+                h = int(hashlib.md5(s + seed.to_bytes(4, 'little')).hexdigest(), 16)
+                min_hash = min(min_hash, h)
+            signature.append(min_hash)
+        return signature
+
+# Usage in Spark/Ray pipeline:
+# filter = DocumentFilter()
+# clean_docs = raw_rdd.map(filter.filter).filter(lambda x: x is not None)
+# signatures = clean_docs.map(DocumentFilter.minhash_signature)
+# # LSH bucketing then pairwise Jaccard similarity >= 0.8 -> deduplicate
+</code></pre>
+      </section>
+
+      <!-- Key Takeaways -->
+      <section id="takeaways" class="section-anchor">
+        <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-8">
+          <h2 class="text-2xl font-bold text-gray-900 mb-6">Key Takeaways</h2>
+          <div class="grid md:grid-cols-2 gap-6">
+            <div class="callout-info rounded-lg p-4">
+              <p class="font-semibold text-blue-800 mb-2">MoE + Shared Experts</p>
+              <p class="text-sm text-blue-700">Fine-grained MoE with always-active shared experts separates universal from specialized knowledge, dramatically improving parameter efficiency over standard sparse MoE. V2's 236B parameters at 21B active cost = 3× a dense 7B model's FLOPs for 33× the capacity.</p>
+            </div>
+            <div class="callout-tip rounded-lg p-4">
+              <p class="font-semibold text-green-800 mb-2">MLA: 32× KV Cache Reduction</p>
+              <p class="text-sm text-green-700">Multi-head Latent Attention compresses KV cache into 512-dim latents vs. 16,384-dim full K/V, enabling long-context inference on commodity hardware without quantization tricks.</p>
+            </div>
+            <div class="callout-tip rounded-lg p-4">
+              <p class="font-semibold text-green-800 mb-2">DualPipe + FP8 = &lt;1% Bubble</p>
+              <p class="text-sm text-green-700">Bidirectional pipeline with computation-communication overlap effectively eliminates pipeline bubbles. Combined with FP8 training (2× memory, 2× compute over BF16), MFU reaches ~38.6% on H800 clusters.</p>
+            </div>
+            <div class="callout-note rounded-lg p-4">
+              <p class="font-semibold text-purple-800 mb-2">Multi-Token Prediction: Free Speedup</p>
+              <p class="text-sm text-purple-700">MTP auxiliary heads add &lt;5% training compute overhead but provide 1.8× inference speedup via built-in speculative decoding — a rare case where a training regularizer directly translates to deployment efficiency.</p>
+            </div>
+            <div class="callout-warning rounded-lg p-4">
+              <p class="font-semibold text-amber-800 mb-2">Constraint-Driven Innovation</p>
+              <p class="text-sm text-amber-700">H800 export restrictions (halved NVLink bandwidth) forced node-constrained routing (max M=4 nodes per token) and aggressive IB/NVLink overlap — solutions that would benefit any large MoE deployment, not just export-restricted setups.</p>
+            </div>
+            <div class="callout-info rounded-lg p-4">
+              <p class="font-semibold text-blue-800 mb-2">Data Quality Over Quantity</p>
+              <p class="text-sm text-blue-700">14.8T tokens with aggressive MinHash deduplication and heuristic + ML quality filtering outperforms naively larger corpora. Per-digit tokenization and 100K vocab provide meaningful code and math improvements at negligible cost.</p>
+            </div>
+          </div>
+          <div class="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+            <p class="text-sm text-gray-700"><strong>Part 2 Preview:</strong> <a href="ch18b_deepseek_r1.html" class="text-blue-600 hover:underline">Chapter 18b</a> covers DeepSeek-R1 — how pure reinforcement learning (GRPO without SFT warm-up) produced emergent chain-of-thought reasoning, the AIME/MATH benchmark results, and a detailed cost breakdown comparing DeepSeek's total training spend to OpenAI/Anthropic estimates.</p>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<!-- Bottom Navigation -->
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+  <div class="border-t border-gray-200 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+    <a href="ch16_llm_ops.html" class="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+      Previous: Chapter 16 — LLM Ops
+    </a>
+    <div class="text-sm text-gray-400">Chapter 18 · Part 1 of 2</div>
+    <a href="ch18b_deepseek_r1.html" class="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors">
+      Next: Chapter 18b — DeepSeek-R1 &amp; Lessons
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+    </a>
+  </div>
+</div>
+
+<footer class="bg-gray-900 text-gray-400 text-sm py-8 mt-4">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-1">
+    <p>Modern MLOps Tutorial — Chapter 18: Case Study: DeepSeek Architecture &amp; Training Infrastructure</p>
+    <p>Content based on DeepSeek-V2 (arXiv:2405.04434), DeepSeek-V3 (arXiv:2412.19437), DeepSeek-R1 (arXiv:2501.12948).</p>
+    <p class="text-gray-500">Updated April 2026</p>
+  </div>
+</footer>
+
+</body>
+</html>

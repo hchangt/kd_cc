@@ -1,0 +1,2125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chapter 23: Case Study — Infrastructure as Code (Pulumi) — TypeScript for the AI Era</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/hcl.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/yaml.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --white: #FFFFFF;
+      --surface: #F9FAFB;
+      --border: #E5E7EB;
+      --border-code: #E1E4E8;
+      --text-primary: #111827;
+      --text-secondary: #6B7280;
+      --text-muted: #9CA3AF;
+      --indigo-600: #4F46E5;
+      --indigo-700: #4338CA;
+      --indigo-100: #EEF2FF;
+      --indigo-50: #EEF2FF;
+      --green-500: #10B981;
+      --green-50: #ECFDF5;
+      --blue-500: #3B82F6;
+      --blue-50: #EFF6FF;
+      --amber-500: #F59E0B;
+      --amber-50: #FFFBEB;
+      --orange-500: #F97316;
+      --orange-50: #FFF7ED;
+      --purple-500: #8B5CF6;
+      --purple-50: #F5F3FF;
+      --pink-500: #EC4899;
+      --pink-50: #FDF2F8;
+      --red-500: #EF4444;
+      --red-50: #FEF2F2;
+      --nav-height: 60px;
+      --toc-width: 240px;
+      --max-width: 1100px;
+      --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+    }
+
+    html { scroll-behavior: smooth; font-size: 16px; }
+    body {
+      font-family: var(--font-sans);
+      background: var(--white);
+      color: var(--text-primary);
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ============ PROGRESS BAR ============ */
+    .progress-bar-wrap {
+      position: fixed; top: 0; left: 0; right: 0;
+      z-index: 1000; height: 3px; background: var(--border);
+    }
+    .progress-bar-fill {
+      height: 100%;
+      width: calc(23 / 24 * 100%);
+      background: linear-gradient(90deg, var(--indigo-600), #818CF8);
+    }
+    .progress-label {
+      position: fixed; top: 3px; right: 0;
+      background: var(--indigo-600); color: white;
+      font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+      padding: 2px 8px; border-radius: 0 0 0 4px; z-index: 1000;
+    }
+
+    /* ============ TOP NAV ============ */
+    .top-nav {
+      position: fixed; top: 3px; left: 0; right: 0;
+      height: var(--nav-height);
+      background: rgba(255,255,255,0.97);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(8px);
+      z-index: 900;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 24px;
+    }
+    .nav-logo {
+      display: flex; align-items: center; gap: 10px;
+      text-decoration: none; color: var(--text-primary);
+    }
+    .nav-logo-badge {
+      background: var(--indigo-600); color: white;
+      font-size: 11px; font-weight: 800; letter-spacing: 0.06em;
+      padding: 3px 8px; border-radius: 4px; font-family: var(--font-mono);
+    }
+    .nav-logo-text { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+    .nav-chapters { display: flex; align-items: center; gap: 6px; }
+    .nav-chapters a {
+      display: flex; align-items: center; gap: 5px;
+      text-decoration: none; font-size: 13px; font-weight: 500;
+      color: var(--text-secondary); padding: 6px 12px;
+      border-radius: 6px; border: 1px solid var(--border); transition: all 0.15s;
+    }
+    .nav-chapters a:hover { background: var(--indigo-50); color: var(--indigo-600); border-color: #C7D2FE; }
+    .nav-chapters .sep { color: var(--border); font-size: 18px; }
+
+    /* ============ PAGE LAYOUT ============ */
+    .page-wrap {
+      max-width: var(--max-width); margin: 0 auto;
+      padding-top: calc(var(--nav-height) + 3px + 24px);
+      padding-bottom: 80px;
+      display: grid; grid-template-columns: var(--toc-width) 1fr;
+      gap: 40px; padding-left: 24px; padding-right: 24px;
+    }
+
+    /* ============ SIDEBAR TOC ============ */
+    .toc-sidebar {
+      position: sticky;
+      top: calc(var(--nav-height) + 3px + 24px);
+      height: calc(100vh - var(--nav-height) - 3px - 48px);
+      overflow-y: auto; padding-right: 12px;
+      scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+    }
+    .toc-sidebar::-webkit-scrollbar { width: 4px; }
+    .toc-sidebar::-webkit-scrollbar-track { background: transparent; }
+    .toc-sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+    .toc-label {
+      font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--text-muted); margin-bottom: 12px;
+    }
+    .toc-list { list-style: none; }
+    .toc-list li { margin-bottom: 2px; }
+    .toc-list a {
+      display: block; font-size: 13px; color: var(--text-secondary);
+      text-decoration: none; padding: 5px 10px; border-radius: 5px;
+      border-left: 2px solid transparent; transition: all 0.15s; line-height: 1.4;
+    }
+    .toc-list a:hover, .toc-list a.active {
+      color: var(--indigo-600); background: var(--indigo-50); border-left-color: var(--indigo-600);
+    }
+    .toc-list .toc-sub { padding-left: 22px; font-size: 12px; }
+
+    /* ============ MAIN CONTENT ============ */
+    .main-content { min-width: 0; }
+
+    /* ============ CHAPTER HERO ============ */
+    .chapter-hero {
+      background: linear-gradient(135deg, #EEF2FF 0%, #F0FFF4 50%, #FFF7ED 100%);
+      border: 1px solid #C7D2FE; border-radius: 16px;
+      padding: 48px 48px 40px; margin-bottom: 48px;
+      position: relative; overflow: hidden;
+    }
+    .chapter-hero::before {
+      content: '';
+      position: absolute; top: -60px; right: -60px;
+      width: 240px; height: 240px;
+      background: radial-gradient(circle, rgba(79,70,229,0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .chapter-number {
+      font-size: 100px; font-weight: 900; line-height: 1;
+      color: rgba(79,70,229,0.10); font-family: var(--font-mono);
+      position: absolute; top: 16px; right: 32px; user-select: none;
+    }
+    .chapter-eyebrow {
+      font-size: 12px; font-weight: 700; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--indigo-600); margin-bottom: 12px;
+    }
+    .chapter-title {
+      font-size: 34px; font-weight: 800; line-height: 1.15;
+      color: var(--text-primary); margin-bottom: 8px; max-width: 600px;
+    }
+    .chapter-subtitle {
+      font-size: 17px; color: var(--text-secondary);
+      margin-bottom: 24px; max-width: 540px; line-height: 1.6;
+    }
+    .chapter-meta { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+    .chapter-author { display: flex; align-items: center; gap: 10px; }
+    .author-avatar {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--indigo-600), #818CF8);
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-size: 15px; font-weight: 700;
+    }
+    .author-info { line-height: 1.3; }
+    .author-name { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+    .author-title { font-size: 12px; color: var(--text-secondary); }
+    .chapter-meta-pills { display: flex; gap: 8px; flex-wrap: wrap; }
+    .meta-pill {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 12px; font-weight: 500; color: var(--text-secondary);
+      background: white; border: 1px solid var(--border);
+      border-radius: 100px; padding: 4px 12px;
+    }
+
+    /* ============ TYPOGRAPHY ============ */
+    .main-content h2 {
+      font-size: 26px; font-weight: 800; color: var(--text-primary);
+      margin: 56px 0 20px; padding-top: 8px;
+      border-top: 1px solid var(--border); line-height: 1.25;
+    }
+    .main-content h2:first-of-type { margin-top: 0; border-top: none; }
+    .main-content h3 {
+      font-size: 19px; font-weight: 700; color: var(--text-primary);
+      margin: 36px 0 14px; line-height: 1.3;
+    }
+    .main-content h4 {
+      font-size: 15px; font-weight: 700; color: var(--text-primary);
+      margin: 24px 0 10px; text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .main-content p { margin-bottom: 18px; font-size: 16px; line-height: 1.75; color: #1F2937; }
+    .main-content ul, .main-content ol { margin: 0 0 20px 24px; }
+    .main-content li { margin-bottom: 8px; font-size: 16px; line-height: 1.7; color: #1F2937; }
+    .main-content a { color: var(--indigo-600); text-decoration: underline; text-underline-offset: 3px; }
+    .main-content a:hover { color: var(--indigo-700); }
+
+    code {
+      font-family: var(--font-mono); font-size: 0.875em;
+      background: #F3F4F6; border: 1px solid #E5E7EB;
+      border-radius: 4px; padding: 1px 6px; color: #B91C1C;
+    }
+
+    /* ============ CODE BLOCKS ============ */
+    .code-block {
+      position: relative; margin: 24px 0;
+      border-radius: 10px; border: 1px solid var(--border-code); overflow: hidden;
+    }
+    .code-block-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 16px; background: #F6F8FA; border-bottom: 1px solid var(--border-code);
+    }
+    .code-lang-badge {
+      font-family: var(--font-mono); font-size: 11px; font-weight: 700;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      padding: 2px 8px; border-radius: 4px;
+    }
+    .badge-ts { background: #DBEAFE; color: #1D4ED8; }
+    .badge-hcl { background: #F3E8FF; color: #6D28D9; }
+    .badge-yaml { background: #FEF9C3; color: #92400E; }
+    .badge-sh { background: #D1FAE5; color: #065F46; }
+    .code-filename { font-family: var(--font-mono); font-size: 12px; color: var(--text-secondary); }
+    .code-block pre { margin: 0; padding: 20px; background: #F6F8FA; overflow-x: auto; }
+    .code-block pre code {
+      background: none; border: none; padding: 0;
+      font-size: 13.5px; line-height: 1.6; color: inherit;
+    }
+
+    /* Side-by-side code comparison */
+    .code-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 28px 0; }
+    .code-compare .code-block { margin: 0; }
+    .code-compare-label {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.08em; color: var(--text-muted);
+      text-align: center; margin-bottom: 8px;
+    }
+
+    /* ============ CALLOUT BOXES ============ */
+    .callout {
+      display: flex; gap: 14px; padding: 18px 20px;
+      border-radius: 10px; border-left: 4px solid; margin: 28px 0;
+    }
+    .callout-icon { font-size: 20px; flex-shrink: 0; line-height: 1.4; }
+    .callout-body { flex: 1; min-width: 0; }
+    .callout-title {
+      font-size: 13px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.07em; margin-bottom: 6px;
+    }
+    .callout-body p { margin-bottom: 8px; font-size: 15px; }
+    .callout-body p:last-child { margin-bottom: 0; }
+    .callout-body ul { margin-bottom: 0; }
+    .callout-body li { font-size: 15px; }
+
+    .callout-tip { background: var(--green-50); border-color: var(--green-500); }
+    .callout-tip .callout-title { color: #065F46; }
+    .callout-info { background: var(--blue-50); border-color: var(--blue-500); }
+    .callout-info .callout-title { color: #1E40AF; }
+    .callout-warn { background: var(--amber-50); border-color: var(--amber-500); }
+    .callout-warn .callout-title { color: #92400E; }
+    .callout-ai { background: var(--pink-50); border-color: var(--pink-500); }
+    .callout-ai .callout-title { color: #9D174D; }
+    .callout-arch { background: var(--indigo-50); border-color: var(--indigo-600); }
+    .callout-arch .callout-title { color: #3730A3; }
+    .callout-cost { background: var(--red-50); border-color: var(--red-500); }
+    .callout-cost .callout-title { color: #991B1B; }
+    .callout-insight { background: var(--orange-50); border-color: var(--orange-500); }
+    .callout-insight .callout-title { color: #9A3412; }
+
+    /* ============ TABLES ============ */
+    .table-wrap {
+      overflow-x: auto; margin: 28px 0;
+      border-radius: 10px; border: 1px solid var(--border);
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th {
+      background: var(--indigo-50); color: var(--indigo-600);
+      font-weight: 700; font-size: 12px; text-transform: uppercase;
+      letter-spacing: 0.07em; padding: 12px 16px; text-align: left;
+      border-bottom: 2px solid #C7D2FE;
+    }
+    td {
+      padding: 12px 16px; border-bottom: 1px solid var(--border);
+      vertical-align: top; line-height: 1.5;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:nth-child(even) td { background: var(--surface); }
+    td code { font-size: 12px; }
+    .td-check { text-align: center; font-size: 16px; }
+    .check-yes { color: var(--green-500); font-weight: 700; }
+    .check-no { color: #EF4444; font-weight: 700; }
+    .check-partial { color: var(--amber-500); font-weight: 700; }
+
+    /* ============ SVG DIAGRAMS ============ */
+    .diagram-wrap {
+      margin: 36px 0; padding: 32px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; overflow-x: auto; text-align: center;
+    }
+    .diagram-caption {
+      text-align: center; font-size: 13px;
+      color: var(--text-secondary); margin-top: 16px; font-style: italic;
+    }
+    svg text { font-family: var(--font-sans); }
+
+    /* ============ FILE TREE ============ */
+    .file-tree {
+      background: #F6F8FA; border: 1px solid var(--border-code);
+      border-radius: 10px; padding: 20px 24px; margin: 24px 0;
+      font-family: var(--font-mono); font-size: 13.5px; line-height: 1.8;
+    }
+    .file-tree .dir { color: var(--indigo-600); font-weight: 600; }
+    .file-tree .file { color: #374151; }
+    .file-tree .comment { color: var(--text-muted); font-style: italic; }
+
+    /* ============ CONCEPT CARDS ============ */
+    .concept-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px; margin: 28px 0;
+    }
+    .concept-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 20px;
+    }
+    .concept-card-icon { font-size: 28px; margin-bottom: 10px; }
+    .concept-card-title { font-size: 14px; font-weight: 700; margin-bottom: 6px; color: var(--text-primary); }
+    .concept-card-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+
+    /* ============ PULL QUOTE ============ */
+    .pull-quote {
+      border-left: 4px solid var(--indigo-600);
+      background: var(--indigo-50); border-radius: 0 10px 10px 0;
+      padding: 24px 28px; margin: 36px 0;
+    }
+    .pull-quote p {
+      font-size: 20px; font-style: italic; font-weight: 500;
+      color: var(--text-primary); margin-bottom: 12px; line-height: 1.5;
+    }
+    .pull-quote cite { font-size: 13px; font-style: normal; font-weight: 600; color: var(--indigo-600); }
+
+    /* ============ FOOTER NAV ============ */
+    .footer-nav {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 16px; margin-top: 64px; padding-top: 32px;
+      border-top: 1px solid var(--border);
+    }
+    .footer-nav-btn {
+      display: flex; align-items: center; gap: 12px;
+      text-decoration: none; padding: 20px 24px;
+      border-radius: 10px; border: 1px solid var(--border);
+      background: var(--surface); transition: all 0.2s;
+    }
+    .footer-nav-btn:hover { border-color: #C7D2FE; background: var(--indigo-50); }
+    .footer-nav-btn.next { justify-content: flex-end; text-align: right; }
+    .footer-nav-arrow { font-size: 24px; color: var(--indigo-600); flex-shrink: 0; }
+    .footer-nav-label {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 3px;
+    }
+    .footer-nav-title { font-size: 15px; font-weight: 700; color: var(--text-primary); }
+
+    /* ============ RESPONSIVE ============ */
+    @media (max-width: 860px) {
+      .page-wrap { grid-template-columns: 1fr; }
+      .toc-sidebar { display: none; }
+      .code-compare { grid-template-columns: 1fr; }
+      .chapter-number { display: none; }
+      .chapter-title { font-size: 26px; }
+      .chapter-hero { padding: 32px 24px; }
+    }
+    @media (max-width: 600px) {
+      .nav-logo-text { display: none; }
+    }
+
+    .hljs { background: #F6F8FA !important; }
+    .section-anchor { scroll-margin-top: calc(var(--nav-height) + 3px + 20px); }
+  </style>
+</head>
+<body>
+
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-fill"></div>
+  </div>
+  <div class="progress-label">Chapter 23 of 24</div>
+
+  <nav class="top-nav">
+    <a href="../index.html" class="nav-logo">
+      <span class="nav-logo-badge">TS</span>
+      <span class="nav-logo-text">TypeScript for the AI Era</span>
+    </a>
+    <div class="nav-chapters">
+      <a href="chapter-22-cli.html">&#8592; Ch 22: CLI Tools</a>
+      <span class="sep">|</span>
+      <a href="chapter-24-saas.html">Ch 24: SaaS &#8594;</a>
+    </div>
+  </nav>
+
+  <div class="page-wrap">
+
+    <!-- ===== SIDEBAR TOC ===== -->
+    <aside class="toc-sidebar">
+      <div class="toc-label">On this page</div>
+      <ul class="toc-list">
+        <li><a href="#iac-overview">1. IaC Overview</a></li>
+        <li><a href="#iac-landscape" class="toc-sub">The Landscape</a></li>
+        <li><a href="#why-yaml-fails" class="toc-sub">Why YAML Fails</a></li>
+        <li><a href="#pulumi-concepts">2. Pulumi Concepts</a></li>
+        <li><a href="#resource-graph" class="toc-sub">Resource Graph</a></li>
+        <li><a href="#getting-started">3. Getting Started</a></li>
+        <li><a href="#project-structure" class="toc-sub">Project Structure</a></li>
+        <li><a href="#output-type">4. The Output&lt;T&gt; Type</a></li>
+        <li><a href="#output-monad" class="toc-sub">Output as Monad</a></li>
+        <li><a href="#real-infrastructure">5. Real Infrastructure</a></li>
+        <li><a href="#nextjs-deploy" class="toc-sub">Next.js on AWS</a></li>
+        <li><a href="#component-resources">6. Component Resources</a></li>
+        <li><a href="#webservice-class" class="toc-sub">WebService Class</a></li>
+        <li><a href="#config-secrets">7. Config &amp; Secrets</a></li>
+        <li><a href="#testing">8. Testing Pulumi</a></li>
+        <li><a href="#type-system">9. TypeScript Type System</a></li>
+        <li><a href="#tf-vs-pulumi">10. Terraform vs Pulumi</a></li>
+        <li><a href="#advanced-patterns">11. Advanced Patterns</a></li>
+        <li><a href="#automation-api" class="toc-sub">Automation API</a></li>
+        <li><a href="#key-lessons">12. Key Lessons</a></li>
+      </ul>
+    </aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="main-content">
+
+      <!-- Chapter Hero -->
+      <div class="chapter-hero">
+        <div class="chapter-number">23</div>
+        <div class="chapter-eyebrow">Chapter Twenty-Three &middot; Case Study</div>
+        <h1 class="chapter-title">Infrastructure as Code: Pulumi Architecture</h1>
+        <p class="chapter-subtitle">Write real TypeScript to define cloud infrastructure — not YAML, not HCL. Types, loops, classes, and tests for your entire AWS stack.</p>
+        <div class="chapter-meta">
+          <div class="chapter-author">
+            <div class="author-avatar">GCP</div>
+            <div class="author-info">
+              <div class="author-name">Senior Staff Engineer</div>
+              <div class="author-title">Google Cloud Platform &middot; Infrastructure &amp; Developer Tooling</div>
+            </div>
+          </div>
+          <div class="chapter-meta-pills">
+            <span class="meta-pill">&#128337; 70 min read</span>
+            <span class="meta-pill">&#128640; Advanced</span>
+            <span class="meta-pill">&#9729; Cloud/IaC</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================================================================
+           SECTION 1: IaC OVERVIEW
+      ================================================================ -->
+      <h2 id="iac-overview" class="section-anchor">1. Infrastructure as Code (IaC) Overview</h2>
+
+      <p>
+        When I was on the GCP team at Google, we managed thousands of cloud resources: Kubernetes clusters, Cloud SQL instances, load balancers, IAM bindings, service accounts, VPCs. The only way to keep that sane — reproducible, reviewable, auditable — was to define every resource in code. Not through the console. Not through one-off CLI commands. In code, checked into version control, reviewed like any other change.
+      </p>
+
+      <p>
+        That discipline is called <strong>Infrastructure as Code (IaC)</strong>. The idea is simple: instead of clicking through the AWS console to create an S3 bucket, you write a declaration that says "I want a bucket with these properties," commit it, and a tool reads that declaration and makes it real. When the declaration changes, the tool figures out the minimal set of changes to apply.
+      </p>
+
+      <div class="callout callout-info">
+        <div class="callout-icon">&#128161;</div>
+        <div class="callout-body">
+          <div class="callout-title">Info — Why IaC Matters</div>
+          <p>IaC gives you reproducibility (same code = same infra), version history (git blame your outage), peer review (PRs for infrastructure changes), and disaster recovery (rebuild from scratch in minutes, not weeks).</p>
+        </div>
+      </div>
+
+      <h3 id="iac-landscape">The IaC Landscape</h3>
+
+      <p>Several tools compete in this space. Each makes a different tradeoff between simplicity and power:</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Tool</th>
+              <th>Language</th>
+              <th>Company</th>
+              <th>Type Safety</th>
+              <th>Real Loops</th>
+              <th>Real Functions</th>
+              <th>Unit Tests</th>
+              <th>IDE Support</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Terraform</strong></td>
+              <td>HCL (custom DSL)</td>
+              <td>HashiCorp</td>
+              <td class="td-check"><span class="check-no">&#10007;</span></td>
+              <td class="td-check"><span class="check-partial">~</span></td>
+              <td class="td-check"><span class="check-partial">~</span></td>
+              <td class="td-check"><span class="check-no">&#10007;</span></td>
+              <td class="td-check"><span class="check-partial">~</span></td>
+            </tr>
+            <tr>
+              <td><strong>CloudFormation</strong></td>
+              <td>YAML / JSON</td>
+              <td>AWS</td>
+              <td class="td-check"><span class="check-no">&#10007;</span></td>
+              <td class="td-check"><span class="check-no">&#10007;</span></td>
+              <td class="td-check"><span class="check-no">&#10007;</span></td>
+              <td class="td-check"><span class="check-no">&#10007;</span></td>
+              <td class="td-check"><span class="check-no">&#10007;</span></td>
+            </tr>
+            <tr>
+              <td><strong>AWS CDK</strong></td>
+              <td>TypeScript / Python / Java</td>
+              <td>AWS</td>
+              <td class="td-check"><span class="check-yes">&#10003;</span></td>
+              <td class="td-check"><span class="check-yes">&#10003;</span></td>
+              <td class="td-check"><span class="check-yes">&#10003;</span></td>
+              <td class="td-check"><span class="check-yes">&#10003;</span></td>
+              <td class="td-check"><span class="check-yes">&#10003;</span></td>
+            </tr>
+            <tr>
+              <td><strong>Pulumi</strong></td>
+              <td>TypeScript / Python / Go / C#</td>
+              <td>Pulumi Corp</td>
+              <td class="td-check"><span class="check-yes">&#10003;</span></td>
+              <td class="td-check"><span class="check-yes">&#10003;</span></td>
+              <td class="td-check"><span class="check-yes">&#10003;</span></td>
+              <td class="td-check"><span class="check-yes">&#10003;</span></td>
+              <td class="td-check"><span class="check-yes">&#10003;</span></td>
+            </tr>
+            <tr>
+              <td><strong>Ansible</strong></td>
+              <td>YAML</td>
+              <td>Red Hat</td>
+              <td class="td-check"><span class="check-no">&#10007;</span></td>
+              <td class="td-check"><span class="check-partial">~</span></td>
+              <td class="td-check"><span class="check-no">&#10007;</span></td>
+              <td class="td-check"><span class="check-partial">~</span></td>
+              <td class="td-check"><span class="check-no">&#10007;</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 id="why-yaml-fails">Why YAML and HCL Are Limiting</h3>
+
+      <p>The fundamental problem with YAML- and HCL-based IaC is that they are <em>data formats</em> pretending to be programming languages. They can express what you want, but not how to compute what you want.</p>
+
+      <div class="code-compare">
+        <div>
+          <div class="code-compare-label">Terraform HCL — creating 3 subnets</div>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang-badge badge-hcl">HCL</span>
+              <span class="code-filename">main.tf</span>
+            </div>
+            <pre><code class="language-hcl"># No real loops — must use count or for_each
+resource "aws_subnet" "subnet" {
+  count      = 3
+  vpc_id     = aws_vpc.main.id
+  cidr_block = element(
+    ["10.0.1.0/24","10.0.2.0/24","10.0.3.0/24"],
+    count.index
+  )
+  # Can't call a function to compute CIDR
+  # Can't use if/else for conditional logic
+  # Error messages are cryptic
+}</code></pre>
+          </div>
+        </div>
+        <div>
+          <div class="code-compare-label">Pulumi TypeScript — same thing</div>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang-badge badge-ts">TypeScript</span>
+              <span class="code-filename">index.ts</span>
+            </div>
+            <pre><code class="language-typescript">// Real loops with real logic
+const subnets = [1, 2, 3].map(i =>
+  new aws.ec2.Subnet(`subnet-${i}`, {
+    vpcId: vpc.id,
+    // Real function call — compute CIDR
+    cidrBlock: computeCidr(i),
+    availabilityZone: azs[i - 1],
+    tags: { Name: `subnet-${i}` },
+  })
+)
+
+function computeCidr(index: number): string {
+  return `10.0.${index}.0/24`
+}</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <p>Here is what you simply cannot do in Terraform HCL or raw CloudFormation YAML, but can do trivially in Pulumi TypeScript:</p>
+
+      <ul>
+        <li><strong>No type safety</strong> — misspell <code>cidrBlock</code> as <code>cidr_block</code> (or vice versa) and you find out at deploy time, not at your editor</li>
+        <li><strong>No real loops</strong> — Terraform's <code>count</code> and <code>for_each</code> are limited hacks; you cannot loop over heterogeneous resource types</li>
+        <li><strong>No abstraction</strong> — you cannot write a "function" that creates a standard web service with a load balancer, ECS task, and security group, then reuse it three times</li>
+        <li><strong>No testing</strong> — you cannot write unit tests for HCL. You can run <code>terraform plan</code> and squint at the diff</li>
+        <li><strong>No refactoring</strong> — rename a resource in HCL and your editor has no idea what other files reference it</li>
+      </ul>
+
+      <div class="callout callout-ai">
+        <div class="callout-icon">&#129302;</div>
+        <div class="callout-body">
+          <div class="callout-title">AI Era — LLMs Write Better Pulumi than HCL</div>
+          <p>LLMs are dramatically better at writing Pulumi TypeScript than Terraform HCL. The reason is simple: TypeScript is in their training data by the gigabyte. HCL is not. When you ask Claude or GPT-4 to generate infrastructure, the TypeScript output is type-checked by your IDE immediately — the HCL output requires a full <code>terraform plan</code> cycle to catch mistakes.</p>
+        </div>
+      </div>
+
+      <!-- ================================================================
+           SECTION 2: PULUMI CONCEPTS
+      ================================================================ -->
+      <h2 id="pulumi-concepts" class="section-anchor">2. Pulumi Concepts</h2>
+
+      <p>Before writing any code, you need to understand the six core concepts in Pulumi's model. These map cleanly to TypeScript primitives, which is why the mental model clicks so fast.</p>
+
+      <div class="concept-grid">
+        <div class="concept-card">
+          <div class="concept-card-icon">&#127890;</div>
+          <div class="concept-card-title">Stack</div>
+          <div class="concept-card-desc">An isolated deployment of your program. One codebase, multiple stacks: <code>dev</code>, <code>staging</code>, <code>prod</code>. Each stack has its own state and config.</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-card-icon">&#129695;</div>
+          <div class="concept-card-title">Resource</div>
+          <div class="concept-card-desc">A cloud primitive — S3 bucket, EC2 instance, RDS database, IAM role. Creating a resource object in TypeScript registers it in the deployment graph.</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-card-icon">&#9200;</div>
+          <div class="concept-card-title">Output&lt;T&gt;</div>
+          <div class="concept-card-desc">Like a Promise — a value that exists after deployment. The bucket ID is not known until AWS creates the bucket. <code>Output&lt;T&gt;</code> wraps that future value.</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-card-icon">&#128274;</div>
+          <div class="concept-card-title">Config</div>
+          <div class="concept-card-desc">Per-stack configuration. Public values in <code>Pulumi.dev.yaml</code>. Secrets are encrypted at rest and never appear in logs.</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-card-icon">&#128190;</div>
+          <div class="concept-card-title">State</div>
+          <div class="concept-card-desc">Pulumi tracks every deployed resource in a state file. Stored in Pulumi Cloud (default), S3, or local. This is how Pulumi knows what to update vs. create.</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-card-icon">&#9928;</div>
+          <div class="concept-card-title">Provider</div>
+          <div class="concept-card-desc">The cloud plugin — AWS, GCP, Azure, Cloudflare, Vercel, Kubernetes, GitHub. Each provider generates typed TypeScript bindings from its schema.</div>
+        </div>
+      </div>
+
+      <h3 id="resource-graph">The Resource Graph</h3>
+
+      <p>
+        The most important thing Pulumi does is build a <strong>directed acyclic graph (DAG)</strong> of your resources. When resource B depends on resource A (for example, an ECS service depends on an ECS cluster), Pulumi knows it must create A before B, and can parallelize everything else. You never write explicit ordering — it falls out of the dependency structure automatically, inferred from which <code>Output&lt;T&gt;</code> values you reference.
+      </p>
+
+      <div class="diagram-wrap">
+        <svg viewBox="0 0 700 320" width="700" height="320" style="max-width:100%">
+          <!-- Background grid hint -->
+          <defs>
+            <marker id="arrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+              <polygon points="0 0, 10 3.5, 0 7" fill="#4F46E5"/>
+            </marker>
+            <marker id="arrow-gray" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+              <polygon points="0 0, 10 3.5, 0 7" fill="#9CA3AF"/>
+            </marker>
+          </defs>
+
+          <!-- VPC node -->
+          <rect x="280" y="20" width="140" height="48" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2"/>
+          <text x="350" y="40" text-anchor="middle" font-size="13" font-weight="700" fill="#3730A3">VPC</text>
+          <text x="350" y="57" text-anchor="middle" font-size="11" fill="#6B7280">awsx.ec2.Vpc</text>
+
+          <!-- Subnets -->
+          <rect x="60" y="120" width="130" height="48" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+          <text x="125" y="140" text-anchor="middle" font-size="13" font-weight="700" fill="#3730A3">Public Subnets</text>
+          <text x="125" y="157" text-anchor="middle" font-size="11" fill="#6B7280">aws.ec2.Subnet</text>
+
+          <rect x="280" y="120" width="140" height="48" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+          <text x="350" y="140" text-anchor="middle" font-size="13" font-weight="700" fill="#3730A3">Security Groups</text>
+          <text x="350" y="157" text-anchor="middle" font-size="11" fill="#6B7280">aws.ec2.SecurityGroup</text>
+
+          <rect x="510" y="120" width="130" height="48" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+          <text x="575" y="140" text-anchor="middle" font-size="13" font-weight="700" fill="#3730A3">RDS Subnet Group</text>
+          <text x="575" y="157" text-anchor="middle" font-size="11" fill="#6B7280">aws.rds.SubnetGroup</text>
+
+          <!-- ECS Cluster -->
+          <rect x="60" y="228" width="130" height="48" rx="8" fill="#ECFDF5" stroke="#10B981" stroke-width="1.5"/>
+          <text x="125" y="248" text-anchor="middle" font-size="13" font-weight="700" fill="#065F46">ECS Cluster</text>
+          <text x="125" y="265" text-anchor="middle" font-size="11" fill="#6B7280">aws.ecs.Cluster</text>
+
+          <!-- RDS -->
+          <rect x="280" y="228" width="140" height="48" rx="8" fill="#FFF7ED" stroke="#F97316" stroke-width="1.5"/>
+          <text x="350" y="248" text-anchor="middle" font-size="13" font-weight="700" fill="#9A3412">RDS Database</text>
+          <text x="350" y="265" text-anchor="middle" font-size="11" fill="#6B7280">aws.rds.Instance</text>
+
+          <!-- ECS Service -->
+          <rect x="510" y="228" width="130" height="48" rx="8" fill="#FDF2F8" stroke="#EC4899" stroke-width="1.5"/>
+          <text x="575" y="248" text-anchor="middle" font-size="13" font-weight="700" fill="#9D174D">Fargate Service</text>
+          <text x="575" y="265" text-anchor="middle" font-size="11" fill="#6B7280">awsx.ecs.Fargate</text>
+
+          <!-- Arrows: VPC -> subnets, security groups, subnet group -->
+          <line x1="305" y1="68" x2="185" y2="120" stroke="#4F46E5" stroke-width="1.5" marker-end="url(#arrow)"/>
+          <line x1="350" y1="68" x2="350" y2="120" stroke="#4F46E5" stroke-width="1.5" marker-end="url(#arrow)"/>
+          <line x1="395" y1="68" x2="530" y2="120" stroke="#4F46E5" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+          <!-- subnets -> ECS Cluster -->
+          <line x1="125" y1="168" x2="125" y2="228" stroke="#9CA3AF" stroke-width="1.5" marker-end="url(#arrow-gray)"/>
+          <!-- security groups -> RDS, ECS -->
+          <line x1="350" y1="168" x2="350" y2="228" stroke="#9CA3AF" stroke-width="1.5" marker-end="url(#arrow-gray)"/>
+          <line x1="395" y1="168" x2="540" y2="228" stroke="#9CA3AF" stroke-width="1.5" marker-end="url(#arrow-gray)"/>
+          <!-- subnet group -> RDS -->
+          <line x1="520" y1="168" x2="400" y2="228" stroke="#9CA3AF" stroke-width="1.5" marker-end="url(#arrow-gray)"/>
+          <!-- ECS Cluster -> Fargate -->
+          <line x1="190" y1="252" x2="510" y2="252" stroke="#9CA3AF" stroke-width="1.5" marker-end="url(#arrow-gray)"/>
+        </svg>
+        <div class="diagram-caption">Pulumi's resource graph — dependency arrows determine deployment order. Pulumi parallelizes independent branches automatically.</div>
+      </div>
+
+      <div class="callout callout-arch">
+        <div class="callout-icon">&#127959;</div>
+        <div class="callout-body">
+          <div class="callout-title">Architecture Note — The Graph Is Implicit</div>
+          <p>You never draw this graph manually. It emerges from which <code>Output&lt;T&gt;</code> values you pass to which resources. If you pass <code>vpc.id</code> to a subnet, Pulumi infers "subnet depends on VPC" and orders the deployment accordingly. This is the core insight of Pulumi's design.</p>
+        </div>
+      </div>
+
+      <!-- ================================================================
+           SECTION 3: GETTING STARTED
+      ================================================================ -->
+      <h2 id="getting-started" class="section-anchor">3. Getting Started with Pulumi + TypeScript</h2>
+
+      <h3>Installation</h3>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-lang-badge badge-sh">Shell</span>
+        </div>
+        <pre><code class="language-bash"># Install the Pulumi CLI
+brew install pulumi
+
+# Authenticate (uses Pulumi Cloud for free state management)
+pulumi login
+
+# Create a new AWS TypeScript project
+mkdir my-infra && cd my-infra
+pulumi new aws-typescript
+
+# You'll be prompted for:
+#   project name, description, stack name (e.g. "dev"), AWS region</code></pre>
+      </div>
+
+      <h3 id="project-structure">Project Structure</h3>
+
+      <div class="file-tree">
+        <span class="dir">my-infra/</span><br>
+        &nbsp;&nbsp;&#9500;&#9472;&#9472; <span class="file">index.ts</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment"># Your infrastructure — this is where you write code</span><br>
+        &nbsp;&nbsp;&#9500;&#9472;&#9472; <span class="file">package.json</span> &nbsp;&nbsp;&nbsp;&nbsp;<span class="comment"># @pulumi/pulumi, @pulumi/aws dependencies</span><br>
+        &nbsp;&nbsp;&#9500;&#9472;&#9472; <span class="file">tsconfig.json</span> &nbsp;&nbsp;&nbsp;<span class="comment"># Strict TypeScript config</span><br>
+        &nbsp;&nbsp;&#9500;&#9472;&#9472; <span class="file">Pulumi.yaml</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment"># Project metadata (name, runtime: nodejs)</span><br>
+        &nbsp;&nbsp;&#9500;&#9472;&#9472; <span class="file">Pulumi.dev.yaml</span> &nbsp;<span class="comment"># Stack config for "dev" (committed)</span><br>
+        &nbsp;&nbsp;&#9492;&#9472;&#9472; <span class="file">Pulumi.prod.yaml</span> <span class="comment"># Stack config for "prod" (committed, no secrets)</span>
+      </div>
+
+      <h3>Core CLI Commands</h3>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-lang-badge badge-sh">Shell</span>
+        </div>
+        <pre><code class="language-bash"># Preview what will change (like terraform plan)
+pulumi preview
+
+# Deploy — creates/updates/deletes resources to match your code
+pulumi up
+
+# Tear everything down
+pulumi destroy
+
+# Manage stacks
+pulumi stack ls                    # list stacks
+pulumi stack select prod           # switch to prod
+pulumi stack output serviceUrl     # read an exported value
+
+# Set config values
+pulumi config set region us-west-2
+pulumi config set --secret dbPassword hunter2  # encrypted</code></pre>
+      </div>
+
+      <div class="callout callout-tip">
+        <div class="callout-icon">&#9989;</div>
+        <div class="callout-body">
+          <div class="callout-title">Tip — Always Run Preview First</div>
+          <p>Make <code>pulumi preview</code> part of your PR pipeline. It shows exactly what will be created, updated, or deleted — without touching any real infrastructure. Catching a destructive change in CI is infinitely better than noticing it after <code>pulumi up</code>.</p>
+        </div>
+      </div>
+
+      <!-- ================================================================
+           SECTION 4: OUTPUT<T>
+      ================================================================ -->
+      <h2 id="output-type" class="section-anchor">4. The <code>Output&lt;T&gt;</code> Type — Pulumi's Core Innovation</h2>
+
+      <p>
+        <code>Output&lt;T&gt;</code> is the single most important concept in Pulumi. Everything else builds on top of it. Understanding it deeply — where it comes from, how it flows, and why it exists — is the key to writing fluent Pulumi code.
+      </p>
+
+      <p>
+        When you create a cloud resource, many of its properties are not known until the cloud provider actually creates it. An S3 bucket's ID, an EC2 instance's IP address, an RDS endpoint — these values exist only after deployment. But you need to reference them in other resources before deployment happens. <code>Output&lt;T&gt;</code> is Pulumi's solution: a typed wrapper around a value that will exist in the future.
+      </p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-lang-badge badge-ts">TypeScript</span>
+          <span class="code-filename">index.ts</span>
+        </div>
+        <pre><code class="language-typescript">import * as aws from '@pulumi/aws'
+import * as pulumi from '@pulumi/pulumi'
+
+// Create an S3 bucket
+// TypeScript knows the full shape of all inputs — no guessing
+const bucket = new aws.s3.BucketV2('my-bucket', {
+  tags: { Environment: 'production', Team: 'platform' },
+})
+
+// bucket.id is Output<string> — the bucket name is not known yet
+const bucketId: pulumi.Output<string> = bucket.id
+
+// bucket.tags is Output<{[key: string]: string} | undefined>
+const bucketTags: pulumi.Output<{[key: string]: string} | undefined> = bucket.tags
+
+// .apply() transforms an Output — like Promise.then()
+// The callback runs only during deployment, with the real value
+const bucketUrl: pulumi.Output<string> = bucket.bucket.apply(
+  (name: string) => `https://${name}.s3.amazonaws.com`
+)
+
+// pulumi.all() combines multiple Outputs — like Promise.all()
+const db = new aws.rds.Instance('db', { /* ... */ })
+
+const connectionString: pulumi.Output<string> = pulumi.all([
+  db.endpoint,
+  db.port,
+  db.dbName,
+]).apply(([endpoint, port, name]) =>
+  `postgresql://${endpoint}:${port}/${name}`
+)
+
+// pulumi.interpolate is a tagged template for Output<string>
+// Cleaner than .apply() for string construction
+const lambdaEnv = {
+  DATABASE_URL: pulumi.interpolate`postgresql://${db.endpoint}:${db.port}/${db.dbName}`,
+  BUCKET_URL: pulumi.interpolate`https://${bucket.bucket}.s3.amazonaws.com`,
+}
+
+// Export outputs — these appear after `pulumi up`
+export const url = bucketUrl
+export const dbEndpoint = db.endpoint</code></pre>
+      </div>
+
+      <h3 id="output-monad">Output&lt;T&gt; as a Monad</h3>
+
+      <p>
+        If you have a functional programming background, <code>Output&lt;T&gt;</code> is a <strong>monad</strong> (specifically a functor with applicative structure). <code>.apply()</code> is <code>map</code>. <code>pulumi.all()</code> is the applicative combinator. The values are "effectful" — they carry the additional context that the value is produced by a deployment, not immediately available.
+      </p>
+
+      <div class="diagram-wrap">
+        <svg viewBox="0 0 680 200" width="680" height="200" style="max-width:100%">
+          <defs>
+            <marker id="arr2" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+              <polygon points="0 0, 10 3.5, 0 7" fill="#4F46E5"/>
+            </marker>
+          </defs>
+
+          <!-- Output<string> bucket.id -->
+          <rect x="10" y="60" width="150" height="56" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2"/>
+          <text x="85" y="84" text-anchor="middle" font-size="11" font-weight="700" fill="#4F46E5">Output&lt;string&gt;</text>
+          <text x="85" y="101" text-anchor="middle" font-size="12" fill="#374151">bucket.bucket</text>
+
+          <!-- .apply arrow -->
+          <line x1="160" y1="88" x2="230" y2="88" stroke="#4F46E5" stroke-width="2" marker-end="url(#arr2)"/>
+          <text x="195" y="80" text-anchor="middle" font-size="11" fill="#6B7280">.apply()</text>
+
+          <!-- Output<string> url -->
+          <rect x="230" y="60" width="170" height="56" rx="8" fill="#ECFDF5" stroke="#10B981" stroke-width="2"/>
+          <text x="315" y="84" text-anchor="middle" font-size="11" font-weight="700" fill="#065F46">Output&lt;string&gt;</text>
+          <text x="315" y="101" text-anchor="middle" font-size="12" fill="#374151">bucketUrl</text>
+
+          <!-- pulumi.all label -->
+          <rect x="10" y="145" width="150" height="40" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+          <text x="85" y="162" text-anchor="middle" font-size="11" font-weight="700" fill="#4F46E5">Output&lt;string&gt;</text>
+          <text x="85" y="178" text-anchor="middle" font-size="11" fill="#374151">db.endpoint</text>
+
+          <rect x="175" y="145" width="140" height="40" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+          <text x="245" y="162" text-anchor="middle" font-size="11" font-weight="700" fill="#4F46E5">Output&lt;number&gt;</text>
+          <text x="245" y="178" text-anchor="middle" font-size="11" fill="#374151">db.port</text>
+
+          <!-- pulumi.all() arrow -->
+          <line x1="315" y1="145" x2="395" y2="105" stroke="#4F46E5" stroke-width="1.5" marker-end="url(#arr2)"/>
+          <text x="370" y="118" text-anchor="middle" font-size="11" fill="#6B7280">pulumi.all()</text>
+
+          <!-- combined -->
+          <rect x="430" y="60" width="230" height="56" rx="8" fill="#FFF7ED" stroke="#F97316" stroke-width="2"/>
+          <text x="545" y="84" text-anchor="middle" font-size="11" font-weight="700" fill="#9A3412">Output&lt;string&gt;</text>
+          <text x="545" y="101" text-anchor="middle" font-size="11" fill="#374151">connectionString</text>
+
+          <!-- Label at top -->
+          <text x="340" y="22" text-anchor="middle" font-size="13" font-weight="700" fill="#111827">Output&lt;T&gt; composition — like Promise chaining for cloud values</text>
+        </svg>
+        <div class="diagram-caption"><code>Output&lt;T&gt;</code> values compose via <code>.apply()</code> and <code>pulumi.all()</code>. The real values flow through only when Pulumi deploys.</div>
+      </div>
+
+      <div class="callout callout-warn">
+        <div class="callout-icon">&#9888;</div>
+        <div class="callout-body">
+          <div class="callout-title">Warning — Never Use Output&lt;T&gt; in Plain JavaScript</div>
+          <p>You cannot use <code>console.log(bucket.id)</code> and see the bucket name — it will print <code>[object Object]</code>. Output values are not resolved until Pulumi's deployment engine runs them. Always use <code>.apply()</code>, <code>pulumi.interpolate</code>, or <code>pulumi.all()</code> to work with Output values. If you need to conditionally create resources based on a value, pass the Output through to the resource that needs it — never try to extract the raw value.</p>
+        </div>
+      </div>
+
+      <!-- ================================================================
+           SECTION 5: REAL INFRASTRUCTURE
+      ================================================================ -->
+      <h2 id="real-infrastructure" class="section-anchor">5. Building Real Infrastructure</h2>
+
+      <p>
+        Let's put it together. Here is a complete, production-representative Pulumi TypeScript program that deploys a Next.js application to AWS: VPC, ECS Fargate, RDS Postgres, an Application Load Balancer, and all the wiring between them.
+      </p>
+
+      <h3 id="nextjs-deploy">Deploying a Next.js App to AWS</h3>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-lang-badge badge-ts">TypeScript</span>
+          <span class="code-filename">index.ts</span>
+        </div>
+        <pre><code class="language-typescript">import * as aws from '@pulumi/aws'
+import * as awsx from '@pulumi/awsx'
+import * as pulumi from '@pulumi/pulumi'
+
+const config = new pulumi.Config()
+const stack = pulumi.getStack()          // "dev" | "staging" | "prod"
+const isProd = stack === 'prod'
+
+// ── VPC ────────────────────────────────────────────────────────────────
+// awsx (Crosswalk) provides higher-level constructs built on top of aws.*
+const vpc = new awsx.ec2.Vpc('app-vpc', {
+  numberOfAvailabilityZones: isProd ? 3 : 2,
+  natGateways: { strategy: isProd ? 'OnePerAz' : 'Single' },
+  tags: { Project: 'myapp', Stack: stack },
+})
+
+// ── Security Groups ────────────────────────────────────────────────────
+const albSg = new aws.ec2.SecurityGroup('alb-sg', {
+  vpcId: vpc.vpcId,
+  description: 'Allow HTTP/HTTPS from internet',
+  ingress: [
+    { protocol: 'tcp', fromPort: 80,  toPort: 80,  cidrBlocks: ['0.0.0.0/0'] },
+    { protocol: 'tcp', fromPort: 443, toPort: 443, cidrBlocks: ['0.0.0.0/0'] },
+  ],
+  egress: [{ protocol: '-1', fromPort: 0, toPort: 0, cidrBlocks: ['0.0.0.0/0'] }],
+})
+
+const appSg = new aws.ec2.SecurityGroup('app-sg', {
+  vpcId: vpc.vpcId,
+  description: 'App containers — allow from ALB only',
+  ingress: [{
+    protocol: 'tcp', fromPort: 3000, toPort: 3000,
+    securityGroups: [albSg.id],        // typed: Output<string>
+  }],
+  egress: [{ protocol: '-1', fromPort: 0, toPort: 0, cidrBlocks: ['0.0.0.0/0'] }],
+})
+
+const dbSg = new aws.ec2.SecurityGroup('db-sg', {
+  vpcId: vpc.vpcId,
+  description: 'Postgres — allow from app only',
+  ingress: [{
+    protocol: 'tcp', fromPort: 5432, toPort: 5432,
+    securityGroups: [appSg.id],
+  }],
+})
+
+// ── ECS Cluster ────────────────────────────────────────────────────────
+const cluster = new aws.ecs.Cluster('app-cluster', {
+  settings: [{ name: 'containerInsights', value: 'enabled' }],
+})
+
+// ── RDS Database ───────────────────────────────────────────────────────
+const dbSubnetGroup = new aws.rds.SubnetGroup('db-subnets', {
+  subnetIds: vpc.privateSubnetIds,     // Output<string[]>
+})
+
+const db = new aws.rds.Instance('app-db', {
+  engine:           'postgres',
+  engineVersion:    '15.4',
+  instanceClass:    isProd ? 'db.t3.medium' : 'db.t3.micro',
+  allocatedStorage: isProd ? 100 : 20,
+  storageEncrypted: true,              // TypeScript ensures this is boolean
+  dbName:           'appdb',
+  username:         config.require('dbUsername'),
+  password:         config.requireSecret('dbPassword'),  // Output<string>
+  vpcSecurityGroupIds: [dbSg.id],
+  dbSubnetGroupName:   dbSubnetGroup.name,
+  skipFinalSnapshot:   !isProd,
+  backupRetentionPeriod: isProd ? 7 : 0,
+  multiAz: isProd,
+})
+
+// Build the connection string from Output values
+const dbUrl: pulumi.Output<string> = pulumi.interpolate`postgresql://${
+  config.require('dbUsername')
+}:${config.requireSecret('dbPassword')}@${db.endpoint}/${db.dbName}`
+
+// ── ECR Image ──────────────────────────────────────────────────────────
+// In a real pipeline, imageUri comes from your CI/CD system
+// For this example we read it from config
+const imageUri = config.require('imageUri')
+
+// ── ECS Fargate Service (with ALB) ────────────────────────────────────
+const service = new awsx.ecs.FargateService('app-service', {
+  cluster: cluster.arn,
+  desiredCount: isProd ? 3 : 1,
+  networkConfiguration: {
+    subnets:        vpc.privateSubnetIds,
+    securityGroups: [appSg.id],
+    assignPublicIp: false,
+  },
+  taskDefinitionArgs: {
+    cpu:    isProd ? '1024' : '256',
+    memory: isProd ? '2048' : '512',
+    container: {
+      name:  'app',
+      image: imageUri,
+      portMappings: [{ containerPort: 3000, protocol: 'tcp' }],
+      environment: [
+        { name: 'NODE_ENV',      value: isProd ? 'production' : 'development' },
+        { name: 'DATABASE_URL',  value: dbUrl },
+        { name: 'STACK',         value: stack },
+      ],
+      logConfiguration: {
+        logDriver: 'awslogs',
+        options: {
+          'awslogs-group':         pulumi.interpolate`/ecs/myapp-${stack}`,
+          'awslogs-region':        aws.config.region ?? 'us-east-1',
+          'awslogs-stream-prefix': 'app',
+        },
+      },
+    },
+  },
+  loadBalancers: [{
+    targetGroupArn: targetGroup.arn,
+    containerName: 'app',
+    containerPort: 3000,
+  }],
+})
+
+// ── Application Load Balancer ──────────────────────────────────────────
+const alb = new aws.lb.LoadBalancer('app-alb', {
+  internal:        false,
+  loadBalancerType: 'application',
+  securityGroups:  [albSg.id],
+  subnets:         vpc.publicSubnetIds,
+})
+
+const targetGroup = new aws.lb.TargetGroup('app-tg', {
+  port:       3000,
+  protocol:   'HTTP',
+  targetType: 'ip',
+  vpcId:      vpc.vpcId,
+  healthCheck: { path: '/api/health', interval: 30, healthyThreshold: 2 },
+})
+
+new aws.lb.Listener('http-listener', {
+  loadBalancerArn: alb.arn,
+  port:            80,
+  protocol:        'HTTP',
+  defaultActions: [{
+    type:           'forward',
+    targetGroupArn: targetGroup.arn,
+  }],
+})
+
+// ── Exports ────────────────────────────────────────────────────────────
+// These appear after `pulumi up` and can be read by other stacks
+export const serviceUrl  = pulumi.interpolate`http://${alb.dnsName}`
+export const dbEndpoint  = db.endpoint
+export const clusterName = cluster.name
+export const vpcId       = vpc.vpcId</code></pre>
+      </div>
+
+      <div class="callout callout-cost">
+        <div class="callout-icon">&#128176;</div>
+        <div class="callout-body">
+          <div class="callout-title">Cloud Cost Warning — NAT Gateways Are Expensive</div>
+          <p>NAT Gateways cost ~$32/month each <em>plus</em> $0.045/GB of data processed. For dev stacks, set <code>natGateways: { strategy: 'Single' }</code>. For prod with 3 AZs, that's $96/month before any traffic. Always use <code>isProd</code> conditionals to right-size dev environments. This is trivial in TypeScript, impossible in YAML.</p>
+        </div>
+      </div>
+
+      <!-- ================================================================
+           SECTION 6: COMPONENT RESOURCES
+      ================================================================ -->
+      <h2 id="component-resources" class="section-anchor">6. Component Resources — Reusable Infrastructure</h2>
+
+      <p>
+        The greatest power of Pulumi over Terraform modules or CloudFormation nested stacks is <strong>Component Resources</strong>: real TypeScript classes that encapsulate a group of cloud resources, expose typed public properties, and can be instantiated like any class. Think of them as React components — but for infrastructure.
+      </p>
+
+      <div class="callout callout-insight">
+        <div class="callout-icon">&#128161;</div>
+        <div class="callout-body">
+          <div class="callout-title">Key Insight — Components Are Just Classes</div>
+          <p>A Pulumi Component Resource is a <code>class extends pulumi.ComponentResource</code>. All child resources pass <code>{ parent: this }</code> so Pulumi tracks ownership. Public outputs are typed properties. Callers get full IntelliSense on what the component exposes. This is the abstraction primitive that Terraform modules can only dream about.</p>
+        </div>
+      </div>
+
+      <h3 id="webservice-class">The WebService Component</h3>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-lang-badge badge-ts">TypeScript</span>
+          <span class="code-filename">components/web-service.ts</span>
+        </div>
+        <pre><code class="language-typescript">import * as aws from '@pulumi/aws'
+import * as awsx from '@pulumi/awsx'
+import * as pulumi from '@pulumi/pulumi'
+
+// Strongly typed inputs — TypeScript catches missing required fields
+export interface WebServiceArgs {
+  /** Docker image URI (e.g. "123456.dkr.ecr.us-east-1.amazonaws.com/myapp:latest") */
+  image: string
+  /** Container port the app listens on */
+  port: number
+  /** Environment variables injected into the container */
+  environment: Record<string, pulumi.Input<string>>
+  /** VPC to deploy into */
+  vpcId: pulumi.Input<string>
+  /** Subnets for the ECS tasks (private) */
+  privateSubnetIds: pulumi.Input<pulumi.Input<string>[]>
+  /** Subnets for the ALB (public) */
+  publicSubnetIds: pulumi.Input<pulumi.Input<string>[]>
+  /** CPU units — 256 = 0.25 vCPU */
+  cpu?: string
+  /** Memory in MB */
+  memory?: string
+  /** Number of running tasks */
+  desiredCount?: number
+}
+
+export class WebService extends pulumi.ComponentResource {
+  /** The ALB DNS name — use this to reach the service */
+  public readonly url: pulumi.Output<string>
+  /** The ECS service ARN */
+  public readonly serviceArn: pulumi.Output<string>
+  /** The target group ARN — attach to your own listener if needed */
+  public readonly targetGroupArn: pulumi.Output<string>
+
+  constructor(
+    name: string,
+    args: WebServiceArgs,
+    opts?: pulumi.ComponentResourceOptions,
+  ) {
+    // Register this component with Pulumi's engine
+    super('myapp:index:WebService', name, {}, opts)
+
+    // All child resources get { parent: this } so Pulumi tracks ownership
+    const childOpts = { parent: this }
+
+    // ALB Security Group
+    const albSg = new aws.ec2.SecurityGroup(`${name}-alb-sg`, {
+      vpcId: args.vpcId,
+      ingress: [
+        { protocol: 'tcp', fromPort: 80,  toPort: 80,  cidrBlocks: ['0.0.0.0/0'] },
+        { protocol: 'tcp', fromPort: 443, toPort: 443, cidrBlocks: ['0.0.0.0/0'] },
+      ],
+      egress: [{ protocol: '-1', fromPort: 0, toPort: 0, cidrBlocks: ['0.0.0.0/0'] }],
+    }, childOpts)
+
+    // App Security Group
+    const appSg = new aws.ec2.SecurityGroup(`${name}-app-sg`, {
+      vpcId: args.vpcId,
+      ingress: [{
+        protocol: 'tcp',
+        fromPort: args.port,
+        toPort:   args.port,
+        securityGroups: [albSg.id],
+      }],
+      egress: [{ protocol: '-1', fromPort: 0, toPort: 0, cidrBlocks: ['0.0.0.0/0'] }],
+    }, childOpts)
+
+    // Application Load Balancer
+    const alb = new aws.lb.LoadBalancer(`${name}-alb`, {
+      loadBalancerType: 'application',
+      securityGroups:   [albSg.id],
+      subnets:          args.publicSubnetIds,
+    }, childOpts)
+
+    // Target Group
+    const targetGroup = new aws.lb.TargetGroup(`${name}-tg`, {
+      port:       args.port,
+      protocol:   'HTTP',
+      targetType: 'ip',
+      vpcId:      args.vpcId,
+      healthCheck: { path: '/health', interval: 30 },
+    }, childOpts)
+
+    // Listener
+    new aws.lb.Listener(`${name}-listener`, {
+      loadBalancerArn: alb.arn,
+      port:            80,
+      protocol:        'HTTP',
+      defaultActions: [{ type: 'forward', targetGroupArn: targetGroup.arn }],
+    }, childOpts)
+
+    // ECS Cluster
+    const cluster = new aws.ecs.Cluster(`${name}-cluster`, {}, childOpts)
+
+    // Convert environment map to ECS format
+    const envVars = Object.entries(args.environment).map(([name, value]) => ({
+      name,
+      value: value as pulumi.Input<string>,
+    }))
+
+    // Fargate Service
+    const service = new awsx.ecs.FargateService(`${name}-svc`, {
+      cluster:      cluster.arn,
+      desiredCount: args.desiredCount ?? 1,
+      networkConfiguration: {
+        subnets:        args.privateSubnetIds,
+        securityGroups: [appSg.id],
+        assignPublicIp: false,
+      },
+      taskDefinitionArgs: {
+        cpu:    args.cpu    ?? '256',
+        memory: args.memory ?? '512',
+        container: {
+          name:         name,
+          image:        args.image,
+          portMappings: [{ containerPort: args.port, protocol: 'tcp' }],
+          environment:  envVars,
+        },
+      },
+      loadBalancers: [{
+        targetGroupArn: targetGroup.arn,
+        containerName:  name,
+        containerPort:  args.port,
+      }],
+    }, childOpts)
+
+    // Expose public outputs
+    this.url            = pulumi.interpolate`http://${alb.dnsName}`
+    this.serviceArn     = service.service.arn
+    this.targetGroupArn = targetGroup.arn
+
+    // Tell Pulumi what this component outputs
+    this.registerOutputs({
+      url:            this.url,
+      serviceArn:     this.serviceArn,
+      targetGroupArn: this.targetGroupArn,
+    })
+  }
+}</code></pre>
+      </div>
+
+      <p>Now using this component is as simple as instantiating a class. The component encapsulates ~80 lines of resource configuration behind a clean, typed interface:</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-lang-badge badge-ts">TypeScript</span>
+          <span class="code-filename">index.ts</span>
+        </div>
+        <pre><code class="language-typescript">import { WebService } from './components/web-service'
+
+// Deploy the API service
+const api = new WebService('api', {
+  image:            'my-api:v1.2.3',
+  port:             3000,
+  vpcId:            vpc.vpcId,
+  privateSubnetIds: vpc.privateSubnetIds,
+  publicSubnetIds:  vpc.publicSubnetIds,
+  cpu:              '512',
+  memory:           '1024',
+  desiredCount:     2,
+  environment: {
+    NODE_ENV:     'production',
+    DATABASE_URL: dbUrl,
+    LOG_LEVEL:    'info',
+  },
+})
+
+// Deploy the web frontend — references api.url (Output<string>)
+// TypeScript knows api.url is Output<string> — no guessing
+const web = new WebService('web', {
+  image:            'my-nextjs:v2.0.0',
+  port:             3000,
+  vpcId:            vpc.vpcId,
+  privateSubnetIds: vpc.privateSubnetIds,
+  publicSubnetIds:  vpc.publicSubnetIds,
+  environment: {
+    NODE_ENV: 'production',
+    API_URL:  api.url,          // Output<string> flows through cleanly
+  },
+})
+
+// Export both URLs
+export const apiUrl = api.url
+export const webUrl = web.url</code></pre>
+      </div>
+
+      <div class="diagram-wrap">
+        <svg viewBox="0 0 620 260" width="620" height="260" style="max-width:100%">
+          <defs>
+            <marker id="arr3" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+              <polygon points="0 0, 10 3.5, 0 7" fill="#4F46E5"/>
+            </marker>
+          </defs>
+
+          <!-- WebService: api -->
+          <rect x="40" y="20" width="230" height="220" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2" stroke-dasharray="6,3"/>
+          <text x="155" y="44" text-anchor="middle" font-size="13" font-weight="800" fill="#3730A3">WebService "api"</text>
+
+          <rect x="60" y="56" width="190" height="34" rx="6" fill="white" stroke="#C7D2FE" stroke-width="1.5"/>
+          <text x="155" y="78" text-anchor="middle" font-size="12" fill="#374151">aws.ec2.SecurityGroup &#215;2</text>
+
+          <rect x="60" y="100" width="190" height="34" rx="6" fill="white" stroke="#C7D2FE" stroke-width="1.5"/>
+          <text x="155" y="122" text-anchor="middle" font-size="12" fill="#374151">aws.lb.LoadBalancer</text>
+
+          <rect x="60" y="144" width="190" height="34" rx="6" fill="white" stroke="#C7D2FE" stroke-width="1.5"/>
+          <text x="155" y="166" text-anchor="middle" font-size="12" fill="#374151">aws.ecs.Cluster</text>
+
+          <rect x="60" y="188" width="190" height="34" rx="6" fill="white" stroke="#C7D2FE" stroke-width="1.5"/>
+          <text x="155" y="210" text-anchor="middle" font-size="12" fill="#374151">awsx.ecs.FargateService</text>
+
+          <!-- api.url Output -->
+          <rect x="160" y="248" width="110" height="28" rx="6" fill="#ECFDF5" stroke="#10B981" stroke-width="1.5"/>
+          <text x="215" y="267" text-anchor="middle" font-size="11" font-weight="700" fill="#065F46">api.url Output</text>
+
+          <!-- WebService: web -->
+          <rect x="350" y="20" width="230" height="220" rx="10" fill="#FFF7ED" stroke="#F97316" stroke-width="2" stroke-dasharray="6,3"/>
+          <text x="465" y="44" text-anchor="middle" font-size="13" font-weight="800" fill="#9A3412">WebService "web"</text>
+
+          <rect x="370" y="56" width="190" height="34" rx="6" fill="white" stroke="#FED7AA" stroke-width="1.5"/>
+          <text x="465" y="78" text-anchor="middle" font-size="12" fill="#374151">aws.ec2.SecurityGroup &#215;2</text>
+
+          <rect x="370" y="100" width="190" height="34" rx="6" fill="white" stroke="#FED7AA" stroke-width="1.5"/>
+          <text x="465" y="122" text-anchor="middle" font-size="12" fill="#374151">aws.lb.LoadBalancer</text>
+
+          <rect x="370" y="144" width="190" height="34" rx="6" fill="white" stroke="#FED7AA" stroke-width="1.5"/>
+          <text x="465" y="166" text-anchor="middle" font-size="12" fill="#374151">aws.ecs.Cluster</text>
+
+          <rect x="370" y="188" width="190" height="34" rx="6" fill="white" stroke="#FED7AA" stroke-width="1.5"/>
+          <text x="465" y="210" text-anchor="middle" font-size="12" fill="#374151">awsx.ecs.FargateService</text>
+
+          <!-- arrow from api.url to web -->
+          <line x1="270" y1="262" x2="370" y2="130" stroke="#10B981" stroke-width="2" marker-end="url(#arr3)" stroke-dasharray="5,3"/>
+          <text x="310" y="200" text-anchor="middle" font-size="10" fill="#065F46" transform="rotate(-52, 310, 200)">API_URL</text>
+        </svg>
+        <div class="diagram-caption">Component Resources encapsulate child resources. <code>api.url</code> flows as an <code>Output&lt;string&gt;</code> into the web service's environment, establishing a deployment dependency automatically.</div>
+      </div>
+
+      <!-- ================================================================
+           SECTION 7: CONFIG AND SECRETS
+      ================================================================ -->
+      <h2 id="config-secrets" class="section-anchor">7. Configuration and Secrets</h2>
+
+      <p>
+        Pulumi's config system is per-stack, version-controlled, and has first-class support for secrets. Public config is stored in plain YAML. Secrets are encrypted with a per-stack key before being written to disk — they never appear in logs or state files in plaintext.
+      </p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-lang-badge badge-ts">TypeScript</span>
+          <span class="code-filename">index.ts — config patterns</span>
+        </div>
+        <pre><code class="language-typescript">import * as pulumi from '@pulumi/pulumi'
+
+const config = new pulumi.Config()
+
+// ── Basic values ───────────────────────────────────────────────────────
+// config.get() returns string | undefined
+const region = config.get('region') ?? 'us-east-1'
+
+// config.require() throws if missing — use for mandatory values
+const imageUri = config.require('imageUri')
+
+// config.getNumber() / config.requireNumber()
+const minInstances = config.getNumber('minInstances') ?? 1
+
+// config.getBoolean() / config.requireBoolean()
+const enableXray = config.getBoolean('enableXray') ?? false
+
+// ── Secrets ────────────────────────────────────────────────────────────
+// config.requireSecret() returns Output<string> — never a plain string
+// The value is decrypted only during deployment, never logged
+const dbPassword: pulumi.Output<string> = config.requireSecret('dbPassword')
+const apiKey:     pulumi.Output<string> = config.requireSecret('stripeApiKey')
+
+// ── Typed config object ────────────────────────────────────────────────
+interface AppConfig {
+  region:       string
+  instanceType: string
+  minInstances: number
+  maxInstances: number
+  enableXray:   boolean
+}
+
+function loadConfig(): AppConfig {
+  return {
+    region:       config.get('region')                ?? 'us-east-1',
+    instanceType: config.get('instanceType')          ?? 't3.micro',
+    minInstances: config.getNumber('minInstances')    ?? 1,
+    maxInstances: config.getNumber('maxInstances')    ?? 10,
+    enableXray:   config.getBoolean('enableXray')     ?? false,
+  }
+}
+
+const appConfig = loadConfig()
+// appConfig is fully typed — TypeScript knows all properties and their types
+
+// ── Object config ──────────────────────────────────────────────────────
+// config.getObject<T>() for structured values
+interface ScalingPolicy {
+  minCount: number
+  maxCount: number
+  targetCpu: number
+}
+
+const scaling = config.getObject<ScalingPolicy>('scaling') ?? {
+  minCount:  1,
+  maxCount:  5,
+  targetCpu: 70,
+}</code></pre>
+      </div>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-lang-badge badge-yaml">YAML</span>
+          <span class="code-filename">Pulumi.prod.yaml — stack config file (committed)</span>
+        </div>
+        <pre><code class="language-yaml">config:
+  aws:region: us-east-1
+  myapp:region: us-east-1
+  myapp:instanceType: t3.medium
+  myapp:minInstances: 2
+  myapp:maxInstances: 20
+  myapp:enableXray: true
+  # Secrets are stored encrypted — safe to commit
+  myapp:dbPassword:
+    secure: AAABAHNm5z+8Q3k...  # encrypted ciphertext</code></pre>
+      </div>
+
+      <!-- ================================================================
+           SECTION 8: TESTING
+      ================================================================ -->
+      <h2 id="testing" class="section-anchor">8. Testing Pulumi Programs</h2>
+
+      <p>
+        One of the biggest advantages of Pulumi over Terraform is that your infrastructure is just TypeScript — you can unit test it with Jest, exactly like any other TypeScript code. Pulumi provides a mocking system that intercepts resource creation during tests, so no real cloud resources are created.
+      </p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-lang-badge badge-ts">TypeScript</span>
+          <span class="code-filename">tests/infra.test.ts</span>
+        </div>
+        <pre><code class="language-typescript">import * as pulumi from '@pulumi/pulumi'
+
+// Set up mocks BEFORE importing your infrastructure code
+// This intercepts all resource creation — no real AWS calls
+pulumi.runtime.setMocks({
+  newResource: (args: pulumi.runtime.MockResourceArgs) => {
+    // Return a fake ID and echo the inputs back as state
+    return {
+      id:    `${args.name}_id`,
+      state: {
+        ...args.inputs,
+        // Simulate values that AWS would set after creation
+        endpoint: args.name.includes('db') ? 'db.cluster.us-east-1.rds.amazonaws.com' : undefined,
+        dnsName:  args.name.includes('alb') ? 'myapp-alb-123.us-east-1.elb.amazonaws.com' : undefined,
+      },
+    }
+  },
+  call: (args: pulumi.runtime.MockCallArgs) => ({
+    result: {},
+  }),
+})
+
+describe('Infrastructure', () => {
+  // Dynamically import after mocks are set
+  let infra: typeof import('../index')
+
+  beforeAll(async () => {
+    infra = await import('../index')
+  })
+
+  // ── S3 / Storage ────────────────────────────────────────────────────
+  it('S3 bucket has required tags', async () => {
+    const tags = await infra.bucket.tags.promise()
+    expect(tags).toMatchObject({
+      Environment: 'production',
+      Team:        'platform',
+    })
+  })
+
+  // ── Database security ───────────────────────────────────────────────
+  it('RDS database has encryption enabled', async () => {
+    const encrypted = await infra.db.storageEncrypted.promise()
+    expect(encrypted).toBe(true)
+  })
+
+  it('RDS database is not publicly accessible', async () => {
+    const publiclyAccessible = await infra.db.publiclyAccessible.promise()
+    expect(publiclyAccessible).toBe(false)
+  })
+
+  it('RDS has backup retention in prod', async () => {
+    // In prod, backupRetentionPeriod should be > 0
+    const retention = await infra.db.backupRetentionPeriod.promise()
+    expect(retention).toBeGreaterThan(0)
+  })
+
+  // ── Network security ────────────────────────────────────────────────
+  it('App security group does not allow SSH from internet', async () => {
+    const ingress = await infra.appSg.ingress.promise()
+    const sshRules = (ingress ?? []).filter(
+      r => r.fromPort === 22 && r.cidrBlocks?.includes('0.0.0.0/0')
+    )
+    expect(sshRules).toHaveLength(0)
+  })
+
+  // ── Service configuration ───────────────────────────────────────────
+  it('ECS service exports a URL', async () => {
+    const url = await infra.serviceUrl.promise()
+    expect(url).toMatch(/^http:\/\//)
+  })
+
+  it('environment variables contain DATABASE_URL', async () => {
+    const env = await infra.taskEnv.promise()
+    const names = env.map((e: { name: string }) => e.name)
+    expect(names).toContain('DATABASE_URL')
+  })
+})
+
+// ── Policy tests — enforce organization standards ──────────────────────
+describe('Security policy enforcement', () => {
+  it('all resources have a Team tag', async () => {
+    // In a real suite, you'd enumerate all resource outputs
+    // and verify each one has required tags
+    const bucketTags = await infra.bucket.tags.promise()
+    expect(bucketTags).toHaveProperty('Team')
+  })
+})</code></pre>
+      </div>
+
+      <div class="callout callout-tip">
+        <div class="callout-icon">&#9989;</div>
+        <div class="callout-body">
+          <div class="callout-title">Tip — Use .promise() to Resolve Outputs in Tests</div>
+          <p>In test code, <code>output.promise()</code> resolves the <code>Output&lt;T&gt;</code> to its underlying value (since the mock provides it synchronously). This is only valid in test mode — never call <code>.promise()</code> in production infrastructure code. Use <code>.apply()</code> and <code>pulumi.interpolate</code> there instead.</p>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-lang-badge badge-sh">Shell</span>
+        </div>
+        <pre><code class="language-bash"># Run infrastructure tests (no cloud credentials needed!)
+npm test
+
+# With coverage
+npx jest --coverage
+
+# Watch mode during development
+npx jest --watch</code></pre>
+      </div>
+
+      <!-- ================================================================
+           SECTION 9: TYPE SYSTEM
+      ================================================================ -->
+      <h2 id="type-system" class="section-anchor">9. How Pulumi Uses TypeScript's Type System</h2>
+
+      <p>
+        Pulumi's TypeScript SDK is arguably the best example in any ecosystem of using TypeScript's type system as an API design tool. Every resource's inputs and outputs are generated from the cloud provider's own schema — meaning the types are always up to date and complete.
+      </p>
+
+      <h3>Generated Types from Cloud Schemas</h3>
+
+      <p>
+        When AWS publishes a new resource type, Pulumi re-generates the TypeScript types from the CloudFormation resource provider schema. Every property — its name, type, whether it's required, what values it accepts — is captured in TypeScript. Your IDE knows everything the AWS SDK knows, at author time, not deploy time.
+      </p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-lang-badge badge-ts">TypeScript</span>
+          <span class="code-filename">Type safety in action</span>
+        </div>
+        <pre><code class="language-typescript">import * as aws from '@pulumi/aws'
+
+// ── TypeScript CATCHES these bugs before you deploy ────────────────────
+
+// Error: 'instanceclass' does not exist — should be 'instanceClass'
+new aws.rds.Instance('db', {
+  instanceclass: 'db.t3.micro',  // TS2345 — caught immediately in IDE
+})
+
+// Error: Type '"POSTGRES"' is not assignable to type
+// '"mysql" | "postgres" | "aurora" | ...'
+new aws.rds.Instance('db', {
+  engine: 'POSTGRES',            // TS2322 — must be lowercase 'postgres'
+})
+
+// Error: Property 'password' is missing — it's required
+new aws.rds.Instance('db', {
+  engine:   'postgres',
+  username: 'admin',
+  // password is required — TypeScript error right here
+})
+
+// ── Input<T> vs Output<T> ────────────────────────────────────────────
+// Pulumi uses Input<T> for resource inputs — accepts both T and Output<T>
+// This is how you can pass an Output as input to another resource
+
+type Input<T> = T | pulumi.Output<T>
+
+// This works — TypeScript accepts Output<string> where Input<string> is expected
+const sg = new aws.ec2.SecurityGroup('sg', {
+  vpcId: vpc.vpcId,  // vpc.vpcId is Output<string>, vpcId wants Input<string>
+})
+
+// ── Type narrowing ────────────────────────────────────────────────────
+function getInstanceClass(env: 'dev' | 'prod'): aws.rds.InstanceType {
+  // TypeScript knows aws.rds.InstanceType is a union of all valid instance class strings
+  return env === 'prod' ? 'db.t3.medium' : 'db.t3.micro'
+  // Return 'db.t99.huge' and TypeScript errors immediately
+}</code></pre>
+      </div>
+
+      <div class="callout callout-arch">
+        <div class="callout-icon">&#127959;</div>
+        <div class="callout-body">
+          <div class="callout-title">Architecture Note — Input&lt;T&gt; is the Dual of Output&lt;T&gt;</div>
+          <p><code>pulumi.Input&lt;T&gt;</code> is defined as <code>T | Promise&lt;T&gt; | pulumi.Output&lt;T&gt;</code>. All resource inputs accept <code>Input&lt;T&gt;</code>, which means you can pass a raw value, a Promise, or an Output — and TypeScript validates it all at compile time. This is the glue that makes the resource graph type-safe.</p>
+        </div>
+      </div>
+
+      <!-- ================================================================
+           SECTION 10: TERRAFORM VS PULUMI
+      ================================================================ -->
+      <h2 id="tf-vs-pulumi" class="section-anchor">10. Terraform vs Pulumi — Side by Side</h2>
+
+      <p>
+        Let's compare the same task in both tools: creating three identically-configured S3 buckets with different names, then using their ARNs in an IAM policy.
+      </p>
+
+      <div class="code-compare">
+        <div>
+          <div class="code-compare-label">Terraform HCL</div>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang-badge badge-hcl">HCL</span>
+              <span class="code-filename">main.tf</span>
+            </div>
+            <pre><code class="language-hcl">locals {
+  bucket_names = [
+    "assets",
+    "uploads",
+    "backups",
+  ]
+}
+
+resource "aws_s3_bucket" "buckets" {
+  count  = length(local.bucket_names)
+  bucket = "${var.prefix}-${local.bucket_names[count.index]}"
+
+  tags = {
+    Environment = var.environment
+  }
+}
+
+resource "aws_s3_bucket_versioning" "versioning" {
+  count  = length(local.bucket_names)
+  bucket = aws_s3_bucket.buckets[count.index].id
+
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+data "aws_iam_policy_document" "policy" {
+  statement {
+    actions   = ["s3:GetObject"]
+    resources = [
+      for bucket in aws_s3_bucket.buckets :
+      "${bucket.arn}/*"
+    ]
+  }
+}
+
+resource "aws_iam_policy" "policy" {
+  name   = "${var.prefix}-s3-policy"
+  policy = data.aws_iam_policy_document.policy.json
+}
+
+# Variables defined separately
+variable "prefix" { type = string }
+variable "environment" { type = string }</code></pre>
+          </div>
+        </div>
+        <div>
+          <div class="code-compare-label">Pulumi TypeScript</div>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang-badge badge-ts">TypeScript</span>
+              <span class="code-filename">index.ts</span>
+            </div>
+            <pre><code class="language-typescript">import * as aws from '@pulumi/aws'
+import * as pulumi from '@pulumi/pulumi'
+
+const config = new pulumi.Config()
+const prefix = config.require('prefix')
+const environment = config.require('environment')
+
+const bucketNames = ['assets', 'uploads', 'backups']
+
+// Real array — real map — real TypeScript
+const buckets = bucketNames.map(name =>
+  new aws.s3.BucketV2(`${name}-bucket`, {
+    bucket: `${prefix}-${name}`,
+    tags: { Environment: environment },
+  })
+)
+
+// Enable versioning on all buckets — still a real loop
+buckets.forEach((bucket, i) => {
+  new aws.s3.BucketVersioningV2(`${bucketNames[i]}-versioning`, {
+    bucket: bucket.id,
+    versioningConfiguration: { status: 'Enabled' },
+  })
+})
+
+// Combine Output<string>[] → Output<string[]> with pulumi.all()
+const bucketArns = pulumi.all(buckets.map(b => b.arn))
+
+// Build IAM policy with typed document
+const policyDocument = bucketArns.apply(arns =>
+  aws.iam.getPolicyDocumentOutput({
+    statements: [{
+      actions:   ['s3:GetObject'],
+      resources: arns.map(arn => `${arn}/*`),
+    }],
+  })
+)
+
+const policy = new aws.iam.Policy('s3-policy', {
+  name:   `${prefix}-s3-policy`,
+  policy: policyDocument.json,
+})
+
+export const policyArn = policy.arn</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Feature</th>
+              <th>Terraform HCL</th>
+              <th>Pulumi TypeScript</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Loops</strong></td>
+              <td><code>count</code>, <code>for_each</code> — limited to same resource type</td>
+              <td>Native <code>for</code>, <code>.map()</code>, <code>.forEach()</code> — any pattern</td>
+            </tr>
+            <tr>
+              <td><strong>Conditionals</strong></td>
+              <td>HCL ternary: <code>var.prod ? "a" : "b"</code></td>
+              <td>Real <code>if/else</code>, ternary, switch — full language</td>
+            </tr>
+            <tr>
+              <td><strong>Functions</strong></td>
+              <td>Terraform <code>locals</code> + built-in functions only</td>
+              <td>Any TypeScript function — async, recursive, closures</td>
+            </tr>
+            <tr>
+              <td><strong>Abstraction</strong></td>
+              <td>Modules (directory-based, limited composition)</td>
+              <td>Classes, functions, npm packages — full language</td>
+            </tr>
+            <tr>
+              <td><strong>Type Safety</strong></td>
+              <td class="td-check"><span class="check-no">&#10007;</span> None — runtime errors only</td>
+              <td class="td-check"><span class="check-yes">&#10003;</span> Full — IDE catches mismatches instantly</td>
+            </tr>
+            <tr>
+              <td><strong>Unit Tests</strong></td>
+              <td class="td-check"><span class="check-no">&#10007;</span> Not possible</td>
+              <td class="td-check"><span class="check-yes">&#10003;</span> Jest, Vitest — full mock support</td>
+            </tr>
+            <tr>
+              <td><strong>IDE Support</strong></td>
+              <td>Basic HCL plugins</td>
+              <td>Full IntelliSense, go-to-definition, refactoring</td>
+            </tr>
+            <tr>
+              <td><strong>State Management</strong></td>
+              <td>S3 + DynamoDB (common), Terraform Cloud</td>
+              <td>Pulumi Cloud (free), S3, local, Azure Blob</td>
+            </tr>
+            <tr>
+              <td><strong>Multi-language</strong></td>
+              <td class="td-check"><span class="check-no">&#10007;</span> HCL only</td>
+              <td class="td-check"><span class="check-yes">&#10003;</span> TS, Python, Go, C#, Java, YAML</td>
+            </tr>
+            <tr>
+              <td><strong>Providers</strong></td>
+              <td>~4000 community providers (mature ecosystem)</td>
+              <td>~150 native + all Terraform providers via bridge</td>
+            </tr>
+            <tr>
+              <td><strong>Maturity</strong></td>
+              <td>~10 years, very large community</td>
+              <td>~7 years, growing fast</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout callout-insight">
+        <div class="callout-icon">&#128161;</div>
+        <div class="callout-body">
+          <div class="callout-title">Key Insight — Terraform's Ecosystem is a Real Advantage</div>
+          <p>Terraform has ~4000 providers and a massive community. Pulumi can use any Terraform provider through its bridge layer, but native Pulumi providers give better TypeScript types. When evaluating tools, consider your existing team skills and whether you need a specific provider. For greenfield TypeScript teams, Pulumi wins on developer experience. For teams with existing HCL expertise, the migration cost is real.</p>
+        </div>
+      </div>
+
+      <!-- ================================================================
+           SECTION 11: ADVANCED PATTERNS
+      ================================================================ -->
+      <h2 id="advanced-patterns" class="section-anchor">11. Advanced Patterns</h2>
+
+      <h3>Stack References — Sharing Outputs Between Stacks</h3>
+
+      <p>
+        Large organizations split their infrastructure into multiple Pulumi stacks: a "network" stack creates the VPC, and application stacks reference it. Stack references let stacks consume each other's exported outputs with full type safety.
+      </p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-lang-badge badge-ts">TypeScript</span>
+          <span class="code-filename">app/index.ts — consuming network stack outputs</span>
+        </div>
+        <pre><code class="language-typescript">import * as pulumi from '@pulumi/pulumi'
+
+const stack = pulumi.getStack()  // 'dev' | 'prod'
+
+// Reference the network stack for this environment
+const networkStack = new pulumi.StackReference(`myorg/network/${stack}`)
+
+// Get typed outputs from the other stack
+const vpcId            = networkStack.getOutput('vpcId')            // Output<any>
+const privateSubnetIds = networkStack.getOutput('privateSubnetIds') // Output<any>
+const publicSubnetIds  = networkStack.getOutput('publicSubnetIds')  // Output<any>
+
+// For stronger typing, cast — the network team should document their outputs
+const typedVpcId = vpcId.apply(v => v as string)
+const typedPrivateSubnets = privateSubnetIds.apply(v => v as string[])
+
+// Now use these in your resources exactly like local Outputs
+const sg = new aws.ec2.SecurityGroup('app-sg', {
+  vpcId: typedVpcId,
+})</code></pre>
+      </div>
+
+      <h3>Policy as Code with CrossGuard</h3>
+
+      <p>
+        Pulumi CrossGuard lets you write infrastructure policies in TypeScript that run before any deployment. If a resource violates policy, <code>pulumi up</code> is blocked — preventing the misconfiguration from reaching production.
+      </p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-lang-badge badge-ts">TypeScript</span>
+          <span class="code-filename">policy/s3-policy.ts</span>
+        </div>
+        <pre><code class="language-typescript">import { PolicyPack, validateResourceOfType } from '@pulumi/policy'
+import * as aws from '@pulumi/aws'
+
+new PolicyPack('aws-security-policies', {
+  policies: [
+    {
+      name:        'no-public-s3-buckets',
+      description: 'S3 buckets must not be publicly accessible',
+      enforcementLevel: 'mandatory',  // blocks deployment
+      validateResource: validateResourceOfType(
+        aws.s3.BucketV2,
+        (bucket, args, reportViolation) => {
+          // bucket is fully typed — aws.s3.BucketV2
+          if (bucket.acl === 'public-read' || bucket.acl === 'public-read-write') {
+            reportViolation('S3 bucket must not have a public ACL')
+          }
+        }
+      ),
+    },
+    {
+      name:        'rds-encryption-required',
+      description: 'All RDS instances must have storage encryption enabled',
+      enforcementLevel: 'mandatory',
+      validateResource: validateResourceOfType(
+        aws.rds.Instance,
+        (db, args, reportViolation) => {
+          if (!db.storageEncrypted) {
+            reportViolation('RDS instance must have storageEncrypted: true')
+          }
+          if (db.backupRetentionPeriod === 0) {
+            reportViolation('RDS instance must have backups enabled')
+          }
+        }
+      ),
+    },
+    {
+      name:        'require-tags',
+      description: 'All resources must have Team and Environment tags',
+      enforcementLevel: 'advisory',  // warns but does not block
+      validateResource: (args, reportViolation) => {
+        const tags = (args.props['tags'] ?? {}) as Record<string, string>
+        if (!tags['Team']) {
+          reportViolation('Resource is missing required tag: Team')
+        }
+        if (!tags['Environment']) {
+          reportViolation('Resource is missing required tag: Environment')
+        }
+      },
+    },
+  ],
+})</code></pre>
+      </div>
+
+      <h3 id="automation-api">The Pulumi Automation API</h3>
+
+      <p>
+        The Automation API lets you drive Pulumi programmatically from TypeScript — not as a CLI tool, but as a library. This enables building internal deployment platforms, self-service infrastructure portals, and sophisticated CI/CD pipelines without shelling out to the CLI.
+      </p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-lang-badge badge-ts">TypeScript</span>
+          <span class="code-filename">deploy.ts — programmatic deployments</span>
+        </div>
+        <pre><code class="language-typescript">import { LocalWorkspace, PulumiFn } from '@pulumi/pulumi/automation'
+
+// Your Pulumi program as a function — not a file
+const infraProgram: PulumiFn = async () => {
+  const aws = await import('@pulumi/aws')
+
+  const bucket = new aws.s3.BucketV2('auto-bucket', {
+    tags: { CreatedBy: 'automation-api' },
+  })
+
+  return { bucketName: bucket.bucket }
+}
+
+async function deployTenant(tenantId: string): Promise<string> {
+  // Create (or select) a stack for this tenant
+  const stack = await LocalWorkspace.createOrSelectStack({
+    stackName:   tenantId,
+    projectName: 'saas-infra',
+    program:     infraProgram,
+  })
+
+  // Set config for this tenant's stack
+  await stack.setConfig('aws:region', { value: 'us-east-1' })
+
+  // Run pulumi up programmatically
+  const result = await stack.up({ onOutput: console.log })
+
+  if (result.summary.result !== 'succeeded') {
+    throw new Error(`Deployment failed: ${result.summary.message}`)
+  }
+
+  // Read the exported output
+  return result.outputs['bucketName'].value
+}
+
+// Create a per-tenant environment on signup
+async function onNewTenantSignup(tenantId: string) {
+  console.log(`Provisioning infrastructure for tenant ${tenantId}...`)
+  const bucketName = await deployTenant(tenantId)
+  console.log(`Tenant ${tenantId} storage: ${bucketName}`)
+}
+
+// Tear down when a tenant cancels
+async function onTenantCancellation(tenantId: string) {
+  const stack = await LocalWorkspace.selectStack({
+    stackName:   tenantId,
+    projectName: 'saas-infra',
+    program:     infraProgram,
+  })
+  await stack.destroy({ onOutput: console.log })
+  await stack.workspace.removeStack(tenantId)
+}</code></pre>
+      </div>
+
+      <div class="callout callout-ai">
+        <div class="callout-icon">&#129302;</div>
+        <div class="callout-body">
+          <div class="callout-title">AI Era — Infrastructure as a Service with Automation API</div>
+          <p>The Automation API is how you build AI-driven infrastructure. Imagine an LLM that receives a user request ("I need a Postgres database for my app"), generates a Pulumi program, validates it against your CrossGuard policies, and calls the Automation API to deploy it — all within an automated approval workflow. This is the converging point of AI agents and cloud infrastructure.</p>
+        </div>
+      </div>
+
+      <!-- ================================================================
+           SECTION 12: KEY LESSONS
+      ================================================================ -->
+      <h2 id="key-lessons" class="section-anchor">12. Key Lessons from Pulumi's Architecture</h2>
+
+      <p>
+        Pulumi is one of the cleanest examples in any ecosystem of using TypeScript's type system to create a developer tool that is both more powerful <em>and</em> easier to use than its predecessors. Here is what Pulumi's architecture teaches us about TypeScript API design.
+      </p>
+
+      <h3>1. The Type System as the API</h3>
+      <p>
+        Pulumi generates its entire AWS SDK from a machine-readable schema. The types are not written by hand — they are computed. Every new AWS service or property update automatically produces correct TypeScript types. This is the right way to build typed wrappers around large external systems: generate, don't maintain.
+      </p>
+
+      <h3>2. Lazy Evaluation via Output&lt;T&gt;</h3>
+      <p>
+        Cloud values do not exist at program-authoring time — they exist after deployment. <code>Output&lt;T&gt;</code> is TypeScript's way of representing this: a value that will be computed later, with full type information about what that value will be. This is the same pattern as Promises in async code. Pulumi's insight was that the same monad that works for async operations works for deployment-time values.
+      </p>
+
+      <h3>3. The Resource Graph is a Typed DAG</h3>
+      <p>
+        Pulumi's deployment engine builds a dependency graph from the <code>Output&lt;T&gt;</code> references in your code. You never draw the graph manually — it falls out of the type relationships. TypeScript's type system ensures you can only pass an <code>Output&lt;string&gt;</code> where a string is expected (<code>Input&lt;string&gt;</code> accepts both). The correctness of the graph is enforced by types.
+      </p>
+
+      <h3>4. Component Resources as the Abstraction Primitive</h3>
+      <p>
+        Extending <code>pulumi.ComponentResource</code> is the right primitive for reuse: it groups child resources, gives them a parent for Pulumi's state tracking, and exposes a clean typed interface to callers. This is the equivalent of writing a well-typed React component — hide the implementation, expose a contract.
+      </p>
+
+      <h3>5. Testing Infrastructure is Not Optional</h3>
+      <p>
+        The ability to unit test infrastructure — to verify that your RDS instance has encryption enabled, that your security group does not expose SSH to the internet, that all resources have required tags — before anything is deployed is transformative. Teams that test their infrastructure find bugs in code review that Terraform teams find in production incidents.
+      </p>
+
+      <div class="pull-quote">
+        <p>"When I joined the GCP team, I spent my first week reading Terraform modules. I spent my second week wondering why no one had made these TypeScript yet. Pulumi is the answer I was waiting for."</p>
+        <cite>— Senior Staff Engineer, Google Cloud Platform</cite>
+      </div>
+
+      <!-- ================================================================
+           FOOTER NAV
+      ================================================================ -->
+      <div class="footer-nav">
+        <a href="chapter-22-cli.html" class="footer-nav-btn">
+          <div class="footer-nav-arrow">&#8592;</div>
+          <div>
+            <div class="footer-nav-label">Previous Chapter</div>
+            <div class="footer-nav-title">Ch 22: Case Study — CLI Tools</div>
+          </div>
+        </a>
+        <a href="chapter-24-saas.html" class="footer-nav-btn next">
+          <div>
+            <div class="footer-nav-label">Next Chapter</div>
+            <div class="footer-nav-title">Ch 24: Case Study — SaaS Architecture</div>
+          </div>
+          <div class="footer-nav-arrow">&#8594;</div>
+        </a>
+      </div>
+
+    </main>
+  </div><!-- /.page-wrap -->
+
+  <script>
+    // Syntax highlighting
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('pre code').forEach(block => {
+        hljs.highlightElement(block)
+      })
+    })
+
+    // Active TOC link on scroll
+    const tocLinks = document.querySelectorAll('.toc-list a')
+    const sections = document.querySelectorAll('.section-anchor')
+
+    const observer = new IntersectionObserver(
+      entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            tocLinks.forEach(l => l.classList.remove('active'))
+            const id = entry.target.getAttribute('id')
+            const active = document.querySelector(`.toc-list a[href="#${id}"]`)
+            if (active) active.classList.add('active')
+          }
+        })
+      },
+      { rootMargin: '-20% 0px -70% 0px' }
+    )
+    sections.forEach(s => observer.observe(s))
+  </script>
+</body>
+</html>

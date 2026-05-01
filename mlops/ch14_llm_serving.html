@@ -1,0 +1,1812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 14: LLM Serving & Inference Optimization - Modern MLOps Tutorial</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script>hljs.highlightAll(); mermaid.initialize({startOnLoad:true, theme:'default'});</script>
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; color: #1f2937; }
+    .chapter-badge { background: #2563eb; color: white; padding: 4px 12px; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
+    .section-anchor { scroll-margin-top: 80px; }
+    .callout-warning { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px; border-radius: 0 8px 8px 0; margin: 16px 0; }
+    .callout-info { background: #eff6ff; border-left: 4px solid #2563eb; padding: 16px; border-radius: 0 8px 8px 0; margin: 16px 0; }
+    .callout-success { background: #f0fdf4; border-left: 4px solid #059669; padding: 16px; border-radius: 0 8px 8px 0; margin: 16px 0; }
+    .callout-danger { background: #fef2f2; border-left: 4px solid #dc2626; padding: 16px; border-radius: 0 8px 8px 0; margin: 16px 0; }
+    pre code.hljs { border-radius: 8px; font-size: 0.85rem; }
+    .mermaid { background: #f8fafc; border-radius: 8px; padding: 16px; margin: 16px 0; overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.9rem; }
+    th { background: #2563eb; color: white; padding: 10px 14px; text-align: left; }
+    td { padding: 9px 14px; border-bottom: 1px solid #e5e7eb; }
+    tr:nth-child(even) td { background: #f9fafb; }
+    tr:hover td { background: #eff6ff; }
+    .toc-link { color: #2563eb; text-decoration: none; }
+    .toc-link:hover { text-decoration: underline; }
+    h2.section-title { color: #1e3a8a; border-bottom: 2px solid #2563eb; padding-bottom: 8px; margin-top: 48px; }
+    h3.subsection-title { color: #1e40af; margin-top: 28px; }
+    .metric-card { background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; text-align: center; }
+    .metric-value { font-size: 2rem; font-weight: 700; color: #2563eb; }
+    .metric-label { font-size: 0.8rem; color: #6b7280; margin-top: 4px; }
+    code.inline { background: #f1f5f9; color: #0f172a; padding: 2px 6px; border-radius: 4px; font-size: 0.875em; font-family: monospace; }
+  </style>
+</head>
+<body class="bg-gray-50">
+
+<!-- Navbar -->
+<nav class="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center h-14">
+      <div class="flex items-center gap-3">
+        <a href="index.html" class="text-blue-600 font-bold text-lg hover:text-blue-800">Modern MLOps</a>
+        <span class="text-gray-400">/</span>
+        <span class="chapter-badge">Chapter 14</span>
+        <span class="text-gray-600 text-sm font-medium hidden sm:block">LLM Serving &amp; Inference Optimization</span>
+      </div>
+      <div class="flex items-center gap-4 text-sm text-gray-500">
+        <span class="hidden md:block">120 min read</span>
+        <a href="ch13_model_registry.html" class="text-blue-600 hover:underline">&larr; Ch 13</a>
+        <a href="ch15_monitoring.html" class="text-blue-600 hover:underline">Ch 15 &rarr;</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero -->
+<div class="bg-gradient-to-r from-blue-700 to-blue-900 text-white py-16">
+  <div class="max-w-5xl mx-auto px-6">
+    <div class="flex items-center gap-3 mb-4">
+      <span class="chapter-badge text-sm">Chapter 14</span>
+      <span class="text-blue-300 text-sm">Advanced Track · ~120 min</span>
+    </div>
+    <h1 class="text-4xl font-bold mb-4">LLM Serving &amp; Inference Optimization</h1>
+    <p class="text-blue-100 text-xl max-w-3xl">vLLM, TGI, SGLang, speculative decoding, quantization, multi-GPU scaling, and production-grade LLM serving infrastructure — from first principles to petabyte-scale deployments.</p>
+    <div class="mt-8 flex flex-wrap gap-3">
+      <span class="bg-blue-600 px-3 py-1 rounded-full text-sm">vLLM</span>
+      <span class="bg-blue-600 px-3 py-1 rounded-full text-sm">TGI</span>
+      <span class="bg-blue-600 px-3 py-1 rounded-full text-sm">SGLang</span>
+      <span class="bg-blue-600 px-3 py-1 rounded-full text-sm">Speculative Decoding</span>
+      <span class="bg-blue-600 px-3 py-1 rounded-full text-sm">Quantization</span>
+      <span class="bg-blue-600 px-3 py-1 rounded-full text-sm">TensorRT-LLM</span>
+      <span class="bg-blue-600 px-3 py-1 rounded-full text-sm">KV Cache</span>
+      <span class="bg-blue-600 px-3 py-1 rounded-full text-sm">PagedAttention</span>
+    </div>
+  </div>
+</div>
+
+<!-- Table of Contents -->
+<div class="max-w-5xl mx-auto px-6 py-8">
+  <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+    <h2 class="text-lg font-bold text-gray-800 mb-4">Table of Contents</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+      <a href="#s1" class="toc-link">1. LLM Inference Challenges</a>
+      <a href="#s8" class="toc-link">8. Quantization Deep Dive</a>
+      <a href="#s2" class="toc-link">2. Key Optimization Concepts</a>
+      <a href="#s9" class="toc-link">9. TensorRT-LLM (NVIDIA)</a>
+      <a href="#s3" class="toc-link">3. vLLM — The Standard</a>
+      <a href="#s10" class="toc-link">10. Scaling LLM Serving</a>
+      <a href="#s4" class="toc-link">4. TGI (Hugging Face)</a>
+      <a href="#s11" class="toc-link">11. Serving Infrastructure Design</a>
+      <a href="#s5" class="toc-link">5. SGLang</a>
+      <a href="#s12" class="toc-link">12. OpenAI-Compatible APIs</a>
+      <a href="#s6" class="toc-link">6. Ollama for Development</a>
+      <a href="#s13" class="toc-link">13. Structured Output &amp; Constrained Generation</a>
+      <a href="#s7" class="toc-link">7. Speculative Decoding</a>
+      <a href="#s14" class="toc-link">14. Benchmarking</a>
+    </div>
+  </div>
+</div>
+
+<div class="max-w-5xl mx-auto px-6 pb-20">
+
+<!-- ============================================================ -->
+<!-- SECTION 1 -->
+<!-- ============================================================ -->
+<h2 id="s1" class="section-title section-anchor text-2xl font-bold">1. LLM Inference Challenges</h2>
+
+<p class="mt-4 text-gray-700 leading-relaxed">Serving large language models is fundamentally different from serving classical ML models. A ResNet-50 image classifier takes a fixed-size tensor, runs a deterministic forward pass, and returns a probability vector in ~5 ms. An LLM generating 512 tokens requires 512 sequential forward passes, each attending over all previously generated tokens, while managing gigabytes of cached intermediate states. The operational requirements are categorically different.</p>
+
+<h3 class="subsection-title text-xl font-semibold">1.1 Why LLM Serving is Different</h3>
+<ul class="list-disc list-inside text-gray-700 mt-3 space-y-2">
+  <li><strong>Variable output length:</strong> You cannot pre-allocate a fixed output buffer. A user asking for a haiku and another asking for a legal contract both hit the same endpoint but consume wildly different compute.</li>
+  <li><strong>Sequential token generation:</strong> Each token depends on all previous tokens — true data dependency that blocks parallelism across the generation dimension.</li>
+  <li><strong>KV Cache memory pressure:</strong> Attention keys and values for every token in every layer must be kept in GPU VRAM across the entire generation lifecycle.</li>
+  <li><strong>Batching is non-trivial:</strong> Requests finish at different times. Static batching wastes GPU cycles waiting for the slowest request. You need continuous (dynamic) batching.</li>
+  <li><strong>Memory bandwidth bound, not compute bound:</strong> During decoding, you move model weights from HBM to SRAM for every single generated token, even when generating just one token per step. Arithmetic intensity is ~1 FLOP per byte — far below the ridge point of modern GPUs.</li>
+</ul>
+
+<h3 class="subsection-title text-xl font-semibold">1.2 Memory Requirements</h3>
+
+<p class="mt-3 text-gray-700">GPU VRAM has three consumers: <strong>model weights</strong>, <strong>KV cache</strong>, and <strong>activation buffers</strong>. The dominant costs:</p>
+
+<div class="callout-warning mt-4">
+  <strong>Hardware Rule of Thumb:</strong> A 70B parameter model in FP16 requires ~140 GB VRAM for weights alone — that's 2x A100 80GB or 1x H200 141GB just to fit the weights, before a single token is generated.
+</div>
+
+<h4 class="font-semibold text-gray-800 mt-5">Model Weight Memory by Precision (70B Parameters)</h4>
+<table>
+  <thead><tr><th>Precision</th><th>Bytes/Param</th><th>Weights Only</th><th>+KV Cache (4K ctx)</th><th>Minimum GPUs (A100 80GB)</th></tr></thead>
+  <tbody>
+    <tr><td>FP32</td><td>4</td><td>280 GB</td><td>~310 GB</td><td>4× A100</td></tr>
+    <tr><td>BF16 / FP16</td><td>2</td><td>140 GB</td><td>~160 GB</td><td>2× A100</td></tr>
+    <tr><td>INT8 (GPTQ/AWQ)</td><td>1</td><td>70 GB</td><td>~85 GB</td><td>1× A100 (tight)</td></tr>
+    <tr><td>INT4 (GPTQ 4-bit)</td><td>0.5</td><td>35 GB</td><td>~45 GB</td><td>1× A100 with headroom</td></tr>
+    <tr><td>FP8 (H100 native)</td><td>1</td><td>70 GB</td><td>~85 GB</td><td>1× H100 80GB</td></tr>
+  </tbody>
+</table>
+
+<h4 class="font-semibold text-gray-800 mt-5">KV Cache Memory Formula</h4>
+<p class="text-gray-700 mt-2">For a single token, the KV cache memory (in bytes) per layer is:</p>
+<div class="bg-gray-100 rounded-lg p-4 font-mono text-sm mt-2">
+  KV_bytes_per_token = 2 × num_heads × head_dim × bytes_per_element<br>
+  KV_total = KV_bytes_per_token × num_layers × sequence_length × batch_size<br><br>
+  <span class="text-gray-500">// Llama-3-70B example (FP16):</span><br>
+  // 2 × 64 × 128 × 2 = 32,768 bytes per layer per token<br>
+  // × 80 layers × 4096 tokens = 10.7 GB for batch_size=1
+</div>
+
+<h3 class="subsection-title text-xl font-semibold">1.3 Autoregressive Generation: The Sequential Bottleneck</h3>
+
+<p class="text-gray-700 mt-3">LLMs generate tokens autoregressively: token <em>t+1</em> cannot be computed until token <em>t</em> is fully computed, because it attends to token <em>t</em>'s key-value pairs. This creates two fundamentally different phases:</p>
+
+<div class="mermaid">
+flowchart LR
+    subgraph PREFILL["PREFILL Phase (parallel)"]
+        direction TB
+        P1["Input tokens [t1...tN]"] --> PA["Full attention\n(N×N matrix)"]
+        PA --> PO["KV cache populated\nfor all N tokens"]
+    end
+    subgraph DECODE["DECODE Phase (sequential)"]
+        direction TB
+        D1["Token tN+1"] --> DA["Attend to\ncached KV [t1..tN]"]
+        DA --> D2["Token tN+2"] --> DB["Attend to\ncached KV [t1..tN+1]"]
+        DB --> D3["Token tN+3 ..."]
+    end
+    PREFILL --> DECODE
+    style PREFILL fill:#dbeafe,stroke:#2563eb
+    style DECODE fill:#fef3c7,stroke:#f59e0b
+</div>
+
+<ul class="text-gray-700 space-y-2 mt-3">
+  <li><strong>Prefill:</strong> All input tokens are processed in one forward pass. GPU is compute-bound. Fast, uses tensor parallelism efficiently. Contributes to TTFT.</li>
+  <li><strong>Decode:</strong> One token generated per step. GPU is memory-bandwidth-bound — weights are loaded for each single-token forward pass. Each step contributes to ITL.</li>
+</ul>
+
+<h3 class="subsection-title text-xl font-semibold">1.4 Key Metrics</h3>
+
+<div class="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
+  <div class="metric-card">
+    <div class="metric-value text-2xl">TTFT</div>
+    <div class="metric-label">Time to First Token<br>Prefill latency. Goal: &lt;500ms</div>
+  </div>
+  <div class="metric-card">
+    <div class="metric-value text-2xl">ITL</div>
+    <div class="metric-label">Inter-Token Latency<br>Per-step decode time. Goal: &lt;50ms</div>
+  </div>
+  <div class="metric-card">
+    <div class="metric-value text-2xl">E2EL</div>
+    <div class="metric-label">End-to-End Latency<br>TTFT + (N_tokens × ITL)</div>
+  </div>
+  <div class="metric-card">
+    <div class="metric-value text-2xl">TPS</div>
+    <div class="metric-label">Tokens/sec/GPU<br>Throughput metric</div>
+  </div>
+  <div class="metric-card">
+    <div class="metric-value text-2xl">RPS</div>
+    <div class="metric-label">Requests/sec<br>System throughput</div>
+  </div>
+  <div class="metric-card">
+    <div class="metric-value text-2xl">MFU</div>
+    <div class="metric-label">Model FLOP Utilization<br>Efficiency metric. Good: &gt;50%</div>
+  </div>
+</div>
+
+<div class="callout-info mt-6">
+  <strong>Latency vs Throughput Trade-off:</strong> Optimizing for TTFT/ITL (latency) and tokens/sec (throughput) are often in conflict. Small batch sizes minimize latency but waste GPU utilization. Large batches maximize throughput but increase queuing latency. Production systems tune this via SLO-aware schedulers.
+</div>
+
+<!-- ============================================================ -->
+<!-- SECTION 2 -->
+<!-- ============================================================ -->
+<h2 id="s2" class="section-title section-anchor text-2xl font-bold">2. Key Optimization Concepts</h2>
+
+<h3 class="subsection-title text-xl font-semibold">2.1 KV Cache</h3>
+<p class="text-gray-700 mt-3">Without KV caching, each decode step would recompute attention keys and values for all previous tokens — O(N²) total compute for N tokens. KV caching stores these tensors in GPU VRAM, reducing decode compute to O(N) at the cost of O(N × layers × heads × head_dim) memory. It is the single most important optimization in LLM inference, non-negotiable for any production deployment.</p>
+
+<div class="callout-warning">
+  <strong>KV Cache is the bottleneck for long contexts:</strong> A 128K context window with Llama-3-70B in FP16 requires ~342 GB of KV cache for a single request. This is why context length directly drives GPU cluster sizing in production.
+</div>
+
+<h3 class="subsection-title text-xl font-semibold">2.2 Continuous Batching vs Static Batching</h3>
+
+<div class="mermaid">
+gantt
+    title Static vs Continuous Batching
+    dateFormat X
+    axisFormat %s
+
+    section Static Batch (4 requests)
+    Req A (short)   :done, 0, 3
+    Req B (medium)  :done, 0, 6
+    Req C (long)    :done, 0, 10
+    Req D (medium)  :done, 0, 6
+    Wait (A idle)   :crit, 3, 10
+    Wait (B,D idle) :crit, 6, 10
+
+    section Continuous Batch
+    Req A           :active, 0, 3
+    Req E (new)     :active, 3, 8
+    Req B           :active, 0, 6
+    Req F (new)     :active, 6, 9
+    Req C           :active, 0, 10
+    Req D           :active, 0, 6
+</div>
+
+<p class="text-gray-700 mt-4">With <strong>static batching</strong>, the server waits until a batch is full, runs all requests together, and only returns results when every request in the batch finishes. Short requests sit idle waiting for long ones. GPU utilization collapses.</p>
+<p class="text-gray-700 mt-3">With <strong>continuous batching</strong> (iteration-level scheduling), as soon as a request finishes generating its last token, it is evicted from the batch and a new waiting request is immediately inserted at the very next decode step. GPU utilization stays near 100%. vLLM, TGI, and all serious serving frameworks implement this.</p>
+
+<h3 class="subsection-title text-xl font-semibold">2.3 PagedAttention: vLLM's Core Innovation</h3>
+<p class="text-gray-700 mt-3">Traditional KV cache management pre-allocates a contiguous VRAM block for the maximum possible sequence length, causing internal fragmentation and inability to serve many concurrent requests. PagedAttention (Kwon et al., 2023) manages KV cache like virtual memory in an OS — KV cache is divided into fixed-size <em>pages</em>. Each sequence maps to a list of pages, which need not be contiguous. A block table maps logical block numbers to physical GPU memory addresses.</p>
+<ul class="list-disc list-inside text-gray-700 mt-3 space-y-2">
+  <li>Near-zero internal memory fragmentation (only the last page may be partially filled)</li>
+  <li>Memory sharing: requests with the same prefix share physical pages (prefix caching)</li>
+  <li>Copy-on-write for beam search: forked sequences share pages until divergence</li>
+  <li>3-4x throughput improvement over Hugging Face Transformers baseline</li>
+</ul>
+
+<h3 class="subsection-title text-xl font-semibold">2.4 Flash Attention</h3>
+<p class="text-gray-700 mt-3">Standard attention materializes the full N×N attention matrix in HBM — O(N²) memory and IO. Flash Attention (Dao et al., 2022) tiles Q, K, V and computes attention in SRAM, making multiple passes in smaller chunks. The full attention matrix is never materialized. Flash Attention 2 improves work partitioning; Flash Attention 3 exploits H100 async WGMMA and TMA instructions. Results: O(N) memory, 2-4× speedup for long sequences, numerically exact.</p>
+
+<h3 class="subsection-title text-xl font-semibold">2.5 Speculative Decoding</h3>
+<p class="text-gray-700 mt-3">Speculative decoding uses a small <em>draft model</em> to propose K tokens in roughly the same time a large <em>target model</em> verifies them in one parallel forward pass. If draft tokens match the target distribution, all K tokens are accepted — K× speedup. If they diverge, the first divergent token is corrected and decoding continues. Typical speedup: 2-3× with well-matched draft models.</p>
+
+<h3 class="subsection-title text-xl font-semibold">2.6 Quantization Overview</h3>
+<table>
+  <thead><tr><th>Method</th><th>Bits</th><th>Type</th><th>Quality</th><th>Speedup</th><th>Tool</th><th>Best For</th></tr></thead>
+  <tbody>
+    <tr><td>GPTQ</td><td>4-bit</td><td>Weight-only PTQ</td><td>Good (0.5-1 ppl)</td><td>2-3×</td><td>AutoGPTQ, vLLM</td><td>A100/H100 serving</td></tr>
+    <tr><td>AWQ</td><td>4-bit</td><td>Activation-aware PTQ</td><td>Very Good (&lt;0.5 ppl)</td><td>2-3×</td><td>AutoAWQ, vLLM</td><td>A100/H100 serving</td></tr>
+    <tr><td>GGUF Q4_K_M</td><td>4-bit</td><td>Mixed block quant</td><td>Good</td><td>2-3×</td><td>llama.cpp, Ollama</td><td>CPU / edge</td></tr>
+    <tr><td>FP8</td><td>8-bit float</td><td>W8A8</td><td>Excellent (&lt;0.1 ppl)</td><td>1.5-2×</td><td>TensorRT-LLM, vLLM</td><td>H100 production</td></tr>
+    <tr><td>INT8 SmoothQuant</td><td>8-bit</td><td>W8A8 PTQ</td><td>Very Good</td><td>1.5-2×</td><td>SmoothQuant, TGI</td><td>A100 production</td></tr>
+    <tr><td>GGUF Q8_0</td><td>8-bit</td><td>Block quant</td><td>Near-lossless</td><td>1.5×</td><td>llama.cpp, Ollama</td><td>High-quality CPU</td></tr>
+    <tr><td>BnB NF4</td><td>4-bit</td><td>Double quant</td><td>Good (QLoRA)</td><td>2×</td><td>bitsandbytes</td><td>Fine-tuning, dev</td></tr>
+  </tbody>
+</table>
+
+<!-- SECTION 3 -->
+<h2 id="s3" class="section-title section-anchor text-2xl font-bold">3. vLLM — The Standard for LLM Serving</h2>
+<p class="text-gray-700 mt-4">vLLM (UC Berkeley, 2023) is the de facto standard for GPU-accelerated LLM serving. It implements PagedAttention, continuous batching, Flash Attention, and provides an OpenAI-compatible REST API supporting virtually all popular open-weight models and quantization formats.</p>
+
+<h3 class="subsection-title text-xl font-semibold">3.1 vLLM Architecture</h3>
+<div class="mermaid">
+graph TD
+    CLIENT["API Client (OpenAI-compatible)"] --> ENGINE["LLM Engine (Async)"]
+    ENGINE --> SCHEDULER["Scheduler (Continuous Batching)"]
+    ENGINE --> BLOCKMGR["Block Manager (PagedAttention)"]
+    SCHEDULER --> WORKER["Worker Process (per GPU)"]
+    BLOCKMGR --> KVCACHE["KV Cache (Block Pool)"]
+    WORKER --> MODEL["Model Executor (Flash Attn + CUDA Graphs)"]
+    MODEL --> KVCACHE
+    MODEL --> SAMPLER["Sampler (Top-p, Top-k, Beam)"]
+    SAMPLER --> DETOKENIZER["Detokenizer"]
+    DETOKENIZER --> CLIENT
+    style ENGINE fill:#dbeafe,stroke:#2563eb
+    style BLOCKMGR fill:#fef3c7,stroke:#f59e0b
+    style MODEL fill:#f0fdf4,stroke:#059669
+</div>
+
+<h3 class="subsection-title text-xl font-semibold">3.2 Installation and Quick Start</h3>
+<pre><code class="language-bash"># Install vLLM (requires CUDA 12.1+ and Python 3.9+)
+pip install vllm
+
+# Verify installation
+python -c "import vllm; print(vllm.__version__)"</code></pre>
+
+<h3 class="subsection-title text-xl font-semibold">3.3 vLLM Server (OpenAI-Compatible API)</h3>
+<pre><code class="language-bash"># Start vLLM server
+python -m vllm.entrypoints.openai.api_server \
+    --model meta-llama/Llama-3.1-8B-Instruct \
+    --tensor-parallel-size 1 \
+    --max-model-len 8192 \
+    --gpu-memory-utilization 0.90 \
+    --enable-prefix-caching \
+    --served-model-name llama-3.1-8b \
+    --host 0.0.0.0 \
+    --port 8000 \
+    --dtype bfloat16
+
+# For quantized model (AWQ)
+python -m vllm.entrypoints.openai.api_server \
+    --model casperhansen/llama-3-70b-instruct-awq \
+    --quantization awq \
+    --tensor-parallel-size 2 \
+    --max-model-len 4096 \
+    --gpu-memory-utilization 0.85</code></pre>
+
+<h3 class="subsection-title text-xl font-semibold">3.4 vLLM Python Client (OpenAI SDK)</h3>
+<pre><code class="language-python">from openai import OpenAI
+
+client = OpenAI(base_url="http://localhost:8000/v1", api_key="not-needed")
+
+# Chat completion
+response = client.chat.completions.create(
+    model="llama-3.1-8b",
+    messages=[
+        {"role": "system", "content": "You are a helpful assistant."},
+        {"role": "user", "content": "Explain KV caching in LLM inference."},
+    ],
+    max_tokens=512,
+    temperature=0.7,
+)
+print(response.choices[0].message.content)
+
+# Streaming response
+stream = client.chat.completions.create(
+    model="llama-3.1-8b",
+    messages=[{"role": "user", "content": "Write a haiku about GPUs."}],
+    stream=True,
+    max_tokens=100,
+)
+for chunk in stream:
+    if chunk.choices[0].delta.content:
+        print(chunk.choices[0].delta.content, end="", flush=True)</code></pre>
+
+<h3 class="subsection-title text-xl font-semibold">3.5 vLLM Offline Batch Inference</h3>
+<pre><code class="language-python">from vllm import LLM, SamplingParams
+
+llm = LLM(
+    model="meta-llama/Llama-3.1-8B-Instruct",
+    tensor_parallel_size=1,
+    gpu_memory_utilization=0.90,
+    max_model_len=4096,
+    dtype="bfloat16",
+    enable_prefix_caching=True,
+)
+
+sampling_params = SamplingParams(
+    temperature=0.8, top_p=0.95, top_k=50, max_tokens=256,
+    stop=["&lt;|eot_id|&gt;"],
+)
+
+prompts = [
+    "Summarize the theory of relativity in 3 sentences:",
+    "What are the top 5 Python performance tips?",
+    "Explain transformer attention in simple terms:",
+]
+
+outputs = llm.generate(prompts, sampling_params)
+for output in outputs:
+    print(f"Prompt: {output.prompt[:50]}...")
+    print(f"Generated: {output.outputs[0].text[:100]}...")
+    print()</code></pre>
+
+<h3 class="subsection-title text-xl font-semibold">3.6 Multi-GPU Tensor Parallelism</h3>
+<pre><code class="language-python">from vllm import LLM, SamplingParams
+
+# Tensor parallel across 4 GPUs
+llm = LLM(
+    model="meta-llama/Llama-3.1-70B-Instruct",
+    tensor_parallel_size=4,
+    pipeline_parallel_size=1,
+    max_model_len=8192,
+    gpu_memory_utilization=0.85,
+    dtype="bfloat16",
+)
+
+# CLI equivalent:
+# CUDA_VISIBLE_DEVICES=0,1,2,3 python -m vllm.entrypoints.openai.api_server \
+#     --model meta-llama/Llama-3.1-70B-Instruct \
+#     --tensor-parallel-size 4 \
+#     --max-model-len 8192
+
+sampling_params = SamplingParams(max_tokens=512, temperature=0.7)
+outputs = llm.generate(["Explain distributed training in 3 paragraphs:"], sampling_params)
+print(outputs[0].outputs[0].text)</code></pre>
+
+<h3 class="subsection-title text-xl font-semibold">3.7 Prefix Caching</h3>
+<pre><code class="language-python">from vllm import LLM, SamplingParams
+
+llm = LLM(
+    model="meta-llama/Llama-3.1-8B-Instruct",
+    enable_prefix_caching=True,
+    gpu_memory_utilization=0.90,
+    max_model_len=8192,
+)
+
+SYSTEM_PROMPT = "You are an expert financial analyst with 20 years of experience. [... 500 more tokens ...]"
+sampling_params = SamplingParams(max_tokens=256, temperature=0.3)
+
+requests = [
+    f"&lt;|system|&gt;{SYSTEM_PROMPT}&lt;|user|&gt;Analyze NVDA Q3 2024 earnings.",
+    f"&lt;|system|&gt;{SYSTEM_PROMPT}&lt;|user|&gt;What is the P/E ratio implication for AAPL?",
+    f"&lt;|system|&gt;{SYSTEM_PROMPT}&lt;|user|&gt;Explain the DCF model for MSFT.",
+]
+
+# First batch: system prompt KV computed and cached
+outputs_batch1 = llm.generate(requests[:2], sampling_params)
+# Second batch: system prompt KV served from cache — much faster TTFT
+outputs_batch2 = llm.generate(requests[2:], sampling_params)</code></pre>
+
+<h3 class="subsection-title text-xl font-semibold">3.8 LoRA Serving with Multiple Adapters</h3>
+<pre><code class="language-python">from vllm import LLM, SamplingParams
+from vllm.lora.request import LoRARequest
+
+llm = LLM(
+    model="meta-llama/Llama-3.1-8B-Instruct",
+    enable_lora=True,
+    max_loras=4,
+    max_lora_rank=64,
+    max_model_len=4096,
+)
+
+outputs = llm.generate(
+    ["Summarize this legal document: ...", "Write marketing copy for: ..."],
+    SamplingParams(max_tokens=200, temperature=0.7),
+    lora_request=[
+        LoRARequest("legal-adapter", 1, "/adapters/llama-legal-lora"),
+        LoRARequest("marketing-adapter", 2, "/adapters/llama-marketing-lora"),
+    ],
+)</code></pre>
+
+<div class="callout-success mt-4">
+  <strong>vLLM Performance:</strong> On a single A100 80GB with Llama-3-8B (BF16): ~2,800 tokens/sec at batch=64. With AWQ 4-bit: ~4,100 tokens/sec. vLLM achieves 3-5× higher throughput vs naive HuggingFace inference.
+</div>
+
+<!-- SECTION 4 -->
+<h2 id="s4" class="section-title section-anchor text-2xl font-bold">4. TGI — Text Generation Inference (Hugging Face)</h2>
+<p class="text-gray-700 mt-4">Hugging Face's Text Generation Inference (TGI) is a production-grade Rust+Python serving framework that pioneered continuous batching and tensor parallelism. It is the serving backend for HF Inference Endpoints.</p>
+
+<h3 class="subsection-title text-xl font-semibold">4.1 TGI Docker Deployment</h3>
+<pre><code class="language-bash"># Single GPU — Llama-3.1-8B
+docker run --gpus all --shm-size 1g -p 8080:80 \
+    -v $HOME/.cache/huggingface:/data \
+    -e HUGGING_FACE_HUB_TOKEN=$HF_TOKEN \
+    ghcr.io/huggingface/text-generation-inference:latest \
+        --model-id meta-llama/Llama-3.1-8B-Instruct \
+        --max-input-length 4096 \
+        --max-total-tokens 8192 \
+        --dtype bfloat16
+
+# Multi-GPU (4 GPUs) — Llama-3.1-70B
+docker run --gpus '"device=0,1,2,3"' --shm-size 16g -p 8080:80 \
+    -v $HOME/.cache/huggingface:/data \
+    -e HUGGING_FACE_HUB_TOKEN=$HF_TOKEN \
+    ghcr.io/huggingface/text-generation-inference:latest \
+        --model-id meta-llama/Llama-3.1-70B-Instruct \
+        --num-shard 4 \
+        --max-input-length 4096 \
+        --dtype bfloat16
+
+# With GPTQ quantization
+docker run --gpus '"device=0,1"' --shm-size 8g -p 8080:80 \
+    -v $HOME/.cache/huggingface:/data \
+    ghcr.io/huggingface/text-generation-inference:latest \
+        --model-id TheBloke/Llama-2-70B-Chat-GPTQ \
+        --num-shard 2 \
+        --quantize gptq</code></pre>
+
+<h3 class="subsection-title text-xl font-semibold">4.2 TGI Python Client</h3>
+<pre><code class="language-python">from huggingface_hub import InferenceClient
+import requests
+
+client = InferenceClient(model="http://localhost:8080")
+
+# Text generation
+response = client.text_generation(
+    prompt="[INST] Explain KV caching in LLMs. [/INST]",
+    max_new_tokens=256,
+    temperature=0.7,
+    repetition_penalty=1.1,
+)
+print(response)
+
+# Streaming
+for token in client.text_generation(
+    prompt="[INST] Write a haiku about neural networks. [/INST]",
+    max_new_tokens=100,
+    stream=True,
+):
+    print(token, end="", flush=True)
+
+# Raw REST API
+payload = {
+    "inputs": "[INST] What is speculative decoding? [/INST]",
+    "parameters": {"max_new_tokens": 300, "temperature": 0.8, "top_p": 0.9},
+}
+response = requests.post("http://localhost:8080/generate", json=payload)
+print(response.json()["generated_text"])</code></pre>
+
+<h3 class="subsection-title text-xl font-semibold">4.3 TGI on Kubernetes</h3>
+<pre><code class="language-yaml">apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tgi-llama-8b
+  namespace: llm-serving
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: tgi-llama-8b
+  template:
+    metadata:
+      labels:
+        app: tgi-llama-8b
+    spec:
+      containers:
+      - name: tgi
+        image: ghcr.io/huggingface/text-generation-inference:latest
+        args:
+          - --model-id=meta-llama/Llama-3.1-8B-Instruct
+          - --max-input-length=4096
+          - --max-total-tokens=8192
+          - --dtype=bfloat16
+        ports:
+        - containerPort: 80
+        env:
+        - name: HUGGING_FACE_HUB_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: hf-token
+              key: token
+        resources:
+          limits:
+            nvidia.com/gpu: "1"
+            memory: "64Gi"
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 80
+          initialDelaySeconds: 120
+          periodSeconds: 10</code></pre>
+
+<h3 class="subsection-title text-xl font-semibold">4.4 TGI vs vLLM Comparison</h3>
+<table>
+  <thead><tr><th>Feature</th><th>vLLM</th><th>TGI</th></tr></thead>
+  <tbody>
+    <tr><td>Core innovation</td><td>PagedAttention</td><td>Continuous batching (pioneered)</td></tr>
+    <tr><td>Language</td><td>Python + C++/CUDA</td><td>Rust + Python</td></tr>
+    <tr><td>OpenAI-compatible API</td><td>Yes (native)</td><td>Partial (messages API added)</td></tr>
+    <tr><td>Tensor parallelism</td><td>Yes</td><td>Yes</td></tr>
+    <tr><td>Quantization</td><td>GPTQ, AWQ, FP8, INT8</td><td>GPTQ, AWQ, bitsandbytes, FP8</td></tr>
+    <tr><td>LoRA multi-adapter</td><td>Yes (dynamic loading)</td><td>Limited</td></tr>
+    <tr><td>Prefix caching</td><td>Yes</td><td>No (as of 2024)</td></tr>
+    <tr><td>Throughput (8B, A100)</td><td>~2800 tok/s</td><td>~2400 tok/s</td></tr>
+    <tr><td>Best use case</td><td>General production serving</td><td>HF Endpoints, enterprise Docker</td></tr>
+  </tbody>
+</table>
+
+<!-- SECTION 5 -->
+<h2 id="s5" class="section-title section-anchor text-2xl font-bold">5. SGLang</h2>
+<p class="text-gray-700 mt-4">SGLang (Structured Generation Language) is a serving framework from the LMSYS team that co-optimizes the runtime and programming interface. Its RadixAttention provides automatic KV cache reuse via radix trees, and it has native support for structured generation (JSON, regex), often exceeding vLLM throughput for prompt-reuse-heavy workloads.</p>
+
+<h3 class="subsection-title text-xl font-semibold">5.1 SGLang Server and Client</h3>
+<pre><code class="language-bash"># Install SGLang
+pip install "sglang[all]"
+
+# Start SGLang server (OpenAI-compatible)
+python -m sglang.launch_server \
+    --model-path meta-llama/Llama-3.1-8B-Instruct \
+    --host 0.0.0.0 --port 30000 \
+    --tp 1 --mem-fraction-static 0.85 \
+    --enable-torch-compile</code></pre>
+
+<pre><code class="language-python">import sglang as sgl
+
+@sgl.function
+def multi_turn_qa(s, q1, q2):
+    s += sgl.system("You are a concise technical assistant.")
+    s += sgl.user(q1)
+    s += sgl.assistant(sgl.gen("answer1", max_tokens=200))
+    s += sgl.user(q2)
+    s += sgl.assistant(sgl.gen("answer2", max_tokens=200))
+
+sgl.set_default_backend(sgl.RuntimeEndpoint("http://localhost:30000"))
+
+state = multi_turn_qa.run(
+    q1="What is attention in transformers?",
+    q2="How does multi-head attention extend this?",
+)
+print(state["answer1"])
+print(state["answer2"])</code></pre>
+
+<h3 class="subsection-title text-xl font-semibold">5.2 Structured Output with SGLang</h3>
+<pre><code class="language-python">import sglang as sgl
+import json
+
+sgl.set_default_backend(sgl.RuntimeEndpoint("http://localhost:30000"))
+
+PERSON_SCHEMA = """{
+  "type": "object",
+  "properties": {
+    "name": {"type": "string"},
+    "age": {"type": "integer"},
+    "skills": {"type": "array", "items": {"type": "string"}}
+  },
+  "required": ["name", "age", "skills"]
+}"""
+
+@sgl.function
+def extract_json(s, text):
+    s += f"Extract structured data from: {text}\nJSON output:\n"
+    s += sgl.gen("data", json_schema=PERSON_SCHEMA, max_tokens=200)
+
+state = extract_json.run(text="Alice Chen, 35, expert in Python, Rust, and ML.")
+data = json.loads(state["data"])
+print(data)  # {'name': 'Alice Chen', 'age': 35, 'skills': ['Python', 'Rust', 'ML']}</code></pre>
+
+<div class="callout-success">
+  <strong>When SGLang beats vLLM:</strong> High prompt reuse (multi-turn, RAG with fixed documents) — RadixAttention delivers 2-5× cache hit rates. Structured output (JSON extraction, function calling) — native grammar-constrained decoding. Agent workflows with branching — shared prefix trees compress KV cache across parallel branches.
+</div>
+
+<!-- SECTION 6 -->
+<h2 id="s6" class="section-title section-anchor text-2xl font-bold">6. Ollama for Development</h2>
+<p class="text-gray-700 mt-4">Ollama wraps llama.cpp in a user-friendly CLI and REST server, making it trivial to run quantized LLMs locally on Mac (Apple Silicon MPS), Windows, or Linux including CPU-only machines. Not for production GPU serving — excellent for local dev, testing, and edge deployment.</p>
+
+<h3 class="subsection-title text-xl font-semibold">6.1 Ollama API Usage</h3>
+<pre><code class="language-bash"># Install (Mac)
+brew install ollama
+ollama serve
+
+# Pull and run a model
+ollama pull llama3.1:8b
+ollama run llama3.1:8b "What is speculative decoding?"
+
+# Quantized variants
+ollama pull llama3.1:70b-instruct-q4_K_M  # ~40GB
+ollama pull codellama:13b-code-q4_0</code></pre>
+
+<pre><code class="language-python">import ollama
+
+client = ollama.Client(host="http://localhost:11434")
+
+# Chat completion
+response = client.chat(
+    model="llama3.1:8b",
+    messages=[{"role": "user", "content": "Explain transformer attention in 3 sentences."}],
+    options={"temperature": 0.7, "num_predict": 200, "num_ctx": 4096},
+)
+print(response["message"]["content"])
+
+# Streaming
+stream = client.chat(
+    model="llama3.1:8b",
+    messages=[{"role": "user", "content": "Write Python code to sort a list."}],
+    stream=True,
+)
+for chunk in stream:
+    print(chunk["message"]["content"], end="", flush=True)</code></pre>
+
+<h3 class="subsection-title text-xl font-semibold">6.2 GGUF Format and llama.cpp</h3>
+<table>
+  <thead><tr><th>GGUF Variant</th><th>Bits</th><th>Quality vs F16</th><th>7B Size</th><th>13B Size</th><th>70B Size</th></tr></thead>
+  <tbody>
+    <tr><td>Q2_K</td><td>2.6</td><td>Significant loss</td><td>2.8 GB</td><td>5.4 GB</td><td>26 GB</td></tr>
+    <tr><td>Q4_0</td><td>4.0</td><td>Good</td><td>3.8 GB</td><td>7.4 GB</td><td>38 GB</td></tr>
+    <tr><td>Q4_K_M</td><td>4.5</td><td>Very Good</td><td>4.1 GB</td><td>8.0 GB</td><td>41 GB</td></tr>
+    <tr><td>Q5_K_M</td><td>5.7</td><td>Excellent</td><td>4.8 GB</td><td>9.2 GB</td><td>49 GB</td></tr>
+    <tr><td>Q6_K</td><td>6.6</td><td>Near-lossless</td><td>5.5 GB</td><td>10.7 GB</td><td>57 GB</td></tr>
+    <tr><td>Q8_0</td><td>8.0</td><td>Essentially lossless</td><td>6.7 GB</td><td>13.0 GB</td><td>70 GB</td></tr>
+    <tr><td>F16</td><td>16</td><td>Reference</td><td>13.5 GB</td><td>26 GB</td><td>140 GB</td></tr>
+  </tbody>
+</table>
+
+<div class="callout-info">
+  <strong>Ollama vs vLLM:</strong> Use Ollama for local dev, CI/CD test environments, and edge deployments on consumer hardware. Use vLLM/TGI for production GPU serving. Ollama has much lower throughput (single-request llama.cpp) but requires no CUDA and works on Apple Silicon MPS.
+</div>
+
+<!-- SECTION 7 -->
+<h2 id="s7" class="section-title section-anchor text-2xl font-bold">7. Speculative Decoding</h2>
+<p class="text-gray-700 mt-4">Speculative decoding is one of the highest-impact inference optimizations for latency-sensitive workloads. The core insight: the memory-bandwidth bottleneck during decode means the GPU is idle much of the time between loading weights and computing the single next token. We can exploit this slack by proposing multiple future tokens cheaply, then verifying them in one parallel step.</p>
+
+<h3 class="subsection-title text-xl font-semibold">7.1 Algorithm: Draft Model + Verification</h3>
+<div class="mermaid">
+sequenceDiagram
+    participant User
+    participant Draft as Draft Model (small)
+    participant Target as Target Model (large)
+
+    User->>Draft: Generate K draft tokens speculatively
+    Draft->>Draft: t1=argmax(p_draft(·|context))
+    Draft->>Draft: t2=argmax(p_draft(·|context,t1))
+    Draft->>Draft: t3=argmax(p_draft(·|context,t1,t2))
+    Draft->>Target: Verify [t1,t2,t3] in ONE forward pass
+    Target->>Target: Compute p_target(·|context) for all K+1 positions
+    Note over Target: Accept t1 if p_target(t1)/p_draft(t1) >= U[0,1]
+    Note over Target: Accept t2 if t1 accepted AND p_target(t2)/p_draft(t2) >= U[0,1]
+    Note over Target: On rejection: resample from corrected distribution
+    Target->>User: Return accepted tokens (1 to K+1 tokens per step)
+</div>
+
+<p class="text-gray-700 mt-3">The acceptance rate α depends on distribution overlap between draft and target. If α is high (draft closely approximates target), you get near-K× speedup. The corrected sampling ensures the output distribution is exactly the target distribution — no quality loss at any acceptance rate.</p>
+
+<h3 class="subsection-title text-xl font-semibold">7.2 Speculative Decoding Setup in vLLM</h3>
+<pre><code class="language-python">from vllm import LLM, SamplingParams
+
+# Method 1: Separate draft model
+llm = LLM(
+    model="meta-llama/Llama-3.1-70B-Instruct",    # Target model
+    speculative_model="meta-llama/Llama-3.2-1B-Instruct",  # Draft model
+    num_speculative_tokens=5,        # Propose 5 tokens per step
+    speculative_draft_tensor_parallel_size=1,
+    tensor_parallel_size=4,          # Target across 4 GPUs
+    gpu_memory_utilization=0.85,
+)
+
+# Method 2: ngram-based speculation (no separate model needed)
+# Uses n-gram patterns from input as draft — works for repetitive text
+llm_ngram = LLM(
+    model="meta-llama/Llama-3.1-8B-Instruct",
+    speculative_model="[ngram]",
+    num_speculative_tokens=5,
+    ngram_prompt_lookup_max=4,
+    ngram_prompt_lookup_min=1,
+)
+
+# Method 3: EAGLE (Extrapolation Algorithm for Greater Language-model Efficiency)
+# Uses a lightweight head that drafts based on target model's hidden states
+llm_eagle = LLM(
+    model="meta-llama/Llama-3.1-8B-Instruct",
+    speculative_model="yuhuili/EAGLE-LLaMA3-Instruct-8B",
+    num_speculative_tokens=6,
+    use_v2_block_manager=True,
+)
+
+sampling_params = SamplingParams(max_tokens=512, temperature=0.7)
+outputs = llm.generate(["Explain the history of machine learning:"], sampling_params)
+print(outputs[0].outputs[0].text)</code></pre>
+
+<h3 class="subsection-title text-xl font-semibold">7.3 When Speculative Decoding Helps vs Hurts</h3>
+<table>
+  <thead><tr><th>Scenario</th><th>Expected Speedup</th><th>Why</th></tr></thead>
+  <tbody>
+    <tr><td>Low temperature (greedy/low-temp)</td><td>2-3×</td><td>High acceptance rate — draft closely matches target</td></tr>
+    <tr><td>Repetitive/formulaic text (code, templates)</td><td>2-4×</td><td>Easy for draft model to predict</td></tr>
+    <tr><td>Small vocabulary outputs (numbers, dates)</td><td>3-5×</td><td>Draft is almost always correct</td></tr>
+    <tr><td>High temperature sampling (creative writing)</td><td>0.8-1.2×</td><td>Low acceptance rate — overhead dominates</td></tr>
+    <tr><td>Very short outputs (&lt;30 tokens)</td><td>0.9-1.1×</td><td>Speculation overhead vs output length</td></tr>
+    <tr><td>Very long prompts (large KV cache)</td><td>1.5-2×</td><td>Memory bandwidth savings still apply</td></tr>
+    <tr><td>Batch size &gt; 16</td><td>1.0-1.3×</td><td>GPU already well-utilized without speculation</td></tr>
+  </tbody>
+</table>
+
+<div class="callout-warning">
+  <strong>Speculative Decoding Pitfall:</strong> Speculative decoding helps most at batch_size=1 (interactive latency) and hurts throughput for large batches. The draft model consumes additional VRAM and compute. Always benchmark your specific workload before deploying.
+</div>
+
+<h3 class="subsection-title text-xl font-semibold">7.4 Medusa: Multi-Head Speculation</h3>
+<p class="text-gray-700 mt-3">Medusa (Cai et al., 2024) adds K additional "Medusa heads" directly to the target model's final layer. Each head predicts tokens 2, 3, ..., K+1 steps ahead. This eliminates the need for a separate draft model and achieves 2-3× speedup with minimal quality loss. The heads are lightweight MLP layers trained on top of frozen target model features.</p>
+
+<table>
+  <thead><tr><th>Method</th><th>Draft Source</th><th>Speedup</th><th>Extra VRAM</th><th>Quality</th><th>Complexity</th></tr></thead>
+  <tbody>
+    <tr><td>Classic SpecDec</td><td>Separate small LLM</td><td>2-3×</td><td>High (full draft model)</td><td>Exact</td><td>Medium</td></tr>
+    <tr><td>EAGLE</td><td>Draft head on target hidden states</td><td>3-4×</td><td>Low (&lt;1GB)</td><td>Exact</td><td>Low</td></tr>
+    <tr><td>Medusa</td><td>Multiple prediction heads</td><td>2-3×</td><td>Very Low</td><td>Near-exact</td><td>Low</td></tr>
+    <tr><td>n-gram lookup</td><td>Input prompt n-grams</td><td>1.5-2×</td><td>None</td><td>Exact</td><td>Zero</td></tr>
+    <tr><td>Lookahead Decoding</td><td>Jacobi iteration</td><td>1.5-2×</td><td>None</td><td>Exact</td><td>Low</td></tr>
+  </tbody>
+</table>
+
+<!-- SECTION 8 -->
+<h2 id="s8" class="section-title section-anchor text-2xl font-bold">8. Quantization Deep Dive</h2>
+<p class="text-gray-700 mt-4">Quantization is often the first optimization applied in production: it reduces model size, VRAM requirements, and increases effective memory bandwidth — all without requiring any model architecture changes. For LLMs, weight-only quantization (W4A16: 4-bit weights, 16-bit activations) is the most common approach, offering good quality-speed trade-offs.</p>
+
+<h3 class="subsection-title text-xl font-semibold">8.1 GPTQ (Post-Training Quantization)</h3>
+<p class="text-gray-700 mt-3">GPTQ (Frantar et al., 2022) quantizes each weight layer individually by minimizing the reconstruction error using second-order information from a small calibration dataset (~128 samples). It applies an optimal quantization order within each row to minimize the cumulative error. GPTQ is the most widely used post-training quantization method for LLMs and is supported by vLLM, TGI, and llama.cpp.</p>
+
+<pre><code class="language-python">from auto_gptq import AutoGPTQForCausalLM, BaseQuantizeConfig
+from transformers import AutoTokenizer
+import torch
+
+# Load tokenizer
+tokenizer = AutoTokenizer.from_pretrained("meta-llama/Llama-3.1-8B-Instruct")
+
+# Define quantization configuration
+quantize_config = BaseQuantizeConfig(
+    bits=4,                    # 4-bit quantization
+    group_size=128,            # Group size for quantization granularity
+    desc_act=False,            # Whether to use activation ordering
+    static_groups=False,
+    sym=True,                  # Symmetric quantization
+    true_sequential=True,      # Quantize in true sequential order
+)
+
+# Load model for quantization
+model = AutoGPTQForCausalLM.from_pretrained(
+    "meta-llama/Llama-3.1-8B-Instruct",
+    quantize_config=quantize_config,
+    torch_dtype=torch.float16,
+    device_map="auto",
+)
+
+# Calibration data (128 samples recommended)
+calibration_dataset = [
+    tokenizer("The theory of relativity was proposed by Einstein in 1905.", return_tensors="pt").input_ids,
+    tokenizer("Machine learning models learn patterns from data.", return_tensors="pt").input_ids,
+    # ... more calibration samples
+]
+
+# Quantize the model
+model.quantize(calibration_dataset, batch_size=1)
+
+# Save quantized model
+model.save_quantized("./llama-3.1-8b-gptq-4bit", use_safetensors=True)
+tokenizer.save_pretrained("./llama-3.1-8b-gptq-4bit")
+print("Quantization complete. Model saved to ./llama-3.1-8b-gptq-4bit")</code></pre>
+
+<h3 class="subsection-title text-xl font-semibold">8.2 AWQ (Activation-Aware Weight Quantization)</h3>
+<p class="text-gray-700 mt-3">AWQ (Lin et al., 2023) addresses GPTQ's weakness: not all weights are equally important. Weights corresponding to high-magnitude activation channels cause more error when quantized. AWQ identifies these salient channels by analyzing activation statistics and scales them up (making them more resistant to quantization error) before quantizing. Result: consistently 0.3-0.5 perplexity better than GPTQ at the same bit width.</p>
+
+<pre><code class="language-python">from awq import AutoAWQForCausalLM
+from transformers import AutoTokenizer
+
+model_path = "meta-llama/Llama-3.1-8B-Instruct"
+quant_path = "./llama-3.1-8b-awq-4bit"
+
+# Load model
+model = AutoAWQForCausalLM.from_pretrained(
+    model_path,
+    torch_dtype="auto",
+    device_map="auto",
+    low_cpu_mem_usage=True,
+)
+tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
+
+# AWQ quantization config
+quant_config = {
+    "zero_point": True,    # Use zero-point quantization
+    "q_group_size": 128,   # Group size
+    "w_bit": 4,            # 4-bit weights
+    "version": "GEMM",     # GEMM kernel (vs GEMV — GEMM faster for batched)
+}
+
+# Quantize (uses its own internal calibration dataset by default)
+model.quantize(tokenizer, quant_config=quant_config)
+
+# Save
+model.save_quantized(quant_path)
+tokenizer.save_pretrained(quant_path)
+
+# Load AWQ model for inference with vLLM
+from vllm import LLM, SamplingParams
+llm = LLM(model=quant_path, quantization="awq", dtype="float16")
+outputs = llm.generate(["Explain AWQ quantization:"], SamplingParams(max_tokens=200))
+print(outputs[0].outputs[0].text)</code></pre>
+
+<h3 class="subsection-title text-xl font-semibold">8.3 GGUF/llama.cpp for CPU Inference</h3>
+<pre><code class="language-python">from llama_cpp import Llama
+
+# Load GGUF model (CPU inference)
+llm = Llama(
+    model_path="./llama-3.1-8b-q4_k_m.gguf",
+    n_ctx=4096,          # Context window
+    n_threads=8,         # CPU threads
+    n_gpu_layers=0,      # 0 = CPU only; -1 = all layers on GPU if available
+    verbose=False,
+)
+
+# Generation
+output = llm(
+    "Q: What is the capital of France? A:",
+    max_tokens=50,
+    temperature=0.1,
+    stop=["Q:", "\n"],
+)
+print(output["choices"][0]["text"])
+
+# For GPU-accelerated GGUF (partial offload)
+llm_gpu = Llama(
+    model_path="./llama-3.1-70b-q4_k_m.gguf",
+    n_ctx=4096,
+    n_gpu_layers=40,     # Offload 40 of 80 layers to GPU
+    n_threads=4,
+)
+
+# Chat interface
+output = llm_gpu.create_chat_completion(
+    messages=[{"role": "user", "content": "Explain gradient descent."}],
+    max_tokens=256,
+    temperature=0.7,
+)
+print(output["choices"][0]["message"]["content"])</code></pre>
+
+<h3 class="subsection-title text-xl font-semibold">8.4 FP8 Quantization on H100</h3>
+<p class="text-gray-700 mt-3">H100 GPUs include native FP8 (E4M3 and E5M2) tensor cores via the NVTX instruction set. FP8 W8A8 quantization (both weights and activations in FP8) achieves near-FP16 quality with ~2× throughput improvement. It's the primary quantization for H100 production deployments.</p>
+
+<pre><code class="language-bash"># vLLM with FP8 (H100 required for W8A8; A100 supports W8 only)
+python -m vllm.entrypoints.openai.api_server \
+    --model meta-llama/Llama-3.1-70B-Instruct \
+    --quantization fp8 \
+    --tensor-parallel-size 4 \
+    --max-model-len 8192
+
+# Using pre-quantized FP8 model from HuggingFace
+python -m vllm.entrypoints.openai.api_server \
+    --model neuralmagic/Meta-Llama-3.1-70B-Instruct-FP8 \
+    --tensor-parallel-size 4</code></pre>
+
+<h3 class="subsection-title text-xl font-semibold">8.5 Quality at Each Quantization Level</h3>
+<table>
+  <thead><tr><th>Precision</th><th>Llama-3-8B PPL (WikiText-2)</th><th>Llama-3-70B PPL</th><th>MMLU Avg</th><th>Relative Quality</th></tr></thead>
+  <tbody>
+    <tr><td>FP16 (baseline)</td><td>6.14</td><td>2.85</td><td>66.6%</td><td>100%</td></tr>
+    <tr><td>FP8 W8A8</td><td>6.16</td><td>2.86</td><td>66.5%</td><td>99.9%</td></tr>
+    <tr><td>INT8 SmoothQuant</td><td>6.20</td><td>2.89</td><td>66.2%</td><td>99.5%</td></tr>
+    <tr><td>AWQ W4A16 (g128)</td><td>6.35</td><td>2.96</td><td>65.8%</td><td>98.8%</td></tr>
+    <tr><td>GPTQ W4A16 (g128)</td><td>6.48</td><td>3.02</td><td>65.3%</td><td>98.1%</td></tr>
+    <tr><td>GGUF Q4_K_M</td><td>6.50</td><td>3.05</td><td>65.1%</td><td>97.7%</td></tr>
+    <tr><td>GGUF Q4_0</td><td>6.65</td><td>3.12</td><td>64.5%</td><td>96.9%</td></tr>
+    <tr><td>GGUF Q2_K</td><td>7.80</td><td>3.78</td><td>59.2%</td><td>88.9%</td></tr>
+  </tbody>
+</table>
+
+<!-- SECTION 9 -->
+<h2 id="s9" class="section-title section-anchor text-2xl font-bold">9. TensorRT-LLM (NVIDIA)</h2>
+<p class="text-gray-700 mt-4">NVIDIA TensorRT-LLM is a production-grade inference optimization library that compiles LLMs into highly optimized TensorRT engines. It implements in-flight batching (NVIDIA's continuous batching), paged KV cache, FP8 quantization, and aggressive kernel fusion. TRT-LLM is the recommended backend for NVIDIA Triton Inference Server deployments and is typically 20-50% faster than vLLM on H100 hardware.</p>
+
+<h3 class="subsection-title text-xl font-semibold">9.1 Building TRT-LLM Engines</h3>
+<pre><code class="language-bash"># Install TensorRT-LLM
+pip install tensorrt-llm --extra-index-url https://pypi.nvidia.com
+
+# Convert HF model to TRT-LLM checkpoint
+python examples/llama/convert_checkpoint.py \
+    --model_dir meta-llama/Llama-3.1-8B-Instruct \
+    --output_dir ./trt_checkpoints/llama-8b \
+    --dtype bfloat16 \
+    --tp_size 1
+
+# Build TRT engine from checkpoint
+trtllm-build \
+    --checkpoint_dir ./trt_checkpoints/llama-8b \
+    --output_dir ./trt_engines/llama-8b \
+    --max_batch_size 64 \
+    --max_input_len 4096 \
+    --max_output_len 2048 \
+    --use_paged_context_fmha enable \
+    --use_fp8_context_fmha enable \
+    --workers 1
+
+# For 4-GPU tensor parallel engine
+python examples/llama/convert_checkpoint.py \
+    --model_dir meta-llama/Llama-3.1-70B-Instruct \
+    --output_dir ./trt_checkpoints/llama-70b-tp4 \
+    --dtype bfloat16 \
+    --tp_size 4 \
+    --pp_size 1
+
+trtllm-build \
+    --checkpoint_dir ./trt_checkpoints/llama-70b-tp4 \
+    --output_dir ./trt_engines/llama-70b-tp4 \
+    --max_batch_size 32 \
+    --max_input_len 4096 \
+    --max_output_len 2048 \
+    --workers 4</code></pre>
+
+<h3 class="subsection-title text-xl font-semibold">9.2 TensorRT-LLM with Triton Inference Server</h3>
+<pre><code class="language-bash"># Clone TRT-LLM backend for Triton
+git clone https://github.com/triton-inference-server/tensorrtllm_backend.git
+
+# Repository structure required for Triton
+mkdir -p triton_model_repo/llama-8b/1
+cp -r trt_engines/llama-8b/* triton_model_repo/llama-8b/1/
+
+# config.pbtxt for the ensemble model
+cat > triton_model_repo/llama-8b/config.pbtxt << 'EOF'
+name: "llama-8b"
+backend: "tensorrtllm"
+max_batch_size: 64
+
+model_transaction_policy {
+  decoupled: true
+}
+
+dynamic_batching {
+  preferred_batch_size: [1, 2, 4, 8, 16, 32, 64]
+  max_queue_delay_microseconds: 100
+}
+
+instance_group [
+  {
+    count: 1
+    kind: KIND_GPU
+    gpus: [0]
+  }
+]
+
+parameters {
+  key: "max_beam_width"
+  value: { string_value: "1" }
+}
+parameters {
+  key: "executor_worker_path"
+  value: { string_value: "/opt/tritonserver/backends/tensorrtllm/trtllmExecutorWorker" }
+}
+parameters {
+  key: "gpt_model_path"
+  value: { string_value: "/models/llama-8b/1/" }
+}
+EOF
+
+# Start Triton server
+docker run --gpus all --rm -p 8000:8000 -p 8001:8001 -p 8002:8002 \
+    -v $(pwd)/triton_model_repo:/models \
+    nvcr.io/nvidia/tritonserver:24.08-trtllm-python-py3 \
+    tritonserver --model-repository=/models</code></pre>
+
+<h3 class="subsection-title text-xl font-semibold">9.3 TRT-LLM vs vLLM Performance</h3>
+<table>
+  <thead><tr><th>Model</th><th>Hardware</th><th>Metric</th><th>vLLM</th><th>TRT-LLM</th><th>TRT-LLM Advantage</th></tr></thead>
+  <tbody>
+    <tr><td>Llama-3-8B BF16</td><td>1× H100 80GB</td><td>Tokens/sec (bs=64)</td><td>4,200</td><td>5,800</td><td>+38%</td></tr>
+    <tr><td>Llama-3-70B BF16</td><td>4× H100 80GB</td><td>Tokens/sec (bs=32)</td><td>2,100</td><td>2,900</td><td>+38%</td></tr>
+    <tr><td>Llama-3-8B FP8</td><td>1× H100 80GB</td><td>Tokens/sec (bs=64)</td><td>7,100</td><td>9,200</td><td>+30%</td></tr>
+    <tr><td>Llama-3-8B BF16</td><td>1× H100 80GB</td><td>TTFT (bs=1, 2K input)</td><td>95ms</td><td>75ms</td><td>-21%</td></tr>
+    <tr><td>Llama-3-70B BF16</td><td>4× H100 80GB</td><td>ITL (bs=1)</td><td>22ms</td><td>17ms</td><td>-23%</td></tr>
+  </tbody>
+</table>
+
+<div class="callout-info">
+  <strong>TRT-LLM Trade-off:</strong> TRT-LLM is faster than vLLM by 20-40% but requires a time-consuming engine build step (15-60 minutes for large models). It has more limited model coverage and is harder to customize. Use vLLM for broad compatibility and rapid iteration; use TRT-LLM when squeezing maximum performance from H100s in high-traffic production environments.
+</div>
+
+<!-- SECTION 10 -->
+<h2 id="s10" class="section-title section-anchor text-2xl font-bold">10. Scaling LLM Serving</h2>
+
+<h3 class="subsection-title text-xl font-semibold">10.1 Multi-GPU Serving Strategies</h3>
+<p class="text-gray-700 mt-3">Three complementary parallelism strategies exist for scaling LLM serving beyond single-GPU capacity:</p>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+  <div class="bg-blue-50 rounded-xl p-4 border border-blue-200">
+    <h4 class="font-bold text-blue-800 mb-2">Tensor Parallelism (TP)</h4>
+    <p class="text-sm text-gray-700">Split individual weight matrices across GPUs. Requires all-reduce every layer. Best for <strong>minimizing latency</strong>. Use within a single node (NVLink bandwidth critical). TP=4 on 4x H100 NVLink is typical for 70B models.</p>
+  </div>
+  <div class="bg-green-50 rounded-xl p-4 border border-green-200">
+    <h4 class="font-bold text-green-800 mb-2">Pipeline Parallelism (PP)</h4>
+    <p class="text-sm text-gray-700">Split model layers across GPUs/nodes. Each GPU processes full activations for its assigned layers. Lower communication bandwidth requirement — works across nodes. Best for <strong>very large models</strong> that don't fit with TP alone. Introduces pipeline bubbles.</p>
+  </div>
+  <div class="bg-yellow-50 rounded-xl p-4 border border-yellow-200">
+    <h4 class="font-bold text-green-800 mb-2">Data Parallelism (DP)</h4>
+    <p class="text-sm text-gray-700">Replicate the full model on multiple GPUs/nodes. Each replica handles different requests. Best for <strong>maximizing throughput</strong>. Requires a load balancer. KV cache is not shared between replicas — use prefix caching within each replica.</p>
+  </div>
+</div>
+
+<h3 class="subsection-title text-xl font-semibold">10.2 Multi-Node LLM Serving Topology</h3>
+<div class="mermaid">
+graph TB
+    subgraph INGRESS["Ingress Layer"]
+        LB["Load Balancer\n(nginx / Envoy)"]
+        ROUTER["LLM Router\n(model-aware routing)"]
+    end
+    subgraph REPLICA1["Replica 1 (4× H100)"]
+        W1A["GPU 0\nLayers 1-20 (TP shard)"]
+        W1B["GPU 1\nLayers 1-20 (TP shard)"]
+        W1C["GPU 2\nLayers 21-40 (TP shard)"]
+        W1D["GPU 3\nLayers 21-40 (TP shard)"]
+    end
+    subgraph REPLICA2["Replica 2 (4× H100)"]
+        W2A["GPU 4\nLayers 1-20 (TP shard)"]
+        W2B["GPU 5\nLayers 1-20 (TP shard)"]
+        W2C["GPU 6\nLayers 21-40 (TP shard)"]
+        W2D["GPU 7\nLayers 21-40 (TP shard)"]
+    end
+    subgraph PREFILL_DECODE["Prefill/Decode Disaggregation"]
+        PFNODE["Prefill Node\n(optimized for compute)"]
+        DCNODE["Decode Node\n(optimized for memory bandwidth)"]
+    end
+    LB --> ROUTER
+    ROUTER --> REPLICA1
+    ROUTER --> REPLICA2
+    ROUTER --> PFNODE
+    PFNODE --> DCNODE
+    style INGRESS fill:#dbeafe,stroke:#2563eb
+    style PREFILL_DECODE fill:#fef3c7,stroke:#f59e0b
+</div>
+
+<h3 class="subsection-title text-xl font-semibold">10.3 Prefill/Decode Disaggregation</h3>
+<p class="text-gray-700 mt-3">Prefill and decode phases have very different compute characteristics. Prefill is compute-bound (benefits from high-FLOP GPUs) and decode is memory-bandwidth-bound (benefits from high-bandwidth memory). Disaggregating them allows each phase to be scheduled on hardware optimized for that phase:</p>
+<ul class="list-disc list-inside text-gray-700 mt-2 space-y-2">
+  <li><strong>Prefill cluster:</strong> Use fewer, higher-FLOP GPUs (H100 SXM). Can handle long prompts efficiently. KV cache is computed and must be transferred to decode cluster.</li>
+  <li><strong>Decode cluster:</strong> Use more GPUs optimized for bandwidth. Handle many ongoing decode requests with small per-step compute.</li>
+  <li>KV cache transfer between clusters is the main overhead — requires high-bandwidth interconnect (InfiniBand or NVLink-C2C).</li>
+  <li>Implemented in DistServe (2024) and Mooncake (Kimi AI, 2024). Expected to become standard for large-scale deployments.</li>
+</ul>
+
+<h3 class="subsection-title text-xl font-semibold">10.4 Router Design for Multi-Instance Serving</h3>
+<pre><code class="language-python">import asyncio
+import aiohttp
+from typing import List
+import hashlib
+
+class LLMRouter:
+    """Simple consistent-hash router for LLM serving.
+    Routes requests with the same system prompt to the same replica
+    to maximize prefix cache hit rates.
+    """
+
+    def __init__(self, endpoints: List[str]):
+        self.endpoints = endpoints
+        self.n = len(endpoints)
+        self._request_counts = [0] * self.n
+
+    def _hash_route(self, system_prompt: str) -> int:
+        """Route based on system prompt hash — maximizes prefix cache hits."""
+        h = int(hashlib.md5(system_prompt.encode()).hexdigest(), 16)
+        return h % self.n
+
+    def _least_loaded(self) -> int:
+        return self._request_counts.index(min(self._request_counts))
+
+    def route(self, system_prompt: str = "", use_prefix_routing: bool = True) -> str:
+        if use_prefix_routing and system_prompt:
+            idx = self._hash_route(system_prompt)
+        else:
+            idx = self._least_loaded()
+        self._request_counts[idx] += 1
+        return self.endpoints[idx]
+
+    async def forward(self, payload: dict) -> dict:
+        system_prompt = ""
+        for msg in payload.get("messages", []):
+            if msg.get("role") == "system":
+                system_prompt = msg["content"]
+                break
+        endpoint = self.route(system_prompt=system_prompt)
+        async with aiohttp.ClientSession() as session:
+            async with session.post(
+                f"{endpoint}/v1/chat/completions", json=payload
+            ) as resp:
+                return await resp.json()
+
+router = LLMRouter([
+    "http://vllm-replica-0:8000",
+    "http://vllm-replica-1:8000",
+    "http://vllm-replica-2:8000",
+])
+
+<!-- SECTION 11 -->
+<h2 id="s11" class="section-title section-anchor text-2xl font-bold">11. Serving Infrastructure Design</h2>
+
+<h3 class="subsection-title text-xl font-semibold">11.1 Production LLM Serving Architecture</h3>
+<div class="mermaid">
+graph TB
+    subgraph CLIENTS["Client Layer"]
+        APP["Application Servers"]
+        SDK["Python/JS SDK clients"]
+    end
+    subgraph GATEWAY["API Gateway"]
+        RATE["Rate Limiter\n(per-user quotas)"]
+        AUTH["Auth/JWT\nvalidation"]
+        ROUT["Smart Router\n(model routing,\nprefix hashing)"]
+    end
+    subgraph SERVING["LLM Serving Tier"]
+        V1["vLLM Pod\nLlama-3-8B\n(TP=1, 1×A100)"]
+        V2["vLLM Pod\nLlama-3-8B\n(TP=1, 1×A100)"]
+        V3["vLLM Pod\nLlama-3-70B\n(TP=4, 4×A100)"]
+        V4["vLLM Pod\nLlama-3-70B\n(TP=4, 4×A100)"]
+    end
+    subgraph CACHE["Cache Layer"]
+        REDIS["Redis\n(response cache\nfor deterministic)"]
+        KVEXT["External KV\n(future: distributed\nKV offload)"]
+    end
+    subgraph OBS["Observability"]
+        PROM["Prometheus\n+Grafana"]
+        TRACE["Jaeger\ntracing"]
+        LOG["ELK\nlog pipeline"]
+    end
+    subgraph SCALE["Auto-Scaling"]
+        KEDA["KEDA\n(queue-depth\nbased scaling)"]
+        HPA["HPA\n(GPU util\nbased)"]
+    end
+    APP --> RATE
+    SDK --> RATE
+    RATE --> AUTH
+    AUTH --> ROUT
+    ROUT --> REDIS
+    ROUT --> V1
+    ROUT --> V2
+    ROUT --> V3
+    ROUT --> V4
+    V1 --> PROM
+    V2 --> PROM
+    V3 --> PROM
+    V4 --> PROM
+    PROM --> KEDA
+    KEDA --> V1
+    KEDA --> V3
+    style GATEWAY fill:#dbeafe,stroke:#2563eb
+    style SERVING fill:#f0fdf4,stroke:#059669
+    style SCALE fill:#fef3c7,stroke:#f59e0b
+</div>
+
+<h3 class="subsection-title text-xl font-semibold">11.2 Auto-Scaling with KEDA (Queue Depth)</h3>
+<pre><code class="language-yaml">apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: vllm-llama-8b-scaler
+  namespace: llm-serving
+spec:
+  scaleTargetRef:
+    name: vllm-llama-8b
+  minReplicaCount: 1
+  maxReplicaCount: 8
+  cooldownPeriod: 120    # seconds before scale-down
+  pollingInterval: 15    # check every 15 seconds
+  triggers:
+  - type: prometheus
+    metadata:
+      serverAddress: http://prometheus.monitoring:9090
+      metricName: vllm_request_waiting_total
+      threshold: "10"      # Scale up if >10 requests waiting
+      query: |
+        avg(vllm:num_requests_waiting{model="llama-3.1-8b"})
+  - type: prometheus
+    metadata:
+      serverAddress: http://prometheus.monitoring:9090
+      metricName: vllm_gpu_cache_usage_perc
+      threshold: "85"      # Also scale up if GPU KV cache >85% full
+      query: |
+        avg(vllm:gpu_cache_usage_perc{model="llama-3.1-8b"}) * 100
+---
+# HPA based on custom GPU utilization metric
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: vllm-hpa
+  namespace: llm-serving
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: vllm-llama-8b
+  minReplicas: 1
+  maxReplicas: 8
+  metrics:
+  - type: Pods
+    pods:
+      metric:
+        name: vllm_requests_per_second
+      target:
+        type: AverageValue
+        averageValue: 50  # scale when >50 req/s per pod</code></pre>
+
+<h3 class="subsection-title text-xl font-semibold">11.3 GPU Right-Sizing for Popular Models</h3>
+<table>
+  <thead><tr><th>Model</th><th>Precision</th><th>Min GPU Config</th><th>Recommended</th><th>Context Window</th><th>Max Batch Size</th><th>Expected Throughput</th></tr></thead>
+  <tbody>
+    <tr><td>Llama-3.1-8B</td><td>BF16</td><td>1× A100 40GB</td><td>1× A100 80GB</td><td>8K</td><td>64</td><td>~2,800 tok/s</td></tr>
+    <tr><td>Llama-3.1-8B</td><td>AWQ 4-bit</td><td>1× A100 40GB</td><td>1× A100 40GB</td><td>8K</td><td>128</td><td>~4,100 tok/s</td></tr>
+    <tr><td>Llama-3.1-13B</td><td>BF16</td><td>2× A100 40GB</td><td>1× A100 80GB</td><td>8K</td><td>48</td><td>~1,800 tok/s</td></tr>
+    <tr><td>Llama-3.1-70B</td><td>BF16</td><td>2× A100 80GB</td><td>4× A100 80GB</td><td>8K</td><td>32</td><td>~800 tok/s (4-GPU)</td></tr>
+    <tr><td>Llama-3.1-70B</td><td>AWQ 4-bit</td><td>1× A100 80GB</td><td>2× A100 80GB</td><td>8K</td><td>64</td><td>~1,200 tok/s (2-GPU)</td></tr>
+    <tr><td>Llama-3.1-405B</td><td>BF16</td><td>8× H100 80GB</td><td>16× H100 80GB</td><td>128K</td><td>16</td><td>~400 tok/s (8-GPU)</td></tr>
+    <tr><td>Llama-3.1-405B</td><td>FP8</td><td>4× H100 80GB</td><td>8× H100 80GB</td><td>128K</td><td>32</td><td>~650 tok/s (8-GPU)</td></tr>
+    <tr><td>Mistral-7B</td><td>BF16</td><td>1× A100 40GB</td><td>1× A100 40GB</td><td>32K</td><td>64</td><td>~3,000 tok/s</td></tr>
+    <tr><td>Qwen2.5-72B</td><td>AWQ 4-bit</td><td>2× A100 80GB</td><td>4× A100 80GB</td><td>128K</td><td>32</td><td>~900 tok/s (4-GPU)</td></tr>
+  </tbody>
+</table>
+
+<!-- SECTION 12 -->
+<h2 id="s12" class="section-title section-anchor text-2xl font-bold">12. OpenAI-Compatible APIs</h2>
+<p class="text-gray-700 mt-4">The OpenAI API has become the lingua franca of LLM serving. By implementing the same REST interface, self-hosted servers like vLLM become drop-in replacements for the OpenAI API. This means any existing code using the openai Python SDK works without modification — just change <code class="inline">base_url</code>.</p>
+
+<h3 class="subsection-title text-xl font-semibold">12.1 Streaming Responses (Server-Sent Events)</h3>
+<pre><code class="language-python">import asyncio
+from openai import AsyncOpenAI
+
+client = AsyncOpenAI(base_url="http://localhost:8000/v1", api_key="not-needed")
+
+async def stream_completion(prompt: str):
+    """Stream tokens as they are generated using SSE."""
+    stream = await client.chat.completions.create(
+        model="llama-3.1-8b",
+        messages=[{"role": "user", "content": prompt}],
+        stream=True,
+        max_tokens=512,
+        temperature=0.7,
+    )
+
+    full_response = ""
+    async for chunk in stream:
+        delta = chunk.choices[0].delta.content
+        if delta:
+            print(delta, end="", flush=True)
+            full_response += delta
+
+    # Final usage info in last chunk
+    print(f"\n\nTokens used: {chunk.usage}")
+    return full_response
+
+asyncio.run(stream_completion("Explain how Flash Attention works."))</code></pre>
+
+<pre><code class="language-python">from fastapi import FastAPI
+from fastapi.responses import StreamingResponse
+from openai import OpenAI
+import json
+
+app = FastAPI()
+vllm_client = OpenAI(base_url="http://localhost:8000/v1", api_key="not-needed")
+
+@app.post("/stream")
+async def stream_endpoint(prompt: str):
+    """FastAPI endpoint that proxies vLLM SSE stream to client."""
+
+    def generate():
+        stream = vllm_client.chat.completions.create(
+            model="llama-3.1-8b",
+            messages=[{"role": "user", "content": prompt}],
+            stream=True,
+            max_tokens=512,
+        )
+        for chunk in stream:
+            delta = chunk.choices[0].delta.content
+            if delta:
+                # Format as SSE
+                data = json.dumps({"token": delta})
+                yield f"data: {data}\n\n"
+        yield "data: [DONE]\n\n"
+
+    return StreamingResponse(generate(), media_type="text/event-stream")</code></pre>
+
+<h3 class="subsection-title text-xl font-semibold">12.2 Function Calling with vLLM</h3>
+<pre><code class="language-python">from openai import OpenAI
+import json
+
+client = OpenAI(base_url="http://localhost:8000/v1", api_key="not-needed")
+
+# Define tools/functions
+tools = [
+    {
+        "type": "function",
+        "function": {
+            "name": "get_weather",
+            "description": "Get current weather for a location.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "location": {"type": "string", "description": "City and country, e.g. 'Tokyo, Japan'"},
+                    "unit": {"type": "string", "enum": ["celsius", "fahrenheit"]},
+                },
+                "required": ["location"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "search_database",
+            "description": "Search the product database.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "query": {"type": "string"},
+                    "limit": {"type": "integer", "default": 10},
+                },
+                "required": ["query"],
+            },
+        },
+    },
+]
+
+messages = [{"role": "user", "content": "What is the weather in Tokyo right now?"}]
+
+# First call: model decides to use a tool
+response = client.chat.completions.create(
+    model="llama-3.1-8b",
+    messages=messages,
+    tools=tools,
+    tool_choice="auto",
+    max_tokens=256,
+)
+
+message = response.choices[0].message
+print(f"Stop reason: {response.choices[0].finish_reason}")
+
+if response.choices[0].finish_reason == "tool_calls":
+    tool_call = message.tool_calls[0]
+    fn_name = tool_call.function.name
+    fn_args = json.loads(tool_call.function.arguments)
+    print(f"Tool call: {fn_name}({fn_args})")
+
+    # Execute the function (in real code, call your actual function)
+    tool_result = {"temperature": 22, "condition": "Sunny", "humidity": 65}
+
+    # Add tool result to conversation
+    messages.append(message)
+    messages.append({
+        "role": "tool",
+        "tool_call_id": tool_call.id,
+        "content": json.dumps(tool_result),
+    })
+
+    # Second call: model formulates natural language response
+    final_response = client.chat.completions.create(
+        model="llama-3.1-8b",
+        messages=messages,
+        max_tokens=256,
+    )
+    print(final_response.choices[0].message.content)</code></pre>
+
+<!-- SECTION 13 -->
+<h2 id="s13" class="section-title section-anchor text-2xl font-bold">13. Structured Output and Constrained Generation</h2>
+<p class="text-gray-700 mt-4">Constrained generation ensures LLM output conforms to a specified schema, grammar, or regex pattern at the token generation level — not via post-processing. This is crucial for production use cases like data extraction, API response generation, and function calling where malformed JSON breaks downstream systems.</p>
+
+<h3 class="subsection-title text-xl font-semibold">13.1 Structured Output with Outlines</h3>
+<pre><code class="language-python">import outlines
+from pydantic import BaseModel
+from typing import List, Optional
+import json
+
+# Define output schema with Pydantic
+class ExtractedPerson(BaseModel):
+    full_name: str
+    age: int
+    occupation: str
+    skills: List[str]
+    email: Optional[str] = None
+
+class ExtractionResult(BaseModel):
+    people: List[ExtractedPerson]
+    source_document: str
+
+# Load model with Outlines
+model = outlines.models.transformers(
+    "meta-llama/Llama-3.1-8B-Instruct",
+    device="cuda",
+    model_kwargs={"torch_dtype": "auto"},
+)
+
+# Create structured generator — output is GUARANTEED to match schema
+generator = outlines.generate.json(model, ExtractionResult)
+
+text = """
+Meeting attendees: Alice Chen (35, ML Engineer, skills: Python, PyTorch, CUDA)
+contacted at alice@company.com. Bob Smith (42, DevOps Lead, skills: Kubernetes, Terraform).
+"""
+
+prompt = f"Extract all people from this text:\n{text}\n\nJSON:"
+result = generator(prompt)
+
+# result is already a parsed Pydantic object — no JSON parsing needed
+print(type(result))  # ExtractionResult
+for person in result.people:
+    print(f"{person.full_name}: {person.skills}")</code></pre>
+
+<h3 class="subsection-title text-xl font-semibold">13.2 Grammar-Based Constraints with Outlines</h3>
+<pre><code class="language-python">import outlines
+import outlines.generate as generate
+
+model = outlines.models.transformers("meta-llama/Llama-3.1-8B-Instruct", device="cuda")
+
+# Regex constraint — match a specific pattern
+phone_generator = generate.regex(model, r"\+?[1-9]\d{1,14}")
+phone = phone_generator("What is a US phone number? ")
+print(f"Phone: {phone}")
+
+# Choice constraint — force selection from a fixed set
+classifier = generate.choice(model, ["positive", "negative", "neutral"])
+sentiment = classifier(
+    "Classify the sentiment: 'This product exceeded all my expectations!'"
+)
+print(f"Sentiment: {sentiment}")  # Always one of the three choices
+
+# Context-free grammar — generate valid arithmetic expressions
+arithmetic_grammar = """
+    ?start: expr
+    ?expr: term ("+" term | "-" term)*
+    ?term: factor ("*" factor | "/" factor)*
+    ?factor: NUMBER | "(" expr ")"
+    NUMBER: /[0-9]+/
+    %ignore " "
+"""
+expr_generator = generate.cfg(model, arithmetic_grammar)
+expression = expr_generator("Generate a math expression: ")
+print(f"Expression: {expression}")  # Always a valid arithmetic expression</code></pre>
+
+<h3 class="subsection-title text-xl font-semibold">13.3 JSON Mode with vLLM (Guided Decoding)</h3>
+<pre><code class="language-python">from openai import OpenAI
+import json
+
+client = OpenAI(base_url="http://localhost:8000/v1", api_key="not-needed")
+
+# vLLM supports guided_json via extra_body
+schema = {
+    "type": "object",
+    "properties": {
+        "summary": {"type": "string"},
+        "key_points": {"type": "array", "items": {"type": "string"}},
+        "sentiment": {"type": "string", "enum": ["positive", "negative", "neutral"]},
+        "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+    },
+    "required": ["summary", "key_points", "sentiment", "confidence"],
+}
+
+response = client.chat.completions.create(
+    model="llama-3.1-8b",
+    messages=[
+        {"role": "user", "content": "Analyze this review: 'Best laptop I ever bought. Fast, reliable, great battery.'"},
+    ],
+    max_tokens=300,
+    extra_body={"guided_json": schema},   # vLLM-specific: constrained JSON output
+)
+
+result = json.loads(response.choices[0].message.content)
+print(f"Sentiment: {result['sentiment']} (confidence: {result['confidence']})")
+print(f"Key points: {result['key_points']}")</code></pre>
+
+<!-- SECTION 14 -->
+<h2 id="s14" class="section-title section-anchor text-2xl font-bold">14. LLM Serving Benchmarking</h2>
+<p class="text-gray-700 mt-4">Before deploying any serving configuration, benchmark it under realistic load conditions. The key tools are vLLM's own benchmark scripts, NVIDIA's GenAI-Perf, and lm-evaluation-harness for quality metrics. Always benchmark at the expected production concurrency level — performance characteristics change significantly between batch_size=1 and batch_size=64.</p>
+
+<h3 class="subsection-title text-xl font-semibold">14.1 Benchmarking with vLLM's Built-in Scripts</h3>
+<pre><code class="language-bash"># Install benchmark dependencies
+pip install "vllm[bench]"
+
+# Basic throughput benchmark
+python -m vllm.entrypoints.benchmark_throughput \
+    --model meta-llama/Llama-3.1-8B-Instruct \
+    --dataset-name random \
+    --num-prompts 1000 \
+    --input-len 512 \
+    --output-len 128 \
+    --dtype bfloat16 \
+    --gpu-memory-utilization 0.90
+
+# Latency benchmark (single request)
+python -m vllm.entrypoints.benchmark_latency \
+    --model meta-llama/Llama-3.1-8B-Instruct \
+    --input-len 512 \
+    --output-len 128 \
+    --num-iters 50 \
+    --batch-size 1 \
+    --dtype bfloat16
+
+# Serve benchmark — benchmark against running server
+python benchmarks/benchmark_serving.py \
+    --backend vllm \
+    --host localhost \
+    --port 8000 \
+    --model llama-3.1-8b \
+    --dataset-name sharegpt \
+    --dataset-path ./ShareGPT_V3_unfiltered_cleaned_split.json \
+    --num-prompts 500 \
+    --request-rate 10    # 10 requests per second</code></pre>
+
+<h3 class="subsection-title text-xl font-semibold">14.2 Benchmarking Script</h3>
+<pre><code class="language-python">import asyncio
+import time
+import statistics
+from dataclasses import dataclass, field
+from typing import List
+import aiohttp
+import json
+
+@dataclass
+class BenchmarkResult:
+    request_rate: float
+    total_requests: int
+    successful_requests: int
+    failed_requests: int
+    total_time: float
+    # Latency metrics (seconds)
+    ttft_mean: float
+    ttft_p50: float
+    ttft_p95: float
+    ttft_p99: float
+    # Throughput
+    tokens_per_second: float
+    requests_per_second: float
+    # Token counts
+    total_input_tokens: int
+    total_output_tokens: int
+
+async def single_request(
+    session: aiohttp.ClientSession,
+    endpoint: str,
+    model: str,
+    prompt: str,
+    max_tokens: int = 128,
+) -> dict:
+    start = time.monotonic()
+    first_token_time = None
+    total_tokens = 0
+
+    payload = {
+        "model": model,
+        "messages": [{"role": "user", "content": prompt}],
+        "max_tokens": max_tokens,
+        "stream": True,
+        "temperature": 0.0,
+    }
+
+    try:
+        async with session.post(f"{endpoint}/v1/chat/completions", json=payload) as resp:
+            async for line in resp.content:
+                line = line.decode("utf-8").strip()
+                if line.startswith("data: ") and line != "data: [DONE]":
+                    chunk = json.loads(line[6:])
+                    delta = chunk["choices"][0]["delta"].get("content", "")
+                    if delta and first_token_time is None:
+                        first_token_time = time.monotonic()
+                    if delta:
+                        total_tokens += 1
+
+        end = time.monotonic()
+        return {
+            "success": True,
+            "ttft": first_token_time - start if first_token_time else None,
+            "total_time": end - start,
+            "output_tokens": total_tokens,
+        }
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+async def run_benchmark(
+    endpoint: str,
+    model: str,
+    prompts: List[str],
+    request_rate: float,  # requests per second
+) -> BenchmarkResult:
+    results = []
+    start_time = time.monotonic()
+
+    async with aiohttp.ClientSession() as session:
+        tasks = []
+        for i, prompt in enumerate(prompts):
+            # Schedule requests at given rate
+            target_time = start_time + i / request_rate
+            delay = max(0, target_time - time.monotonic())
+            if delay > 0:
+                await asyncio.sleep(delay)
+
+            task = asyncio.create_task(
+                single_request(session, endpoint, model, prompt)
+            )
+            tasks.append(task)
+
+        results = await asyncio.gather(*tasks)
+
+    total_time = time.monotonic() - start_time
+    successful = [r for r in results if r.get("success")]
+    ttfts = [r["ttft"] for r in successful if r.get("ttft")]
+    total_output = sum(r.get("output_tokens", 0) for r in successful)
+
+    return BenchmarkResult(
+        request_rate=request_rate,
+        total_requests=len(results),
+        successful_requests=len(successful),
+        failed_requests=len(results) - len(successful),
+        total_time=total_time,
+        ttft_mean=statistics.mean(ttfts) if ttfts else 0,
+        ttft_p50=statistics.median(ttfts) if ttfts else 0,
+        ttft_p95=sorted(ttfts)[int(len(ttfts) * 0.95)] if ttfts else 0,
+        ttft_p99=sorted(ttfts)[int(len(ttfts) * 0.99)] if ttfts else 0,
+        tokens_per_second=total_output / total_time,
+        requests_per_second=len(successful) / total_time,
+        total_input_tokens=sum(len(p.split()) * 1.3 for p in prompts[:len(successful)]),
+        total_output_tokens=total_output,
+    )
+
+# Run benchmark at different request rates
+async def sweep():
+    prompts = ["Explain transformer attention in detail."] * 200
+    endpoint = "http://localhost:8000"
+    model = "llama-3.1-8b"
+
+    for rate in [1, 5, 10, 20, 50]:
+        result = await run_benchmark(endpoint, model, prompts[:50], rate)
+        print(f"Rate={rate:.0f} req/s | Throughput={result.tokens_per_second:.0f} tok/s | "
+              f"TTFT p50={result.ttft_p50*1000:.0f}ms | p99={result.ttft_p99*1000:.0f}ms | "
+              f"Success={result.successful_requests}/{result.total_requests}")
+
+asyncio.run(sweep())</code></pre>
+
+<h3 class="subsection-title text-xl font-semibold">14.3 Benchmark Results for Popular Setups</h3>
+<table>
+  <thead><tr><th>Model</th><th>Framework</th><th>GPU</th><th>Precision</th><th>TTFT p50</th><th>ITL p50</th><th>Throughput (tok/s)</th><th>Max Req/s</th></tr></thead>
+  <tbody>
+    <tr><td>Llama-3.1-8B</td><td>vLLM 0.6</td><td>1× A100 80GB</td><td>BF16</td><td>85ms</td><td>18ms</td><td>2,800</td><td>48</td></tr>
+    <tr><td>Llama-3.1-8B</td><td>vLLM 0.6</td><td>1× A100 80GB</td><td>AWQ 4-bit</td><td>70ms</td><td>14ms</td><td>4,100</td><td>72</td></tr>
+    <tr><td>Llama-3.1-8B</td><td>TGI 2.3</td><td>1× A100 80GB</td><td>BF16</td><td>95ms</td><td>21ms</td><td>2,400</td><td>40</td></tr>
+    <tr><td>Llama-3.1-8B</td><td>TRT-LLM</td><td>1× H100 80GB</td><td>FP8</td><td>45ms</td><td>9ms</td><td>9,200</td><td>160</td></tr>
+    <tr><td>Llama-3.1-70B</td><td>vLLM 0.6</td><td>4× A100 80GB</td><td>BF16</td><td>320ms</td><td>38ms</td><td>800</td><td>14</td></tr>
+    <tr><td>Llama-3.1-70B</td><td>vLLM 0.6</td><td>2× A100 80GB</td><td>AWQ 4-bit</td><td>380ms</td><td>48ms</td><td>600</td><td>10</td></tr>
+    <tr><td>Llama-3.1-70B</td><td>TRT-LLM</td><td>4× H100 80GB</td><td>FP8</td><td>120ms</td><td>16ms</td><td>2,900</td><td>52</td></tr>
+    <tr><td>Mistral-7B</td><td>vLLM 0.6</td><td>1× A100 40GB</td><td>BF16</td><td>90ms</td><td>20ms</td><td>2,600</td><td>44</td></tr>
+    <tr><td>Qwen2.5-72B</td><td>vLLM 0.6</td><td>4× A100 80GB</td><td>AWQ 4-bit</td><td>350ms</td><td>42ms</td><td>720</td><td>12</td></tr>
+  </tbody>
+</table>
+
+<div class="callout-warning">
+  <strong>Benchmark Gotcha:</strong> Numbers above are with synthetic uniform workloads. Real production workloads with variable input/output lengths, mixed concurrency, and prefix cache misses will yield 20-40% lower throughput. Always benchmark with representative traffic before capacity planning.
+</div>
+
+<!-- SUMMARY -->
+<div class="bg-gradient-to-r from-blue-50 to-green-50 rounded-2xl border border-blue-100 p-8 mt-12">
+  <h2 class="text-2xl font-bold text-blue-900 mb-6">Key Takeaways</h2>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div>
+      <h3 class="font-bold text-blue-800 mb-3">Core Concepts</h3>
+      <ul class="space-y-2 text-gray-700 text-sm">
+        <li><span class="font-semibold text-blue-700">KV Cache:</span> The single most important optimization — enables O(N) decode cost instead of O(N²). Must be managed efficiently (PagedAttention).</li>
+        <li><span class="font-semibold text-blue-700">Continuous Batching:</span> Non-negotiable for production. Static batching wastes 30-60% GPU utilization.</li>
+        <li><span class="font-semibold text-blue-700">Memory Bandwidth is the bottleneck:</span> LLM decode is bandwidth-bound, not compute-bound. Quantization and KV cache efficiency matter more than raw FLOPS.</li>
+        <li><span class="font-semibold text-blue-700">TTFT vs Throughput:</span> Fundamentally at odds — tune for your SLO using batch size and scheduling strategy.</li>
+      </ul>
+    </div>
+    <div>
+      <h3 class="font-bold text-green-800 mb-3">Tool Selection</h3>
+      <ul class="space-y-2 text-gray-700 text-sm">
+        <li><span class="font-semibold text-green-700">vLLM:</span> Default choice for most production deployments. Best compatibility, active development, OpenAI API-compatible.</li>
+        <li><span class="font-semibold text-green-700">TGI:</span> Strong for HF Endpoints integration, Docker-first deployments, and existing HF infrastructure.</li>
+        <li><span class="font-semibold text-green-700">SGLang:</span> When you have heavy prefix reuse or need first-class structured output — RadixAttention is genuinely better.</li>
+        <li><span class="font-semibold text-green-700">TRT-LLM:</span> 20-40% throughput uplift on H100 — worth the complexity for high-traffic, stable production loads.</li>
+        <li><span class="font-semibold text-green-700">Ollama:</span> Local development, CI testing, Apple Silicon. Not for production GPU serving.</li>
+      </ul>
+    </div>
+    <div>
+      <h3 class="font-bold text-blue-800 mb-3">Optimization Hierarchy</h3>
+      <ol class="space-y-1 text-gray-700 text-sm list-decimal list-inside">
+        <li>Continuous batching (switch from static) — biggest impact, free</li>
+        <li>PagedAttention — already in vLLM/TGI, use them</li>
+        <li>AWQ/GPTQ 4-bit quantization — 2× VRAM reduction, minimal quality loss</li>
+        <li>Prefix caching — big wins for shared system prompts</li>
+        <li>Flash Attention — already default in modern frameworks</li>
+        <li>Speculative decoding — 2-3× for low-temp, latency-critical paths</li>
+        <li>Tensor parallelism — when model doesn't fit single GPU</li>
+        <li>TRT-LLM engine build — last mile H100 optimization</li>
+      </ol>
+    </div>
+    <div>
+      <h3 class="font-bold text-green-800 mb-3">Production Checklist</h3>
+      <ul class="space-y-1 text-gray-700 text-sm">
+        <li>&#9745; Set <code class="inline">gpu_memory_utilization=0.90</code> (not 0.95+)</li>
+        <li>&#9745; Enable prefix caching if system prompts are reused</li>
+        <li>&#9745; Use AWQ 4-bit for 70B+ models on A100s</li>
+        <li>&#9745; Deploy KEDA auto-scaling based on queue depth</li>
+        <li>&#9745; Monitor TTFT p95/p99, ITL, and KV cache utilization</li>
+        <li>&#9745; Benchmark at realistic concurrency before launch</li>
+        <li>&#9745; Configure health checks with /health endpoint</li>
+        <li>&#9745; Use OpenAI-compatible API for ecosystem compatibility</li>
+        <li>&#9745; Route requests with shared prefixes to same replica</li>
+        <li>&#9745; Set max_model_len to actual max required context (not model max)</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+</div><!-- end main content -->
+
+<!-- Bottom Navigation -->
+<div class="bg-white border-t border-gray-200 mt-16">
+  <div class="max-w-5xl mx-auto px-6 py-8">
+    <div class="flex justify-between items-center">
+      <a href="ch13_model_registry.html" class="flex items-center gap-2 text-blue-600 hover:text-blue-800 font-medium">
+        <span>&larr;</span>
+        <div>
+          <div class="text-xs text-gray-500">Previous</div>
+          <div>Chapter 13: Model Registry &amp; Lineage</div>
+        </div>
+      </a>
+      <a href="ch15_monitoring.html" class="flex items-center gap-2 text-blue-600 hover:text-blue-800 font-medium text-right">
+        <div>
+          <div class="text-xs text-gray-500">Next</div>
+          <div>Chapter 15: LLM Monitoring &amp; Observability</div>
+        </div>
+        <span>&rarr;</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<footer class="bg-gray-50 border-t border-gray-200 py-8 text-center text-sm text-gray-500">
+  <p>Modern MLOps Tutorial &mdash; Chapter 14: LLM Serving &amp; Inference Optimization</p>
+  <p class="mt-1">Written by Principal Engineers from OpenAI, NVIDIA, Hugging Face, and UC Berkeley</p>
+</footer>
+
+</body>
+</html>
+

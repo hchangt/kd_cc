@@ -1,0 +1,2643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chapter 11: Node.js &amp; Bun — TypeScript for the AI Era</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/json.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --white: #FFFFFF;
+      --surface: #F9FAFB;
+      --border: #E5E7EB;
+      --text-primary: #111827;
+      --text-secondary: #6B7280;
+      --text-tertiary: #9CA3AF;
+      --indigo-50: #EEF2FF;
+      --indigo-100: #E0E7FF;
+      --indigo-500: #6366F1;
+      --indigo-600: #4F46E5;
+      --indigo-700: #4338CA;
+      --indigo-800: #3730A3;
+      --green-100: #DCFCE7;
+      --green-700: #15803D;
+      --green-600: #16A34A;
+      --amber-100: #FEF3C7;
+      --amber-700: #B45309;
+      --rose-100: #FFE4E6;
+      --rose-700: #BE123C;
+      --violet-100: #EDE9FE;
+      --violet-700: #6D28D9;
+      --yellow-400: #EAB308;
+      --yellow-50: #FEFCE8;
+      --sky-100: #E0F2FE;
+      --sky-700: #0369A1;
+      --teal-100: #CCFBF1;
+      --teal-700: #0F766E;
+      --font-body: system-ui, -apple-system, 'Segoe UI', sans-serif;
+      --font-code: 'JetBrains Mono', monospace;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--white);
+      color: var(--text-primary);
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── TOP NAV ── */
+    .top-nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255,255,255,0.94);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      gap: 1rem;
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: var(--indigo-600);
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .ts-badge {
+      background: var(--indigo-600);
+      color: white;
+      font-family: var(--font-code);
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .nav-chapter-links {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.82rem;
+    }
+
+    .nav-chapter-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      padding: 0.3rem 0.75rem;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+
+    .nav-chapter-links a:hover {
+      color: var(--indigo-600);
+      border-color: var(--indigo-600);
+      background: var(--indigo-50);
+    }
+
+    .nav-progress {
+      font-size: 0.78rem;
+      color: var(--text-tertiary);
+      white-space: nowrap;
+      font-weight: 500;
+    }
+
+    /* ── CHAPTER HERO ── */
+    .chapter-hero {
+      background: linear-gradient(135deg, #1e1b4b 0%, #312e81 40%, #4338CA 70%, #4F46E5 100%);
+      padding: 4rem 2rem 3.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .chapter-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+
+    .chapter-hero-inner {
+      position: relative;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .chapter-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.22);
+      color: rgba(255,255,255,0.9);
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.3rem 0.9rem;
+      border-radius: 999px;
+      margin-bottom: 1.5rem;
+    }
+
+    .chapter-hero h1 {
+      font-size: clamp(2rem, 5vw, 3.25rem);
+      font-weight: 800;
+      color: white;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      margin-bottom: 1rem;
+    }
+
+    .chapter-hero h1 .subtitle {
+      display: block;
+      font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+      font-weight: 400;
+      opacity: 0.8;
+      letter-spacing: -0.01em;
+      margin-top: 0.4rem;
+    }
+
+    .chapter-meta {
+      display: flex;
+      gap: 2rem;
+      margin-top: 1.75rem;
+      flex-wrap: wrap;
+    }
+
+    .chapter-meta-item {
+      color: rgba(255,255,255,0.75);
+      font-size: 0.85rem;
+    }
+
+    .chapter-meta-item strong {
+      color: white;
+      display: block;
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    /* ── LAYOUT ── */
+    .layout {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 3rem 2rem;
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      gap: 3rem;
+      align-items: start;
+    }
+
+    /* ── SIDEBAR TOC ── */
+    .toc {
+      position: sticky;
+      top: 72px;
+      max-height: calc(100vh - 88px);
+      overflow-y: auto;
+      padding-right: 0.5rem;
+    }
+
+    .toc-title {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+      margin-bottom: 0.75rem;
+    }
+
+    .toc ul {
+      list-style: none;
+    }
+
+    .toc li {
+      margin: 0;
+    }
+
+    .toc a {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      text-decoration: none;
+      padding: 0.3rem 0.6rem;
+      border-radius: 5px;
+      border-left: 2px solid transparent;
+      transition: all 0.15s;
+      line-height: 1.4;
+    }
+
+    .toc a:hover {
+      color: var(--indigo-600);
+      background: var(--indigo-50);
+      border-left-color: var(--indigo-500);
+    }
+
+    .toc a.active {
+      color: var(--indigo-600);
+      background: var(--indigo-50);
+      border-left-color: var(--indigo-600);
+      font-weight: 600;
+    }
+
+    .toc .toc-sub {
+      padding-left: 0.75rem;
+    }
+
+    .toc .toc-sub a {
+      font-size: 0.75rem;
+    }
+
+    /* ── CONTENT ── */
+    .content h2 {
+      font-size: 1.75rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      margin-top: 3.5rem;
+      margin-bottom: 1rem;
+      padding-top: 1rem;
+      border-top: 2px solid var(--indigo-600);
+      display: flex;
+      align-items: baseline;
+      gap: 0.6rem;
+    }
+
+    .content h2:first-child { margin-top: 0; }
+
+    .content h2 .section-num {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--indigo-600);
+      background: var(--indigo-50);
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .content h3 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-top: 2rem;
+      margin-bottom: 0.75rem;
+      letter-spacing: -0.01em;
+    }
+
+    .content h4 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-top: 1.5rem;
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-size: 0.8rem;
+    }
+
+    .content p {
+      margin-bottom: 1rem;
+      color: var(--text-primary);
+    }
+
+    .content ul, .content ol {
+      margin: 0.75rem 0 1rem 1.5rem;
+    }
+
+    .content li {
+      margin-bottom: 0.4rem;
+    }
+
+    .content a {
+      color: var(--indigo-600);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
+    /* ── CODE ── */
+    .code-block {
+      margin: 1.25rem 0;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    }
+
+    .code-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #f3f4f6;
+      border-bottom: 1px solid var(--border);
+      padding: 0.5rem 1rem;
+    }
+
+    .code-lang {
+      font-family: var(--font-code);
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .code-filename {
+      font-family: var(--font-code);
+      font-size: 0.72rem;
+      color: var(--indigo-600);
+      font-weight: 500;
+    }
+
+    .code-block pre {
+      margin: 0;
+      overflow-x: auto;
+    }
+
+    .code-block pre code {
+      font-family: var(--font-code);
+      font-size: 0.83rem;
+      line-height: 1.65;
+      padding: 1.1rem 1.25rem;
+      display: block;
+    }
+
+    code:not([class]) {
+      font-family: var(--font-code);
+      font-size: 0.83em;
+      background: #f3f4f6;
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+      color: #be185d;
+    }
+
+    /* ── CALLOUT BOXES ── */
+    .callout {
+      border-radius: 10px;
+      padding: 1.1rem 1.25rem;
+      margin: 1.5rem 0;
+      border-left: 4px solid;
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .callout-icon {
+      font-size: 1.1rem;
+      flex-shrink: 0;
+      line-height: 1.5;
+    }
+
+    .callout-body { flex: 1; min-width: 0; }
+
+    .callout-body strong {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 0.3rem;
+    }
+
+    .callout-body p { margin-bottom: 0.5rem; }
+    .callout-body p:last-child { margin-bottom: 0; }
+
+    .callout.tip {
+      background: var(--green-100);
+      border-color: var(--green-600);
+    }
+    .callout.tip strong { color: var(--green-700); }
+
+    .callout.info {
+      background: var(--sky-100);
+      border-color: #0ea5e9;
+    }
+    .callout.info strong { color: var(--sky-700); }
+
+    .callout.warning {
+      background: var(--rose-100);
+      border-color: #f43f5e;
+    }
+    .callout.warning strong { color: var(--rose-700); }
+
+    .callout.python {
+      background: #fef9c3;
+      border-color: #ca8a04;
+    }
+    .callout.python strong { color: #854d0e; }
+
+    .callout.ai-era {
+      background: var(--violet-100);
+      border-color: #8b5cf6;
+    }
+    .callout.ai-era strong { color: var(--violet-700); }
+
+    .callout.perf {
+      background: var(--yellow-50);
+      border-color: var(--yellow-400);
+    }
+    .callout.perf strong { color: #92400e; }
+
+    /* ── COMPARISON TABLE ── */
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.25rem 0;
+      font-size: 0.875rem;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .comparison-table th {
+      background: var(--indigo-600);
+      color: white;
+      font-weight: 700;
+      text-align: left;
+      padding: 0.7rem 1rem;
+      font-size: 0.8rem;
+      letter-spacing: 0.04em;
+    }
+
+    .comparison-table td {
+      padding: 0.65rem 1rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+
+    .comparison-table tr:last-child td { border-bottom: none; }
+    .comparison-table tr:nth-child(even) td { background: var(--surface); }
+
+    .comparison-table code {
+      font-family: var(--font-code);
+      font-size: 0.8em;
+      background: #e5e7eb;
+      padding: 0.1em 0.35em;
+      border-radius: 3px;
+      color: #111;
+    }
+
+    /* ── MODULE GRID ── */
+    .module-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1rem;
+      margin: 1.25rem 0;
+    }
+
+    .module-card {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.9rem 1rem;
+      background: var(--surface);
+    }
+
+    .module-card .module-name {
+      font-family: var(--font-code);
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--indigo-600);
+      margin-bottom: 0.3rem;
+    }
+
+    .module-card p {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      margin: 0;
+    }
+
+    /* ── SVG DIAGRAMS ── */
+    .diagram-container {
+      margin: 2rem 0;
+      text-align: center;
+    }
+
+    .diagram-container figcaption {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      margin-top: 0.75rem;
+      font-style: italic;
+    }
+
+    /* ── SPEED BADGE ── */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.2rem 0.6rem;
+      border-radius: 999px;
+    }
+
+    .badge-green { background: var(--green-100); color: var(--green-700); }
+    .badge-indigo { background: var(--indigo-100); color: var(--indigo-700); }
+    .badge-amber { background: var(--amber-100); color: var(--amber-700); }
+
+    /* ── SECTION DIVIDER ── */
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 2.5rem 0;
+    }
+
+    /* ── FOOTER NAV ── */
+    .chapter-footer {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 2.5rem 2rem 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid var(--border);
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .footer-nav-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.7rem 1.25rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.875rem;
+      color: var(--text-primary);
+      transition: all 0.15s;
+    }
+
+    .footer-nav-btn:hover {
+      border-color: var(--indigo-600);
+      color: var(--indigo-600);
+      background: var(--indigo-50);
+    }
+
+    .footer-nav-btn.primary {
+      background: var(--indigo-600);
+      color: white;
+      border-color: var(--indigo-600);
+    }
+
+    .footer-nav-btn.primary:hover {
+      background: var(--indigo-700);
+      border-color: var(--indigo-700);
+      color: white;
+    }
+
+    .footer-chapter-info {
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text-tertiary);
+    }
+
+    /* ── SCROLLBAR ── */
+    .toc::-webkit-scrollbar { width: 4px; }
+    .toc::-webkit-scrollbar-track { background: transparent; }
+    .toc::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 800px) {
+      .layout {
+        grid-template-columns: 1fr;
+        padding: 1.5rem 1rem;
+      }
+      .toc { display: none; }
+      .nav-progress { display: none; }
+    }
+
+    @media (max-width: 500px) {
+      .top-nav { padding: 0 1rem; }
+      .chapter-hero { padding: 2.5rem 1rem 2rem; }
+      .chapter-footer { padding: 1.5rem 1rem 2rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════ TOP NAV -->
+<nav class="top-nav">
+  <a href="index.html" class="nav-brand">
+    <span class="ts-badge">TS</span>
+    TypeScript for the AI Era
+  </a>
+  <div class="nav-chapter-links">
+    <a href="chapter-10-testing.html">← Ch 10 Testing</a>
+    <a href="chapter-12-rest-apis.html" class="footer-nav-btn primary" style="padding:0.3rem 0.75rem;border-radius:6px;font-size:0.82rem;">Ch 12 REST APIs →</a>
+  </div>
+  <div class="nav-progress">Chapter 11 of 24</div>
+</nav>
+
+<!-- ════════════════════════════════════════════ HERO -->
+<header class="chapter-hero">
+  <div class="chapter-hero-inner">
+    <div class="chapter-eyebrow">Chapter 11</div>
+    <h1>
+      Node.js &amp; Bun: Backend Runtimes
+      <span class="subtitle">The engine room of TypeScript on the server</span>
+    </h1>
+    <div class="chapter-meta">
+      <div class="chapter-meta-item">
+        <strong>~60 min</strong>
+        Reading time
+      </div>
+      <div class="chapter-meta-item">
+        <strong>11 sections</strong>
+        Deep dives
+      </div>
+      <div class="chapter-meta-item">
+        <strong>Senior Staff Engineer</strong>
+        Author @ Anthropic
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ════════════════════════════════════════════ LAYOUT -->
+<div class="layout">
+
+  <!-- ── SIDEBAR TOC ── -->
+  <aside class="toc">
+    <div class="toc-title">In this chapter</div>
+    <ul>
+      <li><a href="#s1">1. Node.js Architecture</a></li>
+      <ul class="toc-sub">
+        <li><a href="#event-loop">Event Loop Deep Dive</a></li>
+        <li><a href="#libuv">libuv Under the Hood</a></li>
+        <li><a href="#worker-threads">Worker Threads</a></li>
+        <li><a href="#v8">The V8 Engine</a></li>
+      </ul>
+      <li><a href="#s2">2. Core Node.js Modules</a></li>
+      <li><a href="#s3">3. TypeScript Setup</a></li>
+      <li><a href="#s4">4. Bun — The Fast Alternative</a></li>
+      <ul class="toc-sub">
+        <li><a href="#bun-speed">Speed Comparison</a></li>
+        <li><a href="#bun-apis">Bun APIs</a></li>
+      </ul>
+      <li><a href="#s5">5. File System Operations</a></li>
+      <li><a href="#s6">6. Environment Variables</a></li>
+      <li><a href="#s7">7. Process Management</a></li>
+      <li><a href="#s8">8. Streams</a></li>
+      <li><a href="#s9">9. EventEmitter</a></li>
+      <li><a href="#s10">10. Performance &amp; Production</a></li>
+      <li><a href="#s11">11. Python Comparison</a></li>
+    </ul>
+  </aside>
+
+  <!-- ── MAIN CONTENT ── -->
+  <main class="content">
+
+    <!-- ══════════════════════════════ §1 NODE ARCHITECTURE -->
+    <h2 id="s1"><span class="section-num">§1</span> Node.js Architecture</h2>
+
+    <p>Node.js is not just another runtime — it's an architectural decision. When Ryan Dahl introduced it in 2009, he was solving a concrete problem: traditional servers blocked on I/O. Every database query, every file read, every network call parked a thread. Threads are expensive — each one costs ~2MB of stack space. At 10,000 concurrent connections, you're already at 20GB of RAM just for stack space.</p>
+
+    <p>Node's answer: one thread, non-blocking everything. If you're coming from Python, this feels strange at first. But once you internalize it, it's elegant.</p>
+
+    <h3 id="event-loop">The Event Loop Deep Dive</h3>
+
+    <p>The event loop is not a simple queue. It's a sequence of phases, each draining its own queue before moving to the next. Understanding this prevents entire classes of bugs.</p>
+
+    <!-- EVENT LOOP SVG DIAGRAM -->
+    <div class="diagram-container">
+      <figure>
+        <svg width="680" height="420" viewBox="0 0 680 420" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto;">
+          <!-- Background -->
+          <rect width="680" height="420" rx="12" fill="#F9FAFB" stroke="#E5E7EB" stroke-width="1.5"/>
+
+          <!-- Title -->
+          <text x="340" y="30" text-anchor="middle" font-family="system-ui,sans-serif" font-size="13" font-weight="700" fill="#111827">Node.js Event Loop — Six Phases</text>
+
+          <!-- Center circle -->
+          <circle cx="340" cy="220" r="52" fill="white" stroke="#4F46E5" stroke-width="2.5"/>
+          <text x="340" y="215" text-anchor="middle" font-family="system-ui,sans-serif" font-size="11" font-weight="700" fill="#4F46E5">Event</text>
+          <text x="340" y="230" text-anchor="middle" font-family="system-ui,sans-serif" font-size="11" font-weight="700" fill="#4F46E5">Loop</text>
+
+          <!-- Phase 1: timers -->
+          <g transform="translate(340,220)">
+            <!-- Phase boxes placed around circle at r=145 -->
+            <!-- 1: timers — top (270deg) -->
+            <rect x="-55" y="-198" width="110" height="48" rx="7" fill="#4F46E5"/>
+            <text x="0" y="-177" text-anchor="middle" font-family="system-ui,sans-serif" font-size="10" font-weight="700" fill="white">① timers</text>
+            <text x="0" y="-163" text-anchor="middle" font-family="system-ui,sans-serif" font-size="9" fill="rgba(255,255,255,0.85)">setTimeout, setInterval</text>
+
+            <!-- 2: pending callbacks — upper right (330deg) -->
+            <rect x="78" y="-148" width="120" height="48" rx="7" fill="#6366F1"/>
+            <text x="138" y="-127" text-anchor="middle" font-family="system-ui,sans-serif" font-size="10" font-weight="700" fill="white">② pending callbacks</text>
+            <text x="138" y="-113" text-anchor="middle" font-family="system-ui,sans-serif" font-size="9" fill="rgba(255,255,255,0.85)">deferred I/O callbacks</text>
+
+            <!-- 3: idle/prepare — right (30deg) -->
+            <rect x="122" y="-5" width="120" height="48" rx="7" fill="#818CF8"/>
+            <text x="182" y="16" text-anchor="middle" font-family="system-ui,sans-serif" font-size="10" font-weight="700" fill="white">③ idle / prepare</text>
+            <text x="182" y="30" text-anchor="middle" font-family="system-ui,sans-serif" font-size="9" fill="rgba(255,255,255,0.85)">internal use only</text>
+
+            <!-- 4: poll — bottom right (90deg) -->
+            <rect x="55" y="115" width="110" height="48" rx="7" fill="#0EA5E9"/>
+            <text x="110" y="136" text-anchor="middle" font-family="system-ui,sans-serif" font-size="10" font-weight="700" fill="white">④ poll</text>
+            <text x="110" y="150" text-anchor="middle" font-family="system-ui,sans-serif" font-size="9" fill="rgba(255,255,255,0.85)">retrieve new I/O events</text>
+
+            <!-- 5: check — bottom left (150deg) -->
+            <rect x="-163" y="115" width="110" height="48" rx="7" fill="#14B8A6"/>
+            <text x="-108" y="136" text-anchor="middle" font-family="system-ui,sans-serif" font-size="10" font-weight="700" fill="white">⑤ check</text>
+            <text x="-108" y="150" text-anchor="middle" font-family="system-ui,sans-serif" font-size="9" fill="rgba(255,255,255,0.85)">setImmediate callbacks</text>
+
+            <!-- 6: close callbacks — left (210deg) -->
+            <rect x="-202" y="-5" width="120" height="48" rx="7" fill="#8B5CF6"/>
+            <text x="-142" y="16" text-anchor="middle" font-family="system-ui,sans-serif" font-size="10" font-weight="700" fill="white">⑥ close callbacks</text>
+            <text x="-142" y="30" text-anchor="middle" font-family="system-ui,sans-serif" font-size="9" fill="rgba(255,255,255,0.85)">socket.on('close',...)</text>
+
+            <!-- Arrows connecting phases (simplified circular arrow) -->
+            <!-- Arrow 1→2 -->
+            <path d="M 30,-172 Q 90,-170 85,-130" fill="none" stroke="#9CA3AF" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arr)"/>
+            <!-- Arrow 2→3 -->
+            <path d="M 178,-110 Q 192,-60 190,5" fill="none" stroke="#9CA3AF" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arr)"/>
+            <!-- Arrow 3→4 -->
+            <path d="M 195,50 Q 180,90 155,115" fill="none" stroke="#9CA3AF" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arr)"/>
+            <!-- Arrow 4→5 -->
+            <path d="M 50,148 Q 0,165 -45,148" fill="none" stroke="#9CA3AF" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arr)"/>
+            <!-- Arrow 5→6 -->
+            <path d="M -150,112 Q -175,70 -175,48" fill="none" stroke="#9CA3AF" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arr)"/>
+            <!-- Arrow 6→1 -->
+            <path d="M -148,-5 Q -120,-140 -30,-174" fill="none" stroke="#9CA3AF" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arr)"/>
+          </g>
+
+          <!-- microtask queue note -->
+          <rect x="20" y="370" width="200" height="30" rx="5" fill="#FEF3C7" stroke="#F59E0B" stroke-width="1"/>
+          <text x="30" y="387" font-family="system-ui,sans-serif" font-size="10" fill="#92400e" font-weight="600">⚡ Between each phase:</text>
+          <text x="30" y="399" font-family="system-ui,sans-serif" font-size="9" fill="#92400e">process.nextTick + Promise microtasks</text>
+
+          <rect x="240" y="370" width="230" height="30" rx="5" fill="#EDE9FE" stroke="#8B5CF6" stroke-width="1"/>
+          <text x="250" y="387" font-family="system-ui,sans-serif" font-size="10" fill="#5B21B6" font-weight="600">libuv thread pool (default 4 threads)</text>
+          <text x="250" y="399" font-family="system-ui,sans-serif" font-size="9" fill="#5B21B6">handles blocking I/O off the main thread</text>
+
+          <defs>
+            <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+              <path d="M0,0 L0,6 L8,3 z" fill="#9CA3AF"/>
+            </marker>
+          </defs>
+        </svg>
+        <figcaption>The Node.js event loop: six phases, with microtask draining between each phase. Most backend code lives in the poll phase.</figcaption>
+      </figure>
+    </div>
+
+    <div class="callout info">
+      <span class="callout-icon">ℹ️</span>
+      <div class="callout-body">
+        <strong>Info — microtasks jump the queue</strong>
+        <p><code>process.nextTick()</code> and resolved <code>Promise</code> callbacks (microtasks) execute between every phase transition — even between callbacks within the same phase. This means: if you recursively call <code>process.nextTick()</code>, you can starve the I/O poll phase forever. Prefer <code>setImmediate()</code> for deferring work inside callbacks.</p>
+      </div>
+    </div>
+
+    <h3 id="libuv">libuv Under the Hood</h3>
+
+    <p>libuv is the C library that gives Node its superpowers. It provides:</p>
+
+    <ul>
+      <li><strong>The event loop itself</strong> — cross-platform abstraction over epoll (Linux), kqueue (macOS), IOCP (Windows)</li>
+      <li><strong>A thread pool</strong> (default 4, max 1024 via <code>UV_THREADPOOL_SIZE</code>) for operations that don't have async kernel equivalents: DNS lookups, filesystem calls, some crypto ops</li>
+      <li><strong>Async TCP/UDP sockets</strong>, timers, child process management, signal handling</li>
+    </ul>
+
+    <p>The critical insight: <em>not all async in Node is truly non-blocking at the OS level</em>. When you call <code>fs.readFile()</code>, libuv dispatches it to its thread pool. The thread pool thread blocks — but your main thread doesn't. You get the illusion of non-blocking I/O even for operations the OS handles synchronously.</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">typescript</span>
+        <span class="code-filename">libuv-threadpool.ts</span>
+      </div>
+      <pre><code class="language-typescript">import { readFile } from 'fs/promises'
+
+// This is NOT blocking the main thread:
+// libuv pushes the disk read to its thread pool (UV_THREADPOOL_SIZE threads)
+// When done, the callback is queued back to the event loop poll phase
+const data = await readFile('/large-file.bin')
+
+// But this DOES block:
+import { readFileSync } from 'fs'
+const blocking = readFileSync('/large-file.bin') // main thread frozen here
+
+// Tune thread pool size for I/O-heavy workloads
+// process.env.UV_THREADPOOL_SIZE = '16' (set before requiring any modules)
+</code></pre>
+    </div>
+
+    <h3 id="worker-threads">Worker Threads for CPU-Intensive Tasks</h3>
+
+    <p>The event loop is single-threaded, which means CPU-bound code blocks everyone. Compressing an image, computing a hash over 1GB of data, running ML inference — these will freeze your server while they run. The solution: Worker Threads.</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">typescript</span>
+        <span class="code-filename">worker-pool.ts</span>
+      </div>
+      <pre><code class="language-typescript">import { Worker, isMainThread, parentPort, workerData } from 'worker_threads'
+import { cpus } from 'os'
+
+// ── worker.ts (runs in separate thread) ──────────────────────────────
+if (!isMainThread) {
+  const { data }: { data: number[] } = workerData
+  // CPU-intensive: this thread can block without affecting main thread
+  const result = data.reduce((acc, n) => acc + Math.sqrt(n), 0)
+  parentPort?.postMessage(result)
+}
+
+// ── main.ts ──────────────────────────────────────────────────────────
+interface WorkerResult {
+  value: number
+}
+
+function runWorker(data: number[]): Promise&lt;number&gt; {
+  return new Promise((resolve, reject) => {
+    const worker = new Worker(__filename, { workerData: { data } })
+    worker.on('message', (result: number) => resolve(result))
+    worker.on('error', reject)
+    worker.on('exit', (code) => {
+      if (code !== 0) reject(new Error(`Worker exited with code ${code}`))
+    })
+  })
+}
+
+// Parallel CPU work across all cores
+const numCores = cpus().length
+const chunks = Array.from({ length: numCores }, (_, i) =>
+  Array.from({ length: 1_000_000 }, (_, j) => i * 1_000_000 + j)
+)
+
+const results = await Promise.all(chunks.map(runWorker))
+const total = results.reduce((a, b) => a + b, 0)
+console.log('Total:', total)
+</code></pre>
+    </div>
+
+    <div class="callout python">
+      <span class="callout-icon">🐍</span>
+      <div class="callout-body">
+        <strong>Python Comparison — GIL vs Single Thread</strong>
+        <p>Python's Global Interpreter Lock (GIL) allows only one thread to execute Python bytecode at a time — even on multi-core machines. <code>threading.Thread</code> gives you concurrency for I/O-bound work (while one thread waits for I/O, another runs) but no true parallelism for CPU-bound work.</p>
+        <p>Node's model is different: there is one thread and it never blocks (if written correctly). For CPU parallelism, <code>worker_threads</code> spawn true OS threads with separate V8 isolates — no shared heap, communication via structured clone. In Python you'd use <code>multiprocessing</code> for the same reason: escape the GIL with separate processes. Node 12+ worker threads are lighter than processes but still isolated.</p>
+      </div>
+    </div>
+
+    <h3 id="v8">The V8 Engine</h3>
+
+    <p>V8 is the JavaScript engine written by Google, originally for Chrome. It compiles JavaScript (and TypeScript after stripping types) to native machine code via JIT compilation. Two key V8 concepts every Node developer should know:</p>
+
+    <ul>
+      <li><strong>Hidden classes</strong>: V8 creates hidden classes for objects. Adding properties in inconsistent order creates different hidden classes, deoptimizing the code. Always initialize objects with all properties, in the same order.</li>
+      <li><strong>Garbage collection</strong>: V8 uses generational GC. Short-lived objects (young generation) are collected fast. Long-lived objects move to old generation and cause longer pauses. Watch for objects that escape their scope unintentionally.</li>
+    </ul>
+
+    <div class="callout tip">
+      <span class="callout-icon">💡</span>
+      <div class="callout-body">
+        <strong>Tip — V8 optimization</strong>
+        <p>Run Node with <code>--trace-opt --trace-deopt</code> in development to see which functions V8 is deoptimizing. The most common cause: polymorphic function calls (passing objects of different shapes to the same function). TypeScript helps here — if your types are correct, your shapes tend to be consistent.</p>
+      </div>
+    </div>
+
+    <h3>Streams and Backpressure</h3>
+
+    <p>Node streams solve a critical problem: processing data larger than available RAM. Instead of reading a 10GB log file into memory, you read it in chunks. Backpressure is the mechanism that prevents a fast producer from overwhelming a slow consumer.</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">typescript</span>
+        <span class="code-filename">backpressure.ts</span>
+      </div>
+      <pre><code class="language-typescript">import { createReadStream, createWriteStream } from 'fs'
+import { Transform, pipeline } from 'stream'
+import { promisify } from 'util'
+import { createGzip } from 'zlib'
+
+const pipelineAsync = promisify(pipeline)
+
+// pipeline() handles backpressure automatically
+// If the gzip output can't keep up, it signals the read stream to pause
+await pipelineAsync(
+  createReadStream('large-10gb-log.txt'),
+  new Transform({
+    transform(chunk: Buffer, _encoding: string, callback: () => void) {
+      // Filter lines containing 'ERROR'
+      const filtered = chunk
+        .toString()
+        .split('\n')
+        .filter(line => line.includes('ERROR'))
+        .join('\n')
+      this.push(filtered)
+      callback()
+    }
+  }),
+  createGzip(),
+  createWriteStream('errors.txt.gz')
+)
+// Memory usage: ~constant regardless of file size
+</code></pre>
+    </div>
+
+    <!-- ══════════════════════════════ §2 CORE MODULES -->
+    <h2 id="s2"><span class="section-num">§2</span> Core Node.js Modules (with TypeScript Types)</h2>
+
+    <p>Node ships with a comprehensive standard library. All types come from <code>@types/node</code>. Here's the essential catalog — every backend TypeScript engineer should have these at their fingertips.</p>
+
+    <div class="module-grid">
+      <div class="module-card">
+        <div class="module-name">fs / fs/promises</div>
+        <p>File system: read, write, mkdir, watch, stat. Always prefer <code>fs/promises</code> over callback-based <code>fs</code>.</p>
+      </div>
+      <div class="module-card">
+        <div class="module-name">path</div>
+        <p>Cross-platform path manipulation. join, resolve, dirname, basename, extname, relative.</p>
+      </div>
+      <div class="module-card">
+        <div class="module-name">http / https</div>
+        <p>Raw HTTP server and client. Low-level but gives full control over request/response streams.</p>
+      </div>
+      <div class="module-card">
+        <div class="module-name">net</div>
+        <p>TCP/UDP sockets. Build custom protocols, proxies, anything HTTP doesn't cover.</p>
+      </div>
+      <div class="module-card">
+        <div class="module-name">crypto</div>
+        <p>Cryptography: hashing, HMAC, AES encryption, RSA, TLS. Wraps OpenSSL.</p>
+      </div>
+      <div class="module-card">
+        <div class="module-name">os</div>
+        <p>Operating system info: CPU count, total memory, platform, hostname, temp directory.</p>
+      </div>
+      <div class="module-card">
+        <div class="module-name">child_process</div>
+        <p>Spawn subprocesses: exec, spawn, fork. Run shell commands, call Python scripts.</p>
+      </div>
+      <div class="module-card">
+        <div class="module-name">worker_threads</div>
+        <p>True parallel threads with isolated V8 heaps. Share ArrayBuffers for zero-copy data transfer.</p>
+      </div>
+      <div class="module-card">
+        <div class="module-name">cluster</div>
+        <p>Fork the process per CPU core, sharing one port. Pre-worker_threads parallelism pattern.</p>
+      </div>
+      <div class="module-card">
+        <div class="module-name">stream</div>
+        <p>Readable, Writable, Transform, Duplex. The foundation of all I/O in Node.</p>
+      </div>
+      <div class="module-card">
+        <div class="module-name">events</div>
+        <p>EventEmitter base class. Most Node APIs extend it. Foundation for reactive patterns.</p>
+      </div>
+      <div class="module-card">
+        <div class="module-name">url / querystring</div>
+        <p>URL parsing and construction. Use the WHATWG <code>URL</code> class (no import needed in modern Node).</p>
+      </div>
+    </div>
+
+    <p>Let's look at the most important ones with real TypeScript examples.</p>
+
+    <h3>http — Building a Raw HTTP Server</h3>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">typescript</span>
+        <span class="code-filename">raw-http-server.ts</span>
+      </div>
+      <pre><code class="language-typescript">import http, { IncomingMessage, ServerResponse } from 'http'
+
+interface ApiResponse&lt;T&gt; {
+  data: T
+  timestamp: string
+}
+
+function sendJson&lt;T&gt;(res: ServerResponse, statusCode: number, data: T): void {
+  const body: ApiResponse&lt;T&gt; = { data, timestamp: new Date().toISOString() }
+  res.writeHead(statusCode, { 'Content-Type': 'application/json' })
+  res.end(JSON.stringify(body))
+}
+
+const server = http.createServer((req: IncomingMessage, res: ServerResponse) => {
+  if (req.method === 'GET' && req.url === '/health') {
+    sendJson(res, 200, { status: 'ok' })
+    return
+  }
+
+  if (req.method === 'POST' && req.url === '/echo') {
+    const chunks: Buffer[] = []
+    req.on('data', (chunk: Buffer) => chunks.push(chunk))
+    req.on('end', () => {
+      const body = Buffer.concat(chunks).toString('utf-8')
+      sendJson(res, 200, { echo: JSON.parse(body) })
+    })
+    return
+  }
+
+  sendJson(res, 404, { error: 'Not Found' })
+})
+
+server.listen(3000, () => console.log('Server on http://localhost:3000'))
+</code></pre>
+    </div>
+
+    <h3>crypto — Typed Cryptography</h3>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">typescript</span>
+        <span class="code-filename">crypto-utils.ts</span>
+      </div>
+      <pre><code class="language-typescript">import {
+  createHash,
+  createHmac,
+  randomBytes,
+  scrypt,
+  timingSafeEqual,
+} from 'crypto'
+import { promisify } from 'util'
+
+const scryptAsync = promisify(scrypt)
+
+// Hash a string
+function sha256(input: string): string {
+  return createHash('sha256').update(input).digest('hex')
+}
+
+// HMAC — tamper-evident signatures (used in JWTs, webhooks)
+function hmacSHA256(message: string, secret: string): string {
+  return createHmac('sha256', secret).update(message).digest('hex')
+}
+
+// Secure password hashing (use bcrypt/argon2 in production, but scrypt is built-in)
+async function hashPassword(password: string): Promise&lt;{ hash: string; salt: string }&gt; {
+  const salt = randomBytes(16).toString('hex')
+  const derived = await scryptAsync(password, salt, 64) as Buffer
+  return { hash: derived.toString('hex'), salt }
+}
+
+// Timing-safe comparison prevents timing attacks
+async function verifyPassword(
+  password: string,
+  hash: string,
+  salt: string
+): Promise&lt;boolean&gt; {
+  const derived = await scryptAsync(password, salt, 64) as Buffer
+  const hashBuffer = Buffer.from(hash, 'hex')
+  return timingSafeEqual(derived, hashBuffer)
+}
+
+// Secure random token — for session IDs, reset tokens
+function generateToken(bytes = 32): string {
+  return randomBytes(bytes).toString('base64url')
+}
+</code></pre>
+    </div>
+
+    <h3>child_process — Spawning Subprocesses</h3>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">typescript</span>
+        <span class="code-filename">child-process.ts</span>
+      </div>
+      <pre><code class="language-typescript">import { exec, spawn } from 'child_process'
+import { promisify } from 'util'
+
+const execAsync = promisify(exec)
+
+// Simple command — typed output
+async function getGitLog(): Promise&lt;string[]&gt; {
+  const { stdout } = await execAsync('git log --oneline -10')
+  return stdout.trim().split('\n')
+}
+
+// Streaming output — better for long-running commands
+function runPython(scriptPath: string, args: string[]): Promise&lt;number&gt; {
+  return new Promise((resolve, reject) => {
+    const proc = spawn('python3', [scriptPath, ...args], {
+      stdio: ['inherit', 'pipe', 'pipe']
+    })
+
+    proc.stdout?.on('data', (data: Buffer) => {
+      process.stdout.write(`[python] ${data.toString()}`)
+    })
+
+    proc.stderr?.on('data', (data: Buffer) => {
+      process.stderr.write(`[python:err] ${data.toString()}`)
+    })
+
+    proc.on('close', (code: number | null) => {
+      if (code === 0) resolve(0)
+      else reject(new Error(`Python exited with code ${code}`))
+    })
+  })
+}
+</code></pre>
+    </div>
+
+    <div class="callout tip">
+      <span class="callout-icon">💡</span>
+      <div class="callout-body">
+        <strong>Tip — use execa for better child process DX</strong>
+        <p>The built-in <code>child_process</code> module has an awkward API. The <code>execa</code> library (<code>npm i execa</code>) wraps it with promise support, better error messages, and proper TypeScript types. In practice, use <code>execa</code> for everything except cases where you need full control over stdio streams.</p>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════ §3 TYPESCRIPT SETUP -->
+    <h2 id="s3"><span class="section-num">§3</span> Node.js TypeScript Setup</h2>
+
+    <p>Setting up TypeScript for Node has gotten considerably simpler in 2024-2025. Here's the authoritative configuration.</p>
+
+    <h3>1. Install dependencies</h3>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">bash</span>
+      </div>
+      <pre><code class="language-bash">npm install --save-dev typescript @types/node tsx
+
+# Or with Bun — no @types/node needed, types are built-in
+bun add --dev typescript
+</code></pre>
+    </div>
+
+    <h3>2. tsconfig.json for Node</h3>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">json</span>
+        <span class="code-filename">tsconfig.json</span>
+      </div>
+      <pre><code class="language-json">{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "lib": ["ES2022"],
+    "rootDir": "src",
+    "outDir": "dist",
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "skipLibCheck": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
+</code></pre>
+    </div>
+
+    <div class="callout info">
+      <span class="callout-icon">ℹ️</span>
+      <div class="callout-body">
+        <strong>Info — module: "NodeNext" explained</strong>
+        <p><code>module: "NodeNext"</code> tells TypeScript to respect Node's ESM resolution rules, which means <code>.js</code> extensions in imports are required (e.g., <code>import { foo } from './utils.js'</code>) even when writing <code>.ts</code> files. This trips up many teams. The extension you write in the import corresponds to the compiled output, not the source file. It's counterintuitive but correct.</p>
+      </div>
+    </div>
+
+    <h3>3. Development workflow with tsx</h3>
+
+    <p><code>tsx</code> is a TypeScript executor that runs <code>.ts</code> files directly without a compile step, with automatic restarts on file changes.</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">json</span>
+        <span class="code-filename">package.json (scripts)</span>
+      </div>
+      <pre><code class="language-json">{
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc --noEmit && tsup src/index.ts",
+    "start": "node dist/index.js",
+    "type-check": "tsc --noEmit"
+  }
+}
+</code></pre>
+    </div>
+
+    <h3>4. Production bundling with tsup</h3>
+
+    <p><code>tsup</code> is built on esbuild and produces optimized output — it's 10-100x faster than <code>tsc</code> for bundling. Use <code>tsc --noEmit</code> for type checking and <code>tsup</code> for building.</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">typescript</span>
+        <span class="code-filename">tsup.config.ts</span>
+      </div>
+      <pre><code class="language-typescript">import { defineConfig } from 'tsup'
+
+export default defineConfig({
+  entry: ['src/index.ts'],
+  format: ['esm', 'cjs'],
+  target: 'node20',
+  splitting: false,
+  sourcemap: true,
+  clean: true,
+  dts: true,
+})
+</code></pre>
+    </div>
+
+    <!-- ══════════════════════════════ §4 BUN -->
+    <h2 id="s4"><span class="section-num">§4</span> Bun — The Fast Alternative</h2>
+
+    <p>Bun is a JavaScript runtime built from scratch in Zig by Jarred Sumner, released 1.0 in September 2023. Its differentiator: speed. Bun uses JavaScriptCore (Safari's JS engine) instead of V8, which has significantly faster startup time. It runs TypeScript natively — no compilation step, no <code>tsx</code>, no <code>ts-node</code>.</p>
+
+    <p>Bun ships as a single binary that includes: a runtime, a package manager (<code>bun install</code>), a bundler (<code>bun build</code>), and a test runner (<code>bun test</code>). It's the all-in-one tool Node never was.</p>
+
+    <h3 id="bun-speed">Speed Comparison: Node vs Bun</h3>
+
+    <!-- BUN VS NODE BAR CHART SVG -->
+    <div class="diagram-container">
+      <figure>
+        <svg width="640" height="300" viewBox="0 0 640 300" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto;">
+          <rect width="640" height="300" rx="12" fill="#F9FAFB" stroke="#E5E7EB" stroke-width="1.5"/>
+          <text x="320" y="28" text-anchor="middle" font-family="system-ui,sans-serif" font-size="13" font-weight="700" fill="#111827">Bun vs Node.js Performance</text>
+          <text x="320" y="46" text-anchor="middle" font-family="system-ui,sans-serif" font-size="10" fill="#6B7280">(Higher = faster / better. Benchmarks vary by workload.)</text>
+
+          <!-- Y axis -->
+          <line x1="120" y1="60" x2="120" y2="240" stroke="#E5E7EB" stroke-width="1.5"/>
+          <!-- X axis -->
+          <line x1="120" y1="240" x2="600" y2="240" stroke="#E5E7EB" stroke-width="1.5"/>
+
+          <!-- Benchmark: Startup time -->
+          <!-- Node: ~100ms → bar width proportional. Node=100ms, Bun=8ms -->
+          <!-- Category labels -->
+          <text x="110" y="90" text-anchor="end" font-family="system-ui,sans-serif" font-size="10" fill="#374151">Startup time</text>
+          <text x="110" y="115" text-anchor="end" font-family="system-ui,sans-serif" font-size="9" fill="#9CA3AF">lower is faster</text>
+
+          <!-- Node startup bar: 100ms → 380px wide -->
+          <rect x="124" y="74" width="380" height="18" rx="3" fill="#6366F1"/>
+          <text x="512" y="87" font-family="system-ui,sans-serif" font-size="10" fill="#374151" font-weight="600">100ms (Node)</text>
+
+          <!-- Bun startup bar: 8ms → 30.4px wide -->
+          <rect x="124" y="95" width="30" height="18" rx="3" fill="#f97316"/>
+          <text x="160" y="108" font-family="system-ui,sans-serif" font-size="10" fill="#374151" font-weight="600">8ms (Bun)</text>
+
+          <!-- Benchmark: HTTP req/s -->
+          <text x="110" y="150" text-anchor="end" font-family="system-ui,sans-serif" font-size="10" fill="#374151">HTTP req/s</text>
+          <text x="110" y="165" text-anchor="end" font-family="system-ui,sans-serif" font-size="9" fill="#9CA3AF">higher is better</text>
+
+          <!-- Node HTTP: ~75k req/s → 285px -->
+          <rect x="124" y="135" width="285" height="18" rx="3" fill="#6366F1"/>
+          <text x="417" y="148" font-family="system-ui,sans-serif" font-size="10" fill="#374151" font-weight="600">75k req/s (Node)</text>
+
+          <!-- Bun HTTP: ~150k req/s → 380px -->
+          <rect x="124" y="156" width="380" height="18" rx="3" fill="#f97316"/>
+          <text x="512" y="169" font-family="system-ui,sans-serif" font-size="10" fill="#374151" font-weight="600">150k req/s (Bun)</text>
+
+          <!-- Benchmark: Package install -->
+          <text x="110" y="207" text-anchor="end" font-family="system-ui,sans-serif" font-size="10" fill="#374151">npm install (100 deps)</text>
+          <text x="110" y="222" text-anchor="end" font-family="system-ui,sans-serif" font-size="9" fill="#9CA3AF">lower is faster</text>
+
+          <!-- npm: 10s → 380px -->
+          <rect x="124" y="191" width="380" height="18" rx="3" fill="#6366F1"/>
+          <text x="512" y="204" font-family="system-ui,sans-serif" font-size="10" fill="#374151" font-weight="600">10s (npm)</text>
+
+          <!-- bun install: 0.4s → 15px -->
+          <rect x="124" y="212" width="15" height="18" rx="3" fill="#f97316"/>
+          <text x="147" y="225" font-family="system-ui,sans-serif" font-size="10" fill="#374151" font-weight="600">0.4s (bun)</text>
+
+          <!-- Legend -->
+          <rect x="450" y="255" width="12" height="12" rx="2" fill="#6366F1"/>
+          <text x="467" y="265" font-family="system-ui,sans-serif" font-size="10" fill="#374151">Node / npm</text>
+          <rect x="530" y="255" width="12" height="12" rx="2" fill="#f97316"/>
+          <text x="547" y="265" font-family="system-ui,sans-serif" font-size="10" fill="#374151">Bun</text>
+        </svg>
+        <figcaption>Approximate benchmarks — real numbers vary by hardware, workload, and Node version. Bun's startup speed advantage is most impactful in CLI tools and serverless functions.</figcaption>
+      </figure>
+    </div>
+
+    <h3 id="bun-apis">Bun's Built-in TypeScript Support</h3>
+
+    <p>Create a file, run it. No config, no compilation, no <code>tsconfig.json</code> required for the basics.</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">bash</span>
+      </div>
+      <pre><code class="language-bash"># Install Bun
+curl -fsSL https://bun.sh/install | bash
+
+# Run TypeScript directly
+bun run server.ts
+
+# Development with hot reload
+bun --hot run server.ts
+
+# Test runner
+bun test
+
+# Package manager (much faster than npm)
+bun install
+bun add zod
+bun add --dev @types/node
+</code></pre>
+    </div>
+
+    <h3>Bun.serve() — HTTP Server</h3>
+
+    <p>Bun's HTTP server API is simpler and faster than Node's built-in <code>http</code> module. It uses the Fetch API paradigm — the same <code>Request</code> and <code>Response</code> objects you know from the browser.</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">typescript</span>
+        <span class="code-filename">bun-server.ts</span>
+      </div>
+      <pre><code class="language-typescript">import type { Server } from 'bun'
+
+interface RouteHandler {
+  (req: Request, params: Record&lt;string, string&gt;): Response | Promise&lt;Response&gt;
+}
+
+// Bun.serve uses the Web Fetch API — Response, Request, Headers
+const server: Server = Bun.serve({
+  port: 3000,
+  hostname: '0.0.0.0',
+
+  async fetch(req: Request): Promise&lt;Response&gt; {
+    const url = new URL(req.url)
+
+    if (url.pathname === '/health') {
+      return Response.json({ status: 'ok', runtime: 'bun' })
+    }
+
+    if (req.method === 'POST' &amp;&amp; url.pathname === '/echo') {
+      const body = await req.json()
+      return Response.json({ echo: body }, { status: 200 })
+    }
+
+    // Streaming response
+    if (url.pathname === '/stream') {
+      const stream = new ReadableStream({
+        start(controller) {
+          let i = 0
+          const interval = setInterval(() => {
+            controller.enqueue(`data: ${JSON.stringify({ tick: i++ })}\n\n`)
+            if (i > 10) { clearInterval(interval); controller.close() }
+          }, 100)
+        }
+      })
+
+      return new Response(stream, {
+        headers: {
+          'Content-Type': 'text/event-stream',
+          'Cache-Control': 'no-cache',
+        }
+      })
+    }
+
+    return new Response('Not Found', { status: 404 })
+  },
+
+  error(error: Error): Response {
+    console.error(error)
+    return Response.json({ error: error.message }, { status: 500 })
+  }
+})
+
+console.log(`Listening on http://localhost:${server.port}`)
+</code></pre>
+    </div>
+
+    <h3>Bun APIs vs Node APIs — Compatibility</h3>
+
+    <p>Bun implements most of Node's API surface, so existing Node code usually runs unchanged. But Bun also offers superior native alternatives.</p>
+
+    <table class="comparison-table">
+      <thead>
+        <tr>
+          <th>Task</th>
+          <th>Node.js</th>
+          <th>Bun native</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Read file</td>
+          <td><code>fs.readFile()</code></td>
+          <td><code>Bun.file().text()</code></td>
+        </tr>
+        <tr>
+          <td>Write file</td>
+          <td><code>fs.writeFile()</code></td>
+          <td><code>Bun.write(path, data)</code></td>
+        </tr>
+        <tr>
+          <td>HTTP server</td>
+          <td><code>http.createServer()</code></td>
+          <td><code>Bun.serve()</code></td>
+        </tr>
+        <tr>
+          <td>Hash</td>
+          <td><code>crypto.createHash()</code></td>
+          <td><code>Bun.CryptoHasher</code></td>
+        </tr>
+        <tr>
+          <td>SQLite</td>
+          <td>Need <code>better-sqlite3</code></td>
+          <td><code>bun:sqlite</code> (built-in)</td>
+        </tr>
+        <tr>
+          <td>WebSocket</td>
+          <td>Need <code>ws</code> package</td>
+          <td><code>Bun.serve({ websocket })</code></td>
+        </tr>
+        <tr>
+          <td>Password hash</td>
+          <td>Need <code>bcrypt</code></td>
+          <td><code>Bun.password.hash()</code></td>
+        </tr>
+        <tr>
+          <td>Environment</td>
+          <td><code>process.env</code></td>
+          <td><code>Bun.env</code> (typed)</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>When to Choose Bun vs Node</h3>
+
+    <div class="callout tip">
+      <span class="callout-icon">💡</span>
+      <div class="callout-body">
+        <strong>Tip — choosing your runtime</strong>
+        <p><strong>Choose Bun</strong> for: CLI tools (startup speed matters enormously), greenfield projects where you control the full stack, scripts that need to run fast, teams that want zero TypeScript build config friction.</p>
+        <p><strong>Choose Node</strong> for: production systems requiring maximum ecosystem stability, projects with native addons (<code>.node</code> files), when deploying to environments that only support Node, or when team Node expertise is deep and Bun's production track record matters to you.</p>
+        <p>Bun's Node compatibility is ~95%+ for most application code. The gaps are mostly in native addons and some edge cases in streams.</p>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════ §5 FILE SYSTEM -->
+    <h2 id="s5"><span class="section-num">§5</span> File System Operations</h2>
+
+    <p>File I/O is the most common backend task. Always use <code>fs/promises</code> — the callback-based <code>fs</code> API is legacy. TypeScript's types give you full IntelliSense and catch mistakes at compile time.</p>
+
+    <h3>Reading and Writing Files</h3>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">typescript</span>
+        <span class="code-filename">file-ops.ts</span>
+      </div>
+      <pre><code class="language-typescript">import {
+  readFile,
+  writeFile,
+  appendFile,
+  mkdir,
+  rm,
+  readdir,
+  stat,
+  rename,
+  copyFile,
+} from 'fs/promises'
+import { existsSync } from 'fs'
+import { join, resolve, dirname, basename, extname } from 'path'
+
+// Reading a text file — utf-8 encoding makes return type string
+const content: string = await readFile('data.txt', 'utf-8')
+
+// Reading binary — no encoding returns Buffer
+const buffer: Buffer = await readFile('image.png')
+
+// Writing files
+await writeFile('output.txt', content, 'utf-8')
+await writeFile('copy.png', buffer)
+
+// Appending
+await appendFile('log.txt', `${new Date().toISOString()} - Event\n`)
+
+// Working with JSON — fully typed
+interface Config {
+  port: number
+  database: { host: string; name: string }
+}
+
+async function readConfig(path: string): Promise&lt;Config&gt; {
+  const raw = await readFile(path, 'utf-8')
+  return JSON.parse(raw) as Config
+}
+
+async function writeConfig(path: string, config: Config): Promise&lt;void&gt; {
+  await writeFile(path, JSON.stringify(config, null, 2), 'utf-8')
+}
+</code></pre>
+    </div>
+
+    <h3>Directory Operations</h3>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">typescript</span>
+        <span class="code-filename">directory-ops.ts</span>
+      </div>
+      <pre><code class="language-typescript">import { mkdir, readdir, rm, stat } from 'fs/promises'
+import { join } from 'path'
+
+// Create nested directories (like mkdir -p)
+await mkdir('data/logs/2025', { recursive: true })
+
+// List directory entries with types
+const entries = await readdir('src', { withFileTypes: true })
+const tsFiles = entries
+  .filter(e => e.isFile() &amp;&amp; e.name.endsWith('.ts'))
+  .map(e => e.name)
+
+// Recursive directory listing
+async function* walk(dir: string): AsyncGenerator&lt;string&gt; {
+  const entries = await readdir(dir, { withFileTypes: true })
+  for (const entry of entries) {
+    const path = join(dir, entry.name)
+    if (entry.isDirectory()) {
+      yield* walk(path)
+    } else {
+      yield path
+    }
+  }
+}
+
+// Usage
+for await (const file of walk('./src')) {
+  console.log(file)
+}
+
+// Delete recursively (like rm -rf)
+await rm('temp', { recursive: true, force: true })
+
+// File info
+const info = await stat('package.json')
+console.log(info.size, info.mtime, info.isDirectory())
+</code></pre>
+    </div>
+
+    <h3>File Watching</h3>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">typescript</span>
+        <span class="code-filename">file-watch.ts</span>
+      </div>
+      <pre><code class="language-typescript">import { watch } from 'fs'
+import { readFile } from 'fs/promises'
+
+// Watch a file for changes — debounced
+let debounceTimer: ReturnType&lt;typeof setTimeout&gt;
+
+watch('./config.json', { persistent: true }, (event, filename) => {
+  if (!filename) return
+  clearTimeout(debounceTimer)
+  debounceTimer = setTimeout(async () => {
+    const content = await readFile('./config.json', 'utf-8')
+    console.log('Config reloaded:', JSON.parse(content))
+  }, 100)
+})
+
+// Watch a directory
+const watcher = watch('./src', { recursive: true }, (event, filename) => {
+  console.log(`${event}: ${filename}`)
+})
+
+// Clean up on exit
+process.on('SIGINT', () => {
+  watcher.close()
+  process.exit(0)
+})
+</code></pre>
+    </div>
+
+    <h3>Path Manipulation</h3>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">typescript</span>
+        <span class="code-filename">path-utils.ts</span>
+      </div>
+      <pre><code class="language-typescript">import { join, resolve, dirname, basename, extname, relative, parse } from 'path'
+import { fileURLToPath } from 'url'
+
+// ESM equivalent of __dirname (Node ESM doesn't have __dirname)
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
+
+// join: cross-platform path joining (uses \ on Windows, / on Unix)
+const configPath = join(__dirname, '..', 'config', 'app.json')
+// → /home/user/project/config/app.json
+
+// resolve: makes absolute path
+const abs = resolve('relative/path')
+
+// Parse a path into parts
+const parts = parse('/home/user/project/src/index.ts')
+// → { root: '/', dir: '...', base: 'index.ts', ext: '.ts', name: 'index' }
+
+// Get relative path between two absolutes
+const rel = relative('/home/user/project', '/home/user/project/src/utils.ts')
+// → 'src/utils.ts'
+
+// Common patterns
+function resolveFromRoot(...parts: string[]): string {
+  return join(__dirname, ...parts)
+}
+</code></pre>
+    </div>
+
+    <div class="callout python">
+      <span class="callout-icon">🐍</span>
+      <div class="callout-body">
+        <strong>Python Comparison — pathlib vs path</strong>
+        <p>Python's <code>pathlib.Path</code> is an object-oriented API with method chaining: <code>Path('src') / 'index.ts'</code>. Node's <code>path</code> module is functional: <code>join('src', 'index.ts')</code>. Both handle cross-platform separators. In Python you rarely think about <code>__file__</code> in ESM contexts — Node's switch to ESM removed <code>__dirname</code> and requires the <code>fileURLToPath(import.meta.url)</code> dance. Bun fixes this: <code>import.meta.dir</code> gives you the directory directly.</p>
+      </div>
+    </div>
+
+    <h3>Streaming Large Files</h3>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">typescript</span>
+        <span class="code-filename">stream-large-file.ts</span>
+      </div>
+      <pre><code class="language-typescript">import { createReadStream } from 'fs'
+import { createInterface } from 'readline'
+import { Transform, pipeline } from 'stream'
+import { promisify } from 'util'
+import { createWriteStream } from 'fs'
+
+const pipelineAsync = promisify(pipeline)
+
+// Line-by-line processing — constant memory regardless of file size
+async function processLargeCSV(inputPath: string): Promise&lt;void&gt; {
+  const stream = createReadStream(inputPath, { encoding: 'utf-8' })
+  const rl = createInterface({ input: stream, crlfDelay: Infinity })
+
+  let lineNum = 0
+  for await (const line of rl) {
+    lineNum++
+    if (lineNum === 1) continue // skip header
+
+    const [id, name, value] = line.split(',')
+    // Process each row without loading entire file into memory
+    await processRow({ id, name, value: parseFloat(value) })
+  }
+}
+
+// Transform stream: uppercase all text
+const uppercaser = new Transform({
+  encoding: 'utf-8',
+  transform(chunk: string, _enc: string, cb: () => void) {
+    this.push(chunk.toUpperCase())
+    cb()
+  }
+})
+
+// Memory-efficient file transformation
+await pipelineAsync(
+  createReadStream('input.txt'),
+  uppercaser,
+  createWriteStream('output.txt')
+)
+
+async function processRow(_row: { id: string; name: string; value: number }) {
+  // ... process row
+}
+</code></pre>
+    </div>
+
+    <!-- ══════════════════════════════ §6 ENV VARS -->
+    <h2 id="s6"><span class="section-num">§6</span> Environment Variables</h2>
+
+    <p><code>process.env</code> is typed as <code>NodeJS.ProcessEnv</code> — a <code>Record&lt;string, string | undefined&gt;</code>. Every access returns <code>string | undefined</code>, which TypeScript enforces. This is correct behavior: environment variables are not guaranteed to exist at runtime.</p>
+
+    <h3>The Naive Approach (Avoid)</h3>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">typescript</span>
+      </div>
+      <pre><code class="language-typescript">// ❌ Bad — PORT is string | undefined, not number
+const port = process.env.PORT  // string | undefined — not a number!
+const db = process.env.DATABASE_URL  // could be undefined
+
+// ❌ Non-null assertion — lies to TypeScript
+const badPort = process.env.PORT!  // pretends it's defined — blows up in prod
+</code></pre>
+    </div>
+
+    <h3>The Right Way — Validate with Zod</h3>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">typescript</span>
+        <span class="code-filename">env.ts</span>
+      </div>
+      <pre><code class="language-typescript">import { z } from 'zod'
+
+const envSchema = z.object({
+  // Strings
+  NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
+  DATABASE_URL: z.string().url('DATABASE_URL must be a valid URL'),
+  JWT_SECRET: z.string().min(32, 'JWT_SECRET must be at least 32 chars'),
+
+  // Numbers — transform from string
+  PORT: z.string().regex(/^\d+$/).transform(Number).default('3000'),
+  MAX_CONNECTIONS: z.string().transform(Number).default('10'),
+
+  // Booleans — "true"/"false" strings
+  ENABLE_METRICS: z.string()
+    .transform(v => v === 'true')
+    .default('false'),
+
+  // Optional
+  REDIS_URL: z.string().url().optional(),
+  SENTRY_DSN: z.string().optional(),
+})
+
+// Parse at startup — throws immediately if anything is wrong
+export const env = envSchema.parse(process.env)
+
+// Now everything is fully typed:
+// env.PORT → number
+// env.NODE_ENV → "development" | "production" | "test"
+// env.DATABASE_URL → string
+// env.REDIS_URL → string | undefined
+</code></pre>
+    </div>
+
+    <div class="callout warning">
+      <span class="callout-icon">⚠️</span>
+      <div class="callout-body">
+        <strong>Warning — never commit .env to git</strong>
+        <p>Add <code>.env</code>, <code>.env.local</code>, and <code>.env.*.local</code> to your <code>.gitignore</code> immediately. Commit a <code>.env.example</code> with all required keys but no real values. Use a secrets manager (AWS Secrets Manager, 1Password Secrets Automation, Doppler) in production — not <code>.env</code> files on servers.</p>
+      </div>
+    </div>
+
+    <h3>dotenv and Environment File Patterns</h3>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">bash</span>
+        <span class="code-filename">.env.example</span>
+      </div>
+      <pre><code class="language-bash">NODE_ENV=development
+PORT=3000
+DATABASE_URL=postgresql://user:password@localhost:5432/mydb
+JWT_SECRET=change-this-to-a-random-32-char-secret-in-production
+ENABLE_METRICS=false
+# Optional:
+# REDIS_URL=redis://localhost:6379
+# SENTRY_DSN=https://...@sentry.io/...
+</code></pre>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">typescript</span>
+        <span class="code-filename">src/index.ts (entry point)</span>
+      </div>
+      <pre><code class="language-typescript">// Load .env BEFORE importing env.ts
+import 'dotenv/config'
+
+// In Node 20.6+, you can skip dotenv entirely:
+// node --env-file=.env src/index.ts
+
+import { env } from './env.js'
+
+console.log(`Starting on port ${env.PORT} in ${env.NODE_ENV} mode`)
+</code></pre>
+    </div>
+
+    <!-- ══════════════════════════════ §7 PROCESS MANAGEMENT -->
+    <h2 id="s7"><span class="section-num">§7</span> Process Management</h2>
+
+    <h3>Command-Line Arguments</h3>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">typescript</span>
+        <span class="code-filename">cli-args.ts</span>
+      </div>
+      <pre><code class="language-typescript">// process.argv: [node-binary, script-path, ...args]
+const args = process.argv.slice(2)  // ['--port', '3000', '--debug']
+
+// Manual parsing (fine for simple cases)
+function parseArgs(argv: string[]): Record&lt;string, string | boolean&gt; {
+  const result: Record&lt;string, string | boolean&gt; = {}
+  for (let i = 0; i &lt; argv.length; i++) {
+    const arg = argv[i]
+    if (arg.startsWith('--')) {
+      const key = arg.slice(2)
+      const next = argv[i + 1]
+      if (next &amp;&amp; !next.startsWith('--')) {
+        result[key] = next
+        i++
+      } else {
+        result[key] = true
+      }
+    }
+  }
+  return result
+}
+
+// For production CLIs, use a library like 'commander' or 'yargs'
+// They provide typed option parsing, help generation, subcommands
+import { Command } from 'commander'
+
+const program = new Command()
+
+program
+  .name('my-tool')
+  .version('1.0.0')
+  .option('-p, --port &lt;number&gt;', 'port to listen on', '3000')
+  .option('-d, --debug', 'enable debug logging', false)
+  .option('-c, --config &lt;path&gt;', 'config file path')
+  .parse(process.argv)
+
+const opts = program.opts&lt;{ port: string; debug: boolean; config?: string }&gt;()
+console.log('Port:', parseInt(opts.port))
+</code></pre>
+    </div>
+
+    <h3>Graceful Shutdown</h3>
+
+    <p>Graceful shutdown is not optional in production. When Kubernetes sends <code>SIGTERM</code>, your server has ~30 seconds to stop accepting new requests, finish in-flight requests, close database connections, and exit. Getting this right prevents data corruption and dropped requests during deployments.</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">typescript</span>
+        <span class="code-filename">graceful-shutdown.ts</span>
+      </div>
+      <pre><code class="language-typescript">import http from 'http'
+
+interface Closeable {
+  close: () => Promise&lt;void&gt;
+}
+
+class GracefulShutdown {
+  private readonly resources: Closeable[] = []
+  private shuttingDown = false
+
+  register(resource: Closeable): void {
+    this.resources.push(resource)
+  }
+
+  install(server: http.Server): void {
+    // SIGTERM: sent by Kubernetes, systemd, PM2 on restart
+    process.on('SIGTERM', () => this.shutdown('SIGTERM'))
+    // SIGINT: sent by Ctrl+C
+    process.on('SIGINT', () => this.shutdown('SIGINT'))
+    // Uncaught exceptions — last resort
+    process.on('uncaughtException', (err) => {
+      console.error('Uncaught exception:', err)
+      this.shutdown('uncaughtException')
+    })
+    process.on('unhandledRejection', (reason) => {
+      console.error('Unhandled rejection:', reason)
+      this.shutdown('unhandledRejection')
+    })
+  }
+
+  private async shutdown(signal: string): Promise&lt;void&gt; {
+    if (this.shuttingDown) return
+    this.shuttingDown = true
+
+    console.log(`${signal} received — starting graceful shutdown`)
+
+    // Timeout: force exit if graceful shutdown takes too long
+    const timeout = setTimeout(() => {
+      console.error('Graceful shutdown timed out — forcing exit')
+      process.exit(1)
+    }, 30_000)
+
+    try {
+      await Promise.all(this.resources.map(r => r.close()))
+      console.log('Graceful shutdown complete')
+      clearTimeout(timeout)
+      process.exit(0)
+    } catch (err) {
+      console.error('Error during shutdown:', err)
+      process.exit(1)
+    }
+  }
+}
+
+// Usage
+const shutdown = new GracefulShutdown()
+const server = http.createServer(/* ... */)
+
+// Register everything that needs cleanup
+shutdown.register({
+  close: () => new Promise(resolve => server.close(resolve))
+})
+// shutdown.register({ close: () => db.disconnect() })
+// shutdown.register({ close: () => redis.quit() })
+shutdown.install(server)
+</code></pre>
+    </div>
+
+    <div class="callout ai-era">
+      <span class="callout-icon">✨</span>
+      <div class="callout-body">
+        <strong>AI Era — long-running AI request handling</strong>
+        <p>AI inference requests can take 30-120 seconds. Your graceful shutdown must account for in-flight requests to LLM APIs. Pattern: track active requests in a <code>Set</code>, drain them before shutdown (with a longer timeout), use streaming responses so clients see partial output even if shutdown interrupts them. Set <code>terminationGracePeriodSeconds: 120</code> in your Kubernetes pod spec.</p>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════ §8 STREAMS -->
+    <h2 id="s8"><span class="section-num">§8</span> Streams in TypeScript</h2>
+
+    <p>Streams are the backbone of efficient Node.js I/O. There are two stream APIs: Node.js streams (<code>import { Readable } from 'stream'</code>) and the Web Streams API (<code>ReadableStream</code>, <code>WritableStream</code>) which is now available in Node 18+ and is Bun's native API.</p>
+
+    <h3>Node.js Streams — the four types</h3>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">typescript</span>
+        <span class="code-filename">streams.ts</span>
+      </div>
+      <pre><code class="language-typescript">import { Readable, Writable, Transform, Duplex, pipeline } from 'stream'
+import { promisify } from 'util'
+
+const pipelineAsync = promisify(pipeline)
+
+// ── Readable: source of data ─────────────────────────────────────────
+class NumberStream extends Readable {
+  private current = 0
+  private readonly max: number
+
+  constructor(max: number) {
+    super({ objectMode: true })
+    this.max = max
+  }
+
+  _read(): void {
+    if (this.current &gt; this.max) {
+      this.push(null)  // signals end of stream
+    } else {
+      this.push(this.current++)
+    }
+  }
+}
+
+// ── Transform: converts data ──────────────────────────────────────────
+class SquareTransform extends Transform {
+  constructor() {
+    super({ objectMode: true })
+  }
+
+  _transform(chunk: number, _enc: string, cb: () => void): void {
+    this.push(chunk * chunk)
+    cb()
+  }
+}
+
+// ── Writable: sink for data ───────────────────────────────────────────
+class SumWriter extends Writable {
+  sum = 0
+
+  constructor() { super({ objectMode: true }) }
+
+  _write(chunk: number, _enc: string, cb: () => void): void {
+    this.sum += chunk
+    cb()
+  }
+}
+
+// Wire them together
+const writer = new SumWriter()
+await pipelineAsync(
+  new NumberStream(100),
+  new SquareTransform(),
+  writer
+)
+console.log('Sum of squares:', writer.sum)  // 338350
+</code></pre>
+    </div>
+
+    <h3>Async Iteration — the modern stream API</h3>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">typescript</span>
+        <span class="code-filename">async-iteration.ts</span>
+      </div>
+      <pre><code class="language-typescript">import { createReadStream } from 'fs'
+import { createGunzip } from 'zlib'
+
+// Async iteration is the cleanest way to consume streams
+async function processCompressedLog(path: string): Promise&lt;Map&lt;string, number&gt;&gt; {
+  const errorCounts = new Map&lt;string, number&gt;()
+
+  const stream = createReadStream(path).pipe(createGunzip())
+
+  let buffer = ''
+  for await (const chunk of stream as AsyncIterable&lt;Buffer&gt;) {
+    buffer += chunk.toString('utf-8')
+    const lines = buffer.split('\n')
+    buffer = lines.pop() ?? ''  // keep incomplete last line
+
+    for (const line of lines) {
+      if (line.includes('ERROR')) {
+        const match = line.match(/ERROR\s+(\w+)/)
+        if (match) {
+          const key = match[1]
+          errorCounts.set(key, (errorCounts.get(key) ?? 0) + 1)
+        }
+      }
+    }
+  }
+  return errorCounts
+}
+
+// Streaming HTTP response with fetch (Web Streams API, works in Node 18+, Bun)
+async function streamOpenAI(prompt: string): Promise&lt;void&gt; {
+  const response = await fetch('https://api.openai.com/v1/completions', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${process.env.OPENAI_KEY}` },
+    body: JSON.stringify({ model: 'gpt-4o', stream: true, messages: [{ role: 'user', content: prompt }] })
+  })
+
+  if (!response.body) throw new Error('No response body')
+
+  const reader = response.body.getReader()
+  const decoder = new TextDecoder()
+
+  while (true) {
+    const { done, value } = await reader.read()
+    if (done) break
+    process.stdout.write(decoder.decode(value, { stream: true }))
+  }
+}
+</code></pre>
+    </div>
+
+    <!-- ══════════════════════════════ §9 EVENTEMITTER -->
+    <h2 id="s9"><span class="section-num">§9</span> EventEmitter with TypeScript</h2>
+
+    <p>Node's <code>EventEmitter</code> is the pub/sub backbone of the ecosystem — HTTP servers, streams, file watchers all extend it. The problem: it's not typed by default. Here's how to get full type safety.</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">typescript</span>
+        <span class="code-filename">typed-emitter.ts</span>
+      </div>
+      <pre><code class="language-typescript">import { EventEmitter } from 'events'
+
+// ── Pattern 1: TypedEventEmitter utility type ─────────────────────────
+type EventMap = Record&lt;string, unknown[]&gt;
+
+interface TypedEventEmitter&lt;Events extends EventMap&gt; {
+  on&lt;K extends keyof Events &amp; string&gt;(event: K, listener: (...args: Events[K]) => void): this
+  off&lt;K extends keyof Events &amp; string&gt;(event: K, listener: (...args: Events[K]) => void): this
+  emit&lt;K extends keyof Events &amp; string&gt;(event: K, ...args: Events[K]): boolean
+  once&lt;K extends keyof Events &amp; string&gt;(event: K, listener: (...args: Events[K]) => void): this
+}
+
+// Define your event shape
+interface JobEvents extends EventMap {
+  started: [jobId: string, timestamp: Date]
+  progress: [jobId: string, percent: number]
+  completed: [jobId: string, result: unknown]
+  failed: [jobId: string, error: Error]
+}
+
+// Extend EventEmitter with typed interface
+class JobQueue extends (EventEmitter as new () => TypedEventEmitter&lt;JobEvents&gt;) {
+  private jobs = new Map&lt;string, AbortController&gt;()
+
+  async enqueue(jobId: string, task: () => Promise&lt;unknown&gt;): Promise&lt;void&gt; {
+    const controller = new AbortController()
+    this.jobs.set(jobId, controller)
+    this.emit('started', jobId, new Date())
+
+    try {
+      const result = await task()
+      this.emit('completed', jobId, result)
+    } catch (err) {
+      this.emit('failed', jobId, err instanceof Error ? err : new Error(String(err)))
+    } finally {
+      this.jobs.delete(jobId)
+    }
+  }
+}
+
+// Usage — fully typed, IntelliSense works perfectly
+const queue = new JobQueue()
+queue.on('progress', (jobId, percent) => {
+  //              ↑ string    ↑ number  — TypeScript knows!
+  console.log(`Job ${jobId}: ${percent}%`)
+})
+queue.on('failed', (jobId, error) => {
+  //              ↑ string   ↑ Error — TypeScript knows!
+  console.error(`Job ${jobId} failed:`, error.message)
+})
+</code></pre>
+    </div>
+
+    <h3>eventemitter3 — Faster, Better Typed</h3>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">typescript</span>
+        <span class="code-filename">eventemitter3-example.ts</span>
+      </div>
+      <pre><code class="language-typescript">import EventEmitter from 'eventemitter3'
+
+// eventemitter3 has native TypeScript generics — simpler syntax
+interface MetricsEvents {
+  request: (duration: number, path: string, status: number) => void
+  error: (err: Error) => void
+  ready: () => void
+}
+
+class MetricsCollector extends EventEmitter&lt;MetricsEvents&gt; {
+  private readonly timings: number[] = []
+
+  record(duration: number, path: string, status: number): void {
+    this.timings.push(duration)
+    this.emit('request', duration, path, status)
+  }
+
+  p99(): number {
+    const sorted = [...this.timings].sort((a, b) => a - b)
+    return sorted[Math.floor(sorted.length * 0.99)] ?? 0
+  }
+}
+
+const metrics = new MetricsCollector()
+metrics.on('request', (duration, path, status) => {
+  if (duration &gt; 1000) console.warn(`Slow: ${path} ${status} ${duration}ms`)
+})
+</code></pre>
+    </div>
+
+    <!-- ══════════════════════════════ §10 PERFORMANCE -->
+    <h2 id="s10"><span class="section-num">§10</span> Performance &amp; Production</h2>
+
+    <h3>Memory Configuration</h3>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">bash</span>
+      </div>
+      <pre><code class="language-bash"># Default V8 heap: ~1.5GB. Increase for memory-intensive apps.
+node --max-old-space-size=4096 dist/index.js  # 4GB heap
+
+# In Docker/Kubernetes, set it relative to container memory limit
+# Container: 2GB → set Node heap to 1.5GB, leaving room for libuv/OS
+node --max-old-space-size=1536 dist/index.js
+
+# Expose GC metrics
+node --expose-gc dist/index.js
+</code></pre>
+    </div>
+
+    <h3>CPU Profiling</h3>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">bash</span>
+      </div>
+      <pre><code class="language-bash"># Built-in CPU profiler — generates isolate-*.log
+node --prof dist/index.js
+# Run load test...
+node --prof-process isolate-*.log > profile.txt
+
+# Better: use clinic.js for interactive flame graphs
+npx clinic flame -- node dist/index.js
+npx clinic doctor -- node dist/index.js
+
+# Or use Node's built-in inspector with Chrome DevTools
+node --inspect dist/index.js
+# Open chrome://inspect in Chrome
+</code></pre>
+    </div>
+
+    <h3>Memory Leak Detection</h3>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">typescript</span>
+        <span class="code-filename">memory-monitor.ts</span>
+      </div>
+      <pre><code class="language-typescript">import { memoryUsage } from 'process'
+
+interface MemorySnapshot {
+  heapUsed: number
+  heapTotal: number
+  external: number
+  rss: number
+  timestamp: Date
+}
+
+function captureMemory(): MemorySnapshot {
+  const mem = memoryUsage()
+  return {
+    heapUsed: Math.round(mem.heapUsed / 1024 / 1024),
+    heapTotal: Math.round(mem.heapTotal / 1024 / 1024),
+    external: Math.round(mem.external / 1024 / 1024),
+    rss: Math.round(mem.rss / 1024 / 1024),
+    timestamp: new Date(),
+  }
+}
+
+// Monitor heap every 30 seconds — alert if growing steadily
+const snapshots: MemorySnapshot[] = []
+
+setInterval(() => {
+  const snap = captureMemory()
+  snapshots.push(snap)
+  if (snapshots.length &gt; 10) snapshots.shift()
+
+  // Linear trend: if consistently growing → likely leak
+  const heapValues = snapshots.map(s => s.heapUsed)
+  const isGrowing = heapValues.every((v, i) => i === 0 || v &gt;= heapValues[i - 1])
+
+  if (isGrowing &amp;&amp; snap.heapUsed &gt; 500) {  // &gt;500MB and growing
+    console.error('Possible memory leak detected', snap)
+    // Alert to your observability platform
+  }
+}, 30_000)
+</code></pre>
+    </div>
+
+    <h3>PM2 for Process Management</h3>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">json</span>
+        <span class="code-filename">ecosystem.config.json</span>
+      </div>
+      <pre><code class="language-json">{
+  "apps": [{
+    "name": "api-server",
+    "script": "dist/index.js",
+    "instances": "max",
+    "exec_mode": "cluster",
+    "env": {
+      "NODE_ENV": "production"
+    },
+    "node_args": "--max-old-space-size=2048",
+    "max_memory_restart": "2G",
+    "exp_backoff_restart_delay": 100,
+    "log_date_format": "YYYY-MM-DD HH:mm Z",
+    "error_file": "/var/log/api/error.log",
+    "out_file": "/var/log/api/out.log"
+  }]
+}
+</code></pre>
+    </div>
+
+    <h3>Docker Deployment</h3>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">bash</span>
+        <span class="code-filename">Dockerfile</span>
+      </div>
+      <pre><code class="language-bash">FROM node:22-alpine AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --production=false
+COPY . .
+RUN npm run build
+
+FROM node:22-alpine AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+# Run as non-root user
+RUN addgroup -S appgroup &amp;&amp; adduser -S appuser -G appgroup
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package.json .
+USER appuser
+EXPOSE 3000
+CMD ["node", "--max-old-space-size=1536", "dist/index.js"]
+</code></pre>
+    </div>
+
+    <h3>Health Checks and Readiness Probes</h3>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">typescript</span>
+        <span class="code-filename">health.ts</span>
+      </div>
+      <pre><code class="language-typescript">import http from 'http'
+
+interface HealthStatus {
+  status: 'ok' | 'degraded' | 'down'
+  uptime: number
+  memory: {
+    heapUsedMB: number
+    heapTotalMB: number
+  }
+  version: string
+  checks: Record&lt;string, 'ok' | 'error'&gt;
+}
+
+async function checkDatabase(): Promise&lt;boolean&gt; {
+  try {
+    // await db.query('SELECT 1')
+    return true
+  } catch {
+    return false
+  }
+}
+
+export function createHealthRouter() {
+  return async (req: http.IncomingMessage, res: http.ServerResponse) => {
+    const mem = process.memoryUsage()
+    const dbOk = await checkDatabase()
+
+    const status: HealthStatus = {
+      status: dbOk ? 'ok' : 'degraded',
+      uptime: process.uptime(),
+      memory: {
+        heapUsedMB: Math.round(mem.heapUsed / 1024 / 1024),
+        heapTotalMB: Math.round(mem.heapTotal / 1024 / 1024),
+      },
+      version: process.env.npm_package_version ?? 'unknown',
+      checks: { database: dbOk ? 'ok' : 'error' },
+    }
+
+    res.writeHead(status.status === 'ok' ? 200 : 503, {
+      'Content-Type': 'application/json'
+    })
+    res.end(JSON.stringify(status, null, 2))
+  }
+}
+</code></pre>
+    </div>
+
+    <div class="callout perf">
+      <span class="callout-icon">⚡</span>
+      <div class="callout-body">
+        <strong>Performance — the cluster module vs worker_threads</strong>
+        <p>The <code>cluster</code> module forks the entire Node process N times, each listening on the same port — the OS distributes connections between them. This is simpler than <code>worker_threads</code> and still the standard approach for HTTP servers. Worker threads share memory (via <code>SharedArrayBuffer</code>) and are better for CPU-parallel computation. In practice: use <code>cluster</code> or PM2 cluster mode for HTTP servers, <code>worker_threads</code> for CPU-bound tasks within a server.</p>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════ §11 PYTHON COMPARISON -->
+    <h2 id="s11"><span class="section-num">§11</span> Python Comparison Table</h2>
+
+    <p>If you're coming from Python backend development, here's the full equivalence map — from frameworks down to stdlib functions.</p>
+
+    <h3>Frameworks and Ecosystem</h3>
+
+    <table class="comparison-table">
+      <thead>
+        <tr>
+          <th>Category</th>
+          <th>Python</th>
+          <th>Node.js / TypeScript</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Full-featured framework</td>
+          <td><code>Django</code></td>
+          <td><code>NestJS</code></td>
+          <td>Both: ORM, auth, admin, DI container</td>
+        </tr>
+        <tr>
+          <td>Minimal framework</td>
+          <td><code>Flask</code></td>
+          <td><code>Fastify</code>, <code>Hono</code></td>
+          <td>Hono runs on Edge/Bun/Deno too</td>
+        </tr>
+        <tr>
+          <td>Modern async framework</td>
+          <td><code>FastAPI</code></td>
+          <td><code>Hono</code> + <code>zod</code></td>
+          <td>Both: schema validation, OpenAPI generation</td>
+        </tr>
+        <tr>
+          <td>ORM</td>
+          <td><code>SQLAlchemy</code>, <code>Django ORM</code></td>
+          <td><code>Prisma</code>, <code>Drizzle</code>, <code>TypeORM</code></td>
+          <td>Prisma has best TypeScript types</td>
+        </tr>
+        <tr>
+          <td>HTTP client</td>
+          <td><code>requests</code>, <code>httpx</code></td>
+          <td>built-in <code>fetch</code>, <code>axios</code>, <code>ky</code></td>
+          <td>Native fetch in Node 18+</td>
+        </tr>
+        <tr>
+          <td>Task queue</td>
+          <td><code>Celery</code></td>
+          <td><code>BullMQ</code>, <code>Inngest</code></td>
+          <td>Both back by Redis</td>
+        </tr>
+        <tr>
+          <td>Testing</td>
+          <td><code>pytest</code></td>
+          <td><code>Vitest</code>, <code>Jest</code></td>
+          <td>Vitest is fastest, built-in TypeScript</td>
+        </tr>
+        <tr>
+          <td>Linting</td>
+          <td><code>ruff</code>, <code>flake8</code></td>
+          <td><code>ESLint</code>, <code>Biome</code></td>
+          <td>Biome = Rust-speed, replaces Prettier too</td>
+        </tr>
+        <tr>
+          <td>Package manager</td>
+          <td><code>pip</code>, <code>uv</code>, <code>poetry</code></td>
+          <td><code>npm</code>, <code>pnpm</code>, <code>bun</code></td>
+          <td>pnpm/bun are 10-100x faster than npm</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Standard Library Equivalents</h3>
+
+    <table class="comparison-table">
+      <thead>
+        <tr>
+          <th>Task</th>
+          <th>Python</th>
+          <th>Node.js / TypeScript</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Read file</td>
+          <td><code>open('f').read()</code></td>
+          <td><code>await readFile('f', 'utf-8')</code></td>
+        </tr>
+        <tr>
+          <td>Write file</td>
+          <td><code>open('f','w').write(s)</code></td>
+          <td><code>await writeFile('f', s)</code></td>
+        </tr>
+        <tr>
+          <td>Path join</td>
+          <td><code>Path('a') / 'b'</code></td>
+          <td><code>join('a', 'b')</code></td>
+        </tr>
+        <tr>
+          <td>Path dirname</td>
+          <td><code>Path(f).parent</code></td>
+          <td><code>dirname(f)</code></td>
+        </tr>
+        <tr>
+          <td>Async event loop</td>
+          <td><code>asyncio.get_event_loop()</code></td>
+          <td>Node's event loop (automatic)</td>
+        </tr>
+        <tr>
+          <td>Async task</td>
+          <td><code>asyncio.create_task()</code></td>
+          <td>Fire-and-forget <code>Promise</code></td>
+        </tr>
+        <tr>
+          <td>Gather parallel tasks</td>
+          <td><code>asyncio.gather(*tasks)</code></td>
+          <td><code>Promise.all(tasks)</code></td>
+        </tr>
+        <tr>
+          <td>Subprocess</td>
+          <td><code>subprocess.run()</code></td>
+          <td><code>execAsync()</code> / <code>execa()</code></td>
+        </tr>
+        <tr>
+          <td>Environment variable</td>
+          <td><code>os.environ['KEY']</code></td>
+          <td><code>process.env.KEY</code></td>
+        </tr>
+        <tr>
+          <td>CPU count</td>
+          <td><code>os.cpu_count()</code></td>
+          <td><code>os.cpus().length</code></td>
+        </tr>
+        <tr>
+          <td>SHA-256 hash</td>
+          <td><code>hashlib.sha256(b).hexdigest()</code></td>
+          <td><code>createHash('sha256').update(b).digest('hex')</code></td>
+        </tr>
+        <tr>
+          <td>Random bytes</td>
+          <td><code>os.urandom(32)</code></td>
+          <td><code>randomBytes(32)</code></td>
+        </tr>
+        <tr>
+          <td>Pub/sub events</td>
+          <td><code>asyncio.Queue</code>, <code>blinker</code></td>
+          <td><code>EventEmitter</code></td>
+        </tr>
+        <tr>
+          <td>Background thread</td>
+          <td><code>threading.Thread</code></td>
+          <td><code>worker_threads.Worker</code></td>
+        </tr>
+        <tr>
+          <td>Multiprocessing</td>
+          <td><code>multiprocessing.Process</code></td>
+          <td><code>cluster.fork()</code></td>
+        </tr>
+        <tr>
+          <td>Signal handling</td>
+          <td><code>signal.signal(SIGTERM, h)</code></td>
+          <td><code>process.on('SIGTERM', h)</code></td>
+        </tr>
+        <tr>
+          <td>Data validation</td>
+          <td><code>pydantic</code></td>
+          <td><code>zod</code></td>
+        </tr>
+        <tr>
+          <td>Type annotations</td>
+          <td><code>mypy</code>, <code>pyright</code></td>
+          <td><code>tsc</code> (TypeScript compiler)</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout python">
+      <span class="callout-icon">🐍</span>
+      <div class="callout-body">
+        <strong>Python Comparison — asyncio vs the event loop</strong>
+        <p>Python's <code>asyncio</code> is an explicit framework you opt into: you create an event loop, you <code>await</code> coroutines, you call <code>asyncio.run()</code>. Node's event loop is implicit — it's always running, and all async I/O flows through it automatically. This means Python lets you have both synchronous and asynchronous code patterns in the same codebase more easily; Node defaults to async everywhere and synchronous code is the explicit opt-in (the <code>Sync</code> suffix: <code>readFileSync</code>, <code>execSync</code>). In practice, write no synchronous Node code in server paths.</p>
+      </div>
+    </div>
+
+    <hr class="section-divider" />
+
+    <div class="callout ai-era">
+      <span class="callout-icon">✨</span>
+      <div class="callout-body">
+        <strong>AI Era — Node.js as the backbone of AI apps</strong>
+        <p>Node.js is the default runtime for AI-powered backends in 2025. The Vercel AI SDK, LangChain.js, the official Anthropic and OpenAI TypeScript SDKs — all built for Node (and increasingly Bun and Edge runtimes). The streaming-first architecture of the event loop makes it natural to stream LLM tokens to clients. Bun's startup speed makes it excellent for serverless functions that invoke AI APIs. The worker_threads model lets you run embedding models or ONNX inference without blocking your HTTP server. Understanding the runtime deeply — not just Express — is what separates senior engineers who build AI products that scale.</p>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ════════════════════════════════════════════ FOOTER NAV -->
+<footer class="chapter-footer">
+  <a href="chapter-10-testing.html" class="footer-nav-btn">
+    ← Ch 10: Testing
+  </a>
+  <div class="footer-chapter-info">
+    <div style="font-weight:600;margin-bottom:0.2rem;">Chapter 11 of 24</div>
+    <div>TypeScript for the AI Era</div>
+  </div>
+  <a href="chapter-12-rest-apis.html" class="footer-nav-btn primary">
+    Ch 12: REST APIs →
+  </a>
+</footer>
+
+<script>
+  // Syntax highlighting
+  document.addEventListener('DOMContentLoaded', () => {
+    hljs.highlightAll()
+
+    // Active TOC link on scroll
+    const headings = document.querySelectorAll('h2[id], h3[id]')
+    const tocLinks = document.querySelectorAll('.toc a')
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const id = entry.target.getAttribute('id')
+            tocLinks.forEach(link => {
+              link.classList.toggle('active', link.getAttribute('href') === `#${id}`)
+            })
+          }
+        })
+      },
+      { rootMargin: '-72px 0px -60% 0px', threshold: 0 }
+    )
+
+    headings.forEach(h => observer.observe(h))
+  })
+</script>
+</body>
+</html>

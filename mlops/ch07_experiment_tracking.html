@@ -1,0 +1,1854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 7: Experiment Tracking & Model Registry - Modern MLOps Tutorial</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script>hljs.highlightAll(); mermaid.initialize({startOnLoad:true, theme:'default'});</script>
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; color: #1f2937; }
+    .callout-blue  { background:#eff6ff; border-left:4px solid #2563eb; }
+    .callout-green { background:#f0fdf4; border-left:4px solid #059669; }
+    .callout-amber { background:#fffbeb; border-left:4px solid #d97706; }
+    .callout-red   { background:#fef2f2; border-left:4px solid #dc2626; }
+    pre code.hljs  { border-radius:0.5rem; font-size:0.82rem; }
+    .mermaid       { background:#fff; }
+    table          { border-collapse:collapse; width:100%; }
+    th             { background:#f3f4f6; }
+    td, th         { padding:0.6rem 0.9rem; border:1px solid #e5e7eb; font-size:0.875rem; }
+    tr:hover td    { background:#f9fafb; }
+    .section-anchor { scroll-margin-top:4rem; }
+  </style>
+</head>
+<body class="bg-gray-50">
+
+<!-- NAVBAR -->
+<nav class="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-14">
+      <a href="index.html" class="flex items-center gap-2 text-blue-600 font-semibold hover:text-blue-800">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+        Modern MLOps Tutorial
+      </a>
+      <div class="hidden md:flex items-center gap-6 text-sm text-gray-600">
+        <a href="ch06_feature_store.html" class="hover:text-blue-600">← Ch 6</a>
+        <span class="text-blue-600 font-semibold">Ch 7: Experiment Tracking</span>
+        <a href="ch08_model_serving.html" class="hover:text-blue-600">Ch 8 →</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="bg-gradient-to-br from-blue-700 to-blue-900 text-white">
+  <div class="max-w-5xl mx-auto px-6 py-16">
+    <div class="flex items-center gap-3 mb-4">
+      <span class="bg-blue-500 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Chapter 7</span>
+      <span class="text-blue-200 text-sm">~75 min read</span>
+    </div>
+    <h1 class="text-4xl md:text-5xl font-extrabold mb-4">Experiment Tracking &amp; Model Registry</h1>
+    <p class="text-blue-100 text-lg max-w-3xl">From chaos to reproducibility — logging every hyperparameter, metric, and artifact so that any result can be traced, reproduced, and promoted to production with confidence.</p>
+    <div class="mt-8 flex flex-wrap gap-2 text-sm">
+      <span class="bg-blue-600 px-3 py-1 rounded-full">MLflow</span>
+      <span class="bg-blue-600 px-3 py-1 rounded-full">Weights &amp; Biases</span>
+      <span class="bg-blue-600 px-3 py-1 rounded-full">Neptune.ai</span>
+      <span class="bg-blue-600 px-3 py-1 rounded-full">Optuna</span>
+      <span class="bg-blue-600 px-3 py-1 rounded-full">Ray Tune</span>
+      <span class="bg-blue-600 px-3 py-1 rounded-full">DVC</span>
+      <span class="bg-blue-600 px-3 py-1 rounded-full">Model Cards</span>
+    </div>
+  </div>
+</header>
+
+<!-- TABLE OF CONTENTS -->
+<div class="max-w-5xl mx-auto px-6 py-8">
+  <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+    <h2 class="text-lg font-bold text-gray-800 mb-4">Table of Contents</h2>
+    <div class="grid md:grid-cols-2 gap-1 text-sm">
+      <a href="#s1" class="flex items-center gap-2 text-blue-600 hover:underline py-1"><span class="text-gray-400">01</span> The Experiment Tracking Problem</a>
+      <a href="#s2" class="flex items-center gap-2 text-blue-600 hover:underline py-1"><span class="text-gray-400">02</span> MLflow — The Standard</a>
+      <a href="#s3" class="flex items-center gap-2 text-blue-600 hover:underline py-1"><span class="text-gray-400">03</span> MLflow Projects</a>
+      <a href="#s4" class="flex items-center gap-2 text-blue-600 hover:underline py-1"><span class="text-gray-400">04</span> MLflow Model Registry</a>
+      <a href="#s5" class="flex items-center gap-2 text-blue-600 hover:underline py-1"><span class="text-gray-400">05</span> Weights &amp; Biases (W&amp;B)</a>
+      <a href="#s6" class="flex items-center gap-2 text-blue-600 hover:underline py-1"><span class="text-gray-400">06</span> Neptune.ai</a>
+      <a href="#s7" class="flex items-center gap-2 text-blue-600 hover:underline py-1"><span class="text-gray-400">07</span> Hyperparameter Optimization</a>
+      <a href="#s8" class="flex items-center gap-2 text-blue-600 hover:underline py-1"><span class="text-gray-400">08</span> Model Versioning Deep Dive</a>
+      <a href="#s9" class="flex items-center gap-2 text-blue-600 hover:underline py-1"><span class="text-gray-400">09</span> The Model Registry as a Hub</a>
+      <a href="#s10" class="flex items-center gap-2 text-blue-600 hover:underline py-1"><span class="text-gray-400">10</span> Evaluation &amp; Model Selection</a>
+      <a href="#s11" class="flex items-center gap-2 text-blue-600 hover:underline py-1"><span class="text-gray-400">11</span> Reproducibility Best Practices</a>
+      <a href="#takeaways" class="flex items-center gap-2 text-blue-600 hover:underline py-1"><span class="text-gray-400">--</span> Key Takeaways</a>
+    </div>
+  </div>
+</div>
+
+<main class="max-w-5xl mx-auto px-6 pb-20 space-y-20">
+
+<!-- ============================================================ -->
+<!-- SECTION 1 -->
+<!-- ============================================================ -->
+<section id="s1" class="section-anchor">
+  <div class="flex items-center gap-3 mb-6">
+    <span class="bg-blue-100 text-blue-700 font-bold text-sm px-3 py-1 rounded-full">Section 1</span>
+    <h2 class="text-2xl font-bold text-gray-900">The Experiment Tracking Problem</h2>
+  </div>
+
+  <p class="text-gray-700 leading-relaxed mb-6">Every ML practitioner has lived the nightmare: a model in production is degrading, someone asks "what hyperparameters did we use for that version?", and the answer is a Slack search through six months of messages, a pile of Jupyter notebooks named <code>model_final_v3_ACTUALLY_FINAL.ipynb</code>, and a shared Google Sheet that three people edited and nobody trusts. Experiment tracking exists to eliminate this category of pain entirely.</p>
+
+  <h3 class="text-xl font-semibold text-gray-800 mt-8 mb-3">Why Tracking Matters</h3>
+  <div class="grid md:grid-cols-3 gap-4 mb-8">
+    <div class="bg-white border border-gray-200 rounded-lg p-5 shadow-sm">
+      <div class="text-blue-600 font-bold text-lg mb-2">Reproducibility</div>
+      <p class="text-gray-600 text-sm">Recreate any result exactly — same data version, same code, same environment, same random seeds. Reviewers, auditors, and your future self can re-run any experiment.</p>
+    </div>
+    <div class="bg-white border border-gray-200 rounded-lg p-5 shadow-sm">
+      <div class="text-green-600 font-bold text-lg mb-2">Collaboration</div>
+      <p class="text-gray-600 text-sm">Multiple researchers can explore the same problem in parallel. A shared experiment store surfaces what has already been tried and prevents duplicate work.</p>
+    </div>
+    <div class="bg-white border border-gray-200 rounded-lg p-5 shadow-sm">
+      <div class="text-amber-600 font-bold text-lg mb-2">Debugging</div>
+      <p class="text-gray-600 text-sm">When a production model regresses, you need the exact training run artifacts: loss curves, dataset hash, preprocessing config, hardware spec. Without tracking, debugging is archaeology.</p>
+    </div>
+  </div>
+
+  <h3 class="text-xl font-semibold text-gray-800 mb-3">What Needs to Be Tracked</h3>
+  <div class="overflow-x-auto mb-8">
+    <table>
+      <thead>
+        <tr><th>Category</th><th>Examples</th><th>Why It Matters</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Hyperparameters</strong></td><td>learning_rate, batch_size, layers, dropout</td><td>Defines the experiment; must be logged before training starts</td></tr>
+        <tr><td><strong>Metrics</strong></td><td>loss, accuracy, F1, AUC, BLEU</td><td>Quantifies outcome; should be logged per-step and per-epoch</td></tr>
+        <tr><td><strong>Artifacts</strong></td><td>model weights, tokenizers, plots, confusion matrices</td><td>Enables deployment and offline analysis</td></tr>
+        <tr><td><strong>Environment</strong></td><td>Python version, CUDA, library versions, hardware</td><td>Reproducibility; subtle bugs from version mismatches</td></tr>
+        <tr><td><strong>Code</strong></td><td>Git commit hash, diff, source snapshot</td><td>Ties result back to exact code; CI/CD gating</td></tr>
+        <tr><td><strong>Data</strong></td><td>Dataset version, split hashes, DVC tag</td><td>Model is only as reproducible as the data it saw</td></tr>
+        <tr><td><strong>System</strong></td><td>CPU/GPU utilization, memory, training time</td><td>Cost attribution, capacity planning</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout-amber rounded-lg p-5 mb-8">
+    <p class="font-semibold text-amber-800 mb-1">The Chaos Without Tracking</p>
+    <p class="text-amber-900 text-sm">A 2022 survey of 500 ML practitioners found that 73% could not reliably reproduce their own results from three months prior. The primary causes: no parameter logging (61%), no dataset versioning (54%), ad-hoc notebook naming (48%). Experiment tracking is not optional — it is the foundation every other MLOps practice builds on.</p>
+  </div>
+
+  <h3 class="text-xl font-semibold text-gray-800 mb-4">ML Experiment Lifecycle</h3>
+  <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+    <div class="mermaid">
+flowchart TD
+    A([Idea / Hypothesis]) --> B[Data Preparation]
+    B --> C[Feature Engineering]
+    C --> D[Model Architecture Design]
+    D --> E[Training Run]
+    E --> F{Metrics OK?}
+    F -- No --> G[Adjust HP / Architecture]
+    G --> D
+    F -- Yes --> H[Evaluation on Hold-out]
+    H --> I{Business Criteria Met?}
+    I -- No --> J[Review Data / Labels]
+    J --> B
+    I -- Yes --> K[Register in Model Registry]
+    K --> L[Staging Deployment]
+    L --> M[A/B / Shadow Test]
+    M --> N([Production Promotion])
+
+    style A fill:#dbeafe,stroke:#2563eb
+    style N fill:#d1fae5,stroke:#059669
+    style K fill:#fef3c7,stroke:#d97706
+
+    subgraph "Track at Each Stage"
+      direction LR
+      T1[data hash + version]
+      T2[feature config + transforms]
+      T3[arch + HP snapshot]
+      T4[loss curves + system metrics]
+      T5[eval metrics + artifacts]
+      T6[registry metadata + lineage]
+    end
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 2 -->
+<!-- ============================================================ -->
+<section id="s2" class="section-anchor">
+  <div class="flex items-center gap-3 mb-6">
+    <span class="bg-blue-100 text-blue-700 font-bold text-sm px-3 py-1 rounded-full">Section 2</span>
+    <h2 class="text-2xl font-bold text-gray-900">MLflow — The Standard</h2>
+  </div>
+
+  <p class="text-gray-700 leading-relaxed mb-6">MLflow is the de-facto open-source standard for experiment tracking. Originally released by Databricks in 2018, it has grown into a four-component platform covering the full lifecycle from experiment logging to model deployment. Its greatest strength is framework-agnosticism — it works with scikit-learn, PyTorch, TensorFlow, XGBoost, Spark, and dozens more through a consistent API.</p>
+
+  <h3 class="text-xl font-semibold text-gray-800 mb-4">MLflow Architecture</h3>
+  <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm mb-8">
+    <div class="mermaid">
+graph LR
+    subgraph "MLflow Components"
+      TR[Tracking\nServer]
+      PR[Projects]
+      MO[Models]
+      RE[Registry]
+    end
+    subgraph "Storage Backend"
+      DB[(PostgreSQL /\nSQLite)]
+      ART[(S3 / GCS /\nAzure Blob)]
+    end
+    subgraph "Clients"
+      PY[Python SDK]
+      REST[REST API]
+      UI[Web UI\n:5000]
+    end
+    PY -->|log params/metrics/artifacts| TR
+    REST --> TR
+    UI --> TR
+    TR --> DB
+    TR --> ART
+    PR -->|defines env + entrypoints| TR
+    MO -->|flavors: sklearn / pyfunc / onnx| ART
+    RE -->|stages: None→Staging→Production| DB
+    </div>
+  </div>
+
+  <h3 class="text-xl font-semibold text-gray-800 mb-3">Installation and Setup</h3>
+  <pre><code class="language-bash"># Local installation
+pip install mlflow
+
+# With extras for common frameworks
+pip install "mlflow[extras]"
+
+# Start the local UI (stores data in ./mlruns)
+mlflow ui --port 5000
+
+# Start with explicit backend + artifact store
+mlflow server \
+  --backend-store-uri postgresql://user:pass@localhost/mlflow \
+  --default-artifact-root s3://my-bucket/mlflow-artifacts \
+  --host 0.0.0.0 \
+  --port 5000</code></pre>
+
+  <h3 class="text-xl font-semibold text-gray-800 mt-8 mb-3">Code Example 1: MLflow Tracking Basics</h3>
+  <pre><code class="language-python">import mlflow
+import mlflow.sklearn
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.datasets import load_breast_cancer
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score, roc_auc_score, f1_score
+import numpy as np
+
+# Point to your tracking server (defaults to ./mlruns locally)
+mlflow.set_tracking_uri("http://localhost:5000")
+
+# Experiments group related runs
+mlflow.set_experiment("breast-cancer-classification")
+
+# Load data
+X, y = load_breast_cancer(return_X_y=True)
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y
+)
+
+# Hyperparameters we want to explore
+params = {
+    "n_estimators": 200,
+    "max_depth": 8,
+    "min_samples_split": 4,
+    "random_state": 42,
+}
+
+with mlflow.start_run(run_name="rf-baseline") as run:
+    # ---- Log hyperparameters ----
+    mlflow.log_params(params)
+
+    # Also log dataset metadata (not the data itself, just descriptors)
+    mlflow.set_tag("dataset", "breast_cancer_sklearn")
+    mlflow.set_tag("git_commit", "abc123")  # use subprocess to get real hash
+    mlflow.set_tag("author", "ml-team")
+
+    # ---- Train ----
+    model = RandomForestClassifier(**params)
+    model.fit(X_train, y_train)
+
+    # ---- Evaluate ----
+    y_pred = model.predict(X_test)
+    y_prob = model.predict_proba(X_test)[:, 1]
+
+    acc   = accuracy_score(y_test, y_pred)
+    auc   = roc_auc_score(y_test, y_prob)
+    f1    = f1_score(y_test, y_pred)
+
+    # ---- Log scalar metrics ----
+    mlflow.log_metric("accuracy", acc)
+    mlflow.log_metric("roc_auc",  auc)
+    mlflow.log_metric("f1_score", f1)
+
+    # ---- Log step-wise metrics (e.g., simulated training curve) ----
+    for step, oob_score in enumerate(
+        np.linspace(0.80, acc, num=params["n_estimators"])
+    ):
+        mlflow.log_metric("oob_score", oob_score, step=step)
+
+    # ---- Log the model itself ----
+    mlflow.sklearn.log_model(
+        sk_model=model,
+        artifact_path="model",
+        registered_model_name="breast-cancer-rf",  # auto-register
+        input_example=X_test[:5],
+        signature=mlflow.models.infer_signature(X_train, y_pred),
+    )
+
+    # ---- Log arbitrary artifacts ----
+    import matplotlib.pyplot as plt
+    from sklearn.metrics import ConfusionMatrixDisplay
+    fig, ax = plt.subplots(figsize=(5, 4))
+    ConfusionMatrixDisplay.from_predictions(y_test, y_pred, ax=ax)
+    fig.savefig("/tmp/confusion_matrix.png", dpi=150, bbox_inches="tight")
+    mlflow.log_artifact("/tmp/confusion_matrix.png", artifact_path="plots")
+
+    print(f"Run ID : {run.info.run_id}")
+    print(f"Accuracy: {acc:.4f}  AUC: {auc:.4f}  F1: {f1:.4f}")</code></pre>
+
+  <h3 class="text-xl font-semibold text-gray-800 mt-8 mb-3">Code Example 2: Auto-logging</h3>
+  <pre><code class="language-python">import mlflow
+import mlflow.pytorch
+import torch
+import torch.nn as nn
+from torch.utils.data import DataLoader, TensorDataset
+
+mlflow.set_tracking_uri("http://localhost:5000")
+mlflow.set_experiment("pytorch-autolog-demo")
+
+# Enable autologging BEFORE training — captures optimizer, loss,
+# gradients, model summary, requirements.txt automatically
+mlflow.pytorch.autolog(
+    log_every_n_epoch=1,
+    log_every_n_step=50,
+    log_models=True,
+    disable=False,
+    exclusive=False,
+    disable_for_unsupported_versions=False,
+    silent=False,
+)
+
+class SimpleNet(nn.Module):
+    def __init__(self, in_features: int, hidden: int, out_features: int):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Linear(in_features, hidden),
+            nn.ReLU(),
+            nn.Dropout(0.2),
+            nn.Linear(hidden, out_features),
+        )
+    def forward(self, x):
+        return self.net(x)
+
+# Synthetic regression data
+X = torch.randn(1000, 20)
+y = torch.randn(1000, 1)
+dataset = TensorDataset(X, y)
+loader  = DataLoader(dataset, batch_size=64, shuffle=True)
+
+model     = SimpleNet(20, 128, 1)
+optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
+criterion = nn.MSELoss()
+
+with mlflow.start_run(run_name="simple-net-autolog"):
+    # autolog intercepts PyTorch Lightning or manual loops equally
+    for epoch in range(10):
+        epoch_loss = 0.0
+        for xb, yb in loader:
+            optimizer.zero_grad()
+            loss = criterion(model(xb), yb)
+            loss.backward()
+            optimizer.step()
+            epoch_loss += loss.item()
+        avg = epoch_loss / len(loader)
+        # autolog captures these automatically if using Lightning;
+        # for plain PyTorch log explicitly:
+        mlflow.log_metric("train_loss", avg, step=epoch)
+    print("Training complete — check MLflow UI for logged data")</code></pre>
+
+  <h3 class="text-xl font-semibold text-gray-800 mt-8 mb-3">Code Example 3: Nested Runs for Hyperparameter Search</h3>
+  <pre><code class="language-python">import mlflow
+from itertools import product
+
+mlflow.set_tracking_uri("http://localhost:5000")
+mlflow.set_experiment("hp-search-nested")
+
+learning_rates = [1e-3, 5e-4, 1e-4]
+batch_sizes    = [32, 64, 128]
+
+# Parent run holds the overall search context
+with mlflow.start_run(run_name="grid-search-parent") as parent:
+    mlflow.log_param("search_strategy", "grid")
+    mlflow.log_param("total_combinations", len(learning_rates) * len(batch_sizes))
+
+    best_val_loss = float("inf")
+    best_run_id   = None
+
+    for lr, bs in product(learning_rates, batch_sizes):
+        # Each child run is a single HP configuration
+        with mlflow.start_run(
+            run_name=f"lr={lr}_bs={bs}",
+            nested=True,          # <-- key flag
+        ) as child:
+            mlflow.log_params({"learning_rate": lr, "batch_size": bs})
+
+            # Simulate training — replace with real training loop
+            import random; random.seed(hash((lr, bs)))
+            val_loss = random.uniform(0.1, 0.8) - lr * 100
+            mlflow.log_metric("val_loss", val_loss)
+
+            if val_loss < best_val_loss:
+                best_val_loss = val_loss
+                best_run_id   = child.info.run_id
+
+    mlflow.log_metric("best_val_loss", best_val_loss)
+    mlflow.log_param("best_child_run_id", best_run_id)
+    print(f"Best run: {best_run_id}  val_loss={best_val_loss:.4f}")</code></pre>
+
+  <h3 class="text-xl font-semibold text-gray-800 mt-8 mb-3">Code Example 4: MLflow Server with Docker Compose</h3>
+  <pre><code class="language-yaml"># docker-compose.yml — production MLflow deployment
+version: "3.9"
+
+services:
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER:     mlflow
+      POSTGRES_PASSWORD: mlflow_secret
+      POSTGRES_DB:       mlflow
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mlflow"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER:     minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    volumes:
+      - miniodata:/data
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+
+  mlflow:
+    image: python:3.11-slim
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      MLFLOW_S3_ENDPOINT_URL:    http://minio:9000
+      AWS_ACCESS_KEY_ID:         minioadmin
+      AWS_SECRET_ACCESS_KEY:     minioadmin
+    command: >
+      bash -c "
+        pip install mlflow psycopg2-binary boto3 --quiet &&
+        mlflow server
+          --backend-store-uri postgresql://mlflow:mlflow_secret@db/mlflow
+          --default-artifact-root s3://mlflow/artifacts
+          --host 0.0.0.0
+          --port 5000
+          --workers 4
+      "
+    ports:
+      - "5000:5000"
+
+volumes:
+  pgdata:
+  miniodata:</code></pre>
+
+  <div class="callout-blue rounded-lg p-5 mt-6">
+    <p class="font-semibold text-blue-800 mb-2">MLflow UI Walkthrough</p>
+    <p class="text-blue-900 text-sm mb-2">After running <code>mlflow ui</code> or connecting to your server at port 5000, the interface provides: <strong>Experiments</strong> (left sidebar) — groups of related runs. <strong>Runs table</strong> — sortable by any logged metric; supports column selection and filtering. <strong>Run detail</strong> — parameters, metrics (with interactive charts), artifacts browser, model signature. <strong>Compare view</strong> — side-by-side parallel coordinates plot for HP search. <strong>Model Registry</strong> tab — version history, stage transitions, aliases, and annotations.</p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 3 -->
+<!-- ============================================================ -->
+<section id="s3" class="section-anchor">
+  <div class="flex items-center gap-3 mb-6">
+    <span class="bg-blue-100 text-blue-700 font-bold text-sm px-3 py-1 rounded-full">Section 3</span>
+    <h2 class="text-2xl font-bold text-gray-900">MLflow Projects</h2>
+  </div>
+
+  <p class="text-gray-700 leading-relaxed mb-6">An MLflow Project packages your code, its dependencies, and its entry points into a single portable unit. Anyone with <code>mlflow run</code> can reproduce your exact training pipeline without reading a README or manually installing libraries. Projects are the bridge between experiment logging and CI/CD-driven retraining.</p>
+
+  <h3 class="text-xl font-semibold text-gray-800 mb-3">Code Example 5: MLproject File</h3>
+  <pre><code class="language-yaml"># MLproject — place in your repo root
+name: credit-risk-model
+
+# --- Environment: choose conda, docker, or python_env ---
+conda_env: conda.yaml   # OR docker_env below
+
+# docker_env:
+#   image: my-registry/ml-base:3.11-cuda12
+#   volumes: ["/data:/data"]
+#   environment:
+#     - MLFLOW_TRACKING_URI
+#     - AWS_ACCESS_KEY_ID
+#     - AWS_SECRET_ACCESS_KEY
+
+entry_points:
+  # Default entry point for training
+  train:
+    parameters:
+      learning_rate:
+        type: float
+        default: 0.001
+      max_depth:
+        type: int
+        default: 6
+      n_estimators:
+        type: int
+        default: 100
+      data_path:
+        type: str
+        default: "data/train.parquet"
+    command: >
+      python src/train.py
+        --lr {learning_rate}
+        --max-depth {max_depth}
+        --n-estimators {n_estimators}
+        --data-path {data_path}
+
+  # Separate evaluation entry point
+  evaluate:
+    parameters:
+      run_id:
+        type: str
+      test_path:
+        type: str
+        default: "data/test.parquet"
+    command: >
+      python src/evaluate.py
+        --run-id {run_id}
+        --test-path {test_path}
+
+  # Multi-step workflow
+  full_pipeline:
+    parameters:
+      data_path: {type: str, default: "data/raw.parquet"}
+    command: "python src/pipeline.py --data-path {data_path}"</code></pre>
+
+  <pre><code class="language-yaml"># conda.yaml
+name: credit-risk
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.11
+  - pip
+  - pip:
+    - mlflow==2.11.0
+    - scikit-learn==1.4.1
+    - pandas==2.2.1
+    - xgboost==2.0.3
+    - boto3==1.34.0</code></pre>
+
+  <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">Code Example 6: Running MLflow Projects</h3>
+  <pre><code class="language-bash"># Run from a local directory
+mlflow run . -P learning_rate=0.005 -P n_estimators=200
+
+# Run from a Git repository (SHA pinned for reproducibility)
+mlflow run https://github.com/org/credit-risk#abc123 \
+  -P learning_rate=0.005 \
+  --experiment-name "credit-risk-production"
+
+# Run with Docker environment instead of conda
+mlflow run . --docker-args '{"gpus": "all"}' \
+  -P learning_rate=0.001
+
+# Run from Python (useful for orchestrators like Airflow/Prefect)
+import mlflow
+
+run = mlflow.projects.run(
+    uri="https://github.com/org/credit-risk",
+    version="v1.3.0",
+    entry_point="train",
+    parameters={"learning_rate": 0.005, "max_depth": 8},
+    experiment_name="credit-risk-ci",
+    backend="local",           # or "databricks", "kubernetes"
+    synchronous=True,
+)
+print(f"Training run ID: {run.run_id}")</code></pre>
+
+  <pre><code class="language-python"># src/pipeline.py — multi-step workflow using mlflow.projects.run
+import mlflow
+
+def run_pipeline(data_path: str, experiment_name: str = "pipeline-run"):
+    mlflow.set_experiment(experiment_name)
+
+    with mlflow.start_run(run_name="full-pipeline") as parent_run:
+        # Step 1: train
+        train_run = mlflow.projects.run(
+            uri=".",
+            entry_point="train",
+            parameters={"data_path": data_path, "learning_rate": 1e-3},
+            run_id=None,
+            experiment_id=parent_run.info.experiment_id,
+            synchronous=True,
+        )
+        mlflow.log_param("train_run_id", train_run.run_id)
+
+        # Step 2: evaluate using output of step 1
+        eval_run = mlflow.projects.run(
+            uri=".",
+            entry_point="evaluate",
+            parameters={
+                "run_id": train_run.run_id,
+                "test_path": data_path.replace("train", "test"),
+            },
+            experiment_id=parent_run.info.experiment_id,
+            synchronous=True,
+        )
+        mlflow.log_param("eval_run_id", eval_run.run_id)
+        print("Pipeline complete.")
+
+if __name__ == "__main__":
+    run_pipeline("data/train.parquet")</code></pre>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 4 -->
+<!-- ============================================================ -->
+<section id="s4" class="section-anchor">
+  <div class="flex items-center gap-3 mb-6">
+    <span class="bg-blue-100 text-blue-700 font-bold text-sm px-3 py-1 rounded-full">Section 4</span>
+    <h2 class="text-2xl font-bold text-gray-900">MLflow Model Registry</h2>
+  </div>
+
+  <p class="text-gray-700 leading-relaxed mb-6">The Model Registry is a centralized catalog of versioned models with lifecycle management. Every model that might go to production should be registered. The registry is not a deployment system — it is a gating system that forces explicit promotion decisions and provides an auditable history of what ran in production and when.</p>
+
+  <h3 class="text-xl font-semibold text-gray-800 mb-3">Registration Workflow</h3>
+  <div class="overflow-x-auto mb-6">
+    <table>
+      <thead><tr><th>Stage</th><th>Meaning</th><th>Who sets it</th><th>Typical action</th></tr></thead>
+      <tbody>
+        <tr><td><code>None</code></td><td>Freshly registered, untested</td><td>Automated (CI)</td><td>Run offline evaluation suite</td></tr>
+        <tr><td><code>Staging</code></td><td>Passed eval, candidate for production</td><td>CI/CD gate</td><td>Shadow traffic test, load test</td></tr>
+        <tr><td><code>Production</code></td><td>Live, serving real traffic</td><td>ML team lead / automated</td><td>Monitor for drift</td></tr>
+        <tr><td><code>Archived</code></td><td>Superseded or retired</td><td>Automated on promotion of successor</td><td>Keep for audit / rollback</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 class="text-xl font-semibold text-gray-800 mb-3">Code Example 7: Register and Manage Models</h3>
+  <pre><code class="language-python">import mlflow
+from mlflow.tracking import MlflowClient
+
+client = MlflowClient(tracking_uri="http://localhost:5000")
+MODEL_NAME = "breast-cancer-rf"
+
+# ---- Option A: register during training (shown in Section 2) ----
+# mlflow.sklearn.log_model(..., registered_model_name=MODEL_NAME)
+
+# ---- Option B: register an existing run after the fact ----
+run_id  = "YOUR_RUN_ID_HERE"
+version = mlflow.register_model(
+    model_uri=f"runs:/{run_id}/model",
+    name=MODEL_NAME,
+)
+print(f"Registered as version {version.version}")
+
+# ---- Add descriptive tags and alias ----
+client.set_registered_model_tag(MODEL_NAME, "team", "ds-squad")
+client.set_model_version_tag(MODEL_NAME, version.version, "trained_on", "2026-04")
+
+# MLflow 2.x aliases replace deprecated stage strings
+client.set_registered_model_alias(MODEL_NAME, "challenger", version.version)
+
+# ---- Transition to Staging (legacy API, still supported) ----
+client.transition_model_version_stage(
+    name=MODEL_NAME,
+    version=version.version,
+    stage="Staging",
+    archive_existing_versions=False,
+)
+
+# ---- Search registry ----
+for mv in client.search_model_versions(f"name='{MODEL_NAME}'"):
+    print(f"  v{mv.version}  stage={mv.current_stage}  "
+          f"aliases={mv.aliases}  run={mv.run_id[:8]}")</code></pre>
+
+  <h3 class="text-xl font-semibold text-gray-800 mt-8 mb-3">Code Example 8: Load Model from Registry for Serving</h3>
+  <pre><code class="language-python">import mlflow
+import mlflow.pyfunc
+import pandas as pd
+
+TRACKING_URI = "http://localhost:5000"
+MODEL_NAME   = "breast-cancer-rf"
+
+mlflow.set_tracking_uri(TRACKING_URI)
+
+# ---- Load by stage ----
+model_stage = mlflow.pyfunc.load_model(
+    model_uri=f"models:/{MODEL_NAME}/Production"
+)
+
+# ---- Load by alias (preferred in MLflow 2.x) ----
+model_champion = mlflow.pyfunc.load_model(
+    model_uri=f"models:/{MODEL_NAME}@champion"
+)
+
+# ---- Load specific version ----
+model_v3 = mlflow.sklearn.load_model(
+    model_uri=f"models:/{MODEL_NAME}/3"
+)
+
+# Use pyfunc for framework-agnostic serving
+features = pd.DataFrame(
+    data=[[17.99, 10.38, 122.80, 1001.0] + [0.0] * 26],
+    columns=[f"feat_{i}" for i in range(30)],
+)
+prediction = model_champion.predict(features)
+print(prediction)</code></pre>
+
+  <h3 class="text-xl font-semibold text-gray-800 mt-8 mb-3">Code Example 9: Automated Model Promotion Pipeline</h3>
+  <pre><code class="language-python">"""
+Automated promotion: runs evaluation suite, promotes to Production
+if metrics pass thresholds, archives the previous Production version.
+Designed to run as a CI/CD step after every model registration.
+"""
+import mlflow
+from mlflow.tracking import MlflowClient
+from sklearn.metrics import roc_auc_score
+import numpy as np
+
+TRACKING_URI = "http://localhost:5000"
+MODEL_NAME   = "breast-cancer-rf"
+
+# Thresholds that must be met for promotion
+PROMOTION_THRESHOLDS = {
+    "roc_auc":  0.95,
+    "accuracy": 0.92,
+    "f1_score": 0.91,
+}
+
+def evaluate_model(model_uri: str, X_test, y_test) -> dict[str, float]:
+    """Run evaluation and return metrics dict."""
+    from sklearn.metrics import accuracy_score, f1_score
+    model  = mlflow.sklearn.load_model(model_uri)
+    y_pred = model.predict(X_test)
+    y_prob = model.predict_proba(X_test)[:, 1]
+    return {
+        "accuracy": accuracy_score(y_test, y_pred),
+        "f1_score": f1_score(y_test, y_pred),
+        "roc_auc":  roc_auc_score(y_test, y_prob),
+    }
+
+def promote_if_ready(version: str, X_test, y_test) -> bool:
+    client = MlflowClient(tracking_uri=TRACKING_URI)
+    uri    = f"models:/{MODEL_NAME}/{version}"
+
+    print(f"Evaluating {MODEL_NAME} v{version}...")
+    metrics = evaluate_model(uri, X_test, y_test)
+
+    # Check all thresholds
+    passed = all(
+        metrics[k] >= v for k, v in PROMOTION_THRESHOLDS.items()
+    )
+
+    # Log eval results back to the originating run
+    mv       = client.get_model_version(MODEL_NAME, version)
+    run_id   = mv.run_id
+    with mlflow.start_run(run_id=run_id):
+        for k, v in metrics.items():
+            mlflow.log_metric(f"ci_eval_{k}", v)
+        mlflow.set_tag("promotion_status", "passed" if passed else "failed")
+
+    if passed:
+        # Archive existing Production
+        for mv in client.get_latest_versions(MODEL_NAME, stages=["Production"]):
+            client.transition_model_version_stage(
+                MODEL_NAME, mv.version, "Archived"
+            )
+
+        # Promote the new version
+        client.transition_model_version_stage(
+            MODEL_NAME, version, "Production", archive_existing_versions=False
+        )
+        client.set_registered_model_alias(MODEL_NAME, "champion", version)
+        print(f"Promoted {MODEL_NAME} v{version} to Production")
+        return True
+    else:
+        print(f"Promotion FAILED. Metrics: {metrics}")
+        return False
+
+# Example usage in CI
+if __name__ == "__main__":
+    from sklearn.datasets import load_breast_cancer
+    from sklearn.model_selection import train_test_split
+    X, y = load_breast_cancer(return_X_y=True)
+    _, X_test, _, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+    NEW_VERSION = "3"  # version just registered by training job
+    mlflow.set_tracking_uri(TRACKING_URI)
+    promote_if_ready(NEW_VERSION, X_test, y_test)</code></pre>
+
+  <div class="callout-green rounded-lg p-5 mt-6">
+    <p class="font-semibold text-green-800 mb-1">Registry Webhook Integration</p>
+    <p class="text-green-900 text-sm">MLflow Registry supports webhooks (HTTP callbacks) on events like <code>MODEL_VERSION_CREATED</code>, <code>TRANSITION_REQUEST_CREATED</code>, <code>MODEL_VERSION_TRANSITIONED_STAGE</code>. Use them to trigger Slack notifications, CI pipelines, or evaluation jobs: <code>mlflow.tracking.MlflowClient().create_registry_webhook(events=[...], http_url_spec=HttpUrlSpec(url="https://ci.example.com/trigger", ...))</code>. On Databricks, webhooks can trigger jobs directly via the Jobs API.</p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 5 -->
+<!-- ============================================================ -->
+<section id="s5" class="section-anchor">
+  <div class="flex items-center gap-3 mb-6">
+    <span class="bg-green-100 text-green-700 font-bold text-sm px-3 py-1 rounded-full">Section 5</span>
+    <h2 class="text-2xl font-bold text-gray-900">Weights &amp; Biases (W&amp;B)</h2>
+  </div>
+
+  <p class="text-gray-700 leading-relaxed mb-6">Weights &amp; Biases started as a tool for deep learning practitioners who needed richer experiment visualization than MLflow offered — interactive media logging, real-time collaboration, and built-in hyperparameter sweeps. It is now a full MLOps platform with artifacts, model registry, tables, reports, and an LLM-specific observability layer. The free tier is generous and the enterprise offering is widely used at organizations running thousands of GPU hours per day.</p>
+
+  <h3 class="text-xl font-semibold text-gray-800 mb-3">Code Example 10: W&amp;B Core API</h3>
+  <pre><code class="language-python">import wandb
+import torch
+import torch.nn as nn
+from torch.utils.data import DataLoader, TensorDataset
+
+# Initialize — creates a run on wandb.ai (or self-hosted server)
+run = wandb.init(
+    project="image-classifier",
+    name="resnet50-baseline",
+    group="experiment-set-A",          # groups related runs
+    job_type="training",
+    tags=["resnet", "imagenet", "v2"],
+    config={                            # hyperparameters
+        "architecture":  "resnet50",
+        "learning_rate": 1e-3,
+        "batch_size":    128,
+        "epochs":        30,
+        "optimizer":     "AdamW",
+        "weight_decay":  1e-4,
+        "augmentation":  "randaugment",
+    },
+    notes="Baseline with RandAugment, testing LR schedule",
+)
+
+# Access config (useful when sweeps override values)
+cfg = wandb.config
+
+# Synthetic model and data for demonstration
+model     = nn.Sequential(nn.Linear(512, 256), nn.ReLU(), nn.Linear(256, 10))
+optimizer = torch.optim.AdamW(
+    model.parameters(), lr=cfg.learning_rate, weight_decay=cfg.weight_decay
+)
+criterion = nn.CrossEntropyLoss()
+X = torch.randn(1000, 512); y = torch.randint(0, 10, (1000,))
+loader = DataLoader(TensorDataset(X, y), batch_size=cfg.batch_size, shuffle=True)
+
+# Watch model — logs gradients and parameter histograms
+wandb.watch(model, criterion, log="all", log_freq=50)
+
+for epoch in range(cfg.epochs):
+    epoch_loss, correct, total = 0.0, 0, 0
+    for xb, yb in loader:
+        optimizer.zero_grad()
+        logits = model(xb)
+        loss   = criterion(logits, yb)
+        loss.backward()
+        optimizer.step()
+        epoch_loss += loss.item()
+        correct    += (logits.argmax(1) == yb).sum().item()
+        total      += len(yb)
+
+    # Log a dict — every key becomes a tracked metric
+    wandb.log({
+        "epoch":      epoch,
+        "train/loss": epoch_loss / len(loader),
+        "train/acc":  correct / total,
+        "lr":         optimizer.param_groups[0]["lr"],
+    }, step=epoch)
+
+    # Log media — images, audio, video, 3D point clouds
+    if epoch % 5 == 0:
+        wandb.log({
+            "sample_predictions": wandb.Image(
+                torch.zeros(3, 64, 64),   # replace with real image tensor
+                caption=f"epoch {epoch}",
+            )
+        })
+
+# Save model as a W&B artifact (see below)
+wandb.finish()
+print(f"Run URL: {run.url}")</code></pre>
+
+  <h3 class="text-xl font-semibold text-gray-800 mt-8 mb-3">Code Example 11: W&amp;B Artifacts</h3>
+  <pre><code class="language-python">import wandb
+import os
+
+# ---- Producer: log a dataset artifact ----
+with wandb.init(project="data-pipeline", job_type="data-prep") as run:
+    artifact = wandb.Artifact(
+        name="cancer-dataset",
+        type="dataset",
+        description="Breast cancer sklearn dataset, stratified 80/20 split",
+        metadata={"source": "sklearn", "n_samples": 569, "n_features": 30},
+    )
+    artifact.add_file("data/train.csv", name="train.csv")
+    artifact.add_file("data/test.csv",  name="test.csv")
+    run.log_artifact(artifact)
+    print(f"Artifact version: {artifact.version}")
+
+# ---- Consumer: use dataset artifact in training ----
+with wandb.init(project="image-classifier", job_type="training") as run:
+    # Declare artifact as input — creates lineage graph automatically
+    data_artifact = run.use_artifact("cancer-dataset:latest", type="dataset")
+    data_dir = data_artifact.download(root="./artifacts/data")
+
+    # --- train model ... ---
+
+    # Log model artifact
+    model_artifact = wandb.Artifact(
+        name="cancer-classifier",
+        type="model",
+        metadata={"val_auc": 0.972, "framework": "sklearn"},
+    )
+    import joblib
+    from sklearn.ensemble import RandomForestClassifier
+    clf = RandomForestClassifier(n_estimators=100, random_state=42)
+    joblib.dump(clf, "model.pkl")
+    model_artifact.add_file("model.pkl")
+    run.log_artifact(model_artifact)
+
+# ---- Retrieve a specific artifact version ----
+api = wandb.Api()
+artifact = api.artifact("my-entity/image-classifier/cancer-classifier:v2")
+artifact.download(root="./downloaded_model")</code></pre>
+
+  <h3 class="text-xl font-semibold text-gray-800 mt-8 mb-3">Code Example 12: W&amp;B Sweeps (Bayesian HPO)</h3>
+  <pre><code class="language-python">import wandb
+import torch
+import torch.nn as nn
+
+# ---- 1. Define sweep configuration ----
+sweep_config = {
+    "method": "bayes",          # "grid" | "random" | "bayes"
+    "metric": {"name": "val/loss", "goal": "minimize"},
+    "early_terminate": {
+        "type": "hyperband",
+        "s": 2, "eta": 3, "max_iter": 27,
+    },
+    "parameters": {
+        "learning_rate": {"distribution": "log_uniform_values", "min": 1e-5, "max": 1e-1},
+        "batch_size":    {"values": [32, 64, 128, 256]},
+        "hidden_dim":    {"values": [64, 128, 256, 512]},
+        "dropout":       {"distribution": "uniform", "min": 0.1, "max": 0.5},
+        "optimizer":     {"values": ["adam", "adamw", "sgd"]},
+    },
+}
+
+# ---- 2. Training function called by each sweep agent ----
+def train_sweep():
+    with wandb.init() as run:
+        cfg = wandb.config
+        model = nn.Sequential(
+            nn.Linear(30, cfg.hidden_dim),
+            nn.ReLU(),
+            nn.Dropout(cfg.dropout),
+            nn.Linear(cfg.hidden_dim, 2),
+        )
+        opt_cls   = {"adam": torch.optim.Adam, "adamw": torch.optim.AdamW,
+                     "sgd":  torch.optim.SGD}[cfg.optimizer]
+        optimizer = opt_cls(model.parameters(), lr=cfg.learning_rate)
+        criterion = nn.CrossEntropyLoss()
+
+        import torch
+        from torch.utils.data import DataLoader, TensorDataset, random_split
+        X = torch.randn(500, 30); y = torch.randint(0, 2, (500,))
+        ds = TensorDataset(X, y)
+        train_ds, val_ds = random_split(ds, [400, 100])
+        train_loader = DataLoader(train_ds, batch_size=cfg.batch_size)
+        val_loader   = DataLoader(val_ds,   batch_size=cfg.batch_size)
+
+        for epoch in range(20):
+            model.train()
+            for xb, yb in train_loader:
+                optimizer.zero_grad()
+                criterion(model(xb), yb).backward()
+                optimizer.step()
+            model.eval()
+            val_loss = 0.0
+            with torch.no_grad():
+                for xb, yb in val_loader:
+                    val_loss += criterion(model(xb), yb).item()
+            wandb.log({"val/loss": val_loss / len(val_loader), "epoch": epoch})
+
+# ---- 3. Launch sweep ----
+sweep_id = wandb.sweep(sweep_config, project="hp-sweep-demo")
+wandb.agent(sweep_id, function=train_sweep, count=20)</code></pre>
+
+  <h3 class="text-xl font-semibold text-gray-800 mt-8 mb-4">W&amp;B vs MLflow Comparison</h3>
+  <div class="overflow-x-auto">
+    <table>
+      <thead>
+        <tr><th>Feature</th><th>MLflow</th><th>W&amp;B</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Deployment model</td><td>Self-hosted or Managed (Databricks)</td><td>SaaS or self-hosted (W&amp;B Server)</td></tr>
+        <tr><td>Open source</td><td>Yes (Apache 2.0)</td><td>SDK only; server is proprietary</td></tr>
+        <tr><td>Real-time collaboration</td><td>Limited (shared UI)</td><td>Excellent — live dashboards, comments</td></tr>
+        <tr><td>Media logging</td><td>Artifacts (files)</td><td>Native Images, Audio, Video, Tables, 3D</td></tr>
+        <tr><td>Built-in HPO sweeps</td><td>No (use Optuna/Ray)</td><td>Yes — grid, random, Bayesian + Hyperband</td></tr>
+        <tr><td>Model registry</td><td>Yes — stages + aliases</td><td>Yes — aliases, links to artifacts</td></tr>
+        <tr><td>LLM observability</td><td>MLflow Tracing (2.13+)</td><td>W&amp;B Weave (native)</td></tr>
+        <tr><td>Reports / sharing</td><td>No (export only)</td><td>W&amp;B Reports — rich narrative + charts</td></tr>
+        <tr><td>Artifact lineage</td><td>Via run lineage</td><td>First-class DAG visualization</td></tr>
+        <tr><td>Pricing</td><td>Free (OSS) / Databricks cost</td><td>Free tier (100 GB); Enterprise pricing</td></tr>
+        <tr><td>Best for</td><td>Enterprise on-prem, Databricks shops</td><td>Deep learning, research teams, startups</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 6 -->
+<!-- ============================================================ -->
+<section id="s6" class="section-anchor">
+  <div class="flex items-center gap-3 mb-6">
+    <span class="bg-green-100 text-green-700 font-bold text-sm px-3 py-1 rounded-full">Section 6</span>
+    <h2 class="text-2xl font-bold text-gray-900">Neptune.ai</h2>
+  </div>
+
+  <p class="text-gray-700 leading-relaxed mb-6">Neptune.ai targets teams that need fine-grained metadata management and audit trails — common in regulated industries (finance, healthcare, pharma). Its data model is more flexible than MLflow: every logged value is a namespaced field that can be structured hierarchically, queried with a rich API, and fetched as DataFrames for offline analysis.</p>
+
+  <h3 class="text-xl font-semibold text-gray-800 mb-3">Code Example 13: Neptune Basic Tracking</h3>
+  <pre><code class="language-python">import neptune
+import neptune.integrations.sklearn as npt_utils
+from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.datasets import load_breast_cancer
+from sklearn.model_selection import train_test_split
+
+# Initialize run — NEPTUNE_API_TOKEN read from env var
+run = neptune.init_run(
+    project="my-workspace/cancer-classification",
+    tags=["gbm", "baseline", "v1"],
+    description="Gradient boosting baseline on breast cancer dataset",
+)
+
+params = {"n_estimators": 150, "learning_rate": 0.05, "max_depth": 4}
+run["parameters"] = params
+run["dataset/name"]       = "breast_cancer"
+run["dataset/n_samples"]  = 569
+run["dataset/n_features"] = 30
+
+X, y = load_breast_cancer(return_X_y=True)
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y
+)
+
+clf = GradientBoostingClassifier(**params)
+clf.fit(X_train, y_train)
+
+# Neptune sklearn integration — logs estimator params, metrics, plots
+run["sklearn/classifier"] = npt_utils.create_classifier_summary(
+    clf, X_train, X_test, y_train, y_test
+)
+
+# Step-wise metric logging
+for i, score in enumerate(clf.staged_predict(X_test)):
+    from sklearn.metrics import accuracy_score
+    run["metrics/staged_accuracy"].append(accuracy_score(y_test, score), step=i)
+
+# Upload model file
+import joblib, tempfile, os
+with tempfile.NamedTemporaryFile(suffix=".pkl", delete=False) as f:
+    joblib.dump(clf, f.name)
+    run["model/weights"].upload(f.name)
+    os.unlink(f.name)
+
+run.stop()
+print(f"Neptune run: {run['sys/id'].fetch()}")</code></pre>
+
+  <h3 class="text-xl font-semibold text-gray-800 mt-8 mb-4">Tool Selection Guide: MLflow vs W&amp;B vs Neptune</h3>
+  <div class="overflow-x-auto">
+    <table>
+      <thead>
+        <tr><th>Criteria</th><th>Choose MLflow</th><th>Choose W&amp;B</th><th>Choose Neptune</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Deployment preference</td><td>Fully self-hosted</td><td>SaaS acceptable</td><td>Either</td></tr>
+        <tr><td>Primary workload</td><td>Tabular, Spark, Databricks</td><td>Deep learning, CV, NLP, LLMs</td><td>Research with heavy metadata querying</td></tr>
+        <tr><td>Compliance / audit</td><td>Moderate</td><td>Moderate</td><td>High — fine-grained, queryable</td></tr>
+        <tr><td>Team size</td><td>Any, especially large enterprise</td><td>Small-medium DL teams</td><td>Medium research-heavy orgs</td></tr>
+        <tr><td>Budget</td><td>Free (OSS) or Databricks</td><td>Free tier generous</td><td>Free tier limited</td></tr>
+        <tr><td>Visualization quality</td><td>Good (standard charts)</td><td>Excellent (interactive, real-time)</td><td>Good (queryable, DataFrame output)</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 7 -->
+<!-- ============================================================ -->
+<section id="s7" class="section-anchor">
+  <div class="flex items-center gap-3 mb-6">
+    <span class="bg-blue-100 text-blue-700 font-bold text-sm px-3 py-1 rounded-full">Section 7</span>
+    <h2 class="text-2xl font-bold text-gray-900">Hyperparameter Optimization</h2>
+  </div>
+
+  <p class="text-gray-700 leading-relaxed mb-6">Choosing hyperparameters by intuition is the single most common form of waste in ML projects. A systematic HPO strategy can find configurations that intuition never would, and the tracking infrastructure from previous sections makes each trial a first-class logged experiment. For expensive training runs, Bayesian methods recover far more value per trial than grid or random search.</p>
+
+  <div class="overflow-x-auto mb-8">
+    <table>
+      <thead>
+        <tr><th>Method</th><th>How It Works</th><th>When to Use</th><th>Weakness</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Grid Search</strong></td><td>Exhaustive over all combinations</td><td>≤3 params, narrow ranges</td><td>Exponential cost</td></tr>
+        <tr><td><strong>Random Search</strong></td><td>Sample uniformly from distributions</td><td>Quick baselines, broad search</td><td>No learning across trials</td></tr>
+        <tr><td><strong>Bayesian (TPE)</strong></td><td>Fit probabilistic model of objective; sample promising regions</td><td>Expensive training, ≤20 params</td><td>Sequential by default</td></tr>
+        <tr><td><strong>Hyperband</strong></td><td>Early-stop poor performers; promote survivors to more compute</td><td>When total budget is fixed</td><td>Requires step-wise metric</td></tr>
+        <tr><td><strong>BOHB</strong></td><td>Bayesian + Hyperband combined</td><td>Large budgets, many params</td><td>Complex to tune itself</td></tr>
+        <tr><td><strong>Evolutionary (CMA-ES)</strong></td><td>Genetic/evolutionary population update</td><td>Non-differentiable, many params</td><td>Slow convergence on small budgets</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 class="text-xl font-semibold text-gray-800 mb-3">Code Example 14: Optuna with MLflow Integration</h3>
+  <pre><code class="language-python">import optuna
+import mlflow
+import xgboost as xgb
+from sklearn.datasets import load_breast_cancer
+from sklearn.model_selection import cross_val_score, StratifiedKFold
+import numpy as np
+
+mlflow.set_tracking_uri("http://localhost:5000")
+mlflow.set_experiment("xgb-optuna-sweep")
+
+X, y = load_breast_cancer(return_X_y=True)
+cv   = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+
+def objective(trial: optuna.Trial) -> float:
+    params = {
+        "n_estimators":     trial.suggest_int("n_estimators", 50, 500, step=50),
+        "max_depth":        trial.suggest_int("max_depth", 3, 10),
+        "learning_rate":    trial.suggest_float("learning_rate", 1e-3, 0.3, log=True),
+        "subsample":        trial.suggest_float("subsample", 0.5, 1.0),
+        "colsample_bytree": trial.suggest_float("colsample_bytree", 0.5, 1.0),
+        "min_child_weight": trial.suggest_int("min_child_weight", 1, 10),
+        "gamma":            trial.suggest_float("gamma", 0.0, 5.0),
+        "reg_alpha":        trial.suggest_float("reg_alpha", 1e-4, 10.0, log=True),
+        "reg_lambda":       trial.suggest_float("reg_lambda", 1e-4, 10.0, log=True),
+        "use_label_encoder": False,
+        "eval_metric":      "logloss",
+        "random_state":     42,
+    }
+    clf    = xgb.XGBClassifier(**params)
+    scores = cross_val_score(clf, X, y, cv=cv, scoring="roc_auc", n_jobs=-1)
+    auc    = scores.mean()
+
+    with mlflow.start_run(run_name=f"trial-{trial.number}", nested=True):
+        mlflow.log_params(params)
+        mlflow.log_metric("cv_auc_mean", auc)
+        mlflow.log_metric("cv_auc_std",  scores.std())
+        mlflow.set_tag("trial_number", trial.number)
+    return auc
+
+with mlflow.start_run(run_name="optuna-study-parent"):
+    storage = optuna.storages.RDBStorage(
+        url="sqlite:///optuna.db",
+        engine_kwargs={"connect_args": {"check_same_thread": False}},
+    )
+    study = optuna.create_study(
+        study_name="xgb-breast-cancer",
+        direction="maximize",
+        sampler=optuna.samplers.TPESampler(
+            n_startup_trials=10, multivariate=True, seed=42
+        ),
+        pruner=optuna.pruners.HyperbandPruner(
+            min_resource=1, max_resource=500, reduction_factor=3
+        ),
+        storage=storage,
+        load_if_exists=True,
+    )
+    study.optimize(objective, n_trials=50, n_jobs=4)
+
+    best = study.best_trial
+    mlflow.log_metric("best_cv_auc",  best.value)
+    mlflow.log_params({f"best_{k}": v for k, v in best.params.items()})
+    print(f"Best AUC: {best.value:.4f}")
+
+    # Visualize
+    fig = optuna.visualization.plot_param_importances(study)
+    fig.write_html("/tmp/param_importance.html")
+    mlflow.log_artifact("/tmp/param_importance.html", "optuna_plots")</code></pre>
+
+  <h3 class="text-xl font-semibold text-gray-800 mt-8 mb-3">Code Example 15: Ray Tune with PyTorch Lightning</h3>
+  <pre><code class="language-python">from ray import tune
+from ray.tune.schedulers import ASHAScheduler
+from ray.tune.integration.mlflow import MLflowLoggerCallback
+from ray.tune.integration.pytorch_lightning import TuneReportCallback
+import pytorch_lightning as pl
+import torch, torch.nn as nn
+from torch.utils.data import DataLoader, TensorDataset, random_split
+
+class LitMLP(pl.LightningModule):
+    def __init__(self, config):
+        super().__init__()
+        self.save_hyperparameters(config)
+        self.net = nn.Sequential(
+            nn.Linear(30, config["hidden"]),
+            nn.ReLU(),
+            nn.Dropout(config["dropout"]),
+            nn.Linear(config["hidden"], 2),
+        )
+        self.criterion = nn.CrossEntropyLoss()
+
+    def forward(self, x): return self.net(x)
+
+    def training_step(self, batch, _):
+        x, y = batch
+        loss = self.criterion(self(x), y)
+        self.log("train_loss", loss)
+        return loss
+
+    def validation_step(self, batch, _):
+        x, y = batch
+        logits = self(x)
+        loss = self.criterion(logits, y)
+        acc  = (logits.argmax(1) == y).float().mean()
+        self.log("val_loss", loss, prog_bar=True)
+        self.log("val_acc",  acc,  prog_bar=True)
+
+    def configure_optimizers(self):
+        return torch.optim.Adam(
+            self.parameters(), lr=self.hparams["lr"],
+            weight_decay=self.hparams["weight_decay"]
+        )
+
+def train_fn(config):
+    from sklearn.datasets import load_breast_cancer
+    X, y = load_breast_cancer(return_X_y=True)
+    X_t  = torch.tensor(X, dtype=torch.float32)
+    y_t  = torch.tensor(y, dtype=torch.long)
+    ds   = TensorDataset(X_t, y_t)
+    tr, va = random_split(ds, [455, 114])
+    model   = LitMLP(config)
+    trainer = pl.Trainer(
+        max_epochs=20, enable_progress_bar=False,
+        callbacks=[TuneReportCallback(
+            {"val_loss": "val_loss", "val_acc": "val_acc"}, on="validation_end"
+        )],
+    )
+    trainer.fit(
+        model,
+        DataLoader(tr, batch_size=int(config["batch_size"]), shuffle=True),
+        DataLoader(va, batch_size=int(config["batch_size"])),
+    )
+
+tuner = tune.Tuner(
+    tune.with_resources(train_fn, resources={"cpu": 2, "gpu": 0}),
+    tune_config=tune.TuneConfig(
+        scheduler=ASHAScheduler(metric="val_loss", mode="min",
+                                max_t=20, grace_period=5),
+        num_samples=30,
+    ),
+    param_space={
+        "lr":           tune.loguniform(1e-4, 1e-1),
+        "hidden":       tune.choice([64, 128, 256]),
+        "dropout":      tune.uniform(0.1, 0.5),
+        "batch_size":   tune.choice([32, 64, 128]),
+        "weight_decay": tune.loguniform(1e-5, 1e-2),
+    },
+    run_config=tune.RunConfig(
+        name="ray-tune-lightning-demo",
+        callbacks=[MLflowLoggerCallback(
+            tracking_uri="http://localhost:5000",
+            experiment_name="ray-tune-mlflow",
+            save_artifact=True,
+        )],
+    ),
+)
+results = tuner.fit()
+best    = results.get_best_result("val_loss", "min")
+print(f"Best config: {best.config}")
+print(f"Best val_loss: {best.metrics['val_loss']:.4f}")</code></pre>
+
+  <h3 class="text-xl font-semibold text-gray-800 mt-8 mb-4">HPO Framework Comparison</h3>
+  <div class="overflow-x-auto mb-8">
+    <table>
+      <thead>
+        <tr><th>Feature</th><th>Optuna</th><th>Ray Tune</th><th>W&amp;B Sweeps</th><th>Ax / BoTorch</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Algorithms</td><td>TPE, CMA-ES, NSGA-II, QMC</td><td>ASHA, PBT, BOHB, Optuna</td><td>Bayes, Random, Grid + Hyperband</td><td>Bayesian (GP, SAASBO), Bandit</td></tr>
+        <tr><td>Distributed</td><td>Via RDB storage + n_jobs</td><td>Native (Ray cluster)</td><td>Multi-agent across machines</td><td>Via Ax service API</td></tr>
+        <tr><td>Early stopping</td><td>MedianPruner, HyperbandPruner</td><td>ASHA, HyperBand, PBT</td><td>Hyperband</td><td>Early stopping callback</td></tr>
+        <tr><td>Multi-objective</td><td>Yes (NSGA-II, MOTPE)</td><td>Yes</td><td>No (single metric)</td><td>Yes (Pareto front, qNEHVI)</td></tr>
+        <tr><td>MLflow integration</td><td>MLflowCallback</td><td>MLflowLoggerCallback</td><td>Via wandb2mlflow</td><td>Manual</td></tr>
+        <tr><td>GPU-aware scheduling</td><td>No (manual)</td><td>Yes (native resource specs)</td><td>Via W&amp;B agents</td><td>No</td></tr>
+        <tr><td>Best for</td><td>General purpose, tabular</td><td>Large-scale DL, multi-node</td><td>Teams using W&amp;B already</td><td>Industrial Bayesian opt, safety</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 8 -->
+<!-- ============================================================ -->
+<section id="s8" class="section-anchor">
+  <div class="flex items-center gap-3 mb-6">
+    <span class="bg-blue-100 text-blue-700 font-bold text-sm px-3 py-1 rounded-full">Section 8</span>
+    <h2 class="text-2xl font-bold text-gray-900">Model Versioning Deep Dive</h2>
+  </div>
+
+  <p class="text-gray-700 leading-relaxed mb-6">A model version number means nothing unless it is coupled to exact data, code, and environment. Git handles code; DVC handles large data and model binaries; semantic versioning communicates breaking changes to consumers. Model cards document everything a user or auditor needs to know before deploying.</p>
+
+  <h3 class="text-xl font-semibold text-gray-800 mb-3">Semantic Versioning for ML Models</h3>
+  <div class="overflow-x-auto mb-6">
+    <table>
+      <thead><tr><th>Bump</th><th>When to use</th><th>Example trigger</th></tr></thead>
+      <tbody>
+        <tr><td><strong>MAJOR (1.x.x → 2.0.0)</strong></td><td>Input/output interface change; consumers must update code</td><td>Feature schema change, output label encoding change</td></tr>
+        <tr><td><strong>MINOR (1.1.x → 1.2.0)</strong></td><td>New capability, no breaking change</td><td>Additional output class, new optional feature</td></tr>
+        <tr><td><strong>PATCH (1.1.0 → 1.1.1)</strong></td><td>Bug fix or minor performance improvement</td><td>Retrain on updated labels, fix preprocessing bug</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 class="text-xl font-semibold text-gray-800 mb-3">Code Example 16: Model Card Template</h3>
+  <pre><code class="language-python">"""model_card.py — programmatic model card using dataclasses."""
+from dataclasses import dataclass, field, asdict
+from datetime import date
+from typing import Optional
+import json
+
+@dataclass
+class EthicsConsiderations:
+    groups_at_risk:      list[str]
+    mitigation_strategy: str
+    bias_audit_done:     bool
+    bias_audit_results:  Optional[str] = None
+
+@dataclass
+class QuantitativeAnalysis:
+    overall_metrics:       dict[str, float]
+    disaggregated_metrics: dict[str, dict[str, float]] = field(default_factory=dict)
+
+@dataclass
+class ModelCard:
+    model_name:        str
+    model_version:     str
+    model_type:        str
+    description:       str
+    date_created:      str = field(default_factory=lambda: date.today().isoformat())
+    developers:        list[str] = field(default_factory=list)
+    contact_email:     str = ""
+    license:           str = "Apache-2.0"
+    training_data:     str = ""
+    eval_data:         str = ""
+    data_version:      str = ""
+    framework:         str = ""
+    hardware:          str = ""
+    training_time_hrs: float = 0.0
+    mlflow_run_id:     str = ""
+    git_commit:        str = ""
+    primary_uses:      list[str] = field(default_factory=list)
+    out_of_scope_uses: list[str] = field(default_factory=list)
+    known_limitations: list[str] = field(default_factory=list)
+    performance:       Optional[QuantitativeAnalysis] = None
+    ethics:            Optional[EthicsConsiderations] = None
+
+    def to_json(self, path: str) -> None:
+        with open(path, "w") as f:
+            json.dump(asdict(self), f, indent=2, default=str)
+
+    def to_markdown(self, path: str) -> None:
+        md = [
+            f"# Model Card: {self.model_name} v{self.model_version}",
+            f"\n**Type:** {self.model_type}  **Created:** {self.date_created}",
+            f"\n## Description\n{self.description}",
+            f"\n## Intended Use",
+        ]
+        for u in self.primary_uses:
+            md.append(f"- {u}")
+        if self.performance:
+            md += ["\n## Performance\n| Metric | Value |", "|--------|-------|"]
+            for k, v in self.performance.overall_metrics.items():
+                md.append(f"| {k} | {v:.4f} |")
+        md.append(f"\n## Lineage\n- MLflow run: `{self.mlflow_run_id}`")
+        md.append(f"- Git commit: `{self.git_commit}`")
+        md.append(f"- Data version: `{self.data_version}`")
+        with open(path, "w") as f:
+            f.write("\n".join(md))
+
+# Usage
+card = ModelCard(
+    model_name    = "BreastCancerClassifier",
+    model_version = "1.2.0",
+    model_type    = "Binary classifier (RandomForest)",
+    description   = "Predicts malignant vs benign breast tumors from 30 cell features.",
+    developers    = ["Alice Chen", "Bob Kumar"],
+    contact_email = "ml-team@example.com",
+    training_data = "UCI Breast Cancer Wisconsin — 455 samples",
+    eval_data     = "UCI Breast Cancer Wisconsin — 114 samples (20% holdout)",
+    data_version  = "sha256:abc123",
+    framework     = "scikit-learn 1.4.1, Python 3.11",
+    hardware      = "8-core CPU, no GPU",
+    training_time_hrs = 0.05,
+    mlflow_run_id = "7f2e4c8a9b1d",
+    git_commit    = "refs/tags/v1.2.0 (abc1234)",
+    primary_uses  = ["Clinical decision support (second opinion only)"],
+    out_of_scope_uses = ["Primary diagnostic replacement for pathologist"],
+    known_limitations = [
+        "Trained on single-institution data — external validation not done",
+        "Performance may degrade on populations outside training distribution",
+    ],
+    performance = QuantitativeAnalysis(
+        overall_metrics = {"accuracy": 0.9649, "roc_auc": 0.9921, "f1": 0.9710},
+        disaggregated_metrics = {
+            "age_gt_60":  {"accuracy": 0.961, "roc_auc": 0.988},
+            "age_lte_60": {"accuracy": 0.967, "roc_auc": 0.995},
+        },
+    ),
+    ethics = EthicsConsiderations(
+        groups_at_risk       = ["Patients from underrepresented demographics"],
+        mitigation_strategy  = "Bias audit on disaggregated subgroups; human review mandatory",
+        bias_audit_done      = True,
+        bias_audit_results   = "No statistically significant disparity across age/gender subgroups",
+    ),
+)
+card.to_json("/tmp/model_card.json")
+card.to_markdown("/tmp/MODEL_CARD.md")
+print("Model card written.")</code></pre>
+
+  <h3 class="text-xl font-semibold text-gray-800 mt-8 mb-4">Model Lineage Graph</h3>
+  <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+    <div class="mermaid">
+graph TD
+    subgraph "Data Layer"
+      D1[Raw Data\ncancer_raw_v3\nsha:abc123]
+      D2[Preprocessed Train\ncancer_train_v3\nsha:def456]
+      D3[Test Split\ncancer_test_v3\nsha:ghi789]
+    end
+    subgraph "Code Layer"
+      C1[feature_eng.py\ngit:1a2b3c]
+      C2[train.py\ngit:4d5e6f]
+      C3[evaluate.py\ngit:7g8h9i]
+    end
+    subgraph "Experiments"
+      E1[MLflow Run 7f2e4c\nlr=0.001 n=200\nAUC=0.971]
+      E2[MLflow Run 9a3b5c\nlr=0.005 n=150\nAUC=0.993]
+    end
+    subgraph "Registry"
+      M1[v1.1.0 Archived]
+      M2[v1.2.0 Production\nalias:champion]
+    end
+    subgraph "Serving"
+      P1[Prediction Service\nv1.2.0]
+    end
+
+    D1 -->|preprocess| D2
+    D1 -->|split| D3
+    C1 --> D2
+    D2 --> E1
+    D2 --> E2
+    C2 --> E1
+    C2 --> E2
+    D3 --> E1
+    D3 --> E2
+    C3 --> E1
+    C3 --> E2
+    E1 -->|register| M1
+    E2 -->|register| M2
+    M1 -->|superseded by| M2
+    M2 -->|deploy| P1
+
+    style M2 fill:#d1fae5,stroke:#059669
+    style P1 fill:#dbeafe,stroke:#2563eb
+    </div>
+  </div>
+
+  <div class="callout-blue rounded-lg p-5 mt-6">
+    <p class="font-semibold text-blue-800 mb-2">DVC + Git for Model Versioning</p>
+    <p class="text-blue-900 text-sm"><code>dvc add models/model.pkl</code> stores the file in remote storage and commits a lightweight <code>.dvc</code> pointer to Git. Tag the commit as <code>v1.2.0</code> and anyone can run <code>git checkout v1.2.0 &amp;&amp; dvc pull</code> to retrieve exactly that model. Tag the Git commit with the MLflow run ID for full lineage: data hash + code commit + MLflow run + DVC pointer.</p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 9 -->
+<!-- ============================================================ -->
+<section id="s9" class="section-anchor">
+  <div class="flex items-center gap-3 mb-6">
+    <span class="bg-blue-100 text-blue-700 font-bold text-sm px-3 py-1 rounded-full">Section 9</span>
+    <h2 class="text-2xl font-bold text-gray-900">The Model Registry as a Hub</h2>
+  </div>
+
+  <p class="text-gray-700 leading-relaxed mb-6">A mature organization runs many models across many teams. The model registry is the single source of truth: every production-bound artifact must pass through it. It is the gateway that enforces governance, surfaces metadata, and coordinates deployment. Without a central registry, each team deploys models in their own way and nobody knows what is actually running in production.</p>
+
+  <h3 class="text-xl font-semibold text-gray-800 mb-4">Registry Workflow</h3>
+  <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm mb-8">
+    <div class="mermaid">
+flowchart LR
+    TR[Training\nJob] -->|log_model| RN[None Stage\nNew Version]
+    RN -->|automated eval gate| ST[Staging\nPassed CI tests]
+    ST -->|shadow traffic test| PR[Production\nChampion alias]
+    PR -->|new version available| AR[Archived\nRollback target]
+
+    subgraph "Metadata per version"
+      direction TB
+      M1[training run ID]
+      M2[dataset version + hash]
+      M3[eval metrics per split]
+      M4[hardware / environment]
+      M5[model card JSON]
+      M6[approval log + timestamp]
+    end
+
+    style PR fill:#d1fae5,stroke:#059669
+    style ST fill:#fef3c7,stroke:#d97706
+    style AR fill:#f3f4f6,stroke:#9ca3af
+    </div>
+  </div>
+
+  <h3 class="text-xl font-semibold text-gray-800 mb-4">Commercial Model Registry Comparison</h3>
+  <div class="overflow-x-auto">
+    <table>
+      <thead>
+        <tr><th>Registry</th><th>Platform</th><th>Staging Workflow</th><th>Governance</th><th>Deployment Integration</th><th>Best For</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>MLflow Registry</strong></td><td>OSS / Databricks</td><td>None→Staging→Production→Archived + aliases</td><td>Tags, annotations, webhooks</td><td>mlflow models serve, Seldon, KServe</td><td>Multi-cloud, Databricks shops</td></tr>
+        <tr><td><strong>W&amp;B Model Registry</strong></td><td>W&amp;B SaaS</td><td>Artifact aliases + custom stages</td><td>Team roles, audit log</td><td>W&amp;B Launch, custom webhooks</td><td>DL teams already on W&amp;B</td></tr>
+        <tr><td><strong>Vertex AI Model Registry</strong></td><td>Google Cloud</td><td>Model versions + evaluation jobs</td><td>IAM, VPC-SC, Audit logging</td><td>Vertex AI Endpoints, Batch prediction</td><td>GCP-native MLOps pipelines</td></tr>
+        <tr><td><strong>SageMaker Model Registry</strong></td><td>AWS</td><td>PendingManualApproval→Approved→Rejected</td><td>IAM, Lambda triggers, SNS</td><td>SageMaker Endpoints, Pipelines</td><td>AWS-native MLOps, regulated industries</td></tr>
+        <tr><td><strong>Azure ML Model Registry</strong></td><td>Azure</td><td>Versions + environments, no built-in stages</td><td>RBAC, Azure Policy</td><td>Azure ML Endpoints, AKS</td><td>Microsoft ecosystem, enterprise</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout-green rounded-lg p-5 mt-6">
+    <p class="font-semibold text-green-800 mb-2">Multi-Team Governance Pattern</p>
+    <p class="text-green-900 text-sm">In organizations with multiple ML teams, implement a two-layer registry: a team-level registry for development and a central org-level registry for production-eligible models. Promotion from team to org registry requires: (1) passing automated eval suite, (2) model card complete, (3) security review approved, (4) at least one peer approval. Encode this as a pipeline gate, not a manual process.</p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 10 -->
+<!-- ============================================================ -->
+<section id="s10" class="section-anchor">
+  <div class="flex items-center gap-3 mb-6">
+    <span class="bg-blue-100 text-blue-700 font-bold text-sm px-3 py-1 rounded-full">Section 10</span>
+    <h2 class="text-2xl font-bold text-gray-900">Evaluation and Model Selection</h2>
+  </div>
+
+  <p class="text-gray-700 leading-relaxed mb-6">Model selection is not just picking the highest validation metric. It involves statistical rigor (is the difference real or noise?), business relevance (does the metric proxy the business outcome?), and operational constraints (latency, memory, cost). A systematic evaluation framework prevents premature promotion and catches regressions before they hit production.</p>
+
+  <h3 class="text-xl font-semibold text-gray-800 mb-4">Evaluation Metrics by Task Type</h3>
+  <div class="overflow-x-auto mb-8">
+    <table>
+      <thead>
+        <tr><th>Task</th><th>Primary Metrics</th><th>Secondary Metrics</th><th>Pitfalls</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Binary Classification</td><td>ROC-AUC, PR-AUC</td><td>F1, accuracy, MCC</td><td>Accuracy on imbalanced classes</td></tr>
+        <tr><td>Multi-class Classification</td><td>Macro-F1, weighted-F1</td><td>Confusion matrix, per-class AUC</td><td>Macro vs micro averaging choice</td></tr>
+        <tr><td>Regression</td><td>RMSE, MAE</td><td>R², MAPE, quantile loss</td><td>RMSE sensitivity to outliers</td></tr>
+        <tr><td>Ranking</td><td>NDCG@K, MAP</td><td>MRR, Precision@K</td><td>Position bias in training labels</td></tr>
+        <tr><td>NLP (generation)</td><td>BLEU, ROUGE-L</td><td>BERTScore, human eval</td><td>n-gram metrics miss semantic quality</td></tr>
+        <tr><td>Object Detection</td><td>mAP@50, mAP@50:95</td><td>IoU, AR</td><td>Small object performance hidden in mAP</td></tr>
+        <tr><td>Anomaly Detection</td><td>PR-AUC (rare class)</td><td>FPR at fixed TPR, F1@threshold</td><td>Threshold selection on test set</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 class="text-xl font-semibold text-gray-800 mb-3">Code Example 17: A/B Comparison of Two Model Versions</h3>
+  <pre><code class="language-python">"""
+Statistical comparison of two model versions.
+Uses bootstrap confidence intervals + paired t-test.
+"""
+import numpy as np
+from scipy import stats
+from sklearn.metrics import roc_auc_score, accuracy_score, f1_score
+from sklearn.datasets import load_breast_cancer
+from sklearn.model_selection import train_test_split, StratifiedKFold
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+import mlflow
+
+mlflow.set_tracking_uri("http://localhost:5000")
+mlflow.set_experiment("model-ab-comparison")
+
+X, y = load_breast_cancer(return_X_y=True)
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y
+)
+
+# Models to compare
+model_a = RandomForestClassifier(n_estimators=200, random_state=42)
+model_b = GradientBoostingClassifier(n_estimators=200, learning_rate=0.05, random_state=42)
+
+model_a.fit(X_train, y_train)
+model_b.fit(X_train, y_train)
+
+def bootstrap_metric(y_true, y_score, metric_fn, n_bootstrap=10_000, ci=0.95):
+    """Return (mean, lower_ci, upper_ci) via bootstrap resampling."""
+    rng   = np.random.default_rng(42)
+    scores = []
+    n      = len(y_true)
+    for _ in range(n_bootstrap):
+        idx = rng.integers(0, n, size=n)
+        scores.append(metric_fn(y_true[idx], y_score[idx]))
+    scores = np.array(scores)
+    alpha  = (1 - ci) / 2
+    return scores.mean(), np.quantile(scores, alpha), np.quantile(scores, 1 - alpha)
+
+def paired_significance(scores_a, scores_b):
+    """Paired t-test on per-sample scores; returns p-value."""
+    t_stat, p_value = stats.ttest_rel(scores_a, scores_b)
+    return float(p_value)
+
+# Per-sample predicted probabilities
+prob_a = model_a.predict_proba(X_test)[:, 1]
+prob_b = model_b.predict_proba(X_test)[:, 1]
+
+# Bootstrap AUC
+auc_a, ci_a_lo, ci_a_hi = bootstrap_metric(y_test, prob_a, roc_auc_score)
+auc_b, ci_b_lo, ci_b_hi = bootstrap_metric(y_test, prob_b, roc_auc_score)
+
+# Paired significance test: per-sample correct/incorrect
+correct_a = (model_a.predict(X_test) == y_test).astype(float)
+correct_b = (model_b.predict(X_test) == y_test).astype(float)
+p_val     = paired_significance(correct_a, correct_b)
+
+print(f"Model A (RF)  AUC: {auc_a:.4f}  95% CI: [{ci_a_lo:.4f}, {ci_a_hi:.4f}]")
+print(f"Model B (GBM) AUC: {auc_b:.4f}  95% CI: [{ci_b_lo:.4f}, {ci_b_hi:.4f}]")
+print(f"Paired t-test p-value: {p_val:.4f} ({'significant' if p_val < 0.05 else 'not significant'} at α=0.05)")
+print(f"Recommendation: {'Promote Model B' if auc_b > auc_a and p_val < 0.05 else 'Keep Model A'}")
+
+with mlflow.start_run(run_name="ab-comparison"):
+    mlflow.log_metrics({
+        "model_a_auc": auc_a, "model_a_ci_lo": ci_a_lo, "model_a_ci_hi": ci_a_hi,
+        "model_b_auc": auc_b, "model_b_ci_lo": ci_b_lo, "model_b_ci_hi": ci_b_hi,
+        "paired_pvalue": p_val,
+    })
+    mlflow.set_tag("winner", "model_b" if auc_b > auc_a and p_val < 0.05 else "model_a")</code></pre>
+
+  <div class="callout-amber rounded-lg p-5 mt-6">
+    <p class="font-semibold text-amber-800 mb-2">Shadow Evaluation</p>
+    <p class="text-amber-900 text-sm">Shadow mode runs a new model candidate alongside the production model, sending each request to both but only serving the production model's response to users. The shadow model's predictions are logged and compared offline. This is the safest way to validate real-world distribution coverage before promoting — particularly important when the training distribution differs from live traffic. Implement with a sidecar container or a router-level feature flag.</p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 11 -->
+<!-- ============================================================ -->
+<section id="s11" class="section-anchor">
+  <div class="flex items-center gap-3 mb-6">
+    <span class="bg-blue-100 text-blue-700 font-bold text-sm px-3 py-1 rounded-full">Section 11</span>
+    <h2 class="text-2xl font-bold text-gray-900">Reproducibility Best Practices</h2>
+  </div>
+
+  <p class="text-gray-700 leading-relaxed mb-6">Reproducibility in ML requires deliberate effort across four dimensions: random seeds, software environment, data versioning, and hardware determinism. Missing any one dimension can prevent exact reproduction of a result, even when all others are controlled. The goal is not always bit-for-bit identical output — floating-point non-determinism on GPUs may make that impossible — but close enough that results are scientifically equivalent.</p>
+
+  <h3 class="text-xl font-semibold text-gray-800 mb-3">Code Example 18: Complete Reproducibility Setup</h3>
+  <pre><code class="language-python">"""reproducibility.py — drop-in setup for reproducible ML training."""
+import os
+import random
+import hashlib
+import subprocess
+import numpy as np
+import torch
+
+def set_seeds(seed: int = 42) -> None:
+    """Set all relevant random seeds for reproducibility."""
+    random.seed(seed)
+    os.environ["PYTHONHASHSEED"] = str(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)   # multi-GPU
+
+    # Deterministic convolution algorithms (may be slower)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark     = False
+
+    # PyTorch 1.11+ full determinism flag (errors on non-deterministic ops)
+    # torch.use_deterministic_algorithms(True)
+
+    print(f"Seeds set to {seed}")
+
+def get_environment_info() -> dict:
+    """Snapshot the full environment for logging."""
+    import platform
+    import sys
+
+    info = {
+        "python_version":  sys.version,
+        "platform":        platform.platform(),
+        "torch_version":   torch.__version__,
+        "numpy_version":   np.__version__,
+        "cuda_available":  torch.cuda.is_available(),
+        "cuda_version":    torch.version.cuda if torch.cuda.is_available() else "N/A",
+        "cudnn_version":   str(torch.backends.cudnn.version()) if torch.cuda.is_available() else "N/A",
+    }
+
+    # GPU info
+    if torch.cuda.is_available():
+        info["gpu_name"]   = torch.cuda.get_device_name(0)
+        info["gpu_memory"] = f"{torch.cuda.get_device_properties(0).total_memory // 1024**3} GB"
+
+    # Git info
+    try:
+        info["git_commit"] = subprocess.check_output(
+            ["git", "rev-parse", "HEAD"], text=True
+        ).strip()
+        info["git_dirty"] = bool(subprocess.check_output(
+            ["git", "status", "--porcelain"], text=True
+        ).strip())
+    except Exception:
+        info["git_commit"] = "unavailable"
+
+    return info
+
+def hash_dataset(X: np.ndarray, y: np.ndarray) -> str:
+    """Compute a deterministic hash of train/test data arrays."""
+    h = hashlib.sha256()
+    h.update(X.tobytes())
+    h.update(y.tobytes())
+    return h.hexdigest()[:16]
+
+def snapshot_requirements(path: str = "/tmp/requirements_snapshot.txt") -> None:
+    """Write frozen pip requirements to a file."""
+    import pkg_resources
+    pkgs = sorted(
+        f"{d.project_name}=={d.version}"
+        for d in pkg_resources.working_set
+    )
+    with open(path, "w") as f:
+        f.write("\n".join(pkgs))
+    print(f"Requirements snapshot written to {path}")
+
+# ---- Usage ----
+if __name__ == "__main__":
+    import mlflow
+    from sklearn.datasets import load_breast_cancer
+    from sklearn.model_selection import train_test_split
+    from sklearn.ensemble import RandomForestClassifier
+
+    SEED = 42
+    set_seeds(SEED)
+
+    X, y = load_breast_cancer(return_X_y=True)
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=SEED, stratify=y
+    )
+
+    env_info   = get_environment_info()
+    data_hash  = hash_dataset(X_train, y_train)
+    snapshot_requirements("/tmp/requirements_snapshot.txt")
+
+    mlflow.set_tracking_uri("http://localhost:5000")
+    with mlflow.start_run(run_name="reproducible-run"):
+        mlflow.log_param("seed",        SEED)
+        mlflow.log_param("data_hash",   data_hash)
+        mlflow.log_params(env_info)
+        mlflow.log_artifact("/tmp/requirements_snapshot.txt", "environment")
+
+        clf = RandomForestClassifier(n_estimators=100, random_state=SEED)
+        clf.fit(X_train, y_train)
+        mlflow.log_metric("test_acc", clf.score(X_test, y_test))
+
+    print(f"Data hash: {data_hash}")
+    print(f"Git commit: {env_info.get('git_commit')}")</code></pre>
+
+  <h3 class="text-xl font-semibold text-gray-800 mt-8 mb-4">Reproducibility Checklist</h3>
+  <div class="overflow-x-auto">
+    <table>
+      <thead>
+        <tr><th>Category</th><th>Checklist Item</th><th>How to Implement</th><th>Priority</th></tr>
+      </thead>
+      <tbody>
+        <tr><td rowspan="3"><strong>Random Seeds</strong></td><td>Python random seed</td><td><code>random.seed(N)</code></td><td>Critical</td></tr>
+        <tr><td>NumPy seed</td><td><code>np.random.seed(N)</code></td><td>Critical</td></tr>
+        <tr><td>Framework seed (torch/tf)</td><td><code>torch.manual_seed(N)</code></td><td>Critical</td></tr>
+        <tr><td rowspan="3"><strong>Environment</strong></td><td>Exact library versions</td><td><code>pip freeze</code> or conda export</td><td>Critical</td></tr>
+        <tr><td>Python version pinned</td><td>pyenv + .python-version file</td><td>High</td></tr>
+        <tr><td>OS / Docker image pinned</td><td>Dockerfile with exact base tag + SHA</td><td>High</td></tr>
+        <tr><td rowspan="3"><strong>Data</strong></td><td>Dataset version tracked</td><td>DVC + Git tag</td><td>Critical</td></tr>
+        <tr><td>Preprocessing deterministic</td><td>Avoid time-dependent ops; log hash</td><td>High</td></tr>
+        <tr><td>Train/test split fixed</td><td>Fixed <code>random_state</code>; log split hash</td><td>Critical</td></tr>
+        <tr><td rowspan="3"><strong>Code</strong></td><td>Git commit logged</td><td><code>git rev-parse HEAD</code> in run metadata</td><td>Critical</td></tr>
+        <tr><td>No dirty working tree on training</td><td>CI gate: fail if <code>git status</code> is dirty</td><td>High</td></tr>
+        <tr><td>Model definition versioned</td><td>Architecture hash in metadata</td><td>Medium</td></tr>
+        <tr><td rowspan="2"><strong>Hardware</strong></td><td>GPU model logged</td><td><code>torch.cuda.get_device_name()</code></td><td>Medium</td></tr>
+        <tr><td>Deterministic GPU ops</td><td><code>cudnn.deterministic=True</code> (may be slower)</td><td>Low (accept near-reproducibility)</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- KEY TAKEAWAYS -->
+<!-- ============================================================ -->
+<section id="takeaways" class="section-anchor">
+  <div class="bg-gradient-to-br from-blue-50 to-green-50 rounded-2xl border border-blue-200 p-8">
+    <h2 class="text-2xl font-bold text-gray-900 mb-6">Key Takeaways</h2>
+    <div class="grid md:grid-cols-2 gap-4">
+      <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+        <div class="font-bold text-blue-700 mb-2">1. Track everything from day one</div>
+        <p class="text-gray-600 text-sm">Log hyperparameters, metrics, artifacts, environment, code commit, and data version on every training run. Adding tracking after the fact means the first reproducibility failure has already occurred.</p>
+      </div>
+      <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+        <div class="font-bold text-blue-700 mb-2">2. MLflow for enterprise, W&amp;B for deep learning</div>
+        <p class="text-gray-600 text-sm">MLflow is the right default when you need full self-hosting, Spark integration, or a Databricks-native workflow. W&amp;B wins for deep learning teams that want richer visualization, sweeps, and media logging out of the box.</p>
+      </div>
+      <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+        <div class="font-bold text-blue-700 mb-2">3. The registry is a gate, not a warehouse</div>
+        <p class="text-gray-600 text-sm">Every production-bound model must pass through the registry and satisfy automated evaluation thresholds. Human approval gates are the last line of defense, not the primary one. Code the thresholds, not the decisions.</p>
+      </div>
+      <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+        <div class="font-bold text-blue-700 mb-2">4. Bayesian HPO beats random search at scale</div>
+        <p class="text-gray-600 text-sm">For training runs exceeding 30 minutes, switch from random search to Optuna TPE or W&amp;B Bayesian sweeps. With 50 trials and a 1-hour run time per trial, Bayesian methods typically find configurations that would require 200+ random trials to match.</p>
+      </div>
+      <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+        <div class="font-bold text-blue-700 mb-2">5. Lineage must be first-class</div>
+        <p class="text-gray-600 text-sm">A model version is only as trustworthy as its lineage. Tie every registered model to an exact data version (DVC hash), code commit (Git SHA), and MLflow run ID. This triad is the minimum requirement for regulated industries and responsible AI.</p>
+      </div>
+      <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+        <div class="font-bold text-blue-700 mb-2">6. Reproducibility is non-negotiable</div>
+        <p class="text-gray-600 text-sm">Set all random seeds, snapshot your environment, version your data, and log your Git commit on every single run. The five-minute investment per experiment pays back when debugging a production regression six months later.</p>
+      </div>
+      <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+        <div class="font-bold text-blue-700 mb-2">7. Evaluate statistically, not just numerically</div>
+        <p class="text-gray-600 text-sm">A 0.3% AUC improvement may be noise. Use bootstrap confidence intervals and paired significance tests before promoting a new model version. Shadow mode evaluation on live traffic is the gold standard before full promotion.</p>
+      </div>
+      <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+        <div class="font-bold text-blue-700 mb-2">8. Automate the boring governance parts</div>
+        <p class="text-gray-600 text-sm">Promotion checks, model card generation, stage transitions, and webhook triggers should all be automated in CI/CD pipelines. Human review should focus on strategy and risk, not on running eval scripts manually.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BOTTOM NAV -->
+<nav class="flex items-center justify-between pt-8 border-t border-gray-200">
+  <a href="ch06_feature_store.html" class="flex items-center gap-2 text-blue-600 hover:text-blue-800 font-medium">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+    Ch 6: Feature Store
+  </a>
+  <a href="ch08_model_serving.html" class="flex items-center gap-2 text-blue-600 hover:text-blue-800 font-medium">
+    Ch 8: Model Serving
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+  </a>
+</nav>
+
+</section>
+</main>
+</body>
+</html>

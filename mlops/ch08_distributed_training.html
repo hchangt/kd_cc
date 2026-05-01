@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 8: Distributed Training at Scale - Modern MLOps Tutorial</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script>hljs.highlightAll(); mermaid.initialize({startOnLoad:true, theme:'default'});</script>
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; color: #1f2937; }
+    .callout-blue  { background:#eff6ff; border-left:4px solid #2563eb; }
+    .callout-green { background:#f0fdf4; border-left:4px solid #059669; }
+    .callout-amber { background:#fffbeb; border-left:4px solid #d97706; }
+    .callout-red   { background:#fef2f2; border-left:4px solid #dc2626; }
+    pre code.hljs  { border-radius:0.5rem; font-size:0.82rem; }
+    .mermaid       { background:#fff; }
+    table          { border-collapse:collapse; width:100%; }
+    th, td         { border:1px solid #e5e7eb; padding:0.5rem 0.75rem; text-align:left; }
+    th             { background:#f9fafb; font-weight:600; }
+    tr:nth-child(even) td { background:#f9fafb; }
+  </style>
+</head>
+<body class="bg-gray-50">
+
+<!-- Navbar -->
+<nav class="bg-white border-b border-gray-200 sticky top-0 z-50">
+  <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+    <a href="index.html" class="text-blue-600 font-semibold text-lg hover:text-blue-800">Modern MLOps Tutorial</a>
+    <div class="flex gap-6 text-sm text-gray-600">
+      <a href="ch07_experiment_tracking.html" class="hover:text-blue-600">← Ch7: Experiment Tracking</a>
+      <a href="index.html" class="hover:text-blue-600">Index</a>
+      <a href="ch08b_advanced_training.html" class="hover:text-blue-600">Ch8b: Advanced Training →</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Header -->
+<header class="bg-gradient-to-r from-blue-700 to-blue-900 text-white py-14 px-4">
+  <div class="max-w-4xl mx-auto">
+    <div class="flex items-center gap-3 mb-4">
+      <span class="bg-blue-500 text-white text-xs font-bold px-3 py-1 rounded-full">CHAPTER 8 · PART 1</span>
+      <span class="text-blue-200 text-sm">~90 min read</span>
+    </div>
+    <h1 class="text-4xl font-bold mb-3">Distributed Training at Scale</h1>
+    <p class="text-blue-100 text-lg max-w-2xl">Data parallelism, model parallelism, ZeRO, FSDP, mixed precision, and everything you need to train models that don't fit on a single GPU.</p>
+  </div>
+</header>
+
+<main class="max-w-4xl mx-auto px-4 py-10 space-y-16">
+
+<!-- TOC -->
+<nav class="bg-white rounded-xl border border-gray-200 p-6">
+  <h2 class="font-bold text-gray-800 mb-3">Contents</h2>
+  <ol class="list-decimal list-inside space-y-1 text-sm text-blue-700 columns-2">
+    <li><a href="#s1" class="hover:underline">Why Distributed Training</a></li>
+    <li><a href="#s2" class="hover:underline">Data Parallelism (DDP)</a></li>
+    <li><a href="#s3" class="hover:underline">Model &amp; Tensor Parallelism</a></li>
+    <li><a href="#s4" class="hover:underline">ZeRO Optimization (DeepSpeed)</a></li>
+    <li><a href="#s5" class="hover:underline">FSDP</a></li>
+    <li><a href="#s6" class="hover:underline">Mixed Precision Training</a></li>
+    <li><a href="#s7" class="hover:underline">Gradient Checkpointing &amp; Flash Attention</a></li>
+    <li><a href="#s8" class="hover:underline">Training Frameworks</a></li>
+    <li><a href="#s9" class="hover:underline">Efficient Data Loading</a></li>
+    <li><a href="#s10" class="hover:underline">Cost Optimization &amp; Debugging</a></li>
+  </ol>
+</nav>
+
+<!-- ============================================================ -->
+<!-- SECTION 1 -->
+<!-- ============================================================ -->
+<section id="s1">
+  <h2 class="text-2xl font-bold text-gray-900 mb-4">1. Why Distributed Training</h2>
+
+  <p class="text-gray-700 mb-4">GPT-3 (175B params) needs ~350 GB in FP16 just for weights — an A100 has 80 GB. Training memory is 3-4× inference: you need activations, gradients, and optimizer states simultaneously. A single Adam step on a 70B model requires ~840 GB of GPU memory.</p>
+
+  <div class="callout-amber rounded-lg p-4 mb-6 text-sm">
+    <strong>Memory math for a transformer:</strong><br>
+    Parameters: P × 2 bytes (FP16) | Gradients: P × 2 bytes | Adam states: P × 8 bytes (FP32 master weights + m + v)<br>
+    <strong>Total ≈ 12 × P bytes</strong> → 7B model needs ~84 GB, 70B model needs ~840 GB
+  </div>
+
+  <h3 class="text-lg font-semibold mb-2">Three Axes of Parallelism</h3>
+  <ul class="list-disc list-inside text-gray-700 space-y-1 mb-6 text-sm">
+    <li><strong>Data Parallelism (DP):</strong> Same model on every GPU, different data shards. Gradients averaged across GPUs.</li>
+    <li><strong>Tensor Parallelism (TP):</strong> Individual layer weight matrices split across GPUs (intra-layer).</li>
+    <li><strong>Pipeline Parallelism (PP):</strong> Different layers assigned to different GPUs (inter-layer).</li>
+  </ul>
+
+  <div class="mermaid">
+timeline
+    title Training Compute Growth (PetaFLOP-days)
+    2017 : Transformer (0.05)
+    2018 : BERT-Large (5)
+    2019 : GPT-2 (100)
+    2020 : GPT-3 (3640)
+    2022 : PaLM (2500)
+         : Chinchilla (1800)
+    2023 : LLaMA-65B (2800)
+         : GPT-4 (~estimated 50000)
+    2024 : LLaMA-3 70B (6400)
+    2025 : Frontier models (100000+)
+  </div>
+
+  <div class="mermaid mt-6">
+graph LR
+  subgraph "3D Parallelism"
+    DP["Data Parallel<br/>N copies of model<br/>different batches"]
+    TP["Tensor Parallel<br/>Split weight matrices<br/>within a layer"]
+    PP["Pipeline Parallel<br/>Split layers<br/>across stages"]
+  end
+  DP -->|"scales batch size"| SCALE["Training Scale"]
+  TP -->|"reduces per-GPU memory"| SCALE
+  PP -->|"enables very deep models"| SCALE
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 2 -->
+<!-- ============================================================ -->
+<section id="s2">
+  <h2 class="text-2xl font-bold text-gray-900 mb-4">2. Data Parallelism (DDP)</h2>
+
+  <p class="text-gray-700 mb-4">PyTorch DDP replicates the model on each GPU. Each GPU processes a different mini-batch, computes gradients, then an <strong>AllReduce</strong> operation averages gradients across all ranks before the optimizer step. Communication overlaps with backward pass via gradient bucketing.</p>
+
+  <div class="mermaid mb-6">
+sequenceDiagram
+    participant GPU0
+    participant GPU1
+    participant GPU2
+    participant GPU3
+    Note over GPU0,GPU3: Forward pass (different batches)
+    GPU0->>GPU0: loss0, grad0
+    GPU1->>GPU1: loss1, grad1
+    GPU2->>GPU2: loss2, grad2
+    GPU3->>GPU3: loss3, grad3
+    Note over GPU0,GPU3: AllReduce (Ring-AllReduce)
+    GPU0->>GPU1: partial grad
+    GPU1->>GPU2: partial grad
+    GPU2->>GPU3: partial grad
+    GPU3->>GPU0: partial grad
+    Note over GPU0,GPU3: All GPUs have avg gradient → optimizer step
+  </div>
+
+  <h3 class="text-lg font-semibold mb-2">Complete DDP Training Script</h3>
+  <pre><code class="language-python">"""
+ddp_train.py — multi-GPU + multi-node DDP training
+Launch: torchrun --nproc_per_node=8 --nnodes=2 --node_rank=0
+        --master_addr=10.0.0.1 --master_port=29500 ddp_train.py
+"""
+import os, torch, torch.nn as nn
+from torch.nn.parallel import DistributedDataParallel as DDP
+from torch.utils.data import DataLoader, DistributedSampler
+from torch.distributed import init_process_group, destroy_process_group
+
+def setup():
+    init_process_group(backend="nccl")   # NCCL for GPU-GPU comms
+    torch.cuda.set_device(int(os.environ["LOCAL_RANK"]))
+
+def cleanup():
+    destroy_process_group()
+
+def train(rank, world_size, epochs=3):
+    setup()
+    device = torch.device(f"cuda:{os.environ['LOCAL_RANK']}")
+
+    # Model — wrap AFTER moving to device
+    model = MyTransformer().to(device)
+    model = DDP(model, device_ids=[device.index],
+                find_unused_parameters=False)  # faster when all params used
+
+    # Sampler ensures each rank sees non-overlapping data
+    dataset = MyDataset()
+    sampler = DistributedSampler(dataset, num_replicas=world_size,
+                                 rank=rank, shuffle=True, drop_last=True)
+    loader  = DataLoader(dataset, batch_size=64, sampler=sampler,
+                         num_workers=4, pin_memory=True,
+                         persistent_workers=True)
+
+    optimizer = torch.optim.AdamW(model.parameters(), lr=3e-4)
+    scaler    = torch.cuda.amp.GradScaler()          # for AMP
+
+    # Gradient accumulation: effective_batch = batch_size * world_size * accum_steps
+    ACCUM_STEPS = 4
+    optimizer.zero_grad()
+
+    for epoch in range(epochs):
+        sampler.set_epoch(epoch)   # reshuffle across epochs
+        for step, (x, y) in enumerate(loader):
+            x, y = x.to(device, non_blocking=True), y.to(device, non_blocking=True)
+
+            with torch.autocast(device_type="cuda", dtype=torch.bfloat16):
+                loss = model(x, y) / ACCUM_STEPS
+
+            scaler.scale(loss).backward()
+
+            if (step + 1) % ACCUM_STEPS == 0:
+                scaler.unscale_(optimizer)
+                torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+                scaler.step(optimizer)
+                scaler.update()
+                optimizer.zero_grad()
+
+        # Only rank 0 saves checkpoints
+        if rank == 0 and (epoch + 1) % 1 == 0:
+            torch.save({"model": model.module.state_dict(),
+                        "opt":   optimizer.state_dict(),
+                        "epoch": epoch},
+                       f"ckpt_epoch{epoch}.pt")
+
+    cleanup()
+
+if __name__ == "__main__":
+    import torch.multiprocessing as mp
+    rank      = int(os.environ["RANK"])
+    world     = int(os.environ["WORLD_SIZE"])
+    train(rank, world)
+</code></pre>
+
+  <h3 class="text-lg font-semibold mt-6 mb-2">Effective Batch Size Guide</h3>
+  <table>
+    <thead><tr><th>Model Size</th><th>GPUs</th><th>Batch/GPU</th><th>Accum Steps</th><th>Effective Batch</th><th>LR Scaling</th></tr></thead>
+    <tbody>
+      <tr><td>1B</td><td>8</td><td>32</td><td>2</td><td>512</td><td>3e-4 (linear)</td></tr>
+      <tr><td>7B</td><td>64</td><td>8</td><td>4</td><td>2048</td><td>1e-4 (linear)</td></tr>
+      <tr><td>13B</td><td>128</td><td>4</td><td>8</td><td>4096</td><td>1e-4</td></tr>
+      <tr><td>70B</td><td>512</td><td>2</td><td>4</td><td>4096</td><td>1e-4 with warmup</td></tr>
+      <tr><td>405B</td><td>2048</td><td>1</td><td>4</td><td>8192</td><td>8e-5 with warmup</td></tr>
+    </tbody>
+  </table>
+  <p class="text-xs text-gray-500 mt-1">Rule of thumb: scale LR linearly with batch size up to ~2K, then use sqrt scaling. Always warm up for 1-2% of total steps.</p>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 3 -->
+<!-- ============================================================ -->
+<section id="s3">
+  <h2 class="text-2xl font-bold text-gray-900 mb-4">3. Model &amp; Tensor Parallelism</h2>
+
+  <h3 class="text-lg font-semibold mb-2">Tensor Parallelism (Megatron-style)</h3>
+  <p class="text-gray-700 mb-3 text-sm">Column-parallel: split weight matrix along output dimension — each GPU computes a partial output. Row-parallel: split along input dimension — requires AllReduce to sum partial results. For MLP: column-parallel on W1, row-parallel on W2 → only one AllReduce per layer.</p>
+
+  <div class="bg-gray-50 rounded-lg border border-gray-200 p-4 text-sm font-mono mb-4">
+    <div class="text-gray-500 mb-1">// MLP with 4-way Tensor Parallelism</div>
+    <div>GPU0: W1[0:H/4, :] | GPU1: W1[H/4:H/2, :] | GPU2: W1[H/2:3H/4, :] | GPU3: W1[3H/4:H, :]</div>
+    <div class="text-gray-500 mt-2">→ each GPU computes partial GELU → all-gather → row-parallel W2 → allreduce</div>
+  </div>
+
+  <h3 class="text-lg font-semibold mb-2">Pipeline Parallelism</h3>
+  <ul class="list-disc list-inside text-gray-700 text-sm space-y-1 mb-4">
+    <li><strong>GPipe:</strong> flush pipeline each batch. Simple but GPU idle time (bubble) = (p-1)/p where p = pipeline stages.</li>
+    <li><strong>PipeDream:</strong> interleave forward/backward of different micro-batches. Reduces bubble but needs weight stashing.</li>
+    <li><strong>1F1B (One-Forward-One-Backward):</strong> steady state alternates F and B micro-batches. Bubble = (p-1)/(m+p-1) where m = micro-batches.</li>
+  </ul>
+
+  <div class="mermaid mb-6">
+gantt
+    title 1F1B Pipeline Schedule (4 stages, 8 micro-batches)
+    dateFormat X
+    axisFormat %s
+    section GPU0
+    F1 :0, 1
+    F2 :1, 2
+    F3 :2, 3
+    F4 :3, 4
+    B4 :4, 5
+    F5 :5, 6
+    B5 :6, 7
+    F6 :7, 8
+    B6 :8, 9
+    section GPU1
+    idle :crit, 0, 1
+    F1 :1, 2
+    F2 :2, 3
+    F3 :3, 4
+    B4 :4, 5
+    F4 :5, 6
+    B5 :6, 7
+    F5 :7, 8
+    B6 :8, 9
+    section GPU2
+    idle :crit, 0, 2
+    F1 :2, 3
+    F2 :3, 4
+    B3 :4, 5
+    F3 :5, 6
+    B4 :6, 7
+    F4 :7, 8
+    B5 :8, 9
+    section GPU3
+    idle :crit, 0, 3
+    F1 :3, 4
+    B1 :4, 5
+    F2 :5, 6
+    B2 :6, 7
+    F3 :7, 8
+    B3 :8, 9
+  </div>
+
+  <h3 class="text-lg font-semibold mb-2">PyTorch Pipeline Parallelism</h3>
+  <pre><code class="language-python">from torch.distributed.pipeline.sync import Pipe
+import torch.nn as nn
+
+# Split model into pipeline stages (one per GPU)
+stage0 = nn.Sequential(EmbedLayer(), TransformerBlocks(0, 12)).to("cuda:0")
+stage1 = nn.Sequential(TransformerBlocks(12, 24)).to("cuda:1")
+stage2 = nn.Sequential(TransformerBlocks(24, 32), LMHead()).to("cuda:2")
+
+# Wrap with Pipe — chunks=8 means 8 micro-batches
+model = Pipe(nn.Sequential(stage0, stage1, stage2), chunks=8)
+
+# RPC backend required for cross-device pipeline
+import torch.distributed.rpc as rpc
+rpc.init_rpc("worker0", rank=0, world_size=3)
+
+# Forward pass returns RRef; call .local_value() on the last stage
+output = model(input_tensor)
+loss   = criterion(output.local_value(), labels)
+loss.backward()
+</code></pre>
+
+  <h3 class="text-lg font-semibold mt-6 mb-2">Parallelism Strategy by Model Size</h3>
+  <table>
+    <thead><tr><th>Model Size</th><th>Strategy</th><th>TP</th><th>PP</th><th>DP</th><th>Min GPUs</th></tr></thead>
+    <tbody>
+      <tr><td>&lt;1B</td><td>DDP only</td><td>1</td><td>1</td><td>N</td><td>1</td></tr>
+      <tr><td>1–7B</td><td>DDP + ZeRO-2</td><td>1</td><td>1</td><td>N</td><td>8</td></tr>
+      <tr><td>7–13B</td><td>ZeRO-3 or FSDP</td><td>1</td><td>1</td><td>N</td><td>16</td></tr>
+      <tr><td>13–70B</td><td>TP=4 + ZeRO-1</td><td>4</td><td>1</td><td>N/4</td><td>64</td></tr>
+      <tr><td>70–175B</td><td>TP=8 + PP=4</td><td>8</td><td>4</td><td>N/32</td><td>128</td></tr>
+      <tr><td>175B+</td><td>3D (TP+PP+DP)</td><td>8</td><td>8+</td><td>N/64</td><td>512+</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 4 -->
+<!-- ============================================================ -->
+<section id="s4">
+  <h2 class="text-2xl font-bold text-gray-900 mb-4">4. ZeRO Optimization (DeepSpeed)</h2>
+
+  <p class="text-gray-700 mb-4 text-sm">ZeRO (Zero Redundancy Optimizer) eliminates redundant memory by partitioning optimizer states, gradients, and parameters across data-parallel ranks — while DDP keeps full copies everywhere.</p>
+
+  <table class="mb-6">
+    <thead><tr><th>ZeRO Stage</th><th>What's Partitioned</th><th>Memory/GPU (7B, 64 GPUs)</th><th>Communication Overhead</th></tr></thead>
+    <tbody>
+      <tr><td>Baseline DDP</td><td>Nothing</td><td>~84 GB</td><td>1× AllReduce</td></tr>
+      <tr><td>ZeRO-1</td><td>Optimizer states</td><td>~31 GB</td><td>1× AllReduce</td></tr>
+      <tr><td>ZeRO-2</td><td>Optimizer states + gradients</td><td>~18 GB</td><td>1× AllReduce</td></tr>
+      <tr><td>ZeRO-3</td><td>All (params + grads + opt)</td><td>~1.5 GB</td><td>3× AllGather/ReduceScatter</td></tr>
+      <tr><td>ZeRO-Infinity</td><td>ZeRO-3 + NVMe offload</td><td>~0.5 GB GPU</td><td>CPU/NVMe bandwidth bound</td></tr>
+    </tbody>
+  </table>
+
+  <h3 class="text-lg font-semibold mb-2">DeepSpeed ZeRO-3 Config</h3>
+  <pre><code class="language-json">{
+  "train_batch_size": 2048,
+  "train_micro_batch_size_per_gpu": 4,
+  "gradient_accumulation_steps": 64,
+  "gradient_clipping": 1.0,
+  "bf16": { "enabled": true },
+  "zero_optimization": {
+    "stage": 3,
+    "offload_optimizer": { "device": "cpu", "pin_memory": true },
+    "offload_param":     { "device": "cpu", "pin_memory": true },
+    "overlap_comm": true,
+    "contiguous_gradients": true,
+    "reduce_bucket_size": 5e8,
+    "stage3_prefetch_bucket_size": 5e7,
+    "stage3_param_persistence_threshold": 1e6,
+    "stage3_max_live_parameters": 1e9,
+    "stage3_gather_16bit_weights_on_model_save": true
+  },
+  "activation_checkpointing": {
+    "partition_activations": true,
+    "contiguous_memory_optimization": true
+  },
+  "wall_clock_breakdown": false
+}
+</code></pre>
+
+  <h3 class="text-lg font-semibold mt-4 mb-2">Training with DeepSpeed</h3>
+  <pre><code class="language-python">"""
+deepspeed_train.py
+Launch: deepspeed --num_gpus=8 deepspeed_train.py --deepspeed ds_config.json
+"""
+import deepspeed, torch, os
+from transformers import AutoModelForCausalLM, AutoTokenizer
+
+def main():
+    # deepspeed.init_distributed() called automatically
+    model     = AutoModelForCausalLM.from_pretrained("meta-llama/Llama-2-7b-hf")
+    tokenizer = AutoTokenizer.from_pretrained("meta-llama/Llama-2-7b-hf")
+
+    optimizer  = torch.optim.AdamW(model.parameters(), lr=1e-4)
+    lr_sched   = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=1000)
+
+    # DeepSpeed engine wraps model, optimizer, lr_scheduler
+    model_engine, optimizer, _, lr_sched = deepspeed.initialize(
+        model=model,
+        optimizer=optimizer,
+        lr_scheduler=lr_sched,
+        config="ds_config.json"
+    )
+
+    dataset = build_dataset(tokenizer)
+    loader  = build_loader(dataset, model_engine.local_rank)
+
+    for epoch in range(3):
+        for step, batch in enumerate(loader):
+            batch = {k: v.to(model_engine.local_rank) for k, v in batch.items()}
+            outputs = model_engine(**batch)
+            loss    = outputs.loss
+            model_engine.backward(loss)       # handles scaler + ZeRO internally
+            model_engine.step()               # optimizer + lr_scheduler step
+
+            if step % 100 == 0 and model_engine.local_rank == 0:
+                print(f"epoch={epoch} step={step} loss={loss.item():.4f}")
+
+        # DeepSpeed checkpoint (all ranks save their shard)
+        model_engine.save_checkpoint(f"./ckpts/", tag=f"epoch{epoch}")
+
+if __name__ == "__main__":
+    main()
+</code></pre>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 5 -->
+<!-- ============================================================ -->
+<section id="s5">
+  <h2 class="text-2xl font-bold text-gray-900 mb-4">5. FSDP (Fully Sharded Data Parallel)</h2>
+
+  <p class="text-gray-700 mb-4 text-sm">PyTorch native FSDP (torch 1.12+) implements ZeRO-3 semantics without DeepSpeed. Each parameter is sharded across ranks; AllGather is called before forward/backward on each module, then parameters are discarded after use.</p>
+
+  <table class="mb-6">
+    <thead><tr><th>Feature</th><th>DeepSpeed ZeRO-3</th><th>PyTorch FSDP</th></tr></thead>
+    <tbody>
+      <tr><td>Sharding granularity</td><td>Flat parameters (whole model)</td><td>Per-module (finer control)</td></tr>
+      <tr><td>CPU offload</td><td>Yes (optimizer + params)</td><td>Yes (CPU offload policy)</td></tr>
+      <tr><td>Mixed precision</td><td>bf16/fp16 via config</td><td>MixedPrecision dataclass</td></tr>
+      <tr><td>Activation checkpointing</td><td>Via config</td><td>Via apply_activation_checkpointing</td></tr>
+      <tr><td>Integration</td><td>Requires deepspeed install</td><td>Built into PyTorch</td></tr>
+      <tr><td>Compilation (torch.compile)</td><td>Limited</td><td>Full support (2.0+)</td></tr>
+      <tr><td>Checkpoint format</td><td>DeepSpeed proprietary</td><td>Standard PyTorch / DCP</td></tr>
+    </tbody>
+  </table>
+
+  <h3 class="text-lg font-semibold mb-2">FSDP Training Script with Wrapping Policy</h3>
+  <pre><code class="language-python">import torch
+from torch.distributed.fsdp import FullyShardedDataParallel as FSDP, MixedPrecision
+from torch.distributed.fsdp.wrap import transformer_auto_wrap_policy
+from torch.distributed.fsdp import BackwardPrefetch, ShardingStrategy
+from torch.distributed.fsdp.fully_sharded_data_parallel import CPUOffload
+from functools import partial
+import os
+from torch.distributed import init_process_group
+
+def setup():
+    init_process_group(backend="nccl")
+    torch.cuda.set_device(int(os.environ["LOCAL_RANK"]))
+
+def build_fsdp_model(model_cls, layer_cls):
+    """Wrap transformer with FSDP — shard each transformer layer independently."""
+    # Auto-wrap policy: wrap each TransformerDecoderLayer as an FSDP unit
+    wrap_policy = partial(transformer_auto_wrap_policy, transformer_layer_cls={layer_cls})
+
+    mp_policy = MixedPrecision(
+        param_dtype=torch.bfloat16,
+        reduce_dtype=torch.float32,   # AllReduce in FP32 for stability
+        buffer_dtype=torch.bfloat16,
+    )
+
+    model = model_cls()
+    model = FSDP(
+        model,
+        auto_wrap_policy=wrap_policy,
+        mixed_precision=mp_policy,
+        sharding_strategy=ShardingStrategy.FULL_SHARD,        # ZeRO-3 equivalent
+        backward_prefetch=BackwardPrefetch.BACKWARD_PRE,      # overlap comms
+        cpu_offload=CPUOffload(offload_params=False),         # set True to offload
+        device_id=torch.cuda.current_device(),
+        use_orig_params=True,    # required for torch.compile + optimizer groups
+    )
+    return model
+
+def train():
+    setup()
+    from transformers import LlamaForCausalLM, LlamaConfig
+    from transformers.models.llama.modeling_llama import LlamaDecoderLayer
+
+    config = LlamaConfig(num_hidden_layers=32, hidden_size=4096, num_attention_heads=32)
+    model  = build_fsdp_model(lambda: LlamaForCausalLM(config), LlamaDecoderLayer)
+
+    # Activation checkpointing — trade compute for memory
+    from torch.distributed.algorithms._checkpoint.checkpoint_wrapper import (
+        apply_activation_checkpointing, checkpoint_wrapper, CheckpointImpl)
+    check_fn = lambda m: isinstance(m, LlamaDecoderLayer)
+    apply_activation_checkpointing(model, checkpoint_wrapper_fn=checkpoint_wrapper,
+                                   check_fn=check_fn)
+
+    optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4, weight_decay=0.1)
+    loader    = build_loader()
+
+    for step, batch in enumerate(loader):
+        optimizer.zero_grad()
+        loss = model(**batch).loss
+        loss.backward()
+        torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+        optimizer.step()
+
+    # Save sharded checkpoint
+    from torch.distributed.fsdp import StateDictType, FullStateDictConfig
+    with FSDP.state_dict_type(model, StateDictType.FULL_STATE_DICT,
+                               FullStateDictConfig(offload_to_cpu=True, rank0_only=True)):
+        state = model.state_dict()
+        if int(os.environ["RANK"]) == 0:
+            torch.save(state, "model_final.pt")
+</code></pre>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 6 -->
+<!-- ============================================================ -->
+<section id="s6">
+  <h2 class="text-2xl font-bold text-gray-900 mb-4">6. Mixed Precision Training</h2>
+
+  <table class="mb-6">
+    <thead><tr><th>Format</th><th>Bits</th><th>Range</th><th>Training Use</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>FP32</td><td>32</td><td>±3.4×10³⁸</td><td>Master weights, optimizer states</td><td>Baseline; memory-heavy</td></tr>
+      <tr><td>FP16</td><td>16</td><td>±65504</td><td>Forward/backward with loss scaling</td><td>Overflow risk; needs GradScaler</td></tr>
+      <tr><td>BF16</td><td>16</td><td>±3.4×10³⁸</td><td>Forward/backward directly</td><td>Same range as FP32; preferred for LLMs</td></tr>
+      <tr><td>FP8 (E4M3)</td><td>8</td><td>±448</td><td>MatMul kernels (H100+)</td><td>2× memory, ~2× throughput; needs calibration</td></tr>
+      <tr><td>INT8</td><td>8</td><td>-128–127</td><td>Inference quantization</td><td>Training unstable without QAT</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout-green rounded-lg p-4 text-sm mb-4">
+    <strong>Why BF16 over FP16 for LLMs:</strong> BF16 has the same 8-bit exponent as FP32, so it can represent the same range. No overflow/underflow during training. No loss scaling needed. H100/A100 support BF16 at full tensor core throughput.
+  </div>
+
+  <h3 class="text-lg font-semibold mb-2">AMP Training with torch.autocast</h3>
+  <pre><code class="language-python">import torch
+from torch.cuda.amp import GradScaler
+
+device = "cuda"
+model  = MyModel().to(device)
+optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4)
+
+# FP16 needs GradScaler to handle underflow; BF16 does not
+use_fp16 = False  # Switch to True on V100/older GPUs without BF16
+dtype    = torch.float16 if use_fp16 else torch.bfloat16
+scaler   = GradScaler(enabled=use_fp16)
+
+for batch in loader:
+    x, y = batch
+    x, y = x.to(device), y.to(device)
+
+    optimizer.zero_grad(set_to_none=True)  # faster than zero_grad()
+
+    # autocast casts ops to low precision automatically
+    with torch.autocast(device_type="cuda", dtype=dtype):
+        logits = model(x)
+        loss   = criterion(logits, y)
+
+    # scaler.scale is a no-op when enabled=False (BF16 path)
+    scaler.scale(loss).backward()
+
+    # Unscale before clipping so clip uses true gradient magnitudes
+    scaler.unscale_(optimizer)
+    torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
+
+    scaler.step(optimizer)
+    scaler.update()
+
+# FP8 training (H100 via transformer-engine)
+# import transformer_engine.pytorch as te
+# with te.fp8_autocast(enabled=True, fp8_recipe=te.recipe.DelayedScaling()):
+#     loss = model(x, y)
+</code></pre>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 7 -->
+<!-- ============================================================ -->
+<section id="s7">
+  <h2 class="text-2xl font-bold text-gray-900 mb-4">7. Gradient Checkpointing &amp; Flash Attention</h2>
+
+  <p class="text-gray-700 mb-3 text-sm">Activations from forward pass are needed for backward. Without checkpointing, memory scales as O(n·L) (sequence × layers). With checkpointing, re-compute activations during backward — memory drops to O(√L) at cost of ~30% extra compute.</p>
+
+  <h3 class="text-lg font-semibold mb-2">torch.utils.checkpoint</h3>
+  <pre><code class="language-python">import torch.utils.checkpoint as ckpt
+
+class TransformerBlock(nn.Module):
+    def __init__(self, d_model, nhead):
+        super().__init__()
+        self.attn = nn.MultiheadAttention(d_model, nhead, batch_first=True)
+        self.ffn  = nn.Sequential(nn.Linear(d_model, 4*d_model),
+                                   nn.GELU(),
+                                   nn.Linear(4*d_model, d_model))
+        self.ln1  = nn.LayerNorm(d_model)
+        self.ln2  = nn.LayerNorm(d_model)
+
+    def _forward(self, x):
+        x = x + self.attn(self.ln1(x), self.ln1(x), self.ln1(x))[0]
+        x = x + self.ffn(self.ln2(x))
+        return x
+
+    def forward(self, x):
+        # use_reentrant=False recommended for composability with FSDP/compile
+        return ckpt.checkpoint(self._forward, x, use_reentrant=False)
+
+
+# For HuggingFace models:
+# model.gradient_checkpointing_enable()
+# This calls model.config.use_cache = False (incompatible with checkpointing)
+</code></pre>
+
+  <h3 class="text-lg font-semibold mt-4 mb-2">Flash Attention Integration</h3>
+  <pre><code class="language-python"># Option 1: torch native (PyTorch 2.0+) — uses Flash Attention under the hood
+# scaled_dot_product_attention uses FlashAttention-2 when possible
+import torch.nn.functional as F
+
+def flash_attention(q, k, v, is_causal=True):
+    # Automatically selects FlashAttention, memory-efficient, or math backend
+    return F.scaled_dot_product_attention(q, k, v, is_causal=is_causal)
+
+# Option 2: flash-attn library directly
+# pip install flash-attn --no-build-isolation
+from flash_attn import flash_attn_qkvpacked_func, flash_attn_func
+
+def forward(self, x):
+    B, T, C = x.shape
+    qkv = self.c_attn(x).reshape(B, T, 3, self.n_head, C // self.n_head)
+    # dropout_p=0.0 during inference
+    x = flash_attn_qkvpacked_func(qkv, dropout_p=0.1 if self.training else 0.0,
+                                   causal=True)
+    return x.reshape(B, T, C)
+
+
+# Memory optimization configuration — all together
+def configure_memory_optimizations(model, use_flash=True, use_checkpointing=True):
+    if use_flash:
+        torch.backends.cuda.enable_flash_sdp(True)
+        torch.backends.cuda.enable_mem_efficient_sdp(True)
+
+    if use_checkpointing:
+        model.gradient_checkpointing_enable(
+            gradient_checkpointing_kwargs={"use_reentrant": False})
+
+    # Enable TF32 on Ampere (A100/RTX30xx) — free ~20% speedup
+    torch.backends.cuda.matmul.allow_tf32 = True
+    torch.backends.cudnn.allow_tf32        = True
+    torch.backends.cudnn.benchmark         = True   # auto-tune convolutions
+
+    return model
+</code></pre>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 8 -->
+<!-- ============================================================ -->
+<section id="s8">
+  <h2 class="text-2xl font-bold text-gray-900 mb-4">8. Training Frameworks Comparison</h2>
+
+  <table class="mb-6 text-sm">
+    <thead><tr><th>Framework</th><th>Best For</th><th>ZeRO/Sharding</th><th>Ease of Use</th><th>torch.compile</th><th>Multi-node</th></tr></thead>
+    <tbody>
+      <tr><td>PyTorch DDP</td><td>&lt;7B, simple jobs</td><td>No (full replication)</td><td>★★★★★</td><td>Full</td><td>Yes (torchrun)</td></tr>
+      <tr><td>PyTorch FSDP</td><td>7B–70B, native</td><td>ZeRO-3 equivalent</td><td>★★★★☆</td><td>Full (use_orig_params)</td><td>Yes</td></tr>
+      <tr><td>DeepSpeed</td><td>Any size, ZeRO-Inf</td><td>ZeRO 1/2/3 + Inf</td><td>★★★☆☆</td><td>Limited</td><td>Yes (pdsh/mpirun)</td></tr>
+      <tr><td>Megatron-LM</td><td>100B+ 3D parallel</td><td>TP + PP + DP</td><td>★★☆☆☆</td><td>Partial</td><td>Yes (SLURM)</td></tr>
+      <tr><td>HF Accelerate</td><td>Research, portability</td><td>Via FSDP/DS backend</td><td>★★★★★</td><td>Full</td><td>Yes</td></tr>
+    </tbody>
+  </table>
+
+  <h3 class="text-lg font-semibold mb-2">HuggingFace Accelerate — Multi-GPU Transparent</h3>
+  <pre><code class="language-python">"""
+accelerate_train.py — works on 1 GPU, 8 GPUs, or 128 GPUs with zero code changes
+Configure with: accelerate config
+Launch with:    accelerate launch accelerate_train.py
+"""
+from accelerate import Accelerator
+from transformers import AutoModelForCausalLM, AutoTokenizer, get_scheduler
+import torch
+from torch.utils.data import DataLoader
+
+def train():
+    accelerator = Accelerator(
+        mixed_precision="bf16",        # "fp16" / "bf16" / "no"
+        gradient_accumulation_steps=4,
+        log_with="wandb",
+        project_dir="./logs"
+    )
+    accelerator.init_trackers("my_llm_run", config={"lr": 1e-4})
+
+    model     = AutoModelForCausalLM.from_pretrained("meta-llama/Llama-2-7b-hf")
+    tokenizer = AutoTokenizer.from_pretrained("meta-llama/Llama-2-7b-hf")
+    optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4)
+    loader    = DataLoader(MyDataset(tokenizer), batch_size=8, shuffle=True)
+    scheduler = get_scheduler("cosine", optimizer, num_warmup_steps=100,
+                              num_training_steps=len(loader) * 3)
+
+    # prepare() handles DDP/FSDP wrapping, device placement, sampler replacement
+    model, optimizer, loader, scheduler = accelerator.prepare(
+        model, optimizer, loader, scheduler)
+
+    for epoch in range(3):
+        for step, batch in enumerate(loader):
+            with accelerator.accumulate(model):   # handles grad accumulation
+                outputs = model(**batch)
+                loss    = outputs.loss
+                accelerator.backward(loss)
+                accelerator.clip_grad_norm_(model.parameters(), 1.0)
+                optimizer.step()
+                scheduler.step()
+                optimizer.zero_grad()
+
+            if step % 50 == 0:
+                accelerator.log({"loss": loss.item()}, step=step)
+
+    # Unwrap before saving
+    unwrapped = accelerator.unwrap_model(model)
+    accelerator.wait_for_everyone()
+    if accelerator.is_main_process:
+        unwrapped.save_pretrained("./output")
+
+if __name__ == "__main__":
+    train()
+</code></pre>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 9 -->
+<!-- ============================================================ -->
+<section id="s9">
+  <h2 class="text-2xl font-bold text-gray-900 mb-4">9. Efficient Data Loading</h2>
+
+  <p class="text-gray-700 mb-3 text-sm">GPU utilization drops to 40-60% when data loading is the bottleneck. Key levers: <code>num_workers</code>, <code>pin_memory</code>, <code>prefetch_factor</code>, and streaming datasets for large corpora that don't fit on disk.</p>
+
+  <pre><code class="language-python">"""
+data_pipeline.py — optimized distributed data loading
+"""
+import webdataset as wds
+import torch
+from torch.utils.data import DataLoader
+from torch.utils.data.distributed import DistributedSampler
+
+# ── Approach 1: Standard dataset with DistributedSampler ──────────────────
+def make_standard_loader(dataset, rank, world_size, batch_size=32):
+    sampler = DistributedSampler(
+        dataset, num_replicas=world_size, rank=rank,
+        shuffle=True, seed=42, drop_last=True)
+    return DataLoader(
+        dataset,
+        batch_size=batch_size,
+        sampler=sampler,
+        num_workers=min(8, torch.multiprocessing.cpu_count() // 2),
+        pin_memory=True,          # page-lock host memory for fast H2D transfer
+        prefetch_factor=2,        # prefetch 2 batches per worker
+        persistent_workers=True,  # keep workers alive across epochs
+        drop_last=True,
+    )
+
+# ── Approach 2: WebDataset for streaming from S3/GCS/local tar files ──────
+def make_webdataset_loader(urls, batch_size=32, world_size=1, rank=0):
+    """
+    urls: e.g., "s3://bucket/data/shard-{000000..001023}.tar"
+    Each shard is a .tar file of (sample.txt, sample.json) pairs.
+    """
+    dataset = (
+        wds.WebDataset(urls, resampled=True, shardshuffle=True)
+          .shuffle(10000)          # buffer 10k samples
+          .decode("torch")         # auto-decode images/tensors
+          .to_tuple("input.pt", "label.pt")
+          .batched(batch_size, partial=False)
+    )
+
+    # WebDataset handles distributed sharding via shard splitting
+    loader = wds.WebLoader(dataset, batch_size=None, num_workers=4,
+                           pin_memory=True, prefetch_factor=4)
+    # Rebalance across ranks
+    loader = loader.with_epoch(10000 // batch_size)
+    return loader
+
+# ── Approach 3: HuggingFace datasets with streaming ───────────────────────
+from datasets import load_dataset, IterableDataset
+
+def make_streaming_loader(dataset_name, tokenizer, batch_size=16):
+    ds = load_dataset(dataset_name, split="train", streaming=True)
+    ds = ds.shuffle(seed=42, buffer_size=50_000)
+    ds = ds.map(lambda x: tokenizer(x["text"], truncation=True,
+                                     max_length=2048, padding="max_length"),
+                batched=True, remove_columns=["text"])
+    ds = ds.with_format("torch")
+    return DataLoader(ds, batch_size=batch_size, num_workers=2, pin_memory=True)
+</code></pre>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 10 -->
+<!-- ============================================================ -->
+<section id="s10">
+  <h2 class="text-2xl font-bold text-gray-900 mb-4">10. Cost Optimization &amp; Debugging</h2>
+
+  <h3 class="text-lg font-semibold mb-2">Spot Instance Training with Auto-Resume</h3>
+  <pre><code class="language-python">"""
+spot_train.py — fault-tolerant training for AWS Spot / GCP Preemptible
+Key: checkpoint every N steps; detect preemption via SIGTERM
+"""
+import signal, sys, os, time, torch
+
+CKPT_DIR   = "/mnt/efs/checkpoints"
+CKPT_EVERY = 500  # steps
+
+class SpotTrainer:
+    def __init__(self, model, optimizer, scheduler):
+        self.model     = model
+        self.optimizer = optimizer
+        self.scheduler = scheduler
+        self.step      = 0
+        self._interrupted = False
+        # Register SIGTERM handler (Spot interruption gives ~2 min warning)
+        signal.signal(signal.SIGTERM, self._handle_sigterm)
+
+    def _handle_sigterm(self, signum, frame):
+        print(f"[Rank {os.environ.get('RANK',0)}] SIGTERM received — saving checkpoint")
+        self._save(tag="preempted")
+        self._interrupted = True
+
+    def _save(self, tag="step"):
+        if int(os.environ.get("RANK", 0)) != 0:
+            return
+        path = f"{CKPT_DIR}/ckpt_{tag}_{self.step}.pt"
+        torch.save({
+            "step":      self.step,
+            "model":     self.model.state_dict(),
+            "optimizer": self.optimizer.state_dict(),
+            "scheduler": self.scheduler.state_dict(),
+            "rng_state": torch.cuda.get_rng_state(),
+        }, path + ".tmp")
+        os.replace(path + ".tmp", path)   # atomic rename — no corrupt checkpoints
+        print(f"Checkpoint saved: {path}")
+        # Keep only last 3 checkpoints
+        ckpts = sorted(f for f in os.listdir(CKPT_DIR) if f.startswith("ckpt_step"))
+        for old in ckpts[:-3]:
+            os.remove(os.path.join(CKPT_DIR, old))
+
+    def load_latest(self):
+        ckpts = sorted(f for f in os.listdir(CKPT_DIR) if f.endswith(".pt"))
+        if not ckpts:
+            return 0
+        ckpt  = torch.load(os.path.join(CKPT_DIR, ckpts[-1]), map_location="cpu")
+        self.model.load_state_dict(ckpt["model"])
+        self.optimizer.load_state_dict(ckpt["optimizer"])
+        self.scheduler.load_state_dict(ckpt["scheduler"])
+        self.step = ckpt["step"]
+        print(f"Resumed from step {self.step}")
+        return self.step
+
+    def train_loop(self, loader):
+        self.load_latest()
+        for batch in loader:
+            if self._interrupted:
+                sys.exit(0)
+            # ... normal training step ...
+            self.step += 1
+            if self.step % CKPT_EVERY == 0:
+                self._save(tag="step")
+</code></pre>
+
+  <h3 class="text-lg font-semibold mt-6 mb-2">Common Distributed Errors and Fixes</h3>
+  <table class="text-sm mb-6">
+    <thead><tr><th>Error</th><th>Cause</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td><code>NCCL timeout</code></td><td>One rank hanging; network issue</td><td>Set <code>NCCL_DEBUG=INFO</code>, check network topology, increase <code>NCCL_TIMEOUT</code></td></tr>
+      <tr><td><code>OOM during backward</code></td><td>Activations too large</td><td>Enable gradient checkpointing, reduce batch size, use ZeRO-3</td></tr>
+      <tr><td><code>Deadlock in DDP</code></td><td><code>find_unused_parameters=False</code> but some params unused</td><td>Set <code>find_unused_parameters=True</code> or remove unused modules</td></tr>
+      <tr><td><code>Loss NaN after 1k steps</code></td><td>FP16 overflow; large LR</td><td>Switch to BF16, reduce LR, check GradScaler init scale</td></tr>
+      <tr><td><code>AllReduce shape mismatch</code></td><td>Unequal batch sizes across ranks</td><td>Set <code>drop_last=True</code> in DistributedSampler</td></tr>
+      <tr><td><code>Checkpoint save hang</code></td><td>Non-rank-0 blocked on save</td><td>Guard save with <code>if rank == 0:</code>, use <code>dist.barrier()</code> after</td></tr>
+      <tr><td><code>Slow throughput (&lt;50% MFU)</code></td><td>Data loading bottleneck</td><td>Increase <code>num_workers</code>, use <code>pin_memory=True</code>, profile with <code>nvtx</code></td></tr>
+      <tr><td><code>FSDP + torch.compile error</code></td><td>Missing <code>use_orig_params=True</code></td><td>Add <code>use_orig_params=True</code> to FSDP constructor</td></tr>
+    </tbody>
+  </table>
+
+  <h3 class="text-lg font-semibold mb-2">Training Cost Estimation</h3>
+  <div class="bg-gray-50 rounded-lg border border-gray-200 p-4 text-sm font-mono mb-4">
+    <div class="text-gray-600 mb-2">// Chinchilla scaling: FLOPs ≈ 6 × N × D (N=params, D=tokens)</div>
+    <div>FLOPS = 6 × 7e9 × 1e12 = 4.2 × 10²² FLOPs  (7B model, 1T tokens)</div>
+    <div class="mt-1">A100 peak BF16: 312 TFLOP/s → at 40% MFU → ~125 TFLOP/s effective</div>
+    <div class="mt-1">GPU-hours = 4.2×10²² / (125×10¹²×3600) ≈ 93,333 A100-hours</div>
+    <div class="mt-1">512 A100s → 182 hours ≈ 7.6 days @ ~$2/hr → ~$186K</div>
+    <div class="text-gray-600 mt-2">// MFU = (observed tokens/sec × 6N) / (GPUs × peak_flops)</div>
+  </div>
+
+  <div class="callout-blue rounded-lg p-4 text-sm">
+    <strong>Cost reduction levers:</strong> Use BF16 (2× vs FP32). Enable Flash Attention (1.5–3× throughput). Use Spot/Preemptible instances (60-80% discount). Pack sequences (remove padding). Use compiled model with <code>torch.compile(model, mode="reduce-overhead")</code>. Together these can reduce cost by 4-6×.
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- KEY TAKEAWAYS -->
+<!-- ============================================================ -->
+<section class="bg-white rounded-xl border border-gray-200 p-8">
+  <h2 class="text-2xl font-bold text-gray-900 mb-5">Key Takeaways</h2>
+  <ul class="space-y-3 text-sm text-gray-700">
+    <li class="flex gap-2"><span class="text-green-600 font-bold">1.</span> <span><strong>Memory math first:</strong> 12×P bytes for full training (params + grads + Adam states). Know your budget before choosing a parallelism strategy.</span></li>
+    <li class="flex gap-2"><span class="text-green-600 font-bold">2.</span> <span><strong>Start with DDP + ZeRO-2/3:</strong> Covers 90% of use cases up to ~70B params. Only add TP/PP for 100B+ where inter-GPU bandwidth is not the bottleneck.</span></li>
+    <li class="flex gap-2"><span class="text-green-600 font-bold">3.</span> <span><strong>BF16 is the right default</strong> for training on A100/H100. FP16 requires loss scaling and overflows in long runs. FP8 is emerging for H100 pre-training.</span></li>
+    <li class="flex gap-2"><span class="text-green-600 font-bold">4.</span> <span><strong>FSDP vs DeepSpeed:</strong> FSDP is native PyTorch and composes with torch.compile. DeepSpeed has ZeRO-Infinity (NVMe offload) for extreme memory constraints.</span></li>
+    <li class="flex gap-2"><span class="text-green-600 font-bold">5.</span> <span><strong>Gradient checkpointing + Flash Attention</strong> together reduce memory by 8-10× with only ~30% compute overhead. Always enable both for long-context training.</span></li>
+    <li class="flex gap-2"><span class="text-green-600 font-bold">6.</span> <span><strong>Data loading is frequently the bottleneck.</strong> Profile GPU utilization first. WebDataset + multiple workers nearly always fixes it.</span></li>
+    <li class="flex gap-2"><span class="text-green-600 font-bold">7.</span> <span><strong>Checkpoint atomically.</strong> Write to <code>.tmp</code>, rename. Save every 500 steps on spot instances. SIGTERM gives you ~2 minutes on AWS.</span></li>
+    <li class="flex gap-2"><span class="text-green-600 font-bold">8.</span> <span><strong>MFU (Model FLOP Utilization)</strong> is the right efficiency metric. Target &gt;40% for DDP jobs, &gt;35% for ZeRO-3. Below 30% means something is wrong — debug with <code>torch.profiler</code>.</span></li>
+  </ul>
+
+  <div class="mt-6 p-4 bg-blue-50 rounded-lg text-sm text-blue-800">
+    <strong>Next:</strong> Chapter 8b covers Megatron-LM 3D parallelism, sequence parallelism, context parallelism for long sequences, and custom fused CUDA kernels. These techniques are used to train the largest frontier models at Meta, Google, and OpenAI.
+  </div>
+</section>
+
+</main>
+
+<!-- Bottom nav -->
+<footer class="max-w-4xl mx-auto px-4 py-10 flex justify-between items-center border-t border-gray-200 text-sm text-gray-600">
+  <a href="ch07_experiment_tracking.html" class="flex items-center gap-2 hover:text-blue-600">
+    <span>←</span>
+    <span>Ch7: Experiment Tracking &amp; Model Registry</span>
+  </a>
+  <a href="index.html" class="text-gray-400 hover:text-gray-700">Modern MLOps Tutorial</a>
+  <a href="ch08b_advanced_training.html" class="flex items-center gap-2 hover:text-blue-600">
+    <span>Ch8b: Advanced Training (3D Parallelism)</span>
+    <span>→</span>
+  </a>
+</footer>
+
+</body>
+</html>

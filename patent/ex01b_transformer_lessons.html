@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Case Study 1B: The Transformer Architecture — §101 eligibility analysis, open-source tension, competitive response, and lessons for AI researchers on patent strategy." />
+  <title>Case Study 1B: Transformer Legal Analysis &amp; Lessons — Patent Law for Technologists</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .alice-step {
+      background: var(--gray-50);
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .alice-step-header {
+      display: flex; align-items: center; gap: .875rem; margin-bottom: 1rem;
+    }
+    .alice-step-num {
+      background: var(--navy); color: white; font-weight: 700;
+      font-size: .875rem; padding: .4rem .875rem; border-radius: 20px; white-space: nowrap;
+    }
+    .alice-step-num.sub { background: var(--navy-light); font-size: .8rem; }
+    .alice-step-title { font-weight: 700; color: var(--navy); font-size: 1rem; }
+    .alice-outcome {
+      display: inline-flex; align-items: center; gap: .375rem;
+      font-size: .8125rem; font-weight: 700; padding: .3rem .75rem;
+      border-radius: 20px; margin-top: .75rem;
+    }
+    .alice-outcome.eligible  { background: #d4efdf; color: var(--success); }
+    .alice-outcome.concern   { background: #fdebd0; color: #e67e22; }
+    .alice-outcome.ineligible { background: #fdedec; color: var(--danger); }
+  </style>
+</head>
+<body>
+
+<!-- ══ TOP NAVIGATION ══════════════════════════════════════════ -->
+<nav class="top-nav">
+  <div class="nav-container">
+    <a href="index.html" class="nav-logo">Patent Law <span>for Technologists</span></a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="ch01_patent_system_overview.html">Ch.1</a>
+      <a href="ch05_writing_claims.html">Ch.5</a>
+      <a href="ch08_application_process.html">Ch.8</a>
+      <a href="ch12_monetization.html">Ch.12</a>
+      <a href="ex01a_transformer_technology.html">Ex.1A</a>
+      <a href="ex01b_transformer_lessons.html" class="active">Ex.1B</a>
+      <a href="ex02_lora.html">Ex.2</a>
+      <a href="ex03_crispr.html">Ex.3</a>
+      <a href="ex04_gpt.html">Ex.4</a>
+      <a href="ex05_alphafold.html">Ex.5</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ══ HERO ════════════════════════════════════════════════════ -->
+<header class="chapter-hero">
+  <div class="chapter-hero-content">
+    <div class="chapter-badge">Case Study 1 &middot; Part B</div>
+    <h1>The Transformer: Legal Analysis &amp; Lessons</h1>
+    <p class="subtitle">
+      &sect;101 eligibility, open-source strategy, competitive response, and what AI researchers
+      should do differently
+    </p>
+    <div class="chapter-meta">
+      <span>Prof. Colleen V. Chien &mdash; Berkeley School of Law</span>
+      <span>Case Study 1B of 5</span>
+      <span>Prerequisite: Case Study 1A</span>
+    </div>
+  </div>
+</header>
+
+<!-- ══ PAGE LAYOUT ═════════════════════════════════════════════ -->
+<div class="page-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <nav class="toc">
+      <h3>In This Section</h3>
+      <ol>
+        <li><a href="#section-101">&sect;101 Eligibility Challenge</a></li>
+        <li><a href="#unprotected">What Was Left Unprotected</a></li>
+        <li><a href="#open-source">The Open-Source Tension</a></li>
+        <li><a href="#competitive">Competitive Response</a></li>
+        <li><a href="#redesign">What You Would Do Differently</a></li>
+        <li><a href="#lessons">Lessons for AI Researchers</a></li>
+        <li><a href="#takeaways">Key Takeaways</a></li>
+      </ol>
+    </nav>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="chapter-content">
+
+    <!-- ══ SECTION 1: §101 ══════════════════════════════════════ -->
+    <section id="section-101" class="section-anchor">
+      <h2>1. &sect;101 Eligibility Challenge</h2>
+
+      <p>
+        The most dangerous obstacle for transformer-related claims is not prior art — it is the
+        <span class="key-term" title="35 U.S.C. §101, as interpreted by Alice Corp. v. CLS Bank">Alice/Mayo</span>
+        framework. Scaled dot-product attention is, on its face, a mathematical formula:
+        <strong>Attention(Q,K,V) = softmax(QK<sup>T</sup>/&radic;d<sub>k</sub>)V</strong>.
+        The Patent Office and courts have shown little patience for math dressed up as software.
+        Working through the two-step analysis carefully is therefore essential.
+      </p>
+
+      <!-- Alice Flowchart -->
+      <div class="flowchart">
+        <div class="flow-node">Claim: Scaled Dot-Product Attention Method</div>
+        <div class="flow-arrow"></div>
+        <div class="flow-node decision">Step 1: Abstract idea?</div>
+        <div class="flow-row">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:.5rem;">
+            <span style="font-size:.75rem;font-weight:700;color:var(--danger);">YES (mathematical formula)</span>
+            <div class="flow-arrow"></div>
+            <div class="flow-node decision">Step 2A: Practical application?</div>
+            <div class="flow-row" style="margin-top:.5rem;">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:.5rem;">
+                <span style="font-size:.75rem;font-weight:700;color:var(--danger);">NO</span>
+                <div class="flow-arrow"></div>
+                <div class="flow-node warning">INELIGIBLE &mdash; reject</div>
+              </div>
+              <div class="flow-arrow-h"></div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:.5rem;">
+                <span style="font-size:.75rem;font-weight:700;color:var(--success);">YES &rarr; Step 2B</span>
+                <div class="flow-arrow"></div>
+                <div class="flow-node success">ELIGIBLE &mdash; allow</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 1 -->
+      <div class="alice-step">
+        <div class="alice-step-header">
+          <span class="alice-step-num">Step 1</span>
+          <span class="alice-step-title">Is the claim directed to an abstract idea?</span>
+        </div>
+        <p>
+          <strong>Analysis:</strong> At its core, scaled dot-product attention computes a weighted
+          average of value vectors, where weights are derived from query-key dot products. This is
+          a mathematical operation on matrices. Under <em>Alice Corp. v. CLS Bank</em> (2014) and
+          the USPTO's 2019 Revised Guidance, mathematical concepts &mdash; including mathematical
+          relationships and mathematical formulas &mdash; are abstract ideas and presumptively
+          ineligible.
+        </p>
+        <div class="alice-outcome concern">&#9888; Likely directed to a mathematical concept &mdash; Step 2 analysis required</div>
+      </div>
+
+      <!-- Step 2A -->
+      <div class="alice-step">
+        <div class="alice-step-header">
+          <span class="alice-step-num sub">Step 2A, Prong 1</span>
+          <span class="alice-step-title">Is the claim integrated into a practical application?</span>
+        </div>
+        <p>
+          The <em>Enfish</em> line of cases saves claims that provide a specific technical improvement
+          to a computer or computing process itself. The transformer's attention mechanism provides
+          exactly that:
+        </p>
+        <ul>
+          <li><strong>Longer-range dependencies:</strong> O(1) path length between any two positions
+            vs. O(n) for RNNs &mdash; a specific structural improvement to sequence modeling.</li>
+          <li><strong>Faster training:</strong> Full parallelism across positions; eliminates the
+            sequential bottleneck of recurrent architectures.</li>
+          <li><strong>Measurable NLP improvement:</strong> 28.4 BLEU on WMT English-to-German, at
+            the time the highest reported score for that benchmark.</li>
+        </ul>
+        <p>
+          These are specific, quantifiable improvements to a technical process &mdash; not abstract
+          benefits. Citing <em>McRO, Inc. v. Bandai Namco</em>: the claim uses a specific method
+          to achieve an improved result, not a generic instruction to apply a mathematical concept.
+        </p>
+        <div class="alice-outcome eligible">&#10003; Integrated into a practical application &mdash; eligible under Step 2A</div>
+      </div>
+
+      <!-- Step 2B -->
+      <div class="alice-step">
+        <div class="alice-step-header">
+          <span class="alice-step-num sub">Step 2B</span>
+          <span class="alice-step-title">Does the claim amount to "significantly more" than the abstract idea?</span>
+        </div>
+        <p>
+          Even if Step 2A is contested, Step 2B is satisfied by the combination of: (1) a specific
+          hardware implementation &mdash; the claim recites processors executing operations on
+          specific data structures; (2) the novel multi-head architecture combining multiple parallel
+          attention operations; and (3) the scaling factor <strong>1/&radic;d<sub>k</sub></strong>,
+          which is a non-obvious technical solution to the vanishing-gradient problem in large
+          dot-product spaces. No single element was conventional in combination.
+        </p>
+        <div class="alice-outcome eligible">&#10003; Amounts to significantly more &mdash; eligible under Step 2B</div>
+      </div>
+
+      <!-- Comparison grid -->
+      <h3>Claim Language: Fail vs. Pass</h3>
+      <div class="comparison-grid">
+        <div class="comparison-item bad">
+          <h4>&#10007; Would Likely FAIL &sect;101</h4>
+          <p style="font-family:var(--font-serif);font-size:.9rem;line-height:1.8;">
+            "A method comprising: computing an attention score between each pair of positions in an
+            input sequence using a dot product of learned query and key vectors; and weighting value
+            vectors by said scores."
+          </p>
+          <p style="font-size:.875rem;color:var(--danger);font-weight:600;margin-bottom:0;">
+            Problem: Pure mathematical formula, no practical application, no structural limitation.
+          </p>
+        </div>
+        <div class="comparison-item good">
+          <h4>&#10003; Framing That PASSES &sect;101</h4>
+          <p style="font-family:var(--font-serif);font-size:.9rem;line-height:1.8;">
+            "A computer-implemented method for machine translation comprising: encoding an input
+            sequence with a stack of self-attention layers each computing scaled dot-product attention
+            as softmax(QK<sup>T</sup>/&radic;d<sub>k</sub>)V across all positions in parallel;
+            wherein said method achieves at least 28 BLEU on the WMT English-to-German translation
+            task."
+          </p>
+          <p style="font-size:.875rem;color:var(--success);font-weight:600;margin-bottom:0;">
+            Strength: Specific application, measurable benchmark, structural implementation detail.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ SECTION 2: UNPROTECTED ══════════════════════════════ -->
+    <section id="unprotected" class="section-anchor">
+      <h2>2. What Was Left Unprotected</h2>
+
+      <p>
+        The Vaswani et al. paper disclosed far more than the filed patents covered. Understanding
+        what was left in the public domain is as strategically important as understanding what
+        was claimed &mdash; because the unprotected material became the foundation of an entire
+        ecosystem.
+      </p>
+
+      <div class="callout callout-info">
+        <div class="callout-icon">&#128161;</div>
+        <div class="callout-body">
+          <div class="callout-title">The Innovation Commons</div>
+          <p>
+            By disclosing specific hyperparameters, benchmark results, and training procedures
+            without claiming them, Google effectively donated these implementation details to the
+            public. This was likely intentional: Google benefited more from rapid ecosystem
+            adoption (driving TensorFlow usage, talent recruitment, research reputation) than from
+            enforcing narrow method patents against open researchers.
+          </p>
+          <p>
+            The consequence: GPT (OpenAI, 2018), BERT (Google, 2018), T5 (Google, 2019), and
+            virtually every large language model since 2017 are built directly on these unprotected
+            disclosures. <strong>Google's own competitors freely used Google's own paper.</strong>
+          </p>
+        </div>
+      </div>
+
+      <h3>Key Disclosures That Were Not Claimed</h3>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Disclosed Element</th>
+              <th>Specific Value / Detail</th>
+              <th>Why Not Claimed</th>
+              <th>Consequence</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Number of attention heads</td>
+              <td>h = 8</td>
+              <td>Too specific; limits scope; would read off easily</td>
+              <td>BERT used 12/16; all implementations free to choose</td>
+            </tr>
+            <tr>
+              <td>Model dimension</td>
+              <td>d<sub>model</sub> = 512</td>
+              <td>Arbitrary engineering choice; easy design-around</td>
+              <td>GPT-3 used d = 12,288 &mdash; unconstrained by any claim</td>
+            </tr>
+            <tr>
+              <td>Training data</td>
+              <td>WMT 2014 EN-DE, EN-FR datasets</td>
+              <td>Not patentable (data, not method)</td>
+              <td>Benchmarks became industry standard; freely replicable</td>
+            </tr>
+            <tr>
+              <td>BLEU score results</td>
+              <td>28.4 BLEU (EN-DE), 41.0 BLEU (EN-FR)</td>
+              <td>Results, not inventions; would be §101 risk</td>
+              <td>Any implementation achieving &ge;28 BLEU is free to operate</td>
+            </tr>
+            <tr>
+              <td>The concept of "scaling"</td>
+              <td>Larger d<sub>model</sub> &rarr; better performance</td>
+              <td>Obvious relationship; no specific scaling law claimed</td>
+              <td>Enabled GPT-3/4 scaling paradigm; unclaimed territory</td>
+            </tr>
+            <tr>
+              <td>Positional encoding formula</td>
+              <td>sin/cos at different frequencies</td>
+              <td>Mathematical function; likely ineligible alone</td>
+              <td>Later replaced by learned embeddings (RoPE, ALiBi) &mdash; free innovations</td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="table-caption">Table 1. Transformer paper disclosures not captured by patent claims.</p>
+      </div>
+    </section>
+
+    <!-- ══ SECTION 3: OPEN SOURCE ══════════════════════════════ -->
+    <section id="open-source" class="section-anchor">
+      <h2>3. The Open-Source Tension</h2>
+
+      <p>
+        Google executed an unusual dual strategy: simultaneously publishing the paper, releasing
+        the <code>tensor2tensor</code> implementation under Apache License 2.0, <em>and</em> filing
+        patent applications. This is coherent &mdash; but it creates legal complexity that
+        downstream users must understand.
+      </p>
+
+      <h3>The Apache 2.0 Patent Grant</h3>
+      <p>
+        Apache License 2.0 contains an explicit, irrevocable patent grant in Section 3:
+      </p>
+      <blockquote>
+        "Each Contributor hereby grants to You a perpetual, worldwide, non-exclusive, no-charge,
+        royalty-free, irrevocable... patent license to make, have made, use, offer to sell, sell,
+        import, and otherwise transfer the Work..."
+        <cite>&mdash; Apache License 2.0, Section 3 (Grant of Patent License)</cite>
+      </blockquote>
+
+      <div class="callout callout-warning">
+        <div class="callout-icon">&#9888;</div>
+        <div class="callout-body">
+          <div class="callout-title">Apache 2.0 Patent Grant Scope &mdash; Critical Limitation</div>
+          <p>
+            The Apache 2.0 patent grant covers patents that are "necessarily infringed by their
+            Contribution(s) alone or by combination of their Contribution(s) with the Work."
+            <strong>This is narrower than it appears.</strong> Three important limitations:
+          </p>
+          <ol>
+            <li><strong>Code-linked:</strong> The grant applies to use of the licensed code itself,
+              not to independent implementations of the same method. A developer who writes their
+              own attention mechanism from scratch, without using the Apache-licensed tensor2tensor
+              code, may not be covered.</li>
+            <li><strong>Contribution-linked:</strong> Only patents covering what Google contributed
+              to the repo are granted. Patents on improvements or related methods filed after the
+              initial contribution may not be licensed.</li>
+            <li><strong>Termination on litigation:</strong> If you sue Google for patent
+              infringement, your Apache 2.0 patent license terminates automatically.</li>
+          </ol>
+          <p style="margin-bottom:0;">
+            <strong>Practical implication:</strong> Using Hugging Face's <code>transformers</code>
+            library (MIT license, no patent grant) to implement attention-based models provides
+            <em>no</em> patent license from Google. Using the original Apache 2.0 code arguably does.
+          </p>
+        </div>
+      </div>
+
+      <h3>Is Open Source + Patents a Coherent Strategy?</h3>
+      <p>
+        Yes, when structured deliberately. The Google transformer case illustrates how:
+      </p>
+      <ul>
+        <li><strong>Open source builds the ecosystem.</strong> Apache 2.0 release drove adoption,
+          making the transformer the industry standard. More adoption means more potential licensees.</li>
+        <li><strong>Patents provide enterprise leverage.</strong> A company deploying transformers
+          in a commercial product (not using the open-source code) remains a potential licensing
+          target. The patents exist as a backstop for non-open-source commercial use.</li>
+        <li><strong>Defensive deterrence.</strong> Even if Google never enforces the patents,
+          competitors know they exist. This creates cross-licensing leverage in any dispute.</li>
+        <li><strong>The risk: community backlash.</strong> If a patent holder pursues open-source
+          users, the reputational damage can outweigh the royalties. The implicit social contract
+          of Apache 2.0 + patent filing requires careful enforcement choices.</li>
+      </ul>
+    </section>
+
+    <!-- ══ SECTION 4: COMPETITIVE RESPONSE ════════════════════ -->
+    <section id="competitive" class="section-anchor">
+      <h2>4. The Competitive Response</h2>
+
+      <p>
+        The transformer's open publication triggered a wave of IP activity across the industry.
+        Each major player responded according to their strategic position &mdash; revealing how
+        different companies use patents and open source as complementary or alternative tools.
+      </p>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Company</th>
+              <th>Strategic Response</th>
+              <th>Key IP Moves</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Microsoft</td>
+              <td>
+                Licensed from Google; invested $1B+ in OpenAI (2019); integrated GPT-based
+                models into Azure, Office 365, and Bing.
+              </td>
+              <td>
+                Filed patents on BERT and GPT fine-tuning methods, transformer-based code
+                completion (GitHub Copilot), and retrieval-augmented generation. Cross-licensed
+                with Google as part of broader portfolio arrangement.
+              </td>
+            </tr>
+            <tr>
+              <td>Meta AI</td>
+              <td>
+                Released PyTorch transformer implementations; open-sourced LLaMA model weights.
+                Positioned as the open-source champion to counter Google/Microsoft closed models.
+              </td>
+              <td>
+                Filed own attention variant patents (sparse attention, grouped-query attention).
+                LLaMA release under research license &mdash; notably <em>not</em> Apache 2.0,
+                limiting the patent grant argument.
+              </td>
+            </tr>
+            <tr>
+              <td>Amazon (AWS)</td>
+              <td>
+                Did not develop foundational transformer models; focused on inference infrastructure
+                and hosting (SageMaker, Bedrock). Monetized others' models at scale.
+              </td>
+              <td>
+                Filed patents on transformer inference optimization: KV-cache management, dynamic
+                batching for variable-length sequences, tensor parallelism across GPU clusters.
+                Infrastructure patents &mdash; not model patents.
+              </td>
+            </tr>
+            <tr>
+              <td>Hugging Face</td>
+              <td>
+                Open-sourced the <code>transformers</code> library (30k+ GitHub stars within a
+                year); became the de facto hub for pretrained models. No transformer patents filed.
+              </td>
+              <td>
+                Defensive open-source strategy: by contributing all implementations to the public,
+                Hugging Face creates prior art that limits others' ability to patent transformer
+                variants. Community trust &gt; patent royalties in their business model.
+              </td>
+            </tr>
+            <tr>
+              <td>Chinese Tech (Baidu, Alibaba, Tencent)</td>
+              <td>
+                Filed hundreds of transformer variant patent applications in China (CNIPA).
+                ERNIE (Baidu), Aliformer, PanGu-Alpha represent major localized LLM efforts.
+              </td>
+              <td>
+                Aggressive domestic patent filing: positional encoding variants, multilingual
+                attention, knowledge-enhanced attention, efficient transformer architectures.
+                Most filings are China-only; few PCT applications seeking global coverage.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="table-caption">Table 2. Competitive IP responses to the open publication of the Transformer (2017&ndash;2024).</p>
+      </div>
+
+      <p>
+        The pattern is clear: the original inventors (Google) got the foundational patents;
+        downstream players filed patents on specific applications and optimizations. This is the
+        normal trajectory of a disruptive technology &mdash; and it illustrates why filing early,
+        broadly, and on the mechanism (not just the application) matters so much.
+      </p>
+    </section>
+
+    <!-- ══ SECTION 5: REDESIGN ═════════════════════════════════ -->
+    <section id="redesign" class="section-anchor">
+      <h2>5. What You Would Do Differently</h2>
+
+      <p>
+        Hindsight is valuable in patent strategy. Below are two hypothetical claims that would
+        have provided materially broader or more strategically valuable coverage than what was
+        actually filed &mdash; along with an honest assessment of each approach's risks.
+      </p>
+
+      <!-- Hypothetical Claim H-1 -->
+      <h3>Hypothetical Claim H-1: Broader Coverage of the Self-Attention Principle</h3>
+
+      <div class="claim-box">
+        <div class="claim-header">Hypothetical Claim H-1 &mdash; Method (Broader Self-Attention)</div>
+        <p>
+          <span class="claim-number">H-1.</span> A computer-implemented method for processing
+          sequential data comprising:
+          <span class="claim-element">receiving, as input, a sequence of tokens each represented
+            by a learned vector embedding in a d-dimensional vector space;</span>
+          <span class="claim-element">computing, for each position i in the input sequence, a
+            context-aware representation by: (a) generating a query vector q<sub>i</sub>, a key
+            vector k<sub>j</sub>, and a value vector v<sub>j</sub> for each position j via
+            learned linear projections; (b) computing an attention weight for each pair (i, j)
+            as a function of q<sub>i</sub> and k<sub>j</sub>; and (c) producing the output
+            representation as a weighted combination of the value vectors;</span>
+          <span class="claim-element">applying said computation simultaneously and in parallel
+            across all positions in the sequence; and</span>
+          <span class="claim-element">outputting the context-aware representations for use in
+            at least one of: natural language generation, machine translation, or sequence
+            classification.</span>
+        </p>
+      </div>
+
+      <div class="callout callout-warning">
+        <div class="callout-icon">&#9888;</div>
+        <div class="callout-body">
+          <div class="callout-title">Analysis: Why H-1 Is Broader but Riskier</div>
+          <p>
+            <strong>Coverage advantage:</strong> By omitting the specific softmax scaling factor
+            and specific matrix dimensions, H-1 would cover all attention variants including
+            linear attention, cosine attention, and any future mechanisms that follow the
+            query-key-value pattern. It would read on BERT, GPT, T5, ViT, and most LLMs developed
+            since 2017.
+          </p>
+          <p>
+            <strong>&sect;101 risk:</strong> Dropping the specific technical details that anchor
+            the claim to a "practical application" increases Alice vulnerability. The broader the
+            claim, the more it looks like claiming the abstract concept itself.
+          </p>
+          <p style="margin-bottom:0;">
+            <strong>Prior art risk:</strong> Broader claims face more prior art. Bahdanau et al.
+            (2014) neural attention, Luong et al. (2015), and memory networks all compute weighted
+            sums over context vectors. H-1 might not survive a <em>Wands</em> challenge without
+            further distinguishing language.
+          </p>
+        </div>
+      </div>
+
+      <!-- Hypothetical Claim H-2 -->
+      <h3>Hypothetical Claim H-2: Claiming the Training Method Separately</h3>
+
+      <div class="claim-box">
+        <div class="claim-header">Hypothetical Claim H-2 &mdash; Method (Training Procedure)</div>
+        <p>
+          <span class="claim-number">H-2.</span> A method for training a sequence-to-sequence
+          neural network on a hardware accelerator comprising:
+          <span class="claim-element">receiving a plurality of training pairs each comprising
+            an input sequence and a corresponding target sequence;</span>
+          <span class="claim-element">training an encoder comprising a plurality of multi-head
+            self-attention layers, wherein each multi-head self-attention layer computes h parallel
+            attention functions over learned projections of query, key, and value matrices, and
+            wherein the encoder processes all positions of the input sequence simultaneously in a
+            single forward pass;</span>
+          <span class="claim-element">training a decoder comprising: (a) masked multi-head
+            self-attention layers that attend only to preceding output positions; and (b) multi-head
+            cross-attention layers that attend to the encoder output;</span>
+          <span class="claim-element">applying a label-smoothed cross-entropy loss with smoothing
+            parameter &epsilon; during training; and</span>
+          <span class="claim-element">optimizing all trainable parameters jointly using an adaptive
+            gradient method with a learning rate schedule comprising a linear warmup phase followed
+            by a decay phase proportional to the inverse square root of the training step.</span>
+        </p>
+      </div>
+
+      <div class="callout callout-info">
+        <div class="callout-icon">&#128161;</div>
+        <div class="callout-body">
+          <div class="callout-title">Analysis: Why the Training Method Is Independently Valuable</div>
+          <p>
+            <strong>Independent coverage:</strong> A system claim covers the model architecture.
+            A training method claim covers the process of creating the model. These are
+            <em>different legal acts</em>: a competitor who uses the architecture but develops
+            their own training procedure might escape a system claim while still infringing a
+            training method claim &mdash; or vice versa. Filing both maximizes coverage.
+          </p>
+          <p>
+            <strong>Commercial leverage:</strong> Large-scale model training is where the
+            significant capital expenditure occurs. A training method claim gives the patentee
+            rights against cloud providers (AWS, Azure, GCP) who train transformer models on
+            behalf of customers &mdash; a multi-billion dollar market.
+          </p>
+          <p style="margin-bottom:0;">
+            <strong>Continuation strategy:</strong> H-2 is a natural continuation claim: file the
+            architecture claims first, then add training-method claims as a continuation before
+            the parent issues. This gives more time to observe what the market actually does and
+            to tailor claims accordingly.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ SECTION 6: LESSONS ══════════════════════════════════ -->
+    <section id="lessons" class="section-anchor">
+      <h2>6. Lessons for AI Researchers</h2>
+
+      <p>
+        The transformer story is a case study in what happens when world-class researchers file
+        patents almost as an afterthought. The architecture changed the world; the patent portfolio
+        left significant value on the table. Here is what to do differently.
+      </p>
+
+      <ol class="process-steps">
+        <li>
+          <div class="step-content">
+            <h4>File before or simultaneously with paper submission</h4>
+            <p>
+              The 12-month grace period under 35 U.S.C. &sect;102(b)(1) allows filing up to one
+              year after your own disclosure &mdash; but international patent rights (Europe, China,
+              Japan) require filing <em>before</em> any public disclosure. Submit a provisional
+              application on the day you submit to arXiv or a conference. Cost: ~$320 USPTO fee.
+              Value: preserves global patent rights for up to 12 months.
+            </p>
+          </div>
+        </li>
+        <li>
+          <div class="step-content">
+            <h4>Claim the mechanism, not just the application</h4>
+            <p>
+              The transformer was claimed primarily for machine translation. But the mechanism
+              &mdash; position-invariant learned attention &mdash; works for vision (ViT), audio
+              (Whisper), proteins (AlphaFold), code (Codex), and more. Claim the underlying method
+              first, then add dependent claims for specific applications. Applications you did not
+              think of in 2017 are now multi-billion dollar markets.
+            </p>
+          </div>
+        </li>
+        <li>
+          <div class="step-content">
+            <h4>File method + system + computer-readable medium claims</h4>
+            <p>
+              Three independent claim types give you three chances to enforce and three theories of
+              infringement. A competitor who argues that a system claim requires physical components
+              they do not have may still infringe the method claim. Filing all three is standard
+              practice and adds minimal cost if drafted simultaneously.
+            </p>
+          </div>
+        </li>
+        <li>
+          <div class="step-content">
+            <h4>Think about downstream variants before filing &mdash; build continuations in</h4>
+            <p>
+              When writing the specification, include detailed descriptions of variations you can
+              imagine: different numbers of heads, different scaling functions, sparse attention,
+              cross-attention for multimodal inputs. Each described variant is a potential
+              continuation claim. The specification is your strategic reserve; claims are your
+              deployed forces. A thick specification costs little extra and enables decades of
+              continuation filings.
+            </p>
+          </div>
+        </li>
+        <li>
+          <div class="step-content">
+            <h4>Open source and patents can coexist &mdash; structure the licenses deliberately</h4>
+            <p>
+              If you release open-source code, choose the license with patent strategy in mind.
+              Apache 2.0 includes a patent grant; MIT does not. GPL creates copyleft obligations
+              that may deter commercial adoption. If you want open research adoption but patent
+              protection against commercial infringers who do not use your code, Apache 2.0 is
+              the right vehicle. Document the relationship between your patent claims and your
+              open-source contribution explicitly.
+            </p>
+          </div>
+        </li>
+        <li>
+          <div class="step-content">
+            <h4>File internationally &mdash; especially China, Europe, and Japan</h4>
+            <p>
+              A US patent alone is insufficient for AI innovations. The largest transformer
+              deployments are global. File a PCT application within 12 months of your provisional;
+              this preserves the right to enter national phase in 150+ countries for up to 30
+              months. Priority markets for AI: USA, Europe (EPO), China (CNIPA), Japan (JPO),
+              and South Korea (KIPO). Budget $20,000&ndash;$50,000 for international prosecution.
+            </p>
+          </div>
+        </li>
+        <li>
+          <div class="step-content">
+            <h4>Build a claim ladder, not a single broad claim</h4>
+            <p>
+              A single broad independent claim is a single point of failure &mdash; one prior art
+              reference can invalidate your entire patent. Instead, draft a claim ladder: one broad
+              independent claim (claim 1) with 10&ndash;20 dependent claims that each add
+              narrowing limitations. If claim 1 falls, claims 5, 8, and 12 may survive.
+              Dependent claims cost almost nothing to add and dramatically improve portfolio
+              resilience.
+            </p>
+          </div>
+        </li>
+      </ol>
+    </section>
+
+    <!-- ══ SECTION 7: TAKEAWAYS ════════════════════════════════ -->
+    <section id="takeaways" class="section-anchor">
+      <h2>7. Key Takeaways</h2>
+
+      <ul class="checklist">
+        <li>The transformer demonstrates that even a deeply mathematical innovation can be
+          patent-eligible if the claims are anchored to a specific technical implementation.</li>
+        <li>Filing a provisional on the day of paper submission costs ~$320 and preserves global
+          rights; failing to do so costs millions in lost international protection.</li>
+        <li>The Alice/Mayo two-step is navigable: quantify technical improvements, specify
+          hardware context, and tie the abstract math to a concrete technical result.</li>
+        <li>What is disclosed but not claimed becomes prior art that anyone can use &mdash;
+          including your direct competitors building the next generation of your own technology.</li>
+        <li>Specific hyperparameters (d<sub>model</sub>, h, layers) should generally not appear
+          in independent claims; they narrow scope without adding eligibility protection.</li>
+        <li>Method claims and system claims cover different acts; filing both is necessary for
+          comprehensive infringement coverage.</li>
+        <li>Apache 2.0's patent grant is tied to the code contribution, not the underlying method
+          &mdash; independent implementations of the same method are not covered.</li>
+        <li>Open source + patents is a coherent strategy when structured deliberately; the
+          social contract requires disciplined enforcement choices.</li>
+        <li>Competitors will file on your variants and improvements; file continuations proactively
+          to capture the ecosystem your architecture enables.</li>
+        <li>Infrastructure players (cloud providers) often file patents on inference optimization
+          rather than model architecture &mdash; a distinct and valuable layer of the stack.</li>
+        <li>Chinese tech companies filed hundreds of transformer variant patents domestically;
+          a US-only strategy leaves the world's largest AI market unprotected.</li>
+        <li>The specification is strategic real estate: describe every variant you can imagine, even
+          those you have not implemented, to support future continuation claims.</li>
+      </ul>
+
+      <div class="highlight-box">
+        <h4>The Central Insight from the Transformer Case Study</h4>
+        <p>
+          The Transformer shows that even a "mathematical" innovation can be patent-eligible if
+          you claim the specific technical implementation and quantify the technical improvement.
+          The failure was not in filing patents &mdash; it was in filing patents that were too
+          narrow, too application-specific, and too late to capture the full scope of a
+          paradigm-shifting invention. The lesson for AI researchers: the architecture you design
+          today may define an industry for a decade. Invest proportionally in protecting it.
+        </p>
+      </div>
+
+      <!-- Chapter Nav -->
+      <nav class="chapter-nav">
+        <a href="ex01a_transformer_technology.html" class="chapter-nav-btn">
+          <span class="nav-label">&#8592; Previous</span>
+          <span class="nav-title">Case Study 1A: Technical Innovation and Claims</span>
+        </a>
+        <a href="ex02_lora.html" class="chapter-nav-btn nav-next">
+          <span class="nav-label">Next &#8594;</span>
+          <span class="nav-title">Case Study 2: LoRA</span>
+        </a>
+      </nav>
+    </section>
+
+  </main>
+</div><!-- /.page-layout -->
+
+<!-- ══ FOOTER ══════════════════════════════════════════════════ -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <span class="footer-logo">Patent Law <span>for Technologists</span></span>
+      <p class="footer-tagline">
+        Practical patent education for researchers, engineers, and founders working at the
+        frontier of technology.
+      </p>
+    </div>
+    <div class="footer-links">
+      <div class="footer-col">
+        <h4>Chapters</h4>
+        <ul>
+          <li><a href="ch01_patent_system_overview.html">Ch. 1 &mdash; Patent System Overview</a></li>
+          <li><a href="ch05_writing_claims.html">Ch. 5 &mdash; Writing Claims</a></li>
+          <li><a href="ch08_application_process.html">Ch. 8 &mdash; Application Process</a></li>
+          <li><a href="ch12_monetization.html">Ch. 12 &mdash; Monetization</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Case Studies</h4>
+        <ul>
+          <li><a href="ex01a_transformer_technology.html">Ex. 1A &mdash; Transformer Technology</a></li>
+          <li><a href="ex01b_transformer_lessons.html">Ex. 1B &mdash; Transformer Lessons</a></li>
+          <li><a href="ex02_lora.html">Ex. 2 &mdash; LoRA</a></li>
+          <li><a href="ex03_crispr.html">Ex. 3 &mdash; CRISPR</a></li>
+          <li><a href="ex04_gpt.html">Ex. 4 &mdash; GPT</a></li>
+          <li><a href="ex05_alphafold.html">Ex. 5 &mdash; AlphaFold</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>
+      &copy; 2026 Patent Law for Technologists &mdash; Prof. Colleen V. Chien, Berkeley School of Law.
+      For educational use only. Not legal advice.
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>

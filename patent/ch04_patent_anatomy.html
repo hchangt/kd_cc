@@ -1,0 +1,1412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 4: Anatomy of a Patent Application — Patent Law for Technologists</title>
+  <meta name="description" content="A comprehensive breakdown of every section of a US utility patent application, with detailed guidance for AI/ML inventions. By Dr. Robert A. Sachs, Morrison &amp; Foerster.">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* Chapter-specific overrides */
+    .section-label {
+      display: inline-block;
+      background: var(--navy);
+      color: var(--gold-light);
+      font-size: .72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      padding: .2rem .6rem;
+      border-radius: 4px;
+      margin-right: .5rem;
+      vertical-align: middle;
+    }
+    .spec-block {
+      background: #f9f8f5;
+      border: 1px solid #d5cdb8;
+      border-left: 5px solid var(--navy);
+      border-radius: var(--radius);
+      padding: 1.5rem 1.75rem;
+      margin: 1.75rem 0;
+      font-family: var(--font-serif);
+      font-size: .9375rem;
+      line-height: 1.9;
+      color: var(--gray-800);
+    }
+    .spec-block .spec-label {
+      font-family: var(--font-sans);
+      font-weight: 700;
+      font-size: .7rem;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      color: var(--gray-500);
+      margin-bottom: .875rem;
+      border-bottom: 1px dashed var(--gray-300);
+      padding-bottom: .5rem;
+    }
+    .req-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: .2rem .65rem;
+      border-radius: 20px;
+      font-size: .78rem;
+      font-weight: 600;
+      margin: .2rem;
+    }
+    .req-mandatory { background: #fdedec; color: var(--danger); border: 1px solid #f1948a; }
+    .req-optional  { background: #e8f8f5; color: var(--success); border: 1px solid #82e0aa; }
+    .req-strategic { background: #fef9e7; color: #b7770d; border: 1px solid #f9e79f; }
+    .anatomy-legend {
+      display: flex; gap: .75rem; flex-wrap: wrap; margin-top: 1rem; justify-content: center;
+    }
+    .legend-item {
+      display: flex; align-items: center; gap: .4rem; font-size: .8125rem; color: var(--gray-700);
+    }
+    .legend-dot {
+      width: 12px; height: 12px; border-radius: 2px; flex-shrink: 0;
+    }
+    .statute-ref {
+      font-weight: 600; color: var(--navy); font-size: .875rem;
+      background: var(--gray-100); padding: .1rem .45rem; border-radius: 3px;
+      border: 1px solid var(--gray-300); white-space: nowrap;
+    }
+    .title-example {
+      padding: 1rem 1.25rem;
+      border-radius: var(--radius);
+      margin: .75rem 0;
+      font-family: var(--font-serif);
+      font-size: .9375rem;
+    }
+    .title-good { background: #e8f8f5; border-left: 4px solid var(--success); }
+    .title-bad  { background: #fdedec; border-left: 4px solid var(--danger); }
+    .title-verdict {
+      font-family: var(--font-sans);
+      font-size: .75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      margin-bottom: .35rem;
+    }
+    .title-good .title-verdict { color: var(--success); }
+    .title-bad  .title-verdict  { color: var(--danger); }
+    .fig-table td:first-child { font-weight: 600; color: var(--navy); white-space: nowrap; }
+    .two-col-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: .25rem .5rem;
+    }
+    @media (max-width: 600px) { .two-col-list { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════
+     TOP NAVIGATION
+═══════════════════════════════════════════════════════════ -->
+<nav class="top-nav" aria-label="Book navigation">
+  <div class="nav-container">
+    <a href="index.html" class="nav-logo">Patent Law <span>for Technologists</span></a>
+    <div class="nav-links">
+      <a href="ch01_introduction.html">Ch 1</a>
+      <a href="ch02_patentability.html">Ch 2</a>
+      <a href="ch03_prior_art_research.html">Ch 3</a>
+      <a href="ch04_patent_anatomy.html" class="active">Ch 4</a>
+      <a href="ch05_writing_claims.html">Ch 5</a>
+      <a href="ch06_office_actions.html">Ch 6</a>
+      <a href="ch07_drawings.html">Ch 7</a>
+      <a href="ch08_prosecution.html">Ch 8</a>
+      <a href="ch09_portfolio.html">Ch 9</a>
+      <a href="ch10_enforcement.html">Ch 10</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════════
+     CHAPTER HERO
+═══════════════════════════════════════════════════════════ -->
+<header class="chapter-hero">
+  <div class="chapter-hero-content">
+    <div class="chapter-badge">Chapter 4</div>
+    <h1>Anatomy of a Patent Application</h1>
+    <p class="subtitle">Every Section Explained — From Title to Abstract, with Deep Dives into AI/ML Specification Drafting</p>
+    <div class="chapter-meta">
+      <span>Dr. Robert A. Sachs</span>
+      <span>Morrison &amp; Foerster LLP, San Francisco</span>
+      <span>35 USC §§ 111–113, 119–120, 132</span>
+      <span>37 CFR § 1.51–1.77</span>
+    </div>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PAGE LAYOUT
+═══════════════════════════════════════════════════════════ -->
+<div class="page-layout">
+
+  <!-- Sidebar TOC -->
+  <aside class="sidebar">
+    <nav class="toc" aria-label="Chapter contents">
+      <h3>In This Chapter</h3>
+      <ol>
+        <li><a href="#overview">Application Overview &amp; Structure</a></li>
+        <li><a href="#title">Title of the Invention</a></li>
+        <li><a href="#cross-references">Cross-References &amp; Priority Claims</a></li>
+        <li><a href="#background">Background of the Invention</a></li>
+        <li><a href="#summary">Summary of the Invention</a></li>
+        <li><a href="#brief-drawings">Brief Description of the Drawings</a></li>
+        <li><a href="#detailed-description">Detailed Description</a></li>
+        <li><a href="#claims-overview">Claims (Overview)</a></li>
+        <li><a href="#abstract">Abstract</a></li>
+        <li><a href="#drawings">Drawings and Figures</a></li>
+        <li><a href="#provisional">The Provisional Application</a></li>
+        <li><a href="#checklist">Specification Checklist</a></li>
+      </ol>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="chapter-content">
+
+    <!-- ──────────────────────────────────────────────────────
+         SECTION 1: OVERVIEW
+    ─────────────────────────────────────────────────────── -->
+    <section id="overview" class="section-anchor">
+      <h2>1. The Patent Application: An Overview</h2>
+
+      <p>A United States utility patent application is a precisely structured legal document governed by <span class="statute-ref">35 USC § 111</span> and <span class="statute-ref">37 CFR § 1.51</span>. Unlike a research paper or technical report, every section serves a specific legal function, and omissions or misfiling can cost you a patent entirely. Before writing a single word of specification prose, a competent patent attorney maps the complete document architecture.</p>
+
+      <p>This chapter dissects every mandatory and optional section of a nonprovisional utility application, explains the legal requirement each section satisfies, and provides concrete examples drawn from AI and machine learning inventions — the domain where specification quality most frequently determines the difference between a broad, enforceable patent and a narrow, easily-designed-around one.</p>
+
+      <!-- SVG: Patent Document Structure -->
+      <div class="figure">
+        <div class="figure-content">
+          <svg class="diagram-svg" viewBox="0 0 680 780" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Annotated structure of a US utility patent application">
+            <defs>
+              <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                <path d="M0,0 L0,6 L8,3 z" fill="#adb5bd"/>
+              </marker>
+              <filter id="dropshadow">
+                <feDropShadow dx="2" dy="2" stdDeviation="2" flood-opacity="0.12"/>
+              </filter>
+            </defs>
+
+            <!-- Document outline -->
+            <rect x="120" y="10" width="340" height="740" rx="8" fill="#f8f9fa" stroke="#dee2e6" stroke-width="1.5" filter="url(#dropshadow)"/>
+
+            <!-- Document top bar (USPTO header) -->
+            <rect x="120" y="10" width="340" height="32" rx="8" fill="#1a2744"/>
+            <text x="290" y="32" text-anchor="middle" fill="white" font-family="Inter,sans-serif" font-size="11" font-weight="700" letter-spacing="1">US UTILITY PATENT APPLICATION</text>
+
+            <!-- Section blocks -->
+            <!-- Application Data Sheet -->
+            <rect x="132" y="52" width="316" height="30" rx="4" fill="#2d3f6b" opacity="0.9"/>
+            <text x="145" y="72" fill="white" font-family="Inter,sans-serif" font-size="10" font-weight="600">Application Data Sheet (ADS)</text>
+            <text x="420" y="72" fill="#c8942a" font-family="Inter,sans-serif" font-size="9">37 CFR §1.76</text>
+
+            <!-- Title -->
+            <rect x="132" y="90" width="316" height="28" rx="4" fill="#c8942a" opacity="0.95"/>
+            <text x="145" y="109" fill="#0f1729" font-family="Inter,sans-serif" font-size="10" font-weight="700">Title of the Invention</text>
+            <text x="392" y="109" fill="#0f1729" font-family="Inter,sans-serif" font-size="9">§112(b)</text>
+
+            <!-- Cross References -->
+            <rect x="132" y="126" width="316" height="28" rx="4" fill="#e9ecef"/>
+            <text x="145" y="145" fill="#1a2744" font-family="Inter,sans-serif" font-size="10" font-weight="600">Cross-References to Related Applications</text>
+            <text x="390" y="145" fill="#6c757d" font-family="Inter,sans-serif" font-size="9">§119–120</text>
+
+            <!-- Statement -->
+            <rect x="132" y="162" width="316" height="28" rx="4" fill="#e9ecef"/>
+            <text x="145" y="181" fill="#1a2744" font-family="Inter,sans-serif" font-size="10" font-weight="600">Statement re Federally Sponsored Research</text>
+            <text x="405" y="181" fill="#6c757d" font-family="Inter,sans-serif" font-size="9">§202</text>
+
+            <!-- Background -->
+            <rect x="132" y="198" width="316" height="38" rx="4" fill="#1a5276" opacity="0.85"/>
+            <text x="145" y="216" fill="white" font-family="Inter,sans-serif" font-size="10" font-weight="600">Background of the Invention</text>
+            <text x="145" y="230" fill="#85c1e9" font-family="Inter,sans-serif" font-size="9">Technical Field + Prior Art Problems</text>
+
+            <!-- Summary -->
+            <rect x="132" y="244" width="316" height="38" rx="4" fill="#1a5276" opacity="0.85"/>
+            <text x="145" y="262" fill="white" font-family="Inter,sans-serif" font-size="10" font-weight="600">Summary of the Invention</text>
+            <text x="145" y="276" fill="#85c1e9" font-family="Inter,sans-serif" font-size="9">Brief statement of what the invention does</text>
+
+            <!-- Brief Desc Drawings -->
+            <rect x="132" y="290" width="316" height="28" rx="4" fill="#e9ecef"/>
+            <text x="145" y="309" fill="#1a2744" font-family="Inter,sans-serif" font-size="10" font-weight="600">Brief Description of the Drawings</text>
+            <text x="405" y="309" fill="#6c757d" font-family="Inter,sans-serif" font-size="9">§113</text>
+
+            <!-- Detailed Description — tallest block -->
+            <rect x="132" y="326" width="316" height="120" rx="4" fill="#0f1729" opacity="0.95"/>
+            <text x="145" y="348" fill="white" font-family="Inter,sans-serif" font-size="11" font-weight="700">Detailed Description of the Invention</text>
+            <text x="145" y="366" fill="#c8942a" font-family="Inter,sans-serif" font-size="9" font-weight="600">THE HEART OF THE SPECIFICATION</text>
+            <text x="145" y="385" fill="#adb5bd" font-family="Inter,sans-serif" font-size="9">• Enablement (§112(a))</text>
+            <text x="145" y="400" fill="#adb5bd" font-family="Inter,sans-serif" font-size="9">• Written Description (§112(a))</text>
+            <text x="145" y="415" fill="#adb5bd" font-family="Inter,sans-serif" font-size="9">• Best Mode (§112(a))</text>
+            <text x="145" y="430" fill="#adb5bd" font-family="Inter,sans-serif" font-size="9">• All embodiments &amp; alternatives</text>
+
+            <!-- Claims -->
+            <rect x="132" y="454" width="316" height="80" rx="4" fill="#c8942a" opacity="0.9"/>
+            <text x="145" y="476" fill="#0f1729" font-family="Inter,sans-serif" font-size="11" font-weight="700">Claims</text>
+            <text x="145" y="494" fill="#0f1729" font-family="Inter,sans-serif" font-size="9">Independent Claims (broadest scope)</text>
+            <text x="145" y="509" fill="#0f1729" font-family="Inter,sans-serif" font-size="9">Dependent Claims (narrower fallbacks)</text>
+            <text x="145" y="524" fill="#0f1729" font-family="Inter,sans-serif" font-size="9" font-weight="700">35 USC §112(b) — Legal definition of protection</text>
+
+            <!-- Abstract -->
+            <rect x="132" y="542" width="316" height="36" rx="4" fill="#2d3f6b" opacity="0.9"/>
+            <text x="145" y="562" fill="white" font-family="Inter,sans-serif" font-size="10" font-weight="600">Abstract</text>
+            <text x="145" y="576" fill="#85c1e9" font-family="Inter,sans-serif" font-size="9">≤150 words — searchability &amp; notice</text>
+
+            <!-- Drawings -->
+            <rect x="132" y="586" width="316" height="36" rx="4" fill="#e9ecef"/>
+            <text x="145" y="606" fill="#1a2744" font-family="Inter,sans-serif" font-size="10" font-weight="600">Drawings / Figures</text>
+            <text x="145" y="620" fill="#6c757d" font-family="Inter,sans-serif" font-size="9">Block diagrams, flowcharts, architecture diagrams</text>
+
+            <!-- Sequence Listing / Deposit -->
+            <rect x="132" y="630" width="316" height="28" rx="4" fill="#e9ecef"/>
+            <text x="145" y="649" fill="#1a2744" font-family="Inter,sans-serif" font-size="10" font-weight="600">Sequence Listing / Deposit Info (if applicable)</text>
+
+            <!-- Information Disclosure -->
+            <rect x="132" y="666" width="316" height="28" rx="4" fill="#e9ecef"/>
+            <text x="145" y="685" fill="#1a2744" font-family="Inter,sans-serif" font-size="10" font-weight="600">Information Disclosure Statement (IDS)</text>
+            <text x="393" y="685" fill="#6c757d" font-family="Inter,sans-serif" font-size="9">37 CFR §1.56</text>
+
+            <!-- Fee transmittal -->
+            <rect x="132" y="702" width="316" height="28" rx="4" fill="#2d3f6b" opacity="0.9"/>
+            <text x="145" y="721" fill="white" font-family="Inter,sans-serif" font-size="10" font-weight="600">Fee Transmittal &amp; Oath/Declaration</text>
+            <text x="362" y="721" fill="#c8942a" font-family="Inter,sans-serif" font-size="9">37 CFR §1.63</text>
+
+            <!-- Annotation arrows (right side) -->
+            <!-- Mandatory -->
+            <line x1="490" y1="80" x2="448" y2="105" stroke="#adb5bd" stroke-width="1" marker-end="url(#arrow)"/>
+            <text x="494" y="77" fill="#922b21" font-family="Inter,sans-serif" font-size="9" font-weight="600">MANDATORY</text>
+
+            <line x1="490" y1="320" x2="448" y2="395" stroke="#adb5bd" stroke-width="1" marker-end="url(#arrow)"/>
+            <text x="494" y="317" fill="#1e8449" font-family="Inter,sans-serif" font-size="9" font-weight="600">MAX DETAIL</text>
+
+            <line x1="490" y1="490" x2="448" y2="490" stroke="#c8942a" stroke-width="1.5" marker-end="url(#arrow)"/>
+            <text x="494" y="487" fill="#c8942a" font-family="Inter,sans-serif" font-size="9" font-weight="700">LEGAL SCOPE</text>
+
+            <!-- Optional bracket -->
+            <line x1="120" y1="162" x2="100" y2="162" stroke="#adb5bd" stroke-width="1"/>
+            <line x1="100" y1="162" x2="100" y2="186" stroke="#adb5bd" stroke-width="1"/>
+            <line x1="100" y1="186" x2="120" y2="186" stroke="#adb5bd" stroke-width="1"/>
+            <text x="60" y="178" fill="#6c757d" font-family="Inter,sans-serif" font-size="9" text-anchor="middle">OPT.</text>
+          </svg>
+          <div class="anatomy-legend">
+            <div class="legend-item"><div class="legend-dot" style="background:#1a2744;"></div>Administrative / Procedural</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#1a5276;"></div>Specification (Disclosure)</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#0f1729;"></div>Detailed Description (Core)</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#c8942a;"></div>Claims / Legal Scope</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#e9ecef; border: 1px solid #dee2e6;"></div>Optional / Conditional</div>
+          </div>
+        </div>
+        <p class="figure-caption">Figure 4-1. Annotated structure of a US nonprovisional utility patent application. Dark sections are mandatory in virtually all cases. The Detailed Description is by far the largest and most legally consequential portion of the specification.</p>
+      </div>
+
+      <h3>Provisional vs. Nonprovisional: Core Differences</h3>
+
+      <p>The USPTO offers two filing pathways for utility inventions. Understanding when and why to use each is one of the earliest strategic decisions in a patent prosecution.</p>
+
+      <div class="comparison-grid">
+        <div class="comparison-item" style="border-top-color: var(--navy);">
+          <h4>Provisional Application</h4>
+          <span class="req-pill req-strategic">Strategic Tool</span>
+          <ul style="margin-top: 1rem;">
+            <li>Establishes a priority date immediately</li>
+            <li>Never examined on the merits</li>
+            <li>Automatically abandoned after 12 months</li>
+            <li>Does not require formal claims</li>
+            <li>Lower filing fees (~$320 small entity, ~$160 micro)</li>
+            <li>Cannot issue as a patent</li>
+            <li>Buys 12 months to refine claims and assess market</li>
+          </ul>
+        </div>
+        <div class="comparison-item" style="border-top-color: var(--gold);">
+          <h4>Nonprovisional Application</h4>
+          <span class="req-pill req-mandatory">Required for Issuance</span>
+          <ul style="margin-top: 1rem;">
+            <li>Examined by the USPTO on the merits</li>
+            <li>Must include at least one claim</li>
+            <li>Subject to all formal requirements (37 CFR §1.51)</li>
+            <li>Filing fees: ~$1,720 large entity, ~$860 small, ~$430 micro</li>
+            <li>Can claim priority to an earlier provisional</li>
+            <li>Publication at 18 months (unless opted out)</li>
+            <li>Can ultimately issue as an enforceable patent</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="table-wrapper">
+        <table>
+          <caption style="text-align:left; padding: .75rem 0; font-size:.875rem; color:var(--gray-600);">Table 4-1. Side-by-side comparison of provisional and nonprovisional utility applications</caption>
+          <thead>
+            <tr>
+              <th>Attribute</th>
+              <th>Provisional (35 USC §111(b))</th>
+              <th>Nonprovisional (35 USC §111(a))</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Claims Required</td><td>No</td><td>Yes — at least one</td></tr>
+            <tr><td>Examined?</td><td>No</td><td>Yes</td></tr>
+            <tr><td>Pendency</td><td>12 months (fixed, no extensions)</td><td>~24–36 months average</td></tr>
+            <tr><td>Publication</td><td>Not published</td><td>At 18 months (unless non-pub request)</td></tr>
+            <tr><td>Patent Term Clock</td><td>Does not start clock</td><td>20 years from earliest nonprovisional filing date</td></tr>
+            <tr><td>Oath/Declaration</td><td>Not required at filing</td><td>Required (37 CFR §1.63)</td></tr>
+            <tr><td>Formal Drawings</td><td>Not required (informal OK)</td><td>Required (37 CFR §1.84)</td></tr>
+            <tr><td>Information Disclosure</td><td>No duty at time of filing</td><td>Ongoing duty of candor (37 CFR §1.56)</td></tr>
+            <tr><td>Priority Benefit</td><td>None (is not a patent)</td><td>Can claim priority to provisional(s)</td></tr>
+            <tr><td>Continuation Practice</td><td>Cannot be continued from</td><td>Continuations, CIPs, divisionals allowed</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout callout-info">
+        <div class="callout-icon">&#9432;</div>
+        <div class="callout-body">
+          <div class="callout-title">The AIA and First-Inventor-to-File</div>
+          <p>The Leahy-Smith America Invents Act (AIA), effective March 16, 2013, shifted the US to a <strong>first-inventor-to-file</strong> system. Under pre-AIA law, a US inventor could swear behind a reference by showing prior conception and reduction to practice. Under AIA, the inventor who files first — not who invented first — generally prevails. This makes the priority date of your provisional or nonprovisional filing the single most critical date in your entire patent lifecycle.</p>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ──────────────────────────────────────────────────────
+         SECTION 2: TITLE
+    ─────────────────────────────────────────────────────── -->
+    <section id="title" class="section-anchor">
+      <h2>2. Title of the Invention</h2>
+
+      <p>The title is the first thing an examiner, competitor, and potential licensee reads. While <span class="statute-ref">37 CFR § 1.72(a)</span> requires only that the title be "short and specific" — generally fewer than 500 characters — a well-crafted title is a strategic document element that influences classification, searchability, and the psychological framing of your invention.</p>
+
+      <h3>Rules for a Good Patent Title</h3>
+
+      <ul>
+        <li><strong>Be specific, not generic.</strong> The title should identify the technical contribution, not just the field.</li>
+        <li><strong>Use the "System and Method for…" structure</strong> when claiming both apparatus and process to capture both claim types.</li>
+        <li><strong>Include the key differentiating technology</strong> — the noun phrase that distinguishes your invention from the prior art.</li>
+        <li><strong>Avoid trade names, trademarks, and proprietary identifiers.</strong> "GPT-4 Fine-Tuning Method" is impermissible.</li>
+        <li><strong>Avoid promotional language.</strong> Words like "improved," "optimized," "enhanced," or "revolutionary" are discouraged by USPTO guidelines.</li>
+        <li><strong>Keep it under 60 words</strong> in practice (though the limit is 500 characters); examiners distrust titles that read like abstracts.</li>
+        <li><strong>Think about CPC classification.</strong> The title heavily influences the classification symbols assigned, which determines which examiner art unit receives your application.</li>
+      </ul>
+
+      <h3>AI/ML Title Examples</h3>
+
+      <div class="title-example title-good">
+        <div class="title-verdict">Good Title</div>
+        System and Method for Training Neural Networks Using Adaptive Learning Rate Schedules Based on Gradient Curvature Estimation
+      </div>
+      <p style="font-size:.875rem; color:var(--gray-600); margin-top: -.5rem;">Why it works: identifies the claim types (system + method), the technical domain (neural network training), the specific mechanism (adaptive LR schedules), and the differentiating feature (gradient curvature estimation).</p>
+
+      <div class="title-example title-bad">
+        <div class="title-verdict">Bad Title</div>
+        Machine Learning Method
+      </div>
+      <p style="font-size:.875rem; color:var(--gray-600); margin-top: -.5rem;">Why it fails: hopelessly generic. Describes thousands of prior art documents. An examiner will immediately treat the application skeptically.</p>
+
+      <div class="title-example title-good">
+        <div class="title-verdict">Good Title</div>
+        Attention-Based Collaborative Filtering System for Real-Time Cross-Domain Content Recommendation
+      </div>
+
+      <div class="title-example title-bad">
+        <div class="title-verdict">Bad Title</div>
+        Improved Recommendation Engine Using AI
+      </div>
+      <p style="font-size:.875rem; color:var(--gray-600); margin-top: -.5rem;">Why it fails: "improved" is discouraged; "AI" is not a technical mechanism; no specificity about the inventive concept.</p>
+
+      <div class="title-example title-good">
+        <div class="title-verdict">Good Title</div>
+        Federated Learning System with Differential Privacy Guarantees for Distributed Model Training Across Heterogeneous Edge Devices
+      </div>
+
+      <div class="title-example title-bad">
+        <div class="title-verdict">Bad Title</div>
+        Privacy-Preserving Machine Learning
+      </div>
+
+      <div class="callout callout-tip">
+        <div class="callout-icon">&#128161;</div>
+        <div class="callout-body">
+          <div class="callout-title">Strategic Tip: Title Alignment with Independent Claims</div>
+          <p>The best titles are extracted directly from the preamble of your broadest independent claim. If your independent system claim reads "A system for training a neural network using adaptive learning rate schedules, comprising…" then your title is naturally "System for Training Neural Networks Using Adaptive Learning Rate Schedules." This alignment ensures consistency and makes examination more predictable.</p>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ──────────────────────────────────────────────────────
+         SECTION 3: CROSS-REFERENCES AND PRIORITY
+    ─────────────────────────────────────────────────────── -->
+    <section id="cross-references" class="section-anchor">
+      <h2>3. Cross-References and Priority Claims</h2>
+
+      <p>This section — governed by <span class="statute-ref">35 USC §§ 119, 120</span> and <span class="statute-ref">37 CFR § 1.78</span> — is short but legally critical. A defective or missing priority claim can result in the loss of years of priority date, exposing your patent to prior art that would otherwise be antedated.</p>
+
+      <h3>Types of Continuing Applications</h3>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>Statute</th>
+              <th>Disclosure Requirement</th>
+              <th>Claims</th>
+              <th>Best Used When</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Continuation (CON)</td>
+              <td>§ 120</td>
+              <td>Identical to parent — no new matter</td>
+              <td>Different claims on the same disclosure</td>
+              <td>Pursuing broader or different claim scope after allowance</td>
+            </tr>
+            <tr>
+              <td>Continuation-in-Part (CIP)</td>
+              <td>§ 120</td>
+              <td>Adds new matter beyond parent</td>
+              <td>Some claims entitled to parent's date; new claims get CIP filing date</td>
+              <td>Improvements or additions to original invention</td>
+            </tr>
+            <tr>
+              <td>Divisional (DIV)</td>
+              <td>§ 121</td>
+              <td>Restricted subject matter from parent</td>
+              <td>Claims to the elected species/genus</td>
+              <td>After a restriction requirement splits the application</td>
+            </tr>
+            <tr>
+              <td>RCE (Request for Continued Examination)</td>
+              <td>§ 132(b)</td>
+              <td>Same as parent (not a new application)</td>
+              <td>Amended or new claims in same application</td>
+              <td>Continued prosecution after final rejection</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Standard Cross-Reference Language</h3>
+
+      <div class="spec-block">
+        <div class="spec-label">Example — Priority Claim to Provisional</div>
+        This application claims priority to and the benefit of U.S. Provisional Patent Application No. 63/XXX,XXX, filed January 15, 2025, entitled "Attention-Based Recommendation System," the disclosure of which is incorporated herein by reference in its entirety.
+      </div>
+
+      <div class="spec-block">
+        <div class="spec-label">Example — Continuation Claim</div>
+        This application is a continuation of U.S. Patent Application No. 18/XXX,XXX, filed March 10, 2024, which claims priority to U.S. Provisional Patent Application No. 63/XXX,XXX, filed March 12, 2023, each of which is incorporated herein by reference in its entirety.
+      </div>
+
+      <div class="callout callout-warning">
+        <div class="callout-icon">&#9888;</div>
+        <div class="callout-body">
+          <div class="callout-title">Critical: The Specific Reference Requirement</div>
+          <p><span class="statute-ref">37 CFR § 1.78(d)(1)</span> requires that a claim for domestic benefit under § 120 must be made in an <strong>application data sheet</strong> (ADS) <em>and</em> must identify each prior application by application number, relationship, and filing date. As of 2023, the USPTO enforces this rigorously. A priority claim made only in the specification but not in the ADS is ineffective. File the ADS correctly — do not rely on specification language alone to establish priority.</p>
+        </div>
+      </div>
+
+      <h3>AIA First-Inventor-to-File: Priority Date Importance</h3>
+
+      <p>Under the AIA, your <strong>effective filing date</strong> determines which prior art can be used against you. An earlier effective filing date means:</p>
+      <ul>
+        <li>More prior art falls after your date (and therefore cannot be prior art)</li>
+        <li>Competing inventors who filed later cannot derive claims from your disclosure</li>
+        <li>Publications, including your own, made less than one year before your filing date may be excused under the § 102(b)(1) grace period — but only for disclosures by the inventor or joint inventor</li>
+      </ul>
+
+      <div class="callout callout-danger">
+        <div class="callout-icon">&#9889;</div>
+        <div class="callout-body">
+          <div class="callout-title">Danger: The 12-Month AIA Grace Period is Narrower Than You Think</div>
+          <p>Under <span class="statute-ref">35 USC § 102(b)(1)</span>, the grace period only excuses <em>your own</em> disclosures made within one year before your effective filing date. It does <strong>not</strong> excuse third-party disclosures made before your filing date, even if those disclosures were made after your own earlier disclosure. In practice, once you publish — at a conference, on arXiv, in a product — a clock starts ticking. Filing a provisional before any public disclosure is best practice.</p>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ──────────────────────────────────────────────────────
+         SECTION 4: BACKGROUND
+    ─────────────────────────────────────────────────────── -->
+    <section id="background" class="section-anchor">
+      <h2>4. Background of the Invention</h2>
+
+      <p>The Background section sets the stage for your invention by describing the technical landscape and articulating the problem your invention solves. It is governed by no express statutory requirement — unlike the Detailed Description — but it plays three important roles: (1) contextualizing the invention for the examiner, (2) establishing the problem-solution framing that will anchor your claim arguments, and (3) potentially limiting your claims if drafted carelessly.</p>
+
+      <h3>What to Include</h3>
+
+      <ul>
+        <li><strong>Technical field statement:</strong> One to three sentences identifying the technology domain. This often mirrors the preamble of the broadest independent claim.</li>
+        <li><strong>Description of the prior art:</strong> What approaches existed before? What were their limitations? Be specific enough to be credible, but not so specific that you unnecessarily narrow your claims.</li>
+        <li><strong>Problem statement:</strong> Clearly articulate the technical problem that remained unsolved. This creates the narrative foundation for your non-obviousness arguments.</li>
+        <li><strong>Why existing solutions fail:</strong> Explain the technical shortcomings — not just that solutions were inadequate, but <em>why</em> they were inadequate mechanistically.</li>
+      </ul>
+
+      <h3>What NOT to Include</h3>
+
+      <div class="callout callout-warning">
+        <div class="callout-icon">&#9888;</div>
+        <div class="callout-body">
+          <div class="callout-title">Warning: Do Not Over-Disclose Prior Art in the Background</div>
+          <p>Every prior art reference you identify in the Background can potentially be used against you. Courts may construe claim terms narrowly to distinguish prior art explicitly acknowledged in the specification. <strong>Avoid:</strong> citing specific patents or publications by name unless you must (use general descriptions instead); admitting that something is "conventional" or "well-known" unless you are certain the examiner already knows it; describing the prior art in more detail than necessary to establish the problem your invention solves. The Background is not a literature review — it is a targeted narrative.</p>
+        </div>
+      </div>
+
+      <h3>Example Background: Attention-Based Recommendation System</h3>
+
+      <div class="spec-block">
+        <div class="spec-label">Example Background Section — AI/ML Patent</div>
+        <strong>BACKGROUND OF THE INVENTION</strong>
+        <br><br>
+        <strong>Technical Field</strong>
+        <br><br>
+        The present disclosure relates to content recommendation systems, and more particularly to systems and methods employing attention mechanisms for generating personalized content recommendations in real-time across heterogeneous content domains.
+        <br><br>
+        <strong>Background Information</strong>
+        <br><br>
+        Content recommendation systems are widely deployed in digital platforms to surface relevant items from large catalogs to individual users. Traditional collaborative filtering approaches construct user-item interaction matrices and employ matrix factorization techniques to identify latent preference structures. While effective for static item catalogs with dense interaction histories, such approaches suffer from significant limitations in dynamic environments characterized by rapidly expanding item catalogs, sparse interaction data for new users and new items (the "cold start" problem), and cross-domain preference transfer requirements.
+        <br><br>
+        Deep learning-based recommendation methods have been developed in an attempt to address some of these limitations. Sequence-based approaches model user interaction histories as temporal sequences and employ recurrent neural networks or convolutional networks to capture short-term preference dynamics. However, existing sequence-based methods fail to adequately model long-range dependencies between user interactions separated by substantial temporal gaps, resulting in degraded recommendation quality when a user's current session is contextually related to interactions that occurred weeks or months prior.
+        <br><br>
+        Cross-domain recommendation approaches seek to leverage preference signals from one domain (e.g., video content) to improve recommendation quality in a related domain (e.g., music or podcast content). Existing cross-domain methods typically require explicit domain mappings or shared user identifier spaces, which are unavailable in federated or privacy-constrained environments. Moreover, such methods have not adequately addressed the challenge of domain shift — the phenomenon in which user preferences within one content domain differ substantially from their preferences in another domain despite the presence of underlying shared preference structures.
+        <br><br>
+        Accordingly, there remains a need for recommendation systems and methods that effectively model long-range temporal dependencies in user interaction histories, support cross-domain preference transfer without requiring explicit domain correspondence, and operate within the latency constraints of real-time serving environments.
+      </div>
+
+      <p>Notice several features of this example background: it uses <em>general descriptions</em> of prior art approaches rather than citing specific patents; it articulates specific technical mechanisms that fail (poor long-range dependency modeling, lack of implicit domain mapping); and it ends with a "there remains a need for" statement that elegantly sets up the invention without admitting any specific prior art document.</p>
+
+    </section>
+
+    <!-- ──────────────────────────────────────────────────────
+         SECTION 5: SUMMARY
+    ─────────────────────────────────────────────────────── -->
+    <section id="summary" class="section-anchor">
+      <h2>5. Summary of the Invention</h2>
+
+      <p>The Summary provides a brief narrative overview of the invention that bridges the Background's problem statement and the Detailed Description's technical exposition. Governed by <span class="statute-ref">37 CFR § 1.73</span>, the Summary must be sufficiently detailed to understand the invention's nature and objective but should not attempt to substitute for the claims.</p>
+
+      <h3>Aligning the Summary with Claims</h3>
+
+      <p>The most critical rule of Summary drafting: <strong>every limitation recited in the Summary must appear in at least one claim, and every independent claim should be reflected in the Summary.</strong> Courts have used Summary language to limit claim scope under the doctrine of "disclaimer" — where an applicant's characterizations of the invention narrow how claims are later interpreted. Avoid phrases like "the invention requires…" or "the invention always includes…" because these create prosecution history estoppel even if the limitation is not in the claims.</p>
+
+      <div class="callout callout-warning">
+        <div class="callout-icon">&#9888;</div>
+        <div class="callout-body">
+          <div class="callout-title">Avoid "The Invention" Language in the Summary</div>
+          <p>Language like "the present invention includes X" has been held by the Federal Circuit to limit all claims to include X, even if X is absent from some claims. Instead, use "in one embodiment, the system includes X" or "according to one aspect, the method comprises Y." This preserves claim scope flexibility while still complying with § 1.73.</p>
+        </div>
+      </div>
+
+      <h3>Example Summary: Attention-Based Recommendation System</h3>
+
+      <div class="spec-block">
+        <div class="spec-label">Example Summary Section — AI/ML Patent</div>
+        <strong>SUMMARY OF THE INVENTION</strong>
+        <br><br>
+        Disclosed herein are systems and methods for generating content recommendations using a hierarchical attention mechanism that models long-range temporal dependencies in user interaction histories and supports cross-domain preference inference without requiring explicit domain correspondence.
+        <br><br>
+        In one aspect, a computer-implemented recommendation method comprises: receiving, by one or more processors, a user interaction history comprising a plurality of interaction records associated with a user, each interaction record identifying a content item and a timestamp; constructing, from the interaction history, a temporal interaction embedding by applying a position-aware attention module configured to assign attention weights to interaction records based on both content-based similarity and temporal proximity; generating a cross-domain preference representation by projecting the temporal interaction embedding through a domain-agnostic transformation layer trained to preserve preference structure across content domains; and generating one or more content recommendations by scoring candidate content items against the cross-domain preference representation using a learned relevance function.
+        <br><br>
+        In another aspect, a recommendation system comprises one or more processors executing instructions that implement the foregoing method. In yet another aspect, a non-transitory computer-readable medium stores instructions that, when executed by one or more processors, implement the foregoing method.
+        <br><br>
+        The disclosed approaches provide improved recommendation quality for users with sparse interaction histories, superior modeling of long-range temporal preference dependencies, and effective cross-domain preference transfer, all within latency constraints suitable for real-time serving.
+      </div>
+
+    </section>
+
+    <!-- ──────────────────────────────────────────────────────
+         SECTION 6: BRIEF DESCRIPTION OF DRAWINGS
+    ─────────────────────────────────────────────────────── -->
+    <section id="brief-drawings" class="section-anchor">
+      <h2>6. Brief Description of the Drawings</h2>
+
+      <p>This section, required by <span class="statute-ref">37 CFR § 1.74</span> whenever drawings are present, provides a short one-sentence description of each figure. Its function is purely navigational — it tells the reader what they will find in each figure before they encounter the detailed description that refers to those figures. Every figure that appears in the drawings section must have a corresponding entry here.</p>
+
+      <h3>Standard Format</h3>
+
+      <p>The standard format is a numbered list of declarative sentences, each beginning with the figure identifier and followed by a brief description of what the figure depicts. The sentences should be informative but not exhaustive — save the technical detail for the Detailed Description.</p>
+
+      <div class="spec-block">
+        <div class="spec-label">Example — Brief Description of Drawings for an AI Patent with 6 Figures</div>
+        <strong>BRIEF DESCRIPTION OF THE DRAWINGS</strong>
+        <br><br>
+        The accompanying drawings, which are incorporated in and constitute a part of this specification, illustrate embodiments of the invention and together with the description serve to explain the principles of the invention.
+        <br><br>
+        FIG. 1 is a block diagram illustrating an overview of an attention-based content recommendation system according to embodiments of the present disclosure, including user interaction history ingestion, temporal embedding generation, cross-domain projection, and recommendation scoring components.
+        <br><br>
+        FIG. 2 is a schematic diagram illustrating the architecture of a hierarchical attention module configured to model long-range temporal dependencies in a user interaction sequence.
+        <br><br>
+        FIG. 3 is a flowchart illustrating a computer-implemented method for generating content recommendations using a cross-domain preference representation, according to embodiments of the present disclosure.
+        <br><br>
+        FIG. 4 is a diagram illustrating a neural network architecture for the domain-agnostic transformation layer, including encoder layers, a shared latent space projection head, and domain-specific decoder layers.
+        <br><br>
+        FIG. 5 is a graph illustrating training convergence curves comparing the disclosed hierarchical attention approach against baseline collaborative filtering and sequence-based methods across three benchmark datasets.
+        <br><br>
+        FIG. 6 is a block diagram of a computer system suitable for implementing the recommendation system and method of the present disclosure.
+      </div>
+
+      <div class="table-wrapper">
+        <table class="fig-table">
+          <caption style="text-align:left; padding: .75rem 0; font-size:.875rem; color:var(--gray-600);">Table 4-2. Figure types commonly used in AI/ML patent applications and their purposes</caption>
+          <thead>
+            <tr>
+              <th>Figure Type</th>
+              <th>Typical Content</th>
+              <th>Primary Legal Function</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>System Block Diagram</td>
+              <td>Components, modules, data flows, interfaces</td>
+              <td>Supports system/apparatus claims; defines structural elements</td>
+            </tr>
+            <tr>
+              <td>Method Flowchart</td>
+              <td>Process steps, decision nodes, loops, branching</td>
+              <td>Supports method claims; establishes step order and conditionality</td>
+            </tr>
+            <tr>
+              <td>Neural Network Architecture</td>
+              <td>Layer types, dimensions, connections, attention heads</td>
+              <td>Supports enablement; demonstrates workability of disclosed architecture</td>
+            </tr>
+            <tr>
+              <td>Training Curve / Performance Graph</td>
+              <td>Loss curves, accuracy metrics, benchmark comparisons</td>
+              <td>Supports enablement; demonstrates the invention works as claimed</td>
+            </tr>
+            <tr>
+              <td>Data Flow Diagram</td>
+              <td>Input tensors, transformations, embedding dimensions</td>
+              <td>Supports written description; clarifies claim term meanings</td>
+            </tr>
+            <tr>
+              <td>Hardware / Computer System</td>
+              <td>Processors, memory, storage, network interfaces</td>
+              <td>Supports computer-readable medium claims; establishes physical implementation</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </section>
+
+    <!-- ──────────────────────────────────────────────────────
+         SECTION 7: DETAILED DESCRIPTION
+    ─────────────────────────────────────────────────────── -->
+    <section id="detailed-description" class="section-anchor">
+      <h2>7. Detailed Description of the Invention</h2>
+
+      <p>The Detailed Description is the heart of the patent application. It is where the inventor discloses — in legally sufficient detail — exactly how the invention works, how to make it, and how to use it. The Detailed Description is governed by <span class="statute-ref">35 USC § 112(a)</span>, which imposes three independent requirements: enablement, written description, and best mode disclosure. Failure to satisfy any one of these requirements can render claims invalid, even years after a patent issues.</p>
+
+      <div class="stats-row">
+        <div class="stat-item">
+          <div class="stat-number">§ 112(a)</div>
+          <div class="stat-label">Enablement Requirement</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">§ 112(a)</div>
+          <div class="stat-label">Written Description</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">§ 112(a)</div>
+          <div class="stat-label">Best Mode</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">§ 112(b)</div>
+          <div class="stat-label">Definiteness</div>
+        </div>
+      </div>
+
+      <h3>The Three Requirements of 35 USC § 112(a)</h3>
+
+      <h4>Enablement</h4>
+      <p>The specification must enable a person of ordinary skill in the art (POSITA) to make and use the full scope of the claimed invention <em>without undue experimentation</em>. The <em>Wands</em> factors guide this analysis: quantity of experimentation required, amount of direction provided, existence of working examples, nature of the invention, state of the prior art, skill level in the art, predictability of the art, and breadth of the claims.</p>
+
+      <p>For AI/ML inventions, enablement is acutely tested when claims broadly recite "a neural network" or "a machine learning model" without describing the architecture, training procedure, loss function, or hyperparameter regime in sufficient detail for a POSITA to reproduce the claimed performance. The Federal Circuit's 2023 decision in <em>Amgen v. Sanofi</em> reinforced that claims whose functional scope vastly exceeds the disclosed embodiments face serious enablement challenges — a critical lesson for AI patents that claim broad functional outcomes (e.g., "classifying any input image") with narrow architectural disclosure.</p>
+
+      <div class="callout callout-warning">
+        <div class="callout-icon">&#9888;</div>
+        <div class="callout-body">
+          <div class="callout-title">Warning: The Amgen Problem for AI Patent Claims</div>
+          <p>Post-<em>Amgen</em>, claims that recite broad functional results achievable by any mechanism within a vast field face heightened enablement scrutiny. An AI patent claim reciting "a model trained to achieve greater than 90% accuracy on dataset X" without specifying an architecture, training procedure, or reproducible methodology invites invalidation. Disclose at least one working embodiment with sufficient technical detail that a POSITA could reproduce it, and draft claims that do not outrun the disclosure.</p>
+        </div>
+      </div>
+
+      <h4>Written Description</h4>
+      <p>The specification must demonstrate that the inventor, as of the filing date, was <em>in possession</em> of the full scope of the claimed invention. Written description and enablement are independent requirements — a specification can be enabling (someone could figure it out) without adequately describing what the inventor actually possessed. Written description is particularly tested when claims are amended during prosecution to add or broaden limitations beyond what was disclosed in the original specification.</p>
+
+      <h4>Best Mode</h4>
+      <p>Under <span class="statute-ref">35 USC § 112(a)</span>, if the inventor contemplated a "best mode" of carrying out the invention at the time of filing, that mode must be disclosed. The AIA eliminated best mode as a <em>defense to invalidity</em> in post-grant proceedings, but it remains a ground for rejection during prosecution. In AI/ML patents, best mode typically requires disclosing: the specific architecture used in the inventor's experiments, the training dataset (or its characteristics), hyperparameters used to achieve the best-performing results, and any special preprocessing or data augmentation techniques that were critical to performance.</p>
+
+      <div class="callout callout-danger">
+        <div class="callout-icon">&#9889;</div>
+        <div class="callout-body">
+          <div class="callout-title">Danger: Omitting Best Mode in AI Patents</div>
+          <p>A common error among AI/ML inventors is filing a specification that describes the general approach but withholds the specific hyperparameter configuration, training data details, or architectural choices that made the invention actually work. If the inventor used a specific transformer variant with 12 layers, 768 hidden dimensions, and a specific learning rate schedule validated across three training runs — and that specific configuration was their "best mode" — omitting it violates § 112(a). Describe what you actually built and validated, not just the theoretical generalization.</p>
+        </div>
+      </div>
+
+      <h3>Describing System Architecture</h3>
+
+      <p>Begin the Detailed Description with a general overview that tracks the structure of FIG. 1 (the system block diagram), then progressively drill down into each component. Every component that appears in a claim must be described in the specification with sufficient technical specificity.</p>
+
+      <div class="spec-block">
+        <div class="spec-label">Example — System Architecture Description (Attention-Based Recommendation System)</div>
+        <strong>DETAILED DESCRIPTION OF THE INVENTION</strong>
+        <br><br>
+        The following detailed description is presented to enable any person skilled in the art to make and use the invention. For purposes of explanation, specific details are set forth to provide a thorough understanding of the present invention. However, it will be apparent to one skilled in the art that these specific details are not required to practice the invention.
+        <br><br>
+        <strong>Overview of the Recommendation System</strong>
+        <br><br>
+        Referring to FIG. 1, an attention-based content recommendation system 100 according to embodiments of the present disclosure comprises an interaction history ingestion module 110, a temporal embedding generator 120, a cross-domain projection module 130, a candidate scoring engine 140, and a recommendation serving interface 150. The system 100 is implemented on one or more computing devices comprising at least one processor and memory, as described further with respect to FIG. 6.
+        <br><br>
+        The interaction history ingestion module 110 is configured to receive, from a data store or streaming data interface, a user interaction history H = {(i₁, t₁), (i₂, t₂), ..., (iₙ, tₙ)} comprising N interaction records, where each record comprises a content item identifier iₖ and a corresponding Unix timestamp tₖ. In embodiments, N ranges from 10 to 10,000, though the system is not limited to any particular history length. In one embodiment, the interaction history ingestion module 110 applies a recency filter that weights recent interactions more heavily during embedding construction; in another embodiment, no such filter is applied and the full interaction history is processed uniformly.
+        <br><br>
+        The temporal embedding generator 120 is configured to construct a temporal interaction embedding vector e ∈ ℝᵈ from the interaction history H, where d is the embedding dimension (128 in one embodiment, though other dimensions including 64, 256, and 512 are expressly contemplated). The temporal embedding generator 120 employs a hierarchical attention module 125, described in detail with respect to FIG. 2, that assigns attention weights to individual interactions based on both semantic content similarity and temporal proximity.
+      </div>
+
+      <h3>Describing Neural Network Layers</h3>
+
+      <div class="spec-block">
+        <div class="spec-label">Example — Neural Network Architecture Description</div>
+        <strong>Hierarchical Attention Module</strong>
+        <br><br>
+        Referring to FIG. 2, the hierarchical attention module 125 comprises a content embedding layer 210, a temporal positional encoding layer 220, a multi-head self-attention layer 230, a temporal decay layer 240, and a pooling layer 250.
+        <br><br>
+        The content embedding layer 210 maps each content item identifier iₖ to a content embedding vector cₖ ∈ ℝᵈ using a learned embedding matrix E ∈ ℝ^{|V|×d}, where |V| is the content vocabulary size. In one embodiment, the embedding matrix E is initialized using pretrained item2vec representations; in another embodiment, the embedding matrix is initialized randomly and trained end-to-end.
+        <br><br>
+        The temporal positional encoding layer 220 adds to each content embedding cₖ a temporal position encoding pₖ ∈ ℝᵈ that encodes the absolute timestamp tₖ and the relative temporal gap Δtₖ = tₖ - tₖ₋₁ between consecutive interactions. Unlike standard transformer positional encodings that use fixed sinusoidal functions of sequence position, the temporal positional encoding of the present disclosure uses a learned function of actual timestamps, enabling the model to distinguish interactions separated by days from those separated by minutes — a distinction that conventional sequence position encodings cannot capture.
+        <br><br>
+        The multi-head self-attention layer 230 comprises H parallel attention heads, where H = 8 in one embodiment, each head computing a scaled dot-product attention over the temporally-encoded interaction sequence. The attention scores are computed as:
+        <br><br>
+        Attention(Q, K, V) = softmax(QKᵀ / √d_k) · V
+        <br><br>
+        where Q, K, V are query, key, and value matrices derived from learned linear projections of the temporally-encoded embeddings, and d_k = d/H is the per-head dimension. The output of the multi-head attention layer is a sequence of context-enriched interaction representations {r₁, r₂, ..., rₙ}.
+      </div>
+
+      <h3>Describing Training Procedures</h3>
+
+      <div class="spec-block">
+        <div class="spec-label">Example — Training Procedure Description</div>
+        <strong>Training Methodology</strong>
+        <br><br>
+        The attention-based recommendation system 100 is trained end-to-end using a pairwise ranking loss function. Given a positive sample (u, i⁺) representing a user u and an item i⁺ that the user interacted with, and a negative sample (u, i⁻) representing a user u and an item i⁻ sampled uniformly from non-interacted items, the system is trained to minimize the Bayesian Personalized Ranking (BPR) loss:
+        <br><br>
+        L_BPR = -∑_{(u,i⁺,i⁻)} log σ(ŷ_{u,i⁺} - ŷ_{u,i⁻})
+        <br><br>
+        where ŷ_{u,i} denotes the predicted relevance score between user u and item i, and σ is the sigmoid function.
+        <br><br>
+        In one embodiment, the model is trained using the Adam optimizer with an initial learning rate of 1×10⁻³, β₁ = 0.9, β₂ = 0.999, and weight decay of 1×10⁻⁵. The learning rate is decayed by a factor of 0.5 every 10 epochs when validation performance fails to improve. Training is performed over mini-batches of 512 user-interaction-item triplets. Dropout with probability 0.1 is applied to the output of the multi-head self-attention layer to reduce overfitting.
+        <br><br>
+        It will be understood that the foregoing training configuration represents one embodiment of the present disclosure. Other optimizers including SGD with momentum, Adagrad, and RMSProp may be substituted without departing from the scope of the claims. Other loss functions including cross-entropy loss, mean squared error, and contrastive losses are also expressly contemplated.
+        <br><br>
+        In one embodiment, training is performed on a dataset comprising at least 10 million user-item interaction records spanning at least two content domains. In another embodiment, the system is fine-tuned on a domain-specific dataset following initial pretraining on the multi-domain dataset. This two-stage training regime yields improved cross-domain recommendation quality, as illustrated in the training curves of FIG. 5.
+      </div>
+
+      <h3>Describing Inference Methods</h3>
+
+      <div class="spec-block">
+        <div class="spec-label">Example — Inference / Serving Description</div>
+        <strong>Real-Time Inference</strong>
+        <br><br>
+        Referring to FIG. 3, a computer-implemented method 300 for generating real-time content recommendations according to embodiments of the present disclosure comprises the following steps.
+        <br><br>
+        At step 310, the recommendation serving interface 150 receives a recommendation request comprising a user identifier and optionally a context signal (e.g., current viewing session, device type, or time of day). The recommendation request may originate from a client application, a server-side triggering event, or a batch scoring pipeline.
+        <br><br>
+        At step 320, the interaction history ingestion module 110 retrieves the user's interaction history H from a feature store. In one embodiment, the feature store pre-computes and caches temporal interaction embeddings for active users on a rolling basis, enabling sub-10-millisecond latency for history lookup. In another embodiment, the embedding is computed on-demand at request time.
+        <br><br>
+        At step 330, if a pre-computed embedding is available in cache, the system proceeds directly to step 350. If no pre-computed embedding is available (e.g., for new users), the system generates a cold-start embedding using demographic signals and contextual features at step 340, as described further below.
+        <br><br>
+        At step 350, the cross-domain projection module 130 generates a cross-domain preference representation by applying the domain-agnostic transformation layer to the user embedding. The cross-domain preference representation encodes preference structure that is invariant to domain-specific content characteristics, enabling accurate recommendations across content domains without requiring explicit domain mapping.
+        <br><br>
+        At step 360, the candidate scoring engine 140 scores a set of candidate items against the cross-domain preference representation and returns the top-K items by predicted relevance score, where K is configurable by the calling application (default K = 20 in one embodiment).
+      </div>
+
+      <h3>Alternatives, Variations, and Multiple Embodiments</h3>
+
+      <p>A critical but often neglected aspect of the Detailed Description is the explicit disclosure of alternatives, variations, and multiple embodiments. Every limitation in your broadest independent claim should have at least one alternative described in the specification that a dependent claim or fallback claim could capture. The goal is to create a "claim ladder" — from very broad to very narrow — that is fully supported by the specification at every rung.</p>
+
+      <div class="callout callout-tip">
+        <div class="callout-icon">&#128161;</div>
+        <div class="callout-body">
+          <div class="callout-title">Drafting Tip: The Alternative Language Formula</div>
+          <p>After describing the primary embodiment of any limitation, add a sentence using the following formula: "In other embodiments, [the component / step] may comprise / employ [alternative A], [alternative B], or [alternative C]." This simple formula ensures that alternatives appear in the specification without requiring you to fully describe them as separate embodiments, and it creates antecedent basis for dependent claims and fallback claim amendments.</p>
+        </div>
+      </div>
+
+      <h3>Computer System Description</h3>
+
+      <p>Every AI/ML patent application should include a "generic computer system" figure (typically the last figure) and a corresponding description that ties the disclosed software methods to physical hardware. This description supports computer-readable medium (CRM) claims and apparatus claims and helps establish patent-eligibility by grounding the invention in a specific technical implementation.</p>
+
+      <div class="spec-block">
+        <div class="spec-label">Example — Computer System Description (Supporting CRM and Apparatus Claims)</div>
+        <strong>Computer System Implementation</strong>
+        <br><br>
+        Referring to FIG. 6, a computer system 600 suitable for implementing embodiments of the present disclosure comprises one or more processors 610, a memory subsystem 620 comprising one or more computer-readable storage media, a storage subsystem 630, a network interface 640, and an input/output subsystem 650, interconnected by a system bus 660.
+        <br><br>
+        The one or more processors 610 may comprise central processing units (CPUs), graphics processing units (GPUs), tensor processing units (TPUs), field-programmable gate arrays (FPGAs), application-specific integrated circuits (ASICs), or combinations thereof. In one embodiment, the recommendation system 100 is trained on a distributed cluster comprising multiple GPU nodes, each node comprising eight NVIDIA A100 80GB GPU accelerators, with gradient synchronization performed via a ring-allreduce algorithm. In inference (serving) mode, the recommendation system 100 may be deployed on a single server comprising one or more GPU accelerators or, in resource-constrained environments, on CPU-only hardware with reduced embedding dimensions.
+        <br><br>
+        The memory subsystem 620 comprises volatile memory (e.g., DRAM) for storing working data structures during training and inference, and non-volatile memory (e.g., flash storage, SSD arrays) for persisting trained model weights, the interaction history feature store, and the candidate item embedding index. In one embodiment, the trained model weights of the attention-based recommendation system 100 are stored as a serialized checkpoint file in a format compatible with PyTorch, TensorFlow, JAX, or any other deep learning framework, though the present disclosure is not limited to any particular framework.
+        <br><br>
+        The non-transitory computer-readable storage media of the memory subsystem 620 store instructions that, when executed by the one or more processors 610, implement the methods described herein, including the method 300 of FIG. 3. Such non-transitory computer-readable storage media may include, without limitation: magnetic hard disk drives, optical disc drives (CD-ROM, DVD-ROM, Blu-ray), solid-state drives, flash memory modules, network-attached storage, and cloud-based object storage systems (e.g., Amazon S3, Google Cloud Storage, Azure Blob Storage).
+        <br><br>
+        The network interface 640 enables communication with external systems including client applications that submit recommendation requests, upstream data pipelines that provide user interaction events, model training infrastructure, and monitoring and logging systems. In one embodiment, the recommendation serving interface 150 exposes a REST API over HTTPS on port 443; in another embodiment, it exposes a gRPC interface for lower-latency service-to-service communication.
+      </div>
+
+      <h3>Definiteness: Defining Key Terms</h3>
+
+      <p>One of the most important — and most overlooked — aspects of the Detailed Description is the definition of key terms. Under <span class="statute-ref">35 USC § 112(b)</span>, claims must be definite, meaning a person of ordinary skill in the art, reading the claims in light of the specification and prosecution history, must be able to determine the scope of the claimed invention with reasonable certainty (<em>Nautilus, Inc. v. Biosig Instruments</em>, 572 U.S. 898 (2014)). A well-drafted Detailed Description provides explicit definitions for all terms that are: (a) coined by the inventor, (b) used in a non-standard way, or (c) inherently ambiguous in the art.</p>
+
+      <div class="spec-block">
+        <div class="spec-label">Example — Definitions Section in Detailed Description</div>
+        <strong>Definitions</strong>
+        <br><br>
+        As used herein, the following terms have the meanings set forth below unless the context clearly requires otherwise.
+        <br><br>
+        "Attention weight" refers to a scalar value produced by the attention scoring function that indicates the relative importance of a particular interaction record to the generation of the temporal interaction embedding. Attention weights in the present disclosure are normalized via the softmax function such that they sum to unity across all interaction records in the input sequence.
+        <br><br>
+        "Content domain" refers to a category of content items sharing a common medium, genre, or consumption context, including without limitation: video content, audio content, podcast content, textual article content, social media content, e-commerce product listings, and gaming content. A single content item belongs to one content domain, though the system may process interactions spanning multiple content domains simultaneously.
+        <br><br>
+        "Cross-domain preference representation" refers to a vector in the shared latent preference space produced by the domain-agnostic transformation layer, encoding a user's preference structure in a manner that is invariant to the specific content domain from which the preference signal originates. The cross-domain preference representation enables relevance scoring of candidate items from any content domain using a single unified scoring function.
+        <br><br>
+        "Long-range temporal dependency" refers to a statistical relationship between a user's current interaction context and one or more earlier interactions that are separated by a temporal gap of at least 24 hours. The hierarchical attention module of the present disclosure is specifically designed to capture and leverage such long-range temporal dependencies, which conventional recurrent sequence models fail to adequately model due to gradient vanishing in long sequences.
+        <br><br>
+        "Person of ordinary skill in the art" (POSITA), in the context of the present disclosure, is a person having at least a bachelor's degree in computer science, machine learning, or a related discipline and at least two years of practical experience in developing and deploying recommendation systems or related machine learning applications.
+      </div>
+
+      <h3>Describing Equivalent and Alternative Implementations</h3>
+
+      <p>A frequently litigated issue in AI/ML patents is whether an accused product performs a "different" operation that nonetheless achieves the same result. The Detailed Description should anticipate this by describing the broadest reasonable interpretation of each claimed step or component, followed by a non-exclusive list of equivalent implementations. This approach supports both literal infringement arguments and doctrine of equivalents claims.</p>
+
+      <div class="spec-block">
+        <div class="spec-label">Example — Alternatives and Equivalents Language</div>
+        While the foregoing description has presented specific embodiments employing transformer-based multi-head self-attention, it will be appreciated by those skilled in the art that the hierarchical attention principles described herein may be implemented using other attention mechanisms including, without limitation: linear attention mechanisms, sparse attention mechanisms (e.g., Longformer, BigBird), cross-attention mechanisms, graph attention networks, and any other learned attention-based weighting scheme that assigns differential importance to elements of an input sequence based on learned similarity functions.
+        <br><br>
+        Similarly, while the cross-domain projection module has been described as employing a multi-layer perceptron (MLP) with ReLU activations as the domain-agnostic transformation layer, other architectures including variational autoencoders, normalizing flows, contrastive learning-based projectors, and any learned mapping from a domain-specific embedding space to a shared preference latent space are within the scope of the present claims.
+        <br><br>
+        It will further be understood that while the foregoing description refers to specific neural network architectures implemented in software executing on one or more processors, the claimed methods may also be implemented, in whole or in part, in dedicated hardware accelerators, in programmable logic devices, in neuromorphic computing hardware, or in any other computation substrate capable of implementing the mathematical operations described herein.
+      </div>
+
+    </section>
+
+    <!-- ──────────────────────────────────────────────────────
+         SECTION 8: CLAIMS OVERVIEW
+    ─────────────────────────────────────────────────────── -->
+    <section id="claims-overview" class="section-anchor">
+      <h2>8. Claims (Overview)</h2>
+
+      <p>The claims are the legally operative section of the patent — they define exactly what is protected. Everything else in the application exists to support, interpret, and validate the claims. Chapter 5 of this book provides a comprehensive treatment of claim drafting strategy and technique. This section introduces the fundamental structural architecture of claims and their hierarchical relationships.</p>
+
+      <p>Under <span class="statute-ref">35 USC § 112(b)</span>, each claim must "particularly point out and distinctly claim the subject matter which the inventor or a joint inventor regards as the invention." Claims that fail this definiteness standard are invalid under <em>Nautilus, Inc. v. Biosig Instruments</em>, 572 U.S. 898 (2014), which requires that a claim, read in light of the specification and prosecution history, provide "reasonable certainty" about the scope of the invention to a POSITA.</p>
+
+      <h3>Independent vs. Dependent Claims</h3>
+
+      <p>An <strong>independent claim</strong> stands on its own — it does not reference any other claim and defines the broadest version of the claimed subject matter. A <strong>dependent claim</strong> incorporates all limitations of the claim it depends from and adds at least one additional limitation. Dependent claims serve multiple strategic functions:</p>
+
+      <ul>
+        <li><strong>Fallback protection:</strong> If the independent claim is invalidated or found to be obvious, narrower dependent claims may survive.</li>
+        <li><strong>Prosecution leverage:</strong> Examiners sometimes allow dependent claims even when rejecting independent claims, giving the applicant a starting point for argument.</li>
+        <li><strong>Licensing value:</strong> Dependent claims that recite specific commercially important features may have independent licensing value even when broader claims are challenged.</li>
+        <li><strong>Doctrine of equivalents:</strong> A broad independent claim plus progressively narrowing dependent claims creates a claim matrix that makes design-arounds more difficult.</li>
+      </ul>
+
+      <!-- SVG Claim Hierarchy -->
+      <div class="figure">
+        <div class="figure-content">
+          <svg class="diagram-svg" viewBox="0 0 660 440" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Patent claim hierarchy diagram showing independent and dependent claims">
+            <defs>
+              <marker id="arr2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                <path d="M0,0 L0,6 L8,3 z" fill="#adb5bd"/>
+              </marker>
+            </defs>
+
+            <!-- Independent Claims row -->
+            <!-- Claim 1 (System) -->
+            <rect x="20" y="20" width="180" height="70" rx="8" fill="#1a2744"/>
+            <text x="110" y="46" text-anchor="middle" fill="white" font-family="Inter,sans-serif" font-size="11" font-weight="700">Claim 1</text>
+            <text x="110" y="63" text-anchor="middle" fill="#c8942a" font-family="Inter,sans-serif" font-size="9">INDEPENDENT</text>
+            <text x="110" y="78" text-anchor="middle" fill="#adb5bd" font-family="Inter,sans-serif" font-size="9">System Claim (broadest)</text>
+
+            <!-- Claim 8 (Method) -->
+            <rect x="240" y="20" width="180" height="70" rx="8" fill="#1a2744"/>
+            <text x="330" y="46" text-anchor="middle" fill="white" font-family="Inter,sans-serif" font-size="11" font-weight="700">Claim 8</text>
+            <text x="330" y="63" text-anchor="middle" fill="#c8942a" font-family="Inter,sans-serif" font-size="9">INDEPENDENT</text>
+            <text x="330" y="78" text-anchor="middle" fill="#adb5bd" font-family="Inter,sans-serif" font-size="9">Method Claim (broadest)</text>
+
+            <!-- Claim 15 (CRM) -->
+            <rect x="460" y="20" width="180" height="70" rx="8" fill="#1a2744"/>
+            <text x="550" y="46" text-anchor="middle" fill="white" font-family="Inter,sans-serif" font-size="11" font-weight="700">Claim 15</text>
+            <text x="550" y="63" text-anchor="middle" fill="#c8942a" font-family="Inter,sans-serif" font-size="9">INDEPENDENT</text>
+            <text x="550" y="78" text-anchor="middle" fill="#adb5bd" font-family="Inter,sans-serif" font-size="9">CRM Claim (broadest)</text>
+
+            <!-- Arrows down from Claim 1 -->
+            <line x1="80" y1="90" x2="60" y2="150" stroke="#adb5bd" stroke-width="1.5" marker-end="url(#arr2)"/>
+            <line x1="110" y1="90" x2="110" y2="150" stroke="#adb5bd" stroke-width="1.5" marker-end="url(#arr2)"/>
+            <line x1="140" y1="90" x2="165" y2="150" stroke="#adb5bd" stroke-width="1.5" marker-end="url(#arr2)"/>
+
+            <!-- Arrows down from Claim 8 -->
+            <line x1="300" y1="90" x2="280" y2="150" stroke="#adb5bd" stroke-width="1.5" marker-end="url(#arr2)"/>
+            <line x1="330" y1="90" x2="330" y2="150" stroke="#adb5bd" stroke-width="1.5" marker-end="url(#arr2)"/>
+            <line x1="360" y1="90" x2="385" y2="150" stroke="#adb5bd" stroke-width="1.5" marker-end="url(#arr2)"/>
+
+            <!-- First tier dependents from Claim 1 -->
+            <rect x="20" y="150" width="120" height="55" rx="6" fill="#2d3f6b"/>
+            <text x="80" y="172" text-anchor="middle" fill="white" font-family="Inter,sans-serif" font-size="10" font-weight="600">Claim 2</text>
+            <text x="80" y="186" text-anchor="middle" fill="#85c1e9" font-family="Inter,sans-serif" font-size="8.5">dep. on Claim 1</text>
+            <text x="80" y="198" text-anchor="middle" fill="#adb5bd" font-family="Inter,sans-serif" font-size="8">+ attention heads</text>
+
+            <rect x="50" y="150" width="120" height="55" rx="6" fill="#2d3f6b" x="50"/>
+            <!-- re-draw centered -->
+            <rect x="50" y="150" width="120" height="55" rx="6" fill="#2d3f6b"/>
+            <text x="110" y="172" text-anchor="middle" fill="white" font-family="Inter,sans-serif" font-size="10" font-weight="600">Claim 3</text>
+            <text x="110" y="186" text-anchor="middle" fill="#85c1e9" font-family="Inter,sans-serif" font-size="8.5">dep. on Claim 1</text>
+            <text x="110" y="198" text-anchor="middle" fill="#adb5bd" font-family="Inter,sans-serif" font-size="8">+ temporal encoding</text>
+
+            <rect x="140" y="150" width="120" height="55" rx="6" fill="#2d3f6b"/>
+            <text x="200" y="172" text-anchor="middle" fill="white" font-family="Inter,sans-serif" font-size="10" font-weight="600">Claim 4</text>
+            <text x="200" y="186" text-anchor="middle" fill="#85c1e9" font-family="Inter,sans-serif" font-size="8.5">dep. on Claim 1</text>
+            <text x="200" y="198" text-anchor="middle" fill="#adb5bd" font-family="Inter,sans-serif" font-size="8">+ cross-domain proj.</text>
+
+            <!-- First tier dependents from Claim 8 -->
+            <rect x="260" y="150" width="120" height="55" rx="6" fill="#2d3f6b"/>
+            <text x="320" y="172" text-anchor="middle" fill="white" font-family="Inter,sans-serif" font-size="10" font-weight="600">Claim 9</text>
+            <text x="320" y="186" text-anchor="middle" fill="#85c1e9" font-family="Inter,sans-serif" font-size="8.5">dep. on Claim 8</text>
+            <text x="320" y="198" text-anchor="middle" fill="#adb5bd" font-family="Inter,sans-serif" font-size="8">+ BPR training</text>
+
+            <rect x="390" y="150" width="120" height="55" rx="6" fill="#2d3f6b"/>
+            <text x="450" y="172" text-anchor="middle" fill="white" font-family="Inter,sans-serif" font-size="10" font-weight="600">Claim 10</text>
+            <text x="450" y="186" text-anchor="middle" fill="#85c1e9" font-family="Inter,sans-serif" font-size="8.5">dep. on Claim 8</text>
+            <text x="450" y="198" text-anchor="middle" fill="#adb5bd" font-family="Inter,sans-serif" font-size="8">+ cold-start method</text>
+
+            <!-- Second-tier arrows -->
+            <line x1="110" y1="205" x2="90" y2="265" stroke="#adb5bd" stroke-width="1" marker-end="url(#arr2)"/>
+            <line x1="200" y1="205" x2="200" y2="265" stroke="#adb5bd" stroke-width="1" marker-end="url(#arr2)"/>
+            <line x1="320" y1="205" x2="300" y2="265" stroke="#adb5bd" stroke-width="1" marker-end="url(#arr2)"/>
+
+            <!-- Second tier dependents -->
+            <rect x="30" y="265" width="130" height="50" rx="6" fill="#1a5276" opacity="0.85"/>
+            <text x="95" y="286" text-anchor="middle" fill="white" font-family="Inter,sans-serif" font-size="10" font-weight="600">Claim 5</text>
+            <text x="95" y="300" text-anchor="middle" fill="#85c1e9" font-family="Inter,sans-serif" font-size="8">dep. on Claim 3: specifies</text>
+            <text x="95" y="311" text-anchor="middle" fill="#85c1e9" font-family="Inter,sans-serif" font-size="8">sinusoidal vs. learned PE</text>
+
+            <rect x="135" y="265" width="130" height="50" rx="6" fill="#1a5276" opacity="0.85"/>
+            <text x="200" y="286" text-anchor="middle" fill="white" font-family="Inter,sans-serif" font-size="10" font-weight="600">Claim 6</text>
+            <text x="200" y="300" text-anchor="middle" fill="#85c1e9" font-family="Inter,sans-serif" font-size="8">dep. on Claim 4: specifies</text>
+            <text x="200" y="311" text-anchor="middle" fill="#85c1e9" font-family="Inter,sans-serif" font-size="8">projection layer depth</text>
+
+            <rect x="235" y="265" width="130" height="50" rx="6" fill="#1a5276" opacity="0.85"/>
+            <text x="300" y="286" text-anchor="middle" fill="white" font-family="Inter,sans-serif" font-size="10" font-weight="600">Claim 11</text>
+            <text x="300" y="300" text-anchor="middle" fill="#85c1e9" font-family="Inter,sans-serif" font-size="8">dep. on Claim 9: specifies</text>
+            <text x="300" y="311" text-anchor="middle" fill="#85c1e9" font-family="Inter,sans-serif" font-size="8">optimizer hyperparameters</text>
+
+            <!-- Third tier arrow -->
+            <line x1="200" y1="315" x2="200" y2="370" stroke="#adb5bd" stroke-width="1" marker-end="url(#arr2)"/>
+
+            <!-- Narrowest claim -->
+            <rect x="130" y="370" width="140" height="55" rx="6" fill="#c8942a" opacity="0.85"/>
+            <text x="200" y="393" text-anchor="middle" fill="#0f1729" font-family="Inter,sans-serif" font-size="10" font-weight="700">Claim 7</text>
+            <text x="200" y="408" text-anchor="middle" fill="#0f1729" font-family="Inter,sans-serif" font-size="8">dep. on Claim 6:</text>
+            <text x="200" y="419" text-anchor="middle" fill="#0f1729" font-family="Inter,sans-serif" font-size="8">specific embedding dim = 128</text>
+
+            <!-- Legend -->
+            <rect x="450" y="265" width="185" height="130" rx="6" fill="#f8f9fa" stroke="#dee2e6" stroke-width="1"/>
+            <text x="462" y="284" fill="#1a2744" font-family="Inter,sans-serif" font-size="10" font-weight="700">Claim Hierarchy Key</text>
+            <rect x="462" y="295" width="12" height="12" rx="2" fill="#1a2744"/>
+            <text x="480" y="305" fill="#495057" font-family="Inter,sans-serif" font-size="9">Independent (broadest)</text>
+            <rect x="462" y="315" width="12" height="12" rx="2" fill="#2d3f6b"/>
+            <text x="480" y="325" fill="#495057" font-family="Inter,sans-serif" font-size="9">1st-tier dependent</text>
+            <rect x="462" y="335" width="12" height="12" rx="2" fill="#1a5276" opacity="0.85"/>
+            <text x="480" y="345" fill="#495057" font-family="Inter,sans-serif" font-size="9">2nd-tier dependent</text>
+            <rect x="462" y="355" width="12" height="12" rx="2" fill="#c8942a"/>
+            <text x="480" y="365" fill="#495057" font-family="Inter,sans-serif" font-size="9">Narrowest (specific values)</text>
+            <text x="462" y="386" fill="#6c757d" font-family="Inter,sans-serif" font-size="8.5">Max 20 claims included</text>
+            <text x="462" y="397" fill="#6c757d" font-family="Inter,sans-serif" font-size="8.5">in base filing fee</text>
+          </svg>
+        </div>
+        <p class="figure-caption">Figure 4-2. Claim hierarchy diagram showing three independent claims (system, method, computer-readable medium) and progressively narrowing dependent claims. Arrows indicate dependency relationships. Narrower dependent claims provide fallback protection and licensing granularity.</p>
+      </div>
+
+      <div class="highlight-box">
+        <h4>The Tripartite Claim Strategy for AI Inventions</h4>
+        <p>A well-structured AI patent application typically includes at least three independent claims: (1) a <strong>system/apparatus claim</strong> reciting the hardware and software components in structural terms; (2) a <strong>method/process claim</strong> reciting the steps performed by the system; and (3) a <strong>computer-readable medium (CRM) claim</strong> reciting stored instructions that implement the method. This tripartite structure ensures that the patent is infringed whether a competitor ships the system, performs the method, or distributes software that enables performance of the method.</p>
+      </div>
+
+      <p>For full treatment of claim drafting — including independent claim structure, claim element sequencing, means-plus-function claims, Markush groups, and prosecution strategy — see <strong>Chapter 5: Writing Patent Claims That Win</strong>.</p>
+
+    </section>
+
+    <!-- ──────────────────────────────────────────────────────
+         SECTION 8.5: CLAIM EXAMPLES
+    ─────────────────────────────────────────────────────── -->
+
+      <h3>Example Claims: Attention-Based Recommendation System</h3>
+
+      <p>To ground the foregoing structural discussion, below are sample claims for the hypothetical attention-based recommendation system patent. These examples illustrate independent-dependent claim structure, the tripartite system/method/CRM strategy, and the progressive narrowing from broad to specific.</p>
+
+      <div class="claim-box">
+        <div class="claim-header">Sample Claims — Attention-Based Recommendation System Patent</div>
+
+        <p><span class="claim-number">1.</span> A computer-implemented system for generating content recommendations, comprising:</p>
+        <span class="claim-element">one or more processors; and</span>
+        <span class="claim-element">a memory storing instructions that, when executed by the one or more processors, cause the system to:</span>
+        <span class="claim-element" style="padding-left:4rem; text-indent:-1rem;">receive a user interaction history comprising a plurality of interaction records, each interaction record comprising a content item identifier and a timestamp;</span>
+        <span class="claim-element" style="padding-left:4rem; text-indent:-1rem;">construct a temporal interaction embedding from the user interaction history by applying a hierarchical attention module configured to assign attention weights to the plurality of interaction records based on content-based similarity and temporal proximity;</span>
+        <span class="claim-element" style="padding-left:4rem; text-indent:-1rem;">generate a cross-domain preference representation by projecting the temporal interaction embedding through a domain-agnostic transformation layer; and</span>
+        <span class="claim-element" style="padding-left:4rem; text-indent:-1rem;">generate one or more content recommendations by scoring a plurality of candidate content items against the cross-domain preference representation.</span>
+
+        <p style="margin-top:1.25rem;"><span class="claim-number">2.</span> The system of claim 1, wherein the hierarchical attention module comprises a multi-head self-attention layer having a plurality of attention heads, each attention head computing scaled dot-product attention over a sequence of temporally-encoded interaction embeddings.</p>
+
+        <p><span class="claim-number">3.</span> The system of claim 1, wherein constructing the temporal interaction embedding further comprises applying a temporal positional encoding that encodes, for each interaction record, at least an absolute timestamp and a temporal gap between consecutive interaction records.</p>
+
+        <p><span class="claim-number">4.</span> The system of claim 3, wherein the temporal positional encoding is a learned encoding trained jointly with the hierarchical attention module.</p>
+
+        <p><span class="claim-number">5.</span> The system of claim 1, wherein the domain-agnostic transformation layer is trained using a contrastive learning objective that minimizes a distance between preference representations of the same user across different content domains.</p>
+
+        <p><span class="claim-number">6.</span> The system of claim 1, wherein the instructions further cause the system to, in response to a determination that no interaction history is available for a user, generate a cold-start embedding for the user based on at least one of demographic information, device characteristics, or contextual signals.</p>
+
+        <p><span class="claim-number">7.</span> The system of claim 2, wherein the multi-head self-attention layer comprises eight attention heads, and wherein each attention head operates on a per-head dimension of 16.</p>
+
+        <p style="margin-top:1.25rem;"><span class="claim-number">8.</span> A computer-implemented method for generating content recommendations, comprising:</p>
+        <span class="claim-element">receiving, by one or more processors, a user interaction history comprising a plurality of interaction records, each interaction record comprising a content item identifier and a timestamp;</span>
+        <span class="claim-element">constructing, by the one or more processors, a temporal interaction embedding from the user interaction history by applying a hierarchical attention module configured to assign attention weights to the plurality of interaction records based on content-based similarity and temporal proximity;</span>
+        <span class="claim-element">generating, by the one or more processors, a cross-domain preference representation by projecting the temporal interaction embedding through a domain-agnostic transformation layer; and</span>
+        <span class="claim-element">generating, by the one or more processors, one or more content recommendations by scoring a plurality of candidate content items against the cross-domain preference representation.</span>
+
+        <p style="margin-top:1.25rem;"><span class="claim-number">15.</span> A non-transitory computer-readable medium storing instructions that, when executed by one or more processors, cause the one or more processors to perform operations comprising:</p>
+        <span class="claim-element">receiving a user interaction history comprising a plurality of interaction records, each interaction record comprising a content item identifier and a timestamp;</span>
+        <span class="claim-element">constructing a temporal interaction embedding from the user interaction history by applying a hierarchical attention module configured to assign attention weights to the plurality of interaction records based on content-based similarity and temporal proximity;</span>
+        <span class="claim-element">generating a cross-domain preference representation by projecting the temporal interaction embedding through a domain-agnostic transformation layer; and</span>
+        <span class="claim-element">generating one or more content recommendations by scoring a plurality of candidate content items against the cross-domain preference representation.</span>
+      </div>
+
+      <div class="callout callout-info">
+        <div class="callout-icon">&#9432;</div>
+        <div class="callout-body">
+          <div class="callout-title">Note on Claim Count and Filing Fees</div>
+          <p>The USPTO's base filing fee covers up to <strong>20 total claims</strong> and up to <strong>3 independent claims</strong>. Excess claims fees apply: $100 per extra independent claim (small entity) and $240 per extra claim beyond 20 (small entity, as of 2025 fee schedule). A standard AI patent application typically files 20 claims: 3 independent (system, method, CRM) and 17 dependent. This maximizes claim coverage within the base fee structure. Strategic applications may file more claims when the technology warrants it — for example, when multiple distinct inventive aspects need independent protection.</p>
+        </div>
+      </div>
+
+    <!-- ──────────────────────────────────────────────────────
+         SECTION 9: ABSTRACT
+    ─────────────────────────────────────────────────────── -->
+    <section id="abstract" class="section-anchor">
+      <h2>9. Abstract</h2>
+
+      <p>The Abstract is governed by <span class="statute-ref">37 CFR § 1.72(b)</span>, which requires that the Abstract "briefly describe" the invention in a "single paragraph of approximately 150 words." The Abstract appears on the cover page of the issued patent and in USPTO and commercial search databases. It is the first — and sometimes only — text read by a competitor's patent watch service, a potential licensee, or a litigation analyst.</p>
+
+      <h3>What the Abstract Must Include</h3>
+
+      <ul>
+        <li>The nature and gist of the invention (what it is)</li>
+        <li>The principal use or application</li>
+        <li>The key technical feature or mechanism that distinguishes the invention from the prior art</li>
+        <li>Any novel aspects of the preferred embodiment that are likely to be claimed</li>
+      </ul>
+
+      <h3>What the Abstract Must NOT Include</h3>
+
+      <ul>
+        <li>Legal conclusions or claim-like language (the Abstract is explicitly not a claim)</li>
+        <li>Commercial puffery ("the most accurate recommendation system ever devised")</li>
+        <li>Unnecessary background information already obvious from the title</li>
+        <li>Figures or mathematical equations (though formula symbols may be used if necessary)</li>
+        <li>Admissions or disclaimers that could be read as claim limitations</li>
+      </ul>
+
+      <div class="callout callout-warning">
+        <div class="callout-icon">&#9888;</div>
+        <div class="callout-body">
+          <div class="callout-title">The 150-Word Limit is Enforced</div>
+          <p>The USPTO will reject an Abstract that exceeds 150 words and require amendment. More importantly, courts have occasionally used Abstract language as evidence of the inventor's characterization of the invention in claim construction proceedings. Draft the Abstract carefully — do not inadvertently narrow your claim scope by using limiting language, and do not use it as a second chance to write claims.</p>
+        </div>
+      </div>
+
+      <h3>Example Abstract: Attention-Based Recommendation System</h3>
+
+      <div class="spec-block">
+        <div class="spec-label">Example Abstract — AI Patent (143 words)</div>
+        Systems and methods are disclosed for generating personalized content recommendations using a hierarchical attention mechanism that models long-range temporal dependencies in user interaction histories. A recommendation system receives a user interaction history comprising interaction records each including a content item identifier and a timestamp, and constructs a temporal interaction embedding by applying a position-aware attention module that assigns attention weights based on content-based similarity and temporal proximity. The system generates a cross-domain preference representation by projecting the temporal interaction embedding through a domain-agnostic transformation layer trained to preserve preference structure across content domains, enabling recommendation across domains without requiring explicit domain correspondence. One or more content recommendations are generated by scoring candidate items against the cross-domain preference representation. The disclosed approach provides improved recommendation quality for sparse-history users and supports real-time serving within latency constraints of production recommendation platforms.
+      </div>
+
+      <div class="callout callout-tip">
+        <div class="callout-icon">&#128161;</div>
+        <div class="callout-body">
+          <div class="callout-title">Draft the Abstract Last</div>
+          <p>Write the Abstract after the claims and Detailed Description are finalized. The Abstract should accurately reflect the broadest independent claim and the most commercially important embodiment. Drafting it first often leads to an Abstract that does not align with the final claim scope — which can create prosecution history problems if the examiner relies on Abstract language to limit your claims during examination.</p>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ──────────────────────────────────────────────────────
+         SECTION 10: DRAWINGS
+    ─────────────────────────────────────────────────────── -->
+    <section id="drawings" class="section-anchor">
+      <h2>10. Drawings and Figures</h2>
+
+      <p>Patent drawings are governed by <span class="statute-ref">35 USC § 113</span> and <span class="statute-ref">37 CFR § 1.81–1.84</span>, which impose strict formatting requirements including minimum line thickness, reference numeral sizing, margin dimensions, and file format specifications (PDF or TIFF at 300 DPI minimum). The drawings are not merely illustrations — they are legal documents that define the visual embodiments of the invention and form the basis for reference numerals that anchor claim terms to structural description.</p>
+
+      <p>For a comprehensive treatment of drawing preparation standards, USPTO formal requirements, professional illustration tools, and strategies for representing complex AI architectures in patent-compliant figures, see <strong>Chapter 7: Patent Drawings for AI/ML Inventions</strong>.</p>
+
+      <h3>Common Drawing Types for AI/ML Patents</h3>
+
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-icon">&#9634;</div>
+          <h3>Block Diagrams</h3>
+          <p>System architecture diagrams showing components, modules, and their interconnections. The most common figure type for AI system patents. Each block receives a reference numeral and is described in the Detailed Description.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">&#8595;</div>
+          <h3>Flowcharts</h3>
+          <p>Process flow diagrams showing method steps, decision branches, and loops. Each decision diamond and process rectangle receives a step number referenced in the Detailed Description and corresponding method claims.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">&#9673;</div>
+          <h3>Neural Network Architecture Diagrams</h3>
+          <p>Layer-by-layer depictions of model architectures including input dimensions, layer types (conv, attention, MLP), and output shapes. Critical for enabling AI/ML invention disclosures.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">&#128200;</div>
+          <h3>Training Curves &amp; Performance Graphs</h3>
+          <p>Loss/accuracy curves demonstrating training convergence and comparative performance against baselines. Supports enablement by showing the invention actually achieves the claimed results.</p>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ──────────────────────────────────────────────────────
+         SECTION 11: PROVISIONAL APPLICATION
+    ─────────────────────────────────────────────────────── -->
+    <section id="provisional" class="section-anchor">
+      <h2>11. The Provisional Application</h2>
+
+      <p>A provisional patent application under <span class="statute-ref">35 USC § 111(b)</span> is one of the most powerful and most misunderstood tools in the patent practitioner's toolkit. It provides an immediate priority date at a fraction of the cost of a nonprovisional, but it comes with critical limitations that, if misunderstood, can result in complete loss of the priority benefit it was designed to provide.</p>
+
+      <h3>Advantages of Filing a Provisional</h3>
+
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-icon">&#128197;</div>
+          <h3>Immediate Priority Date</h3>
+          <p>Establishes a filing date before any public disclosure, conference presentation, or arXiv posting. Under the AIA's first-inventor-to-file system, this date is often decisive.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">&#128176;</div>
+          <h3>Lower Cost</h3>
+          <p>Filing fees are approximately one-fifth of nonprovisional fees. Attorney preparation costs are lower when formal claims are not yet needed. Preserves capital while the business case is assessed.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">&#128336;</div>
+          <h3>12-Month Runway</h3>
+          <p>Provides 12 months to refine the invention, assess commercial viability, conduct prior art searches, draft the full claim set, and prepare formal drawings before the nonprovisional must be filed.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">&#128203;</div>
+          <h3>No Formal Claim Requirement</h3>
+          <p>A provisional does not need claims. A well-written technical disclosure, detailed technical specification, or even a polished research paper can serve as the provisional specification.</p>
+        </div>
+      </div>
+
+      <h3>Critical Limitations</h3>
+
+      <div class="callout callout-danger">
+        <div class="callout-icon">&#9889;</div>
+        <div class="callout-body">
+          <div class="callout-title">The 12-Month Cliff: No Extensions, No Exceptions</div>
+          <p>A provisional application automatically goes abandoned exactly <strong>12 months</strong> after its filing date. There are no extensions of this deadline — not for small entities, not for micro-entities, not for any reason. If you fail to file a nonprovisional claiming priority to the provisional before the 12-month anniversary, the provisional is permanently abandoned and its filing date is lost. USPTO calendars, law firm docketing systems, and patent counsel should have at minimum three calendar reminders: at 9 months, 11 months, and 12 months from the provisional filing date.</p>
+        </div>
+      </div>
+
+      <h3>What Must Be in a Provisional to Get Priority</h3>
+
+      <p>This is the most misunderstood aspect of provisional practice. A nonprovisional claim will only receive the benefit of a provisional's filing date for claims that are fully supported by the provisional's disclosure. Specifically:</p>
+
+      <ul>
+        <li>The provisional must enable a POSITA to make and use the claimed invention as of the provisional's filing date</li>
+        <li>The provisional must satisfy the written description requirement for each claim seeking its priority benefit</li>
+        <li>New matter added in the nonprovisional (improvements, refinements, additional embodiments) only receives the nonprovisional's filing date</li>
+        <li>A thin provisional — a one-page summary or abstract — will almost certainly fail to support the full claim scope of a well-drafted nonprovisional</li>
+      </ul>
+
+      <div class="callout callout-warning">
+        <div class="callout-icon">&#9888;</div>
+        <div class="callout-body">
+          <div class="callout-title">Warning: The "Just File Something" Fallacy</div>
+          <p>A dangerously common misconception — particularly among engineers and startup founders — is that any provisional filing, no matter how thin, is better than nothing. This is false. A provisional that does not adequately disclose the invention as later claimed provides no priority benefit for those claims. Worse, it may create a false sense of security that leads the inventor to publicly disclose the invention, then discover 12 months later that the provisional was inadequate and the public disclosure has become prior art against the nonprovisional. <strong>A provisional should describe the invention with the same specificity as a nonprovisional specification, minus the formal claims.</strong></p>
+        </div>
+      </div>
+
+      <h3>Provisional Filing Checklist</h3>
+
+      <p>Before filing a provisional, verify that the document includes all of the following elements:</p>
+
+      <ul class="checklist">
+        <li>Descriptive title identifying the invention and its technical domain</li>
+        <li>Technical field paragraph identifying the area of technology</li>
+        <li>Background section describing the problem the invention solves</li>
+        <li>Detailed description of at least one complete embodiment of the invention</li>
+        <li>All components, modules, or steps necessary to perform the invention described in sufficient detail for a POSITA</li>
+        <li>At least one working example (even if results are preliminary) demonstrating that the invention operates as described</li>
+        <li>Alternative embodiments described to support the full anticipated claim scope</li>
+        <li>All critical parameters, configurations, hyperparameters, or ranges that characterize the invention</li>
+        <li>For AI/ML inventions: model architecture, training procedure, loss function, dataset description, evaluation metrics</li>
+        <li>At least informal drawings or diagrams sufficient to illustrate the system architecture and method steps</li>
+        <li>Definition of any novel technical terms or terms of art used in the disclosure</li>
+        <li>Inventor name(s) and contact information</li>
+        <li>Filing fee payment (or fee transmittal)</li>
+        <li>Cover sheet (37 CFR § 1.51(c)(1)) identifying the application as a provisional</li>
+        <li class="unchecked">Formal drawings conforming to 37 CFR § 1.84 (not required for provisional but should be filed if available)</li>
+        <li class="unchecked">Formal claims (not required but recommended if time permits)</li>
+        <li class="unchecked">Oath or declaration (not required for provisional)</li>
+      </ul>
+
+      <div class="callout callout-info">
+        <div class="callout-icon">&#9432;</div>
+        <div class="callout-body">
+          <div class="callout-title">The Multiple-Provisional Strategy</div>
+          <p>In rapidly evolving fields like AI/ML, inventors can file a series of provisionals as the invention develops. A nonprovisional can claim priority to multiple provisionals, receiving each provisional's filing date for the specific subject matter it discloses. This "rolling provisional" strategy allows an AI team to file a provisional when the core architecture is ready, a second provisional when training methodology is finalized, and a third when evaluation results are available — with the nonprovisional claiming priority to all three. The nonprovisional must be filed within 12 months of the <em>earliest</em> provisional or that provisional's filing date is lost.</p>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ──────────────────────────────────────────────────────
+         SECTION 12: SPECIFICATION CHECKLIST
+    ─────────────────────────────────────────────────────── -->
+    <section id="checklist" class="section-anchor">
+      <h2>12. Specification Checklist for AI/ML Patents</h2>
+
+      <p>Use the following comprehensive checklist before finalizing any AI/ML patent specification for filing. Each item corresponds to a specific statutory requirement, USPTO guideline, or court-developed doctrine that has been invoked in examination or litigation to limit or invalidate AI-related patent claims.</p>
+
+      <h3>Enablement (35 USC § 112(a))</h3>
+      <ul class="checklist">
+        <li>At least one complete, reproducible working embodiment described in sufficient detail</li>
+        <li>Architecture of any neural network or model described (layer types, depths, dimensions where critical)</li>
+        <li>Training procedure described (loss function, optimizer, learning rate schedule, batch size, number of epochs)</li>
+        <li>Dataset described by domain, approximate size, and any critical preprocessing steps</li>
+        <li>Evaluation metrics and performance results reported on at least one benchmark or test set</li>
+        <li>Scope of claims does not outrun the breadth of the enabling disclosure (post-<em>Amgen</em> analysis performed)</li>
+        <li>Wands factors addressed: claim breadth, state of the art, level of skill in the art, degree of predictability</li>
+        <li>All claim elements have corresponding enabling description in the specification</li>
+      </ul>
+
+      <h3>Written Description (35 USC § 112(a))</h3>
+      <ul class="checklist">
+        <li>Each limitation of each independent claim is described in the specification</li>
+        <li>Inventor possession of full claim scope as of filing date is demonstrable from specification text</li>
+        <li>Any claim amendments made during prosecution are supported by the original specification</li>
+        <li>Genus claims (where applicable) supported by sufficient representative species</li>
+        <li>Functional claim elements (e.g., "configured to classify") are supported by structural description of how the function is achieved</li>
+        <li>Claims that recite specific data structures, algorithms, or mathematical relationships have those elements described in the specification</li>
+      </ul>
+
+      <h3>Best Mode (35 USC § 112(a))</h3>
+      <ul class="checklist">
+        <li>If inventor had a preferred implementation, it is described in the specification</li>
+        <li>Specific hyperparameter values used in the best-performing embodiment are disclosed</li>
+        <li>Training data sources or dataset characteristics that produced best results are disclosed</li>
+        <li>Any proprietary preprocessing pipelines, data augmentation techniques, or evaluation protocols that are integral to best mode are disclosed</li>
+        <li>Hardware configuration used for best-mode implementation is described (GPU model, memory, distributed training setup if critical)</li>
+      </ul>
+
+      <h3>Definiteness (35 USC § 112(b))</h3>
+      <ul class="checklist">
+        <li>All claim terms are defined or described with sufficient specificity in the specification</li>
+        <li>No term in the claims is purely functional without structural support (or is properly drafted as means-plus-function under §112(f))</li>
+        <li>Relative terms (e.g., "substantially," "approximately," "high accuracy") are given numerical or contextual meaning in the specification</li>
+        <li>Terms of degree are accompanied by examples or standards for measurement</li>
+        <li>Novel coined terms are defined explicitly in the specification</li>
+      </ul>
+
+      <h3>Antecedent Basis</h3>
+      <ul class="checklist">
+        <li>Every claim element introduced with "a" or "an" has its first introduction in the claim using indefinite article</li>
+        <li>Every claim element referenced with "the" or "said" was previously introduced with "a" or "an"</li>
+        <li>Multi-dependent claims (where used) properly depend from alternative preceding claims</li>
+        <li>Reference numerals in the specification correspond to reference numerals in the drawings</li>
+        <li>All elements recited in the claims appear in the specification by name</li>
+      </ul>
+
+      <h3>Claim-Specification Alignment</h3>
+      <ul class="checklist">
+        <li>Summary section reflects each independent claim without adding unnecessary limitations</li>
+        <li>Background section does not contain admissions of prior art that would anticipate the claims</li>
+        <li>No "the invention requires" or "the invention always" language that could limit all claims</li>
+        <li>Alternative embodiments support dependent claim hierarchy</li>
+        <li>Every figure referenced in the claims or Detailed Description is listed in the Brief Description of Drawings</li>
+        <li>Every reference numeral in the figures is introduced and described in the Detailed Description</li>
+      </ul>
+
+      <h3>AI/ML-Specific Requirements</h3>
+      <ul class="checklist">
+        <li>Patent-eligibility analysis performed (Alice/Mayo framework); claims are directed to specific technical improvements, not abstract mathematical concepts alone</li>
+        <li>Specific technical implementation described beyond mere recitation of functional results</li>
+        <li>Training and inference phases described separately if both are claimed or material to patentability</li>
+        <li>Data structures (tensors, embeddings, matrices) described with sufficient specificity</li>
+        <li>Integration with hardware components described (avoids pure software/abstract method characterization)</li>
+        <li>Claims directed to the system/method aspects, not merely the model weights or trained artifact alone</li>
+        <li>All mathematical operations (attention, convolution, softmax) described functionally with reference to how they are implemented in a computer system</li>
+        <li>Real-world technical benefit articulated (latency improvement, accuracy improvement, memory reduction, etc.)</li>
+      </ul>
+
+      <h3>Administrative and Procedural</h3>
+      <ul class="checklist">
+        <li>Title is specific, short (under 500 characters), and free of promotional language</li>
+        <li>All inventors identified correctly (inventorship is determined by contribution to at least one claim)</li>
+        <li>Priority claims filed in ADS <em>and</em> specification (§1.78 compliance)</li>
+        <li>Any government funding acknowledged (Bayh-Dole Act compliance if applicable)</li>
+        <li>Entity status verified (large, small, micro) for correct fee calculation</li>
+        <li>Information Disclosure Statement (IDS) prepared to cite all known material prior art</li>
+        <li>Non-publication request considered if international protection not planned</li>
+        <li>Patent term adjustment (PTA) and patent term extension (PTE) eligibility noted for biologics/pharma</li>
+        <li>Docketing system updated with all deadlines: response deadlines, continuation windows, maintenance fee dates</li>
+      </ul>
+
+    </section>
+
+    <!-- ──────────────────────────────────────────────────────
+         CHAPTER NAV
+    ─────────────────────────────────────────────────────── -->
+    <nav class="chapter-nav" aria-label="Chapter navigation">
+      <a href="ch03_prior_art_research.html" class="chapter-nav-btn">
+        <span class="nav-label">&#8592; Previous Chapter</span>
+        <span class="nav-title">Chapter 3: Prior Art Research</span>
+      </a>
+      <a href="ch05_writing_claims.html" class="chapter-nav-btn nav-next">
+        <span class="nav-label">Next Chapter &#8594;</span>
+        <span class="nav-title">Chapter 5: Writing Patent Claims That Win</span>
+      </a>
+    </nav>
+
+  </main>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     FOOTER
+═══════════════════════════════════════════════════════════ -->
+<footer>
+  <div class="footer-content">
+    <p><strong style="color:var(--gold-light);">Patent Law for Technologists</strong></p>
+    <p>Chapter 4: Anatomy of a Patent Application — Every Section Explained</p>
+    <p>Dr. Robert A. Sachs, Senior Partner, Morrison &amp; Foerster LLP, San Francisco</p>
+    <p style="margin-top:1rem; font-size:.8125rem; opacity:.6;">
+      This material is provided for educational purposes only and does not constitute legal advice.
+      Patent law is highly fact-specific; consult a registered patent attorney or agent regarding your particular situation.
+      &copy; 2026 Morrison &amp; Foerster LLP. All rights reserved.
+    </p>
+    <p style="font-size:.8125rem; opacity:.5; margin-top:.75rem;">
+      References: 35 USC §§ 101, 111–113, 119–120, 132, 202 &bull; 37 CFR §§ 1.51–1.84 &bull;
+      MPEP Chapters 600, 700 &bull; <em>Nautilus v. Biosig</em>, 572 U.S. 898 (2014) &bull;
+      <em>Amgen v. Sanofi</em>, 598 U.S. 594 (2023) &bull; AIA (Pub. L. 112-29, 2011)
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>

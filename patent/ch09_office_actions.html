@@ -1,0 +1,1260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 9: Responding to Office Actions — Patent Law for Technologists</title>
+  <meta name="description" content="Prosecution strategy and the art of persuasion: how to respond to §101, §102, §103, and §112 rejections for AI/ML patents.">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- ── Top Navigation ───────────────────────────────────── -->
+<nav class="top-nav">
+  <div class="nav-container">
+    <a href="index.html" class="nav-logo">Patent Law <span>for Technologists</span></a>
+    <div class="nav-links">
+      <a href="ch01_intro.html">Ch 1</a>
+      <a href="ch02_patentability.html">Ch 2</a>
+      <a href="ch03_claims.html">Ch 3</a>
+      <a href="ch04_specification.html">Ch 4</a>
+      <a href="ch05_prior_art.html">Ch 5</a>
+      <a href="ch06_prosecution.html">Ch 6</a>
+      <a href="ch07_alice_101.html">Ch 7</a>
+      <a href="ch08_application_process.html">Ch 8</a>
+      <a href="ch09_office_actions.html" class="active">Ch 9</a>
+      <a href="ch10_portfolio_strategy.html">Ch 10</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ── Chapter Hero ─────────────────────────────────────── -->
+<header class="chapter-hero">
+  <div class="chapter-hero-content">
+    <div class="chapter-badge">Chapter 9</div>
+    <h1>Responding to Office Actions</h1>
+    <p class="subtitle">Prosecution Strategy and the Art of Persuasion — How to Transform Rejections into Allowances</p>
+    <div class="chapter-meta">
+      <span>Michael A. Torres</span>
+      <span>Finnegan, Henderson, Farabow, Garrett &amp; Dunner</span>
+      <span>Patent Law for Technologists</span>
+      <span>~65 min read</span>
+    </div>
+  </div>
+</header>
+
+<!-- ── Page Layout ──────────────────────────────────────── -->
+<div class="page-layout">
+
+  <!-- Sidebar TOC -->
+  <aside class="sidebar">
+    <nav class="toc">
+      <h3>In This Chapter</h3>
+      <ol>
+        <li><a href="#s1">Understanding Office Actions</a></li>
+        <li><a href="#s2">Reading an Office Action</a></li>
+        <li><a href="#s3">§101 Eligibility Rejections</a></li>
+        <li><a href="#s4">§102 Novelty Rejections</a></li>
+        <li><a href="#s5">§103 Obviousness Rejections</a></li>
+        <li><a href="#s6">§112 Specification Rejections</a></li>
+        <li><a href="#s7">Amendments</a></li>
+        <li><a href="#s8">Arguments</a></li>
+        <li><a href="#s9">Examiner Interviews</a></li>
+        <li><a href="#s10">After Final Rejection</a></li>
+        <li><a href="#s11">Appeal to PTAB</a></li>
+        <li><a href="#s12">Response Strategy Checklist</a></li>
+      </ol>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="chapter-content">
+
+    <p>
+      You have filed your patent application. Months pass. Then, one morning, a thick document lands in your patent attorney's docket — an Office Action from the USPTO. The examiner has rejected your claims. Nearly every patent application receives at least one. The question is not whether you will face a rejection, but how skillfully you will respond to it.
+    </p>
+    <p>
+      Responding to Office Actions is where patent prosecution becomes both science and art. The science lies in understanding the legal standards, the rules of procedure, and the anatomy of each rejection type. The art lies in crafting arguments that are persuasive, technically precise, and strategically sound — arguments that move an examiner from "rejected" to "allowed."
+    </p>
+    <p>
+      For AI and machine learning inventions, this challenge is particularly acute. Examiners frequently apply §101 eligibility rejections to AI claims, citing <em>Alice Corp. v. CLS Bank</em> and <em>Mayo Collaborative Services v. Prometheus</em>. The prior art landscape is dense, the technology moves fast, and functional claim language creates §112 vulnerabilities. This chapter arms you with the doctrine, the tactics, and the example text to respond effectively.
+    </p>
+
+    <!-- ────────────────────────────────────────────────────── -->
+    <h2 id="s1" class="section-anchor">1. Understanding Office Actions</h2>
+
+    <p>
+      An <span class="key-term" title="A communication from the USPTO examiner setting forth rejections, objections, and requirements">Office Action</span> is a written communication from a USPTO patent examiner that identifies deficiencies in your application. It is not a final determination — it is an invitation to argue, amend, or both. Understanding the different types of Office Actions governs how you respond, what your deadlines are, and what options remain available to you.
+    </p>
+
+    <div class="stats-row">
+      <div class="stat-item">
+        <div class="stat-number">85%</div>
+        <div class="stat-label">of applications receive at least one Office Action before allowance</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">2.3</div>
+        <div class="stat-label">average Office Actions per AI/ML application (vs. 1.8 overall)</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">3 mo.</div>
+        <div class="stat-label">statutory period to respond without extension fees</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">6 mo.</div>
+        <div class="stat-label">maximum response period with paid extensions</div>
+      </div>
+    </div>
+
+    <h3>Types of Office Actions</h3>
+
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-icon">✂️</div>
+        <h3>Restriction / Election Requirement</h3>
+        <p>Issued when the examiner determines that the application contains claims to two or more distinct and independent inventions. You must elect one invention to prosecute; the others can be pursued in divisional applications. This is administrative, not substantive — it is not a rejection on the merits. Respond promptly; restriction requirements do not toll the response period like substantive rejections do.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">📋</div>
+        <h3>Non-Final Rejection</h3>
+        <p>The first substantive rejection on the merits. Issued when the examiner has reviewed the claims and finds them unpatentable under §101, §102, §103, or §112. A non-final rejection gives you the broadest response options: you may amend claims, argue against each rejection, request an interview, or do any combination. You are entitled to at least one non-final Office Action before a final rejection.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔒</div>
+        <h3>Final Rejection</h3>
+        <p>Issued after the examiner has considered your response to a non-final rejection and still finds the claims unpatentable. A final rejection closes most prosecution options but does not end the road. Your remaining options include: amending to place the application in condition for allowance, filing an RCE, filing a pre-appeal brief conference request, appealing to PTAB, or filing a continuation application. See Section 10.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">📎</div>
+        <h3>Advisory Action</h3>
+        <p>Issued after you file a response to a final rejection that the examiner finds insufficient to place the application in condition for allowance. An advisory action informs you that the amendment has not been entered (or was entered but new grounds of rejection apply), and typically reminds you of remaining options and deadlines. The advisory action does not extend your response deadline from the final rejection.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">✅</div>
+        <h3>Notice of Allowance</h3>
+        <p>The best communication in patent prosecution. The examiner has determined that all pending claims are patentable. You have three months to pay the issue fee (extendable). Before the patent issues, you may file continuation applications to pursue additional claims. Review the Notice of Allowability carefully — the examiner's reasons for allowance can define the scope of your claims through prosecution history estoppel.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔍</div>
+        <h3>Examiner's Amendment</h3>
+        <p>A special category in which the examiner proposes amendments to claims (typically minor) that would render them allowable, often made with applicant's authorization during a telephone interview. The examiner's amendment becomes part of the prosecution record and has the same effect as any claim amendment you would file. Always review examiner's amendments carefully before authorizing them.</p>
+      </div>
+    </div>
+
+    <div class="callout callout-info">
+      <div class="callout-icon">ℹ️</div>
+      <div class="callout-body">
+        <div class="callout-title">AI/ML Application Trends</div>
+        <p>According to USPTO data, AI-related patent applications (Technology Center 2100 and 2400) receive a disproportionately high rate of §101 rejections — approximately 68% of AI applications receive at least one §101 rejection, compared to 42% across all technologies. The average prosecution timeline for AI applications has historically been 29–36 months from filing to first Office Action. This trend is improving as examiners gain familiarity with AI technology and updated §101 guidance takes hold.</p>
+      </div>
+    </div>
+
+    <!-- ────────────────────────────────────────────────────── -->
+    <h2 id="s2" class="section-anchor">2. Reading an Office Action</h2>
+
+    <p>
+      Before you can respond to an Office Action, you must read it carefully and systematically. Office Actions follow a standard format set by USPTO procedures, but examiners have latitude in how they express their findings. Learning to parse the structure efficiently is a critical skill.
+    </p>
+
+    <h3>Anatomy of an Office Action</h3>
+
+    <div class="figure">
+      <div class="figure-content" style="text-align:left; width:100%;">
+        <div style="background:var(--navy); color:white; padding:1rem 1.5rem; border-radius:var(--radius) var(--radius) 0 0; font-family:var(--font-mono); font-size:.875rem;">
+          <strong>OFFICE ACTION STRUCTURE — Annotated Guide</strong>
+        </div>
+        <div style="border:1px solid var(--gray-200); border-top:none; border-radius:0 0 var(--radius) var(--radius); overflow:hidden;">
+
+          <!-- Header Block -->
+          <div style="background:#eaf4fb; border-left:5px solid var(--info); padding:1rem 1.5rem; border-bottom:1px solid var(--gray-200);">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+              <div>
+                <strong style="color:var(--info); font-size:.75rem; text-transform:uppercase; letter-spacing:.06em;">① HEADER</strong>
+                <p style="margin:.25rem 0 0; font-size:.875rem;">Application Number · Filing Date · Art Unit · Examiner Name · Mailing Date · Reply Deadline</p>
+              </div>
+              <span class="badge badge-info">Read First</span>
+            </div>
+            <p style="margin:.5rem 0 0; font-size:.8125rem; color:var(--text-light);"><em>Action: Verify application number, confirm mailing date, calculate response deadline (3 months from mailing date, extendable to 6).</em></p>
+          </div>
+
+          <!-- Status Block -->
+          <div style="background:#f4ecf7; border-left:5px solid #7d3c98; padding:1rem 1.5rem; border-bottom:1px solid var(--gray-200);">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+              <div>
+                <strong style="color:#7d3c98; font-size:.75rem; text-transform:uppercase; letter-spacing:.06em;">② CLAIM STATUS TABLE</strong>
+                <p style="margin:.25rem 0 0; font-size:.875rem;">Lists every pending claim and its status: rejected, objected to, withdrawn (if restriction), or allowed.</p>
+              </div>
+              <span class="badge" style="background:#f4ecf7; color:#7d3c98; border:1px solid #7d3c98;">Critical</span>
+            </div>
+            <p style="margin:.5rem 0 0; font-size:.8125rem; color:var(--text-light);"><em>Action: Map which claims are rejected under which statute. Every rejected claim needs a response.</em></p>
+          </div>
+
+          <!-- Drawings Block -->
+          <div style="background:var(--gray-50); border-left:5px solid var(--gray-400); padding:1rem 1.5rem; border-bottom:1px solid var(--gray-200);">
+            <strong style="color:var(--gray-600); font-size:.75rem; text-transform:uppercase; letter-spacing:.06em;">③ DRAWINGS / SPECIFICATION OBJECTIONS (if any)</strong>
+            <p style="margin:.25rem 0 0; font-size:.875rem; color:var(--text-light);">Minor formal objections to drawings or specification. Usually straightforward to remedy with a corrected submission.</p>
+          </div>
+
+          <!-- 101 Rejection -->
+          <div style="background:#fdedec; border-left:5px solid var(--danger); padding:1rem 1.5rem; border-bottom:1px solid var(--gray-200);">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+              <div>
+                <strong style="color:var(--danger); font-size:.75rem; text-transform:uppercase; letter-spacing:.06em;">④ REJECTIONS — BODY</strong>
+                <p style="margin:.25rem 0 0; font-size:.875rem;">Each rejection is identified by statute (§101, §102, §103, §112) with claim numbers and examiner's reasoning. Prior art rejections cite specific references by name and publication date.</p>
+              </div>
+              <span class="badge badge-danger">Core</span>
+            </div>
+            <p style="margin:.5rem 0 0; font-size:.8125rem; color:var(--text-light);"><em>Action: For each rejection, identify: (a) which claims are rejected, (b) the legal basis, (c) the specific examiner finding, (d) the cited references. Draft a point-by-point response.</em></p>
+          </div>
+
+          <!-- References -->
+          <div style="background:#fef9e7; border-left:5px solid var(--warning); padding:1rem 1.5rem; border-bottom:1px solid var(--gray-200);">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+              <div>
+                <strong style="color:#b7770d; font-size:.75rem; text-transform:uppercase; letter-spacing:.06em;">⑤ REFERENCES CITED (Form PTO-892)</strong>
+                <p style="margin:.25rem 0 0; font-size:.875rem;">Complete list of all prior art references considered, including those not relied upon in rejections. Includes patents (U.S. and foreign), non-patent literature, and internet citations.</p>
+              </div>
+              <span class="badge badge-warning">Study</span>
+            </div>
+            <p style="margin:.5rem 0 0; font-size:.8125rem; color:var(--text-light);"><em>Action: Pull every reference. Read the entire reference, not just the portions cited. Look for teaching-away, limitations missed by the examiner, publication dates, and inventor identity.</em></p>
+          </div>
+
+          <!-- Examiner signature -->
+          <div style="background:var(--gray-50); border-left:5px solid var(--gray-300); padding:1rem 1.5rem;">
+            <strong style="color:var(--gray-600); font-size:.75rem; text-transform:uppercase; letter-spacing:.06em;">⑥ EXAMINER SIGNATURE &amp; CONTACT INFORMATION</strong>
+            <p style="margin:.25rem 0 0; font-size:.875rem; color:var(--text-light);">Examiner's name, direct phone number, and supervisor's information. <strong>Save this immediately</strong> — you will need it to schedule an interview.</p>
+          </div>
+
+        </div>
+      </div>
+      <p class="figure-caption">Figure 9-1. Annotated structure of a USPTO Office Action. Work through each section methodically before drafting a response.</p>
+    </div>
+
+    <h3>Strategic Reading: The First 48 Hours</h3>
+
+    <p>When an Office Action arrives, experienced prosecutors follow a disciplined triage routine before drafting a single word of the response:</p>
+
+    <ol class="process-steps">
+      <li>
+        <div class="step-content">
+          <h4>Docket Immediately — Calculate Deadline</h4>
+          <p>Enter the mailing date in your docketing system the day the Office Action is received. The three-month statutory period begins from the mailing date on the Office Action, not the date you receive it. Calculate the extended deadlines (4, 5, and 6 months) and associated extension fees in advance.</p>
+        </div>
+      </li>
+      <li>
+        <div class="step-content">
+          <h4>Read the Claim Status Table</h4>
+          <p>Map every claim to its current status. Understand which claims are rejected vs. which are allowed or objected to. Identify the claim structure (independent vs. dependent) to prioritize your prosecution strategy around the independent claims.</p>
+        </div>
+      </li>
+      <li>
+        <div class="step-content">
+          <h4>Pull and Read Every Reference</h4>
+          <p>Download every cited reference from Google Patents, Espacenet, or the USPTO database. Read each reference completely — not just the portions the examiner cited. Examiners frequently misread or excerpt references out of context. Discrepancies between what a reference actually discloses and how the examiner characterizes it are your most powerful arguments.</p>
+        </div>
+      </li>
+      <li>
+        <div class="step-content">
+          <h4>Identify Claim Distinctions</h4>
+          <p>Compare the current claim language against the examiner's analysis. Make a claim chart: for each limitation in each independent claim, identify whether the examiner has addressed it, whether the cited reference discloses it, and whether you can argue the reference does not teach that limitation.</p>
+        </div>
+      </li>
+      <li>
+        <div class="step-content">
+          <h4>Assess Amendment vs. Argument Strategy</h4>
+          <p>Decide upfront whether your primary response will be argument alone, amendment alone, or both. Arguments alone preserve broader claim scope but may not overcome examiner's position. Amendments narrow scope but can present a cleaner path to allowance. For AI/ML applications, the §101 analysis typically requires both a claim amendment and substantive argument.</p>
+        </div>
+      </li>
+    </ol>
+
+    <!-- ────────────────────────────────────────────────────── -->
+    <h2 id="s3" class="section-anchor">3. The 35 U.S.C. §101 Rejection (Eligibility)</h2>
+
+    <p>
+      Section 101 of the Patent Act defines what constitutes patentable subject matter: "any new and useful process, machine, manufacture, or composition of matter." The Supreme Court has long recognized three implicit exceptions: laws of nature, natural phenomena, and abstract ideas. For AI and machine learning inventors, the abstract idea exception is the central challenge.
+    </p>
+
+    <h3>The Alice/Mayo Two-Step Framework</h3>
+
+    <p>
+      In <em>Alice Corp. v. CLS Bank International</em>, 573 U.S. 208 (2014), the Supreme Court articulated a two-step test for determining whether claims are directed to patent-eligible subject matter:
+    </p>
+
+    <div class="comparison-grid">
+      <div class="comparison-item">
+        <h4>Step 1 — Alice Step 2A, Prong 1: Is the Claim Directed to an Abstract Idea?</h4>
+        <p>The examiner determines whether the claim is directed to a judicial exception — specifically, whether the claimed advance is directed to an abstract idea (mathematical concepts, certain methods of organizing human activity, mental processes). For AI claims, examiners frequently characterize the core algorithm as a mathematical concept or mental process.</p>
+        <p style="margin-top:.75rem;">The 2019 Revised Guidance from the USPTO instructs examiners to look at the claim as a whole and not merely identify an abstract concept somewhere within it. However, in practice, many examiners still characterize ML training, inference, or optimization algorithms as abstract mathematical concepts.</p>
+      </div>
+      <div class="comparison-item">
+        <h4>Step 2 — Alice Step 2A, Prong 2 / Step 2B: Is There "Significantly More"?</h4>
+        <p>If the claim is directed to an abstract idea, the examiner then asks whether the claim, considered as a whole, amounts to significantly more than the abstract idea itself. This requires that the additional elements — beyond the abstract idea — either (a) integrate the judicial exception into a practical application, or (b) add an inventive concept that transforms the claim into something patent eligible.</p>
+        <p style="margin-top:.75rem;">For AI/ML claims, "significantly more" arguments typically center on: specific technical improvements to a computer system, particularized applications of the algorithm to a specific technological problem, or unconventional combinations of hardware and software configurations.</p>
+      </div>
+    </div>
+
+    <h3>How Examiners Write §101 Rejections for AI Claims</h3>
+
+    <p>Understanding how examiners typically frame §101 rejections is the first step to overcoming them. Below is an example rejection of the type commonly issued for AI/ML patent claims:</p>
+
+    <blockquote>
+      <p><strong>Rejection Under 35 U.S.C. §101 — Claims 1–20</strong></p>
+      <p>Claims 1–20 are rejected under 35 U.S.C. §101 because the claimed invention is directed to patent-ineligible subject matter. Specifically, the claims are directed to an abstract idea and do not include additional elements that are sufficient to amount to significantly more than the abstract idea.</p>
+      <p>Under Step 2A, Prong 1: The claim is directed to the abstract idea of a mathematical concept, specifically a mathematical relationship, mathematical formula, equation, or calculation. Claim 1 recites applying a trained machine learning model to input data to generate a predicted output, adjusting weights of the model based on a loss function, and iterating until convergence. These operations constitute mathematical operations that can be performed mentally or with pen and paper (given sufficient time and capability), and therefore fall within the category of abstract mathematical concepts as defined in the 2019 Revised Guidance.</p>
+      <p>Under Step 2A, Prong 2: The additional elements recited in the claims — namely, "a processor" and "a memory storing instructions" — are recited at a high level of generality and amount to no more than generic computer components performing generic computer functions. The use of a generic computer to implement an abstract idea does not transform that abstract idea into a patent-eligible application. <em>Alice Corp.</em>, 573 U.S. at 222–23. The claims do not recite any particular technical improvement to the computer itself, any specific hardware configuration, or any particular application of the algorithm that would integrate the mathematical concept into a practical application. Accordingly, the claims do not recite significantly more than the abstract idea itself.</p>
+      <cite>— Example Non-Final Office Action, USPTO Art Unit 2400 (AI/ML applications)</cite>
+    </blockquote>
+
+    <h3>Effective Response Strategies for §101 Rejections</h3>
+
+    <h4>Strategy 1: Argue the Claim Is Not Directed to an Abstract Idea</h4>
+    <p>
+      Under the 2019 Revised Guidance, a claim is only directed to an abstract idea if the abstract idea falls within one of three enumerated groupings: (1) mathematical concepts, (2) certain methods of organizing human activity, or (3) mental processes. If your AI claim cannot fairly be characterized under any of these groupings — for instance, if the claim is directed to a specific technical process for operating a particular machine — argue that the examiner has failed to properly identify the abstract idea within the enumerated groupings.
+    </p>
+
+    <h4>Strategy 2: Argue Integration into a Practical Application</h4>
+    <p>
+      Even if the claim is directed to an abstract idea, argue that additional claim elements integrate that abstract idea into a practical application. Under Step 2A, Prong 2 of the 2019 Guidance, a claim integrates a judicial exception into a practical application if additional elements reflect an improvement to the functioning of a computer or other technology, apply the judicial exception with a particular machine, effect a transformation or reduction of a particular article, or apply the judicial exception in some other meaningful way beyond generally linking it to a particular technological environment.
+    </p>
+
+    <h4>Strategy 3: Argue "Significantly More" Under Alice Step 2B</h4>
+    <p>
+      If Prong 2 analysis is unavailable or insufficient, argue at the Step 2B level that the additional elements — taken individually and as an ordered combination — represent an inventive concept beyond mere conventional computer implementation. Point to the specification's disclosure of non-conventional, non-generic arrangements that produce specific technical effects.
+    </p>
+
+    <h4>Strategy 4: Amend Claims to Add Technical Limitations</h4>
+    <p>
+      When arguments alone are unlikely to prevail, amend claims to recite the specific technical improvement more explicitly. For AI/ML claims, this typically means: replacing generic "processor/memory" language with specific hardware configurations, adding specific data structures or memory architectures, reciting the particular technical problem being solved (e.g., reducing inference latency, improving classification accuracy on sparse data), and adding concrete output limitations that demonstrate a practical application.
+    </p>
+
+    <h4>Strategy 5: Request an Examiner Interview</h4>
+    <p>
+      Before or simultaneously with filing a written response, request an examiner interview (see Section 9). §101 rejections are among the most amendable through dialogue. A fifteen-minute conversation can reveal exactly what technical limitations the examiner believes would overcome the rejection — information worth more than any amount of written argument.
+    </p>
+
+    <div class="callout callout-warning">
+      <div class="callout-icon">⚠️</div>
+      <div class="callout-body">
+        <div class="callout-title">Common §101 Mistakes to Avoid</div>
+        <ul>
+          <li><strong>Arguing that computers are not abstract:</strong> The Supreme Court in <em>Alice</em> explicitly held that limiting an abstract idea to a particular technological environment does not make it patent eligible. Arguing "but it runs on a computer" is insufficient.</li>
+          <li><strong>Relying solely on functional language:</strong> Claims that recite only what the algorithm does (outputs, results) without specifying how it does it technically are especially vulnerable. Add structural, architectural, or process-specific language.</li>
+          <li><strong>Ignoring the specification:</strong> Your specification should support every eligibility argument you make. If the spec does not describe the technical improvement in concrete terms, your arguments will ring hollow.</li>
+          <li><strong>Arguing novelty and eligibility are the same:</strong> The examiner often conflates §101 with §103. Keep the analyses separate — eligibility is about the nature of the claimed concept, not whether it was known before.</li>
+          <li><strong>Failing to distinguish the abstract idea as characterized:</strong> If the examiner characterizes your invention as one specific abstract idea, you must specifically address that characterization — not a strawman version of it.</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>Model §101 Claim Amendment</h3>
+
+    <div class="claim-box">
+      <div class="claim-header">Original Claim 1 (Before Amendment — Likely Rejected)</div>
+      <p><span class="claim-number">1.</span> A computer-implemented method comprising:</p>
+      <span class="claim-element">receiving input data;</span>
+      <span class="claim-element">applying a trained neural network model to the input data to generate a predicted classification; and</span>
+      <span class="claim-element">outputting the predicted classification.</span>
+    </div>
+
+    <div class="claim-box">
+      <div class="claim-header">Amended Claim 1 (After Amendment — Directed to Technical Improvement)</div>
+      <p><span class="claim-number">1.</span> A computer-implemented method for reducing inference latency in a resource-constrained edge computing environment, the method comprising:</p>
+      <span class="claim-element">receiving, by a hardware accelerator comprising a systolic array architecture, sensor data from at least one real-time data stream;</span>
+      <span class="claim-element">partitioning, by a scheduling module executing on a microcontroller unit, the sensor data into a plurality of fixed-size tiles based on a tile size parameter selected to match an on-chip memory capacity of the hardware accelerator;</span>
+      <span class="claim-element">applying, by the systolic array architecture operating in parallel on each tile, a quantized neural network model stored in a read-only memory to each tile to generate tile-level feature vectors, wherein the quantized neural network model comprises weights represented as 8-bit integers rather than 32-bit floating point values;</span>
+      <span class="claim-element">aggregating the tile-level feature vectors using a pooling operation to generate an aggregate feature representation; and</span>
+      <span class="claim-element">generating, by a classification layer of the quantized neural network model, a predicted classification based on the aggregate feature representation, wherein the predicted classification is generated within 10 milliseconds of receiving the sensor data without transmission of the sensor data to a remote server.</span>
+    </div>
+
+    <p>
+      The amended claim identifies: (1) a specific technical problem (inference latency in edge computing), (2) a specific hardware configuration (systolic array, microcontroller unit), (3) specific data processing steps (tiling, quantization), (4) technical parameters (8-bit integers, 10-millisecond latency, on-chip memory), and (5) a specific improvement achieved (local inference without remote transmission). These elements collectively integrate the mathematical aspects of neural network inference into a concrete technical application.
+    </p>
+
+    <!-- ────────────────────────────────────────────────────── -->
+    <h2 id="s4" class="section-anchor">4. The 35 U.S.C. §102 Rejection (Novelty)</h2>
+
+    <p>
+      A §102 rejection — anticipation — means the examiner has found a single prior art reference that discloses, either expressly or inherently, every limitation of your claim. Anticipation requires that every element of the claim be found in a single reference arranged in the same manner as in the claim. If even one limitation is missing from the reference, the rejection should not stand.
+    </p>
+
+    <p>
+      The legal standard for anticipation is rigorous. The reference must disclose the claimed invention "as an operable whole" — it is not sufficient that elements of the claim can be found scattered through the reference in ways not related to each other. <em>Connell v. Sears, Roebuck &amp; Co.</em>, 722 F.2d 1542, 1548 (Fed. Cir. 1983).
+    </p>
+
+    <h3>Reading a §102 Rejection</h3>
+
+    <p>A §102 rejection must specify (1) the prior art reference relied upon, (2) the claim or claims rejected, and (3) where in the reference each claimed limitation is found. The examiner bears the initial burden of making out a <em>prima facie</em> case of anticipation. Your job is to dismantle that prima facie case by showing at least one limitation is not disclosed by the reference.</p>
+
+    <blockquote>
+      <p><strong>§102 Rejection Example — Claim 1</strong></p>
+      <p>Claim 1 is rejected under 35 U.S.C. §102(a)(1) as being anticipated by Chen et al. (US 2021/0056432 A1, "Distributed Gradient Descent Optimization for Large-Scale Neural Network Training," published March 2021).</p>
+      <p>Chen et al. discloses a computer-implemented method for training a machine learning model (Abstract; ¶[0001]). Chen et al. discloses receiving training data comprising input-output pairs (¶[0023]). Chen et al. discloses applying gradient descent optimization to minimize a loss function (¶[0041]–[0045]). Chen et al. discloses updating model parameters based on computed gradients (¶[0047]). Chen et al. discloses iterating the optimization process until a convergence criterion is met (¶[0051]). Accordingly, every limitation of claim 1 is found in Chen et al.</p>
+      <cite>— Example Non-Final Office Action, §102(a)(1) rejection</cite>
+    </blockquote>
+
+    <h3>Response Strategies for §102 Rejections</h3>
+
+    <div class="comparison-grid">
+      <div class="comparison-item good">
+        <h4>Effective Strategies</h4>
+        <ul>
+          <li><strong>Argue a limitation is missing:</strong> The most direct argument. Identify a specific claim limitation — especially one that is precisely drafted — that is simply not disclosed in the reference. Quote both the claim language and the reference to show the mismatch. Be precise: "The reference discloses X, but claim 1 requires Y, and X is not Y because..."</li>
+          <li><strong>Argue improper inherency:</strong> If the examiner argues a limitation is inherently disclosed, require the examiner to provide factual basis. Inherency requires that the missing limitation necessarily results from the disclosed features — possibility or probability is insufficient.</li>
+          <li><strong>Amend to add distinguishing features:</strong> Add a limitation to the claim that is not disclosed by the reference. Choose a limitation that is supported by your specification and that reflects a genuine technical distinction of your invention.</li>
+          <li><strong>Swear behind the reference:</strong> If the reference was published less than one year before your effective filing date, consider whether you can submit a declaration under 37 C.F.R. §1.130 (antedating the reference) by establishing a prior conception and reduction to practice date.</li>
+          <li><strong>Challenge prior art status:</strong> Verify the reference qualifies as prior art under post-AIA or pre-AIA rules. Common defenses: the reference is a prior art publication by the same inventive entity (disqualifying it under §102(b)(1)(A)), the reference does not qualify as a patent or printed publication, or the reference's publication date is after the priority date.</li>
+        </ul>
+      </div>
+      <div class="comparison-item bad">
+        <h4>Strategies That Fail</h4>
+        <ul>
+          <li><strong>Arguing the reference teaches something different in purpose:</strong> Purpose or intended use is generally irrelevant to anticipation. If the reference structure discloses the claimed structure, different purpose does not help.</li>
+          <li><strong>Arguing the reference is less preferred than your invention:</strong> Whether the reference prefers or de-emphasizes a particular embodiment is irrelevant. Disclosure — even a single passing mention — is sufficient for anticipation.</li>
+          <li><strong>Challenging the reference's enablement:</strong> You cannot defeat a §102 rejection by arguing the prior art reference is non-enabling. If the reference discloses the claimed subject matter, it anticipates — even if it does not enable it.</li>
+          <li><strong>Arguing differences in effect or result:</strong> Different results do not overcome a §102 rejection if the claimed steps are the same as in the reference. Result-based distinctions belong in a §103 unexpected results argument, not a §102 novelty argument.</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>Example §102 Response — Arguing Missing Limitation</h3>
+
+    <p>Using the example rejection above (Chen et al.), here is a model response addressing the claim limitation the examiner overlooked:</p>
+
+    <pre><code>RESPONSE TO §102 REJECTION — CLAIM 1
+
+Applicant respectfully traverses the rejection of claim 1 under 35 U.S.C.
+§102(a)(1) as anticipated by Chen et al. The rejection cannot stand because
+Chen et al. fails to disclose a material limitation of claim 1: the step of
+"partitioning, prior to gradient computation, the training data into non-
+overlapping shards distributed across a plurality of worker nodes having
+isolated memory spaces, wherein each worker node independently computes
+gradients without access to training data assigned to any other worker node."
+
+Chen et al. discloses a distributed gradient descent method, but the
+distribution mechanism described in Chen et al. is fundamentally different
+from the claimed isolation requirement. Chen et al. at ¶[0041]–[0045]
+describes "asynchronous parameter server architecture" in which all worker
+nodes have read access to a shared parameter server containing the full model
+state. Chen et al. expressly states that "worker nodes may request updated
+parameters from the central parameter server at any time during the
+computation." (¶[0043], emphasis added.) This architecture presupposes
+communication between worker nodes and shared access to a central store.
+
+By contrast, claim 1 requires "isolated memory spaces" and explicitly requires
+that "each worker node independently computes gradients without access to
+training data assigned to any other worker node." This isolation requirement
+is not a trivial distinction — it is the core technical contribution of the
+claimed invention, which enables privacy-preserving federated learning
+without any shared data exposure. Chen et al. not only fails to disclose this
+limitation, it discloses the opposite arrangement: a parameter server
+architecture that explicitly requires shared access.
+
+Because Chen et al. does not disclose every limitation of claim 1, and
+specifically fails to disclose the "isolated memory spaces" limitation and
+the requirement that each worker node operates independently without access
+to data assigned to other nodes, the §102(a)(1) rejection should be withdrawn.
+
+Applicant respectfully requests allowance of claim 1.</code></pre>
+
+    <!-- ────────────────────────────────────────────────────── -->
+    <h2 id="s5" class="section-anchor">5. The 35 U.S.C. §103 Rejection (Obviousness)</h2>
+
+    <p>
+      A §103 rejection — obviousness — is the most common ground of rejection and the hardest to overcome. Unlike anticipation, obviousness allows the examiner to combine teachings from multiple prior art references. The standard, articulated by the Supreme Court in <em>Graham v. John Deere Co.</em>, 383 U.S. 1 (1966), requires a factual inquiry into: (1) the scope and content of the prior art, (2) the differences between the prior art and the claims, (3) the level of ordinary skill in the pertinent art, and (4) objective indicia of non-obviousness.
+    </p>
+    <p>
+      The Supreme Court in <em>KSR International Co. v. Teleflex Inc.</em>, 550 U.S. 398 (2007), expanded the test by rejecting a rigid "teaching, suggestion, or motivation" (TSM) requirement and instead asking whether a person of ordinary skill would have had an "apparent reason" to combine references. This flexible standard has made §103 rejections easier to assert — and harder to overcome by argument alone.
+    </p>
+
+    <h3>Anatomy of a §103 Rejection</h3>
+
+    <blockquote>
+      <p><strong>§103 Rejection Example — Claims 1, 5, 8–10</strong></p>
+      <p>Claims 1, 5, and 8–10 are rejected under 35 U.S.C. §103 as being unpatentable over Smith et al. (US 10,423,887 B2) in view of Patel et al. (US 2020/0097789 A1).</p>
+      <p>Smith et al. discloses a machine learning-based image classification system comprising a convolutional neural network (CNN) trained on labeled image datasets. Smith et al. discloses all limitations of claim 1 except for the step of applying an attention mechanism to selectively weight spatial features prior to classification.</p>
+      <p>Patel et al. discloses a self-attention mechanism for use in neural network architectures, wherein the attention mechanism computes weighted relevance scores for spatial features to improve classification accuracy on occluded objects. Patel et al. discloses that the attention mechanism can be integrated with CNN architectures as a module interposed between convolutional layers and the classification head (¶[0047]).</p>
+      <p>It would have been obvious to one of ordinary skill in the art to modify the CNN architecture of Smith et al. to incorporate the attention mechanism of Patel et al. because Patel et al. expressly teaches that such integration improves classification accuracy, a result that those skilled in the art would have found desirable. KSR International Co. v. Teleflex Inc., 550 U.S. 398, 417 (2007) ("[I]f a technique has been used to improve one device, and a person of ordinary skill in the art would recognize that it would improve similar devices in the same way, using the technique is obvious."). One of ordinary skill would have had a reasonable expectation of success in combining the references because both references operate in the same technical domain and Patel et al. provides explicit implementation guidance for integration with CNNs.</p>
+      <cite>— Example Non-Final Office Action, §103 rejection combining two prior art references</cite>
+    </blockquote>
+
+    <h3>Challenging the Motivation to Combine</h3>
+
+    <p>
+      The most powerful §103 arguments challenge whether a person of ordinary skill in the art would actually have been motivated to combine the references in the way the examiner proposes. Under <em>KSR</em>, there must be some "apparent reason" to combine — not merely the fact that combination is possible.
+    </p>
+
+    <ul>
+      <li><strong>Teaching Away:</strong> If one reference explicitly warns against the combination proposed by the examiner, this "teaches away" from the combination and undercuts motivation. Cite the specific language in the reference.</li>
+      <li><strong>Incompatible Principles:</strong> If combining the references would require substantial redesign or would destroy a principle of operation of one reference, the combination is not obvious. For example, if Smith et al.'s architecture processes images sequentially and Patel et al.'s attention mechanism requires parallel processing across all spatial positions simultaneously, integration is not trivial.</li>
+      <li><strong>No Reasonable Expectation of Success:</strong> Even if motivation to combine existed, the combination must be expected to succeed. In AI/ML, argue that combining components from different architectures frequently requires non-obvious hyperparameter tuning, architectural adjustments, or training protocol changes — work that is not merely routine experimentation.</li>
+      <li><strong>Hindsight Reconstruction:</strong> When the examiner combines references only because the claimed invention already exists (rather than because the combination would have been obvious before the invention was made), this is impermissible hindsight. The question is what a person of ordinary skill would have done <em>at the time of the invention</em>, not after seeing the applicant's disclosure.</li>
+    </ul>
+
+    <h3>Secondary Considerations (Objective Indicia of Non-Obviousness)</h3>
+
+    <p>
+      Even when you cannot defeat the <em>Graham</em> factual analysis, secondary considerations — sometimes called "objective indicia of non-obviousness" — can establish that an invention was not obvious despite the existence of apparently combinable prior art. These are not mere rebuttal evidence; under <em>Graham</em>, they are part of the primary factual inquiry and must be weighed against the other <em>Graham</em> factors.
+    </p>
+
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-icon">💰</div>
+        <h3>Commercial Success</h3>
+        <p>Evidence that products embodying the claimed invention have achieved commercial success in the marketplace. Must be tied (nexus) to the specific claimed features, not to unrelated aspects of the product such as marketing, superior business execution, or unpatented features. Submit sales data, market share, customer testimonials, or analyst reports showing market adoption.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">⏳</div>
+        <h3>Long-Felt Need</h3>
+        <p>Evidence that the problem solved by the invention was recognized in the field for a substantial period before the invention, and that prior attempts to solve it had failed. For AI/ML, this might be: "The problem of model accuracy degradation on distributional shift has been recognized since [year]..." Submit dated publications, industry whitepapers, or expert declarations identifying the problem and failed prior solutions.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🚫</div>
+        <h3>Failure of Others</h3>
+        <p>Evidence that skilled researchers actively tried and failed to achieve the claimed result. This is distinct from long-felt need — it requires evidence of actual efforts by skilled people, not merely recognition of the problem. Published papers reporting failed approaches, negative results, or acknowledged limitations of prior art systems are valuable evidence here.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔬</div>
+        <h3>Unexpected Results</h3>
+        <p>Evidence that the claimed invention produces results that are unexpectedly superior to the closest prior art. For AI/ML, this is particularly powerful: if your model achieves 94% accuracy on a benchmark where the best prior art achieves 78%, and this gap is substantially larger than would have been predicted from combining prior art techniques, you have strong unexpected results evidence. Submit benchmark data, ablation studies, and expert declarations.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🏆</div>
+        <h3>Industry Recognition</h3>
+        <p>Awards, citations, praise from industry experts, or adoption of the claimed technology by industry leaders. For AI/ML inventions, publication at top venues (NeurIPS, ICML, CVPR), high citation counts, or adoption as a standard approach in the field all suggest the advance was non-trivial to those skilled in the art.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">⚡</div>
+        <h3>Copying by Others</h3>
+        <p>Evidence that competitors have copied the specific claimed features of the invention — as opposed to independently developing similar approaches. Direct evidence of copying (internal documents, reverse engineering) is strongest; circumstantial evidence (implementation of identical non-obvious features) can also be submitted. Requires careful documentation and, often, discovery through litigation.</p>
+      </div>
+    </div>
+
+    <h3>Arguing Unexpected Results for AI/ML Inventions</h3>
+
+    <p>
+      Unexpected results are among the most persuasive secondary considerations for AI/ML patents because the field's empirical nature allows for quantitative, objective comparisons. To effectively present an unexpected results argument:
+    </p>
+
+    <ol>
+      <li><strong>Quantify the gap:</strong> Do not simply state that your method is better. Present specific benchmark data showing the magnitude of improvement. "Our method achieves 94.3% top-1 accuracy on ImageNet-1K, compared to 81.7% achieved by the closest prior art system, representing a 12.6 percentage point improvement."</li>
+      <li><strong>Compare to the closest prior art:</strong> The comparison must be to the specific prior art cited in the rejection, not to a system you chose for favorable comparison. If the examiner cited Smith et al. and Patel et al., your data must compare against the combination that would result from combining Smith et al. and Patel et al. as the examiner proposes.</li>
+      <li><strong>Submit a declaration under 37 C.F.R. §1.132:</strong> The inventor or a qualified expert must submit a declaration (also called a Rule 132 declaration) attesting to the testing methodology, results, and the significance of the difference. Raw data should be attached as exhibits.</li>
+      <li><strong>Argue technical synergy:</strong> Explain <em>why</em> the results are unexpected — not merely that they are larger, but that there is a technical reason the prior art combination would not have been expected to achieve them. For example: "Although Smith et al. and Patel et al. each individually contribute modest improvements (2–3%) on standard benchmarks, Applicant's data demonstrates a synergistic interaction of 15% improvement that would not be predicted from the sum of individual contributions."</li>
+      <li><strong>Establish nexus:</strong> Connect the unexpected results specifically to the claimed features that distinguish the invention from the prior art. Results attributable to features that are already in the prior art do not establish non-obviousness of the distinguishing features.</li>
+    </ol>
+
+    <!-- ────────────────────────────────────────────────────── -->
+    <h2 id="s6" class="section-anchor">6. The 35 U.S.C. §112 Rejection (Specification)</h2>
+
+    <p>
+      Section 112 of the Patent Act requires that the specification contain a written description of the invention, enable any person skilled in the art to make and use the invention, and set forth the best mode contemplated by the inventor. Claims must also be sufficiently definite that those skilled in the art can understand the claim scope. For AI and machine learning inventions, §112 rejections arise with particular frequency and in particularly tricky forms.
+    </p>
+
+    <h3>Written Description Rejections for AI/ML</h3>
+    <p>
+      A written description rejection under §112(a) occurs when the claims recite subject matter that is not adequately described in the specification. For AI/ML applications, common triggers include:
+    </p>
+    <ul>
+      <li><strong>Trained model as a claim element:</strong> Claims that recite "a trained neural network" without disclosing how the model was trained, on what data, or with what architecture may receive a written description rejection if the specification does not provide sufficient structural support for the trained model. The specification should describe the training data domain, architecture family, and training objective.</li>
+      <li><strong>Functional claim language without algorithmic support:</strong> A claim that recites "a classifier configured to identify anomalous patterns" needs specification support showing how that classification is achieved — either through a disclosed algorithm, disclosed training methodology, or disclosed network architecture. Purely functional claims with no structural support in the specification are vulnerable.</li>
+      <li><strong>Later-amended claims expanding scope:</strong> If prosecution amendments introduce new claim language that lacks antecedent basis in the original specification, a new written description rejection will issue. This is particularly common when applicants attempt to add "means-plus-function" limitations or genus claims during prosecution.</li>
+    </ul>
+
+    <h3>Enablement Rejections for AI/ML</h3>
+    <p>
+      Enablement under §112(a) requires that the specification teach those skilled in the art how to make and use the full scope of the claimed invention without undue experimentation. For broad AI/ML claims, examiners apply the <em>Wands</em> factors to assess whether the experimentation required is undue:
+    </p>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Wands Factor</th>
+            <th>Application to AI/ML Claims</th>
+            <th>Response Strategy</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Quantity of experimentation required</td>
+            <td>How many training runs, hyperparameter searches, or architecture variations must be explored to practice the full claim scope?</td>
+            <td>Argue that routine hyperparameter tuning is conventional in the field and does not require undue experimentation. Submit evidence of standard practices.</td>
+          </tr>
+          <tr>
+            <td>Amount of guidance provided in the specification</td>
+            <td>Does the spec provide architecture specifics, training protocols, data types, and evaluation metrics?</td>
+            <td>Point to specification disclosure of training methodology, architecture choices, and worked examples. Amend claims to narrow scope to what is specifically enabled.</td>
+          </tr>
+          <tr>
+            <td>Presence of working examples</td>
+            <td>Does the spec describe actual experimental results? Are the examples prophetic or actual?</td>
+            <td>Where possible, submit post-filing data via §1.132 declaration demonstrating reduction to practice. Distinguish prophetic examples by citing additional guidance in the spec.</td>
+          </tr>
+          <tr>
+            <td>Nature of the invention</td>
+            <td>Is the claimed AI technology in a nascent field where even skilled practitioners struggle to predict outcomes?</td>
+            <td>In nascent fields, argue heightened disclosure. For established fields (e.g., image classification CNNs), argue skilled practitioners can practice the invention from general guidance.</td>
+          </tr>
+          <tr>
+            <td>Predictability of the art</td>
+            <td>How predictable are outcomes in deep learning, reinforcement learning, or generative AI research?</td>
+            <td>Distinguish between claim elements that are predictable (architecture selection) and those that require experimentation (hyperparameter values). Narrow claim scope accordingly.</td>
+          </tr>
+          <tr>
+            <td>Breadth of the claims</td>
+            <td>Do the claims cover all possible neural network architectures, all possible training datasets, or all possible applications?</td>
+            <td>Narrow genus claims to species actually enabled. Replace "any neural network" with the specific families (CNNs, transformers) disclosed in the specification.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Indefiniteness Rejections for AI/ML</h3>
+    <p>
+      A §112(b) rejection for indefiniteness asserts that a claim is so unclear that those skilled in the art could not determine its scope with reasonable certainty. <em>Nautilus, Inc. v. Biosig Instruments, Inc.</em>, 572 U.S. 898 (2014). For AI/ML claims, common indefiniteness issues include:
+    </p>
+    <ul>
+      <li><strong>Subjective terms without objective criteria:</strong> "High accuracy," "efficient classification," "substantially similar outputs" — these terms are indefinite without a defined reference point. In your response, point to locations in the specification that define these terms quantitatively, or amend claims to substitute objective criteria.</li>
+      <li><strong>Functional language in means-plus-function claims:</strong> Computer-implemented claims reciting "means for" performing a function invoke §112(f) means-plus-function interpretation. If the corresponding structure in the specification is a general-purpose computer plus an algorithm, the algorithm must be specifically described. Avoid "means for" language in AI/ML claims unless you have highly specific algorithmic disclosure.</li>
+      <li><strong>"Trained to" language:</strong> Claims reciting a model "trained to perform X" may be indefinite if the training process leaves the claim scope uncertain (different training runs produce different weights — are all weight configurations within the claim scope?). Address this by specifying performance criteria or structural constraints on the trained model.</li>
+    </ul>
+
+    <div class="callout callout-tip">
+      <div class="callout-icon">✅</div>
+      <div class="callout-body">
+        <div class="callout-title">Drafting Tip: §112 Prevention</div>
+        <p>The best §112 response is the one you never have to write. When drafting the original specification for an AI/ML application, include: (1) pseudocode or mathematical formulation of the core algorithm, (2) specific architecture descriptions (number of layers, layer types, activation functions), (3) training data description (domain, size, labeling methodology), (4) quantitative performance metrics that define claim terms like "high accuracy," and (5) at least one complete, worked example showing end-to-end operation of the invention. See Chapter 4 for specification drafting guidance.</p>
+      </div>
+    </div>
+
+    <!-- ────────────────────────────────────────────────────── -->
+    <h2 id="s7" class="section-anchor">7. Amendments</h2>
+
+    <p>
+      A claim amendment is a formal change to the text of one or more claims. Amendments are one of the most powerful tools in your prosecution arsenal — and one of the most dangerous, because every amendment you make becomes permanent prosecution history that can limit your patent's scope in litigation.
+    </p>
+
+    <h3>Types of Amendments</h3>
+
+    <h4>Claim Amendments</h4>
+    <p>
+      Claim amendments can add new limitations (narrowing the claim), delete limitations (broadening, which is strictly controlled), or modify the language of existing limitations. All amended claims must be presented in clean copy, with the amendment marked using underlining (for additions) and brackets (for deletions) in an accompanying marked-up version. The rules governing claim amendment format are set forth in 37 C.F.R. §1.121.
+    </p>
+
+    <h4>Specification Amendments</h4>
+    <p>
+      Amendments to the specification are less common during prosecution but may be necessary to: correct an error in a previously submitted specification, add a definition of a claim term to overcome an indefiniteness rejection, or correct a best mode deficiency. Specification amendments cannot add new matter — any added subject matter must have support in the original disclosure.
+    </p>
+
+    <h4>Argument-Only Responses</h4>
+    <p>
+      A response that contains only arguments, without any amendments to the claims or specification, is called an argument-only response. This strategy is appropriate when you believe the claims are patentable as written and the examiner's rejections are legally infirm. Argument-only responses preserve your full claim scope — but if the examiner disagrees, you will likely receive a final rejection and will then face more constrained options.
+    </p>
+
+    <h3>Rules for Proper Claim Amendment Format</h3>
+
+    <p>
+      Improperly formatted amendments will be rejected on technical grounds, potentially without entering the record. Follow these rules precisely:
+    </p>
+
+    <ul>
+      <li>Present every pending claim, even if not amended (claims not presented are considered canceled)</li>
+      <li>Mark additions with underlining: <u>new language added</u></li>
+      <li>Mark deletions with double brackets: [[deleted language]]</li>
+      <li>Submit a clean version (without markings) alongside the marked-up version</li>
+      <li>Claim numbering must be continuous — do not renumber claims mid-prosecution</li>
+      <li>New claims must not exceed the original claim count unless you pay additional claim fees</li>
+      <li>Do not present new matter in claim amendments</li>
+    </ul>
+
+    <h3>How to Amend Without Surrendering Too Much Scope</h3>
+
+    <p>
+      The art of claim amendment lies in adding enough to overcome the rejection while surrendering as little scope as possible. Consider the following hierarchy of narrowing approaches, from least scope-limiting to most:
+    </p>
+
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="timeline-date">Least Scope Lost</div>
+        <h4>1. Clarify Existing Language</h4>
+        <p>Rephrase an existing limitation to be more precise without actually narrowing it. For example, replacing "processing data" with "processing digital data representing sensor measurements" clarifies the meaning without necessarily excluding anything that would have been covered. Often sufficient to overcome an indefiniteness rejection.</p>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Moderate Scope Loss</div>
+        <h4>2. Add a Functional Limitation</h4>
+        <p>Add a limitation describing what the claimed system or method achieves, rather than structural constraints on how it is implemented. For example, adding "wherein the classification is performed in real time" limits scope to real-time applications but does not constrain the hardware or algorithmic implementation.</p>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Moderate Scope Loss</div>
+        <h4>3. Add a Relational Limitation</h4>
+        <p>Add a limitation describing the relationship between two elements already in the claim. For example, "wherein the feature vectors are generated prior to the pooling operation" does not add new structural elements but establishes a temporal relationship that may distinguish the prior art.</p>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Significant Scope Loss</div>
+        <h4>4. Add a Structural Limitation</h4>
+        <p>Add a new structural element — a hardware component, a data structure, a specific algorithm step — that is disclosed in the specification. This directly narrows the claim to a specific embodiment and should be used when prior art arguments cannot succeed on narrower grounds.</p>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Most Scope Lost</div>
+        <h4>5. Incorporate Dependent Claim Limitations</h4>
+        <p>Combine an independent claim with the limitations of one or more dependent claims to form a narrower independent claim. This is the most common final-stage amendment strategy but surrenders all scope between the original independent claim and the incorporated limitations.</p>
+      </div>
+    </div>
+
+    <div class="callout callout-danger">
+      <div class="callout-icon">🚫</div>
+      <div class="callout-body">
+        <div class="callout-title">Prosecution History Estoppel — A Critical Warning</div>
+        <p>Every claim amendment you make during prosecution — and every argument you make — becomes part of the prosecution history and can be used in litigation to limit your patent's scope under the doctrine of prosecution history estoppel (also called "file wrapper estoppel").</p>
+        <p>Under <em>Festo Corp. v. Shoketsu Kinzoku Kogyo Kabushiki Co.</em>, 535 U.S. 722 (2002), when you narrow a claim by amendment to overcome a prior art rejection, you presumptively surrender the scope between the original claim language and the amended claim language. This surrender applies not only to literal infringement but also to infringement under the doctrine of equivalents.</p>
+        <p><strong>Practical implications:</strong> (1) Never amend broader than necessary to overcome the specific rejection; (2) always explain in your Remarks why the amendment is being made — vague amendments create uncertain estoppel; (3) when you narrow an independent claim, consider whether the surrendered scope can be captured in a continuation application; (4) if you are amending for reasons of clarity only (not to distinguish prior art), say so explicitly in the Remarks to avoid creating unnecessary estoppel.</p>
+        <p><strong>The argument you make is as binding as the amendment you make.</strong> If you argue that your claim is limited to a particular interpretation in order to distinguish prior art, a court will hold you to that interpretation. Choose your arguments with the same care as your amendments.</p>
+      </div>
+    </div>
+
+    <!-- ────────────────────────────────────────────────────── -->
+    <h2 id="s8" class="section-anchor">8. Arguments</h2>
+
+    <p>
+      Arguments — written advocacy in the Remarks section of your response — are where prosecution becomes persuasion. A well-written argument does not merely disagree with the examiner; it educates, it distinguishes, and it makes the examiner's path to allowance feel like the most intellectually honest conclusion.
+    </p>
+
+    <h3>When to Argue vs. When to Amend</h3>
+
+    <p>
+      The decision between arguing and amending should be strategic, not reflexive. Arguments alone are appropriate when: (1) the examiner has misread or mischaracterized a prior art reference, (2) the examiner has failed to address all claim limitations, (3) there is no good amendment available without surrendering critical scope, or (4) you are building a record for appeal. Amendments are appropriate when: (1) you can add a limitation that clearly distinguishes the prior art, (2) the specification supports a narrower claim that is plainly patentable, or (3) the broadest reasonable interpretation of your claims captures subject matter you do not actually want to protect.
+    </p>
+    <p>
+      In practice, the best responses combine both: amend claims to add a clearly distinguishing limitation while simultaneously arguing that the prior art does not teach even the original claim language, and that the amended claims are patentable for independent reasons. This "belt and suspenders" approach gives the examiner multiple reasons to allow the claims and gives you better prosecution history if the arguments alone would have prevailed.
+    </p>
+
+    <h3>Structure of a Persuasive Argument Section</h3>
+
+    <p>Each argument section should follow this structure:</p>
+
+    <ol>
+      <li><strong>Acknowledge the rejection:</strong> State the rejection you are responding to (which statute, which claim, which reference). This shows the examiner you have read the rejection carefully.</li>
+      <li><strong>State your conclusion first:</strong> Tell the examiner upfront that the rejection should be withdrawn and why. Do not bury your conclusion.</li>
+      <li><strong>Lay the legal foundation:</strong> Cite the relevant legal standard briefly. Do not over-cite — one or two cases, stated clearly, are more persuasive than a string citation.</li>
+      <li><strong>Apply the facts:</strong> This is the bulk of your argument. Quote the claim language. Quote the reference. Explain the mismatch specifically and precisely. Use comparison language ("The reference discloses X; claim 1 requires Y; X is not Y because..."). Be direct.</li>
+      <li><strong>Preempt counterarguments:</strong> Anticipate the examiner's likely response and address it. "The Examiner may argue that X implicitly discloses Y. However, implicit disclosure requires that the missing limitation necessarily results from what is expressly disclosed — not merely that it is possible or probable."</li>
+      <li><strong>Request allowance:</strong> Close with a specific request that the rejection be withdrawn and the claims be allowed.</li>
+    </ol>
+
+    <h3>Model Argument: §101 Rejection of an AI Patent Claim</h3>
+
+    <p>The following is a complete, model argument responding to the §101 rejection example in Section 3 above. This argument is approximately 450 words and represents the type of substantive, point-by-point advocacy required to overcome a §101 rejection for an AI/ML invention.</p>
+
+    <pre><code>REMARKS
+
+I. CLAIMS 1–20 ARE DIRECTED TO PATENT-ELIGIBLE SUBJECT MATTER
+   UNDER 35 U.S.C. §101
+
+Claims 1–20 stand rejected under 35 U.S.C. §101. Applicant respectfully
+traverses this rejection. As explained below, the claims are directed to
+a specific technical improvement to edge computing systems — namely, a
+hardware-software co-design architecture that achieves real-time neural
+network inference on resource-constrained devices without cloud transmission
+— and are therefore patent eligible under the framework of Alice Corp. v.
+CLS Bank Int'l, 573 U.S. 208 (2014), and the USPTO's 2019 Revised Guidance
+on Subject Matter Eligibility.
+
+A. Step 2A, Prong 1: The Claims Are Not Directed to an Abstract Idea
+
+The Examiner characterizes the claims as directed to "mathematical operations
+of applying a neural network model to input data." This characterization
+understates the claims. Claim 1 does not broadly recite applying any neural
+network to any data. Rather, claim 1 recites a specific hardware-software
+architecture: a systolic array-based hardware accelerator that processes
+tiled data partitions in parallel, applying a quantized neural network model
+stored in read-only memory, to generate a classification result within 10
+milliseconds without any cloud transmission. This is not an abstract
+mathematical concept — it is a specific technical process implemented on
+specific hardware producing a specific technical result.
+
+The 2019 Revised Guidance identifies three groupings of abstract ideas:
+mathematical concepts, certain methods of organizing human activity, and
+mental processes. The claimed invention fits none of these groupings. It
+cannot be performed mentally — it requires a systolic array hardware
+accelerator, an on-chip ROM, and specific tiling and quantization operations.
+It does not organize human activity; it processes physical sensor data.
+It is not a mathematical concept in the abstract; it is a defined hardware
+operation with bounded timing constraints.
+
+B. Step 2A, Prong 2: The Claims Integrate the Technical Process Into a
+   Practical Application
+
+Even assuming arguendo that the claims recite a mathematical concept, the
+additional elements of the claims integrate that concept into a practical
+application: they improve the functioning of an edge computing system by
+enabling real-time neural network inference within a specific latency
+constraint (10 milliseconds) without the privacy, bandwidth, and latency
+costs of cloud transmission.
+
+This is precisely the type of improvement recognized as patent eligible in
+Enfish, LLC v. Microsoft Corp., 822 F.3d 1327, 1335–36 (Fed. Cir. 2016)
+(method that improves computer functionality itself is patent eligible),
+and McRO, Inc. v. Bandai Namco Games Am. Inc., 837 F.3d 1299, 1314–15
+(Fed. Cir. 2016) (specific technological improvement achieved by application
+of defined rules is patent eligible). The Federal Circuit's decision in
+Cooperative Entertainment, Inc. v. Kollective Technology, Inc., 50 F.4th
+1361 (Fed. Cir. 2022), confirms that claims directed to specific technical
+improvements in distributed processing systems — even when they involve
+mathematical operations — are patent eligible when the claims are directed
+to the improvement itself, not merely to the mathematical concept performed
+on generic hardware.
+
+Here, claim 1 does not merely recite generic computer hardware implementing
+a mathematical concept. It recites a specific systolic array architecture,
+specific tiling parameters constrained by on-chip memory, specific 8-bit
+quantization of model weights, and a specific latency constraint — together
+constituting a technical solution to the problem of real-time AI inference
+on edge devices. The Examiner's characterization of this as abstract
+mathematical computation is precisely the type of oversimplification that
+the Federal Circuit cautioned against in Enfish.
+
+C. Alternatively, Step 2B: The Claims Include Significantly More
+
+Should the Court apply Step 2B, the additional elements — systolic array
+architecture, ROM storage of quantized weights, tiling scheduler constrained
+by on-chip memory, 10-millisecond latency constraint, and elimination of
+cloud transmission — amount to significantly more than the abstract idea
+itself. These are not generic computer components performing generic
+functions. The specification at pages 12–19 and 24–31 discloses, in detail,
+that this specific combination of hardware and algorithm produces a
+non-obvious synergistic improvement in inference speed that is not achievable
+by conventional GPU-based or CPU-based approaches.
+
+In view of the foregoing, the rejection of claims 1–20 under 35 U.S.C. §101
+should be withdrawn, and the claims should be allowed.
+
+Applicant respectfully requests a favorable reconsideration of the claims.</code></pre>
+
+    <!-- ────────────────────────────────────────────────────── -->
+    <h2 id="s9" class="section-anchor">9. Examiner Interviews</h2>
+
+    <p>
+      If there is a single most effective tool in patent prosecution, it is the examiner interview. Studies by the USPTO and independent researchers consistently show that applications in which the applicant conducts at least one examiner interview have higher allowance rates and shorter prosecution timelines than those prosecuted solely through written exchanges. For complex AI/ML applications subject to §101 rejections, the interview is not merely helpful — it is often essential.
+    </p>
+
+    <div class="stats-row">
+      <div class="stat-item">
+        <div class="stat-number">+28%</div>
+        <div class="stat-label">higher allowance rate for applications with at least one examiner interview (USPTO data)</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">4.2 mo.</div>
+        <div class="stat-label">average reduction in prosecution time when interview conducted before or with non-final response</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">30 min</div>
+        <div class="stat-label">typical interview duration — worth more than a 20-page written response</div>
+      </div>
+    </div>
+
+    <h3>Requesting an Interview</h3>
+
+    <p>
+      You may request an examiner interview at any time during ex parte prosecution after a first Office Action has been issued. Interview requests can be made by:
+    </p>
+    <ul>
+      <li>Calling the examiner directly using the phone number on the Office Action (most efficient for scheduling)</li>
+      <li>Filing a formal interview request through the USPTO's Electronic Interview Request (EIR) system via Patent Center</li>
+      <li>Requesting an in-person interview at the USPTO campus in Alexandria, Virginia (rare in practice; most interviews are conducted by phone or video)</li>
+    </ul>
+
+    <p>
+      When requesting an interview, identify yourself, the application number, the docket number, and briefly state the purpose: "I would like to discuss the §101 rejection and propose a specific amendment to overcome it." Have two or three mutually available time slots ready to offer.
+    </p>
+
+    <h3>Preparing for the Interview</h3>
+
+    <p>
+      A poorly prepared interview can be worse than no interview at all. Examiners are busy; they will remember an applicant who wasted their time. Before the interview:
+    </p>
+
+    <ul>
+      <li><strong>Have a specific proposed amendment ready.</strong> The most productive interviews are those in which you come with a concrete proposal: "I propose adding the following limitation to claim 1: [text]. Does this overcome the §101 rejection?" Examiners can respond directly to specific proposals in a way they cannot respond to abstract arguments.</li>
+      <li><strong>Prepare a one-page interview agenda.</strong> File the agenda through the EIR system or email it to the examiner in advance. Include the application number, the rejections to be discussed, and your proposed amendment or argument summary. This allows the examiner to prepare and makes the interview more efficient.</li>
+      <li><strong>Know your technology and your claims cold.</strong> The examiner may ask you technical questions about how the claimed invention works. You should be able to explain, in plain language, what the invention does, why it is technically better than the prior art, and why the proposed amendment is meaningful.</li>
+      <li><strong>Know the examiner's art unit and prior allowances.</strong> Research what types of AI/ML claims the examiner (and the art unit more broadly) has allowed in the past. This intelligence is available from USPTO PAIR and commercial prosecution analytics tools. Understanding the examiner's allowance patterns can help you tailor your proposed amendment to their preferences.</li>
+    </ul>
+
+    <h3>During the Interview</h3>
+
+    <ul>
+      <li><strong>Be professional and collegial.</strong> Examiners are not adversaries — they are government officers doing their jobs under significant time pressure. Treat them as colleagues. Never argue emotionally, speak condescendingly, or suggest that the examiner is incompetent.</li>
+      <li><strong>Listen more than you talk.</strong> The examiner's explanation of why they rejected the claims is valuable intelligence. Let them explain their position fully before responding. Examiners often reveal, in their explanation, exactly what they need to see to allow the claims.</li>
+      <li><strong>Ask directly: "What would you need to see to allow these claims?"</strong> This is the most important question you can ask. Examiners who are motivated to allow (and most are) will often tell you specifically what amendment would overcome their rejection.</li>
+      <li><strong>Do not make admissions about claim scope.</strong> Discussions during interviews are generally not formally binding prosecution history (unlike written arguments), but be cautious about volunteering interpretations of your claims that could limit scope later. If the examiner asks "so claim 1 is limited to X?", a measured response is "for purposes of today's discussion, we are focusing on embodiments that include X, but we believe the claim language as written may be broader."</li>
+      <li><strong>Confirm any agreement reached.</strong> If the examiner indicates that a proposed amendment would overcome the rejection, confirm this: "So if we amend claim 1 to add [limitation X], you would allow the claim?" Get explicit confirmation before hanging up.</li>
+    </ul>
+
+    <h3>After-Interview Summary and Written Response</h3>
+
+    <p>
+      After the interview, file an <span class="key-term" title="A form filed after an examiner interview summarizing what was discussed and agreed upon">After Interview Communication</span> (Form PTO-413B) within one week summarizing what was discussed, any agreements reached, and the proposed amendments or arguments. This filing is important: it creates a record of the interview and confirms any examiner agreement reached during the call.
+    </p>
+    <p>
+      Your written response to the Office Action should then incorporate the amendments agreed upon during the interview, accompanied by arguments explaining why the amendments overcome the rejection. Even if the examiner orally agreed to allow the claims during the interview, you must still file a timely written response — the interview does not toll the response period.
+    </p>
+
+    <div class="callout callout-tip">
+      <div class="callout-icon">✅</div>
+      <div class="callout-body">
+        <div class="callout-title">Interview Best Practice: The Pre-Interview Amendment</div>
+        <p>Consider filing a pre-interview amendment through Patent Center before the interview. This puts a specific amended claim in front of the examiner before the call, giving them time to consider it and consult with their SPE (Supervisory Patent Examiner) if needed. The pre-interview amendment also creates prosecution history that establishes the basis for the agreed-upon allowance, protecting you from any later dispute about what was agreed during the oral conversation.</p>
+      </div>
+    </div>
+
+    <!-- ────────────────────────────────────────────────────── -->
+    <h2 id="s10" class="section-anchor">10. After Final Rejection</h2>
+
+    <p>
+      A final rejection does not mean the end of prosecution — but it does mean your options have narrowed significantly. Understanding the available paths and their strategic trade-offs is critical to making the right decision for your client's patent portfolio objectives.
+    </p>
+
+    <h3>Decision Flowchart: After Final Rejection</h3>
+
+    <div class="flowchart">
+      <div class="flow-node">Final Rejection Received</div>
+      <div class="flow-arrow"></div>
+      <div class="flow-node" style="background:var(--navy-light);">Assess: Can you make minor amendments that place claims in condition for allowance?</div>
+      <div class="flow-arrow"></div>
+      <div class="flow-row">
+        <div style="display:flex; flex-direction:column; align-items:center; gap:.5rem;">
+          <span style="font-size:.8rem; color:var(--success); font-weight:700;">YES</span>
+          <div class="flow-node" style="min-width:200px; font-size:.875rem; background:var(--success);">File After Final Response + Request AFCP 2.0 Consideration</div>
+          <div class="flow-arrow"></div>
+          <div class="flow-node" style="min-width:200px; font-size:.875rem; background:var(--info);">Examiner Considers Under AFCP 2.0</div>
+          <div class="flow-arrow"></div>
+          <div class="flow-row">
+            <div style="display:flex; flex-direction:column; align-items:center; gap:.25rem;">
+              <span style="font-size:.75rem; color:var(--success); font-weight:600;">Allowed</span>
+              <div class="flow-node" style="min-width:120px; font-size:.8rem; background:var(--success); padding:.5rem 1rem;">Notice of Allowance</div>
+            </div>
+            <div class="flow-arrow-h" style="margin-top:1rem;"></div>
+            <div style="display:flex; flex-direction:column; align-items:center; gap:.25rem;">
+              <span style="font-size:.75rem; color:var(--danger); font-weight:600;">Not Allowed</span>
+              <div class="flow-node" style="min-width:120px; font-size:.8rem; background:var(--warning); padding:.5rem 1rem;">Advisory Action</div>
+            </div>
+          </div>
+        </div>
+        <div style="width:2px; height:auto; background:var(--gray-300); margin:0 1rem; min-height:80px;"></div>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:.5rem;">
+          <span style="font-size:.8rem; color:var(--danger); font-weight:700;">NO / AFTER ADVISORY</span>
+          <div class="flow-node" style="min-width:200px; font-size:.875rem; background:var(--navy-light);">Choose Path Forward</div>
+          <div class="flow-arrow"></div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:.5rem; max-width:420px;">
+            <div class="flow-node" style="font-size:.8rem; padding:.6rem 1rem; background:#7d3c98;">File RCE (Reopen Prosecution)</div>
+            <div class="flow-node" style="font-size:.8rem; padding:.6rem 1rem; background:#1a6b8a;">Pre-Appeal Brief Conference</div>
+            <div class="flow-node" style="font-size:.8rem; padding:.6rem 1rem; background:#1e8449;">Appeal to PTAB</div>
+            <div class="flow-node" style="font-size:.8rem; padding:.6rem 1rem; background:var(--gold); color:var(--navy-dark);">File Continuation Application</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h3>Option 1: After Final Consideration Pilot (AFCP 2.0)</h3>
+    <p>
+      AFCP 2.0 allows applicants to request that the examiner consider amendments made after final rejection without charging an RCE fee, provided that the amendments do not broaden claim scope. Under AFCP 2.0, the examiner is allotted additional consideration time (typically up to three additional hours) to consider the amendment. AFCP 2.0 is the first step to consider after a final rejection when you can identify a specific amendment that would clearly place the claims in condition for allowance. File your amendment with the AFCP 2.0 request simultaneously.
+    </p>
+
+    <h3>Option 2: Request for Continued Examination (RCE)</h3>
+    <p>
+      An RCE, governed by 37 C.F.R. §1.114, reopens prosecution by filing a submission (new claims, arguments, or evidence) and paying the RCE fee. After an RCE, prosecution begins anew — the examiner issues a new non-final rejection, and you have the full complement of response options again. RCEs are the most common path after final rejection and are appropriate when: (1) you need to significantly amend the claims, (2) you have new prior art to submit via IDS, or (3) you want to continue prosecution dialogue without the time pressure of an appeal. Strategic warning: multiple RCEs significantly increase prosecution cost and delay.
+    </p>
+
+    <h3>Option 3: Pre-Appeal Brief Conference</h3>
+    <p>
+      The Pre-Appeal Brief Conference Program allows applicants to request a conference (including a panel review by the examiner, the SPE, and a senior examiner) before committing to a full PTAB appeal. The applicant files a short five-page statement identifying alleged errors in the final rejection. The panel reviews the statement and either orders the case reopened (with new prosecution), allows the claims, or confirms the final rejection and sends the case to appeal. This option is inexpensive and can resolve a case quickly — but the panel review is brief and the statement must be tightly targeted.
+    </p>
+
+    <h3>Option 4: Appeal to PTAB</h3>
+    <p>
+      See Section 11 for a detailed discussion of PTAB appeal. Filing a Notice of Appeal after final rejection initiates the appeal process. The appeal preserves your right to challenge the examiner's rejections before an administrative law tribunal without paying RCE fees. Appeals are most appropriate when: (1) the examiner has taken legally incorrect positions, (2) you want to force a final decision on an issue that has dragged through multiple prosecution rounds, or (3) you have strong arguments but cannot reach agreement through prosecution dialogue.
+    </p>
+
+    <h3>Option 5: File a Continuation Application</h3>
+    <p>
+      Filing a continuation application under 35 U.S.C. §120 preserves the parent application's priority date while starting fresh with new claims. A continuation can pursue narrower claims specifically tailored to the examiner's allowance criteria, or broader claims that the parent prosecution history would estop. Continuations are particularly valuable for AI/ML patents because the technology evolves rapidly: a continuation filed after final rejection can be used to pursue claims directed to specific product implementations, new use cases, or improved versions of the technology that have emerged since the parent's filing date.
+    </p>
+
+    <!-- ────────────────────────────────────────────────────── -->
+    <h2 id="s11" class="section-anchor">11. Appeal to PTAB</h2>
+
+    <p>
+      The <span class="key-term" title="Patent Trial and Appeal Board — the administrative tribunal within the USPTO that hears patent appeals">Patent Trial and Appeal Board (PTAB)</span> is the administrative tribunal within the USPTO that hears appeals from examiner rejections. Established under the America Invents Act, the PTAB consists of Administrative Patent Judges (APJs) — most with technical backgrounds in engineering and sciences — who review examiner rejections de novo on the legal questions and for substantial evidence on the factual findings.
+    </p>
+
+    <h3>PTAB Statistics for AI Patent Appeals</h3>
+
+    <div class="stats-row">
+      <div class="stat-item">
+        <div class="stat-number">42%</div>
+        <div class="stat-label">of AI/ML §101 appeal decisions result in full or partial reversal of the examiner (2022–2024 data)</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">24 mo.</div>
+        <div class="stat-label">average PTAB appeal pendency from Notice of Appeal to decision</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">$25K–$60K</div>
+        <div class="stat-label">estimated cost of a PTAB appeal (attorney fees; varies significantly by complexity)</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">3 APJs</div>
+        <div class="stat-label">standard panel size; expanded panels of 5 or more APJs for significant legal questions</div>
+      </div>
+    </div>
+
+    <h3>The Appeal Process</h3>
+
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="timeline-date">Month 0</div>
+        <h4>File Notice of Appeal (Form PTO/SB/31)</h4>
+        <p>File within the response period after the final rejection (typically 2 months from mailing date, extendable to 6 months with extension fees). Pay the notice of appeal fee. Filing the Notice of Appeal preserves all claims and all pending rejections for review.</p>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Month 0–2</div>
+        <h4>Optional: Pre-Appeal Brief Conference Request</h4>
+        <p>File a five-page pre-appeal brief statement simultaneously with or after the Notice of Appeal. The conference result typically issues within one to two months. If the panel orders the case reopened, prosecution resumes with a new non-final rejection.</p>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Month 2</div>
+        <h4>File Appeal Brief</h4>
+        <p>The Appeal Brief is due two months after the Notice of Appeal (extendable). This is your primary document — a comprehensive brief identifying each appealed rejection, the legal and factual arguments for reversal, and citations to the record. Maximum 25 pages (excluding appendices). Include a claim appendix and an evidence appendix.</p>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Month 4–6</div>
+        <h4>Examiner's Answer</h4>
+        <p>The examiner files an Examiner's Answer, typically two to four months after the Appeal Brief. The Examiner's Answer may maintain the rejections, withdraw some rejections, or raise new grounds of rejection (in which case you have the right to file a Supplemental Appeal Brief).</p>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Month 6–8</div>
+        <h4>Optional: Reply Brief</h4>
+        <p>Applicant may file a Reply Brief within two months of the Examiner's Answer. The Reply Brief should respond specifically to new arguments raised in the Examiner's Answer and should not simply repeat arguments already made in the Appeal Brief.</p>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Month 8–24</div>
+        <h4>PTAB Docketing and Decision</h4>
+        <p>After briefing is complete, the case is docketed by the PTAB. An oral hearing may be requested (fee required) and scheduled approximately three to six months before the written decision. The PTAB's written decision may affirm all rejections, reverse all rejections, affirm some and reverse others, or remand to the examiner for further prosecution.</p>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Post-Decision</div>
+        <h4>Further Appeals</h4>
+        <p>PTAB decisions may be appealed to the United States Court of Appeals for the Federal Circuit (for de novo legal review) or to the United States District Court for the Eastern District of Virginia (for a trial de novo). Federal Circuit appeals typically take an additional 18–24 months and cost an additional $100,000–$200,000 or more. Most applicants settle or continue prosecution rather than appealing to the Federal Circuit.</p>
+      </div>
+    </div>
+
+    <h3>Drafting an Effective Appeal Brief</h3>
+
+    <p>
+      The Appeal Brief is fundamentally different from a prosecution response. You are no longer trying to convince an examiner to allow your claims — you are arguing to a panel of judges that the examiner made a legal error. This requires a shift in tone and approach:
+    </p>
+
+    <ul>
+      <li><strong>Lead with your strongest argument.</strong> PTAB judges read hundreds of briefs. The first argument should be your best one — the clearest, most unambiguous error in the examiner's reasoning.</li>
+      <li><strong>Cite the record precisely.</strong> Every claim limitation, every passage from a prior art reference, and every statement by the examiner should be cited with precise pinpoint citations to the prosecution record. PTAB judges value precise record citations above all.</li>
+      <li><strong>Frame legal questions cleanly.</strong> Where you are arguing that the examiner applied an incorrect legal standard (e.g., misapplied the Alice two-step, improperly found inherency, failed to establish motivation to combine), frame the legal question as a binary: either the examiner's legal standard is correct or it is incorrect, and here is why it is incorrect.</li>
+      <li><strong>Include an oral hearing request strategically.</strong> Oral hearings are most useful when: the case turns on a nuanced technical point that is difficult to convey in writing, the PTAB's questions might reveal confusion about the technology, or you need to distinguish a potentially adverse precedent that a judge might raise sua sponte.</li>
+    </ul>
+
+    <!-- ────────────────────────────────────────────────────── -->
+    <h2 id="s12" class="section-anchor">12. Response Strategy Checklist</h2>
+
+    <p>
+      Use the following checklists before filing any response to an Office Action. A missed step in prosecution is rarely recoverable — unlike litigation, there is no discovery, no deposition, and no trial to fill gaps left by a careless prosecution response.
+    </p>
+
+    <h3>General Response Checklist (All Office Actions)</h3>
+
+    <ul class="checklist">
+      <li>Confirm and docket the response deadline (mailing date + 3 months statutory; maximum 6 months with extensions)</li>
+      <li>Read the entire Office Action, including all footnotes and all cited references in full</li>
+      <li>Map every pending claim to its status (rejected, allowed, objected to, withdrawn)</li>
+      <li>Pull and read every cited reference in full — not just the cited passages</li>
+      <li>Prepare a claim chart comparing each limitation to the examiner's disclosure citations</li>
+      <li>Assess whether to argue, amend, or both</li>
+      <li>Request an examiner interview (for substantive rejections on a first Office Action)</li>
+      <li>Identify any limitations the examiner failed to address in the rejection</li>
+      <li>Review the specification for support for any proposed claim amendments</li>
+      <li>Check whether any new references require an IDS filing</li>
+      <li>Ensure every argument responds specifically to the examiner's position (not a generic argument)</li>
+      <li>Review every amendment for potential prosecution history estoppel consequences</li>
+      <li>Consider filing a continuation application to preserve broader claim scope being surrendered</li>
+      <li>Have a second attorney review the response before filing</li>
+      <li>File the response well before the deadline — do not mail on the last day</li>
+    </ul>
+
+    <h3>§101 Eligibility Rejection Checklist</h3>
+
+    <ul class="checklist">
+      <li>Identify the abstract idea as characterized by the examiner (mathematical concept, organizing human activity, or mental process?)</li>
+      <li>Assess whether the examiner's characterization fits the 2019 Revised Guidance groupings</li>
+      <li>Argue Step 2A, Prong 1 if the characterization is wrong or overbroad</li>
+      <li>Identify additional claim elements beyond the abstract idea and assess "practical application" integration</li>
+      <li>Identify specification support for technical improvement arguments (Enfish-type arguments)</li>
+      <li>Prepare a proposed amendment adding specific technical limitations if argument alone is insufficient</li>
+      <li>Avoid: relying solely on "implemented on a computer" argument</li>
+      <li>Avoid: conflating §101 eligibility with §102/§103 novelty/non-obviousness arguments</li>
+      <li>Review recent PTAB decisions in the same art unit for §101 — understand the examiner's allowance criteria</li>
+      <li>Consider filing a Rule 132 declaration establishing technical improvements (for §101 step 2B)</li>
+    </ul>
+
+    <h3>§102 Novelty Rejection Checklist</h3>
+
+    <ul class="checklist">
+      <li>Confirm the reference qualifies as prior art under §102(a)(1) or §102(a)(2) (check publication date vs. priority date)</li>
+      <li>Verify whether the common inventor exception (§102(b)(1)(A)) applies</li>
+      <li>Create a claim chart: for each limitation, find the examiner's cited passage and assess whether the passage actually discloses the limitation</li>
+      <li>Identify at least one limitation the reference does not disclose (the "missing limitation" argument)</li>
+      <li>If the examiner argues inherency, require factual basis — "necessarily results" is the standard, not "probably" or "possibly"</li>
+      <li>Consider whether swearing behind the reference is available (provisional application date, conception/reduction to practice evidence)</li>
+      <li>If amending, add a limitation clearly not disclosed by the reference that is supported by the specification</li>
+      <li>Do not argue that the reference's purpose or preferred embodiment differs from your invention (purpose is irrelevant to anticipation)</li>
+    </ul>
+
+    <h3>§103 Obviousness Rejection Checklist</h3>
+
+    <ul class="checklist">
+      <li>Identify all references cited in the rejection and assess whether all qualify as prior art</li>
+      <li>Identify the specific combination the examiner proposes and the examiner's stated motivation to combine</li>
+      <li>Assess whether the combination is actually achievable — would combining the references destroy a principle of operation?</li>
+      <li>Identify any "teaching away" language in either reference that counsels against the combination</li>
+      <li>Assess the examiner's stated "reasonable expectation of success" — is it conclusory or factually supported?</li>
+      <li>Gather secondary considerations evidence: commercial success, long-felt need, failure of others, unexpected results</li>
+      <li>For unexpected results: prepare benchmark comparisons, Rule 132 declaration, and quantitative performance data</li>
+      <li>Argue hindsight reconstruction if the examiner has assembled the combination only in light of the applicant's disclosure</li>
+      <li>Assess the level of ordinary skill in the art as of the filing date — not the current level, which may be higher</li>
+      <li>Consider filing a continuation to pursue broader claims if the independent claim must be narrowed to overcome §103</li>
+    </ul>
+
+    <h3>§112 Specification Rejection Checklist</h3>
+
+    <ul class="checklist">
+      <li>Identify which §112 subsection is at issue: (a) written description/enablement, or (b) definiteness</li>
+      <li>For written description: identify the specific claim language and the specific specification disclosure that supports it; if support is thin, amend claims to match what is actually described</li>
+      <li>For enablement: assess the Wands factors; identify the scope of the claim vs. the scope of the working examples in the specification; consider narrowing the claim to the enabled scope</li>
+      <li>For indefiniteness: identify the disputed term; point to specification definitions or usage patterns that give the term objective meaning; consider adding a definition to the specification via amendment</li>
+      <li>Avoid amending claims in ways that introduce new matter (37 C.F.R. §1.121)</li>
+      <li>For functional language objections: add structural support in the specification (via amendment) or add structural limitations to the claims</li>
+      <li>For "trained to" language: add performance criteria or architectural constraints that give the trained model limitations definite scope</li>
+    </ul>
+
+    <h3>Response Deadlines Table</h3>
+
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Deadline</th>
+            <th>Period From Mailing Date</th>
+            <th>Extension Fee (2025 Rates, Large Entity)</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Statutory period (no extension)</td>
+            <td>3 months</td>
+            <td>No fee</td>
+            <td>Examiner may set a shorter period (not less than 30 days) for certain actions; statutory period cannot be less than 3 months for Office Actions</td>
+          </tr>
+          <tr>
+            <td>1-month extension</td>
+            <td>4 months</td>
+            <td>~$240</td>
+            <td>Filed with or before the response; automatic with payment</td>
+          </tr>
+          <tr>
+            <td>2-month extension</td>
+            <td>5 months</td>
+            <td>~$680</td>
+            <td>Filed with or before the response; automatic with payment</td>
+          </tr>
+          <tr>
+            <td>3-month extension (maximum)</td>
+            <td>6 months</td>
+            <td>~$1,540</td>
+            <td>Filed with or before the response; automatic with payment. This is the absolute maximum; no response received = abandonment</td>
+          </tr>
+          <tr>
+            <td>Revival from abandonment</td>
+            <td>12 months from abandonment date</td>
+            <td>~$2,180 + revival petition fee (~$2,080)</td>
+            <td>Available for unintentional abandonment only; requires petition under 37 C.F.R. §1.137(a)</td>
+          </tr>
+          <tr>
+            <td>Notice of Appeal (after final)</td>
+            <td>2 months from mailing (extendable)</td>
+            <td>Extension fees apply</td>
+            <td>Filing Notice of Appeal does not extend the final response period; RCE or response must also be filed to continue prosecution</td>
+          </tr>
+          <tr>
+            <td>Appeal Brief</td>
+            <td>2 months from Notice of Appeal</td>
+            <td>Extension fees apply</td>
+            <td>Failure to file Appeal Brief = abandonment of appeal; application may be revived with unintentional abandonment showing</td>
+          </tr>
+          <tr>
+            <td>Reply Brief to Examiner's Answer</td>
+            <td>2 months from Examiner's Answer</td>
+            <td>No extension available</td>
+            <td>Reply Brief is optional; if examiner raises new grounds of rejection in the Answer, 37 C.F.R. §41.39 provides a right to Supplemental Appeal Brief</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="table-caption">Table 9-1. USPTO response deadlines and extension fees. Fees shown are approximate 2025 rates for large entities; small entities (≤500 employees) and micro entities pay reduced rates. Confirm current fees at the USPTO fee schedule at www.uspto.gov.</p>
+    </div>
+
+    <div class="callout callout-danger">
+      <div class="callout-icon">🚫</div>
+      <div class="callout-body">
+        <div class="callout-title">Never Miss a Deadline — Consequences of Abandonment</div>
+        <p>Failing to respond within the maximum 6-month period results in automatic abandonment of the application. Abandoned applications can be revived, but only upon a petition demonstrating that the abandonment was "unintentional" — a high bar that has been narrowed by courts and the USPTO over time. Relying on revival is not a strategy; it is a last resort. Patent rights are worth nothing if the application is abandoned. Docket every deadline the moment the Office Action is received, and set multiple reminder alerts well in advance of the deadline.</p>
+      </div>
+    </div>
+
+    <!-- ── Chapter Summary ──────────────────────────────── -->
+    <div class="highlight-box" style="margin-top:3rem;">
+      <h4>Chapter 9 Summary: Key Takeaways</h4>
+      <ul>
+        <li>Approximately 85% of patent applications receive at least one Office Action; AI/ML applications average 2.3. Rejections are the rule, not the exception — plan for them from the start.</li>
+        <li>The §101 rejection under <em>Alice</em> is the most common challenge for AI/ML patents. Effective responses combine technical claim amendments with substantive arguments under the 2019 Revised Guidance's two-step framework.</li>
+        <li>§102 rejections can be overcome by identifying a single limitation the prior art reference does not disclose. Read every reference in full — examiners frequently cite passages out of context.</li>
+        <li>§103 rejections require challenging the motivation to combine (teaching away, incompatible principles, hindsight) and, where possible, presenting secondary considerations evidence including unexpected results with quantitative data.</li>
+        <li>§112 rejections for AI/ML applications frequently target trained model claims, functional language, and broad genus claims. The best defense is a well-written specification — drafted before the first Office Action, not after.</li>
+        <li>Prosecution history estoppel is permanent. Every amendment and every argument you make limits your patent's scope in litigation. Choose carefully and document the reasons for every amendment.</li>
+        <li>The examiner interview is the single most effective prosecution tool. Use it early, come prepared with a specific proposed amendment, and listen more than you talk.</li>
+        <li>After final rejection, exhaust AFCP 2.0 before paying an RCE fee. File continuation applications to preserve scope being surrendered in prosecution. Appeal to PTAB when the examiner has taken a legally incorrect position.</li>
+      </ul>
+    </div>
+
+    <!-- ── Chapter Navigation ────────────────────────────── -->
+    <nav class="chapter-nav">
+      <a href="ch08_application_process.html" class="chapter-nav-btn">
+        <span class="nav-label">← Previous Chapter</span>
+        <span class="nav-title">Chapter 8: The Application Process</span>
+      </a>
+      <a href="ch10_portfolio_strategy.html" class="chapter-nav-btn nav-next">
+        <span class="nav-label">Next Chapter →</span>
+        <span class="nav-title">Chapter 10: Building a Patent Portfolio</span>
+      </a>
+    </nav>
+
+  </main>
+</div>
+
+<!-- ── Footer ────────────────────────────────────────────── -->
+<footer>
+  <div class="footer-content">
+    <p><strong style="color:white;">Patent Law for Technologists</strong></p>
+    <p>Chapter 9: Responding to Office Actions — Prosecution Strategy and the Art of Persuasion</p>
+    <p>Michael A. Torres &mdash; Finnegan, Henderson, Farabow, Garrett &amp; Dunner</p>
+    <p style="margin-top:1.5rem; font-size:.8125rem; opacity:.5;">This material is provided for educational purposes only and does not constitute legal advice. No attorney-client relationship is formed by reading this chapter. For advice specific to your patent matter, consult a registered patent attorney or agent.</p>
+  </div>
+</footer>
+
+</body>
+</html>

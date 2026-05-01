@@ -1,0 +1,1613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 1: Introduction to Modern MLOps</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script>hljs.highlightAll(); mermaid.initialize({startOnLoad:true, theme:'default'});</script>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --secondary: #059669;
+      --accent: #d97706;
+      --text: #1f2937;
+    }
+    body { color: var(--text); font-family: 'Inter', system-ui, sans-serif; }
+    .nav-link { transition: color 0.15s; }
+    .nav-link:hover { color: #93c5fd; }
+    .toc-link { transition: color 0.15s; }
+    .toc-link:hover { color: var(--primary); }
+    .toc-link.active { color: var(--primary); font-weight: 600; border-left: 2px solid var(--primary); padding-left: 0.5rem; }
+    .callout-info { border-left: 4px solid #2563eb; background: #eff6ff; }
+    .callout-tip { border-left: 4px solid #059669; background: #ecfdf5; }
+    .callout-warning { border-left: 4px solid #d97706; background: #fffbeb; }
+    .callout-note { border-left: 4px solid #7c3aed; background: #f5f3ff; }
+    table { border-collapse: collapse; width: 100%; }
+    thead { background: #2563eb; color: white; }
+    tbody tr:nth-child(even) { background: #f8fafc; }
+    tbody tr:nth-child(odd) { background: #ffffff; }
+    tbody tr:hover { background: #eff6ff; }
+    td, th { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid #e2e8f0; }
+    .mermaid { background: #fff; padding: 1rem; border-radius: 0.5rem; }
+    pre code { font-size: 0.875rem; }
+    .chapter-badge { background: #2563eb; color: white; font-size: 0.75rem; font-weight: 700; padding: 0.25rem 0.75rem; border-radius: 9999px; letter-spacing: 0.05em; text-transform: uppercase; }
+    .section-anchor { scroll-margin-top: 5rem; }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+<!-- Top Navbar -->
+<nav class="bg-gray-900 text-white sticky top-0 z-50 shadow-lg">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center font-bold text-sm">ML</div>
+        <a href="index.html" class="nav-link font-semibold text-lg tracking-tight">Modern MLOps Tutorial</a>
+      </div>
+      <div class="hidden md:flex items-center gap-6 text-sm text-gray-300">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="#toc" class="nav-link">Contents</a>
+        <span class="text-gray-500">|</span>
+        <span class="text-blue-400 font-medium">Chapter 1 of 12</span>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- Chapter Header -->
+<header class="bg-white border-b border-gray-200 shadow-sm">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div class="flex flex-col gap-3">
+      <div class="flex items-center gap-3">
+        <span class="chapter-badge">Chapter 1</span>
+        <span class="text-sm text-gray-500">Foundation Series</span>
+      </div>
+      <h1 class="text-4xl font-bold text-gray-900 leading-tight">Introduction to Modern MLOps</h1>
+      <p class="text-xl text-gray-600 max-w-3xl">From research notebooks to production systems — understanding the discipline, the stack, and the career path.</p>
+      <div class="flex flex-wrap items-center gap-6 text-sm text-gray-500 mt-2">
+        <span class="flex items-center gap-1">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          45 min read
+        </span>
+        <span class="flex items-center gap-1">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+          Senior MLOps Lead — ex-Google Brain, OpenAI, Anthropic
+        </span>
+        <span class="flex items-center gap-1">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          Updated April 2026
+        </span>
+        <span class="flex items-center gap-1">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          Beginner → Intermediate
+        </span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Main Layout -->
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+  <div class="flex gap-10">
+
+    <!-- Sidebar TOC -->
+    <aside class="hidden xl:block w-64 flex-shrink-0">
+      <div class="sticky top-24 bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+        <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4" id="toc">On This Page</h3>
+        <nav class="space-y-1 text-sm text-gray-600">
+          <a href="#s1" class="toc-link block py-1">1. What is MLOps?</a>
+          <a href="#s2" class="toc-link block py-1">2. ML System Complexity</a>
+          <a href="#s3" class="toc-link block py-1">3. MLOps Maturity Levels</a>
+          <a href="#s4" class="toc-link block py-1">4. The Modern MLOps Stack</a>
+          <a href="#s5" class="toc-link block py-1">5. Core MLOps Principles</a>
+          <a href="#s6" class="toc-link block py-1">6. ML Project Lifecycle</a>
+          <a href="#s7" class="toc-link block py-1">7. LLM Era Changes</a>
+          <a href="#s8" class="toc-link block py-1">8. Career Paths</a>
+          <a href="#s9" class="toc-link block py-1">9. Learning Environment Setup</a>
+          <a href="#summary" class="toc-link block py-1">Summary & Takeaways</a>
+        </nav>
+      </div>
+    </aside>
+
+    <!-- Content -->
+    <main class="flex-1 min-w-0 space-y-16">
+
+      <!-- ===== SECTION 1 ===== -->
+      <section id="s1" class="section-anchor">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="w-8 h-8 bg-blue-600 text-white rounded-lg flex items-center justify-center font-bold text-sm">1</span>
+          <h2 class="text-2xl font-bold text-gray-900">What is MLOps?</h2>
+        </div>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          <strong>MLOps</strong> (Machine Learning Operations) is the set of practices, tools, and cultural norms that bridge the gap between experimental machine learning and reliable production systems. The term fuses three disciplines: <em>ML</em> (modeling and experimentation), <em>DevOps</em> (continuous delivery and operational reliability), and <em>DataOps</em> (data pipeline automation and data quality governance). The word itself entered mainstream usage around 2018–2019 as organizations discovered their models worked great in Jupyter notebooks and catastrophically in production.
+        </p>
+
+        <div class="callout-info rounded-lg p-5 mb-6">
+          <p class="text-sm font-bold text-blue-800 mb-1">Etymology</p>
+          <p class="text-sm text-blue-900">MLOps = <strong>ML</strong> (modeling) + <strong>Dev</strong>Ops (continuous delivery culture) + <strong>DataOps</strong> (data pipeline hygiene). Each ancestor contributes something distinct: ML brings the statistical modeling rigor, DevOps brings the automation-first culture, and DataOps brings data lineage and quality thinking. Drop any one pillar and your ML systems will fail in predictable ways.</p>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Why MLOps Exists: The Development Lifecycle Gap</h3>
+        <p class="text-gray-700 leading-relaxed mb-4">
+          Traditional software has a clean input-output contract: given the same code and inputs, you always get the same output. ML inverts this — the behavior of a system is encoded in <em>weights learned from data</em>, not in code. This creates an entirely new class of operational problems that DevOps tooling was never designed to handle:
+        </p>
+        <ul class="list-disc list-inside space-y-2 text-gray-700 mb-6 pl-2">
+          <li><strong>Data drift:</strong> Input distributions shift over time, silently degrading model performance without any code changes.</li>
+          <li><strong>Concept drift:</strong> The relationship between inputs and outputs changes (e.g., user behavior changes post-COVID).</li>
+          <li><strong>Training/serving skew:</strong> The data preprocessing in training differs subtly from production inference.</li>
+          <li><strong>Reproducibility:</strong> Recreating a model from six months ago requires the exact dataset version, random seeds, library versions, and hardware.</li>
+          <li><strong>Evaluation complexity:</strong> "Does it work?" requires domain experts, A/B testing, and statistical significance — not just unit tests.</li>
+          <li><strong>Feedback loops:</strong> Model predictions influence future training data (e.g., recommendation systems that shape user behavior).</li>
+        </ul>
+
+        <div class="callout-warning rounded-lg p-5 mb-6">
+          <p class="text-sm font-bold text-amber-800 mb-1">Industry Reality Check</p>
+          <p class="text-sm text-amber-900">Gartner (2022) found that <strong>85% of ML projects never reach production</strong>. Venturebeat (2019) put the number at 87%. McKinsey (2023) found that only <strong>~26% of ML pilots are deployed at scale</strong>. These are not talent failures — they are process and infrastructure failures. MLOps exists to close this gap.</p>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">MLOps vs. DevOps vs. DataOps</h3>
+        <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm mb-6">
+          <table>
+            <thead>
+              <tr>
+                <th>Dimension</th>
+                <th>DevOps</th>
+                <th>DataOps</th>
+                <th>MLOps</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td class="font-medium">Primary artifact</td><td>Application code</td><td>Data pipelines / datasets</td><td>Trained models + data + code</td></tr>
+              <tr><td class="font-medium">Versioning target</td><td>Code (Git)</td><td>Data (schemas, lineage)</td><td>Code + Data + Models + Experiments</td></tr>
+              <tr><td class="font-medium">Testing paradigm</td><td>Unit / integration tests</td><td>Data quality checks</td><td>Statistical tests + behavioral evals</td></tr>
+              <tr><td class="font-medium">Deployment unit</td><td>Container / binary</td><td>Pipeline DAG</td><td>Model artifact + serving infra</td></tr>
+              <tr><td class="font-medium">Monitoring signal</td><td>Latency, errors, uptime</td><td>Freshness, completeness, accuracy</td><td>Prediction drift, data drift, business metrics</td></tr>
+              <tr><td class="font-medium">Rollback strategy</td><td>Redeploy previous version</td><td>Restore previous snapshot</td><td>Champion/challenger, shadow mode</td></tr>
+              <tr><td class="font-medium">Feedback loop</td><td>User reports / error logs</td><td>Data quality alerts</td><td>Label feedback → retraining triggers</td></tr>
+              <tr><td class="font-medium">Key team members</td><td>SWE, SRE, DevOps eng</td><td>Data eng, Analytics eng</td><td>ML eng, MLOps eng, Data scientist</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">The Two Cultures Problem</h3>
+        <p class="text-gray-700 leading-relaxed mb-4">
+          One of the deepest tensions in applied ML is what practitioners call the <em>two cultures problem</em>: research teams optimize for discovery (move fast, try things, maximize model quality), while production teams optimize for reliability (change slowly, test everything, minimize MTTR). These cultures conflict at nearly every decision point.
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <div class="bg-blue-50 border border-blue-200 rounded-xl p-5">
+            <h4 class="font-bold text-blue-900 mb-3">Research Culture</h4>
+            <ul class="text-sm text-blue-800 space-y-1">
+              <li>Jupyter notebooks as primary artifact</li>
+              <li>Manual experiment tracking (or none)</li>
+              <li>"Works on my machine"</li>
+              <li>Accuracy is the only metric</li>
+              <li>Data is a file on a shared drive</li>
+              <li>Models are .pkl files emailed to ops</li>
+              <li>Retraining = run the notebook again</li>
+            </ul>
+          </div>
+          <div class="bg-green-50 border border-green-200 rounded-xl p-5">
+            <h4 class="font-bold text-green-900 mb-3">Production Culture</h4>
+            <ul class="text-sm text-green-800 space-y-1">
+              <li>Modular Python packages with CI</li>
+              <li>Automated experiment tracking (MLflow / W&amp;B)</li>
+              <li>Reproducible Docker containers</li>
+              <li>Latency, cost, drift alongside accuracy</li>
+              <li>Data is a versioned, cataloged asset</li>
+              <li>Models are registered artifacts with lineage</li>
+              <li>Retraining = automated pipeline trigger</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="callout-tip rounded-lg p-5">
+          <p class="text-sm font-bold text-green-800 mb-1">The MLOps Engineer's Job</p>
+          <p class="text-sm text-green-900">Your core job as an MLOps engineer is to <strong>bridge these two cultures</strong> — making research agility compatible with production reliability. You are not here to slow down data scientists. You are here to build the infrastructure that makes them faster and their models more reliable simultaneously.</p>
+        </div>
+      </section>
+
+      <!-- ===== SECTION 2 ===== -->
+      <section id="s2" class="section-anchor">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="w-8 h-8 bg-blue-600 text-white rounded-lg flex items-center justify-center font-bold text-sm">2</span>
+          <h2 class="text-2xl font-bold text-gray-900">The ML System Complexity</h2>
+        </div>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          In 2015, Google researchers Sculley et al. published <em>"Hidden Technical Debt in Machine Learning Systems"</em> — arguably the most influential paper in the history of MLOps. The core insight: <strong>ML code is a small fraction of a production ML system</strong>. The overwhelming majority of code, complexity, and failure modes live in the surrounding infrastructure. If you have not read this paper, stop and read it before Chapter 2.
+        </p>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">The ML System Iceberg</h3>
+        <div class="bg-white rounded-xl border border-gray-200 p-6 mb-6 shadow-sm">
+          <div class="mermaid">
+graph TD
+    subgraph visible["Visible (What people think of)"]
+      A["ML Code<br/>(model training, inference)"]
+    end
+
+    subgraph hidden["Hidden Infrastructure (What actually matters)"]
+      B["Data Collection &amp; Ingestion"]
+      C["Feature Engineering Pipelines"]
+      D["Data Validation &amp; Quality"]
+      E["Configuration Management"]
+      F["Experiment Tracking"]
+      G["Model Registry &amp; Versioning"]
+      H["Serving Infrastructure"]
+      I["Monitoring &amp; Alerting"]
+      J["Feedback &amp; Labeling Loops"]
+      K["Resource Management &amp; Scheduling"]
+      L["Process Management &amp; Orchestration"]
+    end
+
+    A --> B
+    A --> C
+    A --> D
+    A --> E
+    A --> F
+    A --> G
+    A --> H
+    A --> I
+    A --> J
+    A --> K
+    A --> L
+
+    style A fill:#2563eb,color:#fff,stroke:#1e40af
+    style visible fill:#dbeafe,stroke:#93c5fd
+    style hidden fill:#fef3c7,stroke:#fcd34d
+          </div>
+          <p class="text-sm text-gray-500 text-center mt-3">Figure 1: The ML system iceberg. ML code is the visible tip; production infrastructure is the mass beneath.</p>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Hidden Technical Debt — Key Insights from Sculley et al.</h3>
+        <div class="space-y-3 mb-6">
+          <div class="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
+            <h4 class="font-semibold text-gray-800 mb-1">Entanglement (CACE Principle)</h4>
+            <p class="text-sm text-gray-600">Changing Anything Changes Everything. When you retrain on new data, add a feature, or change a hyperparameter, the entire model behavior may shift. Unlike software where a change has a local blast radius, ML models are globally entangled systems.</p>
+          </div>
+          <div class="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
+            <h4 class="font-semibold text-gray-800 mb-1">Undeclared Consumers</h4>
+            <p class="text-sm text-gray-600">Model outputs are consumed by downstream systems, business logic, and other models without formal contracts. A model score threshold set in a notebook becomes a hard-coded constant in 12 downstream services nobody knows about.</p>
+          </div>
+          <div class="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
+            <h4 class="font-semibold text-gray-800 mb-1">Pipeline Jungles</h4>
+            <p class="text-sm text-gray-600">Data preparation pipelines grow organically: scripts become notebooks, notebooks call other scripts, intermediate files proliferate. The result is an untestable, undocumented maze that nobody dares touch.</p>
+          </div>
+          <div class="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
+            <h4 class="font-semibold text-gray-800 mb-1">Dead Experimental Codepaths</h4>
+            <p class="text-sm text-gray-600">Experiments that "might be useful later" accumulate as conditional flags and commented code, increasing complexity without providing value. Every dead codepath is a maintenance burden and a source of confusion.</p>
+          </div>
+          <div class="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
+            <h4 class="font-semibold text-gray-800 mb-1">Abstraction Debt</h4>
+            <p class="text-sm text-gray-600">ML lacks the clean interface contracts that software engineering has built over decades. What is the interface of a "feature"? A "model"? A "prediction"? Without agreed abstractions, every team builds incompatible systems.</p>
+          </div>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">The 8 Failure Modes of ML Systems in Production</h3>
+        <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm mb-6">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Failure Mode</th>
+                <th>Root Cause</th>
+                <th>Detection Signal</th>
+                <th>Prevention</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="font-bold text-blue-600">1</td>
+                <td class="font-medium">Data Pipeline Failure</td>
+                <td>Schema change, upstream outage, corrupt batch</td>
+                <td>Missing features, null rates spike</td>
+                <td>Data validation with Great Expectations / Soda</td>
+              </tr>
+              <tr>
+                <td class="font-bold text-blue-600">2</td>
+                <td class="font-medium">Training/Serving Skew</td>
+                <td>Different preprocessing in training vs. inference code</td>
+                <td>Prediction distribution mismatch</td>
+                <td>Shared feature store; end-to-end integration tests</td>
+              </tr>
+              <tr>
+                <td class="font-bold text-blue-600">3</td>
+                <td class="font-medium">Data Drift</td>
+                <td>Input distribution shift over time</td>
+                <td>PSI / KL divergence alerts</td>
+                <td>Continuous monitoring; automated retraining triggers</td>
+              </tr>
+              <tr>
+                <td class="font-bold text-blue-600">4</td>
+                <td class="font-medium">Concept Drift</td>
+                <td>Target relationship changes (world changes)</td>
+                <td>Degraded business metrics over weeks/months</td>
+                <td>Regular model evaluation on fresh labeled data</td>
+              </tr>
+              <tr>
+                <td class="font-bold text-blue-600">5</td>
+                <td class="font-medium">Model Serving Overload</td>
+                <td>Traffic spike, batch load, cold start</td>
+                <td>Latency P99 spike, error rate increase</td>
+                <td>Auto-scaling, caching, load testing</td>
+              </tr>
+              <tr>
+                <td class="font-bold text-blue-600">6</td>
+                <td class="font-medium">Silent Degradation</td>
+                <td>Model returns valid but wrong predictions silently</td>
+                <td>Only visible via business KPIs weeks later</td>
+                <td>Shadow mode deployment; canary releases</td>
+              </tr>
+              <tr>
+                <td class="font-bold text-blue-600">7</td>
+                <td class="font-medium">Feedback Loop Corruption</td>
+                <td>Model predictions influence future training labels</td>
+                <td>Gradual homogenization of predictions</td>
+                <td>Randomized exploration; holdout logging</td>
+              </tr>
+              <tr>
+                <td class="font-bold text-blue-600">8</td>
+                <td class="font-medium">Irreproducibility</td>
+                <td>Cannot recreate the model that is in production</td>
+                <td>Post-incident forensics fail</td>
+                <td>Full lineage tracking: data + code + env + config</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout-note rounded-lg p-5">
+          <p class="text-sm font-bold text-purple-800 mb-1">War Story: The Silent Degradation Problem</p>
+          <p class="text-sm text-purple-900">At a large e-commerce company, a recommendation model silently degraded over 8 weeks after a supplier catalog change altered product descriptions. Revenue impact: ~$2.1M before anyone noticed. The detection came from a business analyst, not from any monitoring system. This is failure mode #6 in action. The fix was not a better model — it was better monitoring.</p>
+        </div>
+      </section>
+
+      <!-- ===== SECTION 3 ===== -->
+      <section id="s3" class="section-anchor">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="w-8 h-8 bg-blue-600 text-white rounded-lg flex items-center justify-center font-bold text-sm">3</span>
+          <h2 class="text-2xl font-bold text-gray-900">MLOps Maturity Levels</h2>
+        </div>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          Google's MLOps maturity model (introduced in their 2020 MLOps white paper) defines four levels of operational capability. Most organizations start at Level 0 and aspire to Level 2 or 3. Understanding where your organization sits is the first step to knowing what to build next. These levels are not just about tooling — they represent fundamentally different ways of thinking about ML systems.
+        </p>
+
+        <div class="grid grid-cols-1 gap-4 mb-8">
+
+          <!-- Level 0 -->
+          <div class="bg-white rounded-xl border-l-4 border-red-400 border border-gray-200 p-6 shadow-sm">
+            <div class="flex items-center gap-3 mb-3">
+              <span class="bg-red-100 text-red-700 font-bold text-sm px-3 py-1 rounded-full">Level 0</span>
+              <h3 class="text-lg font-semibold text-gray-800">Manual, Script-Based ML</h3>
+            </div>
+            <p class="text-gray-600 text-sm mb-3">The baseline state of most organizations starting with ML. Everything is done manually by data scientists working in isolation. There are no pipelines, no automation, and no operational infrastructure.</p>
+            <div class="grid grid-cols-2 gap-4 text-sm">
+              <div>
+                <p class="font-semibold text-gray-700 mb-1">Characteristics</p>
+                <ul class="text-gray-600 space-y-1 list-disc list-inside">
+                  <li>Jupyter notebooks as final artifacts</li>
+                  <li>Manual data extraction (SQL, CSV downloads)</li>
+                  <li>No experiment tracking — "model_v7_final_FINAL.pkl"</li>
+                  <li>Manual deployment (copy file to server)</li>
+                  <li>No monitoring — users report problems</li>
+                </ul>
+              </div>
+              <div>
+                <p class="font-semibold text-gray-700 mb-1">Real-world examples</p>
+                <ul class="text-gray-600 space-y-1 list-disc list-inside">
+                  <li>Most early-stage startups</li>
+                  <li>Internal analytics teams at enterprises</li>
+                  <li>Research groups productionizing for the first time</li>
+                  <li>Side projects that "accidentally" became production</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Level 1 -->
+          <div class="bg-white rounded-xl border-l-4 border-yellow-400 border border-gray-200 p-6 shadow-sm">
+            <div class="flex items-center gap-3 mb-3">
+              <span class="bg-yellow-100 text-yellow-700 font-bold text-sm px-3 py-1 rounded-full">Level 1</span>
+              <h3 class="text-lg font-semibold text-gray-800">ML Pipeline Automation</h3>
+            </div>
+            <p class="text-gray-600 text-sm mb-3">Training pipelines are automated and reproducible. Experiment tracking exists. Models are versioned and registered before deployment. Deployment is still largely manual but the artifacts are standardized.</p>
+            <div class="grid grid-cols-2 gap-4 text-sm">
+              <div>
+                <p class="font-semibold text-gray-700 mb-1">Characteristics</p>
+                <ul class="text-gray-600 space-y-1 list-disc list-inside">
+                  <li>Automated training pipelines (Airflow, Prefect, Kubeflow)</li>
+                  <li>Experiment tracking (MLflow, Weights &amp; Biases)</li>
+                  <li>Model registry with versioning</li>
+                  <li>Containerized training environments</li>
+                  <li>Basic model serving (Flask/FastAPI)</li>
+                </ul>
+              </div>
+              <div>
+                <p class="font-semibold text-gray-700 mb-1">Real-world examples</p>
+                <ul class="text-gray-600 space-y-1 list-disc list-inside">
+                  <li>Mid-size tech companies with 2–5 ML engineers</li>
+                  <li>Enterprises that invested in a data science platform</li>
+                  <li>Teams using SageMaker or Vertex AI basics</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Level 2 -->
+          <div class="bg-white rounded-xl border-l-4 border-blue-400 border border-gray-200 p-6 shadow-sm">
+            <div class="flex items-center gap-3 mb-3">
+              <span class="bg-blue-100 text-blue-700 font-bold text-sm px-3 py-1 rounded-full">Level 2</span>
+              <h3 class="text-lg font-semibold text-gray-800">CI/CD Pipeline Automation</h3>
+            </div>
+            <p class="text-gray-600 text-sm mb-3">Full continuous integration and deployment pipelines for both code and models. Tests run automatically. Deployments are automated with canary/blue-green strategies. Monitoring is automated with alerting.</p>
+            <div class="grid grid-cols-2 gap-4 text-sm">
+              <div>
+                <p class="font-semibold text-gray-700 mb-1">Characteristics</p>
+                <ul class="text-gray-600 space-y-1 list-disc list-inside">
+                  <li>CI/CD for ML code (GitHub Actions, Jenkins)</li>
+                  <li>Automated model validation before promotion</li>
+                  <li>Canary deployments with automatic rollback</li>
+                  <li>Production monitoring with drift detection</li>
+                  <li>Shadow mode / A/B testing infrastructure</li>
+                </ul>
+              </div>
+              <div>
+                <p class="font-semibold text-gray-700 mb-1">Real-world examples</p>
+                <ul class="text-gray-600 space-y-1 list-disc list-inside">
+                  <li>Airbnb, LinkedIn, Uber ML platforms (circa 2020)</li>
+                  <li>Financial services firms with mature MLOps teams</li>
+                  <li>Healthcare AI companies with regulatory requirements</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Level 3 -->
+          <div class="bg-white rounded-xl border-l-4 border-green-500 border border-gray-200 p-6 shadow-sm">
+            <div class="flex items-center gap-3 mb-3">
+              <span class="bg-green-100 text-green-700 font-bold text-sm px-3 py-1 rounded-full">Level 3</span>
+              <h3 class="text-lg font-semibold text-gray-800">Full MLOps — Automated Retraining &amp; Feature Stores</h3>
+            </div>
+            <p class="text-gray-600 text-sm mb-3">The full vision: models retrain automatically in response to data drift, new labeled data, or scheduled triggers. A central feature store eliminates training/serving skew across all models. The platform itself is a product serving hundreds of data scientists.</p>
+            <div class="grid grid-cols-2 gap-4 text-sm">
+              <div>
+                <p class="font-semibold text-gray-700 mb-1">Characteristics</p>
+                <ul class="text-gray-600 space-y-1 list-disc list-inside">
+                  <li>Feature store (Feast, Tecton, Hopsworks)</li>
+                  <li>Automated retraining triggers based on drift</li>
+                  <li>ML metadata store with full lineage</li>
+                  <li>Self-service ML platform for data scientists</li>
+                  <li>Online learning / continuous training at scale</li>
+                </ul>
+              </div>
+              <div>
+                <p class="font-semibold text-gray-700 mb-1">Real-world examples</p>
+                <ul class="text-gray-600 space-y-1 list-disc list-inside">
+                  <li>Google (TFX, Vertex AI)</li>
+                  <li>Meta (FBLearner Flow)</li>
+                  <li>Spotify (Hendrix platform)</li>
+                  <li>Netflix (Metaflow)</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Capability Matrix by Maturity Level</h3>
+        <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm mb-6">
+          <table>
+            <thead>
+              <tr>
+                <th>Capability</th>
+                <th>Level 0</th>
+                <th>Level 1</th>
+                <th>Level 2</th>
+                <th>Level 3</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td class="font-medium">Experiment tracking</td><td class="text-red-500">None</td><td class="text-yellow-600">Manual (MLflow local)</td><td class="text-blue-600">Automated (MLflow remote)</td><td class="text-green-600">Integrated metadata store</td></tr>
+              <tr><td class="font-medium">Training pipeline</td><td class="text-red-500">Manual notebook</td><td class="text-yellow-600">Automated DAG</td><td class="text-blue-600">CI-triggered pipeline</td><td class="text-green-600">Event-triggered + scheduled</td></tr>
+              <tr><td class="font-medium">Model versioning</td><td class="text-red-500">Filename-based</td><td class="text-yellow-600">MLflow Registry</td><td class="text-blue-600">Staged registry w/ gates</td><td class="text-green-600">Full lineage + audit trail</td></tr>
+              <tr><td class="font-medium">Deployment</td><td class="text-red-500">Manual copy</td><td class="text-yellow-600">Semi-automated</td><td class="text-blue-600">Canary + blue-green</td><td class="text-green-600">Progressive automated</td></tr>
+              <tr><td class="font-medium">Feature engineering</td><td class="text-red-500">Ad hoc scripts</td><td class="text-yellow-600">Shared library</td><td class="text-blue-600">Versioned transforms</td><td class="text-green-600">Feature store</td></tr>
+              <tr><td class="font-medium">Model monitoring</td><td class="text-red-500">None</td><td class="text-yellow-600">Basic metrics</td><td class="text-blue-600">Drift detection + alerts</td><td class="text-green-600">Automated retraining triggers</td></tr>
+              <tr><td class="font-medium">Testing</td><td class="text-red-500">None</td><td class="text-yellow-600">Unit tests for code</td><td class="text-blue-600">Data + model validation</td><td class="text-green-600">Full evaluation suite</td></tr>
+              <tr><td class="font-medium">Infrastructure</td><td class="text-red-500">Laptops / ad hoc</td><td class="text-yellow-600">Shared compute cluster</td><td class="text-blue-600">Kubernetes + GPU pools</td><td class="text-green-600">Self-service ML platform</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout-tip rounded-lg p-5">
+          <p class="text-sm font-bold text-green-800 mb-1">Practical Advice: Don't Skip Levels</p>
+          <p class="text-sm text-green-900">Many organizations try to jump from Level 0 directly to Level 3 by buying a managed ML platform. This almost always fails. The tooling is not the bottleneck — <strong>organizational practices are</strong>. You need to build the habits of Level 1 (tracking, versioning, containerization) before the automation of Level 2 or 3 will stick. Start with MLflow tracking in a shared server. That single change is worth more than six months of platform selection.</p>
+        </div>
+      </section>
+
+      <!-- ===== SECTION 4 ===== -->
+      <section id="s4" class="section-anchor">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="w-8 h-8 bg-blue-600 text-white rounded-lg flex items-center justify-center font-bold text-sm">4</span>
+          <h2 class="text-2xl font-bold text-gray-900">The Modern MLOps Stack (2024–2025)</h2>
+        </div>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          The MLOps tool landscape has exploded. As of 2025, there are over 300 tools claiming to solve MLOps problems. Rather than surveying all of them, this section maps the landscape by function and helps you understand <em>which category solves which problem</em> — so you can make principled choices rather than following hype.
+        </p>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Full Stack Architecture</h3>
+        <div class="bg-white rounded-xl border border-gray-200 p-6 mb-6 shadow-sm">
+          <div class="mermaid">
+graph TB
+    subgraph src["Data Sources"]
+      DS1[("Databases\n(Postgres, BigQuery)")]
+      DS2[("Data Lakes\n(S3, GCS)")]
+      DS3[("Streams\n(Kafka, Kinesis)")]
+      DS4[("External APIs\n&amp; Webhooks")]
+    end
+
+    subgraph data["Data Layer"]
+      DL1["Ingestion\n(Airbyte, Fivetran)"]
+      DL2["Transformation\n(dbt, Spark)"]
+      DL3["Feature Store\n(Feast, Tecton)"]
+      DL4["Data Catalog\n(DataHub, Amundsen)"]
+    end
+
+    subgraph ml["ML Platform"]
+      ML1["Experiment Tracking\n(MLflow, W&amp;B)"]
+      ML2["Training Orchestration\n(Kubeflow, Metaflow)"]
+      ML3["Model Registry\n(MLflow, Vertex AI)"]
+      ML4["Hyperparameter Tuning\n(Optuna, Ray Tune)"]
+    end
+
+    subgraph serve["Serving Layer"]
+      SV1["Online Serving\n(Triton, TorchServe, BentoML)"]
+      SV2["Batch Inference\n(Spark, Ray)"]
+      SV3["Streaming Inference\n(Flink, Kafka Streams)"]
+    end
+
+    subgraph obs["Observability"]
+      OB1["Model Monitoring\n(Evidently, Arize, Fiddler)"]
+      OB2["Infrastructure\n(Prometheus, Grafana)"]
+      OB3["Data Quality\n(Great Expectations, Soda)"]
+    end
+
+    subgraph infra["Infrastructure"]
+      IN1["Container Platform\n(Kubernetes)"]
+      IN2["GPU Compute\n(AWS, GCP, Azure)"]
+      IN3["IaC\n(Terraform, Pulumi)"]
+    end
+
+    src --> data
+    data --> ml
+    ml --> serve
+    serve --> obs
+    infra --> ml
+    infra --> serve
+
+    style src fill:#f0fdf4,stroke:#86efac
+    style data fill:#eff6ff,stroke:#93c5fd
+    style ml fill:#fdf4ff,stroke:#e879f9
+    style serve fill:#fff7ed,stroke:#fed7aa
+    style obs fill:#fef2f2,stroke:#fca5a5
+    style infra fill:#f8fafc,stroke:#cbd5e1
+          </div>
+          <p class="text-sm text-gray-500 text-center mt-3">Figure 2: The modern MLOps stack — data flows top-to-bottom, infrastructure supports the entire stack.</p>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Tool Landscape — Category Reference</h3>
+        <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm mb-6">
+          <table>
+            <thead>
+              <tr>
+                <th>Category</th>
+                <th>Open Source Tools</th>
+                <th>Managed Services</th>
+                <th>Primary Use Case</th>
+                <th>When to Choose Open Source</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="font-medium">Experiment Tracking</td>
+                <td>MLflow, DVC</td>
+                <td>Weights &amp; Biases, Neptune.ai, CometML</td>
+                <td>Log metrics, params, artifacts per run</td>
+                <td>Small team, cost sensitive, self-hosted infra</td>
+              </tr>
+              <tr>
+                <td class="font-medium">Pipeline Orchestration</td>
+                <td>Airflow, Prefect, Dagster, Metaflow</td>
+                <td>AWS Step Functions, Google Cloud Workflows, Azure ML Pipelines</td>
+                <td>Schedule and coordinate multi-step ML workflows</td>
+                <td>Complex dependencies, custom operators needed</td>
+              </tr>
+              <tr>
+                <td class="font-medium">Model Registry</td>
+                <td>MLflow Model Registry</td>
+                <td>SageMaker Model Registry, Vertex AI Model Registry, Hugging Face Hub</td>
+                <td>Version, stage, and govern model artifacts</td>
+                <td>Already using MLflow, cost and privacy concerns</td>
+              </tr>
+              <tr>
+                <td class="font-medium">Feature Store</td>
+                <td>Feast, Hopsworks (OSS tier)</td>
+                <td>Tecton, SageMaker Feature Store, Vertex AI Feature Store</td>
+                <td>Consistent features for training and serving</td>
+                <td>Budget constraints, data privacy requirements</td>
+              </tr>
+              <tr>
+                <td class="font-medium">Model Serving</td>
+                <td>Triton Inference Server, BentoML, TorchServe, Ray Serve</td>
+                <td>SageMaker Endpoints, Vertex AI Endpoints, Azure ML Endpoints</td>
+                <td>REST/gRPC inference endpoints at scale</td>
+                <td>High-performance GPU serving, multi-model batching</td>
+              </tr>
+              <tr>
+                <td class="font-medium">Model Monitoring</td>
+                <td>Evidently AI, NannyML, WhyLogs</td>
+                <td>Arize AI, Fiddler AI, Arthur AI, Aporia</td>
+                <td>Detect data drift, performance degradation</td>
+                <td>Regulatory requirements for explainability logs</td>
+              </tr>
+              <tr>
+                <td class="font-medium">Data Versioning</td>
+                <td>DVC, LakeFS, Delta Lake</td>
+                <td>Weights &amp; Biases Artifacts, Pachyderm</td>
+                <td>Version datasets alongside model experiments</td>
+                <td>Git-like data workflows, large file tracking</td>
+              </tr>
+              <tr>
+                <td class="font-medium">Container Orchestration</td>
+                <td>Kubernetes (+ KServe, Seldon)</td>
+                <td>EKS, GKE, AKS</td>
+                <td>Run training jobs and serving pods at scale</td>
+                <td>Almost always — managed K8s reduces ops burden</td>
+              </tr>
+              <tr>
+                <td class="font-medium">LLM Infrastructure</td>
+                <td>vLLM, Ollama, LiteLLM, Langfuse</td>
+                <td>OpenAI API, Anthropic API, Bedrock, Vertex AI Generative</td>
+                <td>Host, route, and monitor LLM workloads</td>
+                <td>Custom models, data privacy, latency control</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout-info rounded-lg p-5 mb-6">
+          <p class="text-sm font-bold text-blue-800 mb-1">The "Best Tool" Question</p>
+          <p class="text-sm text-blue-900">Engineers constantly ask: "which tool should I use?" The honest answer: <strong>it depends on your constraints</strong>. Startups should default to managed services (SageMaker, Vertex AI) to minimize operational overhead. Enterprises with data privacy requirements often need self-hosted open source. The most important principle: <strong>pick the boring, well-supported option</strong>. The MLOps ecosystem has many exciting new tools that will not exist in two years.</p>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">A Minimal Production MLOps Stack (Pragmatic Starting Point)</h3>
+        <pre><code class="language-yaml"># docker-compose.yml — Minimal MLOps stack for a small team
+# Provides: experiment tracking, artifact storage, model registry, basic serving
+
+version: "3.8"
+
+services:
+  # MLflow — experiment tracking + model registry
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:v2.10.0
+    ports:
+      - "5000:5000"
+    command: >
+      mlflow server
+        --backend-store-uri postgresql://mlflow:password@db/mlflow
+        --default-artifact-root s3://your-mlflow-artifacts/
+        --host 0.0.0.0
+    environment:
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+    depends_on:
+      - db
+
+  # PostgreSQL — MLflow backend store
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: mlflow
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: mlflow
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # Prefect — pipeline orchestration
+  prefect:
+    image: prefecthq/prefect:2-latest
+    ports:
+      - "4200:4200"
+    command: prefect server start
+    environment:
+      - PREFECT_API_URL=http://localhost:4200/api
+
+  # Evidently — model monitoring dashboard
+  evidently:
+    image: evidently/evidently-service:latest
+    ports:
+      - "8085:8085"
+
+volumes:
+  postgres_data:
+</code></pre>
+      </section>
+
+      <!-- ===== SECTION 5 ===== -->
+      <section id="s5" class="section-anchor">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="w-8 h-8 bg-blue-600 text-white rounded-lg flex items-center justify-center font-bold text-sm">5</span>
+          <h2 class="text-2xl font-bold text-gray-900">Core MLOps Principles</h2>
+        </div>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          Principles matter more than tools. Tools change every year; principles remain stable for decades. These five principles should govern every decision you make as an MLOps engineer. When you are unsure what to build or how to prioritize, come back to these.
+        </p>
+
+        <div class="space-y-6 mb-6">
+
+          <!-- Principle 1 -->
+          <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            <div class="bg-blue-600 px-6 py-3 flex items-center gap-3">
+              <span class="text-white font-bold text-xl">1</span>
+              <h3 class="text-white font-semibold text-lg">Reproducibility — Version Everything</h3>
+            </div>
+            <div class="p-6">
+              <p class="text-gray-700 text-sm mb-4">A production ML system has four axes of versioning: <strong>data</strong> (what was the training set?), <strong>code</strong> (what training code produced this?), <strong>environment</strong> (what Python/CUDA/library versions?), and <strong>model</strong> (what artifact was actually deployed?). Missing any one axis means you cannot reproduce or debug your production model.</p>
+              <pre><code class="language-python"># The four axes of reproducibility — tracked together
+import mlflow
+
+with mlflow.start_run() as run:
+    # 1. Data version
+    mlflow.log_param("dataset_version", "v2024-03-15-sha256abc")
+    mlflow.log_param("dataset_size", 1_500_000)
+
+    # 2. Code version (auto-captured from git)
+    # mlflow automatically logs git commit hash
+
+    # 3. Environment
+    mlflow.log_artifact("requirements.txt")
+    mlflow.log_param("python_version", "3.11.7")
+    mlflow.log_param("cuda_version", "12.1")
+
+    # 4. Model artifact
+    mlflow.sklearn.log_model(
+        model,
+        "model",
+        registered_model_name="fraud-detection-v3"
+    )
+    print(f"Run ID for full lineage: {run.info.run_id}")
+</code></pre>
+            </div>
+          </div>
+
+          <!-- Principle 2 -->
+          <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            <div class="bg-green-600 px-6 py-3 flex items-center gap-3">
+              <span class="text-white font-bold text-xl">2</span>
+              <h3 class="text-white font-semibold text-lg">Automation — Eliminate Manual Toil</h3>
+            </div>
+            <div class="p-6">
+              <p class="text-gray-700 text-sm mb-4">If a data scientist runs the same sequence of steps more than twice, it should be a pipeline. If a deployment requires a human to click buttons or SSH into a server, it should be automated. <strong>Toil is technical debt that compounds</strong>: as your model portfolio grows, manual processes scale linearly while automated ones scale sublinearly. The goal is not to replace humans — it is to redirect human judgment to where it creates value (problem framing, evaluation, architecture decisions).</p>
+              <div class="callout-info rounded p-3 text-xs">
+                <strong>SRE definition of toil</strong> (Google SRE Book): work that is manual, repetitive, automatable, tactical, and scales linearly with service growth. ML training runs, deployment steps, and monitoring reviews are all toil candidates.
+              </div>
+            </div>
+          </div>
+
+          <!-- Principle 3 -->
+          <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            <div class="bg-amber-500 px-6 py-3 flex items-center gap-3">
+              <span class="text-white font-bold text-xl">3</span>
+              <h3 class="text-white font-semibold text-lg">Continuous Training — Models Degrade, Data Drifts</h3>
+            </div>
+            <div class="p-6">
+              <p class="text-gray-700 text-sm mb-4">Unlike traditional software, an ML model deployed today will be less accurate in 6 months without any code changes. The world changes; your training data doesn't. Continuous training is the practice of <em>regularly retraining</em> models on fresh data, either on a schedule or triggered by drift detection. The key insight: <strong>model freshness is a feature, not an operational detail</strong>.</p>
+              <p class="text-gray-700 text-sm">Common retraining triggers: (a) time-based (every week/month), (b) data volume-based (after N new labeled examples), (c) drift-based (when PSI or KL divergence exceeds threshold), (d) performance-based (when evaluation metrics fall below SLA).</p>
+            </div>
+          </div>
+
+          <!-- Principle 4 -->
+          <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            <div class="bg-purple-600 px-6 py-3 flex items-center gap-3">
+              <span class="text-white font-bold text-xl">4</span>
+              <h3 class="text-white font-semibold text-lg">Monitoring-First — You Can't Improve What You Don't Measure</h3>
+            </div>
+            <div class="p-6">
+              <p class="text-gray-700 text-sm mb-4">Monitoring is not an afterthought you add after the model is in production. It must be designed before deployment. The monitoring plan answers: (a) what business metrics does this model affect?, (b) what are the leading indicators of degradation?, (c) what are the alerting thresholds?, (d) who gets paged at 2am?</p>
+              <p class="text-gray-700 text-sm">The monitoring stack for ML has three layers: <strong>infrastructure monitoring</strong> (Prometheus/Grafana — latency, throughput, error rate), <strong>model monitoring</strong> (prediction drift, feature drift, data quality), and <strong>business monitoring</strong> (conversion rate, revenue impact, downstream KPIs).</p>
+            </div>
+          </div>
+
+          <!-- Principle 5 -->
+          <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            <div class="bg-red-600 px-6 py-3 flex items-center gap-3">
+              <span class="text-white font-bold text-xl">5</span>
+              <h3 class="text-white font-semibold text-lg">Treat ML Models as Software Artifacts</h3>
+            </div>
+            <div class="p-6">
+              <p class="text-gray-700 text-sm mb-4">Models are not magic black boxes delivered by data scientists — they are <strong>versioned, tested, deployed, and retired software artifacts</strong> with full lifecycle governance. This means: models have owners, models have SLAs, models have deprecation policies, models go through staging before production, and models are rolled back when they fail.</p>
+              <p class="text-gray-700 text-sm">The practical implication: use a model registry (not a shared file system), define evaluation gates before promotion, write model cards documenting intended use and known limitations, and maintain a model inventory the same way you maintain a service inventory.</p>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ===== SECTION 6 ===== -->
+      <section id="s6" class="section-anchor">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="w-8 h-8 bg-blue-600 text-white rounded-lg flex items-center justify-center font-bold text-sm">6</span>
+          <h2 class="text-2xl font-bold text-gray-900">The ML Project Lifecycle</h2>
+        </div>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          A production ML project is not a one-time build — it is a continuously operating system. Understanding the full lifecycle helps you plan infrastructure, anticipate failure modes, and define ownership boundaries before they become political problems.
+        </p>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">End-to-End ML Project Flow</h3>
+        <div class="bg-white rounded-xl border border-gray-200 p-6 mb-6 shadow-sm">
+          <div class="mermaid">
+flowchart LR
+    A([Business\nProblem]) --> B[Data\nDiscovery]
+    B --> C[Experimentation\n& EDA]
+    C --> D[Model\nTraining]
+    D --> E{Evaluation\nGate}
+    E -- Fails --> C
+    E -- Passes --> F[Staging\nDeployment]
+    F --> G{Canary\nTest}
+    G -- Fails --> H[Rollback &\nDiagnosis]
+    H --> C
+    G -- Passes --> I[Production\nDeployment]
+    I --> J[Monitoring\n& Alerting]
+    J --> K{Drift\nDetected?}
+    K -- Yes --> L[Retraining\nTrigger]
+    K -- No --> J
+    L --> D
+
+    style A fill:#1f2937,color:#fff,stroke:#374151
+    style E fill:#d97706,color:#fff,stroke:#b45309
+    style G fill:#d97706,color:#fff,stroke:#b45309
+    style K fill:#d97706,color:#fff,stroke:#b45309
+    style I fill:#059669,color:#fff,stroke:#047857
+    style H fill:#dc2626,color:#fff,stroke:#b91c1c
+          </div>
+          <p class="text-sm text-gray-500 text-center mt-3">Figure 3: End-to-end ML project lifecycle — note the two feedback loops (experimentation and retraining).</p>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Phase Descriptions</h3>
+        <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm mb-6">
+          <table>
+            <thead>
+              <tr>
+                <th>Phase</th>
+                <th>Key Activities</th>
+                <th>Primary Owner</th>
+                <th>Key Outputs</th>
+                <th>Common Pitfalls</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="font-medium">Data Discovery</td>
+                <td>Data audit, schema review, lineage mapping, quality assessment</td>
+                <td>Data Engineer</td>
+                <td>Data dictionary, quality report, access grants</td>
+                <td>Skipping this phase and discovering data problems in training</td>
+              </tr>
+              <tr>
+                <td class="font-medium">Experimentation</td>
+                <td>EDA, feature engineering, model selection, HPO</td>
+                <td>ML Engineer / Data Scientist</td>
+                <td>Experiment logs, baseline model, feature importance analysis</td>
+                <td>Overfitting on test set; no tracking of experiments</td>
+              </tr>
+              <tr>
+                <td class="font-medium">Training Pipeline</td>
+                <td>Productionize preprocessing, training code, evaluation harness</td>
+                <td>ML Engineer + MLOps Engineer</td>
+                <td>Versioned pipeline code, registered model, eval report</td>
+                <td>Training/serving skew introduced here</td>
+              </tr>
+              <tr>
+                <td class="font-medium">Evaluation Gate</td>
+                <td>Offline evaluation vs. baseline, bias/fairness audit, performance SLA check</td>
+                <td>ML Engineer + Product</td>
+                <td>Go/no-go decision, evaluation card</td>
+                <td>No baseline; evaluation set leaked into training</td>
+              </tr>
+              <tr>
+                <td class="font-medium">Staging Deploy</td>
+                <td>Container build, integration test, shadow mode traffic, load test</td>
+                <td>MLOps Engineer</td>
+                <td>Serving container, performance benchmark, integration test results</td>
+                <td>Testing on too little traffic to detect issues</td>
+              </tr>
+              <tr>
+                <td class="font-medium">Production Deploy</td>
+                <td>Canary rollout (5% → 20% → 100%), monitoring setup, runbook creation</td>
+                <td>MLOps Engineer + SRE</td>
+                <td>Live model endpoint, dashboards, on-call runbook</td>
+                <td>No rollback plan; monitoring not set up before launch</td>
+              </tr>
+              <tr>
+                <td class="font-medium">Monitoring</td>
+                <td>Data drift, prediction drift, business KPI tracking, alerting</td>
+                <td>MLOps Engineer</td>
+                <td>Dashboards, drift reports, incident tickets</td>
+                <td>Monitoring only infra metrics, missing model-level drift</td>
+              </tr>
+              <tr>
+                <td class="font-medium">Retraining</td>
+                <td>Fresh data ingestion, pipeline re-run, evaluation, conditional promotion</td>
+                <td>MLOps Engineer</td>
+                <td>Updated model version, regression test results</td>
+                <td>Retraining without checking if the new model is better</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">RACI Matrix — Typical ML Project</h3>
+        <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm mb-6">
+          <table>
+            <thead>
+              <tr>
+                <th>Activity</th>
+                <th>Data Engineer</th>
+                <th>Data Scientist</th>
+                <th>ML Engineer</th>
+                <th>MLOps Engineer</th>
+                <th>Platform Engineer</th>
+                <th>Product Manager</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td class="font-medium">Business requirements</td><td>I</td><td>C</td><td>C</td><td>I</td><td>I</td><td class="bg-blue-50 font-bold text-blue-700">R/A</td></tr>
+              <tr><td class="font-medium">Data pipeline build</td><td class="bg-blue-50 font-bold text-blue-700">R/A</td><td>C</td><td>C</td><td>C</td><td>I</td><td>I</td></tr>
+              <tr><td class="font-medium">EDA &amp; feature eng.</td><td>C</td><td class="bg-blue-50 font-bold text-blue-700">R/A</td><td>C</td><td>I</td><td>I</td><td>I</td></tr>
+              <tr><td class="font-medium">Model architecture</td><td>I</td><td class="bg-blue-50 font-bold text-blue-700">R/A</td><td>C</td><td>I</td><td>I</td><td>C</td></tr>
+              <tr><td class="font-medium">Training pipeline code</td><td>C</td><td>C</td><td class="bg-blue-50 font-bold text-blue-700">R/A</td><td>C</td><td>I</td><td>I</td></tr>
+              <tr><td class="font-medium">Offline evaluation</td><td>I</td><td class="bg-blue-50 font-bold text-blue-700">R/A</td><td>C</td><td>C</td><td>I</td><td>C</td></tr>
+              <tr><td class="font-medium">Serving infrastructure</td><td>I</td><td>I</td><td>C</td><td class="bg-blue-50 font-bold text-blue-700">R/A</td><td>C</td><td>I</td></tr>
+              <tr><td class="font-medium">Deployment pipeline</td><td>I</td><td>I</td><td>C</td><td class="bg-blue-50 font-bold text-blue-700">R/A</td><td>C</td><td>I</td></tr>
+              <tr><td class="font-medium">Production monitoring</td><td>I</td><td>C</td><td>C</td><td class="bg-blue-50 font-bold text-blue-700">R/A</td><td>C</td><td>C</td></tr>
+              <tr><td class="font-medium">GPU cluster / platform</td><td>I</td><td>I</td><td>I</td><td>C</td><td class="bg-blue-50 font-bold text-blue-700">R/A</td><td>I</td></tr>
+              <tr><td class="font-medium">Business metrics</td><td>I</td><td>C</td><td>C</td><td>C</td><td>I</td><td class="bg-blue-50 font-bold text-blue-700">R/A</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-xs text-gray-500 mb-6">R = Responsible, A = Accountable, C = Consulted, I = Informed. R/A = single owner (ideal).</p>
+      </section>
+
+      <!-- ===== SECTION 7 ===== -->
+      <section id="s7" class="section-anchor">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="w-8 h-8 bg-blue-600 text-white rounded-lg flex items-center justify-center font-bold text-sm">7</span>
+          <h2 class="text-2xl font-bold text-gray-900">LLM Era Changes to MLOps</h2>
+        </div>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          The release of GPT-3 (2020), ChatGPT (2022), and the subsequent explosion of open-weight models (LLaMA, Mistral, Falcon) fundamentally changed the MLOps landscape. Traditional MLOps assumed you <em>train a model from scratch on tabular or structured data</em>. LLMs introduced a new paradigm: <em>adapt a foundation model to your task</em>. This changes the operational problem at every layer of the stack.
+        </p>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Traditional ML vs. LLM-Era Operational Differences</h3>
+        <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm mb-6">
+          <table>
+            <thead>
+              <tr>
+                <th>Operational Dimension</th>
+                <th>Traditional ML (pre-2022)</th>
+                <th>LLM Era (2022–present)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td class="font-medium">Training compute</td><td>Single GPU hours to days</td><td>Thousands of GPUs for weeks/months (pretraining)</td></tr>
+              <tr><td class="font-medium">Model adaptation</td><td>Retrain from scratch or fine-tune on task data</td><td>Prompt engineering → RAG → fine-tuning → pretraining (cost ladder)</td></tr>
+              <tr><td class="font-medium">Evaluation</td><td>Deterministic metrics (AUROC, RMSE, F1)</td><td>Human eval, LLM-as-judge, semantic similarity, alignment checks</td></tr>
+              <tr><td class="font-medium">Inference cost</td><td>Microseconds per prediction</td><td>Seconds per generation; token cost dominates opex</td></tr>
+              <tr><td class="font-medium">Failure modes</td><td>Silent degradation, data drift</td><td>Hallucination, prompt injection, jailbreak, alignment failures</td></tr>
+              <tr><td class="font-medium">Versioning unit</td><td>Model weights + preprocessing code</td><td>Base model + adapters (LoRA) + system prompt + retrieval index</td></tr>
+              <tr><td class="font-medium">Safety/compliance</td><td>Bias audits, fairness metrics</td><td>+ Harmful output filtering, PII leakage, constitutional AI checks</td></tr>
+              <tr><td class="font-medium">Serving infrastructure</td><td>Standard CPU/GPU endpoints</td><td>KV cache management, tensor parallelism, speculative decoding</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">The Adaptation Decision Tree</h3>
+        <div class="bg-white rounded-xl border border-gray-200 p-6 mb-6 shadow-sm">
+          <div class="mermaid">
+flowchart TD
+    START([I need an LLM\nfor my use case]) --> Q1{Is the task achievable\nwith prompt engineering\nalone?}
+    Q1 -- Yes --> PE[Use Prompting\nCheapest, fastest, no infra]
+    Q1 -- No --> Q2{Does my use case\nrequire up-to-date\nor proprietary data?}
+    Q2 -- Yes --> Q3{Is context window\nsize sufficient?}
+    Q3 -- Yes --> LC[Long Context /\nIn-Context Learning]
+    Q3 -- No --> RAG[Implement RAG\nVector DB + Retrieval]
+    Q2 -- No --> Q4{Do I need the model\nto learn new behaviors\nor styles?}
+    Q4 -- Yes --> Q5{Do I have &gt;10k\nlabeled examples?}
+    Q5 -- Yes --> FT[Fine-tune with\nLoRA / QLoRA]
+    Q5 -- No --> SYNTH[Generate synthetic\ndata then fine-tune]
+    Q4 -- No --> Q6{Do I need full\ncontrol / privacy?}
+    Q6 -- Yes --> OSS[Deploy open-weight\nmodel (LLaMA, Mistral)]
+    Q6 -- No --> API[Use API\n(OpenAI, Anthropic, Gemini)]
+
+    style PE fill:#059669,color:#fff
+    style RAG fill:#2563eb,color:#fff
+    style FT fill:#7c3aed,color:#fff
+    style API fill:#d97706,color:#fff
+    style OSS fill:#dc2626,color:#fff
+    style LC fill:#0891b2,color:#fff
+          </div>
+          <p class="text-sm text-gray-500 text-center mt-3">Figure 4: LLM adaptation decision tree — start with the cheapest option and escalate only when needed.</p>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">The New MLOps Stack for LLM Applications</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+            <h4 class="font-bold text-gray-800 mb-3">LLM Infrastructure Layer</h4>
+            <ul class="text-sm text-gray-600 space-y-2">
+              <li><strong>Inference engines:</strong> vLLM, TGI (Text Generation Inference), Ollama (local)</li>
+              <li><strong>Model hosting:</strong> Replicate, Modal, Together AI, Hugging Face Inference Endpoints</li>
+              <li><strong>Serving optimization:</strong> Continuous batching, PagedAttention, speculative decoding</li>
+              <li><strong>Multi-model routing:</strong> LiteLLM, OpenRouter</li>
+            </ul>
+          </div>
+          <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+            <h4 class="font-bold text-gray-800 mb-3">RAG &amp; Context Management</h4>
+            <ul class="text-sm text-gray-600 space-y-2">
+              <li><strong>Vector databases:</strong> Weaviate, Qdrant, Pinecone, pgvector</li>
+              <li><strong>Embedding models:</strong> text-embedding-3-large, BGE, E5</li>
+              <li><strong>RAG frameworks:</strong> LangChain, LlamaIndex, Haystack</li>
+              <li><strong>Context evaluation:</strong> RAGAS, TruLens, DeepEval</li>
+            </ul>
+          </div>
+          <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+            <h4 class="font-bold text-gray-800 mb-3">LLM Observability</h4>
+            <ul class="text-sm text-gray-600 space-y-2">
+              <li><strong>Tracing:</strong> Langfuse, Phoenix (Arize), Helicone, LangSmith</li>
+              <li><strong>Evaluation:</strong> LLM-as-judge patterns, human annotation pipelines</li>
+              <li><strong>Cost tracking:</strong> Token usage, cost per request, model comparison</li>
+              <li><strong>Safety monitoring:</strong> Guardrails AI, LlamaGuard, Azure Content Safety</li>
+            </ul>
+          </div>
+          <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+            <h4 class="font-bold text-gray-800 mb-3">Fine-tuning &amp; Alignment</h4>
+            <ul class="text-sm text-gray-600 space-y-2">
+              <li><strong>PEFT methods:</strong> LoRA, QLoRA, IA3, prefix tuning</li>
+              <li><strong>Frameworks:</strong> Hugging Face PEFT + TRL, Axolotl, LLaMA-Factory</li>
+              <li><strong>Alignment:</strong> RLHF, DPO, ORPO (Direct Preference Optimization)</li>
+              <li><strong>Evaluation:</strong> MMLU, HellaSwag, task-specific evals, MT-Bench</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="callout-warning rounded-lg p-5">
+          <p class="text-sm font-bold text-amber-800 mb-1">LLM Ops is Still MLOps</p>
+          <p class="text-sm text-amber-900">Despite all the new terminology, <strong>LLM applications still need all the same MLOps fundamentals</strong>: versioning (prompts, RAG indexes, fine-tuned adapters), monitoring (hallucination rate, latency, cost), evaluation gates (before deploying prompt changes), and feedback loops (collecting user corrections). The tooling changed; the principles did not. Do not let LLM hype lead you to skip operational fundamentals.</p>
+        </div>
+      </section>
+
+      <!-- ===== SECTION 8 ===== -->
+      <section id="s8" class="section-anchor">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="w-8 h-8 bg-blue-600 text-white rounded-lg flex items-center justify-center font-bold text-sm">8</span>
+          <h2 class="text-2xl font-bold text-gray-900">Career Paths in MLOps</h2>
+        </div>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          The ML infrastructure space has created several distinct career tracks, each with different skill emphases and compensation profiles. Understanding these tracks helps you make deliberate choices about where to invest your learning time.
+        </p>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Role Comparison</h3>
+        <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm mb-6">
+          <table>
+            <thead>
+              <tr>
+                <th>Dimension</th>
+                <th>ML Engineer</th>
+                <th>MLOps Engineer</th>
+                <th>Platform Engineer (ML Infra)</th>
+                <th>Data Scientist</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="font-medium">Primary focus</td>
+                <td>Building and training models</td>
+                <td>Deploying and operating models</td>
+                <td>Building the ML platform itself</td>
+                <td>Analysis, experiments, insights</td>
+              </tr>
+              <tr>
+                <td class="font-medium">Core artifacts</td>
+                <td>Training pipelines, model code</td>
+                <td>Deployment pipelines, serving infra</td>
+                <td>Feature stores, model registries, compute clusters</td>
+                <td>Notebooks, reports, models (exploratory)</td>
+              </tr>
+              <tr>
+                <td class="font-medium">Key skills</td>
+                <td>PyTorch/TF, statistics, distributed training</td>
+                <td>Kubernetes, Docker, CI/CD, monitoring</td>
+                <td>Distributed systems, Kubernetes internals, platform design</td>
+                <td>Statistics, SQL, Python, domain expertise</td>
+              </tr>
+              <tr>
+                <td class="font-medium">SW engineering depth</td>
+                <td>High</td>
+                <td>High</td>
+                <td>Very High</td>
+                <td>Medium</td>
+              </tr>
+              <tr>
+                <td class="font-medium">ML depth</td>
+                <td>Very High</td>
+                <td>Medium</td>
+                <td>Low-Medium</td>
+                <td>High</td>
+              </tr>
+              <tr>
+                <td class="font-medium">Infra depth</td>
+                <td>Medium</td>
+                <td>High</td>
+                <td>Very High</td>
+                <td>Low</td>
+              </tr>
+              <tr>
+                <td class="font-medium">US salary range (2025)</td>
+                <td>$160K–$280K</td>
+                <td>$150K–$260K</td>
+                <td>$170K–$320K</td>
+                <td>$120K–$220K</td>
+              </tr>
+              <tr>
+                <td class="font-medium">Job market demand</td>
+                <td>Very High</td>
+                <td>High (growing fast)</td>
+                <td>High (concentrated at large companies)</td>
+                <td>High</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Skills Matrix — MLOps Engineer Path</h3>
+        <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm mb-6">
+          <table>
+            <thead>
+              <tr>
+                <th>Skill Domain</th>
+                <th>Junior (0–2 yrs)</th>
+                <th>Mid (2–5 yrs)</th>
+                <th>Senior (5–8 yrs)</th>
+                <th>Staff/Architect (8+ yrs)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="font-medium">Python &amp; ML Libraries</td>
+                <td>Proficient (scikit-learn, pandas)</td>
+                <td>Advanced (PyTorch, custom pipelines)</td>
+                <td>Expert (distributed training, custom ops)</td>
+                <td>Strategic (architecture decisions across orgs)</td>
+              </tr>
+              <tr>
+                <td class="font-medium">Containerization</td>
+                <td>Docker basics</td>
+                <td>Docker Compose, Kubernetes basics</td>
+                <td>K8s operator patterns, Helm, service mesh</td>
+                <td>Platform design, multi-cluster, cost optimization</td>
+              </tr>
+              <tr>
+                <td class="font-medium">CI/CD &amp; Automation</td>
+                <td>GitHub Actions basics</td>
+                <td>Full ML CI/CD pipelines</td>
+                <td>GitOps, Argo CD, deployment strategies</td>
+                <td>Organizational CI/CD standards, governance</td>
+              </tr>
+              <tr>
+                <td class="font-medium">Cloud Platforms</td>
+                <td>One cloud, managed services</td>
+                <td>Two clouds, IaC (Terraform)</td>
+                <td>Multi-cloud, cost optimization, landing zones</td>
+                <td>Cloud strategy, vendor negotiation</td>
+              </tr>
+              <tr>
+                <td class="font-medium">Monitoring &amp; Observability</td>
+                <td>Prometheus/Grafana basics</td>
+                <td>ML monitoring (drift detection)</td>
+                <td>Full observability stack, alerting design</td>
+                <td>Observability platform ownership</td>
+              </tr>
+              <tr>
+                <td class="font-medium">Feature Engineering</td>
+                <td>Basic transformations</td>
+                <td>Feature pipeline design</td>
+                <td>Feature store implementation</td>
+                <td>Feature platform architecture</td>
+              </tr>
+              <tr>
+                <td class="font-medium">Systems Design</td>
+                <td>Component-level design</td>
+                <td>Service-level design</td>
+                <td>System-level design (platform components)</td>
+                <td>Organizational ML platform strategy</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">How This Course Maps to Career Progression</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div class="bg-blue-50 border border-blue-200 rounded-xl p-4">
+            <h4 class="font-bold text-blue-900 mb-2">Chapters 1–4: Foundations</h4>
+            <p class="text-sm text-blue-800">MLOps overview, experiment tracking with MLflow, data versioning with DVC, containerization with Docker. Skills for: junior ML engineer, junior MLOps engineer.</p>
+          </div>
+          <div class="bg-purple-50 border border-purple-200 rounded-xl p-4">
+            <h4 class="font-bold text-purple-900 mb-2">Chapters 5–8: Production Systems</h4>
+            <p class="text-sm text-purple-800">Kubernetes for ML, pipeline orchestration, model serving at scale, CI/CD for models. Skills for: mid-level ML engineer, MLOps engineer.</p>
+          </div>
+          <div class="bg-green-50 border border-green-200 rounded-xl p-4">
+            <h4 class="font-bold text-green-900 mb-2">Chapters 9–12: Platform Engineering</h4>
+            <p class="text-sm text-green-800">Feature stores, monitoring platforms, LLM infrastructure, platform architecture. Skills for: senior / staff MLOps engineer, ML platform architect.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== SECTION 9 ===== -->
+      <section id="s9" class="section-anchor">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="w-8 h-8 bg-blue-600 text-white rounded-lg flex items-center justify-center font-bold text-sm">9</span>
+          <h2 class="text-2xl font-bold text-gray-900">Setting Up Your Learning Environment</h2>
+        </div>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          Before Chapter 2, you need a working local environment and cloud accounts. The setup below is opinionated — we have chosen tools that are used in production at scale, not toy tools. Every choice here will appear in later chapters.
+        </p>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Required Local Tools</h3>
+        <pre><code class="language-bash">#!/bin/bash
+# Environment setup script — macOS / Linux
+# Run once before starting the course
+
+# --- Python ---
+# Use pyenv for Python version management
+curl https://pyenv.run | bash
+pyenv install 3.11.9
+pyenv global 3.11.9
+
+# Verify
+python --version  # Should print: Python 3.11.9
+
+# --- Core ML Libraries ---
+pip install \
+  mlflow==2.12.0 \
+  dvc[s3]==3.50.0 \
+  scikit-learn==1.4.2 \
+  torch==2.3.0 \
+  pandas==2.2.2 \
+  prefect==3.0.0 \
+  evidently==0.4.30
+
+# --- Docker ---
+# macOS: install Docker Desktop from https://docker.com/products/docker-desktop
+# Linux:
+curl -fsSL https://get.docker.com | sh
+docker --version  # Should print: Docker version 26.x.x
+
+# --- kubectl & Kubernetes tools ---
+brew install kubectl        # or: snap install kubectl --classic (Linux)
+brew install kubectx        # context switching
+brew install k9s            # terminal UI for K8s
+
+# Install kind (local K8s cluster)
+brew install kind
+kind create cluster --name mlops-lab
+
+# --- Terraform (Infrastructure as Code) ---
+brew install terraform
+terraform --version  # Should print: Terraform v1.8.x
+
+# --- Helm (Kubernetes package manager) ---
+brew install helm
+helm version  # Should print: version.BuildInfo{Version:"v3.x"}
+
+# --- Additional CLIs ---
+brew install awscli           # AWS
+pip install google-cloud-sdk  # GCP
+brew install azure-cli        # Azure
+
+# Verify cluster is running
+kubectl get nodes
+# NAME                      STATUS   ROLES           AGE   VERSION
+# mlops-lab-control-plane   Ready    control-plane   1m    v1.29.x
+</code></pre>
+
+        <h3 class="text-xl font-semibold text-gray-800 mt-8 mb-4">Cloud Accounts Setup</h3>
+        <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm mb-6">
+          <table>
+            <thead>
+              <tr>
+                <th>Cloud Provider</th>
+                <th>Free Tier Highlights</th>
+                <th>Services We'll Use</th>
+                <th>Estimated Monthly Cost (labs)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="font-medium">AWS (primary)</td>
+                <td>12-month free: t2.micro EC2, 5GB S3, 1M Lambda calls</td>
+                <td>S3 (artifact store), ECR (containers), SageMaker, EKS</td>
+                <td>$10–30/mo if free tier is exhausted</td>
+              </tr>
+              <tr>
+                <td class="font-medium">GCP (secondary)</td>
+                <td>$300 credits (90 days); always-free: 1 f1-micro VM, 5GB GCS</td>
+                <td>GCS (storage), Vertex AI, GKE, BigQuery</td>
+                <td>$0 with credits; $5–15/mo after</td>
+              </tr>
+              <tr>
+                <td class="font-medium">Azure (optional)</td>
+                <td>$200 credits (30 days); many always-free tiers</td>
+                <td>Azure ML, AKS, Azure Container Registry</td>
+                <td>$0 with credits</td>
+              </tr>
+              <tr>
+                <td class="font-medium">Hugging Face (required)</td>
+                <td>Free tier: model hosting, Spaces, private repos</td>
+                <td>Model download, fine-tuned model hosting, Spaces demos</td>
+                <td>Free for course purposes</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout-warning rounded-lg p-5 mb-6">
+          <p class="text-sm font-bold text-amber-800 mb-1">Cloud Cost Warning</p>
+          <p class="text-sm text-amber-900">GPU instances are expensive. A p3.2xlarge on AWS costs ~$3.06/hour. Always set up billing alerts and use spot/preemptible instances for training labs. Each chapter will clearly mark when a lab requires GPU compute and provide a CPU fallback. We recommend setting a $50/month hard limit on cloud accounts during this course.</p>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Repository Setup</h3>
+        <pre><code class="language-bash"># Clone the course repository
+git clone https://github.com/mlops-tutorial/course-labs.git
+cd course-labs
+
+# Set up Python virtual environment
+python -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
+
+# Install all course dependencies
+pip install -r requirements.txt
+
+# Set up pre-commit hooks (enforced in all labs)
+pip install pre-commit
+pre-commit install
+
+# Verify setup
+python -c "import mlflow, torch, sklearn; print('Setup OK')"
+# Expected: Setup OK
+
+# Start local MLflow server
+mlflow server \
+  --backend-store-uri sqlite:///mlflow.db \
+  --default-artifact-root ./mlruns \
+  --port 5000 &
+
+# Open browser to http://localhost:5000
+echo "MLflow UI available at http://localhost:5000"
+</code></pre>
+
+        <h3 class="text-xl font-semibold text-gray-800 mt-8 mb-4">Recommended Hardware</h3>
+        <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm mb-6">
+          <table>
+            <thead>
+              <tr>
+                <th>Component</th>
+                <th>Minimum</th>
+                <th>Recommended</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td class="font-medium">RAM</td><td>16 GB</td><td>32 GB</td><td>Kubernetes + Docker + ML models is memory-hungry</td></tr>
+              <tr><td class="font-medium">CPU</td><td>4 cores (Intel/AMD)</td><td>8+ cores (Apple M2/M3 also excellent)</td><td>Apple Silicon runs most PyTorch workloads via MPS backend</td></tr>
+              <tr><td class="font-medium">Storage</td><td>50 GB free</td><td>200 GB SSD</td><td>Docker images, datasets, and model checkpoints accumulate fast</td></tr>
+              <tr><td class="font-medium">GPU (local)</td><td>Not required</td><td>NVIDIA 4060 Ti 16GB or Apple M2 Pro (16GB unified)</td><td>Most labs run on CPU; GPU needed for fine-tuning labs in Ch 10–11</td></tr>
+              <tr><td class="font-medium">OS</td><td>macOS 13+, Ubuntu 22.04+</td><td>macOS 14+ or Ubuntu 24.04</td><td>Windows with WSL2 is supported but less tested</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout-tip rounded-lg p-5">
+          <p class="text-sm font-bold text-green-800 mb-1">No GPU? No Problem for Chapters 1–9</p>
+          <p class="text-sm text-green-900">The first 9 chapters use small datasets and models that run fine on CPU. You will need GPU access (via cloud or local) for Chapters 10–12 which cover LLM fine-tuning. We recommend provisioning a cloud GPU instance for those chapters rather than purchasing dedicated hardware — rental costs are far lower than purchase costs for intermittent use.</p>
+        </div>
+      </section>
+
+      <!-- ===== SUMMARY ===== -->
+      <section id="summary" class="section-anchor">
+        <div class="bg-green-50 border border-green-200 rounded-2xl p-8">
+          <div class="flex items-center gap-3 mb-6">
+            <div class="w-10 h-10 bg-green-600 rounded-xl flex items-center justify-center">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+            <h2 class="text-2xl font-bold text-green-900">Summary &amp; Key Takeaways</h2>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div>
+              <h3 class="font-bold text-green-800 mb-3">What You Learned</h3>
+              <ul class="space-y-2 text-sm text-green-900">
+                <li class="flex items-start gap-2">
+                  <span class="text-green-600 font-bold mt-0.5">1.</span>
+                  <span><strong>MLOps bridges the gap</strong> between research (experimentation) and production (reliability). 85%+ of ML projects fail to reach production due to process failures, not talent failures.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-green-600 font-bold mt-0.5">2.</span>
+                  <span><strong>ML code is the small center</strong> of a production system. The infrastructure surrounding it — data pipelines, feature stores, serving infra, monitoring — is where most complexity and failure lives.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-green-600 font-bold mt-0.5">3.</span>
+                  <span><strong>MLOps maturity is a journey</strong> from manual notebooks (Level 0) through automated pipelines (Level 1), CI/CD (Level 2), to full platform automation with feature stores (Level 3). Don't skip levels.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-green-600 font-bold mt-0.5">4.</span>
+                  <span><strong>The modern MLOps stack</strong> covers five categories: data, training, serving, monitoring, and infrastructure. Choose boring, well-supported tools over exciting new ones.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-green-600 font-bold mt-0.5">5.</span>
+                  <span><strong>Five principles govern everything:</strong> reproducibility, automation, continuous training, monitoring-first, and treating models as software artifacts.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-green-600 font-bold mt-0.5">6.</span>
+                  <span><strong>The LLM era changed the tooling</strong> (RAG, fine-tuning adapters, prompt versioning) but not the principles. LLM applications still need versioning, monitoring, evaluation gates, and feedback loops.</span>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h3 class="font-bold text-green-800 mb-3">Action Items Before Chapter 2</h3>
+              <ul class="space-y-2 text-sm text-green-900">
+                <li class="flex items-start gap-2">
+                  <input type="checkbox" class="mt-1 accent-green-600">
+                  <span>Read Sculley et al., "Hidden Technical Debt in Machine Learning Systems" (2015). Free on Google Scholar.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <input type="checkbox" class="mt-1 accent-green-600">
+                  <span>Install Python 3.11, Docker, kubectl, and kind on your local machine.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <input type="checkbox" class="mt-1 accent-green-600">
+                  <span>Create AWS free tier account and set up billing alerts at $50.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <input type="checkbox" class="mt-1 accent-green-600">
+                  <span>Clone the course repository and verify the setup script runs successfully.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <input type="checkbox" class="mt-1 accent-green-600">
+                  <span>Start a local MLflow server and confirm the UI is accessible at port 5000.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <input type="checkbox" class="mt-1 accent-green-600">
+                  <span>Assess your current organization: which MLOps maturity level are you at? Write it down — you'll revisit this assessment in Chapter 12.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <input type="checkbox" class="mt-1 accent-green-600">
+                  <span>Identify one ML system at your company or in a case study that exhibits at least 3 of the 8 failure modes described in Section 2.</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-xl border border-green-200 p-5">
+            <h3 class="font-bold text-gray-800 mb-3">Key Terms Introduced in This Chapter</h3>
+            <div class="flex flex-wrap gap-2 text-xs">
+              <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded font-medium">MLOps</span>
+              <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded font-medium">DataOps</span>
+              <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded font-medium">Training/Serving Skew</span>
+              <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded font-medium">Data Drift</span>
+              <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded font-medium">Concept Drift</span>
+              <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded font-medium">Technical Debt (ML)</span>
+              <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded font-medium">CACE Principle</span>
+              <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded font-medium">MLOps Maturity Levels</span>
+              <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded font-medium">Feature Store</span>
+              <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded font-medium">Model Registry</span>
+              <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded font-medium">Canary Deployment</span>
+              <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded font-medium">Shadow Mode</span>
+              <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded font-medium">Champion/Challenger</span>
+              <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded font-medium">Reproducibility</span>
+              <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded font-medium">Continuous Training</span>
+              <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded font-medium">RAG</span>
+              <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded font-medium">LoRA / QLoRA</span>
+              <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded font-medium">RACI Matrix</span>
+              <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded font-medium">Pipeline Jungle</span>
+              <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded font-medium">Model Card</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Bottom Navigation -->
+      <div class="flex items-center justify-between pt-8 border-t border-gray-200">
+        <a href="index.html" class="flex items-center gap-2 px-5 py-3 bg-white border border-gray-300 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors shadow-sm">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+          Course Index
+        </a>
+        <div class="text-sm text-gray-500">Chapter 1 of 12</div>
+        <a href="ch02_experiment_tracking.html" class="flex items-center gap-2 px-5 py-3 bg-blue-600 rounded-xl text-sm font-medium text-white hover:bg-blue-700 transition-colors shadow-sm">
+          Chapter 2: Experiment Tracking
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="bg-gray-900 text-gray-400 mt-20 py-12">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div>
+        <div class="flex items-center gap-2 mb-3">
+          <div class="w-7 h-7 bg-blue-600 rounded flex items-center justify-center font-bold text-xs text-white">ML</div>
+          <span class="font-semibold text-white">Modern MLOps Tutorial</span>
+        </div>
+        <p class="text-sm">A comprehensive guide from research to production ML systems, written for engineers targeting staff-level expertise.</p>
+      </div>
+      <div>
+        <h4 class="font-semibold text-white mb-3">Chapters</h4>
+        <ul class="text-sm space-y-1">
+          <li><a href="ch01_introduction.html" class="hover:text-white">Ch 1: Introduction to MLOps</a></li>
+          <li><a href="ch02_experiment_tracking.html" class="hover:text-white">Ch 2: Experiment Tracking</a></li>
+          <li><a href="ch03_data_versioning.html" class="hover:text-white">Ch 3: Data Versioning with DVC</a></li>
+          <li><a href="ch04_containerization.html" class="hover:text-white">Ch 4: Containerization for ML</a></li>
+          <li><span class="text-gray-600">...and 8 more chapters</span></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="font-semibold text-white mb-3">References</h4>
+        <ul class="text-sm space-y-1">
+          <li><a href="https://papers.nips.cc/paper/2015/hash/86df7dcfd896fcaf2674f757a2463eba-Abstract.html" target="_blank" rel="noopener" class="hover:text-white">Sculley et al., Hidden Technical Debt (2015)</a></li>
+          <li><a href="https://cloud.google.com/architecture/mlops-continuous-delivery-and-automation-pipelines-in-machine-learning" target="_blank" rel="noopener" class="hover:text-white">Google MLOps Maturity Model</a></li>
+          <li><a href="https://proceedings.mlsys.org/" target="_blank" rel="noopener" class="hover:text-white">MLSys Conference Proceedings</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="border-t border-gray-800 mt-8 pt-6 text-sm text-center">
+      Modern MLOps Tutorial Series &mdash; Updated April 2026
+    </div>
+  </div>
+</footer>
+
+<!-- TOC active link tracking -->
+<script>
+  const sections = document.querySelectorAll('.section-anchor');
+  const tocLinks = document.querySelectorAll('.toc-link');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => {
+          link.classList.remove('active');
+          if (link.getAttribute('href') === '#' + entry.target.id) {
+            link.classList.add('active');
+          }
+        });
+      }
+    });
+  }, { rootMargin: '-20% 0px -60% 0px' });
+
+  sections.forEach(s => observer.observe(s));
+</script>
+
+</body>
+</html>

@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 8B: Advanced Distributed Training - Modern MLOps Tutorial</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script>hljs.highlightAll(); mermaid.initialize({startOnLoad:true, theme:'default'});</script>
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; color: #1f2937; }
+    .hero-gradient { background: linear-gradient(135deg, #dbeafe 0%, #eff6ff 40%, #ffffff 100%); }
+    .mermaid { background: #f8fafc; border-radius: 0.75rem; padding: 1.5rem; overflow-x: auto; }
+    table.striped tbody tr:nth-child(even) { background: #f8fafc; }
+    .callout-info { background: #eff6ff; border-left: 4px solid #2563eb; }
+    .callout-tip  { background: #f0fdf4; border-left: 4px solid #059669; }
+    .callout-warn { background: #fffbeb; border-left: 4px solid #d97706; }
+    pre { border-radius: 0.5rem; }
+    code.hljs { border-radius: 0.5rem; font-size: 0.82rem; }
+    @media print { .no-print { display: none; } }
+  </style>
+</head>
+<body class="bg-white">
+
+<!-- NAVBAR -->
+<nav class="no-print sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
+  <div class="max-w-7xl mx-auto px-4 flex items-center justify-between h-14">
+    <a href="index.html" class="font-bold text-blue-600 text-lg">MLOps Tutorial</a>
+    <div class="flex gap-6 text-sm font-medium text-gray-600">
+      <a href="index.html" class="hover:text-blue-600">Home</a>
+      <a href="ch05_gpu_hpc.html" class="hover:text-blue-600">GPU/HPC</a>
+      <a href="ch07_experiment_tracking.html" class="hover:text-blue-600">Experiments</a>
+      <a href="ch10_ray_ecosystem.html" class="hover:text-blue-600">Ray</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero-gradient border-b border-gray-200">
+  <div class="max-w-5xl mx-auto px-6 py-12">
+    <div class="flex items-center gap-3 mb-4">
+      <span class="bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full">Chapter 8B</span>
+      <span class="bg-green-600 text-white text-xs font-bold px-3 py-1 rounded-full">Advanced</span>
+      <span class="text-gray-500 text-sm">~75 min read</span>
+    </div>
+    <h1 class="text-4xl font-extrabold text-gray-900 mb-3">Advanced Distributed Training</h1>
+    <p class="text-lg text-gray-600 max-w-3xl">3D parallelism, Megatron-LM, profiling, fault-tolerant checkpointing, training stability, and scaling laws — from the engineers who built LLaMA 3 infrastructure.</p>
+    <p class="mt-3 text-sm text-blue-700 font-medium">Companion to Chapter 8: Distributed Training (DDP, ZeRO, FSDP, mixed precision)</p>
+  </div>
+</div>
+
+<div class="max-w-5xl mx-auto px-6 py-10 space-y-16">
+
+<!-- ═══════════════════════════════════════════════════════
+     SECTION 1: 3D PARALLELISM
+═══════════════════════════════════════════════════════ -->
+<section id="3d-parallelism">
+  <h2 class="text-2xl font-bold text-gray-900 mb-1">1. 3D Parallelism: DP × TP × PP</h2>
+  <p class="text-gray-500 text-sm mb-5">Combining data, tensor, and pipeline parallelism into a unified training strategy.</p>
+
+  <p class="text-gray-700 mb-4">No single parallelism axis suffices at 70B+ parameters. Production clusters combine all three: <strong>Data Parallelism (DP)</strong> across replica groups, <strong>Tensor Parallelism (TP)</strong> within a node (NVLink bandwidth), and <strong>Pipeline Parallelism (PP)</strong> across nodes (slower inter-node links). The total device count is DP × TP × PP.</p>
+
+  <div class="mermaid mb-6">
+graph TB
+    subgraph DP["Data Parallel Replicas (DP=2)"]
+      subgraph R1["Replica 1"]
+        subgraph PP1["Pipeline Stage 1 (PP)"]
+          TP1["GPU 0<br/>TP rank 0"] --- TP2["GPU 1<br/>TP rank 1"]
+        end
+        subgraph PP2["Pipeline Stage 2 (PP)"]
+          TP3["GPU 2<br/>TP rank 0"] --- TP4["GPU 3<br/>TP rank 1"]
+        end
+        PP1 -->|"micro-batch"| PP2
+      end
+      subgraph R2["Replica 2"]
+        subgraph PP3["Pipeline Stage 1 (PP)"]
+          TP5["GPU 4<br/>TP rank 0"] --- TP6["GPU 5<br/>TP rank 1"]
+        end
+        subgraph PP4["Pipeline Stage 2 (PP)"]
+          TP7["GPU 6<br/>TP rank 0"] --- TP8["GPU 7<br/>TP rank 1"]
+        end
+        PP3 -->|"micro-batch"| PP4
+      end
+    end
+    style DP fill:#eff6ff,stroke:#2563eb
+    style R1 fill:#f0fdf4,stroke:#059669
+    style R2 fill:#f0fdf4,stroke:#059669
+  </div>
+
+  <h3 class="text-lg font-semibold mb-3">Communication Volume Analysis</h3>
+  <table class="striped w-full text-sm border border-gray-200 rounded mb-5">
+    <thead class="bg-blue-600 text-white"><tr><th class="px-3 py-2 text-left">Axis</th><th class="px-3 py-2 text-left">Communication Op</th><th class="px-3 py-2 text-left">Volume</th><th class="px-3 py-2 text-left">Link Required</th></tr></thead>
+    <tbody>
+      <tr><td class="px-3 py-2 font-medium">DP</td><td class="px-3 py-2">AllReduce gradients</td><td class="px-3 py-2">2×params per step</td><td class="px-3 py-2">Inter-node (IB/EFA)</td></tr>
+      <tr><td class="px-3 py-2 font-medium">TP</td><td class="px-3 py-2">AllReduce/AllGather per layer</td><td class="px-3 py-2">4×seq×hidden per layer</td><td class="px-3 py-2">Intra-node (NVLink)</td></tr>
+      <tr><td class="px-3 py-2 font-medium">PP</td><td class="px-3 py-2">P2P activation send/recv</td><td class="px-3 py-2">batch×seq×hidden</td><td class="px-3 py-2">Inter-node (IB/EFA)</td></tr>
+      <tr><td class="px-3 py-2 font-medium">SP (seq)</td><td class="px-3 py-2">AllGather + ReduceScatter</td><td class="px-3 py-2">seq/TP × hidden</td><td class="px-3 py-2">Intra-node (NVLink)</td></tr>
+    </tbody>
+  </table>
+
+  <h3 class="text-lg font-semibold mb-3">Recommendations by Model Size</h3>
+  <table class="striped w-full text-sm border border-gray-200 rounded mb-5">
+    <thead class="bg-blue-600 text-white"><tr><th class="px-3 py-2">Model</th><th class="px-3 py-2">TP</th><th class="px-3 py-2">PP</th><th class="px-3 py-2">DP</th><th class="px-3 py-2">Total GPUs (example)</th><th class="px-3 py-2">Notes</th></tr></thead>
+    <tbody>
+      <tr><td class="px-3 py-2 font-medium">7B</td><td class="px-3 py-2">1–2</td><td class="px-3 py-2">1</td><td class="px-3 py-2">64–512</td><td class="px-3 py-2">128 (TP2×DP64)</td><td class="px-3 py-2">DDP+ZeRO-2 often sufficient</td></tr>
+      <tr><td class="px-3 py-2 font-medium">70B</td><td class="px-3 py-2">4–8</td><td class="px-3 py-2">4</td><td class="px-3 py-2">8–64</td><td class="px-3 py-2">512 (TP8×PP4×DP16)</td><td class="px-3 py-2">TP within node, PP across nodes</td></tr>
+      <tr><td class="px-3 py-2 font-medium">405B</td><td class="px-3 py-2">8</td><td class="px-3 py-2">8–16</td><td class="px-3 py-2">8–32</td><td class="px-3 py-2">2048 (TP8×PP16×DP16)</td><td class="px-3 py-2">GQA reduces KV comm; need interleaved schedule</td></tr>
+      <tr><td class="px-3 py-2 font-medium">1T+</td><td class="px-3 py-2">8</td><td class="px-3 py-2">16–32</td><td class="px-3 py-2">16+</td><td class="px-3 py-2">8192+</td><td class="px-3 py-2">Expert parallelism (MoE) on top; VPP critical</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout-tip p-4 rounded mb-4">
+    <strong>LLaMA 3 Tips:</strong> We kept TP=8 (one node for H100 8-GPU nodes). PP used interleaved 1F1B schedule — critical for reducing pipeline bubble to &lt;1%. DP gradient compression with PowerSGD helped at 1K+ node scale. Set <code>NCCL_IB_DISABLE=0</code> and use RoCE v2 for inter-node when InfiniBand unavailable.
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     SECTION 2: MEGATRON-LM
+═══════════════════════════════════════════════════════ -->
+<section id="megatron">
+  <h2 class="text-2xl font-bold text-gray-900 mb-1">2. Megatron-LM Deep Dive</h2>
+  <p class="text-gray-500 text-sm mb-5">NVIDIA's battle-tested framework for training transformers at scale.</p>
+
+  <p class="text-gray-700 mb-4">Megatron-LM implements all three parallelism axes natively plus <strong>sequence parallelism</strong> (distributes LayerNorm/Dropout across TP ranks) and <strong>selective activation recomputation</strong> (recomputes only expensive ops like attention, not cheap ones). Together these cut memory ~30% vs naive recomputation.</p>
+
+  <h3 class="text-lg font-semibold mb-2">Sequence Parallelism</h3>
+  <p class="text-gray-700 mb-4">In standard TP, the sequence dimension is replicated across TP ranks — wasting memory for activations. Sequence parallelism shards the sequence dimension during LayerNorm and Dropout, using AllGather before column-parallel linear layers and ReduceScatter after row-parallel layers. Net comm volume is identical, but activation memory scales as <code>1/TP</code>.</p>
+
+  <h3 class="text-lg font-semibold mb-2">Megatron-LM Training Launch</h3>
+  <pre><code class="language-bash">#!/bin/bash
+# megatron_pretrain.sh — LLaMA-style training with Megatron-LM + torchrun
+
+NNODES=16
+NPROC_PER_NODE=8
+WORLD_SIZE=$((NNODES * NPROC_PER_NODE))
+TP=8; PP=4; DP=$((WORLD_SIZE / TP / PP))  # DP=4
+
+torchrun \
+  --nnodes=$NNODES \
+  --nproc_per_node=$NPROC_PER_NODE \
+  --rdzv_backend=c10d \
+  --rdzv_endpoint=$MASTER_ADDR:$MASTER_PORT \
+  pretrain_gpt.py \
+  --tensor-model-parallel-size $TP \
+  --pipeline-model-parallel-size $PP \
+  --num-layers 80 \
+  --hidden-size 8192 \
+  --num-attention-heads 64 \
+  --group-query-attention \
+  --num-query-groups 8 \
+  --seq-length 4096 \
+  --max-position-embeddings 4096 \
+  --micro-batch-size 2 \
+  --global-batch-size 1024 \
+  --train-iters 500000 \
+  --lr 3e-4 \
+  --lr-decay-style cosine \
+  --min-lr 3e-5 \
+  --lr-warmup-fraction 0.01 \
+  --bf16 \
+  --sequence-parallel \
+  --recompute-activations \
+  --recompute-granularity selective \
+  --use-flash-attn \
+  --no-query-key-layer-scaling \
+  --save $CHECKPOINT_PATH \
+  --load $CHECKPOINT_PATH \
+  --save-interval 1000 \
+  --data-path $DATA_PATH \
+  --tokenizer-type SentencePieceTokenizer \
+  --tokenizer-model $TOKENIZER_MODEL \
+  --split 99,1,0 \
+  --log-interval 10 \
+  --eval-iters 100 \
+  --eval-interval 2000</code></pre>
+
+  <h3 class="text-lg font-semibold mt-5 mb-2">Megatron-Core Transformer Layer (Simplified)</h3>
+  <pre><code class="language-python">from megatron.core import tensor_parallel
+from megatron.core.transformer import TransformerConfig
+import torch, torch.nn as nn
+
+class MegatronTransformerLayer(nn.Module):
+    """Simplified Megatron-Core transformer layer with TP."""
+
+    def __init__(self, config: TransformerConfig):
+        super().__init__()
+        self.config = config
+        # Column-parallel: splits output features across TP ranks
+        self.qkv_proj = tensor_parallel.ColumnParallelLinear(
+            config.hidden_size, 3 * config.hidden_size,
+            config=config, init_method=config.init_method,
+            gather_output=False,  # keep split for attention
+        )
+        # Row-parallel: reduces across TP ranks via AllReduce/ReduceScatter
+        self.out_proj = tensor_parallel.RowParallelLinear(
+            config.hidden_size, config.hidden_size,
+            config=config, init_method=config.output_layer_init_method,
+            input_is_parallel=True,
+        )
+        # MLP: column then row (same pattern)
+        self.mlp_fc1 = tensor_parallel.ColumnParallelLinear(
+            config.hidden_size, 4 * config.hidden_size,
+            config=config, gather_output=False,
+        )
+        self.mlp_fc2 = tensor_parallel.RowParallelLinear(
+            4 * config.hidden_size, config.hidden_size,
+            config=config, input_is_parallel=True,
+        )
+        # Sequence-parallel LayerNorm (operates on sharded seq dim)
+        self.input_layernorm = nn.LayerNorm(config.hidden_size)
+        self.post_attn_layernorm = nn.LayerNorm(config.hidden_size)
+
+    def forward(self, hidden_states, attention_mask=None):
+        # Pre-norm + attention
+        residual = hidden_states
+        hidden_states = self.input_layernorm(hidden_states)
+        qkv, _ = self.qkv_proj(hidden_states)
+        # ... flash attention omitted for brevity ...
+        attn_out, _ = self.out_proj(qkv)
+        hidden_states = residual + attn_out
+        # Pre-norm + MLP
+        residual = hidden_states
+        hidden_states = self.post_attn_layernorm(hidden_states)
+        hidden_states, _ = self.mlp_fc1(hidden_states)
+        hidden_states = torch.nn.functional.silu(hidden_states)
+        hidden_states, _ = self.mlp_fc2(hidden_states)
+        return residual + hidden_states</code></pre>
+
+  <div class="callout-info p-4 rounded mt-4">
+    <strong>Megatron-DeepSpeed Integration:</strong> Use <code>--deepspeed</code> flag with Megatron to layer ZeRO-1 optimizer sharding on top of TP+PP. ZeRO-1 shards optimizer states across DP ranks without touching activations — safe to combine. Avoid ZeRO-3 with Megatron TP: they conflict on parameter sharding.
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     SECTION 3: PYTORCH LIGHTNING
+═══════════════════════════════════════════════════════ -->
+<section id="lightning">
+  <h2 class="text-2xl font-bold text-gray-900 mb-1">3. PyTorch Lightning for Distributed Training</h2>
+  <p class="text-gray-500 text-sm mb-5">High-level abstraction over DDP, FSDP, and DeepSpeed — same code, any backend.</p>
+
+  <h3 class="text-lg font-semibold mb-2">Strategy Selection Guide</h3>
+  <table class="striped w-full text-sm border border-gray-200 rounded mb-5">
+    <thead class="bg-blue-600 text-white"><tr><th class="px-3 py-2">Strategy</th><th class="px-3 py-2">Use When</th><th class="px-3 py-2">Lightning Arg</th><th class="px-3 py-2">Overhead</th></tr></thead>
+    <tbody>
+      <tr><td class="px-3 py-2 font-medium">DDP</td><td class="px-3 py-2">Model fits in 1 GPU VRAM</td><td class="px-3 py-2"><code>strategy="ddp"</code></td><td class="px-3 py-2">Low</td></tr>
+      <tr><td class="px-3 py-2 font-medium">FSDP</td><td class="px-3 py-2">7B–70B, pure PyTorch</td><td class="px-3 py-2"><code>strategy="fsdp"</code></td><td class="px-3 py-2">Medium</td></tr>
+      <tr><td class="px-3 py-2 font-medium">DeepSpeed ZeRO-2</td><td class="px-3 py-2">Large model, optimizer memory</td><td class="px-3 py-2"><code>strategy="deepspeed_stage_2"</code></td><td class="px-3 py-2">Medium</td></tr>
+      <tr><td class="px-3 py-2 font-medium">DeepSpeed ZeRO-3</td><td class="px-3 py-2">70B+ without TP</td><td class="px-3 py-2"><code>strategy="deepspeed_stage_3"</code></td><td class="px-3 py-2">High</td></tr>
+      <tr><td class="px-3 py-2 font-medium">DeepSpeed ZeRO-3 + Offload</td><td class="px-3 py-2">Limited GPU, CPU/NVMe available</td><td class="px-3 py-2"><code>strategy="deepspeed_stage_3_offload"</code></td><td class="px-3 py-2">Very high</td></tr>
+    </tbody>
+  </table>
+
+  <h3 class="text-lg font-semibold mb-2">Full Lightning Training Script</h3>
+  <pre><code class="language-python">import lightning as L
+import torch
+import torch.nn as nn
+from torch.utils.data import DataLoader, DistributedSampler
+from lightning.pytorch.strategies import FSDPStrategy
+from lightning.pytorch.callbacks import ModelCheckpoint, LearningRateMonitor
+from torch.distributed.fsdp.wrap import transformer_auto_wrap_policy
+import functools
+
+class LLMPretrainModule(L.LightningModule):
+    def __init__(self, model, tokenizer, lr=3e-4, warmup_steps=2000,
+                 total_steps=500_000, weight_decay=0.1):
+        super().__init__()
+        self.model = model
+        self.tokenizer = tokenizer
+        self.lr = lr
+        self.warmup_steps = warmup_steps
+        self.total_steps = total_steps
+        self.weight_decay = weight_decay
+        self.save_hyperparameters(ignore=["model", "tokenizer"])
+
+    def forward(self, input_ids, attention_mask=None, labels=None):
+        return self.model(input_ids, attention_mask=attention_mask, labels=labels)
+
+    def training_step(self, batch, batch_idx):
+        out = self(**batch)
+        loss = out.loss
+        self.log("train/loss", loss, on_step=True, on_epoch=False,
+                 prog_bar=True, sync_dist=True)
+        self.log("train/ppl", torch.exp(loss), on_step=True, sync_dist=True)
+        return loss
+
+    def validation_step(self, batch, batch_idx):
+        with torch.no_grad():
+            out = self(**batch)
+        self.log("val/loss", out.loss, sync_dist=True, prog_bar=True)
+
+    def configure_optimizers(self):
+        # Separate weight decay for non-bias/layernorm params
+        decay_params = [p for n, p in self.model.named_parameters()
+                        if p.requires_grad and not any(nd in n for nd in
+                        ["bias", "layer_norm", "layernorm", "ln_"])]
+        no_decay_params = [p for n, p in self.model.named_parameters()
+                           if p.requires_grad and any(nd in n for nd in
+                           ["bias", "layer_norm", "layernorm", "ln_"])]
+        optim = torch.optim.AdamW(
+            [{"params": decay_params, "weight_decay": self.weight_decay},
+             {"params": no_decay_params, "weight_decay": 0.0}],
+            lr=self.lr, betas=(0.9, 0.95), eps=1e-8,
+        )
+        # Cosine LR with linear warmup
+        def lr_lambda(step):
+            if step < self.warmup_steps:
+                return step / max(1, self.warmup_steps)
+            progress = (step - self.warmup_steps) / max(1, self.total_steps - self.warmup_steps)
+            return max(0.1, 0.5 * (1.0 + torch.cos(torch.tensor(progress * 3.14159)).item()))
+        scheduler = torch.optim.lr_scheduler.LambdaLR(optim, lr_lambda)
+        return {"optimizer": optim,
+                "lr_scheduler": {"scheduler": scheduler, "interval": "step"}}
+
+
+def build_fsdp_strategy(transformer_layer_cls):
+    auto_wrap = functools.partial(transformer_auto_wrap_policy,
+                                  transformer_layer_cls={transformer_layer_cls})
+    return FSDPStrategy(
+        auto_wrap_policy=auto_wrap,
+        activation_checkpointing_policy={transformer_layer_cls},
+        sharding_strategy="FULL_SHARD",   # ZeRO-3 equivalent
+        cpu_offload=False,
+        mixed_precision=L.pytorch.plugins.MixedPrecision(
+            param_dtype=torch.bfloat16,
+            reduce_dtype=torch.float32,
+            buffer_dtype=torch.bfloat16,
+        ),
+        limit_all_gathers=True,
+    )
+
+
+if __name__ == "__main__":
+    from transformers import AutoModelForCausalLM, AutoTokenizer
+    from your_dataset import PretrainDataset  # your dataset class
+
+    model = AutoModelForCausalLM.from_pretrained("meta-llama/Meta-Llama-3-8B")
+    tokenizer = AutoTokenizer.from_pretrained("meta-llama/Meta-Llama-3-8B")
+
+    lit_model = LLMPretrainModule(model, tokenizer)
+
+    trainer = L.Trainer(
+        max_steps=500_000,
+        accelerator="gpu",
+        devices=8,
+        num_nodes=int(__import__("os").environ.get("NNODES", 1)),
+        strategy=build_fsdp_strategy(model.model.layers[0].__class__),
+        precision="bf16-true",
+        gradient_clip_val=1.0,
+        accumulate_grad_batches=4,
+        log_every_n_steps=10,
+        val_check_interval=2000,
+        callbacks=[
+            ModelCheckpoint(dirpath="/checkpoints", every_n_train_steps=1000,
+                            save_top_k=-1, save_last=True),
+            LearningRateMonitor(logging_interval="step"),
+        ],
+        enable_progress_bar=True,
+    )
+    # Multi-node: torchrun --nnodes=$NNODES --nproc_per_node=8 train.py
+    train_ds = PretrainDataset(split="train")
+    val_ds   = PretrainDataset(split="val")
+    trainer.fit(lit_model,
+                DataLoader(train_ds, batch_size=2, num_workers=4, pin_memory=True),
+                DataLoader(val_ds,   batch_size=2, num_workers=4))</code></pre>
+
+  <div class="callout-tip p-4 rounded mt-4">
+    <strong>Multi-node with Lightning:</strong> Set <code>MASTER_ADDR</code>, <code>MASTER_PORT</code>, <code>NODE_RANK</code>, <code>NNODES</code> env vars and launch with <code>torchrun</code>. Lightning auto-detects these. Use <code>--rdzv_backend=c10d</code> for elastic training support.
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     SECTION 4: PROFILING AND DEBUGGING
+═══════════════════════════════════════════════════════ -->
+<section id="profiling">
+  <h2 class="text-2xl font-bold text-gray-900 mb-1">4. Profiling and Debugging</h2>
+  <p class="text-gray-500 text-sm mb-5">Find the actual bottleneck before optimizing. Usually it's not what you think.</p>
+
+  <h3 class="text-lg font-semibold mb-2">PyTorch Profiler with TensorBoard</h3>
+  <pre><code class="language-python">import torch
+from torch.profiler import profile, record_function, ProfilerActivity, schedule
+
+def train_with_profiler(model, optimizer, dataloader, output_dir="./profiler_logs"):
+    prof = profile(
+        activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA],
+        schedule=schedule(wait=1, warmup=1, active=3, repeat=2),
+        on_trace_ready=torch.profiler.tensorboard_trace_handler(output_dir),
+        record_shapes=True,
+        profile_memory=True,
+        with_stack=True,
+        with_flops=True,
+    )
+    model.train()
+    with prof:
+        for step, batch in enumerate(dataloader):
+            with record_function("forward"):
+                loss = model(**batch).loss
+            with record_function("backward"):
+                loss.backward()
+            with record_function("optimizer"):
+                optimizer.step()
+                optimizer.zero_grad()
+            prof.step()
+            if step >= 12:
+                break
+
+    # Print top ops by CUDA time
+    print(prof.key_averages().table(
+        sort_by="cuda_time_total", row_limit=20))
+    # tensorboard --logdir ./profiler_logs</code></pre>
+
+  <h3 class="text-lg font-semibold mt-5 mb-2">MFU (Model FLOP Utilization) Monitoring</h3>
+  <p class="text-gray-700 mb-3">MFU = achieved_TFLOPS / peak_TFLOPS. For a transformer: forward FLOPs ≈ 6 × N × T (N = params, T = tokens). Multiply by 3 for forward+backward. Target: &gt;50% MFU on H100 with BF16.</p>
+  <pre><code class="language-python">import time, torch
+
+# H100 SXM peak BF16: 989 TFLOPS
+GPU_PEAK_TFLOPS = {
+    "H100": 989e12,
+    "A100-80G": 312e12,
+    "A100-40G": 312e12,
+    "V100": 130e12,
+}
+
+def estimate_model_flops(num_params: int, seq_len: int, batch_size: int) -> float:
+    """Estimate FLOPs for one forward+backward pass (6×N×T rule of thumb)."""
+    tokens = batch_size * seq_len
+    return 6 * num_params * tokens  # factor 6 = 2 fwd + 4 bwd (remat)
+
+class MFUMonitor:
+    def __init__(self, num_params, seq_len, batch_size,
+                 gpu_type="H100", log_interval=10):
+        self.flops_per_step = estimate_model_flops(num_params, seq_len, batch_size)
+        self.peak_flops = GPU_PEAK_TFLOPS.get(gpu_type, 989e12)
+        self.log_interval = log_interval
+        self._t0 = None
+        self.mfu_history = []
+
+    def start_step(self):
+        if torch.cuda.is_available():
+            torch.cuda.synchronize()
+        self._t0 = time.perf_counter()
+
+    def end_step(self, step):
+        if torch.cuda.is_available():
+            torch.cuda.synchronize()
+        dt = time.perf_counter() - self._t0
+        achieved = self.flops_per_step / dt
+        num_gpus = torch.distributed.get_world_size() if torch.distributed.is_initialized() else 1
+        mfu = achieved / (self.peak_flops * num_gpus)
+        self.mfu_history.append(mfu)
+        if step % self.log_interval == 0:
+            avg_mfu = sum(self.mfu_history[-self.log_interval:]) / min(len(self.mfu_history), self.log_interval)
+            tput = self.flops_per_step / dt / 1e12
+            print(f"step={step:6d} | MFU={avg_mfu:.1%} | throughput={tput:.1f} TFLOPS/GPU | dt={dt*1000:.1f}ms")
+        return mfu</code></pre>
+
+  <h3 class="text-lg font-semibold mt-5 mb-3">Common Performance Bottlenecks</h3>
+  <table class="striped w-full text-sm border border-gray-200 rounded mb-5">
+    <thead class="bg-blue-600 text-white"><tr><th class="px-3 py-2">Symptom</th><th class="px-3 py-2">Root Cause</th><th class="px-3 py-2">Fix</th></tr></thead>
+    <tbody>
+      <tr><td class="px-3 py-2">Low GPU utilization (&lt;30%)</td><td class="px-3 py-2">DataLoader bottleneck</td><td class="px-3 py-2">Increase <code>num_workers</code>, use <code>pin_memory=True</code>, prefetch</td></tr>
+      <tr><td class="px-3 py-2">Bubble in profiler</td><td class="px-3 py-2">PP pipeline idle time</td><td class="px-3 py-2">Increase micro-batch count, use interleaved 1F1B</td></tr>
+      <tr><td class="px-3 py-2">AllReduce dominates</td><td class="px-3 py-2">Gradient sync not overlapped</td><td class="px-3 py-2">Enable <code>gradient_as_bucket_view=True</code>, bucket size tuning</td></tr>
+      <tr><td class="px-3 py-2">Memory OOM mid-training</td><td class="px-3 py-2">Activation memory growth</td><td class="px-3 py-2">Activation checkpointing, reduce seq len, TP increase</td></tr>
+      <tr><td class="px-3 py-2">NCCL timeout errors</td><td class="px-3 py-2">Straggler node / network</td><td class="px-3 py-2">Set <code>NCCL_TIMEOUT=1800</code>, enable elastic training</td></tr>
+      <tr><td class="px-3 py-2">MFU drops over time</td><td class="px-3 py-2">Fragmented GPU memory</td><td class="px-3 py-2"><code>torch.cuda.empty_cache()</code> periodically; check allocator</td></tr>
+      <tr><td class="px-3 py-2">CUDA kernel launch overhead</td><td class="px-3 py-2">Too many small ops</td><td class="px-3 py-2">Use <code>torch.compile()</code>, fuse ops, increase batch size</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout-warn p-4 rounded">
+    <strong>NCCL Debugging Flags:</strong><br>
+    <code>NCCL_DEBUG=INFO</code> — log all NCCL operations<br>
+    <code>NCCL_DEBUG_SUBSYS=ALL</code> — verbose subsystem logging<br>
+    <code>NCCL_P2P_DISABLE=1</code> — disable P2P (test if NVLink is the issue)<br>
+    <code>NCCL_SOCKET_IFNAME=eth0</code> — force specific network interface<br>
+    <code>TORCH_NCCL_BLOCKING_WAIT=1</code> — catch hangs with timeout instead of infinite wait
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     SECTION 5: CHECKPOINTING AT SCALE
+═══════════════════════════════════════════════════════ -->
+<section id="checkpointing">
+  <h2 class="text-2xl font-bold text-gray-900 mb-1">5. Checkpointing at Scale</h2>
+  <p class="text-gray-500 text-sm mb-5">Saving 405B parameters every 1000 steps requires a strategy, not just <code>torch.save()</code>.</p>
+
+  <table class="striped w-full text-sm border border-gray-200 rounded mb-5">
+    <thead class="bg-blue-600 text-white"><tr><th class="px-3 py-2">Strategy</th><th class="px-3 py-2">How</th><th class="px-3 py-2">Save Time</th><th class="px-3 py-2">Use Case</th></tr></thead>
+    <tbody>
+      <tr><td class="px-3 py-2 font-medium">Full (consolidated)</td><td class="px-3 py-2">Gather all shards to rank 0, save single file</td><td class="px-3 py-2">Slow (all-gather)</td><td class="px-3 py-2">Final export, inference</td></tr>
+      <tr><td class="px-3 py-2 font-medium">Sharded</td><td class="px-3 py-2">Each rank saves its own shard in parallel</td><td class="px-3 py-2">Fast</td><td class="px-3 py-2">Mid-training resumption</td></tr>
+      <tr><td class="px-3 py-2 font-medium">Async (non-blocking)</td><td class="px-3 py-2">Copy to CPU, save in background thread</td><td class="px-3 py-2">Near-zero blocking</td><td class="px-3 py-2">Frequent checkpoints</td></tr>
+      <tr><td class="px-3 py-2 font-medium">Distributed (DCP)</td><td class="px-3 py-2">PyTorch DCP: each rank streams to storage</td><td class="px-3 py-2">Fast + scalable</td><td class="px-3 py-2">1000+ GPU runs</td></tr>
+    </tbody>
+  </table>
+
+  <h3 class="text-lg font-semibold mb-2">Distributed Checkpoint with FSDP</h3>
+  <pre><code class="language-python">import torch
+import torch.distributed as dist
+import torch.distributed.checkpoint as dcp
+from torch.distributed.fsdp import FullyShardedDataParallel as FSDP
+from torch.distributed.fsdp.fully_sharded_data_parallel import StateDictType
+from torch.distributed.checkpoint.state_dict import get_state_dict, set_state_dict
+import os
+
+def save_fsdp_checkpoint(model: FSDP, optimizer, step: int, output_dir: str):
+    """Save sharded FSDP checkpoint using PyTorch Distributed Checkpoint."""
+    os.makedirs(output_dir, exist_ok=True)
+    ckpt_dir = os.path.join(output_dir, f"step_{step:07d}")
+
+    # Get sharded state dicts (each rank keeps its own shard)
+    model_state, optim_state = get_state_dict(model, optimizer)
+    state = {"model": model_state, "optimizer": optim_state, "step": step}
+
+    # Async-capable distributed checkpoint
+    storage_writer = dcp.FileSystemWriter(ckpt_dir, single_file_per_rank=True)
+    dcp.save(state, storage_writer=storage_writer)
+
+    if dist.get_rank() == 0:
+        print(f"Checkpoint saved: {ckpt_dir}")
+
+
+def load_fsdp_checkpoint(model: FSDP, optimizer, ckpt_dir: str):
+    """Resume from sharded FSDP checkpoint."""
+    model_state, optim_state = get_state_dict(model, optimizer)
+    state = {"model": model_state, "optimizer": optim_state, "step": 0}
+
+    storage_reader = dcp.FileSystemReader(ckpt_dir)
+    dcp.load(state, storage_reader=storage_reader)
+
+    set_state_dict(model, optimizer,
+                   model_state_dict=state["model"],
+                   optim_state_dict=state["optimizer"])
+    return state["step"]</code></pre>
+
+  <h3 class="text-lg font-semibold mt-5 mb-2">Async Checkpoint Saving</h3>
+  <pre><code class="language-python">import threading, copy
+from pathlib import Path
+
+class AsyncCheckpointer:
+    """Non-blocking checkpoint: copy to CPU, save in background thread."""
+
+    def __init__(self, output_dir: str, keep_last: int = 3):
+        self.output_dir = Path(output_dir)
+        self.keep_last = keep_last
+        self._thread = None
+        self._saved = []
+
+    def _save_worker(self, state_cpu: dict, path: Path):
+        torch.save(state_cpu, path)
+        self._saved.append(path)
+        # Prune old checkpoints
+        while len(self._saved) > self.keep_last:
+            old = self._saved.pop(0)
+            old.unlink(missing_ok=True)
+
+    def save(self, model, optimizer, step: int):
+        # Wait for previous async save to finish before copying
+        if self._thread and self._thread.is_alive():
+            self._thread.join()
+
+        # Fast CPU copy (non-blocking from GPU perspective)
+        state_cpu = {
+            "model": {k: v.cpu() for k, v in model.state_dict().items()},
+            "optimizer": copy.deepcopy(optimizer.state_dict()),
+            "step": step,
+        }
+        path = self.output_dir / f"ckpt_{step:07d}.pt"
+        self._thread = threading.Thread(target=self._save_worker,
+                                        args=(state_cpu, path), daemon=True)
+        self._thread.start()
+        return path  # Returns immediately; save happens in background
+
+    def wait(self):
+        """Call at end of training to ensure last checkpoint completes."""
+        if self._thread:
+            self._thread.join()</code></pre>
+
+  <h3 class="text-lg font-semibold mt-5 mb-2">Fault-Tolerant Training with Elastic torchrun</h3>
+  <pre><code class="language-bash"># Elastic training: tolerates node failures, auto-restarts on membership change
+torchrun \
+  --nnodes=8:16 \           # min:max nodes (elastic range)
+  --nproc_per_node=8 \
+  --rdzv_backend=etcd-v2 \  # or c10d for simpler setup
+  --rdzv_endpoint=etcd-host:2379 \
+  --rdzv_id=llama3_run_001 \
+  --max_restarts=3 \        # auto-restart on failure up to 3 times
+  train.py \
+  --resume_from_checkpoint /checkpoints/latest</code></pre>
+
+  <div class="callout-tip p-4 rounded mt-3">
+    <strong>Checkpoint Interval Optimization:</strong> Balance recovery cost vs checkpoint overhead. Rule of thumb: checkpoint every N steps where N × step_time ≈ 15–30 minutes. For a 1000-node job at 1s/step, every 900–1800 steps. Use async checkpointing to make frequent saves nearly free.
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     SECTION 6: CURRICULUM LEARNING
+═══════════════════════════════════════════════════════ -->
+<section id="curriculum">
+  <h2 class="text-2xl font-bold text-gray-900 mb-1">6. Curriculum Learning and Data Ordering</h2>
+  <p class="text-gray-500 text-sm mb-5">Data order affects both convergence speed and final quality.</p>
+
+  <p class="text-gray-700 mb-4">Curriculum learning presents easier examples first (shorter sequences, common domains) and increases difficulty over training. LLaMA 3 used a data mix that increased code and math proportions in later training phases. Key effects: faster early convergence, better final quality on hard domains, reduced loss spikes from outlier examples.</p>
+
+  <p class="text-gray-700 mb-3"><strong>Warmup strategies:</strong> (1) Sequence length warmup — start with 512 tokens, ramp to 4096 over first 1% of tokens. (2) Domain warmup — saturate with high-quality web text first, introduce specialized domains gradually. (3) Batch size warmup — linear ramp from small to target batch size.</p>
+
+  <h3 class="text-lg font-semibold mb-2">Custom DistributedSampler with Curriculum</h3>
+  <pre><code class="language-python">import torch
+from torch.utils.data import DistributedSampler
+from typing import Optional, List
+import math
+
+class CurriculumDistributedSampler(DistributedSampler):
+    """
+    Distributed sampler with curriculum: samples by difficulty bucket,
+    transitioning from easy to hard over training.
+    """
+
+    def __init__(self, dataset, difficulty_scores: List[float],
+                 num_replicas=None, rank=None, shuffle=True,
+                 curriculum_end_fraction=0.3, seed=42):
+        super().__init__(dataset, num_replicas=num_replicas, rank=rank,
+                         shuffle=shuffle, seed=seed)
+        # Normalize difficulty scores [0, 1]
+        scores = torch.tensor(difficulty_scores, dtype=torch.float)
+        self.difficulty = (scores - scores.min()) / (scores.max() - scores.min() + 1e-8)
+        self.curriculum_end_fraction = curriculum_end_fraction
+        self.current_epoch = 0
+        self.total_epochs = 1  # set externally before each epoch
+
+    def set_epoch_and_total(self, epoch: int, total_epochs: int):
+        self.current_epoch = epoch
+        self.total_epochs = total_epochs
+        super().set_epoch(epoch)
+
+    def _compute_difficulty_threshold(self) -> float:
+        """Linearly increase from 0.3 (easy) to 1.0 (all) over curriculum window."""
+        progress = min(1.0, self.current_epoch / max(1, int(self.total_epochs * self.curriculum_end_fraction)))
+        return 0.3 + 0.7 * progress  # allow bottom 30% initially, open up to 100%
+
+    def __iter__(self):
+        threshold = self._compute_difficulty_threshold()
+        # Filter to allowed difficulty range
+        eligible = (self.difficulty <= threshold).nonzero(as_tuple=True)[0].tolist()
+        if len(eligible) < self.num_replicas:
+            eligible = list(range(len(self.dataset)))  # fallback
+
+        g = torch.Generator()
+        g.manual_seed(self.seed + self.current_epoch)
+        if self.shuffle:
+            indices = [eligible[i] for i in torch.randperm(len(eligible), generator=g).tolist()]
+        else:
+            indices = eligible
+
+        # Pad to be divisible by num_replicas
+        padding = (self.num_replicas - len(indices) % self.num_replicas) % self.num_replicas
+        indices += indices[:padding]
+
+        # Subsample for this rank
+        indices = indices[self.rank::self.num_replicas]
+        return iter(indices)
+
+    def __len__(self):
+        threshold = self._compute_difficulty_threshold()
+        eligible = int((self.difficulty <= threshold).sum().item())
+        return math.ceil(eligible / self.num_replicas)</code></pre>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     SECTION 7: TRAINING STABILITY
+═══════════════════════════════════════════════════════ -->
+<section id="stability">
+  <h2 class="text-2xl font-bold text-gray-900 mb-1">7. Large-Scale Training Stability</h2>
+  <p class="text-gray-500 text-sm mb-5">A loss spike at step 50,000 can ruin a 3-week run. Detect and recover automatically.</p>
+
+  <h3 class="text-lg font-semibold mb-2">Training Stability Hooks</h3>
+  <pre><code class="language-python">import torch, math, collections
+from typing import Optional
+
+class TrainingStabilityMonitor:
+    """
+    Monitors: gradient norms, loss spikes, NaN/Inf detection, rolling averages.
+    """
+
+    def __init__(self, spike_threshold=4.0, window=100, rollback_steps=500,
+                 checkpoint_dir="/checkpoints"):
+        self.spike_threshold = spike_threshold  # spike if loss > mean * threshold
+        self.window = window
+        self.rollback_steps = rollback_steps
+        self.checkpoint_dir = checkpoint_dir
+        self.loss_history = collections.deque(maxlen=window)
+        self.grad_norm_history = collections.deque(maxlen=window)
+        self.spike_count = 0
+
+    def check_loss(self, loss: float, step: int) -> bool:
+        """Returns True if spike detected."""
+        if math.isnan(loss) or math.isinf(loss):
+            print(f"[STABILITY] NaN/Inf loss at step {step}! Triggering rollback.")
+            return True
+        self.loss_history.append(loss)
+        if len(self.loss_history) >= 20:
+            rolling_mean = sum(list(self.loss_history)[:-5]) / (len(self.loss_history) - 5)
+            if loss > rolling_mean * self.spike_threshold:
+                self.spike_count += 1
+                print(f"[STABILITY] Loss spike at step {step}: {loss:.4f} vs mean {rolling_mean:.4f}")
+                return True
+        return False
+
+    def compute_grad_norm(self, model: torch.nn.Module,
+                          norm_type: float = 2.0) -> float:
+        """Compute total gradient norm across all parameters."""
+        total_norm = 0.0
+        for p in model.parameters():
+            if p.grad is not None:
+                if torch.isnan(p.grad).any() or torch.isinf(p.grad).any():
+                    print("[STABILITY] NaN/Inf in gradient!")
+                    return float('inf')
+                param_norm = p.grad.detach().data.norm(norm_type)
+                total_norm += param_norm.item() ** norm_type
+        total_norm = total_norm ** (1.0 / norm_type)
+        self.grad_norm_history.append(total_norm)
+        return total_norm
+
+    def get_smoothed_loss(self, beta=0.98) -> Optional[float]:
+        """Exponential moving average of loss (like fast.ai)."""
+        if not self.loss_history:
+            return None
+        ema = None
+        for i, l in enumerate(self.loss_history):
+            if ema is None:
+                ema = l
+            else:
+                ema = beta * ema + (1 - beta) * l
+        # Bias correction
+        n = len(self.loss_history)
+        return ema / (1 - beta ** n)
+
+    def log_metrics(self, step: int) -> dict:
+        grad_norm = (sum(self.grad_norm_history) / len(self.grad_norm_history)
+                     if self.grad_norm_history else 0.0)
+        return {
+            "stability/grad_norm_avg": grad_norm,
+            "stability/loss_smooth": self.get_smoothed_loss() or 0.0,
+            "stability/spike_count": self.spike_count,
+        }</code></pre>
+
+  <div class="callout-warn p-4 rounded mt-4">
+    <strong>Loss Spike Recovery:</strong> When a spike is detected: (1) rollback to last good checkpoint, (2) skip or re-sample the problematic batch, (3) reduce LR temporarily by 50%, (4) resume. LLaMA 3 training saw ~12 loss spikes over the full run — all recovered automatically within 500 steps.
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     SECTION 8: SCALING LAWS
+═══════════════════════════════════════════════════════ -->
+<section id="scaling-laws">
+  <h2 class="text-2xl font-bold text-gray-900 mb-1">8. Scaling Laws Applied</h2>
+  <p class="text-gray-500 text-sm mb-5">How to optimally allocate compute between model size and training tokens.</p>
+
+  <p class="text-gray-700 mb-4">The <strong>Chinchilla</strong> paper (Hoffmann et al., 2022) showed that optimal training requires scaling tokens proportionally with parameters: <code>N_opt ≈ C / (6 × T_opt)</code> where C is compute budget (FLOPs), N is parameters, T is tokens. The optimal ratio is roughly <strong>20 tokens per parameter</strong> for pure Chinchilla-optimal training. LLaMA 3 deliberately overtrained (15T tokens for 8B/70B) for better inference efficiency.</p>
+
+  <h3 class="text-lg font-semibold mb-2">Scaling Law Calculator</h3>
+  <pre><code class="language-python">#!/usr/bin/env python3
+"""
+Chinchilla scaling law calculator.
+Hoffmann et al. 2022: L(N, D) = E + A/N^alpha + B/D^beta
+Optimal: N_opt = (C / (6 * 20))^0.5 roughly
+"""
+import math
+
+# Chinchilla constants (from paper Table 2, fit A)
+E = 1.69  # irreducible loss
+A = 406.4
+B = 410.7
+ALPHA = 0.34
+BETA = 0.28
+
+def chinchilla_loss(n_params: float, n_tokens: float) -> float:
+    """Predict cross-entropy loss for model with n_params trained on n_tokens."""
+    return E + A / (n_params ** ALPHA) + B / (n_tokens ** BETA)
+
+def optimal_allocation(compute_budget_flops: float) -> dict:
+    """
+    Given FLOPs budget C, find optimal N and D.
+    C ≈ 6 * N * D (forward + backward for non-embedding params)
+    Chinchilla: D_opt ≈ 20 * N_opt
+    """
+    # From Chinchilla paper: N_opt = (C / (6 * 20))^0.5
+    n_opt = math.sqrt(compute_budget_flops / (6 * 20))
+    d_opt = compute_budget_flops / (6 * n_opt)
+    predicted_loss = chinchilla_loss(n_opt, d_opt)
+    return {
+        "optimal_params": n_opt,
+        "optimal_tokens": d_opt,
+        "tokens_per_param": d_opt / n_opt,
+        "predicted_loss": predicted_loss,
+    }
+
+def compute_budget(n_gpus: int, gpu_tflops: float, hours: float,
+                   mfu: float = 0.45) -> float:
+    """Estimate FLOPs from cluster config."""
+    return n_gpus * gpu_tflops * 1e12 * hours * 3600 * mfu
+
+# Example: 1024 H100s for 30 days at 45% MFU
+if __name__ == "__main__":
+    budgets = [
+        ("1024 H100 × 7 days",  compute_budget(1024,  989, 7*24)),
+        ("1024 H100 × 30 days", compute_budget(1024,  989, 30*24)),
+        ("4096 H100 × 90 days", compute_budget(4096,  989, 90*24)),
+    ]
+    for label, C in budgets:
+        r = optimal_allocation(C)
+        print(f"\n{label}")
+        print(f"  Budget:          {C:.2e} FLOPs")
+        print(f"  Optimal N:       {r['optimal_params']/1e9:.1f}B params")
+        print(f"  Optimal tokens:  {r['optimal_tokens']/1e12:.1f}T tokens")
+        print(f"  Tokens/param:    {r['tokens_per_param']:.0f}x")
+        print(f"  Predicted loss:  {r['predicted_loss']:.4f}")</code></pre>
+
+  <h3 class="text-lg font-semibold mt-5 mb-3">Model Size vs Compute Budget</h3>
+  <table class="striped w-full text-sm border border-gray-200 rounded mb-4">
+    <thead class="bg-blue-600 text-white"><tr><th class="px-3 py-2">Compute Budget</th><th class="px-3 py-2">Chinchilla-Optimal N</th><th class="px-3 py-2">Chinchilla Tokens</th><th class="px-3 py-2">LLaMA-style (overtrain)</th><th class="px-3 py-2">Notes</th></tr></thead>
+    <tbody>
+      <tr><td class="px-3 py-2">1e21 FLOPs</td><td class="px-3 py-2">~1B</td><td class="px-3 py-2">~20B</td><td class="px-3 py-2">1B / 200B tokens</td><td class="px-3 py-2">Single A100 node, weeks</td></tr>
+      <tr><td class="px-3 py-2">1e22 FLOPs</td><td class="px-3 py-2">~3B</td><td class="px-3 py-2">~60B</td><td class="px-3 py-2">3B / 1T tokens</td><td class="px-3 py-2">Small cluster, 1–2 weeks</td></tr>
+      <tr><td class="px-3 py-2">1e23 FLOPs</td><td class="px-3 py-2">~10B</td><td class="px-3 py-2">~200B</td><td class="px-3 py-2">7B / 1–2T tokens</td><td class="px-3 py-2">128 H100, 2–3 weeks</td></tr>
+      <tr><td class="px-3 py-2">1e24 FLOPs</td><td class="px-3 py-2">~30B</td><td class="px-3 py-2">~600B</td><td class="px-3 py-2">70B / 2T tokens</td><td class="px-3 py-2">1024 H100, 3–4 weeks</td></tr>
+      <tr><td class="px-3 py-2">1e25 FLOPs</td><td class="px-3 py-2">~100B</td><td class="px-3 py-2">~2T</td><td class="px-3 py-2">70–405B / 15T tokens</td><td class="px-3 py-2">LLaMA 3 scale</td></tr>
+    </tbody>
+  </table>
+  <p class="text-sm text-gray-500">Chinchilla-optimal maximizes loss for a fixed budget; LLaMA-style overtraining maximizes inference efficiency (smaller model, more tokens).</p>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     SECTION 9: REAL-WORLD RECIPES
+═══════════════════════════════════════════════════════ -->
+<section id="recipes">
+  <h2 class="text-2xl font-bold text-gray-900 mb-1">9. Real-World Training Recipes</h2>
+  <p class="text-gray-500 text-sm mb-5">What was actually used in production large-model training runs.</p>
+
+  <h3 class="text-lg font-semibold mb-3">LLaMA 3 Training Recipe (Meta, 2024)</h3>
+  <div class="callout-info p-4 rounded mb-5 text-sm">
+    <strong>Architecture:</strong> GQA (8 KV heads), RoPE, SwiGLU, no bias, pre-RMS-Norm, vocab 128K (tiktoken-style BPE)<br>
+    <strong>Scale:</strong> 8B (32L, h=4096), 70B (80L, h=8192), 405B (126L, h=16384)<br>
+    <strong>Data:</strong> 15T tokens from web + code + math (LLaMA 3 8B/70B), custom data mix per phase<br>
+    <strong>Optimizer:</strong> AdamW (β₁=0.9, β₂=0.95, ε=1e-5), cosine decay to 1e-5, warmup 2000 steps<br>
+    <strong>Batch:</strong> 4M tokens (8B: 4K seq × 1024 seqs), increased to 16M for final phase<br>
+    <strong>LR:</strong> 3e-4 (8B), 1.5e-4 (70B), 8e-5 (405B); weight decay 0.1<br>
+    <strong>Parallelism (405B):</strong> TP=8, PP=16, CP (context parallel)=8, DP=16 → 16384 H100s<br>
+    <strong>Precision:</strong> BF16 forward/backward, FP32 optimizer states, FP8 for some layers (405B)<br>
+    <strong>Infra:</strong> Custom fault-tolerance with automatic checkpoint rollback, ~3 weeks wall clock
+  </div>
+
+  <h3 class="text-lg font-semibold mb-3">Published Large Model Training Configs</h3>
+  <table class="striped w-full text-sm border border-gray-200 rounded mb-6">
+    <thead class="bg-blue-600 text-white"><tr><th class="px-3 py-2">Model</th><th class="px-3 py-2">Params</th><th class="px-3 py-2">Tokens</th><th class="px-3 py-2">Batch (tokens)</th><th class="px-3 py-2">LR</th><th class="px-3 py-2">GPUs</th><th class="px-3 py-2">Precision</th></tr></thead>
+    <tbody>
+      <tr><td class="px-3 py-2 font-medium">GPT-3</td><td class="px-3 py-2">175B</td><td class="px-3 py-2">300B</td><td class="px-3 py-2">3.2M</td><td class="px-3 py-2">6e-5</td><td class="px-3 py-2">~10K V100</td><td class="px-3 py-2">FP16</td></tr>
+      <tr><td class="px-3 py-2 font-medium">LLaMA 2 (70B)</td><td class="px-3 py-2">70B</td><td class="px-3 py-2">2T</td><td class="px-3 py-2">4M</td><td class="px-3 py-2">1.5e-4</td><td class="px-3 py-2">2048 A100</td><td class="px-3 py-2">BF16</td></tr>
+      <tr><td class="px-3 py-2 font-medium">LLaMA 3 (8B)</td><td class="px-3 py-2">8B</td><td class="px-3 py-2">15T</td><td class="px-3 py-2">4M→16M</td><td class="px-3 py-2">3e-4</td><td class="px-3 py-2">~2048 H100</td><td class="px-3 py-2">BF16</td></tr>
+      <tr><td class="px-3 py-2 font-medium">LLaMA 3 (405B)</td><td class="px-3 py-2">405B</td><td class="px-3 py-2">15T</td><td class="px-3 py-2">8M→64M</td><td class="px-3 py-2">8e-5</td><td class="px-3 py-2">16384 H100</td><td class="px-3 py-2">BF16/FP8</td></tr>
+      <tr><td class="px-3 py-2 font-medium">Mistral 7B</td><td class="px-3 py-2">7B</td><td class="px-3 py-2">~1T</td><td class="px-3 py-2">~4M</td><td class="px-3 py-2">3e-4</td><td class="px-3 py-2">~512 A100</td><td class="px-3 py-2">BF16</td></tr>
+      <tr><td class="px-3 py-2 font-medium">Falcon 180B</td><td class="px-3 py-2">180B</td><td class="px-3 py-2">3.5T</td><td class="px-3 py-2">3.8M</td><td class="px-3 py-2">1.85e-4</td><td class="px-3 py-2">4096 A100</td><td class="px-3 py-2">BF16</td></tr>
+    </tbody>
+  </table>
+
+  <h3 class="text-lg font-semibold mb-3">End-to-End Training Pipeline</h3>
+  <div class="mermaid">
+flowchart LR
+    A["Raw Data\n(web, code, books)"] --> B["Data Processing\n(dedup, filter, classify)"]
+    B --> C["Tokenization\n(BPE / SentencePiece)"]
+    C --> D["Pretraining\n(TP+PP+DP)"]
+    D --> E{"Quality\nEvals"}
+    E -- "pass" --> F["Long-context\nFinetuning\n(32K → 128K ctx)"]
+    E -- "loss spike /" --> D
+    F --> G["SFT / RLHF\n(Chat alignment)"]
+    G --> H["Safety Evals\n(benchmarks, red-team)"]
+    H -- "pass" --> I["Quantization\n(INT4/INT8/FP8)"]
+    I --> J["Publish\n(HuggingFace / API)"]
+    H -- "issues" --> G
+    style D fill:#dbeafe,stroke:#2563eb
+    style G fill:#f0fdf4,stroke:#059669
+    style I fill:#fef9c3,stroke:#d97706
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     SUMMARY & KEY TAKEAWAYS
+═══════════════════════════════════════════════════════ -->
+<section id="summary" class="bg-gray-50 rounded-xl p-8 border border-gray-200">
+  <h2 class="text-2xl font-bold text-gray-900 mb-4">Summary & Key Takeaways</h2>
+  <p class="text-gray-700 mb-4">Combined with Chapter 8 (DDP, ZeRO, FSDP, mixed precision), you now have the full picture of modern distributed training infrastructure.</p>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+    <div class="callout-info p-4 rounded">
+      <h3 class="font-semibold mb-2">From Chapter 8 (Foundations)</h3>
+      <ul class="text-sm space-y-1 text-gray-700 list-disc list-inside">
+        <li>DDP: gradient AllReduce across replicas</li>
+        <li>ZeRO Stage 1/2/3: shard optimizer/grad/params</li>
+        <li>FSDP: PyTorch-native ZeRO-3 equivalent</li>
+        <li>Mixed precision: BF16 forward, FP32 master weights</li>
+        <li>Gradient checkpointing: memory vs compute trade-off</li>
+      </ul>
+    </div>
+    <div class="callout-tip p-4 rounded">
+      <h3 class="font-semibold mb-2">From Chapter 8B (Advanced)</h3>
+      <ul class="text-sm space-y-1 text-gray-700 list-disc list-inside">
+        <li>3D parallelism: TP within node, PP+DP across nodes</li>
+        <li>Megatron-LM: sequence parallelism, selective recomputation</li>
+        <li>Profiling: MFU is the single most important metric</li>
+        <li>Async checkpointing: save at full frequency, near-zero overhead</li>
+        <li>Scaling laws: 20 tokens/param optimal; overtrain for inference</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3 class="font-semibold text-gray-900 mb-3">Decision Framework</h3>
+  <ol class="text-sm space-y-2 text-gray-700 list-decimal list-inside">
+    <li><strong>Model &lt;7B:</strong> DDP + ZeRO-2. Add FSDP if VRAM is tight. No need for 3D parallelism.</li>
+    <li><strong>7B–70B:</strong> FSDP or DeepSpeed ZeRO-3. Consider TP=4 if on NVLink nodes. Megatron-LM for production scale.</li>
+    <li><strong>70B–405B:</strong> Megatron-LM with TP=8 (within node), PP=4–16 (across nodes). Interleaved 1F1B schedule mandatory.</li>
+    <li><strong>1T+:</strong> Add expert parallelism (MoE), context parallelism, FP8 compute. Vertical pipeline parallelism (VPP) to minimize bubble.</li>
+    <li><strong>Always:</strong> Measure MFU first. Profile before optimizing. Async checkpoint every 15–30 min. Monitor grad norms and loss for spikes.</li>
+  </ol>
+</section>
+
+</div><!-- end main content -->
+
+<!-- BOTTOM NAV -->
+<div class="no-print border-t border-gray-200 bg-gray-50 mt-12">
+  <div class="max-w-5xl mx-auto px-6 py-6 flex justify-between items-center">
+    <a href="ch08_distributed_training.html" class="flex items-center gap-2 text-blue-600 hover:text-blue-800 font-medium text-sm">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+      Previous: Chapter 8 — Distributed Training
+    </a>
+    <span class="text-gray-400 text-sm">Chapter 8B of 20</span>
+    <a href="ch09_mlops_platforms.html" class="flex items-center gap-2 text-blue-600 hover:text-blue-800 font-medium text-sm">
+      Next: Chapter 9 — MLOps Platforms
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+    </a>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Case Study 1A — The Transformer Architecture: how Google patented the attention mechanism, claim analysis, prior art, and patent strategy." />
+  <title>Case Study 1A: The Transformer Architecture — Patent Law for Technologists</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .claim-analysis {
+      background: var(--gray-50);
+      border: 1px solid var(--gray-200);
+      border-left: 4px solid var(--navy-light);
+      border-radius: 0 var(--radius) var(--radius) 0;
+      padding: 1rem 1.25rem;
+      margin-top: .75rem;
+      font-size: .875rem;
+      color: var(--text-light);
+      font-family: var(--font-sans);
+    }
+    .claim-analysis strong { color: var(--navy); }
+    .patent-ref {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: .8125rem;
+      background: var(--navy);
+      color: var(--gold-light);
+      padding: .15rem .55rem;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+    .family-tree-label {
+      font-family: var(--font-sans);
+      font-size: .75rem;
+      fill: var(--navy, #1a2744);
+    }
+    .prior-art-table td:nth-child(3) { color: var(--success); font-size: .875rem; }
+    .scope-item { display: flex; gap: .5rem; align-items: baseline; margin-bottom: .625rem; }
+    .scope-item::before { content: '●'; color: inherit; flex-shrink: 0; font-size: .6rem; margin-top: .25rem; }
+    .comparison-item.good .scope-item::before { color: var(--success); }
+    .comparison-item.bad  .scope-item::before { color: var(--danger); }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════
+     TOP NAVIGATION
+══════════════════════════════════════════════════ -->
+<nav class="top-nav">
+  <div class="nav-container">
+    <a href="index.html" class="nav-logo">Patent Law <span>for Technologists</span></a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="ch01_patent_system_overview.html">Ch.1</a>
+      <a href="ch05_writing_claims.html">Ch.5</a>
+      <a href="ch08_application_process.html">Ch.8</a>
+      <a href="ch12_monetization.html">Ch.12</a>
+      <a href="ex01a_transformer_technology.html" class="active">Ex.1A</a>
+      <a href="ex01b_transformer_lessons.html">Ex.1B</a>
+      <a href="ex02_lora.html">Ex.2</a>
+      <a href="ex03_crispr.html">Ex.3</a>
+      <a href="ex04_gpt.html">Ex.4</a>
+      <a href="ex05_alphafold.html">Ex.5</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════════════════
+     CHAPTER HERO
+══════════════════════════════════════════════════ -->
+<header class="chapter-hero">
+  <div class="chapter-hero-content">
+    <div class="chapter-badge">Case Study 1 &middot; Part A</div>
+    <h1>The Transformer Architecture</h1>
+    <p class="subtitle">How Google patented the attention mechanism — technical innovation and claim analysis</p>
+    <div class="chapter-meta">
+      <span>Prof. Colleen V. Chien &bull; Berkeley School of Law</span>
+      <span>Patent Law for Technologists, First Edition</span>
+      <span>~3,200 words</span>
+      <span>6 Sections</span>
+    </div>
+  </div>
+</header>
+
+<!-- ══════════════════════════════════════════════════
+     STATS ROW
+══════════════════════════════════════════════════ -->
+<div style="background:var(--gray-50); border-bottom:1px solid var(--gray-200); padding:1.5rem 2rem;">
+  <div class="stats-row" style="max-width:900px; margin:0 auto;">
+    <div class="stat-item">
+      <div class="stat-number">2017</div>
+      <div class="stat-label">"Attention Is All You Need" — Vaswani et al., NeurIPS 2017</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">&gt;100K</div>
+      <div class="stat-label">Citations, making it one of the most cited ML papers ever written</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">$100B+</div>
+      <div class="stat-label">Market built on transformer-based AI (GPT, BERT, PaLM, Gemini)</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">8</div>
+      <div class="stat-label">Authors, all at Google Brain / Google Research at time of publication</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     PAGE LAYOUT
+══════════════════════════════════════════════════ -->
+<div class="page-layout" style="max-width:1200px; margin:0 auto; padding:0 2rem; display:grid; grid-template-columns:260px 1fr; gap:3rem; align-items:start;">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <nav class="toc">
+      <h3>Sections</h3>
+      <ol>
+        <li><a href="#intro">Introduction</a></li>
+        <li><a href="#technical">Key Technical Contributions</a></li>
+        <li><a href="#strategy">Google's Patent Strategy</a></li>
+        <li><a href="#claims">Claim Analysis</a></li>
+        <li><a href="#scope">Patentable vs. Not</a></li>
+        <li><a href="#prior-art">Prior Art Landscape</a></li>
+      </ol>
+    </nav>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="chapter-content">
+
+    <!-- ── 1. INTRODUCTION ─────────────────────────────── -->
+    <section id="intro" class="section-anchor">
+      <h2>1. Introduction</h2>
+
+      <p>In June 2017, eight researchers at Google Brain submitted a preprint titled <em>"Attention Is All You Need."</em> The paper introduced the <span class="key-term" title="Neural network architecture relying entirely on self-attention mechanisms">transformer architecture</span> — a neural network design that dispensed entirely with recurrence and convolution, relying instead on a mechanism called <em>self-attention</em> to model relationships between all positions in a sequence simultaneously. When it appeared at NeurIPS that December, few anticipated how completely it would reorder the AI landscape.</p>
+
+      <p>Within five years, transformers became the backbone of virtually every major language model: BERT, GPT-2, GPT-3, GPT-4, PaLM, T5, and their successors. The architecture transferred, nearly unchanged, to image recognition (ViT), protein structure prediction (AlphaFold 2), code generation, and multimodal reasoning. A $100B+ commercial AI industry now rests on foundations laid in that 2017 paper.</p>
+
+      <p>That raises a central IP question: <strong>who owns the transformer?</strong> The eight authors were Google employees; their inventions belonged to Google. Google filed patents covering core aspects of the architecture in the same month the paper was submitted — before the paper became public, before the research community had seen the claims, and before any startup could design around them. This case study examines what was patented, how claims were drafted, and what the prior art landscape meant for scope.</p>
+
+      <blockquote>
+        "We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely."
+        <cite>— Vaswani et al., "Attention Is All You Need," NeurIPS 2017</cite>
+      </blockquote>
+    </section>
+
+    <!-- ── 2. TECHNICAL CONTRIBUTIONS ─────────────────── -->
+    <section id="technical" class="section-anchor">
+      <h2>2. Key Technical Contributions</h2>
+
+      <p>To evaluate patent claims, you must first understand what was actually novel. The transformer introduced five interlocking innovations, each of which could support independent claims.</p>
+
+      <h3>a. Scaled Dot-Product Attention</h3>
+      <p>The fundamental operation takes three matrices — a <strong>Query (Q)</strong>, a <strong>Key (K)</strong>, and a <strong>Value (V)</strong> — derived from the input by multiplying it with learned weight matrices. Attention is computed as:</p>
+      <pre><code>Attention(Q, K, V) = softmax( Q·Kᵀ / √dₖ ) · V</code></pre>
+      <p>The scaling factor <code>1/√dₖ</code> prevents the dot products from growing large in magnitude as the key dimension <code>dₖ</code> increases, which would push softmax into regions with extremely small gradients. This specific scaling formulation was a key patentable element.</p>
+
+      <h3>b. Multi-Head Attention</h3>
+      <p>Rather than computing attention once, the transformer runs <em>h</em> parallel attention "heads," each with its own learned weight matrices <code>Wᵢ_Q, Wᵢ_K, Wᵢ_V</code>. The outputs are concatenated and projected. This allows the model to jointly attend to information from different representation subspaces at different positions — a capability single-head attention cannot provide.</p>
+
+      <h3>c. Positional Encoding</h3>
+      <p>Because attention operates on sets (not sequences), position information must be injected explicitly. Vaswani et al. added sinusoidal positional encodings to the input embeddings, enabling the model to use sequence order without recurrence.</p>
+
+      <h3>d. Encoder–Decoder Architecture</h3>
+      <p>The original transformer stacks encoder layers (self-attention + feed-forward) and decoder layers (self-attention + cross-attention over encoder output + feed-forward). The cross-attention mechanism lets each decoder position attend to all encoder positions — critical for machine translation.</p>
+
+      <h3>e. Parallelization Advantage</h3>
+      <p>RNNs process tokens sequentially; each step depends on the previous hidden state. Transformers compute all positions in parallel, enabling dramatically faster training on modern GPU/TPU hardware. This architectural advantage — not just accuracy — drove commercial adoption.</p>
+
+      <!-- INLINE SVG DIAGRAM -->
+      <div class="figure">
+        <div class="figure-content">
+          <svg viewBox="0 0 320 400" width="320" height="400" class="diagram-svg" style="max-width:320px;" aria-label="Transformer encoder block diagram">
+            <defs>
+              <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                <path d="M0,0 L0,6 L8,3 z" fill="#333"/>
+              </marker>
+            </defs>
+            <!-- Boxes -->
+            <rect x="60" y="20"  width="200" height="40" rx="6" fill="#f1f3f5" stroke="#1a2744" stroke-width="1.5"/>
+            <rect x="60" y="90"  width="200" height="40" rx="6" fill="#f1f3f5" stroke="#1a2744" stroke-width="1.5"/>
+            <rect x="60" y="160" width="200" height="40" rx="6" fill="#1a2744" stroke="#1a2744" stroke-width="1.5"/>
+            <rect x="60" y="230" width="200" height="40" rx="6" fill="#f1f3f5" stroke="#1a2744" stroke-width="1.5"/>
+            <rect x="60" y="300" width="200" height="40" rx="6" fill="#1a2744" stroke="#1a2744" stroke-width="1.5"/>
+            <rect x="60" y="370" width="200" height="25" rx="6" fill="#c8942a" stroke="#c8942a" stroke-width="1.5"/>
+            <!-- Arrows -->
+            <line x1="160" y1="60"  x2="160" y2="88"  stroke="#333" stroke-width="1.5" marker-end="url(#arr)"/>
+            <line x1="160" y1="130" x2="160" y2="158" stroke="#333" stroke-width="1.5" marker-end="url(#arr)"/>
+            <line x1="160" y1="200" x2="160" y2="228" stroke="#333" stroke-width="1.5" marker-end="url(#arr)"/>
+            <line x1="160" y1="270" x2="160" y2="298" stroke="#333" stroke-width="1.5" marker-end="url(#arr)"/>
+            <line x1="160" y1="340" x2="160" y2="368" stroke="#333" stroke-width="1.5" marker-end="url(#arr)"/>
+            <!-- Labels -->
+            <text x="160" y="44"  text-anchor="middle" font-family="Inter,sans-serif" font-size="11" fill="#1a2744">Input Embeddings (100)</text>
+            <text x="160" y="59"  text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="#566573">+ Positional Encoding (102)</text>
+            <text x="160" y="115" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" fill="#1a2744">Multi-Head Attention (104)</text>
+            <text x="160" y="184" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" fill="#ffffff">Add &amp; Norm (106)</text>
+            <text x="160" y="254" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" fill="#1a2744">Feed-Forward Network (108)</text>
+            <text x="160" y="324" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" fill="#ffffff">Add &amp; Norm (110)</text>
+            <text x="160" y="387" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" fill="#1a2744" font-weight="700">Output (112)</text>
+          </svg>
+        </div>
+        <p class="figure-caption">Fig. 1 — Transformer encoder block with patent reference numerals. Each box corresponds to an element that may appear as a claim limitation.</p>
+      </div>
+    </section>
+
+    <!-- ── 3. PATENT STRATEGY ──────────────────────────── -->
+    <section id="strategy" class="section-anchor">
+      <h2>3. Google's Patent Strategy</h2>
+
+      <p>Google's IP team moved quickly. The transformer paper was submitted to arXiv in June 2017; a patent application covering sequence-to-sequence transduction with attention mechanisms was filed in approximately the same month. The 18-month pre-publication period — standard under 35 U.S.C. § 122 — meant competitors saw the paper long before they saw the claims.</p>
+
+      <h3>The Core Patent</h3>
+      <p>The centerpiece of Google's transformer portfolio is <span class="patent-ref">US 10,366,322 B1</span>, assigned to Google LLC. The patent covers the broad sequence transduction architecture using attention, including the scaled dot-product and multi-head mechanisms. Its claims are written at a level of abstraction that encompasses not just the original NMT application but downstream uses in image captioning, document summarization, and code generation.</p>
+
+      <h3>Continuation Strategy</h3>
+      <p>The parent application was drafted broadly to capture the core mechanism. Continuation applications then claimed specific applications and improvements. This is a classic <span class="key-term" title="Later application claiming priority to an earlier application, with the same specification">continuation strategy</span>: the parent establishes the priority date for the underlying invention, while continuations tailor claims to specific commercial embodiments as the market develops.</p>
+
+      <div class="callout callout-tip">
+        <div class="callout-icon">&#9650;</div>
+        <div class="callout-body">
+          <div class="callout-title">Practice Point: File Before or Simultaneously with Publication</div>
+          <p>Google filed its transformer patent application before the paper became publicly available. Under U.S. law (post-AIA), the inventor has a one-year grace period after their own disclosure, but foreign filings — particularly in Europe and China — require absolute novelty. Filing before or simultaneous with a preprint posting preserves global patent rights. Had Google waited until after the NeurIPS paper was publicly available, PCT rights in jurisdictions without a grace period would have been lost.</p>
+        </div>
+      </div>
+
+      <!-- PATENT FAMILY SVG -->
+      <div class="figure">
+        <div class="figure-content" style="padding:1.5rem 2rem;">
+          <svg viewBox="0 0 560 220" width="560" height="220" class="diagram-svg" aria-label="Patent family tree">
+            <defs>
+              <marker id="arr2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                <path d="M0,0 L0,6 L8,3 z" fill="#1a2744"/>
+              </marker>
+            </defs>
+            <!-- Parent -->
+            <rect x="185" y="10" width="190" height="44" rx="6" fill="#1a2744" stroke="#1a2744"/>
+            <text x="280" y="30" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" fill="#fff" font-weight="600">Parent Application</text>
+            <text x="280" y="46" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="#c8942a">US 10,366,322 B1</text>
+            <!-- Lines from parent -->
+            <line x1="280" y1="54" x2="280" y2="74" stroke="#1a2744" stroke-width="1.5"/>
+            <line x1="100" y1="74" x2="460" y2="74" stroke="#1a2744" stroke-width="1.5"/>
+            <line x1="100" y1="74" x2="100" y2="92" stroke="#1a2744" stroke-width="1.5" marker-end="url(#arr2)"/>
+            <line x1="280" y1="74" x2="280" y2="92" stroke="#1a2744" stroke-width="1.5" marker-end="url(#arr2)"/>
+            <line x1="460" y1="74" x2="460" y2="92" stroke="#1a2744" stroke-width="1.5" marker-end="url(#arr2)"/>
+            <!-- Cont 1 -->
+            <rect x="20" y="92" width="160" height="40" rx="6" fill="#f1f3f5" stroke="#1a2744" stroke-width="1.5"/>
+            <text x="100" y="110" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="#1a2744" font-weight="600">Cont. 1 — NMT</text>
+            <text x="100" y="124" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#566573">Machine Translation</text>
+            <!-- Cont 2 -->
+            <rect x="200" y="92" width="160" height="40" rx="6" fill="#f1f3f5" stroke="#1a2744" stroke-width="1.5"/>
+            <text x="280" y="110" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="#1a2744" font-weight="600">Cont. 2 — Captioning</text>
+            <text x="280" y="124" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#566573">Image Captioning</text>
+            <!-- PCT -->
+            <rect x="380" y="92" width="160" height="40" rx="6" fill="#f1f3f5" stroke="#1a2744" stroke-width="1.5"/>
+            <text x="460" y="110" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="#1a2744" font-weight="600">PCT Application</text>
+            <text x="460" y="124" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#566573">PCT/US2017/xxxxx</text>
+            <!-- PCT children -->
+            <line x1="460" y1="132" x2="460" y2="152" stroke="#1a2744" stroke-width="1.5"/>
+            <line x1="360" y1="152" x2="540" y2="152" stroke="#1a2744" stroke-width="1.5"/>
+            <line x1="360" y1="152" x2="360" y2="168" stroke="#1a2744" stroke-width="1.5" marker-end="url(#arr2)"/>
+            <line x1="540" y1="152" x2="540" y2="168" stroke="#1a2744" stroke-width="1.5" marker-end="url(#arr2)"/>
+            <rect x="300" y="168" width="110" height="36" rx="6" fill="#eaf4fb" stroke="#1a6b8a" stroke-width="1.5"/>
+            <text x="355" y="187" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="#1a6b8a" font-weight="600">EP Patent</text>
+            <text x="355" y="199" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#566573">EPO prosecution</text>
+            <rect x="430" y="168" width="110" height="36" rx="6" fill="#eaf4fb" stroke="#1a6b8a" stroke-width="1.5"/>
+            <text x="485" y="187" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="#1a6b8a" font-weight="600">CN Patent</text>
+            <text x="485" y="199" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#566573">CNIPA prosecution</text>
+          </svg>
+        </div>
+        <p class="figure-caption">Fig. 2 — Simplified transformer patent family. The parent establishes a 2017 priority date; continuations and national phase entries extend coverage across applications and jurisdictions.</p>
+      </div>
+
+      <h3>Timeline</h3>
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-date">May 2017</div>
+          <h4>arXiv Preprint Submitted</h4>
+          <p>Vaswani et al. post the transformer paper. Google's IP team had already been briefed on the invention disclosure.</p>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-date">June 2017</div>
+          <h4>US Patent Application Filed</h4>
+          <p>Application for sequence transduction with attention filed, establishing the critical priority date before any public disclosure in a patent-strict jurisdiction.</p>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-date">December 2017</div>
+          <h4>NeurIPS Presentation</h4>
+          <p>Paper presented publicly. Research community begins building on transformer architecture; patent application is still non-public.</p>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-date">December 2018</div>
+          <h4>Application Published (18-Month Window)</h4>
+          <p>Patent application publishes under 35 U.S.C. § 122(b). Competitors see the claims for the first time — 18 months after filing.</p>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-date">July 2019</div>
+          <h4>US 10,366,322 Issued</h4>
+          <p>Patent granted. Coverage runs until 2037 (20 years from filing).</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 4. CLAIM ANALYSIS ───────────────────────────── -->
+    <section id="claims" class="section-anchor">
+      <h2>4. Claim Analysis: What Was Actually Claimed</h2>
+
+      <p>Understanding patent claims requires reading them element by element. Infringement requires every element of a claim to be present in the accused product or method (the <em>all-elements rule</em>). Below are representative claims with annotation.</p>
+
+      <!-- CLAIM 1 -->
+      <div class="claim-box">
+        <div class="claim-header">US 10,366,322 B1 &mdash; Claim 1 (Independent Method Claim)</div>
+        <p><span class="claim-number">1.</span> A computer-implemented method comprising:</p>
+        <span class="claim-element">receiving, by a computing system, an input sequence of tokens;</span>
+        <span class="claim-element">computing, by the computing system, a query matrix Q, a key matrix K, and a value matrix V from the input sequence using learned weight matrices;</span>
+        <span class="claim-element">computing attention weights by applying a scaled dot-product function to Q and K, wherein the scaling factor comprises an inverse square root of a key dimension d<sub>k</sub>;</span>
+        <span class="claim-element">computing a weighted sum of V using the attention weights to produce an attention output; and</span>
+        <span class="claim-element">generating, by the computing system, an output sequence based on the attention output.</span>
+      </div>
+      <div class="claim-analysis">
+        <strong>Analysis.</strong> Claim 1 is the broadest independent claim and the most commercially significant. The preamble anchors the claim to a "computer-implemented method," satisfying § 101 by tying the mathematical steps to a machine. The key limitation — <em>scaling by the inverse square root of d<sub>k</sub></em> — distinguishes the claim from earlier additive attention (Bahdanau 2014), which used no such scaling, and from general dot-product attention without normalization. Any system using the Q/K/V dot-product formulation with this specific scaling factor will read on this claim.
+      </div>
+
+      <!-- CLAIM 5 -->
+      <div class="claim-box">
+        <div class="claim-header">US 10,366,322 B1 &mdash; Claim 5 (Dependent — Multi-Head Attention)</div>
+        <p><span class="claim-number">5.</span> The method of claim 1, wherein computing the attention weights comprises performing <em>h</em> parallel attention computations using <em>h</em> distinct learned weight matrices, and concatenating the <em>h</em> attention outputs.</p>
+      </div>
+      <div class="claim-analysis">
+        <strong>Analysis.</strong> Claim 5 depends from Claim 1, adding the multi-head limitation. Dependent claims are narrower but often more defensible against prior art challenges because each limitation must be present. A product that runs only a single attention head would not infringe Claim 5, but would still potentially infringe Claim 1. In practice, virtually all transformer implementations use multi-head attention, making Claim 5 commercially equivalent to Claim 1 for most infringement analyses.
+      </div>
+
+      <!-- CLAIM 9 -->
+      <div class="claim-box">
+        <div class="claim-header">US 10,366,322 B1 &mdash; Claim 9 (System Claim)</div>
+        <p><span class="claim-number">9.</span> A system comprising:</p>
+        <span class="claim-element">one or more processors; and</span>
+        <span class="claim-element">one or more non-transitory computer-readable media storing instructions that, when executed by the one or more processors, cause the system to perform operations comprising the method of claim 1.</span>
+      </div>
+      <div class="claim-analysis">
+        <strong>Analysis.</strong> The system claim covers the hardware-software combination. Strategically, having a system claim alongside a method claim enables suit against manufacturers of transformer inference hardware (e.g., specialized ASICs) under the system claim, and against cloud API providers under the method claim, even if either argument fails against the other. The system claim also captures apparatus sold in the United States even if the infringing method is performed abroad.
+      </div>
+
+      <!-- CLAIM 12 -->
+      <div class="claim-box">
+        <div class="claim-header">US 10,366,322 B1 &mdash; Claim 12 (Computer-Readable Medium)</div>
+        <p><span class="claim-number">12.</span> One or more non-transitory computer-readable media storing instructions that, when executed by one or more processors, cause the one or more processors to perform the method of claim 1.</p>
+      </div>
+      <div class="claim-analysis">
+        <strong>Analysis.</strong> The CRM claim covers distribution of software embodying the method — for example, distributing a transformer library or a pre-trained model runtime. The "non-transitory" qualifier was added to overcome USPTO practice under <em>In re Nuijten</em> (Fed. Cir. 2007), which held that transitory signals are unpatentable. CRM claims are particularly useful for infringement by software download and distribution because the object of infringement is the media itself, not a process that must be observed in operation.
+      </div>
+    </section>
+
+    <!-- ── 5. SCOPE ─────────────────────────────────────── -->
+    <section id="scope" class="section-anchor">
+      <h2>5. What Was Patentable vs. What Was Not</h2>
+
+      <p>Patent protection attaches to specific claimed implementations, not to the underlying ideas. Understanding the boundary between patentable subject matter and excluded mathematical concepts is essential to freedom-to-operate analysis.</p>
+
+      <div class="comparison-grid">
+        <div class="comparison-item good">
+          <h4>Patentable</h4>
+          <div class="scope-item">The specific scaled dot-product attention mechanism with 1/√d<sub>k</sub> normalization applied to Q, K, V matrices derived from learned weights</div>
+          <div class="scope-item">Multi-head attention architecture: h parallel heads with distinct weight matrices and concatenated outputs</div>
+          <div class="scope-item">The sinusoidal positional encoding scheme (specific sine/cosine frequency formula applied to embedding dimensions)</div>
+          <div class="scope-item">The training method: joint optimization of encoder, decoder, and attention weights via backpropagation through the full architecture</div>
+          <div class="scope-item">System and CRM claims covering the hardware-software combination and distribution of software embodying the method</div>
+        </div>
+        <div class="comparison-item bad">
+          <h4>Not Patentable</h4>
+          <div class="scope-item">The mathematical concept of "attention" or weighted averaging itself — abstract ideas are excluded under 35 U.S.C. § 101 and <em>Alice Corp. v. CLS Bank</em></div>
+          <div class="scope-item">The resulting trained model weights — weights are data, not a method or apparatus; storing them on media does not constitute a patentable invention under current USPTO guidance</div>
+          <div class="scope-item">Specific NLP tasks (translation, summarization, Q&amp;A) — performing a cognitive task, without more, is not patent-eligible even if a machine is used</div>
+          <div class="scope-item">Transformer variants that use alternative attention formulations (e.g., linear attention, sparse attention) that do not recite the specific claim limitations</div>
+        </div>
+      </div>
+
+      <div class="callout callout-warning">
+        <div class="callout-icon">&#9888;</div>
+        <div class="callout-body">
+          <div class="callout-title">The § 101 Risk</div>
+          <p>Claims directed to mathematical operations on data face heightened scrutiny under <em>Alice</em>. Google's claims survived by consistently tying the attention computation to a "computing system" and to specific structural limitations (the scaling factor, the learned weight matrices). A claim reciting only "computing softmax(QKᵀ) · V" without these structural ties would face rejection as an abstract mathematical formula. Practitioners must ensure every claim includes meaningful non-abstract limitations beyond the equation itself.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 6. PRIOR ART ─────────────────────────────────── -->
+    <section id="prior-art" class="section-anchor">
+      <h2>6. Prior Art Landscape</h2>
+
+      <p>Claim scope is bounded by the prior art. Google's patent examiner would have reviewed the attention literature to determine whether each limitation was novel and non-obvious. The table below maps key prior art references against the transformer claims.</p>
+
+      <div class="table-wrapper">
+        <table class="prior-art-table">
+          <thead>
+            <tr>
+              <th>Prior Art Reference</th>
+              <th>Year</th>
+              <th>What It Covered</th>
+              <th>How Transformer Claims Distinguished It</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Bahdanau et al.</strong> (additive attention)</td>
+              <td>2014</td>
+              <td>Attention in RNN encoder–decoder using a learned additive scoring function: <code>score(sᵢ, hⱼ) = vᵀ tanh(W₁sᵢ + W₂hⱼ)</code>. Applied to neural machine translation.</td>
+              <td>No scaled dot-product; no Q/K/V matrix formulation; requires recurrent hidden states (not parallelizable). Transformer claims require the specific 1/√d<sub>k</sub> scaling and the elimination of recurrence.</td>
+            </tr>
+            <tr>
+              <td><strong>Luong et al.</strong> (multiplicative attention)</td>
+              <td>2015</td>
+              <td>Dot-product attention scoring: <code>score(sᵢ, hⱼ) = sᵢᵀ hⱼ</code>. Improved alignment in NMT over Bahdanau.</td>
+              <td>Closest prior art to scaled dot-product. Critically lacks the 1/√d<sub>k</sub> scaling factor — the key limitation. Also retains RNN encoder; no multi-head or positional encoding. Transformer claims require all these elements together.</td>
+            </tr>
+            <tr>
+              <td><strong>Sutskever et al.</strong> (seq2seq)</td>
+              <td>2014</td>
+              <td>Sequence-to-sequence learning with LSTM encoder–decoder. No attention mechanism; fixed-length thought vector bottleneck.</td>
+              <td>No attention at all; dependent entirely on recurrence. Transformers replace the recurrent structure entirely. Every limitation of Claim 1 (Q, K, V matrices; attention weights; scaled dot-product) is absent.</td>
+            </tr>
+            <tr>
+              <td><strong>Gehring et al.</strong> (convolutional seq2seq)</td>
+              <td>2017</td>
+              <td>Seq2seq using convolutional networks instead of RNNs. Multi-step attention with dot-product scoring over convolutional representations.</td>
+              <td>Uses convolution rather than self-attention; no Q/K/V learned weight matrices applied globally across all positions; no sinusoidal positional encoding; no multi-head mechanism. Published contemporaneously — provides evidence of independent development trend, not anticipation.</td>
+            </tr>
+            <tr>
+              <td><strong>Weston et al.</strong> (Memory Networks)</td>
+              <td>2015</td>
+              <td>External memory with soft addressing using key-value lookup. Conceptually similar to attention over stored memories.</td>
+              <td>Memory Networks operate on an external memory store, not on input sequence self-attention. The Q/K/V formulation in transformers is applied to positional representations within the sequence itself — a different mechanism and context. No scaling factor or multi-head parallelism.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="table-caption">Table 1 — Prior art references and claim differentiation. The 1/√d<sub>k</sub> scaling factor and multi-head mechanism appear in none of these references.</p>
+
+      <div class="callout callout-info">
+        <div class="callout-icon">&#9432;</div>
+        <div class="callout-body">
+          <div class="callout-title">Obviousness Considerations</div>
+          <p>Even if no single reference anticipates all elements of a claim, an examiner may combine references to argue obviousness under 35 U.S.C. § 103. The closest combination here would be Luong (dot-product attention) + multi-head parallelism. Google likely argued that there was no motivation to combine these references and that the specific scaling factor and positional encoding scheme required non-obvious insight — a position strengthened by the paper's dramatic commercial success, which constitutes "secondary evidence" of non-obviousness under <em>Graham v. John Deere</em>.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── CHAPTER NAV ─────────────────────────────────── -->
+    <nav class="chapter-nav">
+      <a href="ch12_monetization.html" class="chapter-nav-btn">
+        <span class="nav-label">&#8592; Previous</span>
+        <span class="nav-title">Chapter 12: Licensing and Monetization</span>
+      </a>
+      <a href="ex01b_transformer_lessons.html" class="chapter-nav-btn nav-next">
+        <span class="nav-label">Next &#8594;</span>
+        <span class="nav-title">Case Study 1B: Legal Analysis and Lessons</span>
+      </a>
+    </nav>
+
+  </main>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     FOOTER
+══════════════════════════════════════════════════ -->
+<footer>
+  <div class="footer-content">
+    <p><strong style="color:white;">Patent Law for Technologists</strong> &mdash; First Edition</p>
+    <p>Prof. Colleen V. Chien, Berkeley School of Law &bull; Case Study 1A</p>
+    <p style="margin-top:1rem; font-size:.8125rem; opacity:.6;">
+      This material is provided for educational purposes. Patent numbers and claim language are illustrative of
+      real-world practice; practitioners should conduct independent research before relying on any claim analysis.
+      &copy; 2025 The Authors. All rights reserved.
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>

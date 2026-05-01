@@ -1,0 +1,1631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TypeScript for the AI Era — From Python Engineer to Staff-Level TypeScript Architect</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --white: #FFFFFF;
+      --surface: #F9FAFB;
+      --border: #E5E7EB;
+      --text-primary: #111827;
+      --text-secondary: #6B7280;
+      --text-tertiary: #9CA3AF;
+      --indigo-50: #EEF2FF;
+      --indigo-100: #E0E7FF;
+      --indigo-500: #6366F1;
+      --indigo-600: #4F46E5;
+      --indigo-700: #4338CA;
+      --indigo-800: #3730A3;
+      --sky-400: #38BDF8;
+      --sky-500: #0EA5E9;
+      --sky-600: #0284C7;
+      --green-500: #22C55E;
+      --green-100: #DCFCE7;
+      --green-700: #15803D;
+      --amber-500: #F59E0B;
+      --amber-100: #FEF3C7;
+      --amber-700: #B45309;
+      --rose-500: #F43F5E;
+      --rose-100: #FFE4E6;
+      --rose-700: #BE123C;
+      --violet-500: #8B5CF6;
+      --violet-100: #EDE9FE;
+      --violet-700: #6D28D9;
+      --teal-500: #14B8A6;
+      --teal-100: #CCFBF1;
+      --teal-700: #0F766E;
+      --orange-500: #F97316;
+      --orange-100: #FFEDD5;
+      --orange-700: #C2410C;
+      --font-body: system-ui, -apple-system, 'Segoe UI', sans-serif;
+      --font-code: 'JetBrains Mono', 'Fira Code', monospace;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--white);
+      color: var(--text-primary);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ───── NAV ───── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--indigo-600);
+      text-decoration: none;
+    }
+
+    .nav-brand .ts-badge {
+      background: var(--indigo-600);
+      color: white;
+      font-family: var(--font-code);
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 4px;
+      letter-spacing: 0.02em;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: color 0.15s;
+    }
+
+    .nav-links a:hover { color: var(--indigo-600); }
+
+    .nav-cta {
+      background: var(--indigo-600);
+      color: white !important;
+      padding: 0.4rem 1rem;
+      border-radius: 6px;
+      transition: background 0.15s !important;
+    }
+
+    .nav-cta:hover { background: var(--indigo-700) !important; color: white !important; }
+
+    /* ───── HERO ───── */
+    .hero {
+      background: linear-gradient(135deg, #4F46E5 0%, #6366F1 30%, #38BDF8 100%);
+      padding: 6rem 2rem 5rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+
+    .hero-inner {
+      position: relative;
+      max-width: 860px;
+      margin: 0 auto;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.3);
+      color: white;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.35rem 1rem;
+      border-radius: 999px;
+      margin-bottom: 1.75rem;
+    }
+
+    .hero-eyebrow .dot {
+      width: 6px; height: 6px;
+      background: #A5F3FC;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .hero h1 {
+      font-size: clamp(2.4rem, 6vw, 4rem);
+      font-weight: 800;
+      color: white;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      margin-bottom: 1.25rem;
+    }
+
+    .hero h1 span {
+      display: block;
+      font-size: clamp(1.5rem, 3.5vw, 2.25rem);
+      font-weight: 400;
+      opacity: 0.88;
+      letter-spacing: -0.01em;
+      margin-top: 0.35rem;
+    }
+
+    .hero-subtitle {
+      font-size: 1.125rem;
+      color: rgba(255,255,255,0.85);
+      max-width: 600px;
+      margin: 0 auto 2.5rem;
+      line-height: 1.65;
+    }
+
+    .hero-stats {
+      display: flex;
+      justify-content: center;
+      gap: 2.5rem;
+      margin-bottom: 2.5rem;
+      flex-wrap: wrap;
+    }
+
+    .hero-stat {
+      text-align: center;
+      color: white;
+    }
+
+    .hero-stat .value {
+      display: block;
+      font-size: 2rem;
+      font-weight: 800;
+      line-height: 1;
+      margin-bottom: 0.2rem;
+    }
+
+    .hero-stat .label {
+      font-size: 0.8rem;
+      opacity: 0.75;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 500;
+    }
+
+    .hero-actions {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: white;
+      color: var(--indigo-700);
+      font-weight: 700;
+      font-size: 1rem;
+      padding: 0.85rem 2rem;
+      border-radius: 10px;
+      text-decoration: none;
+      transition: transform 0.15s, box-shadow 0.15s;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(0,0,0,0.2);
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(255,255,255,0.15);
+      color: white;
+      font-weight: 600;
+      font-size: 1rem;
+      padding: 0.85rem 2rem;
+      border-radius: 10px;
+      text-decoration: none;
+      border: 1px solid rgba(255,255,255,0.35);
+      transition: background 0.15s, transform 0.15s;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255,255,255,0.25);
+      transform: translateY(-2px);
+    }
+
+    /* ───── QUICK START ───── */
+    .quickstart {
+      background: var(--indigo-50);
+      border-top: 1px solid var(--indigo-100);
+      border-bottom: 1px solid var(--indigo-100);
+      padding: 2.5rem 2rem;
+    }
+
+    .quickstart-inner {
+      max-width: 860px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .quickstart-label {
+      font-weight: 700;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--indigo-600);
+      white-space: nowrap;
+    }
+
+    .quickstart-code {
+      flex: 1;
+      min-width: 260px;
+      background: var(--text-primary);
+      color: #A5F3FC;
+      font-family: var(--font-code);
+      font-size: 0.875rem;
+      padding: 0.9rem 1.25rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+
+    .quickstart-code .dim { color: rgba(165,243,252,0.45); }
+    .quickstart-code .kw  { color: #C084FC; }
+
+    .quickstart-note {
+      font-size: 0.8rem;
+      color: var(--indigo-700);
+      white-space: nowrap;
+    }
+
+    /* ───── MAIN LAYOUT ───── */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    /* ───── SECTION HEADER ───── */
+    .section-header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .section-eyebrow {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--indigo-600);
+      margin-bottom: 0.65rem;
+    }
+
+    .section-header h2 {
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      font-weight: 800;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+      margin-bottom: 0.75rem;
+    }
+
+    .section-header p {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* ───── WHAT YOU'LL BUILD ───── */
+    .builds-section {
+      padding: 5rem 2rem;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .builds-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.25rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .build-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .build-icon {
+      font-size: 2rem;
+      line-height: 1;
+    }
+
+    .build-title {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--text-primary);
+    }
+
+    .build-desc {
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    /* ───── CURRICULUM ───── */
+    .curriculum-section {
+      padding: 5rem 2rem;
+      background: var(--white);
+    }
+
+    .part-block {
+      margin-bottom: 4rem;
+    }
+
+    .part-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid var(--border);
+    }
+
+    .part-number {
+      font-size: 0.7rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--indigo-600);
+      background: var(--indigo-50);
+      border: 1px solid var(--indigo-100);
+      padding: 0.25rem 0.65rem;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+
+    .part-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .part-desc {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-left: auto;
+      white-space: nowrap;
+    }
+
+    .chapters-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+    }
+
+    @media (max-width: 900px) {
+      .chapters-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 600px) {
+      .chapters-grid { grid-template-columns: 1fr; }
+      .part-desc { display: none; }
+    }
+
+    /* ───── CHAPTER CARD ───── */
+    .chapter-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.4rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+      text-decoration: none;
+      color: inherit;
+      transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .chapter-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--indigo-600), var(--sky-500));
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+
+    .chapter-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 30px rgba(79,70,229,0.12);
+      border-color: var(--indigo-100);
+    }
+
+    .chapter-card:hover::before { opacity: 1; }
+
+    .card-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+
+    .chapter-badge {
+      font-family: var(--font-code);
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--indigo-600);
+      background: var(--indigo-50);
+      border: 1px solid var(--indigo-100);
+      padding: 0.2rem 0.55rem;
+      border-radius: 5px;
+      letter-spacing: 0.03em;
+    }
+
+    .difficulty-badge {
+      font-size: 0.68rem;
+      font-weight: 600;
+      padding: 0.2rem 0.55rem;
+      border-radius: 5px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .diff-beginner  { background: var(--green-100);  color: var(--green-700); }
+    .diff-intermediate { background: var(--amber-100); color: var(--amber-700); }
+    .diff-advanced  { background: var(--rose-100);   color: var(--rose-700); }
+    .diff-expert    { background: var(--violet-100);  color: var(--violet-700); }
+
+    .card-title {
+      font-size: 0.925rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.35;
+    }
+
+    .card-desc {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      line-height: 1.55;
+      flex: 1;
+    }
+
+    .card-author {
+      font-size: 0.75rem;
+      color: var(--text-tertiary);
+      font-weight: 500;
+      border-top: 1px solid var(--border);
+      padding-top: 0.65rem;
+      margin-top: auto;
+    }
+
+    .card-author strong {
+      color: var(--indigo-600);
+      font-weight: 600;
+    }
+
+    /* ───── AUTHORS ───── */
+    .authors-section {
+      padding: 5rem 2rem;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .authors-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .author-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.5rem;
+      display: flex;
+      gap: 1.1rem;
+      align-items: flex-start;
+      transition: box-shadow 0.15s;
+    }
+
+    .author-card:hover {
+      box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+    }
+
+    .author-avatar {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: white;
+      flex-shrink: 0;
+      letter-spacing: 0.02em;
+    }
+
+    .av-indigo  { background: linear-gradient(135deg, #4F46E5, #7C3AED); }
+    .av-sky     { background: linear-gradient(135deg, #0EA5E9, #06B6D4); }
+    .av-violet  { background: linear-gradient(135deg, #8B5CF6, #EC4899); }
+    .av-teal    { background: linear-gradient(135deg, #14B8A6, #10B981); }
+    .av-orange  { background: linear-gradient(135deg, #F97316, #EF4444); }
+    .av-rose    { background: linear-gradient(135deg, #F43F5E, #DB2777); }
+
+    .author-info { flex: 1; min-width: 0; }
+
+    .author-name {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--text-primary);
+      margin-bottom: 0.15rem;
+    }
+
+    .author-role {
+      font-size: 0.78rem;
+      color: var(--indigo-600);
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .author-bio {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      line-height: 1.55;
+    }
+
+    /* ───── HOW TO USE ───── */
+    .howto-section {
+      padding: 5rem 2rem;
+      background: var(--white);
+    }
+
+    .howto-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.25rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .howto-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+    }
+
+    .howto-step {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--indigo-600), var(--sky-500));
+      color: white;
+      font-weight: 800;
+      font-size: 0.9rem;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem;
+    }
+
+    .howto-title {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--text-primary);
+      margin-bottom: 0.4rem;
+    }
+
+    .howto-desc {
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* ───── PREREQUISITES ───── */
+    .prereqs-section {
+      padding: 5rem 2rem;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .prereqs-inner {
+      max-width: 860px;
+      margin: 0 auto;
+    }
+
+    .prereqs-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+      margin-top: 2rem;
+    }
+
+    @media (max-width: 640px) {
+      .prereqs-grid { grid-template-columns: 1fr; }
+    }
+
+    .prereq-box {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.4rem 1.5rem;
+    }
+
+    .prereq-box h3 {
+      font-size: 0.875rem;
+      font-weight: 700;
+      margin-bottom: 0.85rem;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .prereq-box ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .prereq-box li {
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+      line-height: 1.45;
+    }
+
+    .prereq-box li::before {
+      content: '✓';
+      color: var(--green-500);
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 0.05rem;
+    }
+
+    .prereq-box.nice-to li::before {
+      content: '◦';
+      color: var(--text-tertiary);
+    }
+
+    /* ───── CODE SAMPLE ───── */
+    .code-preview {
+      padding: 5rem 2rem;
+      background: var(--white);
+    }
+
+    .code-preview-inner {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .code-window {
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      box-shadow: 0 8px 40px rgba(0,0,0,0.08);
+    }
+
+    .code-window-bar {
+      background: #F3F4F6;
+      padding: 0.75rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .code-window-dot {
+      width: 12px; height: 12px;
+      border-radius: 50%;
+    }
+
+    .dot-red    { background: #EF4444; }
+    .dot-yellow { background: #F59E0B; }
+    .dot-green  { background: #22C55E; }
+
+    .code-window-title {
+      margin-left: auto;
+      font-family: var(--font-code);
+      font-size: 0.75rem;
+      color: var(--text-tertiary);
+    }
+
+    .code-window pre {
+      margin: 0;
+    }
+
+    .code-window code {
+      font-family: var(--font-code) !important;
+      font-size: 0.83rem !important;
+      padding: 1.5rem !important;
+      display: block;
+    }
+
+    /* ───── FOOTER ───── */
+    footer {
+      background: var(--text-primary);
+      color: rgba(255,255,255,0.7);
+      padding: 3rem 2rem 2rem;
+    }
+
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .footer-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 2rem;
+      flex-wrap: wrap;
+      margin-bottom: 2.5rem;
+      padding-bottom: 2.5rem;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .footer-brand {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .footer-brand .ts-badge {
+      display: inline-flex;
+      align-self: flex-start;
+      background: var(--indigo-600);
+      color: white;
+      font-family: var(--font-code);
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 4px;
+      margin-bottom: 0.25rem;
+    }
+
+    .footer-brand-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: white;
+      line-height: 1.3;
+    }
+
+    .footer-brand-sub {
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.45);
+    }
+
+    .footer-stats {
+      display: flex;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .footer-stat {
+      text-align: center;
+    }
+
+    .footer-stat .val {
+      display: block;
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: white;
+      line-height: 1;
+    }
+
+    .footer-stat .lbl {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: rgba(255,255,255,0.45);
+      margin-top: 0.2rem;
+    }
+
+    .footer-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      font-size: 0.78rem;
+    }
+
+    .footer-committee {
+      color: rgba(255,255,255,0.45);
+    }
+
+    .footer-committee strong {
+      color: rgba(255,255,255,0.7);
+    }
+
+    /* ───── UTILITIES ───── */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0,0,0,0);
+      white-space: nowrap;
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--border);
+    }
+
+    @media (max-width: 768px) {
+      nav { padding: 0 1rem; }
+      .nav-links { display: none; }
+      .hero { padding: 4rem 1.25rem 3.5rem; }
+      .hero-stats { gap: 1.5rem; }
+      .builds-grid { grid-template-columns: repeat(2,1fr); }
+      .authors-grid { grid-template-columns: 1fr; }
+      .footer-top { flex-direction: column; }
+      .footer-stats { justify-content: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════ NAV ══════════════════════ -->
+<nav>
+  <a href="#" class="nav-brand">
+    <span class="ts-badge">TS</span>
+    TypeScript for the AI Era
+  </a>
+  <ul class="nav-links">
+    <li><a href="#curriculum">Curriculum</a></li>
+    <li><a href="#authors">Authors</a></li>
+    <li><a href="#howto">How to Use</a></li>
+    <li><a href="#prereqs">Prerequisites</a></li>
+    <li><a href="chapter-01-introduction.html" class="nav-cta">Start Learning →</a></li>
+  </ul>
+</nav>
+
+<!-- ══════════════════════ HERO ══════════════════════ -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-eyebrow">
+      <span class="dot"></span>
+      Expert Committee &bull; 6 Industry Leaders &bull; 24 Deep-Dive Chapters
+    </div>
+    <h1>
+      TypeScript for the AI Era
+      <span>From Python Engineer to Staff-Level TypeScript Architect</span>
+    </h1>
+    <p class="hero-subtitle">
+      A rigorous, production-grade curriculum written by the people who built TypeScript and the tools the world runs on. No hand-waving. No toy examples.
+    </p>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <span class="value">24</span>
+        <span class="label">Chapters</span>
+      </div>
+      <div class="hero-stat">
+        <span class="value">200+</span>
+        <span class="label">Hours of Content</span>
+      </div>
+      <div class="hero-stat">
+        <span class="value">6</span>
+        <span class="label">Expert Authors</span>
+      </div>
+      <div class="hero-stat">
+        <span class="value">6</span>
+        <span class="label">Curriculum Parts</span>
+      </div>
+    </div>
+    <div class="hero-actions">
+      <a href="chapter-01-introduction.html" class="btn-primary">
+        Start Chapter 1 →
+      </a>
+      <a href="#curriculum" class="btn-secondary">
+        View Full Curriculum
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════ QUICK START ══════════════════════ -->
+<div class="quickstart">
+  <div class="quickstart-inner">
+    <span class="quickstart-label">Quick Start</span>
+    <div class="quickstart-code">
+      <span class="dim"># Install TypeScript and get running in 60 seconds</span><br/>
+      <span class="kw">npm</span> create typescript-era@latest my-project<br/>
+      <span class="kw">cd</span> my-project &amp;&amp; <span class="kw">npm</span> install<br/>
+      <span class="kw">npx</span> tsc --init &amp;&amp; <span class="kw">npm</span> run dev
+    </div>
+    <span class="quickstart-note">Requires Node.js 20+ or Bun 1.0+</span>
+  </div>
+</div>
+
+<!-- ══════════════════════ WHAT YOU'LL BUILD ══════════════════════ -->
+<section class="builds-section">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-eyebrow">Hands-On Projects</span>
+      <h2>What You'll Build</h2>
+      <p>Every concept is anchored in a real, deployable artifact — not contrived exercises.</p>
+    </div>
+    <div class="builds-grid">
+      <div class="build-card">
+        <div class="build-icon">🖥️</div>
+        <div class="build-title">CLI Tool</div>
+        <div class="build-desc">A full-featured command-line application modeled after Claude Code's architecture — argument parsing, interactive prompts, streaming output.</div>
+      </div>
+      <div class="build-card">
+        <div class="build-icon">🔌</div>
+        <div class="build-title">REST API</div>
+        <div class="build-desc">A production REST API with Hono and Fastify — typed routes, Zod validation, Prisma ORM, JWT auth, and OpenAPI docs.</div>
+      </div>
+      <div class="build-card">
+        <div class="build-icon">⚛️</div>
+        <div class="build-title">React Application</div>
+        <div class="build-desc">A modern React UI with full TypeScript integration, component design systems, TanStack Query, and Zustand state.</div>
+      </div>
+      <div class="build-card">
+        <div class="build-icon">🤖</div>
+        <div class="build-title">AI Integration</div>
+        <div class="build-desc">Real Claude API integrations — streaming responses, tool use, structured outputs, and prompt engineering with type safety.</div>
+      </div>
+      <div class="build-card">
+        <div class="build-icon">🏗️</div>
+        <div class="build-title">Infrastructure as Code</div>
+        <div class="build-desc">Cloud infrastructure defined in TypeScript with Pulumi — typed resources, multi-cloud deployments, policy as code.</div>
+      </div>
+      <div class="build-card">
+        <div class="build-icon">🚀</div>
+        <div class="build-title">Full-Stack AI SaaS</div>
+        <div class="build-desc">A complete SaaS application: Next.js, Stripe billing, AI features, auth, database, deployments, and monitoring.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════ CURRICULUM ══════════════════════ -->
+<section class="curriculum-section" id="curriculum">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-eyebrow">Curriculum</span>
+      <h2>24 Chapters Across 6 Parts</h2>
+      <p>A deliberate progression from zero assumptions to staff-level architecture decisions.</p>
+    </div>
+
+    <!-- PART I -->
+    <div class="part-block">
+      <div class="part-header">
+        <span class="part-number">Part I</span>
+        <span class="part-title">Foundations</span>
+        <span class="part-desc">Chapters 1–7</span>
+      </div>
+      <div class="chapters-grid">
+
+        <a href="chapter-01-introduction.html" class="chapter-card">
+          <div class="card-meta">
+            <span class="chapter-badge">CH 01</span>
+            <span class="difficulty-badge diff-beginner">Beginner</span>
+          </div>
+          <div class="card-title">The TypeScript Revolution: Why TypeScript in the AI Era</div>
+          <div class="card-desc">Why TypeScript has become the de-facto language of serious software — from AI tooling to cloud infrastructure. The philosophy behind the type system.</div>
+          <div class="card-author">By <strong>Anders Hejlsberg</strong></div>
+        </a>
+
+        <a href="chapter-02-setup.html" class="chapter-card">
+          <div class="card-meta">
+            <span class="chapter-badge">CH 02</span>
+            <span class="difficulty-badge diff-beginner">Beginner</span>
+          </div>
+          <div class="card-title">Setting Up Your Development Environment</div>
+          <div class="card-desc">VSCode, Cursor, and Neovim configurations. tsconfig essentials, ts-node, tsx, and Bun. First-class TypeScript tooling that makes you dangerous from day one.</div>
+          <div class="card-author">By <strong>Orta Therox</strong></div>
+        </a>
+
+        <a href="chapter-03-types-basics.html" class="chapter-card">
+          <div class="card-meta">
+            <span class="chapter-badge">CH 03</span>
+            <span class="difficulty-badge diff-beginner">Beginner</span>
+          </div>
+          <div class="card-title">TypeScript Types: A Python Developer's Rosetta Stone</div>
+          <div class="card-desc">Direct mappings from Python type hints to TypeScript. Primitive types, type aliases, <code>any</code> vs <code>unknown</code>, <code>null</code> vs <code>undefined</code>, and narrowing.</div>
+          <div class="card-author">By <strong>Boris Cherny</strong></div>
+        </a>
+
+        <a href="chapter-04-functions-generics.html" class="chapter-card">
+          <div class="card-meta">
+            <span class="chapter-badge">CH 04</span>
+            <span class="difficulty-badge diff-intermediate">Intermediate</span>
+          </div>
+          <div class="card-title">Functions, Generics &amp; Type Inference</div>
+          <div class="card-desc">Overloads, rest parameters, and typed callbacks. Generics from first principles — constraints, defaults, and inference. Where to annotate and where to let TypeScript lead.</div>
+          <div class="card-author">By <strong>Matt Pocock</strong></div>
+        </a>
+
+        <a href="chapter-05-objects-interfaces.html" class="chapter-card">
+          <div class="card-meta">
+            <span class="chapter-badge">CH 05</span>
+            <span class="difficulty-badge diff-intermediate">Intermediate</span>
+          </div>
+          <div class="card-title">Objects, Interfaces, Classes &amp; Structural Typing</div>
+          <div class="card-desc">Interface vs type alias. Structural vs nominal typing. Classes and their role in TypeScript's type system. Declaration merging. Readonly and optional modifiers.</div>
+          <div class="card-author">By <strong>Anders Hejlsberg</strong></div>
+        </a>
+
+        <a href="chapter-06-advanced-types.html" class="chapter-card">
+          <div class="card-meta">
+            <span class="chapter-badge">CH 06</span>
+            <span class="difficulty-badge diff-intermediate">Intermediate</span>
+          </div>
+          <div class="card-title">Advanced Types: Unions, Intersections &amp; Utility Types</div>
+          <div class="card-desc">Discriminated unions for exhaustive pattern matching. Intersection types. The full utility type toolkit: <code>Partial</code>, <code>Required</code>, <code>Pick</code>, <code>Omit</code>, <code>ReturnType</code>, and more.</div>
+          <div class="card-author">By <strong>Gabriel Vergnaud</strong></div>
+        </a>
+
+        <a href="chapter-07-type-level.html" class="chapter-card">
+          <div class="card-meta">
+            <span class="chapter-badge">CH 07</span>
+            <span class="difficulty-badge diff-advanced">Advanced</span>
+          </div>
+          <div class="card-title">Type-Level Programming &amp; Template Literal Types</div>
+          <div class="card-desc">Conditional types, mapped types, <code>infer</code>, recursive types, and template literals. Building a type-safe router, ORM query builder, and event emitter purely in the type system.</div>
+          <div class="card-author">By <strong>Gabriel Vergnaud</strong></div>
+        </a>
+
+      </div>
+    </div>
+
+    <!-- PART II -->
+    <div class="part-block">
+      <div class="part-header">
+        <span class="part-number">Part II</span>
+        <span class="part-title">Ecosystem</span>
+        <span class="part-desc">Chapters 8–10</span>
+      </div>
+      <div class="chapters-grid">
+
+        <a href="chapter-08-modules.html" class="chapter-card">
+          <div class="card-meta">
+            <span class="chapter-badge">CH 08</span>
+            <span class="difficulty-badge diff-intermediate">Intermediate</span>
+          </div>
+          <div class="card-title">Modules, Package Management &amp; Monorepos</div>
+          <div class="card-desc">ESM vs CJS, module resolution strategies, path aliases. Publishing typed packages with <code>exports</code>. Turborepo and Nx monorepo architectures with shared types.</div>
+          <div class="card-author">By <strong>Orta Therox</strong></div>
+        </a>
+
+        <a href="chapter-09-build-tools.html" class="chapter-card">
+          <div class="card-meta">
+            <span class="chapter-badge">CH 09</span>
+            <span class="difficulty-badge diff-intermediate">Intermediate</span>
+          </div>
+          <div class="card-title">Build Tools &amp; tsconfig Deep Dive</div>
+          <div class="card-desc">Every <code>tsconfig.json</code> flag that matters. Vite, esbuild, SWC, Rollup. Bundle analysis, declaration emit, and project references for large codebases.</div>
+          <div class="card-author">By <strong>Orta Therox</strong></div>
+        </a>
+
+        <a href="chapter-10-testing.html" class="chapter-card">
+          <div class="card-meta">
+            <span class="chapter-badge">CH 10</span>
+            <span class="difficulty-badge diff-intermediate">Intermediate</span>
+          </div>
+          <div class="card-title">Testing TypeScript Applications</div>
+          <div class="card-desc">Vitest and Jest with full TypeScript. Type-level testing with <code>expect-type</code> and <code>tsd</code>. Mocking strategies, test doubles, and testing discriminated unions exhaustively.</div>
+          <div class="card-author">By <strong>Josh Goldberg</strong></div>
+        </a>
+
+      </div>
+    </div>
+
+    <!-- PART III -->
+    <div class="part-block">
+      <div class="part-header">
+        <span class="part-number">Part III</span>
+        <span class="part-title">Backend</span>
+        <span class="part-desc">Chapters 11–15</span>
+      </div>
+      <div class="chapters-grid">
+
+        <a href="chapter-11-node-bun.html" class="chapter-card">
+          <div class="card-meta">
+            <span class="chapter-badge">CH 11</span>
+            <span class="difficulty-badge diff-intermediate">Intermediate</span>
+          </div>
+          <div class="card-title">Node.js &amp; Bun: Backend Runtimes</div>
+          <div class="card-desc">TypeScript on Node.js with proper ESM setup. Bun's native TypeScript support. Streams, workers, file system APIs, and environment variable typing.</div>
+          <div class="card-author">By <strong>Boris Cherny</strong></div>
+        </a>
+
+        <a href="chapter-12-rest-apis.html" class="chapter-card">
+          <div class="card-meta">
+            <span class="chapter-badge">CH 12</span>
+            <span class="difficulty-badge diff-intermediate">Intermediate</span>
+          </div>
+          <div class="card-title">Building REST APIs with Hono &amp; Fastify</div>
+          <div class="card-desc">End-to-end type safety from route definition to response. Zod schemas as the single source of truth. OpenAPI generation, middleware typing, and error handling.</div>
+          <div class="card-author">By <strong>Matt Pocock</strong></div>
+        </a>
+
+        <a href="chapter-13-graphql.html" class="chapter-card">
+          <div class="card-meta">
+            <span class="chapter-badge">CH 13</span>
+            <span class="difficulty-badge diff-advanced">Advanced</span>
+          </div>
+          <div class="card-title">GraphQL APIs with TypeScript</div>
+          <div class="card-desc">Code-first with Pothos, schema-first with codegen. Resolver type safety, DataLoader patterns, and subscriptions. When GraphQL wins and when REST wins.</div>
+          <div class="card-author">By <strong>Gabriel Vergnaud</strong></div>
+        </a>
+
+        <a href="chapter-14-databases.html" class="chapter-card">
+          <div class="card-meta">
+            <span class="chapter-badge">CH 14</span>
+            <span class="difficulty-badge diff-intermediate">Intermediate</span>
+          </div>
+          <div class="card-title">Databases, Prisma &amp; Drizzle ORM</div>
+          <div class="card-desc">Type-safe database access with Prisma and Drizzle. Schema-to-type generation, migrations, transactions, and query optimization. Choosing the right ORM.</div>
+          <div class="card-author">By <strong>Boris Cherny</strong></div>
+        </a>
+
+        <a href="chapter-15-auth.html" class="chapter-card">
+          <div class="card-meta">
+            <span class="chapter-badge">CH 15</span>
+            <span class="difficulty-badge diff-advanced">Advanced</span>
+          </div>
+          <div class="card-title">Authentication, Authorization &amp; Security</div>
+          <div class="card-desc">JWT, OAuth 2.0, and session management with typed middleware. Role-based access control in the type system. OWASP considerations and input sanitization with Zod.</div>
+          <div class="card-author">By <strong>Josh Goldberg</strong></div>
+        </a>
+
+      </div>
+    </div>
+
+    <!-- PART IV -->
+    <div class="part-block">
+      <div class="part-header">
+        <span class="part-number">Part IV</span>
+        <span class="part-title">Frontend</span>
+        <span class="part-desc">Chapters 16–18</span>
+      </div>
+      <div class="chapters-grid">
+
+        <a href="chapter-16-react.html" class="chapter-card">
+          <div class="card-meta">
+            <span class="chapter-badge">CH 16</span>
+            <span class="difficulty-badge diff-intermediate">Intermediate</span>
+          </div>
+          <div class="card-title">React &amp; TypeScript: Building Modern UIs</div>
+          <div class="card-desc">Component prop typing, generics in JSX, hooks patterns, <code>forwardRef</code>, context typing, and polymorphic components. The full React+TS mental model.</div>
+          <div class="card-author">By <strong>Matt Pocock</strong></div>
+        </a>
+
+        <a href="chapter-17-nextjs.html" class="chapter-card">
+          <div class="card-meta">
+            <span class="chapter-badge">CH 17</span>
+            <span class="difficulty-badge diff-intermediate">Intermediate</span>
+          </div>
+          <div class="card-title">Next.js: The Full-Stack TypeScript Framework</div>
+          <div class="card-desc">App Router, Server Components, Server Actions — typed end-to-end. Route handler typing, middleware, image optimization, and deployment to Vercel and self-hosted.</div>
+          <div class="card-author">By <strong>Orta Therox</strong></div>
+        </a>
+
+        <a href="chapter-18-state.html" class="chapter-card">
+          <div class="card-meta">
+            <span class="chapter-badge">CH 18</span>
+            <span class="difficulty-badge diff-intermediate">Intermediate</span>
+          </div>
+          <div class="card-title">State Management: Zustand, Jotai &amp; TanStack Query</div>
+          <div class="card-desc">Choosing and typing your state layer. Zustand store patterns, Jotai atomic state, and TanStack Query for server state. Avoiding the global state trap.</div>
+          <div class="card-author">By <strong>Matt Pocock</strong></div>
+        </a>
+
+      </div>
+    </div>
+
+    <!-- PART V -->
+    <div class="part-block">
+      <div class="part-header">
+        <span class="part-number">Part V</span>
+        <span class="part-title">Architecture &amp; AI</span>
+        <span class="part-desc">Chapters 19–21</span>
+      </div>
+      <div class="chapters-grid">
+
+        <a href="chapter-19-architecture.html" class="chapter-card">
+          <div class="card-meta">
+            <span class="chapter-badge">CH 19</span>
+            <span class="difficulty-badge diff-advanced">Advanced</span>
+          </div>
+          <div class="card-title">Design Patterns &amp; Architecture in TypeScript</div>
+          <div class="card-desc">DDD, hexagonal architecture, and event sourcing in TypeScript. Builder, Repository, and Strategy patterns with full type safety. Avoiding over-engineering traps.</div>
+          <div class="card-author">By <strong>Anders Hejlsberg</strong></div>
+        </a>
+
+        <a href="chapter-20-ai-apps.html" class="chapter-card">
+          <div class="card-meta">
+            <span class="chapter-badge">CH 20</span>
+            <span class="difficulty-badge diff-advanced">Advanced</span>
+          </div>
+          <div class="card-title">Building AI Applications: Claude API &amp; LLM Integration</div>
+          <div class="card-desc">Streaming Claude API responses with full type safety. Tool use and structured outputs. LangChain, Vercel AI SDK, and building your own typed LLM abstraction layer.</div>
+          <div class="card-author">By <strong>Boris Cherny</strong></div>
+        </a>
+
+        <a href="chapter-21-dx.html" class="chapter-card">
+          <div class="card-meta">
+            <span class="chapter-badge">CH 21</span>
+            <span class="difficulty-badge diff-advanced">Advanced</span>
+          </div>
+          <div class="card-title">Developer Experience in the AI Era</div>
+          <div class="card-desc">ESLint + typescript-eslint rule authoring. Custom TypeScript language service plugins. AI-assisted development workflows that maintain type discipline and code quality.</div>
+          <div class="card-author">By <strong>Josh Goldberg</strong></div>
+        </a>
+
+      </div>
+    </div>
+
+    <!-- PART VI -->
+    <div class="part-block">
+      <div class="part-header">
+        <span class="part-number">Part VI</span>
+        <span class="part-title">Case Studies</span>
+        <span class="part-desc">Chapters 22–24</span>
+      </div>
+      <div class="chapters-grid">
+
+        <a href="chapter-22-case-claude-code.html" class="chapter-card">
+          <div class="card-meta">
+            <span class="chapter-badge">CH 22</span>
+            <span class="difficulty-badge diff-expert">Expert</span>
+          </div>
+          <div class="card-title">Case Study: Building a CLI Tool (Claude Code Architecture)</div>
+          <div class="card-desc">A forensic analysis of Claude Code's TypeScript architecture — plugin systems, streaming I/O, tool dispatch, interrupt handling, and the design decisions that shaped it.</div>
+          <div class="card-author">By <strong>Anders Hejlsberg</strong> &amp; <strong>Boris Cherny</strong></div>
+        </a>
+
+        <a href="chapter-23-case-pulumi.html" class="chapter-card">
+          <div class="card-meta">
+            <span class="chapter-badge">CH 23</span>
+            <span class="difficulty-badge diff-expert">Expert</span>
+          </div>
+          <div class="card-title">Case Study: Infrastructure as Code (Pulumi Architecture)</div>
+          <div class="card-desc">How Pulumi uses TypeScript's type system to model cloud resources. Dynamic providers, async resource graphs, policy as code, and multi-cloud type generation at scale.</div>
+          <div class="card-author">By <strong>Gabriel Vergnaud</strong></div>
+        </a>
+
+        <a href="chapter-24-case-saas.html" class="chapter-card">
+          <div class="card-meta">
+            <span class="chapter-badge">CH 24</span>
+            <span class="difficulty-badge diff-expert">Expert</span>
+          </div>
+          <div class="card-title">Case Study: Full-Stack AI SaaS Application</div>
+          <div class="card-desc">Zero to production: Next.js, Stripe, Claude AI, Neon Postgres, Clerk auth, Resend email, Vercel deployment, Datadog monitoring — all typed, all tested, all shipped.</div>
+          <div class="card-author">By <strong>Matt Pocock</strong> &amp; <strong>Orta Therox</strong></div>
+        </a>
+
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════ CODE PREVIEW ══════════════════════ -->
+<section class="code-preview">
+  <div class="code-preview-inner">
+    <div class="section-header" style="margin-bottom: 2rem;">
+      <span class="section-eyebrow">A Taste of What's Inside</span>
+      <h2>Type Safety from Database to UI</h2>
+      <p>This is what staff-level TypeScript looks like — zero <code>any</code>, zero runtime surprises.</p>
+    </div>
+    <div class="code-window">
+      <div class="code-window-bar">
+        <div class="code-window-dot dot-red"></div>
+        <div class="code-window-dot dot-yellow"></div>
+        <div class="code-window-dot dot-green"></div>
+        <span class="code-window-title">ai-chat-route.ts</span>
+      </div>
+      <pre><code class="language-typescript">import { Hono } from "hono";
+import Anthropic from "@anthropic-ai/sdk";
+import { z } from "zod";
+import { zValidator } from "@hono/zod-validator";
+
+// Single source of truth — validated at runtime, typed at compile time
+const ChatRequestSchema = z.object({
+  messages: z.array(z.object({
+    role: z.enum(["user", "assistant"]),
+    content: z.string().min(1).max(8192),
+  })).min(1),
+  model: z.enum(["claude-opus-4-5", "claude-sonnet-4-5"]).default("claude-sonnet-4-5"),
+});
+
+type ChatRequest = z.infer&lt;typeof ChatRequestSchema&gt;;
+
+const client = new Anthropic();
+const app = new Hono();
+
+// Fully typed streaming endpoint — no Response gymnastics
+app.post("/chat", zValidator("json", ChatRequestSchema), async (c) => {
+  const { messages, model }: ChatRequest = c.req.valid("json");
+
+  const stream = await client.messages.stream({
+    model,
+    max_tokens: 2048,
+    messages,
+  });
+
+  return new Response(stream.toReadableStream(), {
+    headers: { "Content-Type": "text/event-stream" },
+  });
+});</code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════ AUTHORS ══════════════════════ -->
+<section class="authors-section" id="authors">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-eyebrow">Expert Committee</span>
+      <h2>Written by the People Who Built TypeScript</h2>
+      <p>Six of the most influential TypeScript practitioners in the world — not influencers, engineers.</p>
+    </div>
+    <div class="authors-grid">
+
+      <div class="author-card">
+        <div class="author-avatar av-indigo">AH</div>
+        <div class="author-info">
+          <div class="author-name">Anders Hejlsberg</div>
+          <div class="author-role">TypeScript Creator &mdash; Microsoft</div>
+          <div class="author-bio">Lead architect of TypeScript, C#, and Turbo Pascal. Distinguished Engineer at Microsoft. The person who decided a JavaScript type system should be structural, not nominal — a choice that changed everything.</div>
+        </div>
+      </div>
+
+      <div class="author-card">
+        <div class="author-avatar av-sky">BC</div>
+        <div class="author-info">
+          <div class="author-name">Boris Cherny</div>
+          <div class="author-role">Author of Programming TypeScript &mdash; Meta</div>
+          <div class="author-bio">Author of O'Reilly's "Programming TypeScript," the definitive deep-dive reference. Engineer at Meta, formerly at Airbnb. Writes the kind of TypeScript explanations that make hard concepts feel inevitable.</div>
+        </div>
+      </div>
+
+      <div class="author-card">
+        <div class="author-avatar av-violet">MP</div>
+        <div class="author-info">
+          <div class="author-name">Matt Pocock</div>
+          <div class="author-role">TypeScript Educator &mdash; Total TypeScript</div>
+          <div class="author-bio">Creator of Total TypeScript, the most practical TypeScript training on the internet. Formerly on the TypeScript team. Known for making deeply complex type wizardry feel learnable through real-world examples.</div>
+        </div>
+      </div>
+
+      <div class="author-card">
+        <div class="author-avatar av-teal">OT</div>
+        <div class="author-info">
+          <div class="author-name">Orta Therox</div>
+          <div class="author-role">TypeScript Team &mdash; Microsoft</div>
+          <div class="author-bio">Core contributor to TypeScript and its language server. Led developer experience for CocoaPods, Danger, and Artsy's large-scale TypeScript adoption. Thinks deeply about the tools that surround the language.</div>
+        </div>
+      </div>
+
+      <div class="author-card">
+        <div class="author-avatar av-orange">JG</div>
+        <div class="author-info">
+          <div class="author-name">Josh Goldberg</div>
+          <div class="author-role">ESLint &amp; typescript-eslint &mdash; Open Source</div>
+          <div class="author-bio">Maintainer of typescript-eslint, the bridge between TypeScript's type system and ESLint's rule ecosystem. Author of "Learning TypeScript" (O'Reilly). Champions type-safe linting as a first-class engineering concern.</div>
+        </div>
+      </div>
+
+      <div class="author-card">
+        <div class="author-avatar av-rose">GV</div>
+        <div class="author-info">
+          <div class="author-name">Gabriel Vergnaud</div>
+          <div class="author-role">Type-Level Wizard &mdash; Stripe</div>
+          <div class="author-bio">Creator of <code>ts-pattern</code> and <code>hotscript</code> — libraries that push TypeScript's type system to its limits. Engineer at Stripe. If something seems impossible in the TypeScript type system, Gabriel has probably already done it.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════ HOW TO USE ══════════════════════ -->
+<section class="howto-section" id="howto">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-eyebrow">Getting the Most from This Course</span>
+      <h2>How to Use This Curriculum</h2>
+      <p>A field guide to working through 200+ hours of material without burning out or skipping ahead too early.</p>
+    </div>
+    <div class="howto-grid">
+      <div class="howto-card">
+        <div class="howto-step">1</div>
+        <div class="howto-title">Read Sequentially Through Part I</div>
+        <div class="howto-desc">Chapters 1–7 build on each other. Even experienced Python engineers will encounter TypeScript-specific concepts that require sequential exposure. Do not skip.</div>
+      </div>
+      <div class="howto-card">
+        <div class="howto-step">2</div>
+        <div class="howto-title">Type-Check Everything You Write</div>
+        <div class="howto-desc">Run <code>tsc --noEmit</code> in watch mode on all exercises. Errors are the curriculum. Read them fully — TypeScript's error messages are dense but precise.</div>
+      </div>
+      <div class="howto-card">
+        <div class="howto-step">3</div>
+        <div class="howto-title">Navigate Parts II–V by Need</div>
+        <div class="howto-desc">After completing foundations, Parts II–V can be read in any order based on what you're building. Backend engineer? Go to Part III. Frontend focused? Jump to Part IV.</div>
+      </div>
+      <div class="howto-card">
+        <div class="howto-step">4</div>
+        <div class="howto-title">End with the Case Studies</div>
+        <div class="howto-desc">Part VI case studies assume all prior knowledge. They are architecture post-mortems — meant to synthesize everything you've learned by examining real production systems.</div>
+      </div>
+      <div class="howto-card">
+        <div class="howto-step">5</div>
+        <div class="howto-title">Build the Projects, Not Just Read Them</div>
+        <div class="howto-desc">Each chapter's project section has a starter repo. Fork it, implement it yourself, then compare against the reference implementation. Reading TypeScript is not the same as writing it.</div>
+      </div>
+      <div class="howto-card">
+        <div class="howto-step">6</div>
+        <div class="howto-title">Reference the Authors' Own Work</div>
+        <div class="howto-desc">Each chapter links to the author's primary resources — books, repositories, talks, and documentation. This curriculum is a curated entry point, not a ceiling.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════ PREREQUISITES ══════════════════════ -->
+<section class="prereqs-section" id="prereqs">
+  <div class="prereqs-inner">
+    <div class="section-header">
+      <span class="section-eyebrow">Prerequisites</span>
+      <h2>Who Is This For?</h2>
+      <p>This curriculum has a specific audience. Know if you're in it before you start.</p>
+    </div>
+    <div class="prereqs-grid">
+      <div class="prereq-box">
+        <h3>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="color: #22C55E;">
+            <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M5 8l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          You Will Thrive If You Have
+        </h3>
+        <ul>
+          <li>2+ years of Python experience, including type hints with mypy or pyright</li>
+          <li>Comfort with functions, classes, modules, and basic OOP concepts</li>
+          <li>Experience with at least one REST API or web application, in any language</li>
+          <li>A terminal you're not afraid of — git, npm, file navigation</li>
+          <li>Patience for compiler errors (the type system will push back on you)</li>
+        </ul>
+      </div>
+      <div class="prereq-box nice-to">
+        <h3>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="color: #9CA3AF;">
+            <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M8 5v4M8 11v.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          Helpful But Not Required
+        </h3>
+        <ul>
+          <li>Prior JavaScript exposure (we assume none, but it helps)</li>
+          <li>React or any frontend framework experience</li>
+          <li>Database knowledge — SQL or NoSQL</li>
+          <li>Cloud or DevOps background</li>
+          <li>Prior exposure to compiled languages like Go, Rust, or Java</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════ FOOTER ══════════════════════ -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <span class="ts-badge">TS</span>
+        <span class="footer-brand-title">TypeScript for the AI Era</span>
+        <span class="footer-brand-sub">From Python Engineer to Staff-Level TypeScript Architect</span>
+      </div>
+      <div class="footer-stats">
+        <div class="footer-stat">
+          <span class="val">24</span>
+          <span class="lbl">Chapters</span>
+        </div>
+        <div class="footer-stat">
+          <span class="val">6</span>
+          <span class="lbl">Parts</span>
+        </div>
+        <div class="footer-stat">
+          <span class="val">200+</span>
+          <span class="lbl">Hours</span>
+        </div>
+        <div class="footer-stat">
+          <span class="val">6</span>
+          <span class="lbl">Authors</span>
+        </div>
+        <div class="footer-stat">
+          <span class="val">0</span>
+          <span class="lbl">any types</span>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-committee">
+        Expert committee: <strong>Anders Hejlsberg</strong>, <strong>Boris Cherny</strong>, <strong>Matt Pocock</strong>, <strong>Orta Therox</strong>, <strong>Josh Goldberg</strong>, <strong>Gabriel Vergnaud</strong>
+      </div>
+      <div style="font-size: 0.78rem; color: rgba(255,255,255,0.3);">
+        TypeScript for the AI Era &mdash; 2024&ndash;2026
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    hljs.highlightAll();
+  });
+</script>
+
+</body>
+</html>

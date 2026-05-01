@@ -1,0 +1,1714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chapter 3: Prior Art Research and Freedom-to-Operate | Patent Law for Technologists</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- ── Top Navigation ─────────────────────────────────────── -->
+<nav class="top-nav">
+  <div class="nav-container">
+    <a href="index.html" class="nav-logo">Patent Law <span>for Technologists</span></a>
+    <div class="nav-links">
+      <a href="ch01_intro.html">Ch 1: Introduction</a>
+      <a href="ch02_patent_eligibility.html">Ch 2: Eligibility</a>
+      <a href="ch03_prior_art_research.html" class="active">Ch 3: Prior Art</a>
+      <a href="ch04_patent_anatomy.html">Ch 4: Anatomy</a>
+      <a href="ch05_claim_drafting.html">Ch 5: Claims</a>
+      <a href="ch06_specification.html">Ch 6: Specification</a>
+      <a href="ch07_prosecution.html">Ch 7: Prosecution</a>
+      <a href="ch08_fto.html">Ch 8: FTO</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ── Chapter Hero ────────────────────────────────────────── -->
+<header class="chapter-hero">
+  <div class="chapter-hero-content">
+    <div class="chapter-badge">Chapter 3</div>
+    <h1>Prior Art Research and Freedom-to-Operate</h1>
+    <p class="subtitle">Finding What's Already Out There — Before You File, Before You Ship</p>
+    <div class="chapter-meta">
+      <span>Dr. Sarah J. Chen &mdash; Fish &amp; Richardson, Boston</span>
+      <span>Prof. Marcus Webb &mdash; Stanford Law School</span>
+      <span>Dr. Priya Nair &mdash; Finnegan, Henderson &amp; Farabow</span>
+      <span>~85 min read</span>
+    </div>
+  </div>
+</header>
+
+<!-- ── Page Layout ────────────────────────────────────────── -->
+<div class="page-layout">
+
+  <!-- Sidebar TOC -->
+  <aside class="sidebar">
+    <nav class="toc">
+      <h3>In This Chapter</h3>
+      <ol>
+        <li><a href="#why-prior-art">Why Prior Art Matters</a></li>
+        <li><a href="#types-of-prior-art">Types of Prior Art</a></li>
+        <li><a href="#search-databases">Patent Search Databases</a></li>
+        <li><a href="#classification-systems">Classification Systems</a></li>
+        <li><a href="#search-strategy">Search Strategy for AI/ML</a></li>
+        <li><a href="#reading-claims">Reading and Analyzing Claims</a></li>
+        <li><a href="#npl-search">Non-Patent Literature (NPL)</a></li>
+        <li><a href="#fto-analysis">Freedom-to-Operate Analysis</a></li>
+        <li><a href="#common-mistakes">Common Search Mistakes</a></li>
+        <li><a href="#documenting-search">Documenting Your Search</a></li>
+        <li><a href="#tools-resources">Tools and Resources</a></li>
+      </ol>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="chapter-content">
+
+    <!-- ── Opening ──────────────────────────────────────────── -->
+    <p>You have spent three years building a transformer-based drug-target binding predictor. You believe it is novel. Your team is ready to file. Before you do, there is a question you absolutely must answer: <strong>has anyone done this before?</strong></p>
+
+    <p>Prior art research is the unglamorous foundation of all patent strategy. It determines whether your application will survive examination, informs how broadly you can claim your invention, and — critically — tells you whether shipping your product will expose you to infringement liability. This chapter teaches you to do it right: systematically, efficiently, and with the rigor that courts and examiners demand.</p>
+
+    <div class="callout callout-info">
+      <div class="callout-icon">&#9432;</div>
+      <div class="callout-body">
+        <div class="callout-title">Chapter Scope</div>
+        <p>This chapter covers both <strong>patentability searches</strong> (can I get a patent?) and <strong>freedom-to-operate searches</strong> (can I ship without infringing?). These are related but distinct inquiries requiring different methodologies. We cover both, with AI/ML and biotech examples throughout.</p>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════ -->
+    <!-- Section 1: Why Prior Art Matters                       -->
+    <!-- ══════════════════════════════════════════════════════ -->
+    <h2 id="why-prior-art" class="section-anchor">1. Why Prior Art Matters</h2>
+
+    <p>Prior art is the legal universe of everything that was publicly known before your invention's <span class="key-term" title="The date that determines which prior art can be cited against your application">critical date</span>. Two fundamental patent requirements flow directly from the prior art landscape:</p>
+
+    <ul>
+      <li><strong>Novelty (35 U.S.C. § 102):</strong> Your invention must not have been disclosed anywhere — even in one prior-art reference — before the critical date. A single reference that describes every element of your claimed invention destroys novelty outright. This is called <em>anticipation</em>.</li>
+      <li><strong>Non-obviousness (35 U.S.C. § 103):</strong> Even if no single reference discloses your entire invention, the patent office can combine multiple references to argue that your invention would have been obvious to a person having ordinary skill in the art (PHOSITA) at the time of filing. This is the most common rejection AI/ML patents face.</li>
+    </ul>
+
+    <h3>The Dual Role of Prior Art Research</h3>
+
+    <p>Prior art research serves two distinct strategic purposes that technologists often conflate:</p>
+
+    <div class="comparison-grid">
+      <div class="comparison-item good">
+        <h4>Patentability Search</h4>
+        <p><strong>Question:</strong> Can I obtain a patent on my invention?</p>
+        <p><strong>Scope:</strong> Worldwide prior art in all languages</p>
+        <p><strong>Goal:</strong> Find the closest art so you can draft claims around it</p>
+        <p><strong>Timing:</strong> Before drafting the application</p>
+        <p><strong>Who uses it:</strong> Inventor + patent attorney/agent</p>
+      </div>
+      <div class="comparison-item bad">
+        <h4>Freedom-to-Operate (FTO) Search</h4>
+        <p><strong>Question:</strong> Can I make/use/sell my product without infringing?</p>
+        <p><strong>Scope:</strong> In-force patents in jurisdictions where you operate</p>
+        <p><strong>Goal:</strong> Find patents whose claims read on your product</p>
+        <p><strong>Timing:</strong> Before commercial launch</p>
+        <p><strong>Who uses it:</strong> Business + IP counsel</p>
+      </div>
+    </div>
+
+    <h3>The AIA Timeline: What Counts as Prior Art</h3>
+
+    <p>The America Invents Act (AIA), effective March 16, 2013, fundamentally changed U.S. prior art rules. Whether AIA or pre-AIA law applies depends on whether <em>any</em> claim in the application has an effective filing date on or after March 16, 2013.</p>
+
+    <div class="table-wrapper">
+      <table>
+        <caption class="table-caption">Table 3-1: AIA vs. Pre-AIA Prior Art Framework</caption>
+        <thead>
+          <tr>
+            <th>Criterion</th>
+            <th>AIA (§ 102 post-2013)</th>
+            <th>Pre-AIA (§ 102 pre-2013)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Priority system</td>
+            <td>First-inventor-to-file</td>
+            <td>First-to-invent</td>
+          </tr>
+          <tr>
+            <td>Critical date</td>
+            <td>Effective filing date of the application</td>
+            <td>Date of invention (can predate filing)</td>
+          </tr>
+          <tr>
+            <td>Grace period</td>
+            <td>1-year grace period for inventor's own disclosures</td>
+            <td>1-year grace period for public use/sale in U.S.</td>
+          </tr>
+          <tr>
+            <td>Secret prior art</td>
+            <td>U.S. patents/apps with earlier filing dates</td>
+            <td>Same, plus certain prior inventions</td>
+          </tr>
+          <tr>
+            <td>Geographic scope</td>
+            <td>Worldwide (patents, apps, printed publications, public use, on-sale)</td>
+            <td>Foreign patents/publications; U.S. public use/on-sale only</td>
+          </tr>
+          <tr>
+            <td>On-sale bar</td>
+            <td>Covers sales anywhere in the world</td>
+            <td>U.S. commercial sales only</td>
+          </tr>
+          <tr>
+            <td>Interference proceeding</td>
+            <td>Replaced by Inter Partes Review (IPR) and derivation proceedings</td>
+            <td>Available for pre-AIA applications</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout callout-warning">
+      <div class="callout-icon">&#9888;</div>
+      <div class="callout-body">
+        <div class="callout-title">The Inventor's Own Work as Prior Art</div>
+        <p>Under AIA, if you publish your research (e.g., post to arXiv or publish at NeurIPS) and then wait more than <strong>12 months</strong> before filing, your own publication becomes prior art against your own patent application. The clock starts from the <em>first</em> public disclosure — including a conference presentation, a blog post, or even a public GitHub commit. File before you publish, or file within 12 months of your first disclosure.</p>
+      </div>
+    </div>
+
+    <h3>Why AI/ML Patents Face Heightened Prior Art Scrutiny</h3>
+
+    <p>The AI/ML field presents unique prior art challenges. The academic publication cycle is extraordinarily fast — arXiv alone publishes hundreds of machine learning papers per week. A technique that seems novel in January may have been described in a preprint in December. Additionally, open-source code repositories (GitHub, HuggingFace) constitute prior art once publicly accessible, even without a corresponding academic paper.</p>
+
+    <div class="stats-row">
+      <div class="stat-item">
+        <div class="stat-number">~500K</div>
+        <div class="stat-label">AI-related patent applications filed globally in 2023</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">12M+</div>
+        <div class="stat-label">arXiv preprints available as potential NPL prior art</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">61%</div>
+        <div class="stat-label">AI patent applications that face §103 obviousness rejections</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">18 mo.</div>
+        <div class="stat-label">Average lag before patent applications publish (giving time to search)</div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════ -->
+    <!-- Section 2: Types of Prior Art                          -->
+    <!-- ══════════════════════════════════════════════════════ -->
+    <h2 id="types-of-prior-art" class="section-anchor">2. Types of Prior Art</h2>
+
+    <p>Prior art is not limited to patents. Courts have found prior art in a dizzying array of sources, from doctoral dissertations to product manuals, from trade show demonstrations to YouTube tutorials. Understanding every category is essential — your examiner certainly does.</p>
+
+    <div class="table-wrapper">
+      <table>
+        <caption class="table-caption">Table 3-2: Comprehensive Prior Art Categories, Effective Dates, and Jurisdictional Notes</caption>
+        <thead>
+          <tr>
+            <th>Category</th>
+            <th>Examples</th>
+            <th>Effective Date (AIA)</th>
+            <th>Jurisdictional Notes</th>
+            <th>Weight / Risk</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Issued patents</td>
+            <td>U.S., EP, CN, JP, KR patents</td>
+            <td>Filing date of the patent (as prior art vs. patentee)</td>
+            <td>Worldwide scope under AIA; EPO patents cite as prior art globally</td>
+            <td><span class="badge badge-danger">Very High</span></td>
+          </tr>
+          <tr>
+            <td>Published patent applications</td>
+            <td>U.S. PGPubs (18 months after filing), WO (PCT) applications</td>
+            <td>Publication date (or filing date if same or earlier)</td>
+            <td>PCT applications effective as of international filing date; unpublished U.S. apps count from U.S. filing date</td>
+            <td><span class="badge badge-danger">Very High</span></td>
+          </tr>
+          <tr>
+            <td>Scientific journal articles</td>
+            <td>Nature, Science, IEEE Trans., JMLR, NeurIPS proceedings</td>
+            <td>Publication / online-first date</td>
+            <td>Any language; online publication counts from date of web availability</td>
+            <td><span class="badge badge-danger">Very High</span></td>
+          </tr>
+          <tr>
+            <td>Conference papers &amp; proceedings</td>
+            <td>ICML, ICLR, CVPR, AAAI, ACL, MICCAI proceedings</td>
+            <td>Date of public presentation or distribution of proceedings</td>
+            <td>Poster presentations count if abstract is publicly distributed; paper-in-proceedings may differ from talk date</td>
+            <td><span class="badge badge-danger">High</span></td>
+          </tr>
+          <tr>
+            <td>Preprints / arXiv</td>
+            <td>arXiv.org, bioRxiv, medRxiv, SSRN, ChemRxiv</td>
+            <td>Date submitted / publicly available on server</td>
+            <td>Worldwide; widely used by USPTO examiners for AI/ML art</td>
+            <td><span class="badge badge-danger">High</span></td>
+          </tr>
+          <tr>
+            <td>Doctoral theses &amp; dissertations</td>
+            <td>ProQuest Dissertations, institutional repositories</td>
+            <td>Date available to public (library accession date)</td>
+            <td>Often overlooked; ProQuest indexes globally; can destroy novelty retroactively</td>
+            <td><span class="badge badge-warning">Medium–High</span></td>
+          </tr>
+          <tr>
+            <td>Product manuals &amp; datasheets</td>
+            <td>Hardware specs, SDK documentation, API reference docs</td>
+            <td>Date of public distribution or webpage publication</td>
+            <td>Manufacturer's website version history; Wayback Machine captures count</td>
+            <td><span class="badge badge-warning">Medium</span></td>
+          </tr>
+          <tr>
+            <td>Websites &amp; online content</td>
+            <td>Blog posts, GitHub repos, Stack Overflow, forum posts, white papers</td>
+            <td>Date first publicly accessible (Wayback Machine timestamps honored)</td>
+            <td>Public GitHub commit history establishes dates; even deleted content if archived</td>
+            <td><span class="badge badge-warning">Medium–High</span></td>
+          </tr>
+          <tr>
+            <td>Public use or disclosure</td>
+            <td>Trade show demos, conference demos, beta releases, open-source deployment</td>
+            <td>Date of public accessibility or non-confidential disclosure</td>
+            <td>Under AIA, applies worldwide (not just U.S.); NDA-protected demos do not count</td>
+            <td><span class="badge badge-warning">Medium</span></td>
+          </tr>
+          <tr>
+            <td>On-sale bar</td>
+            <td>Commercial sale offers, SaaS licensing, API commercialization</td>
+            <td>Date of offer for sale (even before delivery)</td>
+            <td>Worldwide under AIA; secret sales can still trigger bar (<em>Helsinn v. Teva</em>, 2019)</td>
+            <td><span class="badge badge-danger">High</span></td>
+          </tr>
+          <tr>
+            <td>Prior inventor disclosures</td>
+            <td>The inventors' own prior publications within 12-month grace period</td>
+            <td>Within 12 months before effective filing date</td>
+            <td>Only inventor's own prior disclosures; third-party disclosures after inventor's disclosure may be excluded</td>
+            <td><span class="badge badge-success">Excludable</span></td>
+          </tr>
+          <tr>
+            <td>Patent office records</td>
+            <td>Office actions, IPR petitions, inter partes reexamination</td>
+            <td>Date of public availability in PAIR/Private PAIR</td>
+            <td>USPTO proceedings are public; PTAB decisions extensively cited</td>
+            <td><span class="badge badge-info">Contextual</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout callout-danger">
+      <div class="callout-icon">&#128683;</div>
+      <div class="callout-body">
+        <div class="callout-title">The Helsinn Trap: Secret Commercial Sales Still Bar Patents</div>
+        <p>In <em>Helsinn Healthcare v. Teva Pharmaceuticals</em> (2019), the Supreme Court held that the on-sale bar under AIA applies even when the sale is <em>confidential</em> and the details of the invention are not disclosed publicly. This means that if your company entered into a commercial arrangement (e.g., an API licensing agreement) for an unpatented AI/ML system before filing, that secret commercial activity can still bar patentability. Document the timeline of your commercial activities meticulously.</p>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════ -->
+    <!-- Section 3: Patent Search Databases                     -->
+    <!-- ══════════════════════════════════════════════════════ -->
+    <h2 id="search-databases" class="section-anchor">3. Patent Search Databases</h2>
+
+    <p>No single database covers the entire global patent landscape. Professional prior art searches typically use at least three databases cross-referenced against each other. Below is a comprehensive comparison of the major platforms, from free government databases to enterprise AI-powered tools.</p>
+
+    <div class="table-wrapper">
+      <table>
+        <caption class="table-caption">Table 3-3: Patent Database Comparison — Features, Cost, and AI-Specific Capabilities</caption>
+        <thead>
+          <tr>
+            <th>Database</th>
+            <th>Coverage</th>
+            <th>Cost</th>
+            <th>Strengths</th>
+            <th>Weaknesses</th>
+            <th>AI/ML Features</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>USPTO Patent Full-Text Database</strong><br /><small>patft.uspto.gov / ppubs.uspto.gov</small></td>
+            <td>U.S. patents (1790–present); U.S. applications (2001–present)</td>
+            <td><span class="badge badge-success">Free</span></td>
+            <td>Official source; full-text Boolean search; classification search; assignment data</td>
+            <td>U.S. only; clunky interface; limited semantic search; no family view</td>
+            <td>Limited; PatentsView API provides some analytics; new Patent Public Search (Beta) improving</td>
+          </tr>
+          <tr>
+            <td><strong>Google Patents</strong><br /><small>patents.google.com</small></td>
+            <td>100M+ documents; U.S., EP, CN, WO, DE, FR, JP, KR, AU, CA, and more</td>
+            <td><span class="badge badge-success">Free</span></td>
+            <td>Semantic/AI similarity search; excellent UI; citation mapping; machine translation; NPL integration</td>
+            <td>Not always up-to-date; limited export; no sophisticated Boolean; may miss very recent filings</td>
+            <td>Excellent: semantic search, similar-patent recommendations, full-text ML classification</td>
+          </tr>
+          <tr>
+            <td><strong>Espacenet (EPO)</strong><br /><small>worldwide.espacenet.com</small></td>
+            <td>130M+ documents from 100+ countries; deep EP coverage</td>
+            <td><span class="badge badge-success">Free</span></td>
+            <td>CPC classification browsing; DOCDB family data; legal status; ep-fulltext; patent translate</td>
+            <td>Less intuitive for beginners; full-text search limited to EP/WO; slower UI</td>
+            <td>Moderate; CPC G06N browse useful; no native semantic search</td>
+          </tr>
+          <tr>
+            <td><strong>Lens.org</strong><br /><small>lens.org</small></td>
+            <td>Patents (200+ jurisdictions) + scholarly literature (NPL) in one platform</td>
+            <td><span class="badge badge-success">Free</span> (paid plans for bulk export)</td>
+            <td>Unified patent + NPL search; open data; patent family analysis; citation analysis; API access</td>
+            <td>Less polished than commercial tools; limited saved searches in free tier</td>
+            <td>Good: combined patent + arXiv/PubMed search; citation networks cross-domain</td>
+          </tr>
+          <tr>
+            <td><strong>Derwent Innovation</strong><br /><small>Clarivate (formerly Thomson Innovation)</small></td>
+            <td>100M+ patents; Derwent World Patent Index (DWPI) with expert-abstracted records</td>
+            <td><span class="badge badge-danger">$$$</span> Enterprise license</td>
+            <td>DWPI manual abstracts (highest quality); chemical structure search; analytics; citation mapping; AI semantic</td>
+            <td>Expensive; requires training; overkill for initial searches</td>
+            <td>Strong: AI-assisted clustering, concept search, patent landscaping, Derwent Innovation Index</td>
+          </tr>
+          <tr>
+            <td><strong>PatSnap</strong><br /><small>patsnap.com</small></td>
+            <td>170M+ patents; strong China (CNIPA) coverage; NPL integration</td>
+            <td><span class="badge badge-warning">$$–$$$</span> Subscription</td>
+            <td>AI-powered semantic search; technology landscape maps; competitive intelligence; chemical structure; biotech sequence search</td>
+            <td>Subscription cost; learning curve; China-centric features may not suit all users</td>
+            <td>Excellent: deep AI semantic search, automated claim mapping, competitor patent alerts</td>
+          </tr>
+          <tr>
+            <td><strong>AcclaimIP</strong><br /><small>acclaimip.com</small></td>
+            <td>U.S. and international patents; strong USPTO integration</td>
+            <td><span class="badge badge-warning">$$</span> Subscription</td>
+            <td>Advanced Boolean; classification analysis; portfolio analytics; examiner data; citation charting</td>
+            <td>Less global than PatSnap; limited semantic; primarily U.S.-focused power users</td>
+            <td>Moderate; useful examiner analytics to predict examination outcomes</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Database Cards: Quick-Start Guide</h3>
+
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-icon">&#128269;</div>
+        <h3>Start Here: Google Patents</h3>
+        <p>For any initial search, Google Patents is your fastest entry point. Use the "Similar patents" feature and semantic queries. Paste in your abstract text and let Google rank by semantic similarity. <strong>Always cross-check results</strong> against at least one other database before concluding a search.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">&#127988;</div>
+        <h3>Classification Search: Espacenet</h3>
+        <p>Once you have your CPC codes (see Section 4), browse the classification tree in Espacenet. Filter by <code>G06N</code> for AI computing, then narrow by subclass. The "Patent Translate" feature is invaluable for Chinese and Japanese prior art.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">&#9881;</div>
+        <h3>NPL + Patents: Lens.org</h3>
+        <p>Lens.org uniquely combines patents with scholarly literature (arXiv, PubMed, CrossRef) in a single interface. Set up saved searches with email alerts for competitive monitoring. Export citation networks as CSV for analysis.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">&#128301;</div>
+        <h3>U.S. Official: Patent Public Search</h3>
+        <p>USPTO's Patent Public Search (ppubs.uspto.gov) replaced the old PatFT/AppFT. Use it for authoritative U.S. data, assignee searches, and CPC classification browsing. The Boolean field codes (<code>ABST/</code>, <code>CLMS/</code>, <code>SPEC/</code>) let you search specific patent sections.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">&#128202;</div>
+        <h3>Enterprise AI: PatSnap / Derwent</h3>
+        <p>If your institution has access, PatSnap's semantic AI search can surface relevant art that keyword searches miss entirely. For biotech/pharma, Derwent Innovation's chemical structure and sequence-based searches are indispensable. Request trials before committing.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">&#128203;</div>
+        <h3>Chinese Prior Art: CNIPA / SooPAT</h3>
+        <p>China is now the world's largest patent filer. The CNIPA database (pss-system.cnipa.gov.cn) is the official source; SooPAT (soopat.com) and PatSnap provide better UIs for Chinese patents. For AI/ML art, Chinese filings are extensive and cannot be ignored in a thorough search.</p>
+      </div>
+    </div>
+
+    <div class="callout callout-tip">
+      <div class="callout-icon">&#128161;</div>
+      <div class="callout-body">
+        <div class="callout-title">The "Three-Database Rule" for Serious Searches</div>
+        <p>Professional patent searchers use a minimum of three independent databases for any opinion-level search. Recommended stack for AI/ML: <strong>(1)</strong> Google Patents for semantic coverage, <strong>(2)</strong> USPTO Patent Public Search for authoritative U.S. data, <strong>(3)</strong> Espacenet for international coverage and CPC classification browsing. Add Lens.org as a fourth for combined NPL search. No single database covers everything.</p>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════ -->
+    <!-- Section 4: Classification Systems                      -->
+    <!-- ══════════════════════════════════════════════════════ -->
+    <h2 id="classification-systems" class="section-anchor">4. Classification Systems</h2>
+
+    <p>Patent classification systems organize the entire patent literature into a hierarchical taxonomy. Mastering the relevant classification codes for your technology area transforms you from a keyword searcher into a systematic prior art professional. Keyword searches miss patents that use different terminology; classification searches catch everything in the technical area regardless of words used.</p>
+
+    <h3>CPC vs. IPC: The Two Major Systems</h3>
+
+    <p>The <span class="key-term" title="Cooperative Patent Classification — joint system of USPTO and EPO, most granular">Cooperative Patent Classification (CPC)</span> is a joint system developed by the USPTO and EPO. It is more granular than the International Patent Classification (IPC) and is the primary system used for AI/ML patent searches. The <span class="key-term" title="International Patent Classification — WIPO system used by 100+ patent offices">International Patent Classification (IPC)</span> is administered by WIPO and used by over 100 patent offices; CPC codes are typically aligned with IPC but with additional subdivisions.</p>
+
+    <div class="callout callout-info">
+      <div class="callout-icon">&#9432;</div>
+      <div class="callout-body">
+        <div class="callout-title">CPC Code Structure</div>
+        <p>CPC codes follow a hierarchical structure: <strong>Section &rarr; Class &rarr; Subclass &rarr; Group &rarr; Subgroup</strong>. For example, <code>G06N 3/04</code> breaks down as: G = Physics, 06 = Computing/Calculating, N = Computing by non-arithmetic methods, 3 = Neural networks, /04 = Architectures. The deeper you go, the more specific the art. Always search at multiple hierarchy levels.</p>
+      </div>
+    </div>
+
+    <div class="table-wrapper">
+      <table>
+        <caption class="table-caption">Table 3-4: Key CPC/IPC Codes for AI, ML, Biotech, and Pharma Patent Searches</caption>
+        <thead>
+          <tr>
+            <th>CPC Code</th>
+            <th>IPC Equivalent</th>
+            <th>Technology Area</th>
+            <th>Key Subgroups</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>G06N</code></td>
+            <td>G06N</td>
+            <td>Computing by non-arithmetic methods (core AI/ML)</td>
+            <td>G06N 3 (neural networks), G06N 5 (inference engines), G06N 7 (probabilistic), G06N 20 (machine learning)</td>
+            <td>Primary code for ML patents; always include in AI searches</td>
+          </tr>
+          <tr>
+            <td><code>G06N 3/04</code></td>
+            <td>G06N 3/04</td>
+            <td>Neural network architectures</td>
+            <td>Includes CNNs, RNNs, transformers, attention mechanisms</td>
+            <td>Core for deep learning patent searches; extremely dense with prior art</td>
+          </tr>
+          <tr>
+            <td><code>G06N 3/08</code></td>
+            <td>G06N 3/08</td>
+            <td>Learning methods for neural networks</td>
+            <td>Backpropagation, gradient descent, optimization methods</td>
+            <td>Training algorithms; overlaps with G06N 20</td>
+          </tr>
+          <tr>
+            <td><code>G06N 20/00</code></td>
+            <td>G06N 20/00</td>
+            <td>Machine learning (general)</td>
+            <td>G06N 20/10 (decision trees), G06N 20/20 (ensemble methods), G06N 20/40 (SVMs)</td>
+            <td>Covers classical ML; use alongside G06N 3 for DL</td>
+          </tr>
+          <tr>
+            <td><code>G06F 18/00</code></td>
+            <td>G06F 18/00</td>
+            <td>Data recognition; classification</td>
+            <td>G06F 18/20 (supervised), G06F 18/22 (nearest neighbor), G06F 18/24 (neural)</td>
+            <td>Pattern recognition; overlaps with G06N; check both</td>
+          </tr>
+          <tr>
+            <td><code>G06V</code></td>
+            <td>G06K</td>
+            <td>Image/video recognition and understanding</td>
+            <td>G06V 10 (image analysis), G06V 20 (scene analysis), G06V 40 (human recognition)</td>
+            <td>Computer vision; includes medical imaging AI</td>
+          </tr>
+          <tr>
+            <td><code>G10L</code></td>
+            <td>G10L</td>
+            <td>Speech/audio recognition and synthesis</td>
+            <td>G10L 15 (speech recognition), G10L 25 (speaker recognition)</td>
+            <td>NLP acoustic layer; pair with G06F 40 for text</td>
+          </tr>
+          <tr>
+            <td><code>G06F 40/00</code></td>
+            <td>G06F 40/00</td>
+            <td>Processing of natural language</td>
+            <td>G06F 40/30 (machine translation), G06F 40/40 (text summarization), G06F 40/56 (sentiment)</td>
+            <td>NLP patents; key for LLM/chatbot applications</td>
+          </tr>
+          <tr>
+            <td><code>A61B 5/00</code></td>
+            <td>A61B 5/00</td>
+            <td>Measuring for diagnostic purposes</td>
+            <td>A61B 5/7264 (machine learning applied to biosignals); A61B 5/0022 (wearables)</td>
+            <td>Digital health AI; pair with G16H for health informatics</td>
+          </tr>
+          <tr>
+            <td><code>G16H</code></td>
+            <td>G16H</td>
+            <td>Healthcare informatics</td>
+            <td>G16H 50/20 (clinical decision support), G16H 50/70 (predictive health modeling)</td>
+            <td>AI in clinical settings; critical for medtech AI patents</td>
+          </tr>
+          <tr>
+            <td><code>C12N 15/00</code></td>
+            <td>C12N 15/00</td>
+            <td>Mutation or genetic engineering</td>
+            <td>C12N 15/10 (DNA sequences), C12N 15/82 (gene expression)</td>
+            <td>Core biotech; combine with G06N for AI-assisted gene discovery</td>
+          </tr>
+          <tr>
+            <td><code>C07K</code></td>
+            <td>C07K</td>
+            <td>Peptides / antibodies</td>
+            <td>C07K 16 (monoclonal antibodies), C07K 14 (proteins)</td>
+            <td>Biologic therapeutics; AI-designed proteins combine with G06N</td>
+          </tr>
+          <tr>
+            <td><code>A61K</code></td>
+            <td>A61K</td>
+            <td>Preparations for medical use (pharma)</td>
+            <td>A61K 31 (organic compounds), A61K 39 (vaccines), A61K 48 (gene therapy)</td>
+            <td>Drug compounds; use with A61P for therapeutic indications</td>
+          </tr>
+          <tr>
+            <td><code>G06Q</code></td>
+            <td>G06Q</td>
+            <td>Data processing systems for administrative/commercial/business</td>
+            <td>G06Q 10 (administration), G06Q 30 (e-commerce)</td>
+            <td>Business method patents; relevant for AI-based business process inventions</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>How to Find the Right CPC Code</h3>
+
+    <p>If you are not sure which CPC codes apply to your invention, use these three techniques:</p>
+
+    <ol>
+      <li><strong>Look at the closest known patent:</strong> Find any patent you know is in your space (even an imperfect one) and check its CPC codes in the front page data. These codes are your starting point.</li>
+      <li><strong>Use the CPC scheme browser:</strong> The USPTO hosts the full CPC scheme at <code>https://www.uspto.gov/web/patents/classification/cpc/html/cpc.html</code>. Browse the G06N subclass definitions to find matching codes.</li>
+      <li><strong>Run a keyword search first, extract codes:</strong> Do a preliminary keyword search in Google Patents or Espacenet, export the top 20 results, and run frequency analysis on their CPC codes. The most common codes in your result set are usually the right ones.</li>
+    </ol>
+
+    <!-- ══════════════════════════════════════════════════════ -->
+    <!-- Section 5: Search Strategy for AI/ML Patents           -->
+    <!-- ══════════════════════════════════════════════════════ -->
+    <h2 id="search-strategy" class="section-anchor">5. Search Strategy for AI/ML Patents</h2>
+
+    <p>A systematic search strategy prevents two failure modes: the <em>too-narrow search</em> that misses the closest prior art, and the <em>too-broad search</em> that generates thousands of irrelevant results. The following six-step process is the one we use at Fish &amp; Richardson for pre-filing patentability opinions in the AI/ML space.</p>
+
+    <ol class="process-steps">
+      <li>
+        <div class="step-content">
+          <h4>Define Key Technical Concepts</h4>
+          <p>Before touching any database, write a precise technical description of your invention in 3–5 sentences. Identify: (a) the <strong>problem</strong> being solved, (b) the <strong>technical approach</strong> — architecture, algorithm, training method, data structure, (c) the <strong>key distinguishing features</strong> that differ from the standard/prior approach, and (d) the <strong>result or improvement</strong> achieved. For each concept, brainstorm synonyms — "attention mechanism," "self-attention," "transformer attention," "query-key-value attention" all describe the same thing and may appear differently in prior art.</p>
+        </div>
+      </li>
+      <li>
+        <div class="step-content">
+          <h4>Identify Relevant CPC Classification Codes</h4>
+          <p>Using the technique in Section 4, identify 3–8 CPC codes that cover your invention. For a drug-target binding predictor using a graph neural network: <code>G06N 3/04</code> (neural networks), <code>G06N 20/00</code> (ML general), <code>G06N 3/08</code> (learning methods), <code>C12N 15/00</code> (molecular biology), and <code>G16H 70/40</code> (drug repurposing). Record these codes in your search log. Verify by browsing each code in Espacenet to confirm documents in the code match your technology area.</p>
+        </div>
+      </li>
+      <li>
+        <div class="step-content">
+          <h4>Build Structured Keyword Queries</h4>
+          <p>Construct Boolean queries using the technical vocabulary you mapped in Step 1. Structure queries from broad to narrow. Start with the most specific query (all key concepts), review results, then broaden by removing terms one at a time. Use proximity operators (<code>NEAR</code>, <code>ADJ</code>) available in USPTO and Espacenet to find terms appearing near each other. Record every query you run, the database used, and the result count in your search log.</p>
+        </div>
+      </li>
+      <li>
+        <div class="step-content">
+          <h4>Search Forward and Backward Citations</h4>
+          <p>Once you find relevant patents, follow the citation graph in both directions. <strong>Backward citations</strong> (references cited in the patent) lead to earlier foundational art. <strong>Forward citations</strong> (patents that cite this patent) show subsequent developments that may include your invention. Google Patents and Lens.org display both citation directions visually. Key rule: <em>never analyze a patent in isolation</em> — always trace at least one generation of citations in both directions.</p>
+        </div>
+      </li>
+      <li>
+        <div class="step-content">
+          <h4>Screen and Cluster Results</h4>
+          <p>From your combined search results, apply a two-pass screening process. First pass: scan titles and abstracts; discard clearly irrelevant documents. Second pass: read the claims and abstract of surviving candidates; identify "hot" references (documents disclosing 3+ elements of your invention). Cluster hot references by technical approach. This clustering reveals the prior art landscape and identifies where the gaps — and your patentable distinctions — may lie.</p>
+        </div>
+      </li>
+      <li>
+        <div class="step-content">
+          <h4>Map Claims to Your Invention</h4>
+          <p>For each hot reference, perform a formal claim mapping exercise (see Section 6). Create a matrix: rows are the elements of your proposed claims, columns are the cited references. For each cell, note whether the reference discloses that element. References that map to every element of a proposed claim are <em>anticipatory</em> — your claim must be distinguished over them. References that map to some elements can be combined under a §103 obviousness analysis. Use this mapping to refine your claim scope before drafting.</p>
+        </div>
+      </li>
+    </ol>
+
+    <h3>Sample Search Queries for AI/ML Patent Searches</h3>
+
+    <p>The following examples demonstrate query construction for real AI/ML patent scenarios. These use the USPTO Patent Public Search syntax, but the logic translates to other platforms with minor adjustments.</p>
+
+    <pre><code>/* USPTO Patent Public Search — Example 1: Transformer-based Drug Binding */
+/* Objective: Find prior art on attention-based molecular property prediction */
+
+-- Query 1 (Broad — CPC classification only)
+CPC/G06N3-04 AND CPC/C12N15
+
+-- Query 2 (Narrow — Combined keyword + CPC)
+CLMS/((transformer OR attention-mechanism OR "self-attention")
+  AND (molecule OR molecular OR protein OR "drug target" OR ligand)
+  AND (predict* OR classif*))
+AND CPC/G06N
+
+-- Query 3 (Graph neural networks for molecular property)
+CLMS/((graph-neural-network OR GNN OR "message passing")
+  AND (molecular OR chemical OR compound)
+  AND (binding OR affinity OR activity))
+
+-- Query 4 (Proximity search — terms within 5 words of each other)
+SPEC/("attention mechanism" NEAR5 molecular)
+AND SPEC/(predict* NEAR5 (binding OR affinity))
+
+-- Run each query; document result counts; export top 50 for screening</code></pre>
+
+    <pre><code>/* Espacenet CPC + Keyword Combined Search */
+/* Objective: LLM-based code generation invention */
+
+-- Step 1: CPC Browse
+G06F 40/30   (machine translation — natural language)
+G06N 3/04    (neural network architectures)
+G06F 8/00    (programming; compilers; translators)
+
+-- Step 2: Espacenet Smart Search Query
+ctxt = "large language model" AND ctxt = "code generation"
+AND ctxt = "fine-tuning"
+
+-- Step 3: Advanced Query with CPC
+ctxt = (("language model" OR "LLM" OR "GPT" OR "transformer")
+  AND ("code generation" OR "program synthesis" OR "autocomplete"))
+AND cpc = G06F8
+
+-- Step 4: Title/Abstract only (faster screening)
+ta = ("neural" AND "code" AND "generat*")</code></pre>
+
+    <pre><code>/* Google Patents API Query (Python) */
+/* For automated bulk search and screening */
+
+import requests
+
+def google_patents_search(query: str, num: int = 50) -> list:
+    """
+    Note: Google Patents does not have a public API.
+    Use the SerpAPI Google Patents endpoint instead.
+    Requires: pip install serpapi
+    """
+    from serpapi import GoogleSearch
+
+    params = {
+        "engine": "google_patents",
+        "q": query,
+        "num": num,
+        "api_key": "YOUR_SERPAPI_KEY"
+    }
+
+    search = GoogleSearch(params)
+    results = search.get_dict()
+    return results.get("organic_results", [])
+
+# Example: Find transformer architecture patents
+results = google_patents_search(
+    query="transformer attention mechanism neural network language model",
+    num=50
+)
+
+for r in results:
+    print(r.get("patent_id"), r.get("title"), r.get("filing_date"))</code></pre>
+
+    <!-- ══════════════════════════════════════════════════════ -->
+    <!-- Section 6: Reading and Analyzing Patent Claims         -->
+    <!-- ══════════════════════════════════════════════════════ -->
+    <h2 id="reading-claims" class="section-anchor">6. Reading and Analyzing Patent Claims</h2>
+
+    <p>Claims are the legal heart of a patent — the only part that defines the exclusive right. Everything else (specification, drawings, abstract) exists to support, explain, and interpret the claims. As a prior art researcher, you must read claims precisely and map them against your own technology with surgical accuracy.</p>
+
+    <h3>Independent vs. Dependent Claims</h3>
+
+    <p>Every patent has a hierarchy of claims:</p>
+
+    <ul>
+      <li><strong>Independent claims</strong> stand alone. They define the broadest version of the invention. If your product does not infringe the independent claim, it cannot infringe any dependent claim that depends from it.</li>
+      <li><strong>Dependent claims</strong> incorporate all limitations of the claim(s) they depend from, then add more. They are narrower, but they provide fallback scope if the independent claim is invalidated.</li>
+      <li><strong>Multiple-dependent claims</strong> depend from more than one prior claim. Common in European-origin applications; rarer in U.S. practice due to additional fees.</li>
+    </ul>
+
+    <div class="claim-box">
+      <div class="claim-header">Annotated Claim Example — Hypothetical AI Drug Discovery Patent</div>
+      <p><span class="claim-number">Claim 1. [INDEPENDENT]</span> A computer-implemented method for predicting protein-ligand binding affinity, the method comprising:</p>
+      <span class="claim-element"><strong>[Preamble]</strong> (sets context; "comprising" means open-ended — additional elements OK)</span>
+      <p class="claim-indent">receiving, by at least one processor, a molecular graph representation of a candidate ligand, wherein the molecular graph comprises a plurality of nodes representing atoms and a plurality of edges representing chemical bonds;</p>
+      <span class="claim-element"><strong>[Element 1]</strong> (defines the input data structure — must match in both literal infringement and FTO analysis)</span>
+      <p class="claim-indent">applying a graph neural network comprising at least three message-passing layers to the molecular graph to generate a ligand embedding vector;</p>
+      <span class="claim-element"><strong>[Element 2]</strong> (defines the model architecture — "at least three" is a quantitative limitation; two layers would not infringe)</span>
+      <p class="claim-indent">concatenating the ligand embedding vector with a protein sequence embedding derived from a pre-trained protein language model; and</p>
+      <span class="claim-element"><strong>[Element 3]</strong> (defines the fusion step — the protein embedding source matters for FTO)</span>
+      <p class="claim-indent">outputting, by a prediction head, a binding affinity score representing the predicted binding between the candidate ligand and the protein.</p>
+      <span class="claim-element"><strong>[Element 4]</strong> (defines the output — "binding affinity score" is a specific claim term requiring precise construction)</span>
+      <br />
+      <p><span class="claim-number">Claim 2. [DEPENDENT]</span> The method of claim 1, wherein the graph neural network is an attentive fingerprint network.</p>
+      <span class="claim-element"><strong>[Adds limitation]</strong> — narrows to a specific GNN architecture; if claim 1 is invalid, claim 2 may survive as a distinct invention</span>
+      <br />
+      <p><span class="claim-number">Claim 8. [INDEPENDENT — System]</span> A system for predicting protein-ligand binding affinity, the system comprising: at least one processor; and memory storing instructions that, when executed by the at least one processor, perform the method of any one of claims 1–7.</p>
+      <span class="claim-element"><strong>[System claim]</strong> — parallel protection for the hardware/software combination; same scope as method claims</span>
+    </div>
+
+    <h3>Claim Mapping Worksheet</h3>
+
+    <p>Use this template to systematically map each element of a patent claim against your own product or against your proposed invention claims. This is the core analytical tool for both FTO and novelty analysis.</p>
+
+    <div class="table-wrapper">
+      <table>
+        <caption class="table-caption">Table 3-5: Claim Mapping Worksheet Template</caption>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Claim Element (Exact Language)</th>
+            <th>Your Product / Invention Feature</th>
+            <th>Literal Match?</th>
+            <th>DoE Match?</th>
+            <th>Notes / Distinctions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>"receiving… a molecular graph representation"</td>
+            <td>System receives SMILES strings, not graph format natively</td>
+            <td>No — different input format</td>
+            <td>Possibly — SMILES converted to graph internally</td>
+            <td>If conversion is automatic and internal, DoE risk is real; if user-supplied input is SMILES only, stronger argument of non-infringement</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>"graph neural network comprising at least three message-passing layers"</td>
+            <td>We use a 6-layer GNN with message passing</td>
+            <td>Yes — 6 &ge; 3</td>
+            <td>N/A</td>
+            <td>Literal infringement — "at least three" encompasses 6. This element is met.</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>"pre-trained protein language model"</td>
+            <td>We use ESM-2 (Facebook's protein LM)</td>
+            <td>Yes — ESM-2 is a pre-trained protein LM</td>
+            <td>N/A</td>
+            <td>This element is met. Note: if claim requires training on specific data, ESM-2's training data may be relevant.</td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td>"outputting… a binding affinity score"</td>
+            <td>We output a ranked list of top-k candidates, not a single score per se</td>
+            <td>Unclear — depends on claim construction</td>
+            <td>Likely yes — ranking is derived from underlying scores</td>
+            <td>Seek claim construction opinion on "binding affinity score" — if internal score is computed (even if not displayed), element may be met</td>
+          </tr>
+          <tr>
+            <td colspan="3"><strong>Overall Assessment</strong></td>
+            <td colspan="3"><span class="badge badge-warning">High Risk</span> — 2/4 elements clearly met; 1/4 unclear but likely met under DoE; 1/4 genuinely non-infringing distinction (input format). Recommend design-around: accept native SMILES inputs without internal graph conversion, and output ranked list without computing per-compound affinity score. Counsel opinion required.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Literal Infringement vs. Doctrine of Equivalents</h3>
+
+    <p>Patent infringement is found in two ways:</p>
+
+    <ul>
+      <li><strong>Literal infringement:</strong> Every element of at least one claim is present in the accused product exactly as written. This is the easiest analysis — read the claim, look at the product. A perfect word-for-word match.</li>
+      <li><strong>Doctrine of equivalents (DoE):</strong> Even if your product does not literally infringe, it may infringe under DoE if the accused element performs substantially the <em>same function</em>, in substantially the <em>same way</em>, to achieve substantially the <em>same result</em> as the claimed element. This is the <strong>function-way-result test</strong> from <em>Graver Tank v. Linde Air Products</em> (1950).</li>
+    </ul>
+
+    <div class="callout callout-warning">
+      <div class="callout-icon">&#9888;</div>
+      <div class="callout-body">
+        <div class="callout-title">Prosecution History Estoppel Limits DoE</div>
+        <p>If a patent applicant narrowed a claim during prosecution to overcome a prior art rejection, they are <strong>estopped</strong> from arguing DoE to recapture the surrendered scope (<em>Festo Corp. v. Shoketsu Kinzoku Kogyo Kabushiki Co.</em>, 2002). When analyzing FTO for a third-party patent, always review the prosecution history (file wrapper) to identify narrowing amendments. The USPTO PAIR system provides public access to prosecution histories for granted patents.</p>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════ -->
+    <!-- Section 7: Non-Patent Literature (NPL) Search         -->
+    <!-- ══════════════════════════════════════════════════════ -->
+    <h2 id="npl-search" class="section-anchor">7. Non-Patent Literature (NPL) Search</h2>
+
+    <p>For technology-intensive fields like AI/ML and biotech, <span class="key-term" title="Academic papers, conference proceedings, theses, product documentation — any prior art that is not a patent or patent application">non-patent literature (NPL)</span> is often the most damaging category of prior art. The academic community publishes cutting-edge ML techniques months to years before any patent covering the same technique is filed. Missing NPL prior art is one of the most common errors in AI/ML patent searching.</p>
+
+    <h3>Core NPL Databases for AI/ML</h3>
+
+    <div class="table-wrapper">
+      <table>
+        <caption class="table-caption">Table 3-6: NPL Databases — Coverage, Search Capabilities, and AI/ML Relevance</caption>
+        <thead>
+          <tr>
+            <th>Database</th>
+            <th>Coverage</th>
+            <th>Cost</th>
+            <th>Search Tips</th>
+            <th>AI/ML Relevance</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>arXiv.org</strong></td>
+            <td>Preprints in CS, math, physics, statistics, quantitative biology; 2M+ papers</td>
+            <td><span class="badge badge-success">Free</span></td>
+            <td>Search cs.LG (ML), cs.AI, cs.CL (NLP), cs.CV (vision); filter by date; sort by relevance</td>
+            <td><span class="badge badge-danger">Critical</span> — Most ML techniques appear here before publication; arXiv papers are frequently cited by patent examiners</td>
+          </tr>
+          <tr>
+            <td><strong>IEEE Xplore</strong></td>
+            <td>IEEE journals, transactions, conference proceedings; 5M+ documents</td>
+            <td><span class="badge badge-warning">Subscription</span> (abstracts free)</td>
+            <td>Filter by publication type; use IEEE Thesaurus for controlled vocabulary; export citations; sort by citations</td>
+            <td><span class="badge badge-danger">Very High</span> — IEEE Trans. Neural Networks, IEEE Trans. Pattern Analysis; CVPR, ICCV, ECCV proceedings</td>
+          </tr>
+          <tr>
+            <td><strong>ACM Digital Library</strong></td>
+            <td>ACM journals and conference proceedings; 600K+ works</td>
+            <td><span class="badge badge-warning">Subscription</span> (ACM DL open access expanding)</td>
+            <td>Full-text search; filter by conference (NeurIPS, ICML, KDD); citation search</td>
+            <td><span class="badge badge-danger">Very High</span> — NeurIPS, ICML, KDD, WWW, SIGKDD proceedings; core ML/AI venues</td>
+          </tr>
+          <tr>
+            <td><strong>Google Scholar</strong></td>
+            <td>Broadest coverage: journals, preprints, theses, conference papers, patents</td>
+            <td><span class="badge badge-success">Free</span></td>
+            <td>Advanced search: exact phrase, date range, citing articles; "Cited by" link for forward citations; set up alerts</td>
+            <td><span class="badge badge-danger">Very High</span> — Best starting point for NPL; indexes arXiv, ACM, IEEE, and obscure sources simultaneously</td>
+          </tr>
+          <tr>
+            <td><strong>PubMed / MEDLINE</strong></td>
+            <td>Biomedical literature; 35M+ citations; NLM-indexed journals</td>
+            <td><span class="badge badge-success">Free</span></td>
+            <td>MeSH terms for controlled vocabulary; "Best Match" ranking; link to full text via PubMed Central</td>
+            <td><span class="badge badge-success">High for Biotech/Pharma</span> — AI in medicine, genomics, drug discovery; includes Nature Medicine, NEJM, JAMA</td>
+          </tr>
+          <tr>
+            <td><strong>Semantic Scholar</strong></td>
+            <td>210M+ academic papers; AI-enhanced literature graph; semantic search</td>
+            <td><span class="badge badge-success">Free</span></td>
+            <td>Semantic search for concept queries; TLDR summaries; citation velocity; influence scores</td>
+            <td><span class="badge badge-danger">Very High</span> — Best semantic/conceptual search for NPL; identifies conceptually similar papers across terminology variations</td>
+          </tr>
+          <tr>
+            <td><strong>ProQuest Dissertations</strong></td>
+            <td>Doctoral and master's theses; 5M+ records, global coverage</td>
+            <td><span class="badge badge-warning">Subscription</span></td>
+            <td>Search by university, year, subject; theses often contain earliest public disclosures of academic inventions</td>
+            <td><span class="badge badge-warning">Medium</span> — Often overlooked; theses by AI PhD students can predate publication by 1–2 years</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Key Conferences as Prior Art Sources</h3>
+
+    <p>For AI/ML, the following conferences publish proceedings that constitute prior art from their <strong>submission deadline date</strong> (when papers are publicly posted) or the <strong>presentation date</strong>, whichever is earlier. For many top conferences, papers are posted to arXiv simultaneously with or before the proceedings publication.</p>
+
+    <div class="two-col">
+      <div>
+        <h4>AI / Machine Learning</h4>
+        <ul>
+          <li><strong>NeurIPS</strong> — Advances in Neural Information Processing Systems; December; papers often on arXiv by September</li>
+          <li><strong>ICML</strong> — International Conference on Machine Learning; July; proceedings available months prior</li>
+          <li><strong>ICLR</strong> — International Conference on Learning Representations; May; open-review system makes drafts public early</li>
+          <li><strong>AAAI</strong> — AAAI Conference on Artificial Intelligence; February; long-standing AI venue</li>
+          <li><strong>IJCAI</strong> — International Joint Conference on AI; August; broad AI coverage</li>
+        </ul>
+
+        <h4>Computer Vision</h4>
+        <ul>
+          <li><strong>CVPR</strong> — Computer Vision and Pattern Recognition; June; largest CV conference</li>
+          <li><strong>ICCV</strong> — International Conference on Computer Vision; biennial October</li>
+          <li><strong>ECCV</strong> — European Conference on Computer Vision; biennial September–October</li>
+        </ul>
+
+        <h4>Natural Language Processing</h4>
+        <ul>
+          <li><strong>ACL</strong> — Association for Computational Linguistics; July–August</li>
+          <li><strong>EMNLP</strong> — Empirical Methods in NLP; November</li>
+          <li><strong>NAACL</strong> — North American Chapter of ACL; June</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Biotech / Life Sciences</h4>
+        <ul>
+          <li><strong>Nature</strong> — Broad science; high-impact; embargoed until publication</li>
+          <li><strong>Science</strong> — Comparable to Nature; weekly publication</li>
+          <li><strong>Cell</strong> — Molecular biology flagship</li>
+          <li><strong>Nature Methods</strong> — Computational biology methods</li>
+          <li><strong>RECOMB</strong> — Research in Computational Molecular Biology; April</li>
+          <li><strong>ISMB</strong> — Intelligent Systems for Molecular Biology; July</li>
+        </ul>
+
+        <h4>Drug Discovery / Pharma</h4>
+        <ul>
+          <li><strong>Journal of Medicinal Chemistry</strong> (ACS)</li>
+          <li><strong>Journal of Chemical Information and Modeling</strong></li>
+          <li><strong>Drug Discovery Today</strong></li>
+          <li><strong>ACS Chemical Biology</strong></li>
+        </ul>
+
+        <h4>Robotics / Autonomous Systems</h4>
+        <ul>
+          <li><strong>ICRA</strong> — IEEE Int'l Conference on Robotics and Automation; May</li>
+          <li><strong>RSS</strong> — Robotics: Science and Systems; July</li>
+          <li><strong>CoRL</strong> — Conference on Robot Learning; November</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout callout-example">
+      <div class="callout-icon">&#128218;</div>
+      <div class="callout-body">
+        <div class="callout-title">Case Study: The Attention Is All You Need Problem</div>
+        <p>The foundational "Attention Is All You Need" paper (Vaswani et al., 2017) was posted to arXiv on June 12, 2017. Google Brain filed its first patent application covering transformer architectures in late 2017. Any application filed after June 12, 2018 claiming broadly the same attention mechanism architecture faces this arXiv paper as prior art. This is why <em>every</em> AI/ML NPL search must include arXiv as a primary source, and why date-stamping your search is critical: the arXiv submission date — not the conference proceedings date — is the operative prior art date.</p>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════ -->
+    <!-- Section 8: Freedom-to-Operate Analysis                 -->
+    <!-- ══════════════════════════════════════════════════════ -->
+    <h2 id="fto-analysis" class="section-anchor">8. Freedom-to-Operate Analysis</h2>
+
+    <p>Freedom-to-operate (FTO) analysis is the most legally consequential prior art activity a company can undertake. Getting it wrong does not just affect your patent application — it exposes your product to injunctions, treble damages, and forced redesigns. This section walks through the FTO process with sufficient rigor to help you have an intelligent conversation with your IP counsel about the risks your product faces.</p>
+
+    <div class="callout callout-danger">
+      <div class="callout-icon">&#128683;</div>
+      <div class="callout-body">
+        <div class="callout-title">FTO Opinion = Attorney Work Product</div>
+        <p>While this section teaches you how FTO analysis works, a <strong>formal FTO opinion</strong> must be written by a licensed patent attorney. The opinion can serve as evidence of good-faith belief in non-infringement to rebut claims of willful infringement (which can trigger treble damages). An internal engineer's analysis, however thorough, does not provide this legal protection. Once you identify a potential issue from your own search, bring in counsel immediately.</p>
+      </div>
+    </div>
+
+    <h3>FTO vs. Patentability: Understanding the Difference</h3>
+
+    <p>These two inquiries are often confused but are fundamentally different in scope and purpose:</p>
+
+    <ul>
+      <li><strong>Patentability search:</strong> Searches <em>all prior art</em> (published patents, applications, NPL, public disclosures). Goal: find art that would anticipate or render obvious your claimed invention. Scope: worldwide; expired patents matter.</li>
+      <li><strong>FTO search:</strong> Searches only <em>in-force patent claims</em> in <em>specific jurisdictions</em>. Goal: find claims that could be asserted against your product. Expired patents do not create infringement risk. The scope is narrower but the legal consequence of missing something is more severe.</li>
+    </ul>
+
+    <h3>The FTO Process</h3>
+
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="timeline-date">Phase 1 — Product Mapping</div>
+        <h4>Define the Product Features to Be Analyzed</h4>
+        <p>Prepare a detailed technical description of your product, including every technical feature that could potentially read on a patent claim. For AI/ML products, this includes: model architecture, training data and methodology, inference pipeline, input/output format, hardware requirements, and the use case. Break the product into discrete functional modules — each module may need a separate FTO inquiry.</p>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Phase 2 — Search</div>
+        <h4>Identify Potentially Relevant In-Force Patents</h4>
+        <p>Execute the same search strategy described in Section 5, but with two critical differences: (1) exclude expired patents (utility patents expire 20 years from filing; design patents 15 years from grant); (2) focus on in-force patents in the jurisdictions where you make, use, sell, offer for sale, or import the product. Use Google Patents' "legal status" filter or Espacenet's legal status tool to identify in-force patents.</p>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Phase 3 — Claim Analysis</div>
+        <h4>Read Claims of Identified Patents Against Your Product</h4>
+        <p>For each potentially relevant patent, perform the claim mapping exercise from Section 6. Work from the independent claims first — if your product does not infringe any independent claim, you do not infringe any dependent claim from that patent. Construct arguments of non-infringement for each element you believe is not met. Note ambiguous elements that require claim construction analysis.</p>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Phase 4 — Risk Stratification</div>
+        <h4>Classify Patents by Risk Level</h4>
+        <p>Assign each relevant patent to a risk tier: <strong>High Risk</strong> (all elements of at least one claim appear to read on your product — requires immediate action), <strong>Medium Risk</strong> (most elements read; DoE analysis needed; prosecution history review required), <strong>Low Risk</strong> (one or more elements do not appear to read; well-reasoned distinction available), <strong>No Risk</strong> (no elements read; factual basis clearly documented). High-risk patents require formal attorney opinion.</p>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Phase 5 — Response Strategies</div>
+        <h4>Design Arounds, Licensing, or Invalidity Challenges</h4>
+        <p>For patents in the High or Medium risk category, four responses exist: (1) <strong>Design-around:</strong> modify your product to avoid at least one claim element — this is the preferred technical solution; (2) <strong>License:</strong> negotiate a license from the patent owner; (3) <strong>Challenge validity:</strong> file an IPR (inter partes review) or ex parte reexamination if you have prior art that could invalidate the patent; (4) <strong>Proceed with risk:</strong> rarely recommended without counsel; consider the patentee's enforcement history and financial capacity.</p>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Phase 6 — Opinion</div>
+        <h4>Obtain Formal Clearance Opinion from Patent Counsel</h4>
+        <p>A formal written FTO opinion from qualified patent counsel accomplishes two things: (1) it documents the company's good-faith analysis for purposes of rebutting willful infringement; (2) it provides an attorney-client privilege-protected record of the risk assessment. The opinion should be updated whenever the product changes materially or when new patent publications in the relevant space are identified. Set up patent watch alerts for this purpose.</p>
+      </div>
+    </div>
+
+    <h3>When to Get an FTO Opinion</h3>
+
+    <p>Timing matters. The following events should trigger an FTO inquiry:</p>
+
+    <ul>
+      <li><strong>Before product launch</strong> in any new market or jurisdiction</li>
+      <li><strong>Before significant investment</strong> in a new technology direction (capital efficiency)</li>
+      <li><strong>Before acquiring a company or technology</strong> — the target's FTO position becomes your liability</li>
+      <li><strong>When a competitor files a patent</strong> in your exact technology area — monitor competitor prosecution</li>
+      <li><strong>After a cease-and-desist letter</strong> is received — requires immediate counsel engagement</li>
+      <li><strong>Before licensing negotiations</strong> — understanding the patent landscape strengthens your position</li>
+    </ul>
+
+    <!-- ══════════════════════════════════════════════════════ -->
+    <!-- Section 9: Common Search Mistakes                      -->
+    <!-- ══════════════════════════════════════════════════════ -->
+    <h2 id="common-mistakes" class="section-anchor">9. Common Search Mistakes</h2>
+
+    <p>The following are the most common errors made by technologists — and surprisingly many attorneys — when conducting prior art and FTO searches. Each one has resulted in invalidated patents or costly infringement actions that could have been avoided.</p>
+
+    <details class="accordion">
+      <summary>Mistake 1: Ignoring Foreign Patent Applications (Especially Chinese Patents)</summary>
+      <div class="accordion-content">
+        <p>China surpassed the U.S. as the world's largest patent filer in 2011 and has maintained that position ever since. CNIPA published over 1.5 million patent applications in 2023 alone. For AI/ML and biotech, Chinese academic institutions and companies (Baidu, Tencent, Alibaba, Huawei, Tsinghua, Peking University) are prolific filers.</p>
+        <p>The error: many technologists run a search on USPTO and Google Patents, see U.S.-centric results, and declare the space clear. A Chinese publication or application published before your filing date is valid prior art under AIA §102, even if it never enters the U.S. national phase.</p>
+        <p><strong>Fix:</strong> Always include CNIPA (China), JPO (Japan), KIPO (South Korea), and EPO (Europe) in every comprehensive search. Use PatSnap or Google Patents' multilingual translation to access Chinese-language art. Espacenet's "worldwide" database is a good starting point for non-English prior art.</p>
+      </div>
+    </details>
+
+    <details class="accordion">
+      <summary>Mistake 2: Ignoring Non-Patent Literature (NPL)</summary>
+      <div class="accordion-content">
+        <p>In the AI/ML space, NPL prior art is frequently <em>more relevant and more damaging</em> than patent prior art, because the academic community publishes techniques faster than the patent system processes applications. A technologist who searches only patent databases for an attention mechanism invention will miss the Vaswani et al. (2017) arXiv paper — and face a guaranteed prior art rejection.</p>
+        <p>USPTO examiners are specifically trained to search arXiv, IEEE Xplore, and ACM DL for AI/ML applications. If they find it and you did not disclose it, you face a rejection plus questions about your duty of disclosure (37 C.F.R. §1.56).</p>
+        <p><strong>Fix:</strong> Every AI/ML patent search must include at minimum: arXiv.org (cs.LG, cs.AI, cs.CV, cs.CL), Google Scholar, and IEEE Xplore. For biotech: PubMed and relevant journal databases. The NPL search is not optional — it is the most important part of the search for fast-moving technology fields.</p>
+      </div>
+    </details>
+
+    <details class="accordion">
+      <summary>Mistake 3: Searching Too Narrowly (Terminology Tunnel Vision)</summary>
+      <div class="accordion-content">
+        <p>AI/ML terminology has evolved rapidly. The same concept may be described by entirely different terms depending on the decade, community, or application domain. A search for "graph neural network" will miss patents that use the terms "graph convolutional network," "spectral graph convolution," "message-passing neural network," or "relational graph network" — all of which cover closely related architectures. Similarly, "fine-tuning" might appear as "transfer learning," "domain adaptation," "feature extraction," "task-specific training," or "low-rank adaptation."</p>
+        <p>The error is using only the current buzzword for your concept and ignoring the historical and domain-specific vocabulary.</p>
+        <p><strong>Fix:</strong> Before searching, build a synonym/concept map. Use CPC classification codes alongside keywords — the classification system is vocabulary-independent. Use semantic search tools (Google Patents, Semantic Scholar) that match conceptual similarity rather than keyword matching. Review the first 10 search results for additional terminology used in their claims and abstracts, and add those terms to your query.</p>
+      </div>
+    </details>
+
+    <details class="accordion">
+      <summary>Mistake 4: Missing Continuation and Divisional Patent Families</summary>
+      <div class="accordion-content">
+        <p>Large tech companies like Google, IBM, Microsoft, and Meta maintain enormous patent families with hundreds of continuation applications covering the same invention. A patent family can remain active and generate new claims for 20 years from the original priority date. Finding the parent patent and concluding the family is fully characterized is a serious mistake — a newly issued continuation with fresh claims may read directly on your product even though the parent was filed a decade ago.</p>
+        <p>Example: Google has filed dozens of continuation applications from the original Word2Vec patent family. A search that finds only the parent misses later continuations with potentially broader or more specifically targeted claims.</p>
+        <p><strong>Fix:</strong> For any potentially relevant patent, always pull the <em>full patent family</em>. In USPTO Patent Public Search, search by <code>AN/</code> (assignee) + priority date range. In Espacenet, use "INPADOC patent family" to see all family members. In Google Patents, the "Similar" and "Family" tabs show related applications. Flag any pending applications in the family — pending applications can still issue with claim amendments.</p>
+      </div>
+    </details>
+
+    <details class="accordion">
+      <summary>Mistake 5: Confusing Date of Invention with Date of Filing</summary>
+      <div class="accordion-content">
+        <p>Under AIA (post-March 16, 2013), the critical date for prior art is the <em>effective filing date</em> — not the date you actually conceived or reduced to practice the invention. Pre-AIA law allowed inventors to "swear behind" prior art by proving an earlier date of invention. Under AIA, this is not available for first-to-file applications.</p>
+        <p>The practical error: an inventor knows they conceived the invention on January 1, 2023, but filed the application on March 1, 2024. A competitor publishes a paper on September 15, 2023 (after conception but before filing). Under AIA, that paper is prior art — the inventor cannot swear behind it by proving earlier conception.</p>
+        <p><strong>Fix:</strong> File a provisional application immediately upon identifying a potentially patentable invention. A provisional application locks in the priority date at low cost (&lt;$1,000 for small entities) and gives you 12 months to finalize the non-provisional. Maintain dated invention disclosure records (signed, witnessed, timestamped) for all inventions, but understand these establish internal records, not AIA priority dates.</p>
+      </div>
+    </details>
+
+    <details class="accordion">
+      <summary>Mistake 6: Forgetting About Design-Arounds in FTO Analysis</summary>
+      <div class="accordion-content">
+        <p>When engineers find a potentially blocking patent in an FTO search, the instinctive reaction is often "we need to license this." But patents are defined by their claims — narrow your implementation until it does not read on any claim element, and you have achieved a design-around. This is almost always cheaper than licensing and leaves the product fully competitive.</p>
+        <p>The mistake is failing to ask: <em>what is the minimum change to our product that eliminates infringement of this claim?</em> For many AI/ML patents, the answer is surprisingly minor — changing a hyperparameter range, using a different activation function, or changing the input representation can remove a claimed element entirely.</p>
+        <p><strong>Fix:</strong> In every FTO analysis, include a design-around analysis section. For each High/Medium risk patent, have your engineering team propose three alternative implementations. Have counsel evaluate whether each alternative avoids the claim. Document this analysis — it also demonstrates good faith if litigation occurs. Design-around analysis is an underused and highly cost-effective IP risk management tool.</p>
+      </div>
+    </details>
+
+    <!-- ══════════════════════════════════════════════════════ -->
+    <!-- Section 10: Documenting Your Search                    -->
+    <!-- ══════════════════════════════════════════════════════ -->
+    <h2 id="documenting-search" class="section-anchor">10. Documenting Your Search</h2>
+
+    <p>Documentation transforms a prior art search from a one-time activity into a defensible legal record. Proper documentation serves three purposes: (1) it satisfies your <em>duty of candor</em> to the USPTO under 37 C.F.R. §1.56 (you must disclose known material prior art); (2) it creates an evidence trail for willfulness defenses in litigation; and (3) it enables other team members to build on your work rather than repeat it.</p>
+
+    <h3>The Duty of Disclosure</h3>
+
+    <p>Every individual "associated with the filing or prosecution" of a patent application (inventors, attorneys, assignees) has a duty to disclose information they are aware of that is <em>material to patentability</em>. This duty is discharged by filing an Information Disclosure Statement (IDS) with the USPTO listing all known material prior art. Failure to disclose material prior art with an intent to deceive constitutes <span class="key-term" title="Conduct before the USPTO involving misrepresentation or omission of material information with deceptive intent, which can render the entire patent unenforceable">inequitable conduct</span>, which can render the entire patent unenforceable — a catastrophic outcome.</p>
+
+    <div class="callout callout-tip">
+      <div class="callout-icon">&#128161;</div>
+      <div class="callout-body">
+        <div class="callout-title">When in Doubt, Disclose</div>
+        <p>The IDS threshold is low: disclose anything "material to patentability," which courts have interpreted broadly. It costs almost nothing to include an extra reference in your IDS. The downside of non-disclosure — inequitable conduct, patent unenforceability — is existential. Develop a personal practice: every time you read a paper or patent that touches your invention area, drop it in a running IDS folder. Disclose it all.</p>
+      </div>
+    </div>
+
+    <h3>Search Log Template</h3>
+
+    <p>Maintain a search log for every prior art search you conduct. Use the following structure:</p>
+
+    <pre><code>PRIOR ART SEARCH LOG
+====================
+Invention Title:     [Title of invention disclosure]
+Inventor(s):         [Names]
+Application No.:     [If filed; or "Pre-filing" if not yet filed]
+Search Conducted By: [Name, role, institution]
+Date(s) of Search:   [All search sessions, with dates]
+
+---
+SEARCH SESSION 1
+Date: 2025-11-15
+Database: USPTO Patent Public Search (ppubs.uspto.gov)
+Query 1:
+  String:  CLMS/("graph neural network" AND "drug target")
+  Fields:  Claims
+  Result:  247 documents
+  Exported: Top 50 by relevance → screened 50, 8 flagged for review
+
+Query 2:
+  String:  SPEC/((GNN OR "graph convolutional") AND (binding OR affinity))
+           AND CPC/G06N3
+  Fields:  Specification + CPC
+  Result:  89 documents
+  Exported: All 89 → screened 89, 12 flagged for review
+
+SEARCH SESSION 2
+Date: 2025-11-17
+Database: arXiv.org
+Query:    graph neural network protein-ligand binding affinity
+          Category: cs.LG, q-bio.QM
+          Date range: 2019-01-01 to 2025-11-01
+  Result: ~340 papers
+  Screened: Titles/abstracts of top 100 by citation → 15 flagged
+
+---
+KEY REFERENCES IDENTIFIED
+[List each flagged reference with full citation and relevance note]
+1. US10,XXX,XXX (Smith et al., Acme Corp, filed 2021-03-15)
+   Relevance: Claims GNN for molecular property prediction;
+   missing pre-trained protein LM component
+
+2. arXiv:2203.09797 (Zhou et al., 2022) "AttentiveFP for Drug Discovery"
+   Relevance: Describes GNN architecture for binding prediction;
+   published before our priority date; WILL DISCLOSE IN IDS
+...</code></pre>
+
+    <h3>Search Documentation Checklist</h3>
+
+    <ul class="checklist">
+      <li>Invention disclosure document completed and signed by all inventors, dated</li>
+      <li>Technical concept map with synonyms and alternative terminology prepared</li>
+      <li>CPC classification codes identified and verified in Espacenet browser</li>
+      <li>Search log created with template; all sessions recorded with date, database, query string, result count</li>
+      <li>Minimum three databases searched (USPTO + international + semantic)</li>
+      <li>arXiv / Google Scholar NPL search conducted with date range appropriate to technology area</li>
+      <li>Forward and backward citation search conducted for all hot references</li>
+      <li>Patent family search conducted for all hot references (continuation/divisional applications)</li>
+      <li>Chinese patent database (CNIPA/PatSnap) searched for AI/ML/biotech inventions</li>
+      <li>Claim mapping worksheet completed for each hot reference against proposed invention claims</li>
+      <li>FTO analysis scope defined (product features, jurisdictions, in-force filter applied)</li>
+      <li>All material references collected in IDS folder with full citations (title, authors, publication date, URL or patent number)</li>
+      <li>Search results exported and archived with date-stamp (PDF or structured export)</li>
+      <li>Summary memo prepared identifying top 5–10 most relevant references and why they are distinguishable (or not)</li>
+      <li>All material references submitted to patent counsel for IDS filing consideration</li>
+      <li>Calendar reminder set for 6-month search update before patent publication deadline</li>
+    </ul>
+
+    <!-- ══════════════════════════════════════════════════════ -->
+    <!-- Section 11: Tools and Resources                        -->
+    <!-- ══════════════════════════════════════════════════════ -->
+    <h2 id="tools-resources" class="section-anchor">11. Tools and Resources</h2>
+
+    <p>The following section consolidates the practical toolset for AI/ML patent prior art research, organized by cost and function. We also provide working Python code for automated patent search and monitoring using publicly available APIs.</p>
+
+    <div class="table-wrapper">
+      <table>
+        <caption class="table-caption">Table 3-7: Free vs. Paid Tools for Patent Prior Art Research</caption>
+        <thead>
+          <tr>
+            <th>Tool</th>
+            <th>Type</th>
+            <th>Cost</th>
+            <th>Best For</th>
+            <th>API Available?</th>
+            <th>URL</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>USPTO Patent Public Search</strong></td>
+            <td>Patent DB</td>
+            <td><span class="badge badge-success">Free</span></td>
+            <td>Authoritative U.S. full-text Boolean search</td>
+            <td>PatentsView API (free)</td>
+            <td><code>ppubs.uspto.gov</code></td>
+          </tr>
+          <tr>
+            <td><strong>Google Patents</strong></td>
+            <td>Patent DB</td>
+            <td><span class="badge badge-success">Free</span></td>
+            <td>Global semantic search; quickest results</td>
+            <td>Via SerpAPI (paid)</td>
+            <td><code>patents.google.com</code></td>
+          </tr>
+          <tr>
+            <td><strong>Espacenet</strong></td>
+            <td>Patent DB</td>
+            <td><span class="badge badge-success">Free</span></td>
+            <td>CPC browse; EP/WO full text; legal status</td>
+            <td>OPS (EPO Open Patent Services) — free</td>
+            <td><code>worldwide.espacenet.com</code></td>
+          </tr>
+          <tr>
+            <td><strong>Lens.org</strong></td>
+            <td>Patent + NPL</td>
+            <td><span class="badge badge-success">Free</span> (basic)</td>
+            <td>Combined patent + scholarly search</td>
+            <td>Yes — free API with registration</td>
+            <td><code>lens.org</code></td>
+          </tr>
+          <tr>
+            <td><strong>Semantic Scholar</strong></td>
+            <td>NPL</td>
+            <td><span class="badge badge-success">Free</span></td>
+            <td>AI-powered semantic NPL search</td>
+            <td>Yes — free Semantic Scholar API</td>
+            <td><code>semanticscholar.org</code></td>
+          </tr>
+          <tr>
+            <td><strong>arXiv.org</strong></td>
+            <td>NPL (preprints)</td>
+            <td><span class="badge badge-success">Free</span></td>
+            <td>ML/AI preprint prior art</td>
+            <td>Yes — arXiv API (free)</td>
+            <td><code>arxiv.org</code></td>
+          </tr>
+          <tr>
+            <td><strong>PatSnap</strong></td>
+            <td>Patent DB (Enterprise)</td>
+            <td><span class="badge badge-danger">$$$</span></td>
+            <td>AI semantic; China coverage; analytics</td>
+            <td>Yes (enterprise)</td>
+            <td><code>patsnap.com</code></td>
+          </tr>
+          <tr>
+            <td><strong>Derwent Innovation</strong></td>
+            <td>Patent DB (Enterprise)</td>
+            <td><span class="badge badge-danger">$$$</span></td>
+            <td>DWPI expert abstracts; chemical structure</td>
+            <td>Yes (enterprise)</td>
+            <td><code>clarivate.com</code></td>
+          </tr>
+          <tr>
+            <td><strong>AcclaimIP</strong></td>
+            <td>Patent Analytics</td>
+            <td><span class="badge badge-warning">$$</span></td>
+            <td>Advanced Boolean; examiner analytics</td>
+            <td>Limited</td>
+            <td><code>acclaimip.com</code></td>
+          </tr>
+          <tr>
+            <td><strong>PatentsView</strong></td>
+            <td>Patent DB / Analytics</td>
+            <td><span class="badge badge-success">Free</span></td>
+            <td>USPTO analytics; assignee/inventor networks</td>
+            <td>Yes — PatentsView API (free)</td>
+            <td><code>patentsview.org</code></td>
+          </tr>
+          <tr>
+            <td><strong>Google Scholar Alerts</strong></td>
+            <td>NPL Monitor</td>
+            <td><span class="badge badge-success">Free</span></td>
+            <td>Automated NPL monitoring for keyword alerts</td>
+            <td>No (manual alerts only)</td>
+            <td><code>scholar.google.com/scholar_alerts</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>USPTO Resources for Technologists</h3>
+
+    <ul>
+      <li><strong>CPC Classification Browser:</strong> <code>https://www.uspto.gov/web/patents/classification/cpc/html/cpc.html</code> — Browse the full CPC hierarchy with definitions</li>
+      <li><strong>Patent Public Search (PPUBS):</strong> <code>https://ppubs.uspto.gov</code> — Free full-text Boolean search with CPC, assignee, and date filters</li>
+      <li><strong>PatentsView API:</strong> <code>https://patentsview.org/apis/purpose</code> — Free REST API for querying U.S. patent data programmatically</li>
+      <li><strong>Global Dossier:</strong> <code>https://globaldossier.uspto.gov</code> — One-stop access to file wrappers (prosecution histories) for U.S., EP, and other family members</li>
+      <li><strong>Patent Center:</strong> <code>https://patentcenter.uspto.gov</code> — Filing and PAIR replacement; access to your own pending applications</li>
+      <li><strong>EPO Open Patent Services (OPS):</strong> <code>https://www.epo.org/searching-for-patents/data/web-services/ops.html</code> — Free API providing access to Espacenet data programmatically</li>
+    </ul>
+
+    <h3>Automated Patent Search: Python Code Examples</h3>
+
+    <p>The following code demonstrates how to automate patent search and monitoring using freely available APIs. This is useful for setting up continuous monitoring of a technology area or bulk-processing search results.</p>
+
+    <pre><code>"""
+USPTO PatentsView API — Automated Patent Search
+Requirements: pip install requests pandas
+
+PatentsView API Docs: https://patentsview.org/apis/purpose
+"""
+
+import requests
+import json
+from datetime import datetime, timedelta
+
+PATENTSVIEW_URL = "https://search.patentsview.org/api/v1/patent/"
+
+def search_patents_patentsview(
+    keywords: list[str],
+    cpc_codes: list[str],
+    date_start: str,
+    date_end: str,
+    max_results: int = 100
+) -> list[dict]:
+    """
+    Search USPTO patents via PatentsView API.
+
+    Args:
+        keywords: List of terms to search in claims/abstract
+        cpc_codes: List of CPC codes (e.g., ["G06N3/04", "G06N20/00"])
+        date_start: ISO date string "YYYY-MM-DD"
+        date_end:   ISO date string "YYYY-MM-DD"
+        max_results: Maximum number of results
+
+    Returns:
+        List of patent dicts with title, id, date, assignee, abstract
+    """
+    # Build query — keyword OR search across title and abstract
+    keyword_query = {"_or": [
+        {"_text_any": {"patent_title": " ".join(keywords)}},
+        {"_text_any": {"patent_abstract": " ".join(keywords)}}
+    ]}
+
+    # CPC filter
+    cpc_filters = {"_or": [
+        {"cpc_subgroup_id": code} for code in cpc_codes
+    ]}
+
+    # Date range
+    date_filter = {
+        "_gte": {"patent_date": date_start},
+        "_lte": {"patent_date": date_end}
+    }
+
+    # Combine all filters
+    query = {"_and": [keyword_query, cpc_filters, date_filter]}
+
+    payload = {
+        "q": query,
+        "f": [
+            "patent_id",
+            "patent_title",
+            "patent_date",
+            "patent_abstract",
+            "assignee_organization",
+            "cpc_subgroup_id",
+            "patent_num_claims"
+        ],
+        "o": {"per_page": min(max_results, 1000), "page": 1},
+        "s": [{"patent_date": "desc"}]
+    }
+
+    response = requests.post(
+        PATENTSVIEW_URL,
+        headers={"Content-Type": "application/json"},
+        data=json.dumps(payload),
+        timeout=30
+    )
+    response.raise_for_status()
+    return response.json().get("patents", [])
+
+
+# Example usage — search for GNN drug discovery patents
+patents = search_patents_patentsview(
+    keywords=["graph neural network", "molecular", "drug discovery"],
+    cpc_codes=["G06N3/04", "G06N20/00"],
+    date_start="2020-01-01",
+    date_end="2025-12-31",
+    max_results=200
+)
+
+for p in patents[:10]:
+    print(f"[{p['patent_date']}] {p['patent_id']}: {p['patent_title']}")
+    print(f"  Assignee: {p.get('assignee_organization', 'N/A')}")
+    print()</code></pre>
+
+    <pre><code>"""
+arXiv API — Automated NPL Prior Art Search
+Requirements: pip install arxiv
+
+arXiv API docs: https://info.arxiv.org/help/api/index.html
+"""
+
+import arxiv
+from datetime import datetime
+
+def search_arxiv_prior_art(
+    query: str,
+    categories: list[str],
+    max_results: int = 50,
+    start_date: datetime | None = None,
+    end_date: datetime | None = None
+) -> list[dict]:
+    """
+    Search arXiv for potential NPL prior art.
+
+    Args:
+        query: Search string (supports AND, OR, field prefixes)
+        categories: arXiv categories e.g. ["cs.LG", "cs.AI", "q-bio.QM"]
+        max_results: Max papers to return
+        start_date: Filter papers submitted after this date
+        end_date:   Filter papers submitted before this date
+
+    Returns:
+        List of paper dicts sorted by submission date descending
+    """
+    # Build category filter
+    cat_filter = " OR ".join(f"cat:{c}" for c in categories)
+    full_query = f"({query}) AND ({cat_filter})"
+
+    client = arxiv.Client(page_size=100, delay_seconds=3, num_retries=3)
+
+    search = arxiv.Search(
+        query=full_query,
+        max_results=max_results,
+        sort_by=arxiv.SortCriterion.Relevance,
+    )
+
+    results = []
+    for paper in client.results(search):
+        submitted = paper.published.replace(tzinfo=None)
+
+        # Apply date filters
+        if start_date and submitted < start_date:
+            continue
+        if end_date and submitted > end_date:
+            continue
+
+        results.append({
+            "arxiv_id":   paper.entry_id,
+            "title":      paper.title,
+            "authors":    [a.name for a in paper.authors],
+            "submitted":  submitted.strftime("%Y-%m-%d"),
+            "categories": paper.categories,
+            "abstract":   paper.summary[:400] + "...",
+            "url":        paper.pdf_url
+        })
+
+    return sorted(results, key=lambda x: x["submitted"], reverse=True)
+
+
+# Example: Search for transformer drug discovery NPL prior art
+papers = search_arxiv_prior_art(
+    query="transformer attention molecular binding affinity prediction",
+    categories=["cs.LG", "q-bio.BM", "q-bio.QM"],
+    max_results=100,
+    start_date=datetime(2017, 1, 1),
+    end_date=datetime(2023, 12, 31)
+)
+
+print(f"Found {len(papers)} potential NPL prior art references\n")
+for p in papers[:5]:
+    print(f"[{p['submitted']}] {p['title']}")
+    print(f"  Authors: {', '.join(p['authors'][:3])}")
+    print(f"  ID: {p['arxiv_id']}")
+    print()</code></pre>
+
+    <pre><code>"""
+EPO Open Patent Services (OPS) API — International Patent Search
+Requirements: pip install requests
+Register for free OPS key at: https://www.epo.org/searching-for-patents/data/web-services/ops.html
+"""
+
+import requests
+from base64 import b64encode
+
+EPO_OPS_BASE = "https://ops.epo.org/3.2/rest-services"
+
+def get_ops_token(consumer_key: str, consumer_secret: str) -> str:
+    """Obtain OAuth2 token for EPO OPS API."""
+    credentials = b64encode(
+        f"{consumer_key}:{consumer_secret}".encode()
+    ).decode()
+
+    response = requests.post(
+        "https://ops.epo.org/3.2/auth/accesstoken",
+        headers={
+            "Authorization": f"Basic {credentials}",
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        data="grant_type=client_credentials"
+    )
+    return response.json()["access_token"]
+
+
+def search_epo_cpc(
+    token: str,
+    cpc_code: str,
+    keywords: str,
+    date_range: tuple[str, str]
+) -> dict:
+    """
+    Search Espacenet via OPS for patents in a CPC class.
+
+    Args:
+        token: OAuth2 access token
+        cpc_code: CPC code string e.g. "G06N3/04"
+        keywords: Space-separated keyword string
+        date_range: (start_date, end_date) in "YYYY-MM-DD" format
+
+    Returns:
+        Raw OPS JSON response dict
+    """
+    # CPC query
+    query = (
+        f'cpc="{cpc_code}" '
+        f'AND txt="{keywords}" '
+        f'AND pd within "{date_range[0]},{date_range[1]}"'
+    )
+
+    response = requests.get(
+        f"{EPO_OPS_BASE}/published-data/search",
+        headers={
+            "Authorization": f"Bearer {token}",
+            "Accept": "application/json"
+        },
+        params={
+            "q": query,
+            "Range": "1-25"
+        }
+    )
+    response.raise_for_status()
+    return response.json()
+
+
+# Usage
+# token = get_ops_token("YOUR_KEY", "YOUR_SECRET")
+# results = search_epo_cpc(
+#     token=token,
+#     cpc_code="G06N3/04",
+#     keywords="graph neural network molecular",
+#     date_range=("2020-01-01", "2025-12-31")
+# )
+print("EPO OPS API ready — register at epo.org for free access key")</code></pre>
+
+    <pre><code>"""
+Prior Art Search Orchestrator
+Combines USPTO + arXiv searches into a unified report.
+"""
+
+import json
+from datetime import datetime
+
+def run_combined_prior_art_search(
+    invention_title: str,
+    keywords: list[str],
+    cpc_codes: list[str],
+    arxiv_categories: list[str],
+    search_start: str = "2018-01-01",
+) -> dict:
+    """
+    Orchestrates a multi-source prior art search and returns
+    a structured report for IDS / search log documentation.
+    """
+    search_date = datetime.now().strftime("%Y-%m-%d")
+    search_end  = datetime.now().strftime("%Y-%m-%d")
+
+    print(f"Prior Art Search: {invention_title}")
+    print(f"Search date: {search_date}")
+    print(f"Keywords: {keywords}")
+    print(f"CPC codes: {cpc_codes}")
+    print("-" * 60)
+
+    # 1. USPTO PatentsView search
+    print("\n[1/3] Searching USPTO PatentsView...")
+    patent_results = search_patents_patentsview(
+        keywords=keywords,
+        cpc_codes=cpc_codes,
+        date_start=search_start,
+        date_end=search_end,
+        max_results=200
+    )
+    print(f"  Found {len(patent_results)} patent results")
+
+    # 2. arXiv NPL search
+    print("[2/3] Searching arXiv for NPL prior art...")
+    npl_results = search_arxiv_prior_art(
+        query=" ".join(keywords),
+        categories=arxiv_categories,
+        max_results=100,
+        start_date=datetime.fromisoformat(search_start),
+        end_date=datetime.now()
+    )
+    print(f"  Found {len(npl_results)} NPL results")
+
+    # 3. Compile report
+    print("[3/3] Compiling search report...")
+    report = {
+        "invention_title": invention_title,
+        "search_date": search_date,
+        "search_parameters": {
+            "keywords": keywords,
+            "cpc_codes": cpc_codes,
+            "arxiv_categories": arxiv_categories,
+            "date_range": (search_start, search_end)
+        },
+        "patent_results": {
+            "count": len(patent_results),
+            "results": patent_results[:20]  # Top 20 for report
+        },
+        "npl_results": {
+            "count": len(npl_results),
+            "results": npl_results[:20]
+        },
+        "search_log": {
+            "databases_searched": ["USPTO PatentsView", "arXiv"],
+            "databases_to_add":   ["Espacenet", "Google Scholar",
+                                   "IEEE Xplore", "CNIPA"],
+            "notes": "Preliminary automated search; manual review required"
+        }
+    }
+
+    # Save to JSON for documentation
+    filename = f"prior_art_search_{search_date.replace('-', '')}.json"
+    with open(filename, "w") as f:
+        json.dump(report, f, indent=2)
+    print(f"\nReport saved to {filename}")
+    return report
+
+
+# Run search for GNN-based drug binding predictor
+report = run_combined_prior_art_search(
+    invention_title="GNN-Based Protein-Ligand Binding Affinity Predictor",
+    keywords=["graph neural network", "protein-ligand binding",
+              "molecular property prediction", "drug discovery"],
+    cpc_codes=["G06N3/04", "G06N20/00", "G16H70/40"],
+    arxiv_categories=["cs.LG", "q-bio.BM", "q-bio.QM"]
+)</code></pre>
+
+    <div class="callout callout-tip">
+      <div class="callout-icon">&#128161;</div>
+      <div class="callout-body">
+        <div class="callout-title">Setting Up Continuous Patent Monitoring</div>
+        <p>Prior art searching is not a one-time activity. The best practitioners set up continuous monitoring so they know about new publications in their technology area as soon as they appear. Use: (1) <strong>Google Scholar Alerts</strong> — set keyword alerts at <code>scholar.google.com/scholar_alerts</code> for email notifications; (2) <strong>Lens.org saved searches</strong> with weekly email alerts; (3) <strong>arXiv digest emails</strong> for specific category/keyword combinations; (4) The <code>search_arxiv_prior_art()</code> script above, scheduled via <code>cron</code> or a cloud scheduler (GitHub Actions, AWS Lambda) to run weekly and email you new results. This costs nothing and keeps your IDS current.</p>
+      </div>
+    </div>
+
+    <!-- ── Chapter Summary ───────────────────────────────── -->
+    <h2>Chapter Summary</h2>
+
+    <div class="highlight-box">
+      <h4>Key Takeaways from Chapter 3</h4>
+      <ul>
+        <li>Prior art can destroy your patent (§102/§103) or expose your product to infringement (FTO). Both require systematic searching before you file or ship.</li>
+        <li>Under AIA, the critical date is your <em>effective filing date</em> — not your conception date. File a provisional application early.</li>
+        <li>Your own publications become prior art if you wait more than 12 months before filing. <em>Publish then file</em> is dangerous; <em>file then publish</em> is safe.</li>
+        <li>No single database covers the global patent landscape. Use at minimum: USPTO + Espacenet + Google Patents + an NPL source (arXiv/Google Scholar).</li>
+        <li>For AI/ML inventions, arXiv is often the most relevant prior art source — and the most frequently missed. Search it first.</li>
+        <li>Master CPC codes: <code>G06N</code> for AI computing, <code>G06F 40</code> for NLP, <code>G06V</code> for vision, <code>G16H</code> for health AI, <code>C12N/C07K/A61K</code> for biotech/pharma.</li>
+        <li>Claim mapping is the analytical core of both patentability and FTO analysis. Map every claim element to your product/invention before drawing conclusions.</li>
+        <li>Document every search. The IDS duty of disclosure is real — when in doubt, disclose the reference.</li>
+        <li>For High-risk FTO findings, always engage patent counsel. Design-arounds are often cheaper and cleaner than licenses.</li>
+      </ul>
+    </div>
+
+    <!-- ── Chapter Nav ───────────────────────────────────── -->
+    <nav class="chapter-nav">
+      <a href="ch02_patent_eligibility.html" class="chapter-nav-btn">
+        <span class="nav-label">&larr; Previous Chapter</span>
+        <span class="nav-title">Chapter 2: Patent Eligibility</span>
+      </a>
+      <a href="ch04_patent_anatomy.html" class="chapter-nav-btn nav-next">
+        <span class="nav-label">Next Chapter &rarr;</span>
+        <span class="nav-title">Chapter 4: Anatomy of a Patent Application</span>
+      </a>
+    </nav>
+
+  </main>
+</div>
+
+<!-- ── Footer ────────────────────────────────────────────── -->
+<footer>
+  <div class="footer-content">
+    <p><strong>Patent Law for Technologists</strong> — A Practitioner's Guide to AI, ML, Biotech, and Pharma Patent Strategy</p>
+    <p>Chapter 3: Prior Art Research and Freedom-to-Operate | Dr. Sarah J. Chen, Fish &amp; Richardson | Prof. Marcus Webb, Stanford Law School | Dr. Priya Nair, Finnegan Henderson &amp; Farabow</p>
+    <p style="margin-top:1rem; font-size:.8125rem; opacity:.6">
+      This material is provided for educational purposes only and does not constitute legal advice. For specific legal guidance, consult a licensed patent attorney. Patent law is jurisdiction-specific and subject to change.
+      &copy; 2025 Patent Law for Technologists Editorial Committee. All rights reserved.
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>

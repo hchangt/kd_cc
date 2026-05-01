@@ -1,0 +1,1248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 11: Workflow Orchestration - Modern MLOps Tutorial</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script>hljs.highlightAll(); mermaid.initialize({startOnLoad:true, theme:'default'});</script>
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; color: #1f2937; }
+    .prose-custom h2 { font-size:1.75rem; font-weight:700; color:#1e3a8a; margin:2.5rem 0 1rem; border-bottom:2px solid #dbeafe; padding-bottom:.5rem; }
+    .prose-custom h3 { font-size:1.25rem; font-weight:600; color:#1d4ed8; margin:2rem 0 .75rem; }
+    .prose-custom h4 { font-size:1.05rem; font-weight:600; color:#2563eb; margin:1.5rem 0 .5rem; }
+    .prose-custom p  { line-height:1.75; margin-bottom:1rem; }
+    .prose-custom ul { list-style:disc; padding-left:1.5rem; margin-bottom:1rem; }
+    .prose-custom li { margin-bottom:.4rem; line-height:1.7; }
+    pre code.hljs { border-radius:.5rem; font-size:.82rem; }
+    .callout-tip  { background:#ecfdf5; border-left:4px solid #059669; padding:1rem 1.25rem; border-radius:0 .5rem .5rem 0; margin:1.5rem 0; }
+    .callout-warn { background:#fffbeb; border-left:4px solid #d97706; padding:1rem 1.25rem; border-radius:0 .5rem .5rem 0; margin:1.5rem 0; }
+    .callout-info { background:#eff6ff; border-left:4px solid #2563eb; padding:1rem 1.25rem; border-radius:0 .5rem .5rem 0; margin:1.5rem 0; }
+    .callout-danger{ background:#fef2f2; border-left:4px solid #dc2626; padding:1rem 1.25rem; border-radius:0 .5rem .5rem 0; margin:1.5rem 0; }
+    table { width:100%; border-collapse:collapse; margin:1.5rem 0; font-size:.88rem; }
+    th { background:#1e40af; color:#fff; padding:.65rem 1rem; text-align:left; }
+    td { padding:.6rem 1rem; border-bottom:1px solid #e5e7eb; }
+    tr:nth-child(even) td { background:#f9fafb; }
+    .section-badge { display:inline-block; background:#dbeafe; color:#1d4ed8; font-size:.75rem; font-weight:600; padding:.2rem .7rem; border-radius:9999px; margin-bottom:.5rem; text-transform:uppercase; letter-spacing:.05em; }
+    .mermaid-wrap { background:#f8fafc; border:1px solid #e2e8f0; border-radius:.75rem; padding:1.5rem; margin:1.5rem 0; overflow-x:auto; }
+    .code-label { background:#1e40af; color:#fff; font-size:.7rem; font-weight:600; padding:.15rem .6rem; border-radius:.25rem .25rem 0 0; display:inline-block; margin-bottom:-2px; letter-spacing:.04em; }
+    .nav-pill { display:inline-block; background:#2563eb; color:#fff; padding:.4rem 1rem; border-radius:.5rem; font-size:.85rem; font-weight:600; text-decoration:none; }
+    .nav-pill:hover { background:#1d4ed8; }
+    .nav-pill-outline { background:#fff; color:#2563eb; border:2px solid #2563eb; }
+    .nav-pill-outline:hover { background:#eff6ff; }
+    .takeaway-card { background:#f0fdf4; border:1px solid #86efac; border-radius:.75rem; padding:1.25rem 1.5rem; margin:.75rem 0; }
+  </style>
+</head>
+<body class="bg-gray-50">
+
+<!-- Navbar -->
+<nav class="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
+  <div class="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
+    <a href="index.html" class="text-blue-700 font-bold text-lg">Modern MLOps Tutorial</a>
+    <div class="flex gap-4 text-sm">
+      <a href="index.html" class="text-gray-600 hover:text-blue-700">Home</a>
+      <a href="ch10_ray_ecosystem.html" class="text-gray-600 hover:text-blue-700">Ch 10</a>
+      <span class="text-blue-700 font-semibold">Ch 11</span>
+      <a href="ch12_ml_pipelines_cicd.html" class="text-gray-600 hover:text-blue-700">Ch 12</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero -->
+<div class="bg-gradient-to-r from-blue-700 to-blue-900 text-white py-12 px-6">
+  <div class="max-w-6xl mx-auto">
+    <div class="flex items-center gap-3 mb-3">
+      <span class="bg-blue-500 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">Chapter 11 · Part 1</span>
+      <span class="text-blue-200 text-sm">~75 min read</span>
+    </div>
+    <h1 class="text-4xl font-extrabold mb-3">Workflow Orchestration for ML</h1>
+    <p class="text-blue-100 text-lg max-w-3xl">Airflow, Prefect, Dagster, and production patterns for reliable ML pipelines — from scheduling to event-driven retraining.</p>
+    <p class="text-blue-300 text-sm mt-3">Part 2 (ch11b) covers Dagster in depth and LLM orchestration patterns.</p>
+  </div>
+</div>
+
+<!-- TOC -->
+<div class="max-w-6xl mx-auto px-6 py-8">
+  <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6 mb-10">
+    <h2 class="text-base font-bold text-gray-800 mb-4 uppercase tracking-wide">Contents</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-1 text-sm">
+      <a href="#s1" class="text-blue-700 hover:underline py-1">1. Why Workflow Orchestration for ML</a>
+      <a href="#s2" class="text-blue-700 hover:underline py-1">2. Apache Airflow Architecture</a>
+      <a href="#s3" class="text-blue-700 hover:underline py-1">3. Airflow ML Pipeline (Complete Example)</a>
+      <a href="#s4" class="text-blue-700 hover:underline py-1">4. Airflow Best Practices for ML</a>
+      <a href="#s5" class="text-blue-700 hover:underline py-1">5. Testing Airflow DAGs</a>
+      <a href="#s6" class="text-blue-700 hover:underline py-1">6. Prefect</a>
+      <a href="#s7" class="text-blue-700 hover:underline py-1">7. Other Orchestrators</a>
+      <a href="#s8" class="text-blue-700 hover:underline py-1">8. Event-Driven Orchestration</a>
+      <a href="#s9" class="text-blue-700 hover:underline py-1">9. Production Patterns</a>
+      <a href="#summary" class="text-blue-700 hover:underline py-1">Summary & Key Takeaways</a>
+    </div>
+  </div>
+
+  <div class="prose-custom max-w-none">
+
+    <!-- Section 1 -->
+    <h2 id="s1">1. Why Workflow Orchestration for ML</h2>
+    <span class="section-badge">Foundation</span>
+
+    <p>A production ML system is not a single script — it is a graph of interdependent steps: data ingestion, validation, feature engineering, training, evaluation, registration, and deployment. Each step can fail. Some steps should only run if upstream steps succeeded. Some need to run on a schedule; others need to react to data events. <strong>Workflow orchestration</strong> is the discipline of defining, scheduling, executing, and monitoring these pipelines reliably.</p>
+
+    <p>Without an orchestrator, teams use cron jobs, shell scripts, and ad-hoc retry logic. This works until it doesn't — and in ML, undetected failures mean stale models in production. At Airbnb, every ML pipeline that ships to production runs through Airflow (or a managed equivalent). The orchestrator is the single pane of glass for pipeline health.</p>
+
+    <h3>Core Requirements</h3>
+    <ul>
+      <li><strong>Dependency management:</strong> Task B must not run until Task A succeeds.</li>
+      <li><strong>Scheduling:</strong> Daily retraining, hourly feature refresh, weekly evaluation.</li>
+      <li><strong>Retries and backoff:</strong> Transient failures (network, quota) should not page on-call.</li>
+      <li><strong>Observability:</strong> Which tasks ran, how long they took, what failed and why.</li>
+      <li><strong>Backfilling:</strong> Re-run historical pipeline runs when logic changes.</li>
+      <li><strong>Parameterization:</strong> Same DAG logic, different datasets or hyperparameters.</li>
+    </ul>
+
+    <div class="mermaid-wrap">
+      <div class="mermaid">
+graph TD
+    A([Raw Data\nS3/GCS]) --> B[Data Ingestion\n& Validation]
+    B --> C[Feature Engineering\nSpark/Pandas]
+    C --> D[Training\nSageMaker/K8s]
+    D --> E{Evaluation\nQuality Gate}
+    E -->|Pass| F[Model Registry\nMLflow]
+    E -->|Fail| G[Alert &\nRollback]
+    F --> H[Shadow Deploy\nCanary Test]
+    H --> I{Traffic Split\n95%/5%}
+    I -->|Metrics OK| J[Full Deployment]
+    I -->|Regression| G
+
+    style A fill:#dbeafe,stroke:#2563eb
+    style E fill:#fef9c3,stroke:#d97706
+    style G fill:#fee2e2,stroke:#dc2626
+    style J fill:#d1fae5,stroke:#059669
+      </div>
+    </div>
+
+    <div class="callout-info">
+      <strong>DAG = Directed Acyclic Graph.</strong> All major orchestrators model pipelines as DAGs — nodes are tasks, edges are dependencies. The acyclic constraint ensures pipelines always terminate (no infinite loops).
+    </div>
+
+    <!-- Section 2 -->
+    <h2 id="s2">2. Apache Airflow Architecture</h2>
+    <span class="section-badge">Core Technology</span>
+
+    <p>Airflow was created at Airbnb in 2014 by Maxime Beauchemin and open-sourced in 2015. It became an Apache Top-Level Project in 2019. Airflow 2.x introduced the <strong>TaskFlow API</strong> which dramatically reduced boilerplate for Python-native pipelines.</p>
+
+    <div class="mermaid-wrap">
+      <div class="mermaid">
+graph TB
+    subgraph Client["Client Layer"]
+        WEB[Webserver\nFlask+Gunicorn]
+        CLI[CLI / REST API]
+    end
+    subgraph Control["Control Plane"]
+        SCH[Scheduler\nDAG Parsing &\nTask Queueing]
+        DB[(Metadata DB\nPostgres/MySQL)]
+        TRI[Triggerer\nAsync Sensors]
+    end
+    subgraph Execution["Execution Layer"]
+        BRK[Message Broker\nCelery+Redis/RabbitMQ]
+        W1[Worker 1]
+        W2[Worker 2]
+        W3[Worker N]
+    end
+    subgraph Storage["External Storage"]
+        DFS[DAG Files\nGit / S3]
+        LOG[Logs\nS3 / GCS]
+    end
+
+    WEB --> DB
+    CLI --> SCH
+    SCH --> DB
+    SCH --> BRK
+    TRI --> SCH
+    BRK --> W1
+    BRK --> W2
+    BRK --> W3
+    W1 --> DB
+    W2 --> DB
+    DFS --> SCH
+    W1 --> LOG
+
+    style WEB fill:#dbeafe,stroke:#2563eb
+    style SCH fill:#ede9fe,stroke:#7c3aed
+    style DB fill:#fce7f3,stroke:#db2777
+    style BRK fill:#fef3c7,stroke:#d97706
+      </div>
+    </div>
+
+    <h3>Core Concepts</h3>
+    <table>
+      <thead><tr><th>Concept</th><th>Definition</th><th>ML Use Case</th></tr></thead>
+      <tbody>
+        <tr><td><strong>DAG</strong></td><td>Python file defining the workflow graph, schedule, and default args</td><td>Full training pipeline</td></tr>
+        <tr><td><strong>Task</strong></td><td>A single unit of work in a DAG</td><td>Feature engineering, training</td></tr>
+        <tr><td><strong>Operator</strong></td><td>Template defining what a task does (Python, Bash, K8s, SQL…)</td><td>KubernetesPodOperator for GPU jobs</td></tr>
+        <tr><td><strong>Hook</strong></td><td>Interface to external systems (S3Hook, MLflowHook…)</td><td>Read/write model artifacts</td></tr>
+        <tr><td><strong>XCom</strong></td><td>Cross-communication: small values passed between tasks via metadata DB</td><td>Pass model URI, metrics dict</td></tr>
+        <tr><td><strong>Variable</strong></td><td>Key-value store in metadata DB for config</td><td>Feature store URL, thresholds</td></tr>
+        <tr><td><strong>Connection</strong></td><td>Encrypted credentials for external systems</td><td>AWS, GCP, MLflow credentials</td></tr>
+        <tr><td><strong>Pool</strong></td><td>Concurrency limit for a group of tasks</td><td>Limit parallel GPU jobs to 4</td></tr>
+      </tbody>
+    </table>
+
+    <!-- Section 3 -->
+    <h2 id="s3">3. Airflow ML Pipeline — Complete Example</h2>
+    <span class="section-badge">Code</span>
+
+    <h3>3.1 Full ML Pipeline DAG (TaskFlow API)</h3>
+    <div class="callout-tip">The TaskFlow API (<code>@task</code> decorator, Airflow 2.0+) eliminates explicit XCom push/pull and makes Python-native pipelines feel natural. Return values are automatically XCom'd.</div>
+
+    <div class="code-label">Python · dags/ml_training_pipeline.py</div>
+    <pre><code class="language-python">from __future__ import annotations
+import json
+from datetime import datetime, timedelta
+
+from airflow.decorators import dag, task
+from airflow.models import Variable
+from airflow.operators.empty import EmptyOperator
+from airflow.utils.trigger_rule import TriggerRule
+
+DEFAULT_ARGS = {
+    "owner": "ml-platform",
+    "retries": 2,
+    "retry_delay": timedelta(minutes=5),
+    "retry_exponential_backoff": True,
+    "email_on_failure": True,
+    "email": ["ml-alerts@company.com"],
+}
+
+@dag(
+    dag_id="ml_training_pipeline",
+    default_args=DEFAULT_ARGS,
+    schedule="0 2 * * *",          # 02:00 UTC daily
+    start_date=datetime(2024, 1, 1),
+    catchup=False,
+    max_active_runs=1,
+    tags=["ml", "training", "production"],
+    params={
+        "model_name": "fraud_detector",
+        "min_auc": 0.85,
+        "dataset_date": "{{ ds }}",
+    },
+)
+def ml_training_pipeline():
+    """End-to-end ML training pipeline with quality gate and conditional deploy."""
+
+    @task(task_id="ingest_data")
+    def ingest_data(**context) -> dict:
+        """Pull yesterday's data from S3 into feature store."""
+        from airflow.providers.amazon.aws.hooks.s3 import S3Hook
+        ds = context["params"]["dataset_date"]
+        s3 = S3Hook(aws_conn_id="aws_default")
+        key = f"raw/events/{ds}/data.parquet"
+        s3.get_key(key, bucket_name="ml-data-lake")
+        return {"s3_path": f"s3://ml-data-lake/{key}", "date": ds, "row_count": 1_250_000}
+
+    @task(task_id="validate_data")
+    def validate_data(ingestion_result: dict) -> dict:
+        """Run Great Expectations suite; raise on critical failures."""
+        import great_expectations as ge
+        path = ingestion_result["s3_path"]
+        # In production: load GE checkpoint and run validation
+        validation = {"passed": True, "path": path,
+                      "rows": ingestion_result["row_count"]}
+        if not validation["passed"]:
+            raise ValueError(f"Data validation failed for {path}")
+        return validation
+
+    @task(task_id="preprocess_features")
+    def preprocess_features(validation: dict, **context) -> dict:
+        """Spark job to compute features; returns feature store reference."""
+        from airflow.providers.apache.spark.hooks.spark_submit import SparkSubmitHook
+        ds = context["params"]["dataset_date"]
+        # In production: submit Spark job to EMR/Dataproc
+        feature_uri = f"s3://ml-features/fraud/{ds}/features.parquet"
+        return {"feature_uri": feature_uri, "feature_count": 128, "date": ds}
+
+    @task(task_id="train_model")
+    def train_model(features: dict, **context) -> dict:
+        """Submit training job to SageMaker; poll for completion."""
+        import boto3
+        params = context["params"]
+        sm = boto3.client("sagemaker", region_name="us-east-1")
+        job_name = f"{params['model_name']}-{features['date'].replace('-', '')}"
+        sm.create_training_job(
+            TrainingJobName=job_name,
+            AlgorithmSpecification={
+                "TrainingImage": "763104351884.dkr.ecr.us-east-1.amazonaws.com/xgboost:1.7-1",
+                "TrainingInputMode": "File",
+            },
+            RoleArn=Variable.get("sagemaker_role_arn"),
+            InputDataConfig=[{"ChannelName": "train",
+                              "DataSource": {"S3DataSource": {
+                                  "S3Uri": features["feature_uri"],
+                                  "S3DataType": "S3Prefix"}}}],
+            OutputDataConfig={"S3OutputPath": "s3://ml-models/output/"},
+            ResourceConfig={"InstanceType": "ml.m5.4xlarge", "InstanceCount": 1,
+                            "VolumeSizeInGB": 50},
+            StoppingCondition={"MaxRuntimeInSeconds": 7200},
+            HyperParameters={"max_depth": "6", "eta": "0.1", "num_round": "200"},
+        )
+        # In production: use SageMaker sensor or wait_for_completion
+        model_artifact = f"s3://ml-models/output/{job_name}/output/model.tar.gz"
+        return {"job_name": job_name, "model_artifact": model_artifact}
+
+    @task(task_id="evaluate_model")
+    def evaluate_model(train_result: dict, features: dict, **context) -> dict:
+        """Run offline evaluation; return metrics."""
+        # Load model from S3, run evaluation on holdout set
+        metrics = {"auc": 0.912, "f1": 0.873, "precision": 0.881,
+                   "recall": 0.865, "job_name": train_result["job_name"]}
+        return metrics
+
+    @task.branch(task_id="quality_gate")
+    def quality_gate(metrics: dict, **context) -> str:
+        """Branch: deploy if AUC >= threshold, else alert."""
+        threshold = float(context["params"]["min_auc"])
+        if metrics["auc"] >= threshold:
+            return "register_model"
+        return "send_failure_alert"
+
+    @task(task_id="register_model")
+    def register_model(train_result: dict, metrics: dict, **context) -> dict:
+        """Register model in MLflow Model Registry."""
+        import mlflow
+        mlflow.set_tracking_uri(Variable.get("mlflow_tracking_uri"))
+        model_name = context["params"]["model_name"]
+        with mlflow.start_run(run_name=f"airflow-{train_result['job_name']}") as run:
+            mlflow.log_metrics(metrics)
+            mlflow.log_param("artifact", train_result["model_artifact"])
+            mlflow.register_model(f"runs:/{run.info.run_id}/model", model_name)
+        return {"model_version": "latest", "model_name": model_name}
+
+    @task(task_id="deploy_model")
+    def deploy_model(registration: dict) -> None:
+        """Trigger canary deployment via internal deploy service."""
+        import requests
+        resp = requests.post(
+            Variable.get("deploy_service_url") + "/deploy",
+            json={"model_name": registration["model_name"],
+                  "version": registration["model_version"],
+                  "strategy": "canary", "canary_pct": 5},
+            timeout=30,
+        )
+        resp.raise_for_status()
+
+    @task(task_id="send_failure_alert", trigger_rule=TriggerRule.ALL_DONE)
+    def send_failure_alert(metrics: dict) -> None:
+        """Post Slack alert with failure details."""
+        import requests
+        webhook = Variable.get("slack_webhook_url")
+        requests.post(webhook, json={
+            "text": f":x: Model quality gate FAILED. AUC={metrics['auc']:.3f} (threshold: {Variable.get('min_auc', 0.85)})"
+        })
+
+    end = EmptyOperator(task_id="end", trigger_rule=TriggerRule.NONE_FAILED_MIN_ONE_SUCCESS)
+
+    # Wire up the DAG
+    ingested    = ingest_data()
+    validated   = validate_data(ingested)
+    features    = preprocess_features(validated)
+    trained     = train_model(features)
+    metrics     = evaluate_model(trained, features)
+    gate        = quality_gate(metrics)
+    registered  = register_model(trained, metrics)
+    gate >> [registered, send_failure_alert(metrics)]
+    registered >> deploy_model(registered) >> end
+
+dag_instance = ml_training_pipeline()
+</code></pre>
+
+    <h3>3.2 KubernetesPodOperator for GPU Training</h3>
+    <div class="code-label">Python · dags/k8s_training_task.py</div>
+    <pre><code class="language-python">from airflow.providers.cncf.kubernetes.operators.pod import KubernetesPodOperator
+from kubernetes.client import models as k8s
+
+gpu_training_task = KubernetesPodOperator(
+    task_id="gpu_training",
+    name="ml-gpu-training",
+    namespace="ml-jobs",
+    image="company/ml-trainer:v2.1",
+    cmds=["python", "-m", "trainer.train"],
+    arguments=["--config", "/configs/fraud_v2.yaml",
+               "--run-id", "{{ run_id }}",
+               "--date", "{{ ds }}"],
+    env_vars=[
+        k8s.V1EnvVar(name="MLFLOW_TRACKING_URI",
+                     value_from=k8s.V1EnvVarSource(
+                         secret_key_ref=k8s.V1SecretKeySelector(
+                             name="mlflow-secret", key="tracking-uri"))),
+    ],
+    container_resources=k8s.V1ResourceRequirements(
+        requests={"cpu": "4", "memory": "32Gi", "nvidia.com/gpu": "2"},
+        limits={"cpu": "8", "memory": "64Gi", "nvidia.com/gpu": "2"},
+    ),
+    volumes=[k8s.V1Volume(
+        name="configs",
+        config_map=k8s.V1ConfigMapVolumeSource(name="training-configs"),
+    )],
+    volume_mounts=[k8s.V1VolumeMount(name="configs", mount_path="/configs")],
+    node_selector={"cloud.google.com/gke-accelerator": "nvidia-tesla-a100"},
+    tolerations=[k8s.V1Toleration(key="nvidia.com/gpu", operator="Exists")],
+    is_delete_operator_pod=True,
+    get_logs=True,
+    log_events_on_failure=True,
+    service_account_name="ml-jobs-sa",
+    startup_timeout_seconds=300,
+    dag=dag,
+)
+</code></pre>
+
+    <h3>3.3 Parameterized Training Pipeline</h3>
+    <div class="code-label">Python · dags/parameterized_training.py</div>
+    <pre><code class="language-python">from airflow.decorators import dag, task
+from airflow.models.param import Param
+from datetime import datetime
+
+@dag(
+    dag_id="parameterized_training",
+    schedule=None,          # Triggered manually or via API
+    start_date=datetime(2024, 1, 1),
+    params={
+        "model_type":     Param("xgboost", enum=["xgboost", "lightgbm", "nn"]),
+        "experiment_id":  Param("", type="string"),
+        "max_depth":      Param(6, type="integer", minimum=2, maximum=12),
+        "n_estimators":   Param(200, type="integer", minimum=50, maximum=1000),
+        "test_fraction":  Param(0.2, type="number", minimum=0.1, maximum=0.4),
+        "feature_set":    Param("v3", enum=["v2", "v3", "v3_extended"]),
+    },
+)
+def parameterized_training():
+    @task
+    def build_config(**ctx) -> dict:
+        p = ctx["params"]
+        return {
+            "model": p["model_type"],
+            "hyperparams": {"max_depth": p["max_depth"], "n_estimators": p["n_estimators"]},
+            "data": {"feature_set": p["feature_set"], "test_fraction": p["test_fraction"]},
+            "experiment": p["experiment_id"] or f"auto-{ctx['run_id'][:8]}",
+        }
+
+    @task
+    def run_training(config: dict) -> dict:
+        # Dispatch to appropriate training backend based on model type
+        print(f"Training {config['model']} with config: {config}")
+        return {"run_id": "mlflow-run-123", "config": config}
+
+    config = build_config()
+    run_training(config)
+
+parameterized_training()
+</code></pre>
+
+    <!-- Section 4 -->
+    <h2 id="s4">4. Airflow Best Practices for ML</h2>
+    <span class="section-badge">Best Practices</span>
+
+    <h3>4.1 Idempotency</h3>
+    <p>Every Airflow task must be <strong>idempotent</strong>: running it twice for the same logical date should produce the same result without side effects. This enables safe retries and backfilling.</p>
+    <ul>
+      <li>Use <code>{{ ds }}</code> (execution date) as a partition key in all writes.</li>
+      <li>Overwrite (not append) output partitions; never use auto-increment IDs as keys.</li>
+      <li>Use upsert semantics in databases (<code>INSERT ... ON CONFLICT DO UPDATE</code>).</li>
+      <li>Make training deterministic: fix random seeds, pin library versions.</li>
+    </ul>
+
+    <h3>4.2 XCom Best Practices</h3>
+    <div class="callout-warn"><strong>XCom size limit:</strong> XComs are stored in the Airflow metadata DB (Postgres). Keep values under 48KB. Never XCom DataFrames, model weights, or large arrays — use S3/GCS paths instead.</div>
+
+    <h3>4.3 SLA Alerts and Callbacks</h3>
+    <div class="code-label">Python · dags/ml_pipeline_with_sla.py</div>
+    <pre><code class="language-python">from airflow.decorators import dag, task
+from airflow.models import TaskInstance, DagRun
+from datetime import datetime, timedelta
+
+def on_failure_callback(context: dict) -> None:
+    """Called when any task fails. Posts to PagerDuty + Slack."""
+    from airflow.providers.slack.hooks.slack_webhook import SlackWebhookHook
+    ti: TaskInstance = context["task_instance"]
+    dag_run: DagRun = context["dag_run"]
+    hook = SlackWebhookHook(slack_webhook_conn_id="slack_ml_alerts")
+    hook.send(
+        text=(f":red_circle: *Task Failed*\n"
+              f"DAG: `{ti.dag_id}` | Task: `{ti.task_id}`\n"
+              f"Run: `{dag_run.run_id}` | Execution: `{context['ds']}`\n"
+              f"Exception: ```{context.get('exception', 'unknown')}```"),
+    )
+
+def sla_miss_callback(dag, task_list, blocking_task_list, slas, blocking_tis):
+    """Called when tasks exceed their SLA."""
+    from airflow.providers.slack.hooks.slack_webhook import SlackWebhookHook
+    hook = SlackWebhookHook(slack_webhook_conn_id="slack_ml_alerts")
+    hook.send(text=f":warning: SLA missed in DAG `{dag.dag_id}`: tasks {task_list}")
+
+@dag(
+    dag_id="ml_pipeline_with_sla",
+    default_args={
+        "owner": "ml-platform",
+        "retries": 2,
+        "retry_delay": timedelta(minutes=3),
+        "on_failure_callback": on_failure_callback,
+        "sla": timedelta(hours=2),          # All tasks must finish in 2h
+    },
+    schedule="0 1 * * *",
+    start_date=datetime(2024, 1, 1),
+    sla_miss_callback=sla_miss_callback,
+    catchup=False,
+)
+def ml_pipeline_with_sla():
+    @task(sla=timedelta(minutes=30))        # This specific task: 30-min SLA
+    def ingest() -> str:
+        return "s3://bucket/data.parquet"
+
+    @task(sla=timedelta(hours=1))
+    def train(path: str) -> dict:
+        return {"auc": 0.91}
+
+    train(ingest())
+
+ml_pipeline_with_sla()
+</code></pre>
+
+    <h3>4.4 Dynamic DAG Generation</h3>
+    <div class="code-label">Python · dags/dynamic_model_dags.py</div>
+    <pre><code class="language-python">import yaml
+from airflow.decorators import dag, task
+from datetime import datetime
+
+# Config-driven: one DAG per model in models.yaml
+MODELS_CONFIG = yaml.safe_load(open("/opt/airflow/config/models.yaml"))
+
+for model_cfg in MODELS_CONFIG["models"]:
+    model_id   = model_cfg["id"]
+    schedule   = model_cfg.get("schedule", "0 3 * * *")
+    min_metric = model_cfg.get("min_auc", 0.80)
+
+    @dag(
+        dag_id=f"train_{model_id}",
+        schedule=schedule,
+        start_date=datetime(2024, 1, 1),
+        catchup=False,
+        tags=["ml", model_id],
+        default_args={"owner": model_cfg.get("team", "ml-platform")},
+    )
+    def _make_dag(model=model_cfg):  # closure captures config
+        @task
+        def train() -> dict:
+            print(f"Training {model['id']}")
+            return {"auc": 0.90}
+
+        @task.branch
+        def gate(metrics: dict) -> str:
+            return "deploy" if metrics["auc"] >= model["min_auc"] else "skip"
+
+        @task
+        def deploy(metrics: dict) -> None:
+            print(f"Deploying {model['id']}")
+
+        @task
+        def skip() -> None:
+            print(f"Skipping deploy for {model['id']}: quality gate failed")
+
+        m = train()
+        gate(m) >> [deploy(m), skip()]
+
+    globals()[f"train_{model_id}"] = _make_dag()
+</code></pre>
+
+    <h3>4.5 Managed Airflow</h3>
+    <table>
+      <thead><tr><th>Service</th><th>Provider</th><th>Airflow Version</th><th>Highlights</th><th>Limitations</th></tr></thead>
+      <tbody>
+        <tr><td><strong>MWAA</strong></td><td>AWS</td><td>2.x</td><td>Native IAM, VPC, auto-scaling workers</td><td>Slower updates, limited plugin support</td></tr>
+        <tr><td><strong>Cloud Composer</strong></td><td>GCP</td><td>2.x</td><td>GKE-based, BigQuery/Vertex integration</td><td>Cold start latency, cost</td></tr>
+        <tr><td><strong>Astronomer</strong></td><td>SaaS / self-hosted</td><td>Latest</td><td>Best developer experience, CI/CD</td><td>Cost vs. self-managed</td></tr>
+        <tr><td><strong>Self-hosted</strong></td><td>Any K8s</td><td>Any</td><td>Full control, cost-efficient at scale</td><td>Ops burden</td></tr>
+      </tbody>
+    </table>
+
+    <!-- Section 5 -->
+    <h2 id="s5">5. Testing Airflow DAGs</h2>
+    <span class="section-badge">Testing</span>
+
+    <div class="code-label">Python · tests/test_ml_pipeline_dag.py</div>
+    <pre><code class="language-python">import pytest
+from datetime import datetime
+from unittest.mock import patch, MagicMock
+
+# Must be importable without running Airflow
+from airflow.models import DagBag, Variable
+
+# ─── DAG Validation ────────────────────────────────────────────────────────────
+
+@pytest.fixture(scope="session")
+def dagbag():
+    return DagBag(dag_folder="dags/", include_examples=False)
+
+def test_no_import_errors(dagbag):
+    assert not dagbag.import_errors, \
+        f"DAG import errors: {dagbag.import_errors}"
+
+def test_all_expected_dags_present(dagbag):
+    expected = {"ml_training_pipeline", "parameterized_training", "ml_pipeline_with_sla"}
+    assert expected.issubset(dagbag.dag_ids)
+
+def test_training_pipeline_task_count(dagbag):
+    dag = dagbag.get_dag("ml_training_pipeline")
+    assert len(dag.tasks) >= 7, "Pipeline should have at least 7 tasks"
+
+def test_training_pipeline_no_cycles(dagbag):
+    dag = dagbag.get_dag("ml_training_pipeline")
+    # Airflow raises CycleError on import if DAG is cyclic; this checks structure
+    assert dag.topological_sort()
+
+def test_training_pipeline_schedule(dagbag):
+    dag = dagbag.get_dag("ml_training_pipeline")
+    assert dag.schedule_interval == "0 2 * * *"
+
+def test_all_tasks_have_retries(dagbag):
+    dag = dagbag.get_dag("ml_training_pipeline")
+    for task in dag.tasks:
+        if task.task_id not in ("end",):
+            assert task.retries >= 1, f"Task {task.task_id} has no retries"
+
+# ─── Task Unit Tests ───────────────────────────────────────────────────────────
+
+def test_quality_gate_passes_on_high_auc():
+    """Unit test the branching logic without running Airflow."""
+    from dags.ml_training_pipeline import ml_training_pipeline
+    # Instantiate DAG to access task callables
+    dag = ml_training_pipeline()
+    # Call the underlying Python function directly
+    with patch.dict("os.environ", {}):
+        # Simulate metrics above threshold
+        metrics = {"auc": 0.92, "f1": 0.88}
+        context = {"params": {"min_auc": 0.85}}
+        # Find gate task callable and test its logic
+        # (Simplified — production tests mock context fully)
+        assert metrics["auc"] >= context["params"]["min_auc"]
+
+@patch("dags.ml_training_pipeline.Variable")
+def test_quality_gate_rejects_low_auc(mock_var):
+    mock_var.get.return_value = "0.85"
+    metrics = {"auc": 0.72}
+    # Gate should return "send_failure_alert" branch
+    threshold = 0.85
+    assert metrics["auc"] < threshold   # Would route to failure alert
+
+# ─── Integration Pattern ───────────────────────────────────────────────────────
+
+@pytest.mark.integration
+def test_dag_run_with_test_mode(dagbag):
+    """Run DAG in test mode against real (test) infrastructure."""
+    dag = dagbag.get_dag("parameterized_training")
+    dag.test(
+        execution_date=datetime(2024, 6, 1),
+        run_conf={"model_type": "xgboost", "max_depth": 4,
+                  "n_estimators": 50, "test_fraction": 0.2,
+                  "feature_set": "v2", "experiment_id": "test-run"},
+    )
+</code></pre>
+
+    <!-- Section 6 -->
+    <h2 id="s6">6. Prefect</h2>
+    <span class="section-badge">Alternative Orchestrator</span>
+
+    <p>Prefect was founded in 2018 with an explicit philosophy: <em>"your code is the workflow."</em> Unlike Airflow, where you define a DAG structure and then fill in operators, Prefect 2.x lets you decorate ordinary Python functions with <code>@flow</code> and <code>@task</code>. The runtime infers the DAG from the call graph.</p>
+
+    <h3>Prefect Architecture</h3>
+    <ul>
+      <li><strong>Prefect Server / Prefect Cloud:</strong> API server + UI for monitoring and scheduling.</li>
+      <li><strong>Work Pool:</strong> Named queue backed by an executor (local, Docker, K8s, ECS, etc.).</li>
+      <li><strong>Worker:</strong> Process that polls a work pool and executes flow runs.</li>
+      <li><strong>Deployment:</strong> Versioned package of a flow + its schedule + infrastructure config.</li>
+    </ul>
+
+    <h3>6.1 Prefect ML Flow</h3>
+    <div class="code-label">Python · flows/ml_training_flow.py</div>
+    <pre><code class="language-python">import prefect
+from prefect import flow, task, get_run_logger
+from prefect.blocks.system import Secret
+from prefect.tasks import task_input_hash
+from datetime import timedelta, date
+from typing import Optional
+
+# ─── Tasks ─────────────────────────────────────────────────────────────────────
+
+@task(
+    name="Ingest Data",
+    retries=3,
+    retry_delay_seconds=30,
+    cache_key_fn=task_input_hash,
+    cache_expiration=timedelta(hours=12),
+    tags=["data", "s3"],
+)
+def ingest_data(run_date: str) -> dict:
+    logger = get_run_logger()
+    logger.info(f"Ingesting data for {run_date}")
+    # Real: read from S3 / BigQuery
+    return {"path": f"s3://ml-data/{run_date}/data.parquet",
+            "rows": 1_200_000, "date": run_date}
+
+@task(name="Validate Data", retries=2)
+def validate_data(artifact: dict) -> dict:
+    logger = get_run_logger()
+    logger.info(f"Validating {artifact['rows']:,} rows from {artifact['path']}")
+    return {**artifact, "valid": True}
+
+@task(name="Feature Engineering", retries=2, tags=["spark"])
+def engineer_features(artifact: dict) -> dict:
+    feature_path = artifact["path"].replace("data.parquet", "features.parquet")
+    return {"feature_path": feature_path, "feature_count": 128, "date": artifact["date"]}
+
+@task(name="Train Model", retries=1, timeout_seconds=7200, tags=["training", "gpu"])
+def train_model(features: dict, hyperparams: dict) -> dict:
+    logger = get_run_logger()
+    logger.info(f"Training with features from {features['feature_path']}")
+    # Real: submit to SageMaker / K8s / Ray
+    run_id = prefect.runtime.flow_run.id
+    return {"run_id": str(run_id), "artifact": "s3://ml-models/model.pkl",
+            "hyperparams": hyperparams}
+
+@task(name="Evaluate Model")
+def evaluate_model(train_result: dict, features: dict) -> dict:
+    metrics = {"auc": 0.913, "f1": 0.876, "run_id": train_result["run_id"]}
+    prefect.artifacts.create_table_artifact(
+        key="model-metrics",
+        table=[{"Metric": k, "Value": v} for k, v in metrics.items()],
+        description="Evaluation metrics for current training run",
+    )
+    return metrics
+
+@task(name="Register and Deploy")
+def register_and_deploy(train_result: dict, metrics: dict, model_name: str) -> None:
+    import mlflow
+    tracking_uri = Secret.load("mlflow-tracking-uri").get()
+    mlflow.set_tracking_uri(tracking_uri)
+    with mlflow.start_run(run_name=f"prefect-{train_result['run_id'][:8]}"):
+        mlflow.log_metrics(metrics)
+        mlflow.log_params(train_result["hyperparams"])
+
+# ─── Flow ──────────────────────────────────────────────────────────────────────
+
+@flow(
+    name="ml-training-pipeline",
+    description="Daily ML training pipeline with quality gate",
+    version="2.1.0",
+    timeout_seconds=10800,
+    on_failure=[lambda flow, run, state: print(f"Flow failed: {state}")],
+)
+def ml_training_pipeline(
+    run_date: str = str(date.today()),
+    model_name: str = "fraud_detector",
+    min_auc: float = 0.85,
+    hyperparams: Optional[dict] = None,
+) -> dict:
+    logger = get_run_logger()
+    if hyperparams is None:
+        hyperparams = {"max_depth": 6, "n_estimators": 200, "learning_rate": 0.1}
+
+    artifact  = ingest_data(run_date)
+    validated = validate_data(artifact)
+    features  = engineer_features(validated)
+    trained   = train_model(features, hyperparams)
+    metrics   = evaluate_model(trained, features)
+
+    if metrics["auc"] >= min_auc:
+        logger.info(f"Quality gate passed: AUC={metrics['auc']:.3f}")
+        register_and_deploy(trained, metrics, model_name)
+    else:
+        logger.warning(f"Quality gate FAILED: AUC={metrics['auc']:.3f} < {min_auc}")
+        raise ValueError(f"Model quality insufficient: AUC {metrics['auc']:.3f}")
+
+    return metrics
+
+if __name__ == "__main__":
+    ml_training_pipeline()
+</code></pre>
+
+    <h3>6.2 Prefect Deployment Configuration</h3>
+    <div class="code-label">YAML · prefect.yaml</div>
+    <pre><code class="language-yaml">name: ml-training-pipeline
+prefect-version: 2.14.0
+
+build:
+  - prefect_docker.deployments.steps.build_docker_image:
+      id: build-image
+      requires: prefect-docker>=0.3.0
+      image_name: company/ml-flows
+      tag: "{{ $COMMIT_SHA }}"
+      dockerfile: Dockerfile
+      platform: linux/amd64
+
+push:
+  - prefect_docker.deployments.steps.push_docker_image:
+      requires: prefect-docker>=0.3.0
+      image_name: "{{ build-image.image_name }}"
+      tag: "{{ build-image.tag }}"
+
+pull:
+  - prefect.deployments.steps.set_working_directory:
+      directory: /opt/prefect/flows
+
+deployments:
+  - name: daily-training
+    entrypoint: flows/ml_training_flow.py:ml_training_pipeline
+    schedule:
+      cron: "0 2 * * *"
+      timezone: UTC
+    parameters:
+      model_name: fraud_detector
+      min_auc: 0.85
+    work_pool:
+      name: kubernetes-pool
+      work_queue_name: ml-gpu
+      job_variables:
+        image: "{{ build-image.image }}"
+        namespace: ml-jobs
+        service_account_name: ml-jobs-sa
+        finished_job_ttl: 300
+        cpu_request: "4"
+        memory_request: 16Gi
+        cpu_limit: "8"
+        memory_limit: 32Gi
+
+  - name: on-demand-training
+    entrypoint: flows/ml_training_flow.py:ml_training_pipeline
+    schedule: null          # Manual trigger only
+    work_pool:
+      name: kubernetes-pool
+      job_variables:
+        image: "{{ build-image.image }}"
+        cpu_request: "8"
+        memory_request: 64Gi
+</code></pre>
+
+    <h3>6.3 Prefect with Kubernetes Worker</h3>
+    <div class="code-label">Python · flows/prefect_k8s_worker.py</div>
+    <pre><code class="language-python">from prefect import flow, task
+from prefect_kubernetes.worker import KubernetesWorker
+from prefect.deployments import Deployment
+from prefect.infrastructure.container import KubernetesJob
+
+# Define Kubernetes job template
+k8s_job = KubernetesJob(
+    namespace="ml-jobs",
+    image="company/ml-flows:latest",
+    image_pull_policy="Always",
+    service_account_name="ml-jobs-sa",
+    customizations=[
+        {"op": "add", "path": "/spec/template/spec/containers/0/resources",
+         "value": {"requests": {"nvidia.com/gpu": "1"},
+                   "limits":   {"nvidia.com/gpu": "1"}}},
+        {"op": "add", "path": "/spec/template/spec/tolerations",
+         "value": [{"key": "nvidia.com/gpu", "operator": "Exists"}]},
+    ],
+    finished_job_ttl=300,
+    pod_watch_timeout_seconds=600,
+)
+
+# Create deployment programmatically
+deployment = Deployment.build_from_flow(
+    flow=ml_training_pipeline,
+    name="k8s-gpu-training",
+    infrastructure=k8s_job,
+    work_queue_name="gpu",
+    parameters={"model_name": "fraud_detector"},
+)
+
+if __name__ == "__main__":
+    deployment.apply()
+</code></pre>
+
+    <h3>Airflow vs. Prefect Comparison</h3>
+    <table>
+      <thead><tr><th>Dimension</th><th>Airflow 2.x</th><th>Prefect 2.x</th></tr></thead>
+      <tbody>
+        <tr><td><strong>DAG definition</strong></td><td>Explicit graph construction</td><td>Inferred from Python call graph</td></tr>
+        <tr><td><strong>Learning curve</strong></td><td>Moderate (many concepts)</td><td>Low (just Python)</td></tr>
+        <tr><td><strong>Dynamic tasks</strong></td><td>Dynamic Task Mapping (2.3+)</td><td>Native Python — just loop</td></tr>
+        <tr><td><strong>Local dev</strong></td><td>Requires Airflow installation</td><td><code>prefect server start</code> or no server</td></tr>
+        <tr><td><strong>Retries</strong></td><td>Task-level, exponential backoff</td><td>Task-level, configurable</td></tr>
+        <tr><td><strong>Caching</strong></td><td>XCom (small values only)</td><td>Result caching with TTL</td></tr>
+        <tr><td><strong>Deployment</strong></td><td>Git-sync, MWAA, Composer</td><td>Prefect Cloud, self-hosted server</td></tr>
+        <tr><td><strong>Ecosystem</strong></td><td>Massive (1000+ integrations)</td><td>Growing (Prefect Collections)</td></tr>
+        <tr><td><strong>Backfill</strong></td><td>First-class, CLI-driven</td><td>Manual flow re-runs</td></tr>
+        <tr><td><strong>Best for</strong></td><td>Large teams, complex deps, backfills</td><td>Python-native teams, ML experiments</td></tr>
+      </tbody>
+    </table>
+
+    <!-- Section 7 -->
+    <h2 id="s7">7. Other Orchestrators</h2>
+    <span class="section-badge">Landscape</span>
+
+    <h3>Dagster</h3>
+    <p>Dagster's central abstraction is the <strong>Software-Defined Asset (SDA)</strong>: instead of tasks, you define data assets (tables, model files, features) and Dagster infers the pipeline from asset dependencies. This shifts thinking from "run this job" to "materialize this asset." It has native support for partitions, lineage, and type-checked outputs. <em>See ch11b_dagster.html for a complete deep-dive.</em></p>
+
+    <h3>Metaflow</h3>
+    <p>Created at Netflix, Metaflow is optimized for data scientists: pipelines are Python classes, infrastructure concerns are handled by decorators (<code>@kubernetes</code>, <code>@batch</code>). Strong S3/artifact management. Less powerful scheduling than Airflow; best paired with a cron scheduler or Argo Workflows. No native UI unless using Metaflow Service + Outerbounds.</p>
+
+    <h3>Luigi</h3>
+    <p>Spotify's original workflow tool. Task-centric, simple dependency definition, no scheduler built-in (relies on cron). Still used in legacy ML systems but largely superseded by Airflow and Prefect. Good for simple pipelines where you need minimal infrastructure.</p>
+
+    <h3>ZenML</h3>
+    <p>ML-specific orchestration layer that sits on top of other orchestrators (Airflow, Kubeflow, Vertex AI Pipelines). Provides a portable pipeline abstraction with artifact stores, model registries, and stack components. Useful for teams that want portability across cloud providers without rewriting pipelines.</p>
+
+    <h3>Full Orchestrator Comparison</h3>
+    <table>
+      <thead><tr><th>Tool</th><th>Paradigm</th><th>DAG Language</th><th>Scheduling</th><th>ML-Native</th><th>Managed SaaS</th><th>Best For</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Airflow</strong></td><td>Task-centric</td><td>Python</td><td>Excellent</td><td>Via operators</td><td>MWAA, Composer, Astronomer</td><td>Complex enterprise pipelines</td></tr>
+        <tr><td><strong>Prefect</strong></td><td>Flow-centric</td><td>Python (native)</td><td>Good</td><td>Via collections</td><td>Prefect Cloud</td><td>Python-first teams</td></tr>
+        <tr><td><strong>Dagster</strong></td><td>Asset-centric</td><td>Python</td><td>Good</td><td>Yes (native)</td><td>Dagster Cloud</td><td>Data platform teams</td></tr>
+        <tr><td><strong>Metaflow</strong></td><td>Step-centric</td><td>Python class</td><td>External</td><td>Yes (native)</td><td>Outerbounds</td><td>Data scientist autonomy</td></tr>
+        <tr><td><strong>Luigi</strong></td><td>Task-centric</td><td>Python class</td><td>External</td><td>No</td><td>No</td><td>Simple legacy pipelines</td></tr>
+        <tr><td><strong>ZenML</strong></td><td>Stack-centric</td><td>Python decorator</td><td>Via backend</td><td>Yes (native)</td><td>ZenML Cloud</td><td>Multi-cloud portability</td></tr>
+      </tbody>
+    </table>
+
+    <!-- Section 8 -->
+    <h2 id="s8">8. Event-Driven Orchestration</h2>
+    <span class="section-badge">Advanced Patterns</span>
+
+    <p>Schedule-based pipelines (cron) are simple but wasteful — they run whether or not new data exists. Event-driven pipelines react to real-world signals: a new file lands in S3, a data quality check completes, model drift is detected. Airflow supports this via <strong>Sensors</strong> and <strong>Deferrable Operators</strong>.</p>
+
+    <div class="mermaid-wrap">
+      <div class="mermaid">
+sequenceDiagram
+    participant S3 as S3 Bucket
+    participant SNS as SNS/SQS
+    participant Sensor as Airflow Sensor
+    participant SCH as Scheduler
+    participant Train as Training Task
+    participant Mon as Monitoring Service
+
+    S3->>SNS: New data file event
+    SNS->>Sensor: Message received
+    Sensor->>SCH: Trigger DAG run
+    SCH->>Train: Execute training
+    Train->>Mon: Log metrics
+    Mon-->>SCH: Drift detected (HTTP callback)
+    SCH->>Train: Trigger retraining DAG
+      </div>
+    </div>
+
+    <div class="code-label">Python · dags/event_driven_retraining.py</div>
+    <pre><code class="language-python">from airflow.decorators import dag, task
+from airflow.providers.amazon.aws.sensors.s3 import S3KeySensor
+from airflow.providers.http.sensors.http import HttpSensor
+from airflow.sensors.base import PokeReturnValue
+from airflow.operators.trigger_dagrun import TriggerDagRunOperator
+from datetime import datetime, timedelta
+
+@dag(
+    dag_id="event_driven_retraining",
+    schedule="*/15 * * * *",    # Poll every 15 min for new data
+    start_date=datetime(2024, 1, 1),
+    catchup=False,
+    max_active_runs=1,
+    default_args={"retries": 1},
+)
+def event_driven_retraining():
+    # Deferred S3 sensor — releases worker thread while waiting
+    wait_for_data = S3KeySensor(
+        task_id="wait_for_new_data",
+        bucket_name="ml-data-lake",
+        bucket_key="incoming/{{ ds }}/data_*.parquet",
+        wildcard_match=True,
+        aws_conn_id="aws_default",
+        poke_interval=60,
+        timeout=3600,
+        mode="reschedule",      # Releases worker slot between polls
+        soft_fail=True,         # Don't fail if no data — just skip
+    )
+
+    # Check monitoring service for drift signal
+    check_drift = HttpSensor(
+        task_id="check_model_drift",
+        http_conn_id="monitoring_api",
+        endpoint="/api/drift/fraud_detector",
+        request_params={"threshold": 0.05, "window_hours": 24},
+        response_check=lambda response: response.json().get("drift_detected", False),
+        poke_interval=300,
+        timeout=600,
+        mode="reschedule",
+        soft_fail=True,
+    )
+
+    @task.branch(task_id="decide_trigger")
+    def decide_trigger(ti=None) -> str:
+        """Trigger retraining if new data arrived OR drift detected."""
+        new_data = ti.xcom_pull(task_ids="wait_for_new_data") is not None
+        drift    = ti.xcom_pull(task_ids="check_model_drift") is not None
+        if new_data or drift:
+            return "trigger_training_pipeline"
+        return "no_action_needed"
+
+    trigger = TriggerDagRunOperator(
+        task_id="trigger_training_pipeline",
+        trigger_dag_id="ml_training_pipeline",
+        conf={"triggered_by": "event_sensor", "date": "{{ ds }}"},
+        wait_for_completion=False,
+    )
+
+    @task(task_id="no_action_needed")
+    def no_action() -> None:
+        print("No new data and no drift detected — skipping retraining.")
+
+    [wait_for_data, check_drift] >> decide_trigger() >> [trigger, no_action()]
+
+event_driven_retraining()
+</code></pre>
+
+    <!-- Section 9 -->
+    <h2 id="s9">9. Production Patterns</h2>
+    <span class="section-badge">Production</span>
+
+    <h3>Pattern 1: Daily Retraining with Multi-Stage Validation</h3>
+    <p>Never deploy a freshly trained model directly to production. The pipeline should include: (1) offline evaluation against a holdout set, (2) comparison against the current production model (challenger/champion), (3) optional shadow deployment, and (4) gradual traffic rollout with automated rollback.</p>
+
+    <div class="code-label">Python · dags/production_retraining.py</div>
+    <pre><code class="language-python">from airflow.decorators import dag, task
+from airflow.models import Variable
+from airflow.utils.trigger_rule import TriggerRule
+from datetime import datetime, timedelta
+
+QUALITY_GATES = {
+    "min_auc":         0.85,
+    "max_auc_delta":  -0.02,   # Challenger must not be >2% worse than champion
+    "min_precision":   0.80,
+    "max_latency_ms":  50,
+    "min_data_rows":   500_000,
+}
+
+@dag(
+    dag_id="production_retraining_pipeline",
+    schedule="0 1 * * *",
+    start_date=datetime(2024, 1, 1),
+    catchup=False,
+    max_active_runs=1,
+    default_args={
+        "owner": "ml-platform",
+        "retries": 2,
+        "retry_delay": timedelta(minutes=5),
+        "email_on_failure": True,
+        "email": ["ml-oncall@company.com"],
+        "sla": timedelta(hours=3),
+    },
+    tags=["production", "retraining"],
+)
+def production_retraining_pipeline():
+
+    @task
+    def get_production_metrics() -> dict:
+        """Fetch current champion model metrics from model registry."""
+        import mlflow
+        mlflow.set_tracking_uri(Variable.get("mlflow_tracking_uri"))
+        client = mlflow.MlflowClient()
+        versions = client.get_latest_versions("fraud_detector", stages=["Production"])
+        if not versions:
+            return {"auc": 0.0, "version": None}
+        version = versions[0]
+        run = client.get_run(version.run_id)
+        return {"auc": float(run.data.metrics.get("auc", 0)), "version": version.version}
+
+    @task
+    def ingest_and_validate(**ctx) -> dict:
+        ds = ctx["ds"]
+        # Full data ingestion + Great Expectations validation
+        rows = 1_350_000
+        if rows < QUALITY_GATES["min_data_rows"]:
+            raise ValueError(f"Insufficient data: {rows} < {QUALITY_GATES['min_data_rows']}")
+        return {"path": f"s3://ml-data/{ds}/features.parquet", "rows": rows, "date": ds}
+
+    @task(retries=1)
+    def train_challenger(features: dict) -> dict:
+        # Submit training job; return artifact location
+        return {"artifact": "s3://ml-models/challenger/model.pkl",
+                "run_id": "challenger-run-123"}
+
+    @task
+    def evaluate_challenger(train_result: dict) -> dict:
+        # Run offline evaluation suite
+        return {
+            "auc": 0.917, "precision": 0.884, "recall": 0.872,
+            "p99_latency_ms": 32, "run_id": train_result["run_id"],
+            "artifact": train_result["artifact"],
+        }
+
+    @task.branch
+    def multi_stage_gate(challenger: dict, champion: dict) -> str:
+        """Apply all quality gates; fail fast with specific error."""
+        reasons = []
+        if challenger["auc"] < QUALITY_GATES["min_auc"]:
+            reasons.append(f"AUC {challenger['auc']:.3f} < {QUALITY_GATES['min_auc']}")
+        delta = challenger["auc"] - champion["auc"]
+        if delta < QUALITY_GATES["max_auc_delta"]:
+            reasons.append(f"AUC delta {delta:.3f} < {QUALITY_GATES['max_auc_delta']}")
+        if challenger["precision"] < QUALITY_GATES["min_precision"]:
+            reasons.append(f"Precision {challenger['precision']:.3f} below threshold")
+        if challenger["p99_latency_ms"] > QUALITY_GATES["max_latency_ms"]:
+            reasons.append(f"P99 latency {challenger['p99_latency_ms']}ms > {QUALITY_GATES['max_latency_ms']}ms")
+        if reasons:
+            print(f"GATE FAILED: {'; '.join(reasons)}")
+            return "gate_failed"
+        return "promote_to_staging"
+
+    @task
+    def promote_to_staging(challenger: dict) -> dict:
+        """Register as Staging in MLflow; deploy to shadow environment."""
+        import mlflow
+        mlflow.set_tracking_uri(Variable.get("mlflow_tracking_uri"))
+        client = mlflow.MlflowClient()
+        client.transition_model_version_stage(
+            name="fraud_detector", version=challenger.get("version", "1"),
+            stage="Staging", archive_existing_versions=False)
+        return {"stage": "staging", **challenger}
+
+    @task
+    def run_shadow_evaluation(staging: dict) -> dict:
+        """Run shadow mode: route 1% real traffic, compare outputs."""
+        # In production: compare shadow predictions to champion predictions
+        shadow_divergence = 0.003   # 0.3% prediction divergence
+        return {"divergence": shadow_divergence, **staging}
+
+    @task.branch
+    def shadow_gate(shadow: dict) -> str:
+        return "promote_to_production" if shadow["divergence"] < 0.01 else "gate_failed"
+
+    @task
+    def promote_to_production(shadow: dict) -> None:
+        import mlflow
+        client = mlflow.MlflowClient()
+        client.transition_model_version_stage(
+            name="fraud_detector", version=shadow.get("version", "1"),
+            stage="Production", archive_existing_versions=True)
+        # Trigger canary: 5% → 25% → 100% over 1 hour via feature flags
+
+    @task(trigger_rule=TriggerRule.ONE_SUCCESS)
+    def gate_failed(challenger: dict, champion: dict) -> None:
+        print(f"Deployment blocked. Champion ({champion['auc']:.3f}) retained.")
+        # Trigger PagerDuty / Slack alert
+
+    champion    = get_production_metrics()
+    features    = ingest_and_validate()
+    trained     = train_challenger(features)
+    challenger  = evaluate_challenger(trained)
+    gate_result = multi_stage_gate(challenger, champion)
+    staged      = promote_to_staging(challenger)
+    shadow      = run_shadow_evaluation(staged)
+    shadow_res  = shadow_gate(shadow)
+
+    gate_result >> [staged, gate_failed(challenger, champion)]
+    shadow_res  >> [promote_to_production(shadow), gate_failed(challenger, champion)]
+
+production_retraining_pipeline()
+</code></pre>
+
+    <h3>Pattern 2: Circuit Breaker for ML Pipelines</h3>
+    <p>A circuit breaker prevents a repeatedly failing pipeline from exhausting resources and generating alert fatigue. After N consecutive failures, the circuit "opens" and the pipeline pauses until a human reviews the situation.</p>
+
+    <div class="code-label">Python · plugins/circuit_breaker.py</div>
+    <pre><code class="language-python">from airflow.models import Variable, DagRun
+from airflow.utils.state import State
+from airflow.decorators import task
+from datetime import datetime, timedelta
+
+def check_circuit_breaker(dag_id: str, max_failures: int = 3) -> bool:
+    """Return True if circuit is CLOSED (safe to run), False if OPEN (stop)."""
+    from airflow.models.dagrun import DagRun
+    from airflow.utils.session import create_session
+
+    with create_session() as session:
+        recent_runs = (
+            session.query(DagRun)
+            .filter(DagRun.dag_id == dag_id,
+                    DagRun.execution_date >= datetime.utcnow() - timedelta(days=1))
+            .order_by(DagRun.execution_date.desc())
+            .limit(max_failures)
+            .all()
+        )
+    if len(recent_runs) < max_failures:
+        return True
+    # Circuit OPEN if all recent runs failed
+    all_failed = all(r.state == State.FAILED for r in recent_runs)
+    if all_failed:
+        Variable.set(f"circuit_open_{dag_id}", "1")
+        return False
+    Variable.delete(f"circuit_open_{dag_id}")
+    return True
+
+# Usage in DAG:
+@task(task_id="circuit_breaker_check")
+def circuit_breaker_check(**ctx) -> None:
+    dag_id = ctx["dag"].dag_id
+    if not check_circuit_breaker(dag_id, max_failures=3):
+        from airflow.exceptions import AirflowSkipException
+        raise AirflowSkipException(
+            f"Circuit OPEN for {dag_id}: {3} consecutive failures. "
+            "Requires manual intervention to reset."
+        )
+</code></pre>
+
+    <div class="callout-tip">
+      <strong>Production checklist for ML orchestration:</strong>
+      <ul class="mt-2">
+        <li>All tasks are idempotent (safe to retry)</li>
+        <li>XComs contain only paths/metadata — never raw data</li>
+        <li>Every pipeline has SLA + on-failure callback</li>
+        <li>Quality gates with numeric thresholds are in Variables (not hardcoded)</li>
+        <li>DAG files are in version control with CI validation</li>
+        <li>Sensitive credentials are in Airflow Connections/Secrets (not Variables)</li>
+        <li>Circuit breaker or max_active_runs=1 prevents runaway failures</li>
+      </ul>
+    </div>
+
+    <!-- Summary -->
+    <h2 id="summary">Summary &amp; Key Takeaways</h2>
+
+    <div class="takeaway-card">
+      <strong>1. Orchestration is non-negotiable at production scale.</strong> Ad-hoc cron + scripts fails when tasks have dependencies, need retries, or require audit trails. An orchestrator is the backbone of a reliable ML platform.
+    </div>
+    <div class="takeaway-card">
+      <strong>2. Airflow dominates enterprise ML.</strong> Its rich operator ecosystem, backfill capability, and managed offerings (MWAA, Cloud Composer, Astronomer) make it the default choice. The TaskFlow API in 2.x makes Python-native pipelines ergonomic.
+    </div>
+    <div class="takeaway-card">
+      <strong>3. Prefect excels for Python-native teams.</strong> Lower boilerplate, native result caching, and cleaner local dev experience. Best for teams that want to write flows, not operators.
+    </div>
+    <div class="takeaway-card">
+      <strong>4. Quality gates are the most important pattern.</strong> Never deploy automatically without evaluating challenger vs. champion metrics. Encode thresholds as Variables so non-engineers can tune them without code changes.
+    </div>
+    <div class="takeaway-card">
+      <strong>5. Event-driven beats schedule-driven when data is irregular.</strong> Use Sensors with <code>mode="reschedule"</code> to avoid blocking worker slots. Combine scheduled heartbeats with event triggers for robust coverage.
+    </div>
+    <div class="takeaway-card">
+      <strong>6. Test your DAGs like application code.</strong> DAG validation in CI (import errors, cycle detection, task count), unit tests for branching logic, and integration tests with <code>dag.test()</code> prevent silent breakage.
+    </div>
+    <div class="takeaway-card">
+      <strong>7. The orchestrator choice is less important than the patterns.</strong> Idempotency, quality gates, observability, and circuit breakers apply equally to Airflow, Prefect, or Dagster. Pick the tool your team will actually maintain.
+    </div>
+
+    <div class="callout-info">
+      <strong>Up Next:</strong> <a href="ch11b_dagster.html" class="text-blue-700 underline">Chapter 11b — Dagster &amp; LLM Orchestration</a> covers Dagster's asset-centric model in depth, Software-Defined Assets, Partitions, Sensors, and orchestration patterns for LLM pipelines (RAG pipelines, prompt versioning, evaluation flows).
+    </div>
+
+  </div><!-- end prose-custom -->
+
+  <!-- Bottom Navigation -->
+  <div class="flex justify-between items-center mt-16 pt-8 border-t border-gray-200">
+    <a href="ch10_ray_ecosystem.html" class="nav-pill nav-pill-outline">&larr; Ch 10: The Ray Ecosystem</a>
+    <a href="index.html" class="text-gray-500 text-sm hover:text-blue-700">Home</a>
+    <a href="ch12_ml_pipelines_cicd.html" class="nav-pill">Ch 12: ML Pipelines &amp; CI/CD &rarr;</a>
+  </div>
+  <p class="text-center text-xs text-gray-400 mt-6 mb-10">Chapter 11 Part 1 · Modern MLOps Tutorial · 2024</p>
+
+</div><!-- end max-w-6xl -->
+</body>
+</html>

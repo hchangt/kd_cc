@@ -1,0 +1,1756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 2: Cloud Infrastructure for ML - Modern MLOps Tutorial</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script>hljs.highlightAll(); mermaid.initialize({startOnLoad:true, theme:'default'});</script>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --secondary: #059669;
+      --text: #1f2937;
+    }
+    body { color: var(--text); }
+    .callout-info { background: #eff6ff; border-left: 4px solid #2563eb; }
+    .callout-warn { background: #fffbeb; border-left: 4px solid #d97706; }
+    .callout-danger { background: #fef2f2; border-left: 4px solid #dc2626; }
+    .callout-tip  { background: #f0fdf4; border-left: 4px solid #059669; }
+    pre { margin: 0 !important; }
+    .mermaid { background: #f8fafc; border-radius: 8px; padding: 1.5rem; }
+    table thead { background: #f1f5f9; }
+    table tbody tr:nth-child(even) { background: #f8fafc; }
+    table td, table th { padding: 0.6rem 1rem; border: 1px solid #e2e8f0; font-size: 0.875rem; }
+    .badge { display: inline-block; padding: 2px 10px; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
+  </style>
+</head>
+<body class="bg-white font-sans leading-relaxed">
+
+<!-- NAVBAR -->
+<nav class="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-14">
+    <a href="index.html" class="flex items-center gap-2 text-blue-600 font-semibold hover:text-blue-800 transition">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0h6"/></svg>
+      MLOps Tutorial
+    </a>
+    <div class="hidden md:flex items-center gap-6 text-sm text-gray-600">
+      <a href="#fundamentals" class="hover:text-blue-600">Fundamentals</a>
+      <a href="#aws" class="hover:text-blue-600">AWS</a>
+      <a href="#gcp" class="hover:text-blue-600">GCP</a>
+      <a href="#comparison" class="hover:text-blue-600">Comparison</a>
+      <a href="#networking" class="hover:text-blue-600">Networking</a>
+      <a href="#storage" class="hover:text-blue-600">Storage</a>
+      <a href="#iam" class="hover:text-blue-600">IAM</a>
+      <a href="#cost" class="hover:text-blue-600">Cost</a>
+      <a href="#setup" class="hover:text-blue-600">Setup</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="bg-gradient-to-br from-blue-50 to-indigo-50 border-b border-gray-200">
+  <div class="max-w-5xl mx-auto px-6 py-14">
+    <div class="flex items-center gap-3 mb-4">
+      <span class="badge bg-blue-100 text-blue-700">Chapter 2</span>
+      <span class="badge bg-green-100 text-green-700">Infrastructure</span>
+      <span class="text-sm text-gray-500">60 min read</span>
+    </div>
+    <h1 class="text-4xl font-bold text-gray-900 mb-3">Cloud Infrastructure for ML: AWS &amp; GCP</h1>
+    <p class="text-lg text-gray-600 max-w-3xl">A practical deep-dive into cloud infrastructure for machine learning — from raw compute and storage to networking, IAM, cost optimization, and day-one setup on both AWS and Google Cloud.</p>
+    <div class="mt-6 flex flex-wrap gap-4 text-sm text-gray-500">
+      <span>Author: Staff Infrastructure Engineer, Google Cloud (prev. AWS)</span>
+      <span>·</span>
+      <span>Updated April 2026</span>
+    </div>
+  </div>
+</div>
+
+<div class="max-w-5xl mx-auto px-6 py-10 space-y-20">
+
+<!-- ============================================================
+     SECTION 1: CLOUD FUNDAMENTALS
+     ============================================================ -->
+<section id="fundamentals">
+  <h2 class="text-3xl font-bold text-gray-900 mb-2">1. Cloud Fundamentals for ML Engineers</h2>
+  <p class="text-gray-500 text-sm mb-8">Why you're here, and what you need to know before writing a single line of infrastructure code.</p>
+
+  <h3 class="text-xl font-semibold text-gray-800 mb-3">Why Cloud for ML?</h3>
+  <p class="text-gray-700 mb-4">On-prem GPU clusters feel tangible — you can physically touch the hardware — but they impose hidden costs that crush iteration speed at every level of the stack. A single H100 server costs ~$300k capex, takes 6–18 months to procure in a supply-constrained market, requires a raised-floor data center, a facilities team, network engineers, and a storage team. When the experiment is done, the hardware sits idle.</p>
+  <p class="text-gray-700 mb-6">Cloud flips the model: you pay for exactly what you use, spin up 512 H100s in under five minutes, and release them the moment training finishes. For ML specifically, this elasticity is not a convenience — it is the core enabling technology behind modern large-scale research and production deployment.</p>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+    <div class="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
+      <h4 class="font-semibold text-gray-800 mb-3 text-green-700">Cloud Advantages</h4>
+      <ul class="space-y-2 text-sm text-gray-700">
+        <li class="flex gap-2"><span class="text-green-500 font-bold">+</span> Elastic compute — scale from 0 to thousands of GPUs in minutes</li>
+        <li class="flex gap-2"><span class="text-green-500 font-bold">+</span> No capex — pay only for actual usage</li>
+        <li class="flex gap-2"><span class="text-green-500 font-bold">+</span> Spot/preemptible instances = 60–90% cost reduction for training</li>
+        <li class="flex gap-2"><span class="text-green-500 font-bold">+</span> Managed services (S3, GCS, SageMaker, Vertex AI) reduce ops burden</li>
+        <li class="flex gap-2"><span class="text-green-500 font-bold">+</span> Global presence — deploy inference endpoints close to users</li>
+        <li class="flex gap-2"><span class="text-green-500 font-bold">+</span> Network bandwidth between nodes far exceeds typical on-prem</li>
+      </ul>
+    </div>
+    <div class="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
+      <h4 class="font-semibold text-gray-800 mb-3 text-orange-600">When On-Prem Makes Sense</h4>
+      <ul class="space-y-2 text-sm text-gray-700">
+        <li class="flex gap-2"><span class="text-orange-500 font-bold">!</span> Extremely stable, predictable GPU utilization (&gt;85% for 3+ years)</li>
+        <li class="flex gap-2"><span class="text-orange-500 font-bold">!</span> Hard regulatory/data-sovereignty constraints</li>
+        <li class="flex gap-2"><span class="text-orange-500 font-bold">!</span> Ultra-low latency inference with specialized hardware</li>
+        <li class="flex gap-2"><span class="text-orange-500 font-bold">!</span> Very large orgs with mature infra teams (Meta, Google internal)</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3 class="text-xl font-semibold text-gray-800 mb-4">Key Cloud Concepts</h3>
+  <div class="overflow-x-auto mb-8">
+    <table class="w-full rounded-lg overflow-hidden">
+      <thead>
+        <tr><th class="text-left">Concept</th><th class="text-left">AWS Term</th><th class="text-left">GCP Term</th><th class="text-left">What it means for ML</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Region</strong></td><td>us-east-1, us-west-2</td><td>us-central1, us-east4</td><td>Physical data center clusters. Choose based on GPU availability, latency to users, and data residency.</td></tr>
+        <tr><td><strong>Availability Zone</strong></td><td>us-east-1a, 1b, 1c</td><td>us-central1-a, -b, -c</td><td>Independent failure domains within a region. Spread inference replicas across AZs for HA.</td></tr>
+        <tr><td><strong>VPC</strong></td><td>Virtual Private Cloud</td><td>Virtual Private Cloud</td><td>Your isolated network. All ML compute lives inside a VPC. No public IPs on training nodes.</td></tr>
+        <tr><td><strong>IAM</strong></td><td>IAM Roles/Policies</td><td>IAM / Service Accounts</td><td>Identity control. Training jobs, pipelines, and serving pods each need scoped credentials.</td></tr>
+        <tr><td><strong>Managed Identity</strong></td><td>EC2 Instance Profile</td><td>Workload Identity</td><td>Attach identity to compute without embedding secrets in code or environment variables.</td></tr>
+        <tr><td><strong>Object Storage</strong></td><td>S3</td><td>GCS</td><td>Infinite-scale blob store. All training data, checkpoints, and model artifacts live here.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 class="text-xl font-semibold text-gray-800 mb-4">Cost Models at a Glance</h3>
+  <div class="overflow-x-auto mb-8">
+    <table class="w-full rounded-lg overflow-hidden">
+      <thead>
+        <tr><th class="text-left">Model</th><th class="text-left">AWS Name</th><th class="text-left">GCP Name</th><th class="text-left">Discount vs On-Demand</th><th class="text-left">Best for</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>On-Demand</td><td>On-Demand</td><td>On-Demand</td><td>Baseline (0%)</td><td>Short experiments, unpredictable workloads</td></tr>
+        <tr><td>Spot / Preemptible</td><td>Spot Instances</td><td>Spot VMs</td><td>60–90% off</td><td>Fault-tolerant training with checkpointing</td></tr>
+        <tr><td>Reserved / CUD</td><td>Reserved Instances</td><td>Committed Use Discounts</td><td>30–60% off</td><td>Steady-state inference, prod serving</td></tr>
+        <tr><td>Savings Plans</td><td>Savings Plans</td><td>—</td><td>Up to 66% off</td><td>Flexible compute commitment across instance families</td></tr>
+        <tr><td>Sustained Use</td><td>—</td><td>Sustained Use Discounts</td><td>Up to 30% auto-applied</td><td>VMs running most of the month (GCP only, automatic)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 class="text-xl font-semibold text-gray-800 mb-4">Cloud Architecture Overview for ML Workloads</h3>
+  <div class="mermaid">
+flowchart TB
+    subgraph Internet["External Access"]
+        Dev["Developer / CI"]
+        User["End User"]
+    end
+
+    subgraph Cloud["Cloud Region (e.g. us-east-1 / us-central1)"]
+        subgraph VPC["VPC  10.0.0.0/16"]
+            subgraph Public["Public Subnets"]
+                LB["Load Balancer"]
+                Bastion["Bastion / Jump Host"]
+            end
+            subgraph Private["Private Subnets"]
+                subgraph Training["Training Cluster"]
+                    GPU1["GPU Node 1"]
+                    GPU2["GPU Node 2"]
+                    GPU3["GPU Node N"]
+                end
+                subgraph Serving["Inference Cluster"]
+                    Inf1["Inference Pod"]
+                    Inf2["Inference Pod"]
+                end
+                Pipeline["Orchestration\n(Airflow / Kubeflow)"]
+                Registry["Container Registry\n(ECR / Artifact Registry)"]
+            end
+        end
+        subgraph Storage["Managed Storage"]
+            ObjStore["Object Store\n(S3 / GCS)"]
+            FS["High-Perf FS\n(FSx Lustre / Filestore)"]
+            DB["Metadata DB\n(RDS / Cloud SQL)"]
+        end
+        subgraph MLPlatform["ML Platform Services"]
+            Experiment["Experiment Tracking\n(MLflow / Vertex)"]
+            ModelReg["Model Registry"]
+            Feature["Feature Store"]
+        end
+    end
+
+    Dev -->|"push code / trigger pipeline"| Bastion
+    User --> LB --> Inf1
+    User --> LB --> Inf2
+    Training --> ObjStore
+    Training --> FS
+    Pipeline --> Training
+    Pipeline --> Experiment
+    Serving --> ModelReg
+    Experiment --> ModelReg
+    GPU1 <-->|"NCCL / EFA"| GPU2
+    GPU2 <-->|"NCCL / EFA"| GPU3
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION 2: AWS
+     ============================================================ -->
+<section id="aws">
+  <h2 class="text-3xl font-bold text-gray-900 mb-2">2. AWS for ML Engineers</h2>
+  <p class="text-gray-500 text-sm mb-8">The services you will touch every single day — and the ones worth knowing deeply versus just reading the docs on demand.</p>
+
+  <h3 class="text-xl font-semibold text-gray-800 mb-4">Core AWS Services Map</h3>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mb-10">
+    <div class="bg-orange-50 border border-orange-200 rounded-xl p-4">
+      <h4 class="font-bold text-orange-800 mb-2">Compute</h4>
+      <ul class="text-sm text-gray-700 space-y-1">
+        <li><strong>EC2</strong> — GPU VMs (p3, p4d, p5, g5, trn1)</li>
+        <li><strong>EKS</strong> — Managed Kubernetes (preferred for ML)</li>
+        <li><strong>ECS</strong> — Container orchestration (simpler, less flex)</li>
+        <li><strong>AWS Batch</strong> — Managed batch jobs, ideal for training pipelines</li>
+        <li><strong>Lambda</strong> — Serverless, lightweight pre/post-processing</li>
+      </ul>
+    </div>
+    <div class="bg-blue-50 border border-blue-200 rounded-xl p-4">
+      <h4 class="font-bold text-blue-800 mb-2">Storage</h4>
+      <ul class="text-sm text-gray-700 space-y-1">
+        <li><strong>S3</strong> — Object store, primary data lake</li>
+        <li><strong>EFS</strong> — Managed NFS, shared across instances</li>
+        <li><strong>FSx for Lustre</strong> — Parallel FS for high-throughput training</li>
+        <li><strong>EBS</strong> — Block storage attached to EC2</li>
+        <li><strong>S3 Glacier</strong> — Cold archive for old datasets</li>
+      </ul>
+    </div>
+    <div class="bg-green-50 border border-green-200 rounded-xl p-4">
+      <h4 class="font-bold text-green-800 mb-2">ML-Specific</h4>
+      <ul class="text-sm text-gray-700 space-y-1">
+        <li><strong>SageMaker</strong> — End-to-end ML platform</li>
+        <li><strong>Bedrock</strong> — Foundation model API (Claude, Llama, etc.)</li>
+        <li><strong>ECR</strong> — Container registry for training/serving images</li>
+        <li><strong>Trainium (trn1)</strong> — AWS custom ML chip</li>
+        <li><strong>Inferentia (inf2)</strong> — AWS custom inference chip</li>
+      </ul>
+    </div>
+    <div class="bg-purple-50 border border-purple-200 rounded-xl p-4">
+      <h4 class="font-bold text-purple-800 mb-2">Networking</h4>
+      <ul class="text-sm text-gray-700 space-y-1">
+        <li><strong>VPC</strong> — Isolated virtual network</li>
+        <li><strong>Security Groups</strong> — Stateful firewall rules</li>
+        <li><strong>NAT Gateway</strong> — Outbound internet for private subnets</li>
+        <li><strong>VPN / Direct Connect</strong> — On-prem connectivity</li>
+        <li><strong>EFA</strong> — Elastic Fabric Adapter (RDMA for distributed training)</li>
+      </ul>
+    </div>
+    <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
+      <h4 class="font-bold text-yellow-800 mb-2">Data &amp; Databases</h4>
+      <ul class="text-sm text-gray-700 space-y-1">
+        <li><strong>RDS / Aurora</strong> — Relational DB for metadata</li>
+        <li><strong>DynamoDB</strong> — NoSQL for feature store, low-latency lookup</li>
+        <li><strong>Redshift</strong> — Data warehouse for analytics</li>
+        <li><strong>Glue</strong> — ETL and data catalog</li>
+        <li><strong>Athena</strong> — Serverless SQL on S3</li>
+      </ul>
+    </div>
+    <div class="bg-red-50 border border-red-200 rounded-xl p-4">
+      <h4 class="font-bold text-red-800 mb-2">Observability &amp; Ops</h4>
+      <ul class="text-sm text-gray-700 space-y-1">
+        <li><strong>CloudWatch</strong> — Metrics, logs, alarms</li>
+        <li><strong>CloudTrail</strong> — API audit log</li>
+        <li><strong>X-Ray</strong> — Distributed tracing</li>
+        <li><strong>Secrets Manager</strong> — Credentials management</li>
+        <li><strong>Cost Explorer</strong> — Billing analysis</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3 class="text-xl font-semibold text-gray-800 mb-4">GPU Instance Comparison</h3>
+  <div class="overflow-x-auto mb-8">
+    <table class="w-full rounded-lg overflow-hidden">
+      <thead>
+        <tr>
+          <th>Instance</th><th>GPU</th><th>GPU Count</th><th>GPU Mem</th><th>vCPUs</th><th>RAM</th><th>Network</th><th>On-Demand/hr</th><th>Best For</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><code>p3.2xlarge</code></td><td>V100</td><td>1</td><td>16 GB</td><td>8</td><td>61 GB</td><td>10 Gbps</td><td>~$3.06</td><td>Dev/prototyping, fine-tuning small models</td></tr>
+        <tr><td><code>p3.16xlarge</code></td><td>V100</td><td>8</td><td>128 GB</td><td>64</td><td>488 GB</td><td>25 Gbps</td><td>~$24.48</td><td>Multi-GPU training, NLP fine-tuning</td></tr>
+        <tr><td><code>p4d.24xlarge</code></td><td>A100 (40GB)</td><td>8</td><td>320 GB</td><td>96</td><td>1152 GB</td><td>400 Gbps EFA</td><td>~$32.77</td><td>Large model training, distributed workloads</td></tr>
+        <tr><td><code>p4de.24xlarge</code></td><td>A100 (80GB)</td><td>8</td><td>640 GB</td><td>96</td><td>1152 GB</td><td>400 Gbps EFA</td><td>~$40.97</td><td>70B+ LLM training, large batch sizes</td></tr>
+        <tr><td><code>p5.48xlarge</code></td><td>H100 (80GB SXM5)</td><td>8</td><td>640 GB</td><td>192</td><td>2048 GB</td><td>3200 Gbps EFA v3</td><td>~$98.32</td><td>Frontier model training, max throughput</td></tr>
+        <tr><td><code>g5.xlarge</code></td><td>A10G</td><td>1</td><td>24 GB</td><td>4</td><td>16 GB</td><td>10 Gbps</td><td>~$1.006</td><td>Inference, fine-tuning, diffusion models</td></tr>
+        <tr><td><code>g5.48xlarge</code></td><td>A10G</td><td>8</td><td>192 GB</td><td>192</td><td>768 GB</td><td>100 Gbps</td><td>~$16.29</td><td>Multi-GPU inference, real-time serving</td></tr>
+        <tr><td><code>trn1.32xlarge</code></td><td>Trainium</td><td>16</td><td>512 GB</td><td>128</td><td>512 GB</td><td>800 Gbps EFA</td><td>~$21.50</td><td>Cost-efficient LLM training on AWS</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout-info rounded-lg p-4 mb-8">
+    <p class="font-semibold text-blue-800 mb-1">Choosing between p4d and p5</p>
+    <p class="text-sm text-blue-900">For most training runs under 70B parameters, p4d.24xlarge with spot pricing (~$8/hr) is the best value. p5.48xlarge is justified when you need the H100's 3x tensor core throughput for frontier models or when the EFA v3 3200 Gbps fabric is the bottleneck in multi-node all-reduce. Always benchmark with your actual batch size before committing.</p>
+  </div>
+
+  <h3 class="text-xl font-semibold text-gray-800 mb-4">S3 Best Practices for ML</h3>
+  <ul class="list-disc pl-6 text-gray-700 space-y-2 mb-6">
+    <li><strong>Partitioning:</strong> Organize data as <code>s3://bucket/dataset/year=2025/month=04/part-000.parquet</code>. This enables partition pruning in Athena/Spark and reduces egress scan costs.</li>
+    <li><strong>Multipart Upload:</strong> Always use multipart for files &gt;100 MB. The threshold in boto3 is configurable via <code>TransferConfig</code>. Multipart also enables parallel upload from multiple threads.</li>
+    <li><strong>Lifecycle Policies:</strong> Move training data to S3-IA after 30 days, Glacier after 90 days. Tag datasets with <code>project</code> and <code>environment</code> for cost allocation.</li>
+    <li><strong>Requester Pays:</strong> For shared datasets across teams, enable requester-pays to charge egress to the consuming team.</li>
+    <li><strong>S3 Express One Zone:</strong> For hot training data needing &lt;10ms latency, use S3 Express One Zone — up to 10x lower latency and higher throughput than standard S3.</li>
+    <li><strong>Bucket Policy vs ACL:</strong> Always use bucket policies, never ACLs. Enable <code>BlockPublicAccess</code> at the account level without exception.</li>
+  </ul>
+
+  <h3 class="text-xl font-semibold text-gray-800 mb-4">boto3 Examples</h3>
+
+  <div class="mb-6">
+    <div class="bg-gray-100 rounded-t-lg px-4 py-2 text-xs font-mono text-gray-600 flex items-center justify-between">
+      <span>s3_ml_operations.py — S3 operations for ML</span>
+      <span class="badge bg-blue-100 text-blue-700">Python</span>
+    </div>
+    <pre class="rounded-b-lg"><code class="language-python">import boto3
+from botocore.config import Config
+from boto3.s3.transfer import TransferConfig
+import os
+
+# ── Client with retry config ──────────────────────────────────────────────────
+s3 = boto3.client(
+    "s3",
+    region_name="us-east-1",
+    config=Config(retries={"max_attempts": 10, "mode": "adaptive"}),
+)
+
+# ── Multipart upload for large training datasets ──────────────────────────────
+def upload_dataset(local_path: str, bucket: str, key: str) -> None:
+    transfer_config = TransferConfig(
+        multipart_threshold=100 * 1024 * 1024,   # 100 MB
+        max_concurrency=10,                        # parallel threads
+        multipart_chunksize=100 * 1024 * 1024,    # 100 MB chunks
+        use_threads=True,
+    )
+    s3.upload_file(
+        local_path,
+        bucket,
+        key,
+        Config=transfer_config,
+        ExtraArgs={
+            "StorageClass": "INTELLIGENT_TIERING",
+            "Metadata": {
+                "project": "llm-training-v2",
+                "environment": "prod",
+            },
+        },
+    )
+    print(f"Uploaded {local_path} → s3://{bucket}/{key}")
+
+
+# ── Stream-download checkpoint to local SSD ──────────────────────────────────
+def download_checkpoint(bucket: str, key: str, local_path: str) -> None:
+    transfer_config = TransferConfig(
+        max_concurrency=20,
+        multipart_chunksize=256 * 1024 * 1024,   # 256 MB chunks
+    )
+    os.makedirs(os.path.dirname(local_path), exist_ok=True)
+    s3.download_file(bucket, key, local_path, Config=transfer_config)
+    print(f"Downloaded s3://{bucket}/{key} → {local_path}")
+
+
+# ── List all checkpoints for a run ───────────────────────────────────────────
+def list_checkpoints(bucket: str, run_id: str) -> list[str]:
+    paginator = s3.get_paginator("list_objects_v2")
+    prefix = f"checkpoints/{run_id}/"
+    keys = []
+    for page in paginator.paginate(Bucket=bucket, Prefix=prefix):
+        for obj in page.get("Contents", []):
+            keys.append(obj["Key"])
+    return sorted(keys)
+
+
+# ── Set lifecycle policy on a bucket ─────────────────────────────────────────
+def set_ml_lifecycle_policy(bucket: str) -> None:
+    s3.put_bucket_lifecycle_configuration(
+        Bucket=bucket,
+        LifecycleConfiguration={
+            "Rules": [
+                {
+                    "ID": "training-data-tiering",
+                    "Status": "Enabled",
+                    "Filter": {"Prefix": "datasets/"},
+                    "Transitions": [
+                        {"Days": 30,  "StorageClass": "STANDARD_IA"},
+                        {"Days": 90,  "StorageClass": "GLACIER_IR"},
+                        {"Days": 365, "StorageClass": "DEEP_ARCHIVE"},
+                    ],
+                },
+                {
+                    "ID": "checkpoint-cleanup",
+                    "Status": "Enabled",
+                    "Filter": {"Prefix": "checkpoints/"},
+                    "Expiration": {"Days": 90},
+                },
+            ]
+        },
+    )
+    print(f"Lifecycle policy set on {bucket}")
+</code></pre>
+  </div>
+
+  <div class="mb-6">
+    <div class="bg-gray-100 rounded-t-lg px-4 py-2 text-xs font-mono text-gray-600 flex items-center justify-between">
+      <span>ec2_spot_management.py — EC2 spot instance management</span>
+      <span class="badge bg-blue-100 text-blue-700">Python</span>
+    </div>
+    <pre class="rounded-b-lg"><code class="language-python">import boto3
+import json
+
+ec2 = boto3.client("ec2", region_name="us-east-1")
+
+
+# ── Launch spot fleet for distributed training ────────────────────────────────
+def launch_training_fleet(
+    num_nodes: int,
+    instance_type: str = "p4d.24xlarge",
+    ami_id: str = "ami-0123456789abcdef0",
+    subnet_id: str = "subnet-xxxxxxxxx",
+    security_group_id: str = "sg-xxxxxxxxx",
+    iam_instance_profile: str = "arn:aws:iam::123456789012:instance-profile/MLTrainingRole",
+) -> str:
+    """Launch a spot fleet for distributed training."""
+    user_data = """#!/bin/bash
+set -e
+# Mount FSx Lustre
+mount -t lustre -o relatime,flock fs-xxxxxxxxx.fsx.us-east-1.amazonaws.com@tcp:/xxxxxxxx /fsx
+# Start training (managed by the orchestrator)
+/opt/ml/start_training.sh
+"""
+    response = ec2.request_spot_fleet(
+        SpotFleetRequestConfig={
+            "IamFleetRole": "arn:aws:iam::123456789012:role/aws-ec2-spot-fleet-role",
+            "TargetCapacity": num_nodes,
+            "Type": "maintain",          # auto-replace interrupted nodes
+            "AllocationStrategy": "lowestPrice",
+            "LaunchSpecifications": [
+                {
+                    "ImageId": ami_id,
+                    "InstanceType": instance_type,
+                    "SubnetId": subnet_id,
+                    "SecurityGroups": [{"GroupId": security_group_id}],
+                    "IamInstanceProfile": {"Arn": iam_instance_profile},
+                    "UserData": boto3.client("ec2").meta.events._emitter._lookup_cache.__class__(
+                        __import__("base64").b64encode(user_data.encode()).decode()
+                    ),
+                    "Placement": {"GroupName": "ml-cluster-pg"},  # placement group
+                }
+            ],
+            "TagSpecifications": [
+                {
+                    "ResourceType": "instance",
+                    "Tags": [
+                        {"Key": "Project", "Value": "llm-training"},
+                        {"Key": "Environment", "Value": "prod"},
+                    ],
+                }
+            ],
+        }
+    )
+    fleet_id = response["SpotFleetRequestId"]
+    print(f"Spot fleet launched: {fleet_id}")
+    return fleet_id
+
+
+# ── Describe running training instances ──────────────────────────────────────
+def get_training_instances(project_tag: str) -> list[dict]:
+    response = ec2.describe_instances(
+        Filters=[
+            {"Name": "tag:Project",     "Values": [project_tag]},
+            {"Name": "instance-state-name", "Values": ["running", "pending"]},
+        ]
+    )
+    instances = []
+    for reservation in response["Reservations"]:
+        for inst in reservation["Instances"]:
+            instances.append({
+                "id":         inst["InstanceId"],
+                "type":       inst["InstanceType"],
+                "private_ip": inst.get("PrivateIpAddress", ""),
+                "state":      inst["State"]["Name"],
+                "az":         inst["Placement"]["AvailabilityZone"],
+            })
+    return instances
+</code></pre>
+  </div>
+
+  <h3 class="text-xl font-semibold text-gray-800 mb-4 mt-10">AWS ML Platform Architecture</h3>
+  <div class="mermaid">
+flowchart LR
+    subgraph Ingestion["Data Ingestion"]
+        Kafka["Kafka / Kinesis"]
+        ETL["Glue ETL"]
+    end
+
+    subgraph DataLake["Data Lake  (S3)"]
+        Raw["s3://raw/"]
+        Processed["s3://processed/"]
+        Features["s3://features/"]
+    end
+
+    subgraph Training["Training  (EKS + p4d/p5)"]
+        Scheduler["Kubeflow / Argo"]
+        TrainJob["PyTorch DDP\nTraining Job"]
+        FSxL["FSx for Lustre\n(fast local cache)"]
+    end
+
+    subgraph Registry["Registry & Tracking"]
+        ECR["ECR\nContainer Images"]
+        MLflow["MLflow\nExperiment Tracking"]
+        ModelReg["SageMaker\nModel Registry"]
+    end
+
+    subgraph Serving["Serving  (EKS + g5)"]
+        TorchServe["TorchServe / vLLM"]
+        ALB["Application\nLoad Balancer"]
+        AutoScale["KEDA Autoscaler"]
+    end
+
+    subgraph Monitoring["Monitoring"]
+        CW["CloudWatch\nMetrics & Logs"]
+        Drift["Data Drift\nDetector"]
+    end
+
+    Kafka --> ETL --> Raw --> Processed --> Features
+    Features --> FSxL --> TrainJob
+    Scheduler --> TrainJob
+    TrainJob -->|"log metrics"| MLflow
+    TrainJob -->|"push image"| ECR
+    MLflow --> ModelReg
+    ModelReg -->|"deploy"| TorchServe
+    TorchServe --> ALB
+    ALB --> AutoScale
+    TorchServe --> CW
+    TorchServe --> Drift
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION 3: GCP
+     ============================================================ -->
+<section id="gcp">
+  <h2 class="text-3xl font-bold text-gray-900 mb-2">3. GCP for ML Engineers</h2>
+  <p class="text-gray-500 text-sm mb-8">Google's cloud has always been ML-first — it's the platform that runs Google Brain, DeepMind, and the original TPU research. That heritage shows.</p>
+
+  <h3 class="text-xl font-semibold text-gray-800 mb-4">Core GCP Services Map</h3>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mb-10">
+    <div class="bg-blue-50 border border-blue-200 rounded-xl p-4">
+      <h4 class="font-bold text-blue-800 mb-2">Compute</h4>
+      <ul class="text-sm text-gray-700 space-y-1">
+        <li><strong>GCE A3 (H100)</strong> — 8x H100 80GB, highest GPU performance</li>
+        <li><strong>GCE A2 (A100)</strong> — 1–16x A100 40/80GB</li>
+        <li><strong>TPU v4/v5p Pods</strong> — Custom ML accelerators, massive scale</li>
+        <li><strong>GKE</strong> — Managed Kubernetes, best-in-class for ML</li>
+        <li><strong>Cloud Run</strong> — Serverless containers, inference endpoints</li>
+        <li><strong>Cloud Functions</strong> — Event-driven lightweight compute</li>
+      </ul>
+    </div>
+    <div class="bg-green-50 border border-green-200 rounded-xl p-4">
+      <h4 class="font-bold text-green-800 mb-2">Storage</h4>
+      <ul class="text-sm text-gray-700 space-y-1">
+        <li><strong>GCS</strong> — Object store, primary data lake (S3 equivalent)</li>
+        <li><strong>Filestore</strong> — Managed NFS (EFS equivalent)</li>
+        <li><strong>Hyperdisk ML</strong> — High-throughput block storage for model loading</li>
+        <li><strong>Persistent Disk</strong> — Standard block storage for GCE</li>
+        <li><strong>GCS FUSE</strong> — Mount GCS buckets as local filesystem</li>
+      </ul>
+    </div>
+    <div class="bg-purple-50 border border-purple-200 rounded-xl p-4">
+      <h4 class="font-bold text-purple-800 mb-2">ML-Specific</h4>
+      <ul class="text-sm text-gray-700 space-y-1">
+        <li><strong>Vertex AI</strong> — End-to-end ML platform (SageMaker equivalent)</li>
+        <li><strong>Model Garden</strong> — Curated foundation model hub</li>
+        <li><strong>Vertex AI Pipelines</strong> — Managed KFP-based orchestration</li>
+        <li><strong>Feature Store</strong> — Online/offline feature serving</li>
+        <li><strong>Model Monitoring</strong> — Drift and skew detection</li>
+      </ul>
+    </div>
+    <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
+      <h4 class="font-bold text-yellow-800 mb-2">Data &amp; Analytics</h4>
+      <ul class="text-sm text-gray-700 space-y-1">
+        <li><strong>BigQuery</strong> — Serverless data warehouse, ML-native (BQML)</li>
+        <li><strong>Bigtable</strong> — NoSQL for low-latency serving (feature lookup)</li>
+        <li><strong>Spanner</strong> — Global relational DB</li>
+        <li><strong>Cloud SQL</strong> — Managed PostgreSQL/MySQL</li>
+        <li><strong>Dataflow</strong> — Managed Apache Beam for streaming/batch ETL</li>
+      </ul>
+    </div>
+    <div class="bg-red-50 border border-red-200 rounded-xl p-4">
+      <h4 class="font-bold text-red-800 mb-2">Networking</h4>
+      <ul class="text-sm text-gray-700 space-y-1">
+        <li><strong>VPC</strong> — Global (spans all regions, unlike AWS)</li>
+        <li><strong>Firewall Rules</strong> — Network-level stateless + stateful</li>
+        <li><strong>Cloud NAT</strong> — Outbound for private instances</li>
+        <li><strong>Cloud Interconnect</strong> — Dedicated/partner on-prem link</li>
+        <li><strong>GPUDirect RDMA</strong> — InfiniBand-class networking for A3/TPU pods</li>
+      </ul>
+    </div>
+    <div class="bg-orange-50 border border-orange-200 rounded-xl p-4">
+      <h4 class="font-bold text-orange-800 mb-2">Observability</h4>
+      <ul class="text-sm text-gray-700 space-y-1">
+        <li><strong>Cloud Monitoring</strong> — Metrics (Prometheus-compatible)</li>
+        <li><strong>Cloud Logging</strong> — Centralized logs</li>
+        <li><strong>Cloud Trace</strong> — Distributed tracing</li>
+        <li><strong>Error Reporting</strong> — Exception aggregation</li>
+        <li><strong>Secret Manager</strong> — Credentials management</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3 class="text-xl font-semibold text-gray-800 mb-4">TPU vs GPU: When to Use Each</h3>
+  <div class="overflow-x-auto mb-8">
+    <table class="w-full rounded-lg overflow-hidden">
+      <thead>
+        <tr><th>Dimension</th><th>GPU (A100/H100)</th><th>TPU v4</th><th>TPU v5p</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>BF16 TFLOPS</strong></td><td>312 / 989 per chip</td><td>275 per chip</td><td>459 per chip</td></tr>
+        <tr><td><strong>Memory (per chip)</strong></td><td>80 GB HBM2e/3</td><td>32 GB HBM2</td><td>95 GB HBM2e</td></tr>
+        <tr><td><strong>Interconnect</strong></td><td>NVLink / GPUDirect RDMA</td><td>ICI (600 GB/s bidirectional)</td><td>ICI (4800 GB/s)</td></tr>
+        <tr><td><strong>Max Pod Size</strong></td><td>~16k H100 (special clusters)</td><td>4096 chips</td><td>8960 chips</td></tr>
+        <tr><td><strong>Framework Support</strong></td><td>PyTorch, TF, JAX — excellent</td><td>JAX/TF — excellent; PyTorch — good via XLA</td><td>JAX/TF — excellent; PyTorch/XLA improving</td></tr>
+        <tr><td><strong>Best For</strong></td><td>Flexible research, PyTorch-native, inference</td><td>JAX-based training, transformers at scale</td><td>Frontier model training, Gemini-scale</td></tr>
+        <tr><td><strong>Cost (on-demand)</strong></td><td>$2.93/chip-hr (A100)</td><td>$3.22/chip-hr</td><td>~$4.20/chip-hr</td></tr>
+        <tr><td><strong>Spot/Preemptible</strong></td><td>Yes (60–80% off)</td><td>Yes (preemptible, ~70% off)</td><td>Limited</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout-tip rounded-lg p-4 mb-8">
+    <p class="font-semibold text-green-800 mb-1">TPU Recommendation</p>
+    <p class="text-sm text-green-900">If your team writes JAX and is training transformer-based models &gt;10B parameters, TPU v4/v5p pods are frequently 2–3x more cost-efficient than equivalent GPU clusters. The ICI interconnect eliminates the all-reduce bottleneck entirely. If you need PyTorch or model flexibility (RL loops, custom CUDA kernels), stick with GPU.</p>
+  </div>
+
+  <h3 class="text-xl font-semibold text-gray-800 mb-4">GCS Best Practices for ML</h3>
+  <ul class="list-disc pl-6 text-gray-700 space-y-2 mb-6">
+    <li><strong>Location type:</strong> Use multi-region buckets (<code>US</code>, <code>EU</code>) for training data accessed by jobs across multiple regions. Use single-region buckets co-located with your training cluster for checkpoint I/O.</li>
+    <li><strong>Uniform bucket-level access:</strong> Always enable this. Disables per-object ACLs and enforces IAM-only access control.</li>
+    <li><strong>Parallel composite uploads:</strong> Use <code>gsutil -m cp -Z</code> or the Python storage client with composite uploads for files over 1 GB.</li>
+    <li><strong>Object versioning:</strong> Enable on checkpoint buckets so you can roll back to a previous checkpoint after an experiment goes sideways.</li>
+    <li><strong>Storage class:</strong> Standard for active training data, Nearline (30-day min) for datasets used monthly, Coldline (90-day min) for archives.</li>
+    <li><strong>GCS FUSE:</strong> Mount buckets directly as a filesystem in GKE pods via the GCS FUSE CSI driver — eliminates explicit download steps for training data.</li>
+  </ul>
+
+  <h3 class="text-xl font-semibold text-gray-800 mb-4">GCP Python SDK Examples</h3>
+  <div class="mb-6">
+    <div class="bg-gray-100 rounded-t-lg px-4 py-2 text-xs font-mono text-gray-600 flex items-center justify-between">
+      <span>gcs_ml_operations.py — GCS operations for ML</span>
+      <span class="badge bg-green-100 text-green-700">Python</span>
+    </div>
+    <pre class="rounded-b-lg"><code class="language-python">from google.cloud import storage
+from google.cloud.storage import transfer_manager
+import os
+
+client = storage.Client(project="my-ml-project")
+
+
+# ── Parallel upload of a directory of shards ─────────────────────────────────
+def upload_dataset_directory(local_dir: str, bucket_name: str, prefix: str) -> None:
+    bucket = client.bucket(bucket_name)
+    file_paths = [
+        os.path.join(dp, f)
+        for dp, dn, filenames in os.walk(local_dir)
+        for f in filenames
+    ]
+    blob_names = [
+        os.path.join(prefix, os.path.relpath(fp, local_dir))
+        for fp in file_paths
+    ]
+    results = transfer_manager.upload_many_from_filenames(
+        bucket,
+        file_paths,
+        blob_name_prefix=prefix,
+        max_workers=8,
+    )
+    for path, result in zip(file_paths, results):
+        if isinstance(result, Exception):
+            print(f"FAILED {path}: {result}")
+        else:
+            print(f"Uploaded {path}")
+
+
+# ── Download checkpoint with exponential backoff ─────────────────────────────
+def download_checkpoint(bucket_name: str, blob_name: str, dest_path: str) -> None:
+    from google.api_core.retry import Retry
+    bucket = client.bucket(bucket_name)
+    blob = bucket.blob(blob_name)
+    os.makedirs(os.path.dirname(dest_path), exist_ok=True)
+    blob.download_to_filename(dest_path, retry=Retry())
+    print(f"Downloaded gs://{bucket_name}/{blob_name} → {dest_path}")
+
+
+# ── Set lifecycle policy ──────────────────────────────────────────────────────
+def set_lifecycle_policy(bucket_name: str) -> None:
+    bucket = client.get_bucket(bucket_name)
+    bucket.add_lifecycle_delete_rule(age=90, matches_prefix=["checkpoints/"])
+    bucket.add_lifecycle_transition_rule(
+        age=30,
+        storage_class="NEARLINE",
+        matches_prefix=["datasets/"],
+    )
+    bucket.add_lifecycle_transition_rule(
+        age=90,
+        storage_class="COLDLINE",
+        matches_prefix=["datasets/"],
+    )
+    bucket.patch()
+    print(f"Lifecycle policy updated on {bucket_name}")
+
+
+# ── Vertex AI: launch a custom training job ───────────────────────────────────
+from google.cloud import aiplatform
+
+def launch_vertex_training(
+    project: str,
+    location: str,
+    display_name: str,
+    container_uri: str,
+    staging_bucket: str,
+    machine_type: str = "a2-highgpu-8g",
+    accelerator_type: str = "NVIDIA_TESLA_A100",
+    accelerator_count: int = 8,
+    replica_count: int = 4,
+) -> aiplatform.CustomJob:
+    aiplatform.init(project=project, location=location, staging_bucket=staging_bucket)
+
+    job = aiplatform.CustomJob(
+        display_name=display_name,
+        worker_pool_specs=[
+            {
+                "machine_spec": {
+                    "machine_type": machine_type,
+                    "accelerator_type": accelerator_type,
+                    "accelerator_count": accelerator_count,
+                },
+                "replica_count": replica_count,
+                "container_spec": {
+                    "image_uri": container_uri,
+                    "command": ["python", "-m", "torch.distributed.run"],
+                    "args": [
+                        "--nproc_per_node=8",
+                        "train.py",
+                        "--config=config/llama3_70b.yaml",
+                    ],
+                    "env": [
+                        {"name": "NCCL_DEBUG",   "value": "INFO"},
+                        {"name": "NCCL_IB_DISABLE", "value": "0"},
+                    ],
+                },
+            }
+        ],
+    )
+    job.run(sync=False)
+    print(f"Vertex AI job submitted: {job.resource_name}")
+    return job
+</code></pre>
+  </div>
+
+  <h3 class="text-xl font-semibold text-gray-800 mb-4 mt-10">GCP ML Architecture</h3>
+  <div class="mermaid">
+flowchart LR
+    subgraph Sources["Data Sources"]
+        PubSub["Pub/Sub\nStreaming"]
+        BQ["BigQuery\nBatch"]
+    end
+
+    subgraph DataProc["Data Processing"]
+        Dataflow["Dataflow\n(Apache Beam)"]
+        GCS_raw["GCS\nraw/"]
+        GCS_proc["GCS\nprocessed/"]
+    end
+
+    subgraph Training["Training  (GKE + A100/TPU)"]
+        VAI["Vertex AI\nPipelines"]
+        TrainJob["JAX / PyTorch\nDistributed Job"]
+        GCSFuse["GCS FUSE\nMount"]
+    end
+
+    subgraph Registry["Model Registry"]
+        ArtReg["Artifact Registry\n(Container Images)"]
+        VMR["Vertex AI\nModel Registry"]
+        MLflow2["MLflow\nTracking Server"]
+    end
+
+    subgraph Serving["Serving  (GKE + Cloud Run)"]
+        VEP["Vertex AI\nEndpoint"]
+        CR["Cloud Run\n(lightweight inference)"]
+        CloudLB["Cloud Load\nBalancing"]
+    end
+
+    subgraph Observability["Observability"]
+        CM["Cloud Monitoring"]
+        MM["Model Monitoring\n(drift detection)"]
+    end
+
+    PubSub --> Dataflow --> GCS_raw --> GCS_proc
+    BQ --> GCS_proc
+    GCS_proc --> GCSFuse --> TrainJob
+    VAI --> TrainJob
+    TrainJob -->|"log"| MLflow2
+    TrainJob -->|"push"| ArtReg
+    MLflow2 --> VMR
+    VMR -->|"deploy"| VEP
+    VMR -->|"deploy"| CR
+    VEP --> CloudLB
+    CR --> CloudLB
+    VEP --> CM
+    VEP --> MM
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION 4: AWS vs GCP COMPARISON
+     ============================================================ -->
+<section id="comparison">
+  <h2 class="text-3xl font-bold text-gray-900 mb-2">4. AWS vs GCP Comparison</h2>
+  <p class="text-gray-500 text-sm mb-8">Both are excellent. The right choice depends on your org's existing investments, your team's expertise, and the specific workload.</p>
+
+  <h3 class="text-xl font-semibold text-gray-800 mb-4">Service-by-Service Comparison</h3>
+  <div class="overflow-x-auto mb-8">
+    <table class="w-full rounded-lg overflow-hidden">
+      <thead>
+        <tr><th>Category</th><th>AWS</th><th>GCP</th><th>Notes</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Object Storage</strong></td><td>S3</td><td>GCS</td><td>Functionally equivalent. S3 has more ecosystem integrations; GCS has simpler IAM.</td></tr>
+        <tr><td><strong>Kubernetes</strong></td><td>EKS</td><td>GKE</td><td>GKE is generally considered more mature and easier to operate. EKS requires more manual setup.</td></tr>
+        <tr><td><strong>Serverless Containers</strong></td><td>ECS Fargate / Lambda</td><td>Cloud Run</td><td>Cloud Run is best-in-class for containerized serverless. Lambda has 15-min limit, bad for inference.</td></tr>
+        <tr><td><strong>ML Platform</strong></td><td>SageMaker</td><td>Vertex AI</td><td>SageMaker is more feature-rich and battle-tested. Vertex AI has cleaner APIs and better TPU integration.</td></tr>
+        <tr><td><strong>Foundation Models API</strong></td><td>Bedrock</td><td>Model Garden / Vertex</td><td>Bedrock has Claude (Anthropic), Llama, Titan. Vertex has Gemini, PaLM, Llama.</td></tr>
+        <tr><td><strong>Data Warehouse</strong></td><td>Redshift</td><td>BigQuery</td><td>BigQuery is significantly better: serverless, no tuning required, 10x easier to operate.</td></tr>
+        <tr><td><strong>Streaming</strong></td><td>Kinesis</td><td>Pub/Sub</td><td>Pub/Sub is simpler and more scalable. Kinesis has more precise ordering semantics.</td></tr>
+        <tr><td><strong>ETL</strong></td><td>Glue</td><td>Dataflow (Beam)</td><td>Dataflow is more powerful and flexible. Glue is easier for simple S3-to-Redshift pipelines.</td></tr>
+        <tr><td><strong>Custom Accelerator</strong></td><td>Trainium / Inferentia</td><td>TPU v4/v5p</td><td>TPUs are years ahead in maturity and software ecosystem. Trainium promising but newer.</td></tr>
+        <tr><td><strong>Networking</strong></td><td>Regional VPC</td><td>Global VPC</td><td>GCP's global VPC is a major operational simplification — one network spans all regions.</td></tr>
+        <tr><td><strong>IAM Model</strong></td><td>Roles + Policies (JSON)</td><td>Service Accounts + IAM Bindings</td><td>GCP's model is cleaner and easier to reason about at scale. AWS policies can get complex.</td></tr>
+        <tr><td><strong>Container Registry</strong></td><td>ECR</td><td>Artifact Registry</td><td>Artifact Registry supports multi-format (Docker, Maven, npm, Python). ECR is Docker-only.</td></tr>
+        <tr><td><strong>Secrets</strong></td><td>Secrets Manager</td><td>Secret Manager</td><td>Equivalent functionality. GCP is slightly cheaper per access.</td></tr>
+        <tr><td><strong>Feature Store</strong></td><td>SageMaker Feature Store</td><td>Vertex Feature Store</td><td>Vertex Feature Store v2 (Bigtable-backed) has lower latency for online serving.</td></tr>
+        <tr><td><strong>Parallel FS</strong></td><td>FSx for Lustre</td><td>Filestore (no Lustre equiv)</td><td>AWS FSx Lustre is still unmatched for HPC-style training I/O throughput on GPU clusters.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 class="text-xl font-semibold text-gray-800 mb-4">When to Choose AWS vs GCP</h3>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+    <div class="bg-orange-50 border border-orange-200 rounded-xl p-5">
+      <h4 class="font-bold text-orange-800 mb-3">Choose AWS When…</h4>
+      <ul class="text-sm text-gray-700 space-y-2">
+        <li>Your org already has significant AWS commitments (Enterprise Discount Program)</li>
+        <li>You need FSx for Lustre for HPC-style training I/O</li>
+        <li>Your workload uses services with no GCP equivalent (EMR, Step Functions, etc.)</li>
+        <li>Your team has deep AWS expertise and significant infra already running</li>
+        <li>You want Bedrock for Claude/Anthropic foundation model APIs</li>
+        <li>You need AWS GovCloud for US federal compliance</li>
+        <li>Trainium cost economics work out for your specific PyTorch workload</li>
+      </ul>
+    </div>
+    <div class="bg-blue-50 border border-blue-200 rounded-xl p-5">
+      <h4 class="font-bold text-blue-800 mb-3">Choose GCP When…</h4>
+      <ul class="text-sm text-gray-700 space-y-2">
+        <li>You are training with JAX and want TPU pods (no equivalent on AWS)</li>
+        <li>BigQuery is your primary data warehouse — the ML-native features are unmatched</li>
+        <li>You want Gemini-family models via Vertex AI</li>
+        <li>Your team is Kubernetes-heavy — GKE is best-in-class</li>
+        <li>You want the global VPC simplicity (single network, all regions)</li>
+        <li>Cloud Run's serverless model fits your inference latency / scale pattern</li>
+        <li>Vertex AI Pipelines for managed KFP is a better fit than SageMaker Pipelines</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3 class="text-xl font-semibold text-gray-800 mb-4">Multi-Cloud Considerations</h3>
+  <div class="callout-warn rounded-lg p-4 mb-6">
+    <p class="font-semibold text-yellow-800 mb-1">Warning: Multi-Cloud is Harder Than It Sounds</p>
+    <p class="text-sm text-yellow-900">Every VP who has never managed infrastructure thinks multi-cloud means "not locked in." Every infra engineer who has tried it knows it means double the IAM complexity, double the networking to manage, zero ability to use managed services that cross providers, and 2x higher operational burden. Use multi-cloud only when you have a compelling business reason (regulatory requirement, pricing leverage, specific service only on one cloud). Abstract at the API level (Kubernetes, Terraform) rather than the cloud-service level.</p>
+  </div>
+  <p class="text-gray-700 mb-4">If multi-cloud is required, the least-painful strategy is:</p>
+  <ul class="list-disc pl-6 text-gray-700 space-y-1 mb-4">
+    <li>All training and data pipelines on one primary cloud</li>
+    <li>Inference/serving replicated on secondary cloud for DR or latency</li>
+    <li>Object storage as the boundary — S3 and GCS both support cross-cloud replication policies</li>
+    <li>Kubernetes (EKS + GKE) with a unified control plane (Anthos or Rancher)</li>
+    <li>Terraform for all infra — the provider abstraction prevents cloud-specific drift</li>
+  </ul>
+
+  <h3 class="text-xl font-semibold text-gray-800 mb-4">Cost Comparison: Common ML Workloads</h3>
+  <div class="overflow-x-auto mb-4">
+    <table class="w-full rounded-lg overflow-hidden">
+      <thead>
+        <tr><th>Workload</th><th>AWS Config</th><th>AWS Cost/hr</th><th>GCP Config</th><th>GCP Cost/hr</th><th>Notes</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Single GPU dev</td><td>g5.xlarge (A10G)</td><td>$1.01</td><td>n1 + T4</td><td>$0.95</td><td>Comparable. GCP T4 slightly cheaper.</td></tr>
+        <tr><td>8x A100 training node</td><td>p4d.24xlarge</td><td>$32.77</td><td>a2-highgpu-8g</td><td>$29.39</td><td>GCP ~10% cheaper on-demand.</td></tr>
+        <tr><td>8x H100 training node</td><td>p5.48xlarge</td><td>$98.32</td><td>a3-highgpu-8g</td><td>~$89.00</td><td>GCP slightly cheaper.</td></tr>
+        <tr><td>8x A100 spot/preemptible</td><td>p4d spot</td><td>~$8–12</td><td>a2 preemptible</td><td>~$9</td><td>AWS spot pricing more volatile; can be lower.</td></tr>
+        <tr><td>TPU v4 (8 chips)</td><td>N/A</td><td>—</td><td>tpu-v4-8</td><td>$12.88</td><td>No AWS equivalent; ~2x throughput per dollar for JAX training vs A100.</td></tr>
+        <tr><td>Object storage (1 TB/month)</td><td>S3 Standard</td><td>$23</td><td>GCS Standard</td><td>$20</td><td>GCS slightly cheaper. Egress costs similar.</td></tr>
+        <tr><td>Data warehouse (1 TB scan)</td><td>Redshift (cluster)</td><td>$0.25–1.00</td><td>BigQuery</td><td>$5 (on-demand) / $0 (flat-rate)</td><td>BigQuery on-demand pricier per scan but zero management overhead.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION 5: NETWORKING
+     ============================================================ -->
+<section id="networking">
+  <h2 class="text-3xl font-bold text-gray-900 mb-2">5. Networking for ML</h2>
+  <p class="text-gray-500 text-sm mb-8">Network topology determines whether your 8-node training job saturates at 60% GPU utilization or 95%. Get this right before writing a single training loop.</p>
+
+  <h3 class="text-xl font-semibold text-gray-800 mb-4">VPC Design for ML Workloads</h3>
+  <p class="text-gray-700 mb-4">The canonical ML VPC layout separates public and private subnets across multiple AZs. Training and inference nodes never have public IPs. All outbound internet access routes through a NAT gateway or NAT instance.</p>
+
+  <div class="mermaid">
+flowchart TB
+    subgraph Internet["Internet / Corporate Network"]
+        VPN["VPN / Direct Connect"]
+        CI["CI/CD Systems"]
+    end
+
+    subgraph VPC["VPC  10.0.0.0/8"]
+        subgraph AZ_A["Availability Zone A  10.0.0.0/10"]
+            PubA["Public Subnet\n10.0.0.0/16\n(NAT GW, Load Balancer)"]
+            PrivA_App["Private Subnet (App)\n10.1.0.0/16\n(Inference, APIs)"]
+            PrivA_Train["Private Subnet (Training)\n10.2.0.0/16\n(GPU nodes, batch)"]
+            PrivA_Data["Private Subnet (Data)\n10.3.0.0/16\n(RDS, Redshift)"]
+        end
+        subgraph AZ_B["Availability Zone B  10.64.0.0/10"]
+            PubB["Public Subnet\n10.64.0.0/16"]
+            PrivB_App["Private Subnet (App)\n10.65.0.0/16"]
+            PrivB_Train["Private Subnet (Training)\n10.66.0.0/16"]
+        end
+
+        NAT["NAT Gateway"]
+        IGW["Internet Gateway"]
+        TGW["Transit Gateway\n(connects to on-prem VPCs)"]
+        PlacementGroup["Cluster Placement Group\n(co-locate GPU nodes in AZ-A)"]
+        Endpoints["VPC Endpoints\n(S3, ECR, Secrets Manager)"]
+    end
+
+    VPN --> TGW --> PrivA_Train
+    CI --> IGW --> PubA
+    PubA --> NAT --> PrivA_Train
+    PubA --> NAT --> PrivA_App
+    PrivA_Train --> Endpoints
+    PrivA_Train --> PlacementGroup
+    PrivA_App --> PrivA_Data
+  </div>
+
+  <h3 class="text-xl font-semibold text-gray-800 mb-4 mt-8">Key Networking Decisions</h3>
+
+  <div class="space-y-4 mb-8">
+    <div class="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
+      <h4 class="font-semibold text-gray-800 mb-2">Placement Groups (AWS) / Compact Placement Policies (GCP)</h4>
+      <p class="text-sm text-gray-700">For distributed training, always request a <strong>cluster placement group</strong>. This co-locates your EC2 instances in the same physical rack or row, minimizing the hop count between nodes. Critical for all-reduce operations in NCCL — the difference between a placement group and a randomly scattered fleet can be 2–3x in inter-node bandwidth.</p>
+    </div>
+    <div class="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
+      <h4 class="font-semibold text-gray-800 mb-2">Elastic Fabric Adapter (EFA) — AWS</h4>
+      <p class="text-sm text-gray-700">EFA is AWS's RDMA-capable network interface for HPC/ML workloads. Supported on p4d, p5, trn1. Provides OS-bypass networking — data goes directly to the NIC without going through the OS kernel, eliminating latency. Requires: (1) EFA-enabled instance type, (2) EFA security group rules, (3) NCCL compiled with EFA plugin, (4) cluster placement group. The p5.48xlarge's EFA v3 provides 3200 Gbps aggregate — required for H100 NVLink-scale all-reduce across nodes.</p>
+    </div>
+    <div class="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
+      <h4 class="font-semibold text-gray-800 mb-2">VPC Endpoints</h4>
+      <p class="text-sm text-gray-700">Always create VPC endpoints for S3, ECR, and Secrets Manager. Without endpoints, traffic to these services routes via the NAT gateway, which (a) costs $0.045/GB and (b) adds latency for high-throughput training data reads. S3 gateway endpoints are free. Interface endpoints for ECR, KMS, SageMaker cost ~$7.30/month per AZ but save orders of magnitude more in egress fees.</p>
+    </div>
+    <div class="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
+      <h4 class="font-semibold text-gray-800 mb-2">Security Groups for ML Clusters</h4>
+      <p class="text-sm text-gray-700">Training nodes need: (1) inbound on port 22 from bastion only, (2) inbound on all ports from the same security group (for NCCL inter-node communication), (3) no inbound from 0.0.0.0/0 ever. Inference nodes need: (1) inbound on model serving port (8080, 8501, etc.) from ALB security group only, (2) same-SG rule for cluster gossip.</p>
+    </div>
+  </div>
+
+  <div class="mb-6">
+    <div class="bg-gray-100 rounded-t-lg px-4 py-2 text-xs font-mono text-gray-600 flex items-center justify-between">
+      <span>aws_network_setup.sh — VPC and networking setup</span>
+      <span class="badge bg-gray-200 text-gray-700">Bash</span>
+    </div>
+    <pre class="rounded-b-lg"><code class="language-bash">#!/usr/bin/env bash
+# Create VPC and subnets for an ML training cluster (us-east-1)
+set -euo pipefail
+
+REGION="us-east-1"
+VPC_CIDR="10.0.0.0/16"
+PROJECT_TAG="llm-training"
+
+# ── Create VPC ────────────────────────────────────────────────────────────────
+VPC_ID=$(aws ec2 create-vpc \
+  --cidr-block "$VPC_CIDR" \
+  --region "$REGION" \
+  --tag-specifications "ResourceType=vpc,Tags=[{Key=Name,Value=$PROJECT_TAG-vpc},{Key=Project,Value=$PROJECT_TAG}]" \
+  --query 'Vpc.VpcId' --output text)
+echo "VPC: $VPC_ID"
+
+# ── Enable DNS hostnames (required for EFA) ───────────────────────────────────
+aws ec2 modify-vpc-attribute --vpc-id "$VPC_ID" --enable-dns-hostnames "{\"Value\":true}"
+aws ec2 modify-vpc-attribute --vpc-id "$VPC_ID" --enable-dns-support    "{\"Value\":true}"
+
+# ── Create subnets ────────────────────────────────────────────────────────────
+PRIVATE_SUBNET_AZ_A=$(aws ec2 create-subnet \
+  --vpc-id "$VPC_ID" \
+  --cidr-block "10.0.1.0/24" \
+  --availability-zone "${REGION}a" \
+  --tag-specifications "ResourceType=subnet,Tags=[{Key=Name,Value=$PROJECT_TAG-training-1a}]" \
+  --query 'Subnet.SubnetId' --output text)
+
+PUBLIC_SUBNET=$(aws ec2 create-subnet \
+  --vpc-id "$VPC_ID" \
+  --cidr-block "10.0.0.0/24" \
+  --availability-zone "${REGION}a" \
+  --tag-specifications "ResourceType=subnet,Tags=[{Key=Name,Value=$PROJECT_TAG-public-1a}]" \
+  --query 'Subnet.SubnetId' --output text)
+
+# ── Create cluster placement group for co-located GPU nodes ──────────────────
+aws ec2 create-placement-group \
+  --group-name "$PROJECT_TAG-cluster-pg" \
+  --strategy cluster \
+  --region "$REGION"
+echo "Placement group: $PROJECT_TAG-cluster-pg"
+
+# ── S3 VPC Gateway Endpoint (free, eliminates NAT egress for S3) ──────────────
+RTB_ID=$(aws ec2 describe-route-tables \
+  --filters "Name=vpc-id,Values=$VPC_ID" \
+  --query 'RouteTables[0].RouteTableId' --output text)
+
+aws ec2 create-vpc-endpoint \
+  --vpc-id "$VPC_ID" \
+  --service-name "com.amazonaws.$REGION.s3" \
+  --route-table-ids "$RTB_ID"
+echo "S3 VPC endpoint created"
+
+# ── Security group for training cluster ──────────────────────────────────────
+SG_ID=$(aws ec2 create-security-group \
+  --group-name "$PROJECT_TAG-training-sg" \
+  --description "ML training cluster SG" \
+  --vpc-id "$VPC_ID" \
+  --query 'GroupId' --output text)
+
+# Allow all traffic within the security group (NCCL inter-node)
+aws ec2 authorize-security-group-ingress \
+  --group-id "$SG_ID" \
+  --protocol all \
+  --source-group "$SG_ID"
+
+echo "Security group: $SG_ID"
+echo "Setup complete. Training subnet: $PRIVATE_SUBNET_AZ_A"
+</code></pre>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION 6: STORAGE
+     ============================================================ -->
+<section id="storage">
+  <h2 class="text-3xl font-bold text-gray-900 mb-2">6. Storage Architecture for ML</h2>
+  <p class="text-gray-500 text-sm mb-8">Every storage decision has cost and throughput implications. Understanding the hierarchy prevents "why is my training 40% GPU utilization" conversations at 2am.</p>
+
+  <h3 class="text-xl font-semibold text-gray-800 mb-4">Storage Tiers for ML</h3>
+  <div class="overflow-x-auto mb-8">
+    <table class="w-full rounded-lg overflow-hidden">
+      <thead>
+        <tr><th>Tier</th><th>AWS Option</th><th>GCP Option</th><th>Throughput</th><th>Latency</th><th>Cost ($/GB/mo)</th><th>Use Case</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>NVMe Local SSD</strong></td><td>EC2 Instance Store</td><td>Local SSD (GCE)</td><td>7+ GB/s</td><td>&lt;0.1ms</td><td>Included in instance</td><td>Checkpoint write during training, temp workspace</td></tr>
+        <tr><td><strong>Parallel FS (Hot)</strong></td><td>FSx for Lustre (SSD)</td><td>Filestore (Enterprise)</td><td>100s of GB/s aggregate</td><td>1–5ms</td><td>$0.14–0.19</td><td>Training data reads for large GPU clusters</td></tr>
+        <tr><td><strong>Network SSD</strong></td><td>EBS io2 / gp3</td><td>Hyperdisk Extreme</td><td>1–16 GB/s</td><td>1–2ms</td><td>$0.08–0.26</td><td>OS disk, database, model serving cold start</td></tr>
+        <tr><td><strong>Shared NFS (Warm)</strong></td><td>EFS</td><td>Filestore Basic</td><td>1–3 GB/s</td><td>2–10ms</td><td>$0.30</td><td>Shared code, configs, small datasets</td></tr>
+        <tr><td><strong>Object Store (Hot)</strong></td><td>S3 Standard / Express</td><td>GCS Standard</td><td>1–100+ GB/s (parallel)</td><td>10–100ms</td><td>$0.023</td><td>Primary training data lake, model artifacts</td></tr>
+        <tr><td><strong>Object Store (Warm)</strong></td><td>S3 Infrequent Access</td><td>GCS Nearline</td><td>Same as standard</td><td>Same</td><td>$0.0125</td><td>Datasets used monthly, older model versions</td></tr>
+        <tr><td><strong>Object Store (Cold)</strong></td><td>S3 Glacier IR</td><td>GCS Coldline</td><td>Retrieval minutes</td><td>Minutes</td><td>$0.004</td><td>Historical experiments, compliance archives</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 class="text-xl font-semibold text-gray-800 mb-4">Choosing Storage by ML Artifact Type</h3>
+  <div class="overflow-x-auto mb-8">
+    <table class="w-full rounded-lg overflow-hidden">
+      <thead>
+        <tr><th>Artifact</th><th>Primary Storage</th><th>Why</th><th>Recommended Path Pattern</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Raw training data (TB scale)</td><td>S3 / GCS Standard</td><td>Infinite scale, parallel read via multiple workers</td><td><code>s3://corp-ml-data/raw/{dataset}/{year}/{month}/</code></td></tr>
+        <tr><td>Preprocessed features (WebDataset/Parquet)</td><td>S3 / GCS + FSx Lustre cache</td><td>Cache on FSx for hot path, S3 as source of truth</td><td><code>s3://corp-ml-data/features/{dataset}/v{version}/</code></td></tr>
+        <tr><td>Training checkpoints</td><td>S3 / GCS + instance store buffer</td><td>Write to local NVMe first, async flush to S3</td><td><code>s3://corp-ml-checkpoints/{run_id}/step-{step}/</code></td></tr>
+        <tr><td>Final model weights</td><td>S3 / GCS Standard</td><td>Durability, versioning, lifecycle management</td><td><code>s3://corp-ml-models/{model_name}/{version}/</code></td></tr>
+        <tr><td>Training code + configs</td><td>Git + ECR (container images)</td><td>Reproducibility — never store code in object store</td><td>Docker image tagged with git SHA</td></tr>
+        <tr><td>Experiment metadata</td><td>RDS / Cloud SQL + MLflow / W&amp;B</td><td>Queryable, relational, indexed</td><td>MLflow tracking server with RDS backend</td></tr>
+        <tr><td>Inference model cache</td><td>EBS gp3 / Hyperdisk</td><td>Fast model loading at pod startup</td><td>Baked into container or EBS snapshot</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 class="text-xl font-semibold text-gray-800 mb-4">FSx for Lustre on AWS</h3>
+  <p class="text-gray-700 mb-4">FSx for Lustre is the recommended storage layer when your GPU cluster's data loading is the bottleneck. It is a fully managed parallel filesystem that can be linked to an S3 bucket — training jobs read from the local Lustre mount, and FSx lazily imports objects from S3 on first access (and can be pre-warmed via <code>create-data-repository-task</code>).</p>
+
+  <div class="callout-info rounded-lg p-4 mb-6">
+    <p class="font-semibold text-blue-800 mb-1">FSx Lustre Performance Tiers</p>
+    <ul class="text-sm text-blue-900 list-disc pl-4 space-y-1">
+      <li><strong>Scratch (HDD-backed):</strong> 200 MB/s per TiB, short-lived, no replication. Use for single training runs.</li>
+      <li><strong>Scratch (SSD-backed):</strong> Same but SSD latency. Recommended default for training.</li>
+      <li><strong>Persistent (HDD):</strong> 125/250 MB/s per TiB, 6x replication. Use for datasets accessed by multiple teams.</li>
+      <li><strong>Persistent (SSD):</strong> 500/1000 MB/s per TiB. Use when random access patterns need &lt;1ms latency.</li>
+    </ul>
+  </div>
+
+  <div class="mb-6">
+    <div class="bg-gray-100 rounded-t-lg px-4 py-2 text-xs font-mono text-gray-600 flex items-center justify-between">
+      <span>fsx_lustre_setup.py — Create and link FSx Lustre filesystem to S3</span>
+      <span class="badge bg-blue-100 text-blue-700">Python</span>
+    </div>
+    <pre class="rounded-b-lg"><code class="language-python">import boto3
+
+fsx = boto3.client("fsx", region_name="us-east-1")
+
+
+def create_training_filesystem(
+    subnet_id: str,
+    security_group_id: str,
+    s3_bucket: str,
+    s3_prefix: str = "datasets/",
+    storage_capacity_gib: int = 4800,  # minimum 1200 GiB, must be multiple of 2400
+) -> str:
+    """Create FSx for Lustre linked to S3 for high-throughput training data access."""
+    response = fsx.create_file_system(
+        FileSystemType="LUSTRE",
+        StorageCapacity=storage_capacity_gib,
+        StorageType="SSD",
+        SubnetIds=[subnet_id],
+        SecurityGroupIds=[security_group_id],
+        LustreConfiguration={
+            "ImportPath":           f"s3://{s3_bucket}/{s3_prefix}",
+            "ExportPath":           f"s3://{s3_bucket}/fsx-exports/",
+            "DeploymentType":       "SCRATCH_2",   # fast, no replication
+            "PerUnitStorageThroughput": 200,        # MB/s per TiB
+            "DataCompressionType": "LZ4",           # transparent compression
+        },
+        Tags=[{"Key": "Purpose", "Value": "ml-training"}],
+    )
+    fs_id = response["FileSystem"]["FileSystemId"]
+    dns   = response["FileSystem"]["DNSName"]
+    mount = response["FileSystem"]["LustreConfiguration"]["MountName"]
+    print(f"FSx Lustre created: {fs_id}")
+    print(f"Mount command: mount -t lustre {dns}@tcp:/{mount} /fsx")
+    return fs_id
+
+
+def prewarm_filesystem(fs_id: str) -> str:
+    """Pre-import all S3 objects into Lustre metadata cache before training starts."""
+    response = fsx.create_data_repository_task(
+        Type="IMPORT_METADATA_AND_DATA_REPOSITORY",
+        FileSystemId=fs_id,
+        Paths=["/"],   # import all paths
+        Report={
+            "Enabled": True,
+            "Path": "s3://my-ml-bucket/fsx-import-reports/",
+            "Format": "REPORT_CSV_20191124",
+            "Scope": "FAILED_FILES_ONLY",
+        },
+    )
+    task_id = response["DataRepositoryTask"]["TaskId"]
+    print(f"Pre-warm task submitted: {task_id}")
+    return task_id
+</code></pre>
+  </div>
+
+  <h3 class="text-xl font-semibold text-gray-800 mb-4">Data Transfer Cost Optimization</h3>
+  <div class="callout-warn rounded-lg p-4 mb-4">
+    <p class="font-semibold text-yellow-800 mb-1">Egress Costs Are Real</p>
+    <p class="text-sm text-yellow-900">Data transfer OUT of AWS/GCP costs $0.08–0.09/GB. Downloading a 10 TB training dataset from S3 to a local machine costs ~$800. Always process data in the same region and cloud as your storage. Use VPC endpoints for S3/GCS to eliminate NAT gateway egress charges. Use PrivateLink/Private Service Connect for cross-VPC traffic.</p>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION 7: IAM & SECURITY
+     ============================================================ -->
+<section id="iam">
+  <h2 class="text-3xl font-bold text-gray-900 mb-2">7. IAM &amp; Security</h2>
+  <p class="text-gray-500 text-sm mb-8">Security in ML platforms has unique challenges: training jobs need broad data access, inference services need to call external APIs, and pipelines need to orchestrate dozens of resources — all without storing credentials in code.</p>
+
+  <h3 class="text-xl font-semibold text-gray-800 mb-4">Principle of Least Privilege for ML</h3>
+  <div class="overflow-x-auto mb-8">
+    <table class="w-full rounded-lg overflow-hidden">
+      <thead>
+        <tr><th>Role / Identity</th><th>Required Permissions</th><th>Do NOT Grant</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Training Job</strong></td><td>S3: GetObject, ListBucket on training data bucket; S3: PutObject on checkpoints; Secrets: GetSecretValue for DB credentials; CloudWatch: PutMetricData</td><td>S3:* on all buckets; EC2:* ; IAM:* ; DeleteObject on production data</td></tr>
+        <tr><td><strong>Inference Service</strong></td><td>S3: GetObject on model bucket only; Secrets: GetSecretValue for API keys; CloudWatch: PutMetricData, PutLogEvents</td><td>S3: PutObject; EC2:*; any write permission on production data</td></tr>
+        <tr><td><strong>Data Pipeline</strong></td><td>S3: GetObject raw, PutObject processed; Glue: StartJobRun; EMR: RunJobFlow; CloudWatch: PutMetricData</td><td>IAM:*; S3: DeleteBucket; production inference permissions</td></tr>
+        <tr><td><strong>ML Engineer (human)</strong></td><td>S3: read/write on dev buckets; EC2: start/stop (not create); EKS: kubectl read; CloudWatch: GetMetricData</td><td>IAM:CreateRole; S3 on production data buckets; ECR:Delete* on prod repos</td></tr>
+        <tr><td><strong>CI/CD System</strong></td><td>ECR: PutImage, BatchGetImage; EKS: apply to specific namespaces; S3: PutObject on artifact bucket</td><td>IAM:*; EC2:*; production data access</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 class="text-xl font-semibold text-gray-800 mb-4">IAM Policy Examples</h3>
+  <div class="mb-6">
+    <div class="bg-gray-100 rounded-t-lg px-4 py-2 text-xs font-mono text-gray-600 flex items-center justify-between">
+      <span>iam_policies.py — AWS IAM and GCP IAM policy management</span>
+      <span class="badge bg-blue-100 text-blue-700">Python</span>
+    </div>
+    <pre class="rounded-b-lg"><code class="language-python">import json
+import boto3
+
+iam = boto3.client("iam")
+
+
+# ── AWS: Training job IAM role and policy ─────────────────────────────────────
+TRAINING_JOB_POLICY = {
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid":    "ReadTrainingData",
+            "Effect": "Allow",
+            "Action": ["s3:GetObject", "s3:ListBucket"],
+            "Resource": [
+                "arn:aws:s3:::corp-ml-training-data",
+                "arn:aws:s3:::corp-ml-training-data/*",
+            ],
+        },
+        {
+            "Sid":    "WriteCheckpoints",
+            "Effect": "Allow",
+            "Action": ["s3:PutObject", "s3:GetObject"],
+            "Resource": "arn:aws:s3:::corp-ml-checkpoints/*",
+            "Condition": {
+                "StringEquals": {
+                    "s3:prefix": ["${aws:PrincipalTag/RunId}/*"]
+                }
+            },
+        },
+        {
+            "Sid":    "ReadSecrets",
+            "Effect": "Allow",
+            "Action": ["secretsmanager:GetSecretValue"],
+            "Resource": "arn:aws:secretsmanager:us-east-1:123456789012:secret:ml/training/*",
+        },
+        {
+            "Sid":    "Metrics",
+            "Effect": "Allow",
+            "Action": ["cloudwatch:PutMetricData", "logs:CreateLogGroup",
+                       "logs:CreateLogStream", "logs:PutLogEvents"],
+            "Resource": "*",
+        },
+    ],
+}
+
+
+def create_training_role(role_name: str) -> str:
+    trust_policy = {
+        "Version": "2012-10-17",
+        "Statement": [{
+            "Effect": "Allow",
+            "Principal": {"Service": "ec2.amazonaws.com"},
+            "Action": "sts:AssumeRole",
+        }],
+    }
+    role = iam.create_role(
+        RoleName=role_name,
+        AssumeRolePolicyDocument=json.dumps(trust_policy),
+        Tags=[{"Key": "Purpose", "Value": "ml-training"}],
+    )
+    iam.put_role_policy(
+        RoleName=role_name,
+        PolicyName="MLTrainingPermissions",
+        PolicyDocument=json.dumps(TRAINING_JOB_POLICY),
+    )
+    iam.create_instance_profile(InstanceProfileName=role_name)
+    iam.add_role_to_instance_profile(
+        InstanceProfileName=role_name,
+        RoleName=role_name,
+    )
+    print(f"Created role: {role['Role']['Arn']}")
+    return role["Role"]["Arn"]
+
+
+# ── GCP: Service account and IAM binding for training ─────────────────────────
+from google.cloud import iam_admin_v1
+from google.iam.v1 import iam_policy_pb2
+from google.cloud import storage as gcs
+
+
+def create_gcp_training_service_account(project_id: str, sa_name: str) -> str:
+    """Create a GCP service account for training jobs with least-privilege bindings."""
+    iam_client = iam_admin_v1.IAMClient()
+
+    # Create service account
+    sa = iam_client.create_service_account(
+        name=f"projects/{project_id}",
+        service_account_id=sa_name,
+        service_account=iam_admin_v1.ServiceAccount(
+            display_name="ML Training Service Account",
+            description="Least-privilege SA for distributed training jobs",
+        ),
+    )
+    sa_email = sa.email
+    print(f"Created service account: {sa_email}")
+
+    # Grant GCS read on training data bucket
+    bucket_client = gcs.Client(project=project_id)
+    bucket = bucket_client.bucket("corp-ml-training-data")
+    policy = bucket.get_iam_policy(requested_policy_version=3)
+    policy.bindings.append({
+        "role":    "roles/storage.objectViewer",
+        "members": {f"serviceAccount:{sa_email}"},
+    })
+    bucket.set_iam_policy(policy)
+
+    # Grant GCS write on checkpoints bucket
+    ckpt_bucket = bucket_client.bucket("corp-ml-checkpoints")
+    ckpt_policy = ckpt_bucket.get_iam_policy(requested_policy_version=3)
+    ckpt_policy.bindings.append({
+        "role":    "roles/storage.objectCreator",
+        "members": {f"serviceAccount:{sa_email}"},
+    })
+    ckpt_bucket.set_iam_policy(ckpt_policy)
+
+    return sa_email
+
+
+# ── AWS: Rotate secrets automatically ────────────────────────────────────────
+def store_training_secret(secret_name: str, secret_value: dict) -> str:
+    sm = boto3.client("secretsmanager", region_name="us-east-1")
+    try:
+        response = sm.create_secret(
+            Name=secret_name,
+            SecretString=json.dumps(secret_value),
+            Tags=[{"Key": "Project", "Value": "ml-training"}],
+        )
+    except sm.exceptions.ResourceExistsException:
+        response = sm.put_secret_value(
+            SecretId=secret_name,
+            SecretString=json.dumps(secret_value),
+        )
+    return response["ARN"]
+</code></pre>
+  </div>
+
+  <h3 class="text-xl font-semibold text-gray-800 mb-4">Workload Identity (GCP) and IRSA (AWS)</h3>
+  <p class="text-gray-700 mb-4">Never mount service account JSON keys into Kubernetes pods or bake IAM credentials into container images. Use managed identity instead:</p>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+    <div class="bg-orange-50 border border-orange-200 rounded-xl p-4">
+      <h4 class="font-semibold text-orange-800 mb-2">AWS: IRSA (IAM Roles for Service Accounts)</h4>
+      <ul class="text-sm text-gray-700 space-y-1">
+        <li>1. Create OIDC provider for your EKS cluster</li>
+        <li>2. Create IAM role with trust policy scoped to the K8s service account</li>
+        <li>3. Annotate the K8s ServiceAccount with the IAM role ARN</li>
+        <li>4. AWS SDK automatically uses projected token — no credentials in env vars</li>
+      </ul>
+    </div>
+    <div class="bg-blue-50 border border-blue-200 rounded-xl p-4">
+      <h4 class="font-semibold text-blue-800 mb-2">GCP: Workload Identity Federation</h4>
+      <ul class="text-sm text-gray-700 space-y-1">
+        <li>1. Enable Workload Identity on GKE cluster</li>
+        <li>2. Create GCP service account with required IAM roles</li>
+        <li>3. Bind K8s service account to GCP service account (iam.workloadIdentityUser)</li>
+        <li>4. Annotate K8s SA with GCP SA email</li>
+        <li>5. GCP client libraries automatically exchange the projected token</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION 8: COST OPTIMIZATION
+     ============================================================ -->
+<section id="cost">
+  <h2 class="text-3xl font-bold text-gray-900 mb-2">8. Cost Optimization</h2>
+  <p class="text-gray-500 text-sm mb-8">Cloud bills are the most direct feedback loop between engineering decisions and business impact. At scale, a 20% GPU utilization improvement saves millions per year.</p>
+
+  <h3 class="text-xl font-semibold text-gray-800 mb-4">Cost Optimization Strategies</h3>
+  <div class="overflow-x-auto mb-8">
+    <table class="w-full rounded-lg overflow-hidden">
+      <thead>
+        <tr><th>Strategy</th><th>Applicable To</th><th>Estimated Savings</th><th>Complexity</th><th>Requirements</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Spot / Preemptible Instances</strong></td><td>Training, batch jobs</td><td>60–90%</td><td>Medium</td><td>Checkpointing every N steps; auto-restart logic</td></tr>
+        <tr><td><strong>Reserved / CUD (1-year)</strong></td><td>Production inference</td><td>30–40%</td><td>Low</td><td>Commitment to specific instance type/region</td></tr>
+        <tr><td><strong>Reserved / CUD (3-year)</strong></td><td>Stable inference pods</td><td>50–60%</td><td>Low</td><td>3-year commitment; not suitable for fast-changing workloads</td></tr>
+        <tr><td><strong>GPU Utilization &gt;80%</strong></td><td>Training, inference</td><td>20–40% effective</td><td>High</td><td>Profiling, gradient accumulation, dynamic batching</td></tr>
+        <tr><td><strong>Inference: request batching</strong></td><td>Serving</td><td>30–50% cost per req</td><td>Medium</td><td>Latency tolerance; vLLM/TGI batching config</td></tr>
+        <tr><td><strong>Auto-scaling inference to zero</strong></td><td>Dev/test serving</td><td>Up to 95% (idle time)</td><td>Medium</td><td>KEDA / HPA; cold start tolerable</td></tr>
+        <tr><td><strong>S3/GCS lifecycle tiering</strong></td><td>Data storage</td><td>50–80% on old data</td><td>Low</td><td>Define age thresholds; access pattern analysis</td></tr>
+        <tr><td><strong>Rightsizing instances</strong></td><td>All compute</td><td>10–30%</td><td>Low</td><td>AWS Compute Optimizer / GCP Recommender</td></tr>
+        <tr><td><strong>EFA / GPUDirect RDMA</strong></td><td>Distributed training</td><td>Indirect (faster = less runtime)</td><td>Medium</td><td>Supported instance types; NCCL configuration</td></tr>
+        <tr><td><strong>Quantization (int8/fp8)</strong></td><td>Inference</td><td>50% cost per token</td><td>High</td><td>Quality validation; vLLM/TRT-LLM support</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 class="text-xl font-semibold text-gray-800 mb-4">Spot Instance Training with Auto-Restart</h3>
+  <div class="mb-6">
+    <div class="bg-gray-100 rounded-t-lg px-4 py-2 text-xs font-mono text-gray-600 flex items-center justify-between">
+      <span>spot_training_launcher.py — Fault-tolerant spot training with checkpointing</span>
+      <span class="badge bg-blue-100 text-blue-700">Python</span>
+    </div>
+    <pre class="rounded-b-lg"><code class="language-python">import boto3
+import time
+import signal
+import sys
+import os
+import torch
+from pathlib import Path
+
+# ── Checkpoint utilities ──────────────────────────────────────────────────────
+CHECKPOINT_DIR = Path("/fsx/checkpoints")
+S3_CHECKPOINT_BUCKET = "corp-ml-checkpoints"
+RUN_ID = os.environ.get("RUN_ID", "default-run")
+
+s3 = boto3.client("s3")
+
+
+def save_checkpoint(model, optimizer, step: int, loss: float) -> None:
+    """Save checkpoint to local NVMe then async-upload to S3."""
+    ckpt_path = CHECKPOINT_DIR / f"step-{step}.pt"
+    CHECKPOINT_DIR.mkdir(parents=True, exist_ok=True)
+    torch.save({
+        "step":            step,
+        "model_state":     model.state_dict(),
+        "optimizer_state": optimizer.state_dict(),
+        "loss":            loss,
+    }, ckpt_path)
+    # Upload to S3 (blocking here; use background thread in production)
+    s3_key = f"{RUN_ID}/step-{step}.pt"
+    s3.upload_file(str(ckpt_path), S3_CHECKPOINT_BUCKET, s3_key)
+    print(f"Checkpoint saved: step={step}, s3://{S3_CHECKPOINT_BUCKET}/{s3_key}")
+
+
+def load_latest_checkpoint(model, optimizer) -> int:
+    """Find and load the latest checkpoint from S3."""
+    paginator = s3.get_paginator("list_objects_v2")
+    keys = []
+    for page in paginator.paginate(Bucket=S3_CHECKPOINT_BUCKET, Prefix=f"{RUN_ID}/"):
+        keys += [obj["Key"] for obj in page.get("Contents", [])]
+    if not keys:
+        print("No checkpoint found, starting from scratch.")
+        return 0
+    latest_key = sorted(keys, key=lambda k: int(k.split("step-")[1].replace(".pt", "")))[-1]
+    local_path = CHECKPOINT_DIR / "latest.pt"
+    s3.download_file(S3_CHECKPOINT_BUCKET, latest_key, str(local_path))
+    ckpt = torch.load(str(local_path), map_location="cuda")
+    model.load_state_dict(ckpt["model_state"])
+    optimizer.load_state_dict(ckpt["optimizer_state"])
+    start_step = ckpt["step"]
+    print(f"Resumed from step {start_step} (key: {latest_key})")
+    return start_step
+
+
+# ── Spot interruption handler ─────────────────────────────────────────────────
+_interrupted = False
+
+def _handle_spot_interruption(signum, frame):
+    """AWS sends SIGTERM 2 minutes before reclaiming a spot instance."""
+    global _interrupted
+    print("SPOT INTERRUPTION SIGNAL RECEIVED — saving checkpoint before shutdown.")
+    _interrupted = True
+
+signal.signal(signal.SIGTERM, _handle_spot_interruption)
+
+
+# ── Main training loop with checkpointing ────────────────────────────────────
+def train(model, optimizer, dataloader, total_steps: int, checkpoint_every: int = 500):
+    global _interrupted
+    start_step = load_latest_checkpoint(model, optimizer)
+
+    for step, batch in enumerate(dataloader, start=start_step):
+        if _interrupted:
+            print(f"Saving emergency checkpoint at step {step}...")
+            save_checkpoint(model, optimizer, step, float("nan"))
+            sys.exit(0)   # exit cleanly; SQS/orchestrator will requeue
+
+        loss = model(batch)
+        loss.backward()
+        optimizer.step()
+        optimizer.zero_grad()
+
+        if step % checkpoint_every == 0:
+            save_checkpoint(model, optimizer, step, loss.item())
+
+        if step >= total_steps:
+            break
+
+    save_checkpoint(model, optimizer, total_steps, loss.item())
+    print("Training complete.")
+</code></pre>
+  </div>
+
+  <h3 class="text-xl font-semibold text-gray-800 mb-4">Cost Allocation Tags</h3>
+  <p class="text-gray-700 mb-4">Enforce tagging at the account level to break down bills by team, project, and environment. On AWS, use Service Control Policies (SCPs) to deny resource creation without required tags. On GCP, use Organization Policy constraints to require labels.</p>
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+    <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 text-center text-sm"><code>Project</code><br><span class="text-gray-500 text-xs">llm-training-v2</span></div>
+    <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 text-center text-sm"><code>Environment</code><br><span class="text-gray-500 text-xs">prod / dev / research</span></div>
+    <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 text-center text-sm"><code>Team</code><br><span class="text-gray-500 text-xs">infra / research / product</span></div>
+    <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 text-center text-sm"><code>CostCenter</code><br><span class="text-gray-500 text-xs">CC-1234</span></div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION 9: PRACTICAL SETUP
+     ============================================================ -->
+<section id="setup">
+  <h2 class="text-3xl font-bold text-gray-900 mb-2">9. Practical Setup Guide</h2>
+  <p class="text-gray-500 text-sm mb-8">Day one. Here is how to go from nothing to a working ML environment on both clouds in under 2 hours.</p>
+
+  <h3 class="text-xl font-semibold text-gray-800 mb-4">AWS: First ML Environment</h3>
+  <div class="mb-6">
+    <div class="bg-gray-100 rounded-t-lg px-4 py-2 text-xs font-mono text-gray-600 flex items-center justify-between">
+      <span>aws_ml_bootstrap.sh — Bootstrap an ML environment on AWS</span>
+      <span class="badge bg-gray-200 text-gray-700">Bash</span>
+    </div>
+    <pre class="rounded-b-lg"><code class="language-bash">#!/usr/bin/env bash
+# ── 0. Prerequisites ──────────────────────────────────────────────────────────
+# aws CLI v2, kubectl, eksctl, helm, python 3.11+
+set -euo pipefail
+
+PROJECT="my-ml-project"
+REGION="us-east-1"
+ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+
+echo "Bootstrapping ML environment for account $ACCOUNT_ID in $REGION"
+
+# ── 1. S3 buckets ─────────────────────────────────────────────────────────────
+for BUCKET in \
+  "$PROJECT-training-data" \
+  "$PROJECT-checkpoints" \
+  "$PROJECT-models" \
+  "$PROJECT-artifacts"; do
+  aws s3api create-bucket \
+    --bucket "$BUCKET" \
+    --region "$REGION" \
+    --create-bucket-configuration LocationConstraint="$REGION" 2>/dev/null || true
+
+  aws s3api put-bucket-versioning \
+    --bucket "$BUCKET" \
+    --versioning-configuration Status=Enabled
+
+  aws s3api put-public-access-block \
+    --bucket "$BUCKET" \
+    --public-access-block-configuration \
+      "BlockPublicAcls=true,IgnorePublicAcls=true,BlockPublicPolicy=true,RestrictPublicBuckets=true"
+
+  echo "Bucket ready: s3://$BUCKET"
+done
+
+# ── 2. ECR repository ─────────────────────────────────────────────────────────
+aws ecr create-repository \
+  --repository-name "$PROJECT/training" \
+  --region "$REGION" \
+  --image-scanning-configuration scanOnPush=true 2>/dev/null || true
+
+aws ecr create-repository \
+  --repository-name "$PROJECT/serving" \
+  --region "$REGION" \
+  --image-scanning-configuration scanOnPush=true 2>/dev/null || true
+
+ECR_URI="$ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com"
+echo "ECR login: aws ecr get-login-password | docker login --username AWS --password-stdin $ECR_URI"
+
+# ── 3. EKS cluster (managed node groups with GPU support) ─────────────────────
+cat > /tmp/eks-cluster.yaml << EOF
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+metadata:
+  name: $PROJECT-cluster
+  region: $REGION
+  version: "1.30"
+
+managedNodeGroups:
+  - name: cpu-workers
+    instanceType: m5.2xlarge
+    minSize: 2
+    maxSize: 10
+    desiredCapacity: 2
+    volumeSize: 100
+    labels: {role: cpu-worker}
+    tags: {Project: $PROJECT}
+
+  - name: gpu-workers
+    instanceType: g5.xlarge
+    minSize: 0
+    maxSize: 20
+    desiredCapacity: 0            # scale to zero when idle
+    volumeSize: 200
+    labels: {role: gpu-worker}
+    taints:
+      - key: nvidia.com/gpu
+        value: "true"
+        effect: NoSchedule
+    tags: {Project: $PROJECT}
+EOF
+
+eksctl create cluster -f /tmp/eks-cluster.yaml
+echo "EKS cluster created: $PROJECT-cluster"
+
+# ── 4. Install NVIDIA device plugin + cluster autoscaler ─────────────────────
+kubectl apply -f https://raw.githubusercontent.com/NVIDIA/k8s-device-plugin/v0.16.0/deployments/static/nvidia-device-plugin.yml
+
+helm repo add autoscaler https://kubernetes.github.io/autoscaler
+helm install cluster-autoscaler autoscaler/cluster-autoscaler \
+  --set "autoDiscovery.clusterName=$PROJECT-cluster" \
+  --set "awsRegion=$REGION" \
+  --namespace kube-system
+
+echo "Setup complete. Run: kubectl get nodes"
+</code></pre>
+  </div>
+
+  <h3 class="text-xl font-semibold text-gray-800 mb-4">GCP: First ML Environment</h3>
+  <div class="mb-6">
+    <div class="bg-gray-100 rounded-t-lg px-4 py-2 text-xs font-mono text-gray-600 flex items-center justify-between">
+      <span>gcp_ml_bootstrap.sh — Bootstrap an ML environment on GCP</span>
+      <span class="badge bg-green-100 text-green-700">Bash</span>
+    </div>
+    <pre class="rounded-b-lg"><code class="language-bash">#!/usr/bin/env bash
+# ── 0. Prerequisites ──────────────────────────────────────────────────────────
+# gcloud CLI, kubectl, helm, python 3.11+
+set -euo pipefail
+
+PROJECT_ID="my-ml-project-001"
+REGION="us-central1"
+ZONE="us-central1-a"
+
+echo "Bootstrapping ML environment in project $PROJECT_ID"
+
+# ── 1. Enable required APIs ───────────────────────────────────────────────────
+gcloud services enable \
+  container.googleapis.com \
+  storage.googleapis.com \
+  aiplatform.googleapis.com \
+  artifactregistry.googleapis.com \
+  secretmanager.googleapis.com \
+  monitoring.googleapis.com \
+  --project="$PROJECT_ID"
+
+# ── 2. GCS buckets ────────────────────────────────────────────────────────────
+for SUFFIX in training-data checkpoints models artifacts; do
+  BUCKET="${PROJECT_ID}-${SUFFIX}"
+  gcloud storage buckets create "gs://$BUCKET" \
+    --location="$REGION" \
+    --uniform-bucket-level-access \
+    --project="$PROJECT_ID" 2>/dev/null || true
+
+  # Enable object versioning on checkpoints
+  if [[ "$SUFFIX" == "checkpoints" ]]; then
+    gcloud storage buckets update "gs://$BUCKET" --versioning
+  fi
+
+  echo "Bucket ready: gs://$BUCKET"
+done
+
+# ── 3. Artifact Registry ──────────────────────────────────────────────────────
+gcloud artifacts repositories create ml-images \
+  --repository-format=docker \
+  --location="$REGION" \
+  --description="ML training and serving images" \
+  --project="$PROJECT_ID" 2>/dev/null || true
+
+echo "Artifact Registry: ${REGION}-docker.pkg.dev/${PROJECT_ID}/ml-images"
+
+# ── 4. GKE cluster with GPU node pool ────────────────────────────────────────
+gcloud container clusters create "$PROJECT_ID-cluster" \
+  --zone="$ZONE" \
+  --machine-type="n2-standard-4" \
+  --num-nodes=2 \
+  --enable-autoscaling --min-nodes=1 --max-nodes=10 \
+  --workload-pool="${PROJECT_ID}.svc.id.goog" \
+  --enable-ip-alias \
+  --no-enable-basic-auth \
+  --project="$PROJECT_ID"
+
+# Add GPU node pool (starts at 0, scales up on demand)
+gcloud container node-pools create gpu-pool \
+  --cluster="$PROJECT_ID-cluster" \
+  --zone="$ZONE" \
+  --machine-type="a2-highgpu-1g" \
+  --accelerator="type=nvidia-tesla-a100,count=1" \
+  --num-nodes=0 \
+  --enable-autoscaling --min-nodes=0 --max-nodes=8 \
+  --node-taints="nvidia.com/gpu=present:NoSchedule" \
+  --project="$PROJECT_ID"
+
+# Install NVIDIA drivers via DaemonSet
+kubectl apply -f https://raw.githubusercontent.com/GoogleCloudPlatform/container-engine-accelerators/master/nvidia-driver-installer/cos/daemonset-preloaded.yaml
+
+# ── 5. Enable Workload Identity for default namespace ─────────────────────────
+gcloud container clusters get-credentials "$PROJECT_ID-cluster" \
+  --zone="$ZONE" --project="$PROJECT_ID"
+
+echo "GKE cluster ready: $PROJECT_ID-cluster"
+echo "Run: kubectl get nodes -o wide"
+</code></pre>
+  </div>
+
+  <h3 class="text-xl font-semibold text-gray-800 mb-4">Terraform Preview</h3>
+  <div class="callout-info rounded-lg p-4 mb-4">
+    <p class="font-semibold text-blue-800 mb-1">Chapter 3: Infrastructure as Code</p>
+    <p class="text-sm text-blue-900">The CLI commands above are great for understanding what is being created, but production infrastructure should always be defined as code using Terraform. Chapter 3 covers Terraform in depth: provider configuration, state management, modules, workspaces, and full end-to-end ML platform definitions for both AWS and GCP. You will never run <code>aws ec2 create-*</code> by hand in production after reading it.</p>
+  </div>
+</section>
+
+<!-- ============================================================
+     KEY TAKEAWAYS
+     ============================================================ -->
+<section id="takeaways" class="bg-gray-50 border border-gray-200 rounded-2xl p-8">
+  <h2 class="text-2xl font-bold text-gray-900 mb-6">Key Takeaways</h2>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="flex gap-3">
+      <span class="text-blue-500 font-bold text-lg mt-0.5">1.</span>
+      <p class="text-gray-700 text-sm"><strong>VPC-first:</strong> Every ML resource lives inside a VPC. Training and inference nodes have no public IPs. All S3/GCS access goes through VPC endpoints, not NAT gateways.</p>
+    </div>
+    <div class="flex gap-3">
+      <span class="text-blue-500 font-bold text-lg mt-0.5">2.</span>
+      <p class="text-gray-700 text-sm"><strong>Spot/Preemptible for training:</strong> Implement checkpoint-and-resume before committing to on-demand. 60–90% cost savings make the engineering investment worthwhile after the second training run.</p>
+    </div>
+    <div class="flex gap-3">
+      <span class="text-blue-500 font-bold text-lg mt-0.5">3.</span>
+      <p class="text-gray-700 text-sm"><strong>Storage hierarchy matters:</strong> FSx Lustre / Filestore for active training data, S3/GCS for everything else. Never let training jobs pull from S3 directly at high throughput — the latency variance destroys GPU utilization.</p>
+    </div>
+    <div class="flex gap-3">
+      <span class="text-blue-500 font-bold text-lg mt-0.5">4.</span>
+      <p class="text-gray-700 text-sm"><strong>EFA / GPUDirect RDMA:</strong> On AWS, always use EFA with cluster placement groups for multi-node training. The difference in all-reduce bandwidth vs standard ethernet is 5–10x.</p>
+    </div>
+    <div class="flex gap-3">
+      <span class="text-blue-500 font-bold text-lg mt-0.5">5.</span>
+      <p class="text-gray-700 text-sm"><strong>IAM is not optional:</strong> Use IRSA (AWS) or Workload Identity (GCP) for all pod-level credentials. No JSON keys in containers. No wildcard <code>s3:*</code> permissions. Scope every role to the minimum required.</p>
+    </div>
+    <div class="flex gap-3">
+      <span class="text-blue-500 font-bold text-lg mt-0.5">6.</span>
+      <p class="text-gray-700 text-sm"><strong>GCP for JAX/TPU, AWS for PyTorch/FSx:</strong> Both clouds run excellent ML workloads. The tipping point is (a) TPU pods for JAX → GCP, (b) FSx Lustre for HPC-style I/O → AWS, (c) existing org commitments trump everything.</p>
+    </div>
+    <div class="flex gap-3">
+      <span class="text-blue-500 font-bold text-lg mt-0.5">7.</span>
+      <p class="text-gray-700 text-sm"><strong>BigQuery over Redshift:</strong> If you are on GCP, BigQuery is a serious operational simplification. Zero cluster management, automatic scaling, and native ML integration via BQML. Redshift requires tuning, cluster sizing, and vacuuming.</p>
+    </div>
+    <div class="flex gap-3">
+      <span class="text-blue-500 font-bold text-lg mt-0.5">8.</span>
+      <p class="text-gray-700 text-sm"><strong>Tag everything:</strong> Enforce cost allocation tags at the org/account level from day one. Retroactively attributing cloud spend to teams and projects in a $5M/month environment without tags is an exercise in pain.</p>
+    </div>
+  </div>
+</section>
+
+</div><!-- /max-w-5xl -->
+
+<!-- BOTTOM NAV -->
+<div class="border-t border-gray-200 bg-gray-50 mt-16">
+  <div class="max-w-5xl mx-auto px-6 py-8 flex items-center justify-between">
+    <a href="ch01_intro_mlops.html" class="flex items-center gap-2 text-gray-600 hover:text-blue-600 transition text-sm font-medium">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+      Chapter 1: Introduction to MLOps
+    </a>
+    <span class="text-gray-400 text-sm">Chapter 2 of N</span>
+    <a href="ch03_iac_terraform.html" class="flex items-center gap-2 text-gray-600 hover:text-blue-600 transition text-sm font-medium">
+      Chapter 3: Infrastructure as Code
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+    </a>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 18B: DeepSeek R1 &amp; Lessons - Modern MLOps Tutorial</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script>hljs.highlightAll(); mermaid.initialize({startOnLoad:true, theme:'default'});</script>
+  <style>
+    :root { --primary: #2563eb; --secondary: #059669; --text: #1f2937; }
+    body { color: var(--text); font-family: 'Inter', system-ui, sans-serif; }
+    .nav-link { transition: color 0.15s; }
+    .nav-link:hover { color: #93c5fd; }
+    .toc-link { transition: color 0.15s; }
+    .toc-link:hover { color: var(--primary); }
+    .toc-link.active { color: var(--primary); font-weight: 600; border-left: 2px solid var(--primary); padding-left: 0.5rem; }
+    .callout-info { border-left: 4px solid #2563eb; background: #eff6ff; }
+    .callout-tip  { border-left: 4px solid #059669; background: #ecfdf5; }
+    .callout-warning { border-left: 4px solid #d97706; background: #fffbeb; }
+    .callout-note { border-left: 4px solid #7c3aed; background: #f5f3ff; }
+    table { border-collapse: collapse; width: 100%; }
+    thead { background: #2563eb; color: white; }
+    tbody tr:nth-child(even) { background: #f8fafc; }
+    tbody tr:nth-child(odd)  { background: #ffffff; }
+    tbody tr:hover { background: #eff6ff; }
+    td, th { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid #e2e8f0; }
+    .mermaid { background: #fff; padding: 1rem; border-radius: 0.5rem; }
+    pre code { font-size: 0.875rem; }
+    .chapter-badge { background: #2563eb; color: white; font-size: 0.75rem; font-weight: 700; padding: 0.25rem 0.75rem; border-radius: 9999px; letter-spacing: 0.05em; text-transform: uppercase; }
+    .section-anchor { scroll-margin-top: 5rem; }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+<!-- Top Navbar -->
+<nav class="bg-gray-900 text-white sticky top-0 z-50 shadow-lg">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center font-bold text-sm">ML</div>
+        <a href="index.html" class="nav-link font-semibold text-lg tracking-tight">Modern MLOps Tutorial</a>
+      </div>
+      <div class="hidden md:flex items-center gap-6 text-sm text-gray-300">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="#toc" class="nav-link">Contents</a>
+        <span class="text-gray-500">|</span>
+        <span class="text-blue-400 font-medium">Chapter 18B of 19</span>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- Chapter Header -->
+<header class="bg-white border-b border-gray-200 shadow-sm">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div class="flex flex-col gap-3">
+      <div class="flex items-center gap-3">
+        <span class="chapter-badge">Chapter 18B</span>
+        <span class="text-sm text-gray-500">DeepSeek Case Study — Part 2</span>
+      </div>
+      <h1 class="text-4xl font-bold text-gray-900 leading-tight">DeepSeek-R1: Reasoning, Distillation &amp; MLOps Lessons</h1>
+      <p class="text-xl text-gray-600 max-w-3xl">How RL-based reasoning, aggressive distillation, and $5.5M training costs are reshaping what's possible for every ML team.</p>
+      <div class="flex flex-wrap items-center gap-6 text-sm text-gray-500 mt-2">
+        <span>~45 min read</span>
+        <span>Staff ML Engineer</span>
+        <span>Updated April 2026</span>
+        <span>Advanced</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Main Layout -->
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+  <div class="flex gap-10">
+
+    <!-- Sidebar TOC -->
+    <aside class="hidden xl:block w-64 flex-shrink-0">
+      <div class="sticky top-24 bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+        <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4" id="toc">On This Page</h3>
+        <nav class="space-y-1 text-sm text-gray-600">
+          <a href="#s1" class="toc-link block py-1">1. R1 Reasoning with RL</a>
+          <a href="#s2" class="toc-link block py-1">2. Distillation from R1</a>
+          <a href="#s3" class="toc-link block py-1">3. Cost Analysis</a>
+          <a href="#s4" class="toc-link block py-1">4. Inference Efficiency</a>
+          <a href="#s5" class="toc-link block py-1">5. Lessons for MLOps</a>
+          <a href="#s6" class="toc-link block py-1">6. Applying to Your Team</a>
+          <a href="#s7" class="toc-link block py-1">7. Broader Impact</a>
+          <a href="#takeaways" class="toc-link block py-1">Key Takeaways</a>
+        </nav>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 min-w-0 space-y-12">
+
+      <!-- Citation Banner -->
+      <div class="callout-info p-4 rounded-lg text-sm">
+        <strong>Primary Sources:</strong> DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning (DeepSeek-AI, 2025, arXiv:2501.12948). DeepSeek-V3 Technical Report (DeepSeek-AI, 2024, arXiv:2412.19437). All claims sourced from these published papers.
+      </div>
+
+      <!-- ─── SECTION 1 ─── -->
+      <section id="s1" class="section-anchor">
+        <h2 class="text-2xl font-bold text-gray-900 mb-1">1. DeepSeek-R1 — Reasoning with RL</h2>
+        <p class="text-gray-500 text-sm mb-6">Source: DeepSeek-R1 paper, arXiv:2501.12948</p>
+
+        <h3 class="text-lg font-semibold text-gray-900 mb-3">The Reasoning Model Paradigm</h3>
+        <p class="text-gray-700 mb-4">DeepSeek-R1 introduced a new training paradigm: rather than teaching reasoning through supervised imitation of chain-of-thought examples, the model is trained via reinforcement learning to <em>discover</em> reasoning strategies. The key insight is that reasoning capability can emerge spontaneously when the model is rewarded for correct answers, without explicit reasoning supervision. This mirrors how humans develop reasoning — through trial, error, and feedback — rather than mimicry.</p>
+
+        <p class="text-gray-700 mb-6">The paper distinguishes two key models: <strong>DeepSeek-R1-Zero</strong>, trained purely with RL on DeepSeek-V3-Base with no SFT cold-start, and <strong>DeepSeek-R1</strong>, which uses a carefully designed pipeline combining cold-start SFT data, RL, and rejection sampling to reach production quality.</p>
+
+        <h3 class="text-lg font-semibold text-gray-900 mb-3">GRPO: Group Relative Policy Optimization</h3>
+        <p class="text-gray-700 mb-4">Standard PPO requires a separate critic (value) network. For LLMs this doubles memory and compute cost. DeepSeek-R1 uses <strong>GRPO</strong> (Group Relative Policy Optimization), introduced in DeepSeek-Math (2024), which eliminates the critic by estimating the baseline from a group of sampled outputs for the same prompt.</p>
+
+        <p class="text-gray-700 mb-3">For a prompt <em>q</em>, GRPO samples a group of <em>G</em> outputs {o<sub>1</sub>...o<sub>G</sub>} and computes relative rewards. The policy gradient objective is:</p>
+
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4 font-mono text-sm">
+          J_GRPO(θ) = E[Σ_i (r_i − mean(r)) / std(r) · log π_θ(o_i | q)] − β · KL[π_θ || π_ref]
+        </div>
+
+        <p class="text-gray-700 mb-6">Where <code>r_i</code> is the reward for output <em>i</em>, the mean and std are computed over the group, and the KL term keeps the policy close to a frozen reference model. No critic network needed — the group average serves as the baseline.</p>
+
+        <!-- Mermaid 1: R1 Training Pipeline -->
+        <h3 class="text-lg font-semibold text-gray-900 mb-3">R1 Training Pipeline</h3>
+        <div class="bg-white border border-gray-200 rounded-xl p-4 mb-6 shadow-sm">
+          <div class="mermaid">
+flowchart TD
+    A[DeepSeek-V3-Base\nPre-trained LLM] --> B[Stage 1: Cold-Start SFT\nFew thousand long-CoT examples\nTeach &lt;think&gt; format]
+    B --> C[Stage 2: Reasoning RL\nGRPO with rule-based rewards\nAccuracy + format rewards\nNo human labels needed]
+    C --> D[Stage 3: Rejection Sampling\nSample from RL model\nFilter correct solutions\nGenerate SFT dataset]
+    D --> E[Stage 4: Full SFT\nReasoning + general capability\nChat + writing + code data]
+    E --> F[Stage 5: RL Alignment\nHelpfulness + harmlessness\nFinal DeepSeek-R1]
+    F --> G[Distillation\nTeacher signals to R1-Distill-{1.5B,7B,8B,14B,32B,70B}]
+
+    style A fill:#dbeafe,stroke:#2563eb
+    style C fill:#ecfdf5,stroke:#059669
+    style F fill:#dbeafe,stroke:#2563eb
+    style G fill:#f5f3ff,stroke:#7c3aed
+          </div>
+        </div>
+
+        <h3 class="text-lg font-semibold text-gray-900 mb-3">Cold Start Problem and Solution</h3>
+        <p class="text-gray-700 mb-4">DeepSeek-R1-Zero (pure RL from base) achieves strong benchmark scores but produces outputs that are hard to read — mixed languages, no clear structure, occasionally incoherent reasoning chains. This is the cold-start problem: RL on a base model without any format guidance produces capable but undeployable models.</p>
+
+        <div class="callout-tip p-4 rounded-lg mb-4">
+          <strong>Solution:</strong> Stage 1 uses a small set (~thousands) of curated long-CoT examples with explicit <code>&lt;think&gt;...&lt;/think&gt;</code> tags to teach format before RL begins. This cold-start SFT dramatically improves readability and RL convergence speed without sacrificing the emergent reasoning properties.
+        </div>
+
+        <h3 class="text-lg font-semibold text-gray-900 mb-3">Thinking Tokens and Chain-of-Thought Emergence</h3>
+        <p class="text-gray-700 mb-4">A striking result from DeepSeek-R1-Zero: when trained purely with RL and accuracy rewards, the model spontaneously develops behaviors including self-verification ("Wait, let me reconsider..."), backtracking, and extended exploration — without ever being shown examples of these patterns. The model also learns to allocate more thinking tokens to harder problems. Average thinking length scales with problem difficulty, mirroring human behavior.</p>
+
+        <p class="text-gray-700 mb-6">The paper calls this an "aha moment" in training — a phase transition where the model shifts from short, direct answers to long deliberative reasoning. This emergence happens because the reward model only checks the final answer, so extended reasoning is instrumentally rewarded.</p>
+
+        <!-- Code 1: GRPO Loss -->
+        <h3 class="text-lg font-semibold text-gray-900 mb-3">GRPO Loss Implementation</h3>
+        <pre><code class="language-python">import torch
+import torch.nn.functional as F
+
+def grpo_loss(
+    log_probs_new: torch.Tensor,   # [G, seq_len] current policy log probs
+    log_probs_old: torch.Tensor,   # [G, seq_len] reference policy log probs
+    rewards: torch.Tensor,         # [G] scalar reward per output
+    kl_coeff: float = 0.04,
+    clip_eps: float = 0.2,
+) -> torch.Tensor:
+    """
+    Group Relative Policy Optimization loss.
+    From DeepSeek-R1 paper (arXiv:2501.12948), Section 3.1.
+
+    Args:
+        log_probs_new: log probabilities under current policy π_θ
+        log_probs_old: log probabilities under reference policy π_ref
+        rewards: scalar reward for each of G sampled outputs
+        kl_coeff: β in the paper, KL penalty coefficient
+        clip_eps: PPO-style probability ratio clip range
+    """
+    G = rewards.shape[0]
+
+    # Normalize rewards within the group (group-relative baseline)
+    reward_mean = rewards.mean()
+    reward_std  = rewards.std() + 1e-8
+    advantages  = (rewards - reward_mean) / reward_std  # [G]
+
+    # Token-level probability ratio (PPO-style clipping)
+    ratio = (log_probs_new - log_probs_old).exp()       # [G, seq_len]
+    adv   = advantages.unsqueeze(1).expand_as(ratio)    # [G, seq_len]
+
+    surr1 = ratio * adv
+    surr2 = ratio.clamp(1 - clip_eps, 1 + clip_eps) * adv
+    policy_loss = -torch.min(surr1, surr2).mean()
+
+    # KL divergence penalty (keep policy near reference)
+    # Approximated as: r - 1 - log(r) per token
+    r = ratio.detach()
+    kl_approx = (r - 1 - r.log()).mean()
+
+    return policy_loss + kl_coeff * kl_approx
+
+
+# Reward functions used in R1 (rule-based, no reward model needed)
+def accuracy_reward(prediction: str, ground_truth: str) -> float:
+    """Binary reward: 1.0 if final answer matches, 0.0 otherwise."""
+    # Extract answer from <answer>...</answer> tags
+    import re
+    match = re.search(r'&lt;answer&gt;(.*?)&lt;/answer&gt;', prediction, re.DOTALL)
+    if not match:
+        return 0.0
+    pred_answer = match.group(1).strip()
+    return 1.0 if pred_answer == ground_truth.strip() else 0.0
+
+
+def format_reward(prediction: str) -> float:
+    """Reward proper use of &lt;think&gt; and &lt;answer&gt; tags."""
+    import re
+    has_think  = bool(re.search(r'&lt;think&gt;.*?&lt;/think&gt;', prediction, re.DOTALL))
+    has_answer = bool(re.search(r'&lt;answer&gt;.*?&lt;/answer&gt;', prediction, re.DOTALL))
+    return 0.5 * int(has_think) + 0.5 * int(has_answer)
+</code></pre>
+
+        <!-- Table 1: R1 vs o1 -->
+        <h3 class="text-lg font-semibold text-gray-900 mb-3 mt-6">R1 vs OpenAI o1 Comparison</h3>
+        <div class="overflow-x-auto rounded-xl shadow-sm mb-4">
+          <table>
+            <thead>
+              <tr><th>Benchmark</th><th>DeepSeek-R1</th><th>OpenAI o1</th><th>DeepSeek-R1-Zero</th><th>Notes</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>AIME 2024 (Pass@1)</td><td><strong>79.8%</strong></td><td>79.2%</td><td>71.0%</td><td>Math olympiad</td></tr>
+              <tr><td>MATH-500</td><td><strong>97.3%</strong></td><td>96.4%</td><td>95.9%</td><td>Competition math</td></tr>
+              <tr><td>Codeforces Rating</td><td>2029</td><td><strong>2061</strong></td><td>1444</td><td>Competitive programming</td></tr>
+              <tr><td>GPQA Diamond</td><td>71.5%</td><td><strong>75.7%</strong></td><td>73.3%</td><td>PhD-level science</td></tr>
+              <tr><td>SWE-bench Verified</td><td>49.2%</td><td>48.9%</td><td>—</td><td>Software engineering</td></tr>
+              <tr><td>MMLU</td><td>90.8%</td><td>91.8%</td><td>—</td><td>General knowledge</td></tr>
+              <tr><td>Training cost</td><td>~$5.5M (V3 base)</td><td>Undisclosed</td><td>—</td><td>V3 pre-training only</td></tr>
+              <tr><td>Weights open</td><td>Yes (MIT)</td><td>No</td><td>Yes (MIT)</td><td>Key differentiator</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-xs text-gray-500 mb-2">Source: DeepSeek-R1 paper Table 1-2, arXiv:2501.12948. o1 scores from OpenAI system card (2024).</p>
+      </section>
+
+      <!-- ─── SECTION 2 ─── -->
+      <section id="s2" class="section-anchor">
+        <h2 class="text-2xl font-bold text-gray-900 mb-1">2. Distillation from R1</h2>
+        <p class="text-gray-500 text-sm mb-6">Source: DeepSeek-R1 paper, Section 4</p>
+
+        <p class="text-gray-700 mb-4">DeepSeek-R1 serves as a teacher to distill reasoning capability into much smaller models (1.5B–70B parameters). The distillation strategy is straightforward: use R1 to generate long-CoT training data via rejection sampling, then fine-tune open-source base models (Qwen2.5, Llama-3) on this data. No RL required for the student models — the teacher's reasoning traces are sufficient.</p>
+
+        <div class="callout-note p-4 rounded-lg mb-6">
+          <strong>Key finding from the paper:</strong> Distilled small models significantly outperform models trained with RL directly from the same small base. RL is expensive and unstable at small scale; distillation from a large reasoning teacher is far more sample-efficient.
+        </div>
+
+        <!-- Table 2: Distilled Model Performance -->
+        <h3 class="text-lg font-semibold text-gray-900 mb-3">Distilled Model Performance</h3>
+        <div class="overflow-x-auto rounded-xl shadow-sm mb-6">
+          <table>
+            <thead>
+              <tr><th>Model</th><th>Base Model</th><th>AIME 2024</th><th>MATH-500</th><th>LiveCodeBench</th><th>GPQA Diamond</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>R1-Distill-Qwen-1.5B</td><td>Qwen2.5-1.5B</td><td>28.9%</td><td>83.9%</td><td>16.9%</td><td>33.8%</td></tr>
+              <tr><td>R1-Distill-Qwen-7B</td><td>Qwen2.5-7B</td><td>55.5%</td><td>92.8%</td><td>37.6%</td><td>49.1%</td></tr>
+              <tr><td>R1-Distill-Llama-8B</td><td>Llama-3.1-8B</td><td>50.4%</td><td>89.1%</td><td>35.6%</td><td>49.0%</td></tr>
+              <tr><td>R1-Distill-Qwen-14B</td><td>Qwen2.5-14B</td><td>69.7%</td><td>93.9%</td><td>53.1%</td><td>59.1%</td></tr>
+              <tr><td>R1-Distill-Qwen-32B</td><td>Qwen2.5-32B</td><td>72.6%</td><td>94.3%</td><td>57.2%</td><td>62.1%</td></tr>
+              <tr><td>R1-Distill-Llama-70B</td><td>Llama-3.3-70B</td><td>70.0%</td><td>94.5%</td><td>57.5%</td><td>65.2%</td></tr>
+              <tr><td>OpenAI o1-mini (ref)</td><td>—</td><td>63.6%</td><td>90.0%</td><td>53.8%</td><td>60.0%</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-xs text-gray-500 mb-6">Source: DeepSeek-R1 paper Table 4, arXiv:2501.12948. R1-Distill-Qwen-32B surpasses o1-mini on all shown benchmarks.</p>
+
+        <!-- Code 2: Distillation Training Setup -->
+        <h3 class="text-lg font-semibold text-gray-900 mb-3">Distillation Training Setup</h3>
+        <pre><code class="language-python">from transformers import AutoModelForCausalLM, AutoTokenizer, TrainingArguments
+from trl import SFTTrainer
+from datasets import load_dataset
+
+# Distillation: fine-tune small model on R1-generated reasoning traces
+# No RL needed — supervised fine-tuning on teacher outputs is sufficient.
+
+def prepare_distillation_dataset(teacher_outputs_path: str):
+    """
+    Load rejection-sampled outputs from DeepSeek-R1 teacher.
+    Format: {"prompt": "...", "response": "&lt;think&gt;...&lt;/think&gt;&lt;answer&gt;...&lt;/answer&gt;"}
+    Only keep samples where the final answer is verifiably correct.
+    """
+    dataset = load_dataset("json", data_files=teacher_outputs_path)
+    # Filter: keep only correct solutions (rejection sampling)
+    dataset = dataset.filter(lambda x: x["is_correct"] == True)
+    return dataset["train"]
+
+
+def train_distilled_model(
+    student_model_id: str = "Qwen/Qwen2.5-7B",
+    distill_data_path: str = "./r1_reasoning_traces.jsonl",
+    output_dir: str = "./r1-distill-qwen-7b",
+):
+    model = AutoModelForCausalLM.from_pretrained(
+        student_model_id, torch_dtype="bfloat16", device_map="auto"
+    )
+    tokenizer = AutoTokenizer.from_pretrained(student_model_id)
+
+    dataset = prepare_distillation_dataset(distill_data_path)
+
+    training_args = TrainingArguments(
+        output_dir=output_dir,
+        num_train_epochs=3,
+        per_device_train_batch_size=2,
+        gradient_accumulation_steps=8,       # effective batch = 16
+        learning_rate=1e-5,                  # lower LR preserves base capabilities
+        lr_scheduler_type="cosine",
+        warmup_ratio=0.05,
+        bf16=True,
+        logging_steps=50,
+        save_strategy="epoch",
+        # Long sequences needed for chain-of-thought
+        max_seq_length=16384,
+    )
+
+    trainer = SFTTrainer(
+        model=model,
+        tokenizer=tokenizer,
+        train_dataset=dataset,
+        dataset_text_field="text",           # pre-formatted prompt+response
+        args=training_args,
+    )
+    trainer.train()
+    trainer.save_model(output_dir)
+</code></pre>
+
+        <div class="callout-tip p-4 rounded-lg mt-6">
+          <strong>When distilled models beat same-size RL models:</strong> At &lt;14B parameters, training with RL directly is unstable — reward hacking, mode collapse, and slow convergence dominate. Distillation from R1 consistently produces better benchmarks scores at 7B and 14B than running GRPO on the same base. The paper recommends RL only for models &gt;32B.
+        </div>
+      </section>
+
+      <!-- ─── SECTION 3 ─── -->
+      <section id="s3" class="section-anchor">
+        <h2 class="text-2xl font-bold text-gray-900 mb-1">3. Cost Analysis</h2>
+        <p class="text-gray-500 text-sm mb-6">Source: DeepSeek-V3 Technical Report, arXiv:2412.19437, Section 2.5</p>
+
+        <p class="text-gray-700 mb-4">DeepSeek-V3 — the base model underlying R1 — was trained for approximately <strong>$5.576M USD</strong> in GPU compute costs. This number comes directly from the V3 technical report: 2.788M H800 GPU-hours at a rental rate of $2/GPU-hour. The 671B parameter MoE model was trained on 14.8 trillion tokens.</p>
+
+        <div class="callout-warning p-4 rounded-lg mb-6">
+          <strong>Caveat:</strong> The $5.5M figure covers only pre-training GPU costs at prevailing cloud rental rates. It excludes: engineering salaries, prior research (V1/V2), evaluation infrastructure, post-training (SFT/RLHF for V3), and hardware amortization for owned clusters. The total project cost is substantially higher. Nevertheless, the algorithmic efficiency gains are genuine and reproducible.
+        </div>
+
+        <!-- Table 3: Training Cost Comparison -->
+        <h3 class="text-lg font-semibold text-gray-900 mb-3">Training Cost Comparison</h3>
+        <div class="overflow-x-auto rounded-xl shadow-sm mb-6">
+          <table>
+            <thead>
+              <tr><th>Model</th><th>Parameters</th><th>Training Tokens</th><th>GPU-Hours</th><th>Est. Compute Cost</th><th>Source</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>GPT-4</td><td>~1.8T (est.)</td><td>~13T (est.)</td><td>~60M A100-hours (est.)</td><td>~$100M</td><td>SemiAnalysis estimate</td></tr>
+              <tr><td>Llama 3 70B</td><td>70B</td><td>15T</td><td>~6.4M GPU-hours (est.)</td><td>~$12M (est.)</td><td>Meta AI blog</td></tr>
+              <tr><td>Llama 3 405B</td><td>405B</td><td>15T</td><td>~30M GPU-hours (est.)</td><td>~$60M (est.)</td><td>Meta AI blog</td></tr>
+              <tr><td><strong>DeepSeek-V3</strong></td><td><strong>671B MoE</strong></td><td><strong>14.8T</strong></td><td><strong>2.788M H800-hours</strong></td><td><strong>$5.576M</strong></td><td><strong>V3 Report §2.5</strong></td></tr>
+              <tr><td>Mistral Large 2</td><td>123B</td><td>—</td><td>Not disclosed</td><td>Not disclosed</td><td>Mistral AI</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-xs text-gray-500 mb-4">GPT-4 and Llama cost estimates are third-party analyses. DeepSeek-V3 figure is from the official technical report. All non-DeepSeek figures are estimates and may be inaccurate.</p>
+
+        <h3 class="text-lg font-semibold text-gray-900 mb-3">H800 vs H100 Performance Delta</h3>
+        <p class="text-gray-700 mb-4">The US export controls (October 2022, October 2023) restrict H100 sales to China; DeepSeek trained on H800 GPUs, which have <strong>NVLink bandwidth reduced from 900 GB/s to 400 GB/s</strong> and reduced FP8 throughput. For dense Transformer models this is a ~15–20% throughput penalty for comparable parameter counts. For MoE models, the penalty was more severe because all-to-all expert routing is communication-bound.</p>
+
+        <p class="text-gray-700 mb-4">This constraint directly motivated <strong>DualPipe</strong> (covered in Ch18A) and the aggressive use of FP8 training — both specifically designed to work around reduced NVLink bandwidth. The hardware constraint became an algorithmic forcing function.</p>
+
+        <!-- Mermaid 2: Cost efficiency breakdown -->
+        <div class="bg-white border border-gray-200 rounded-xl p-4 mb-4 shadow-sm">
+          <div class="mermaid">
+pie title DeepSeek-V3 Compute Budget (~2.788M H800-hours)
+    "Pre-training (14.8T tokens)" : 82
+    "Long-context extension (128K)" : 6
+    "Post-training SFT + RL" : 8
+    "Ablation / eval runs" : 4
+          </div>
+        </div>
+        <p class="text-xs text-gray-500 mb-2">Approximate breakdown based on V3 report. Exact sub-stage costs not fully disclosed.</p>
+      </section>
+
+      <!-- ─── SECTION 4 ─── -->
+      <section id="s4" class="section-anchor">
+        <h2 class="text-2xl font-bold text-gray-900 mb-1">4. Inference Efficiency</h2>
+        <p class="text-gray-500 text-sm mb-6">Source: DeepSeek-V3 Technical Report, arXiv:2412.19437, Section 3</p>
+
+        <h3 class="text-lg font-semibold text-gray-900 mb-3">Prefill/Decode Separation for MoE</h3>
+        <p class="text-gray-700 mb-4">DeepSeek-V3's inference architecture separates prefill (processing the input prompt) and decode (generating tokens autoregressively) onto different node pools. Prefill is compute-bound and benefits from large batches; decode is memory-bandwidth-bound and benefits from high GPU memory. Separating these workloads allows each pool to be optimized independently — a key production engineering insight.</p>
+
+        <h3 class="text-lg font-semibold text-gray-900 mb-3">Expert Routing at Inference</h3>
+        <p class="text-gray-700 mb-4">DeepSeek-V3 uses top-K=8 expert selection from 256 routed experts (plus 1 shared expert per layer). At inference, expert activations can be precomputed and cached across requests. The paper reports that expert load is naturally balanced without auxiliary loss — the token-choice routing with sigmoid gating (replacing softmax) converges to more uniform expert utilization during training, reducing inference-time load imbalance.</p>
+
+        <h3 class="text-lg font-semibold text-gray-900 mb-3">Quantization</h3>
+        <p class="text-gray-700 mb-4">FP8 quantization (used during training) translates directly to inference. The paper uses a block-wise FP8 scheme with separate scaling factors per 128-token block, preserving accuracy within 0.1% on most benchmarks while halving memory footprint and doubling throughput versus BF16. At inference, GPTQ W4A16 (4-bit weights, 16-bit activations) is commonly used for further compression.</p>
+
+        <!-- Code 3: vLLM DeepSeek serving -->
+        <h3 class="text-lg font-semibold text-gray-900 mb-3">vLLM DeepSeek-V3 Serving Configuration</h3>
+        <pre><code class="language-python">from vllm import LLM, SamplingParams
+from vllm.engine.arg_utils import AsyncEngineArgs
+
+# DeepSeek-V3/R1 production serving with vLLM
+# Requires vllm >= 0.6.4 for full MoE+FP8 support
+
+engine_args = AsyncEngineArgs(
+    model="deepseek-ai/DeepSeek-R1",
+    tensor_parallel_size=8,          # 8x H100/H800 per serving replica
+    pipeline_parallel_size=1,        # single-node for latency-optimized serving
+    max_model_len=32768,             # context window
+    gpu_memory_utilization=0.92,
+    # FP8 quantization — matches training precision
+    quantization="fp8",
+    # Enable chunked prefill for long prompts (R1 generates long CoT)
+    enable_chunked_prefill=True,
+    max_num_batched_tokens=8192,
+    # Expert parallelism for MoE layers (vLLM >= 0.6.5)
+    # Distributes experts across GPUs within TP group
+    enable_expert_parallel=True,
+    # KV cache in FP8 for 2x memory savings
+    kv_cache_dtype="fp8",
+)
+
+# Sampling for R1 reasoning mode
+# High max_tokens needed — R1 generates lengthy thinking traces
+reasoning_params = SamplingParams(
+    temperature=0.6,     # paper recommends 0.5-0.7 for reasoning tasks
+    top_p=0.95,
+    max_tokens=16384,    # R1 may use 8K-12K tokens for hard math problems
+)
+
+# For chat/non-reasoning use cases
+chat_params = SamplingParams(
+    temperature=0.7,
+    top_p=0.9,
+    max_tokens=2048,
+)
+
+# Token economics at scale (approximate, 8xH100 node)
+# Prefill:  ~3,000 tokens/sec/GPU  → 24,000 tok/s per node
+# Decode:   ~  150 tokens/sec/GPU  → 1,200 tok/s per node
+# At $3/hr per H100 (cloud), 8-GPU node = $24/hr
+# Decode cost: $24 / (1200 tok/s * 3600 s/hr) = $0.0000056/token = ~$5.6/M tokens
+# (Roughly 10-20x cheaper than GPT-4 at published API rates)
+</code></pre>
+
+        <!-- Table 4: Token Economics -->
+        <h3 class="text-lg font-semibold text-gray-900 mb-3 mt-4">Token Economics Comparison</h3>
+        <div class="overflow-x-auto rounded-xl shadow-sm mb-4">
+          <table>
+            <thead>
+              <tr><th>Model / Provider</th><th>Input ($/M tokens)</th><th>Output ($/M tokens)</th><th>Context</th><th>Reasoning</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>GPT-4o (OpenAI API)</td><td>$2.50</td><td>$10.00</td><td>128K</td><td>No</td></tr>
+              <tr><td>OpenAI o1</td><td>$15.00</td><td>$60.00</td><td>200K</td><td>Yes</td></tr>
+              <tr><td>Claude 3.5 Sonnet</td><td>$3.00</td><td>$15.00</td><td>200K</td><td>No</td></tr>
+              <tr><td><strong>DeepSeek-R1 (API)</strong></td><td><strong>$0.55</strong></td><td><strong>$2.19</strong></td><td>128K</td><td>Yes</td></tr>
+              <tr><td>DeepSeek-V3 (API)</td><td>$0.27</td><td>$1.10</td><td>128K</td><td>No</td></tr>
+              <tr><td>Self-hosted R1 (8xH100)</td><td>~$0.20 (est.)</td><td>~$5.60</td><td>32K</td><td>Yes</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-xs text-gray-500">DeepSeek API pricing as of Q1 2025. Self-hosted estimates based on cloud H100 rates. R1 thinking tokens counted as output tokens.</p>
+      </section>
+
+      <!-- ─── SECTION 5 ─── -->
+      <section id="s5" class="section-anchor">
+        <h2 class="text-2xl font-bold text-gray-900 mb-1">5. Lessons for MLOps Engineers</h2>
+        <p class="text-gray-500 text-sm mb-6">Synthesized from DeepSeek-V3 and R1 papers</p>
+
+        <div class="space-y-6">
+          <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+            <div class="flex items-start gap-4">
+              <div class="w-10 h-10 bg-blue-600 text-white rounded-lg flex items-center justify-center font-bold text-sm flex-shrink-0">L1</div>
+              <div>
+                <h3 class="font-semibold text-gray-900 mb-2">Architecture Innovation Can Beat Raw Compute</h3>
+                <p class="text-gray-700">MLA (Multi-head Latent Attention) reduces KV cache memory by 93% vs standard MHA. MoE activates only 37B of 671B parameters per token. These are algorithmic wins that compound — a smaller memory footprint means larger batches, faster iteration, and lower cost, regardless of hardware budget. The V3 training efficiency gap vs GPT-4 estimates is primarily architectural, not just hardware pricing.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+            <div class="flex items-start gap-4">
+              <div class="w-10 h-10 bg-green-600 text-white rounded-lg flex items-center justify-center font-bold text-sm flex-shrink-0">L2</div>
+              <div>
+                <h3 class="font-semibold text-gray-900 mb-2">Hardware Constraints Drive Algorithmic Creativity</h3>
+                <p class="text-gray-700">Restricted to H800 GPUs (reduced NVLink bandwidth), DeepSeek invented DualPipe and optimized all-to-all communication to hide latency behind computation. Constraint-driven engineering produced techniques that benefit the entire field. When your team faces GPU limits, treat them as design constraints — not blockers.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+            <div class="flex items-start gap-4">
+              <div class="w-10 h-10 bg-purple-600 text-white rounded-lg flex items-center justify-center font-bold text-sm flex-shrink-0">L3</div>
+              <div>
+                <h3 class="font-semibold text-gray-900 mb-2">MoE Is Now Viable for Production</h3>
+                <p class="text-gray-700">Prior MoE models (GShard, Switch Transformer) had training instability and load balancing issues. DeepSeek-V3 demonstrates that with auxiliary-loss-free load balancing and modern frameworks, MoE trains stably and serves efficiently. If you're planning a custom model at 7B+ parameters, MoE should be the default consideration — not an advanced option.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+            <div class="flex items-start gap-4">
+              <div class="w-10 h-10 bg-orange-600 text-white rounded-lg flex items-center justify-center font-bold text-sm flex-shrink-0">L4</div>
+              <div>
+                <h3 class="font-semibold text-gray-900 mb-2">RL for Reasoning Is a New Paradigm (Not Just RLHF)</h3>
+                <p class="text-gray-700">RLHF aligns tone and safety. GRPO in R1 teaches <em>how to think</em>. The key differences: reward is rule-based (answer correctness), no reward model needed, and the emergent behaviors (self-verification, backtracking) were not explicitly programmed. For domains with verifiable correctness — math, code, science QA, structured data extraction — this approach is directly applicable to your team's models.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+            <div class="flex items-start gap-4">
+              <div class="w-10 h-10 bg-red-600 text-white rounded-lg flex items-center justify-center font-bold text-sm flex-shrink-0">L5</div>
+              <div>
+                <h3 class="font-semibold text-gray-900 mb-2">Open Weights Enable Rapid Ecosystem Growth</h3>
+                <p class="text-gray-700">Within two weeks of R1 release, the community had: GGUF quantizations for local inference, Ollama integration, fine-tuned variants for specific domains, and GRPO training frameworks (TRL, LlamaFactory). MIT license means commercial use is permitted. Open weights with open methodology (the technical report) allows the field to build on, verify, and extend the work — something closed APIs cannot provide.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Table 5: Technical Innovations Summary -->
+        <h3 class="text-lg font-semibold text-gray-900 mb-3 mt-8">Technical Innovations and Reusable Patterns</h3>
+        <div class="overflow-x-auto rounded-xl shadow-sm">
+          <table>
+            <thead>
+              <tr><th>Innovation</th><th>Paper</th><th>Problem Solved</th><th>Reusable By Your Team?</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>GRPO</td><td>R1 (2501.12948)</td><td>RL without critic network</td><td>Yes — TRL library supports GRPO</td></tr>
+              <tr><td>Rejection sampling SFT</td><td>R1 §3.3</td><td>Generate reasoning training data</td><td>Yes — any verifiable task</td></tr>
+              <tr><td>MLA (Multi-head Latent Attention)</td><td>V3 (2412.19437)</td><td>KV cache compression 93%</td><td>Custom models only</td></tr>
+              <tr><td>FP8 training</td><td>V3 §2.5</td><td>2x throughput vs BF16</td><td>Yes — transformer_engine / nanotron</td></tr>
+              <tr><td>Auxiliary-loss-free MoE routing</td><td>V3 §2.3</td><td>Stable MoE training</td><td>Yes — Mixtral and custom MoE</td></tr>
+              <tr><td>Prefill/decode separation</td><td>V3 §3</td><td>Optimize serving for MoE</td><td>Yes — vLLM disaggregated serving</td></tr>
+              <tr><td>Cold-start SFT before RL</td><td>R1 §3.2</td><td>Format stability in reasoning</td><td>Yes — any GRPO training</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ─── SECTION 6 ─── -->
+      <section id="s6" class="section-anchor">
+        <h2 class="text-2xl font-bold text-gray-900 mb-1">6. Applying DeepSeek Insights to Your Team</h2>
+        <p class="text-gray-500 text-sm mb-6">Practical adoption paths for teams without frontier-scale resources</p>
+
+        <h3 class="text-lg font-semibold text-gray-900 mb-3">MoE at Smaller Scale with Mixtral 8x7B</h3>
+        <p class="text-gray-700 mb-4">You don't need 671B parameters to benefit from MoE. Mixtral 8x7B (56B parameters, 13B active) is the most accessible entry point. It outperforms Llama 2 70B on most benchmarks while being faster at inference due to sparse activation. Running it with vLLM provides a production-ready DeepSeek-inspired MoE deployment.</p>
+
+        <!-- Code 4: Mixtral vLLM deployment -->
+        <pre><code class="language-python">from vllm import LLM, SamplingParams
+import os
+
+# Mixtral 8x7B — MoE deployment inspired by DeepSeek patterns
+# Demonstrates sparse expert routing at accessible scale
+# Requires: ~90GB GPU RAM (2x A100-80GB or 4x A40-48GB)
+
+def deploy_mixtral_moe(
+    tensor_parallel_size: int = 2,
+    max_model_len: int = 32768,
+):
+    """
+    Deploy Mixtral 8x7B as a DeepSeek-inspired MoE serving stack.
+    Applies: prefill/decode batching, FP8-equivalent (AWQ), expert parallelism.
+    """
+    llm = LLM(
+        model="mistralai/Mixtral-8x7B-Instruct-v0.1",
+        tensor_parallel_size=tensor_parallel_size,
+        max_model_len=max_model_len,
+        # AWQ 4-bit quantization — reduces to ~25GB, fits 2x A100-40GB
+        quantization="awq",
+        gpu_memory_utilization=0.90,
+        # Chunked prefill handles long prompts efficiently
+        enable_chunked_prefill=True,
+        max_num_batched_tokens=4096,
+        # Swap KV blocks to CPU for larger effective context
+        swap_space=4,  # GB
+    )
+    return llm
+
+
+def run_domain_reasoning(llm: LLM, prompt: str, domain: str = "medical") -> str:
+    """
+    Apply R1-style reasoning prompt for domain-specific tasks.
+    Works with any instruction-tuned model, not just R1.
+    """
+    system_prompt = (
+        f"You are an expert {domain} reasoning assistant. "
+        "Think step by step before giving your final answer. "
+        "Use &lt;think&gt; tags for your reasoning process."
+    )
+    full_prompt = f"[INST] {system_prompt}\n\n{prompt} [/INST]"
+
+    params = SamplingParams(
+        temperature=0.6,
+        top_p=0.9,
+        max_tokens=4096,
+    )
+    outputs = llm.generate([full_prompt], params)
+    return outputs[0].outputs[0].text
+
+
+# GRPO fine-tuning for domain reasoning (using TRL)
+# Apply this after deploying Mixtral to add reasoning capability
+def setup_grpo_domain_training(
+    base_model: str = "mistralai/Mixtral-8x7B-v0.1",
+    domain_reward_fn=None,
+):
+    """
+    Apply GRPO to add domain reasoning to any base model.
+    domain_reward_fn: callable(response, ground_truth) -&gt; float
+    Example domains: clinical coding (ICD-10 accuracy), SQL generation,
+    legal document analysis, molecule property prediction.
+    """
+    from trl import GRPOConfig, GRPOTrainer
+
+    config = GRPOConfig(
+        model_name=base_model,
+        learning_rate=5e-7,
+        num_train_epochs=1,
+        per_device_train_batch_size=1,
+        gradient_accumulation_steps=16,
+        num_generations=8,       # G in GRPO: sample 8 outputs per prompt
+        max_new_tokens=2048,
+        temperature=0.9,         # high temperature during training for exploration
+        kl_coeff=0.04,           # β: KL penalty (from R1 paper)
+        bf16=True,
+        output_dir="./grpo-domain-model",
+    )
+    # Pass domain_reward_fn as reward_funcs to GRPOTrainer
+    return config
+</code></pre>
+
+        <!-- Mermaid 3: Applying DeepSeek Patterns -->
+        <h3 class="text-lg font-semibold text-gray-900 mb-3 mt-6">Applying DeepSeek Patterns to a Typical ML Team</h3>
+        <div class="bg-white border border-gray-200 rounded-xl p-4 mb-6 shadow-sm">
+          <div class="mermaid">
+flowchart LR
+    subgraph "Available Now (Open Source)"
+        A[Mixtral 8x7B\nor DeepSeek-V3\nopen weights] --> B[vLLM Serving\nFP8 / AWQ quant\nPrefill-decode split]
+        C[R1-Distill-7B/14B\nReasoning model\nfine-tuned base] --> B
+    end
+
+    subgraph "Domain Adaptation"
+        D[Collect domain Q&A\nwith verifiable answers] --> E[Cold-start SFT\nFormat &lt;think&gt; tags\n500-2000 examples]
+        E --> F[GRPO Training\nRule-based reward\nTRL GRPOTrainer]
+        F --> G[Rejection Sampling\nGenerate more\ntraining data]
+        G --> F
+    end
+
+    subgraph "Production"
+        B --> H[Load Balancer\nMultiple replicas]
+        H --> I[Monitoring\nThinking token cost\nLatency p99]
+    end
+
+    C --> D
+    G --> J[Final Domain\nReasoning Model]
+    J --> B
+
+    style A fill:#dbeafe,stroke:#2563eb
+    style F fill:#ecfdf5,stroke:#059669
+    style J fill:#f5f3ff,stroke:#7c3aed
+          </div>
+        </div>
+
+        <div class="callout-info p-4 rounded-lg mb-4">
+          <strong>FP8 Training for Cost Reduction:</strong> NVIDIA transformer_engine (included in PyTorch 2.1+) supports FP8 training. A single configuration change in your training script can reduce memory by ~40% and increase throughput by ~1.5x on H100/H800. Start with <code>te.fp8_autocast()</code> context manager — no model changes required.
+        </div>
+      </section>
+
+      <!-- ─── SECTION 7 ─── -->
+      <section id="s7" class="section-anchor">
+        <h2 class="text-2xl font-bold text-gray-900 mb-1">7. The Broader Impact</h2>
+        <p class="text-gray-500 text-sm mb-6">Context and future directions</p>
+
+        <h3 class="text-lg font-semibold text-gray-900 mb-3">Open Source LLM Ecosystem Acceleration</h3>
+        <p class="text-gray-700 mb-4">DeepSeek-R1's release (January 2025) demonstrated that open-weight reasoning models can match closed frontier models. Within 30 days: llama.cpp added R1-GGUF support, Ollama shipped R1 integration, HuggingFace saw record downloads, and multiple companies announced R1-distilled domain models. The MIT license removes legal barriers that prevented enterprise adoption of earlier open models.</p>
+
+        <p class="text-gray-700 mb-4">The broader pattern: when a Chinese AI lab publishes a technical report with sufficient detail to reproduce results, the open-source community can iterate in days. DeepSeek-R1 proved that GRPO works; within weeks, TRL and LlamaFactory added GRPO support, and dozens of domain-specific reasoning models appeared. This ecosystem flywheel accelerates faster with each frontier open-weight release.</p>
+
+        <h3 class="text-lg font-semibold text-gray-900 mb-3">Chinese AI Lab Contributions to Global Research</h3>
+        <p class="text-gray-700 mb-4">DeepSeek, Zhipu, Qwen (Alibaba), and Kimi (Moonshot AI) have published some of the highest-impact LLM papers of 2024-2025. These labs operate under different hardware and resource constraints than US labs, which produces genuinely different algorithmic approaches. The export control-driven hardware gap has inadvertently produced algorithmic diversity that benefits the global research community.</p>
+
+        <h3 class="text-lg font-semibold text-gray-900 mb-3">Future Directions</h3>
+        <ul class="list-disc list-inside text-gray-700 space-y-2 mb-4">
+          <li><strong>Smaller reasoning models:</strong> R1-1.5B already shows strong math performance. 500M reasoning-capable models for edge deployment are plausible.</li>
+          <li><strong>Multimodal RL:</strong> Extending GRPO to vision-language tasks with verifiable rewards (e.g., geometry problems with diagrams).</li>
+          <li><strong>Process reward models:</strong> Current R1 uses outcome rewards only. Process-level rewards (verify each reasoning step) may further improve accuracy and reduce reward hacking.</li>
+          <li><strong>Test-time compute scaling:</strong> R1 demonstrated that more thinking tokens improve accuracy. Adaptive compute allocation — spending more tokens on hard problems — is an active research direction.</li>
+          <li><strong>MoE at sub-7B scale:</strong> Applying MoE architecture to 1B-3B models for edge/mobile deployment with negligible active parameter cost.</li>
+        </ul>
+      </section>
+
+      <!-- ─── KEY TAKEAWAYS (Combined Ch18 + Ch18B) ─── -->
+      <section id="takeaways" class="section-anchor">
+        <div class="bg-gradient-to-br from-blue-600 to-blue-800 rounded-2xl p-8 text-white">
+          <h2 class="text-2xl font-bold mb-2">Key Takeaways</h2>
+          <p class="text-blue-200 text-sm mb-6">Chapters 18A + 18B — DeepSeek Complete Case Study</p>
+          <div class="grid md:grid-cols-2 gap-4">
+            <div class="bg-white/10 rounded-xl p-4">
+              <h3 class="font-semibold mb-2">Architecture (Ch18A)</h3>
+              <ul class="text-sm text-blue-100 space-y-1">
+                <li>MoE activates 37B/671B params — 5.5x compute efficiency</li>
+                <li>MLA reduces KV cache 93% — enables massive context at scale</li>
+                <li>FP8 training gives 2x throughput with &lt;0.1% accuracy loss</li>
+                <li>DualPipe hides communication behind compute on H800 clusters</li>
+                <li>Auxiliary-loss-free routing solves MoE training instability</li>
+              </ul>
+            </div>
+            <div class="bg-white/10 rounded-xl p-4">
+              <h3 class="font-semibold mb-2">Reasoning &amp; RL (Ch18B)</h3>
+              <ul class="text-sm text-blue-100 space-y-1">
+                <li>GRPO eliminates critic network — RL without 2x memory cost</li>
+                <li>Rule-based rewards beat reward models for verifiable tasks</li>
+                <li>Cold-start SFT is required before RL for format stability</li>
+                <li>Distillation outperforms direct RL at &lt;14B — use the right tool</li>
+                <li>$5.5M training cost vs ~$100M GPT-4 est. — algorithmic efficiency wins</li>
+              </ul>
+            </div>
+            <div class="bg-white/10 rounded-xl p-4">
+              <h3 class="font-semibold mb-2">Inference &amp; Cost</h3>
+              <ul class="text-sm text-blue-100 space-y-1">
+                <li>Prefill/decode separation is essential for MoE serving</li>
+                <li>R1 API: $0.55/$2.19 per M tokens — 7-30x cheaper than closed models</li>
+                <li>Self-hosted R1 on 8xH100: ~$5.60/M output tokens</li>
+                <li>Thinking tokens are expensive — budget them by task complexity</li>
+              </ul>
+            </div>
+            <div class="bg-white/10 rounded-xl p-4">
+              <h3 class="font-semibold mb-2">For Your Team</h3>
+              <ul class="text-sm text-blue-100 space-y-1">
+                <li>Use Mixtral 8x7B as your MoE entry point today</li>
+                <li>Apply GRPO for any domain with verifiable correct answers</li>
+                <li>Distill from R1 for domain tasks — don't train reasoning from scratch</li>
+                <li>Hardware constraints are design inputs — treat them as such</li>
+                <li>Open weights + MIT license = production-legal frontier capabilities</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Bottom Nav -->
+      <nav class="flex items-center justify-between pt-6 border-t border-gray-200">
+        <a href="ch18_deepseek_architecture.html" class="flex items-center gap-2 text-sm text-gray-600 hover:text-blue-600 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+          <span><span class="text-gray-400">Previous:</span> Ch18A — DeepSeek Architecture</span>
+        </a>
+        <a href="ch19_case_rag_agents.html" class="flex items-center gap-2 text-sm text-gray-600 hover:text-blue-600 transition-colors">
+          <span><span class="text-gray-400">Next:</span> Ch19 — RAG &amp; Agents</span>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        </a>
+      </nav>
+
+    </main>
+  </div>
+</div>
+
+<footer class="bg-gray-900 text-gray-400 text-sm mt-16 py-8 px-4 text-center">
+  <p>Modern MLOps Tutorial &mdash; Chapter 18B: DeepSeek-R1 &amp; Lessons</p>
+  <p class="mt-1">Sources: DeepSeek-R1 (arXiv:2501.12948) &bull; DeepSeek-V3 Technical Report (arXiv:2412.19437)</p>
+</footer>
+
+<script>
+  // Active TOC link on scroll
+  const sections = document.querySelectorAll('.section-anchor');
+  const tocLinks = document.querySelectorAll('.toc-link');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        tocLinks.forEach(l => l.classList.remove('active'));
+        const active = document.querySelector(`.toc-link[href="#${e.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>

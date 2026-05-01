@@ -1,0 +1,2699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chapter 16: React & TypeScript — TypeScript for the AI Era</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --white: #FFFFFF;
+      --surface: #F9FAFB;
+      --surface-2: #F3F4F6;
+      --border: #E5E7EB;
+      --border-strong: #D1D5DB;
+      --text-primary: #111827;
+      --text-secondary: #6B7280;
+      --text-tertiary: #9CA3AF;
+      --indigo-50: #EEF2FF;
+      --indigo-100: #E0E7FF;
+      --indigo-200: #C7D2FE;
+      --indigo-500: #6366F1;
+      --indigo-600: #4F46E5;
+      --indigo-700: #4338CA;
+      --indigo-800: #3730A3;
+      --green-50: #F0FDF4;
+      --green-100: #DCFCE7;
+      --green-600: #16A34A;
+      --green-700: #15803D;
+      --amber-50: #FFFBEB;
+      --amber-100: #FEF3C7;
+      --amber-600: #D97706;
+      --amber-700: #B45309;
+      --rose-50: #FFF1F2;
+      --rose-100: #FFE4E6;
+      --rose-600: #E11D48;
+      --rose-700: #BE123C;
+      --orange-50: #FFF7ED;
+      --orange-100: #FFEDD5;
+      --orange-600: #EA580C;
+      --orange-700: #C2410C;
+      --sky-50: #F0F9FF;
+      --sky-100: #E0F2FE;
+      --sky-600: #0284C7;
+      --sky-700: #0369A1;
+      --violet-50: #F5F3FF;
+      --violet-100: #EDE9FE;
+      --violet-600: #7C3AED;
+      --violet-700: #6D28D9;
+      --teal-50: #F0FDFA;
+      --teal-100: #CCFBF1;
+      --teal-600: #0D9488;
+      --teal-700: #0F766E;
+      --font-body: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+      --font-code: 'JetBrains Mono', 'Fira Code', monospace;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--white);
+      color: var(--text-primary);
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ───── TOP NAV ───── */
+    .top-nav {
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1.5rem;
+      gap: 1rem;
+    }
+
+    .nav-prev, .nav-next {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--indigo-600);
+      text-decoration: none;
+      padding: 0.35rem 0.75rem;
+      border: 1px solid var(--indigo-200);
+      border-radius: 6px;
+      background: var(--indigo-50);
+      transition: background 0.15s;
+      white-space: nowrap;
+    }
+    .nav-prev:hover, .nav-next:hover { background: var(--indigo-100); }
+
+    .nav-center {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.1rem;
+    }
+
+    .nav-book-title {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .nav-chapter-title {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .nav-progress {
+      font-size: 0.7rem;
+      color: var(--text-tertiary);
+      font-weight: 500;
+    }
+
+    /* ───── CHAPTER HERO ───── */
+    .chapter-hero {
+      background: linear-gradient(135deg, #1e1b4b 0%, #312e81 35%, #4338CA 65%, #4F46E5 100%);
+      padding: 4rem 2rem 3.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .chapter-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+
+    .chapter-hero-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .chapter-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: rgba(255,255,255,0.9);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.3rem 0.9rem;
+      border-radius: 999px;
+      margin-bottom: 1.25rem;
+    }
+
+    .chapter-hero h1 {
+      font-size: clamp(2rem, 5vw, 3.25rem);
+      font-weight: 800;
+      color: white;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      margin-bottom: 1rem;
+    }
+
+    .chapter-hero h1 .accent {
+      color: #A5B4FC;
+    }
+
+    .chapter-subtitle {
+      font-size: 1.1rem;
+      color: rgba(255,255,255,0.78);
+      max-width: 620px;
+      line-height: 1.65;
+      margin-bottom: 2rem;
+    }
+
+    .chapter-meta {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .chapter-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.82rem;
+      color: rgba(255,255,255,0.7);
+    }
+
+    .chapter-meta-item strong {
+      color: rgba(255,255,255,0.95);
+      font-weight: 600;
+    }
+
+    .chapter-tag {
+      background: rgba(99,102,241,0.4);
+      border: 1px solid rgba(165,180,252,0.3);
+      color: #A5B4FC;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+    }
+
+    /* ───── PAGE LAYOUT ───── */
+    .page-layout {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 3rem 2rem 5rem;
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      gap: 3rem;
+      align-items: start;
+    }
+
+    @media (max-width: 900px) {
+      .page-layout { grid-template-columns: 1fr; }
+      .sidebar { display: none; }
+    }
+
+    /* ───── SIDEBAR TOC ───── */
+    .sidebar {
+      position: sticky;
+      top: 72px;
+      max-height: calc(100vh - 80px);
+      overflow-y: auto;
+    }
+
+    .toc-header {
+      font-size: 0.7rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-tertiary);
+      margin-bottom: 0.75rem;
+    }
+
+    .toc-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.1rem;
+    }
+
+    .toc-list li a {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      text-decoration: none;
+      padding: 0.3rem 0.6rem;
+      border-radius: 5px;
+      transition: background 0.12s, color 0.12s;
+      line-height: 1.4;
+    }
+
+    .toc-list li a:hover {
+      background: var(--indigo-50);
+      color: var(--indigo-600);
+    }
+
+    .toc-list li a.active {
+      background: var(--indigo-50);
+      color: var(--indigo-600);
+      font-weight: 600;
+    }
+
+    .toc-section-label {
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-tertiary);
+      padding: 0.6rem 0.6rem 0.2rem;
+      margin-top: 0.5rem;
+    }
+
+    /* ───── MAIN CONTENT ───── */
+    .chapter-content {
+      min-width: 0;
+    }
+
+    /* ───── SECTION ───── */
+    .section {
+      margin-bottom: 4.5rem;
+    }
+
+    .section-anchor {
+      position: relative;
+      top: -80px;
+      visibility: hidden;
+    }
+
+    .section-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      background: var(--indigo-600);
+      color: white;
+      font-size: 0.72rem;
+      font-weight: 800;
+      border-radius: 6px;
+      margin-bottom: 0.75rem;
+    }
+
+    .section h2 {
+      font-size: 1.65rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+      margin-bottom: 1rem;
+      line-height: 1.25;
+    }
+
+    .section h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.01em;
+      margin-top: 2rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .section p {
+      font-size: 0.975rem;
+      color: var(--text-secondary);
+      margin-bottom: 1rem;
+      line-height: 1.7;
+    }
+
+    .section ul, .section ol {
+      padding-left: 1.4rem;
+      margin-bottom: 1rem;
+    }
+
+    .section li {
+      font-size: 0.975rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.4rem;
+      line-height: 1.65;
+    }
+
+    .section li strong {
+      color: var(--text-primary);
+    }
+
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 4rem 0;
+    }
+
+    /* ───── CODE BLOCKS ───── */
+    .code-block {
+      margin: 1.5rem 0;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+    }
+
+    .code-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #f6f8fa;
+      border-bottom: 1px solid var(--border);
+      padding: 0.55rem 1rem;
+    }
+
+    .code-filename {
+      font-family: var(--font-code);
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .code-lang {
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--indigo-600);
+      background: var(--indigo-50);
+      border: 1px solid var(--indigo-100);
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+    }
+
+    .code-block pre {
+      margin: 0;
+      padding: 1.25rem 1.25rem;
+      overflow-x: auto;
+      background: #f6f8fa;
+      font-size: 0.845rem;
+      line-height: 1.65;
+    }
+
+    .code-block code {
+      font-family: var(--font-code);
+      background: none;
+      padding: 0;
+      font-size: inherit;
+    }
+
+    /* Inline code */
+    .section p code, .section li code, td code, th code {
+      font-family: var(--font-code);
+      font-size: 0.82em;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      padding: 0.1em 0.4em;
+      border-radius: 4px;
+      color: var(--indigo-700);
+    }
+
+    /* ───── CALLOUTS ───── */
+    .callout {
+      border-radius: 10px;
+      padding: 1.1rem 1.25rem;
+      margin: 1.5rem 0;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 0.75rem;
+      align-items: start;
+    }
+
+    .callout-icon {
+      font-size: 1.1rem;
+      line-height: 1;
+      margin-top: 0.1rem;
+    }
+
+    .callout-body {}
+
+    .callout-label {
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.35rem;
+    }
+
+    .callout-body p {
+      font-size: 0.9rem;
+      margin-bottom: 0;
+      line-height: 1.6;
+    }
+
+    .callout-body p + p { margin-top: 0.5rem; }
+
+    .callout-body code {
+      font-family: var(--font-code);
+      font-size: 0.82em;
+      padding: 0.1em 0.4em;
+      border-radius: 4px;
+    }
+
+    /* Tip — green */
+    .callout-tip {
+      background: var(--green-50);
+      border: 1px solid var(--green-100);
+    }
+    .callout-tip .callout-label { color: var(--green-600); }
+    .callout-tip .callout-body p { color: #166534; }
+    .callout-tip .callout-body code { background: #bbf7d0; color: #14532d; }
+
+    /* Info — sky */
+    .callout-info {
+      background: var(--sky-50);
+      border: 1px solid var(--sky-100);
+    }
+    .callout-info .callout-label { color: var(--sky-600); }
+    .callout-info .callout-body p { color: #0c4a6e; }
+    .callout-info .callout-body code { background: #bae6fd; color: #0c4a6e; }
+
+    /* Warning — amber */
+    .callout-warning {
+      background: var(--amber-50);
+      border: 1px solid var(--amber-100);
+    }
+    .callout-warning .callout-label { color: var(--amber-600); }
+    .callout-warning .callout-body p { color: #78350f; }
+    .callout-warning .callout-body code { background: #fde68a; color: #78350f; }
+
+    /* Python Comparison — violet */
+    .callout-python {
+      background: var(--violet-50);
+      border: 1px solid var(--violet-100);
+    }
+    .callout-python .callout-label { color: var(--violet-600); }
+    .callout-python .callout-body p { color: #3b0764; }
+    .callout-python .callout-body code { background: #ddd6fe; color: #3b0764; }
+
+    /* AI Era — teal */
+    .callout-ai {
+      background: var(--teal-50);
+      border: 1px solid var(--teal-100);
+    }
+    .callout-ai .callout-label { color: var(--teal-600); }
+    .callout-ai .callout-body p { color: #134e4a; }
+    .callout-ai .callout-body code { background: #99f6e4; color: #134e4a; }
+
+    /* Mental Model — orange */
+    .callout-mental {
+      background: var(--orange-50);
+      border: 1px solid var(--orange-100);
+    }
+    .callout-mental .callout-label { color: var(--orange-600); }
+    .callout-mental .callout-body p { color: #7c2d12; }
+    .callout-mental .callout-body code { background: #fed7aa; color: #7c2d12; }
+
+    /* Common Mistake — rose/red */
+    .callout-mistake {
+      background: var(--rose-50);
+      border: 1px solid var(--rose-100);
+    }
+    .callout-mistake .callout-label { color: var(--rose-600); }
+    .callout-mistake .callout-body p { color: #881337; }
+    .callout-mistake .callout-body code { background: #fecdd3; color: #881337; }
+
+    /* ───── SVG DIAGRAMS ───── */
+    .diagram-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 1.75rem 0;
+      overflow-x: auto;
+    }
+
+    .diagram-title {
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--text-tertiary);
+      margin-bottom: 1.25rem;
+      text-align: center;
+    }
+
+    /* ───── TABLES ───── */
+    .table-wrap {
+      overflow-x: auto;
+      margin: 1.5rem 0;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+    }
+
+    thead {
+      background: var(--surface-2);
+    }
+
+    thead th {
+      padding: 0.7rem 1rem;
+      text-align: left;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--text-secondary);
+      border-bottom: 1px solid var(--border);
+    }
+
+    tbody td {
+      padding: 0.7rem 1rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-secondary);
+      vertical-align: top;
+      line-height: 1.5;
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    tbody tr:hover td {
+      background: var(--surface);
+    }
+
+    td:first-child {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .badge {
+      display: inline-block;
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 0.15rem 0.45rem;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .badge-green { background: var(--green-100); color: var(--green-700); }
+    .badge-amber { background: var(--amber-100); color: var(--amber-700); }
+    .badge-rose  { background: var(--rose-100); color: var(--rose-700); }
+    .badge-indigo { background: var(--indigo-100); color: var(--indigo-700); }
+
+    /* ───── CHEAT SHEET ───── */
+    .cheatsheet {
+      background: #1e1e2e;
+      border-radius: 12px;
+      padding: 1.75rem;
+      margin: 2rem 0;
+    }
+
+    .cheatsheet-title {
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #6366f1;
+      margin-bottom: 1.25rem;
+    }
+
+    .cheatsheet-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1rem;
+    }
+
+    .cheat-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+
+    .cheat-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .cheat-code {
+      font-family: var(--font-code);
+      font-size: 0.8rem;
+      color: #a5b4fc;
+      line-height: 1.5;
+    }
+
+    .cheat-code .kw { color: #c084fc; }
+    .cheat-code .ty { color: #34d399; }
+    .cheat-code .st { color: #fbbf24; }
+    .cheat-code .cm { color: #64748b; font-style: italic; }
+
+    /* ───── LIFECYCLE SVG ───── */
+    .lifecycle-svg text {
+      font-family: var(--font-body);
+    }
+
+    /* ───── FOOTER ───── */
+    .chapter-footer {
+      border-top: 1px solid var(--border);
+      padding: 3rem 2rem;
+      background: var(--surface);
+    }
+
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .footer-nav-btn {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      text-decoration: none;
+      padding: 0.85rem 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--white);
+      transition: border-color 0.15s, box-shadow 0.15s;
+      min-width: 180px;
+    }
+
+    .footer-nav-btn:hover {
+      border-color: var(--indigo-200);
+      box-shadow: 0 2px 12px rgba(79,70,229,0.08);
+    }
+
+    .footer-nav-direction {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-tertiary);
+    }
+
+    .footer-nav-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--indigo-600);
+    }
+
+    .footer-center {
+      text-align: center;
+    }
+
+    .footer-author {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .footer-byline {
+      font-size: 0.75rem;
+      color: var(--text-tertiary);
+      margin-top: 0.2rem;
+    }
+
+    .progress-bar-wrap {
+      margin-top: 0.75rem;
+      background: var(--border);
+      border-radius: 999px;
+      height: 4px;
+      width: 160px;
+      margin-left: auto;
+      margin-right: auto;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 66.7%; /* 16/24 */
+      background: linear-gradient(90deg, var(--indigo-600), #818cf8);
+      border-radius: 999px;
+    }
+
+    /* ───── RESPONSIVE ───── */
+    @media (max-width: 640px) {
+      .chapter-hero { padding: 2.5rem 1.25rem 2rem; }
+      .page-layout { padding: 2rem 1.25rem 4rem; gap: 2rem; }
+      .top-nav { padding: 0 1rem; }
+      .nav-center { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════ TOP NAV -->
+<nav class="top-nav">
+  <a href="chapter-15-auth.html" class="nav-prev">← Ch 15 Auth</a>
+  <div class="nav-center">
+    <span class="nav-book-title">TypeScript for the AI Era</span>
+    <span class="nav-chapter-title">Chapter 16 — React &amp; TypeScript</span>
+    <span class="nav-progress">Chapter 16 of 24</span>
+  </div>
+  <a href="chapter-17-nextjs.html" class="nav-next">Ch 17 Next.js →</a>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════════ HERO -->
+<header class="chapter-hero">
+  <div class="chapter-hero-inner">
+    <div class="chapter-eyebrow">Chapter 16 &nbsp;·&nbsp; Part IV: The Frontend</div>
+    <h1>React &amp; TypeScript:<br /><span class="accent">Building Modern UIs</span></h1>
+    <p class="chapter-subtitle">
+      TypeScript makes React dramatically better. Props become self-documenting contracts.
+      Hooks become predictable. Forms become safe. This chapter covers everything from
+      function components and event handlers to TanStack Query and compound component patterns.
+    </p>
+    <div class="chapter-meta">
+      <span class="chapter-meta-item"><strong>Matt Pocock</strong> &nbsp;·&nbsp; Total TypeScript</span>
+      <span class="chapter-meta-item">~70 min read</span>
+      <span class="chapter-tag">Practical</span>
+      <span class="chapter-tag">React 18+</span>
+      <span class="chapter-tag">TypeScript 5.x</span>
+    </div>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════════════════════════════ BODY -->
+<div class="page-layout">
+
+  <!-- SIDEBAR TOC -->
+  <aside class="sidebar">
+    <div class="toc-header">In this chapter</div>
+    <ul class="toc-list">
+      <li><a href="#s1">1. React + TypeScript Philosophy</a></li>
+      <li><a href="#s2">2. Typing React Components</a></li>
+      <li><a href="#s3">3. Events &amp; Event Handlers</a></li>
+      <li><a href="#s4">4. Hooks with TypeScript</a></li>
+      <li><a href="#s5">5. Context API</a></li>
+      <li><a href="#s6">6. Forms</a></li>
+      <li><a href="#s7">7. Fetching Data</a></li>
+      <li><a href="#s8">8. Component Composition</a></li>
+      <li><a href="#s9">9. UI Component Libraries</a></li>
+      <li><a href="#s10">10. Performance Optimization</a></li>
+      <li><a href="#s11">11. Testing</a></li>
+      <li><a href="#s12">12. Python Comparison</a></li>
+    </ul>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="chapter-content">
+
+    <!-- ─── SECTION 1 ─── -->
+    <section class="section" id="s1">
+      <span id="anchor-s1" class="section-anchor"></span>
+      <div class="section-number">1</div>
+      <h2>React + TypeScript Philosophy</h2>
+
+      <p>
+        React has won the frontend. Over 40% of all web applications use it — not because of performance,
+        but because its component model maps cleanly onto how UIs actually work: isolated pieces of state
+        and UI that compose into larger experiences. TypeScript makes this model dramatically safer.
+      </p>
+
+      <p>
+        Without TypeScript, prop mistakes are runtime errors discovered in production. With TypeScript,
+        they're compile errors discovered in your editor. You get autocomplete on every prop, instant
+        feedback when you rename a component, and zero guessing about what a component accepts.
+      </p>
+
+      <h3>JSX and TSX</h3>
+      <p>
+        TypeScript natively understands JSX through <code>.tsx</code> files. The compiler validates that
+        JSX elements correspond to real component types, that intrinsic elements like <code>&lt;div&gt;</code>
+        receive valid HTML attributes, and that children are the right type. This is all built-in — no
+        extra configuration beyond setting <code>"jsx": "react-jsx"</code> in <code>tsconfig.json</code>.
+      </p>
+
+      <h3>Setting up with Vite</h3>
+      <p>Vite is the fastest way to start a React + TypeScript project today.</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">terminal</span>
+          <span class="code-lang">shell</span>
+        </div>
+        <pre><code class="language-bash">pnpm create vite my-app --template react-ts
+cd my-app
+pnpm install
+pnpm dev</code></pre>
+      </div>
+
+      <p>The generated project structure looks like this:</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">project structure</span>
+          <span class="code-lang">text</span>
+        </div>
+        <pre><code>my-app/
+├── src/
+│   ├── App.tsx          ← root component
+│   ├── main.tsx         ← ReactDOM.createRoot()
+│   ├── components/      ← your components
+│   ├── hooks/           ← custom hooks
+│   └── types/           ← shared TypeScript types
+├── index.html
+├── tsconfig.json
+├── tsconfig.node.json   ← for vite.config.ts
+└── vite.config.ts</code></pre>
+      </div>
+
+      <h3>@types/react</h3>
+      <p>
+        The <code>@types/react</code> package provides all React type definitions. As of React 18,
+        it ships with Vite's template automatically. It defines everything: <code>React.FC</code>,
+        <code>React.ReactNode</code>, all event types, all hook signatures, and intrinsic JSX element maps.
+        React 19 ships types directly in the package — no separate <code>@types</code> install needed.
+      </p>
+
+      <div class="callout callout-ai">
+        <div class="callout-icon">&#x2728;</div>
+        <div class="callout-body">
+          <div class="callout-label">AI Era</div>
+          <p>AI tools like Claude and Copilot are dramatically better at React when you use TypeScript.
+          The typed props interface is essentially a structured prompt — the AI knows exactly what the
+          component accepts, what's optional, and what the valid values are. Untyped React is guesswork
+          for both humans and AI.</p>
+        </div>
+      </div>
+    </section>
+
+    <hr class="section-divider" />
+
+    <!-- ─── SECTION 2 ─── -->
+    <section class="section" id="s2">
+      <span id="anchor-s2" class="section-anchor"></span>
+      <div class="section-number">2</div>
+      <h2>Typing React Components</h2>
+
+      <p>
+        A React component is a function that accepts props and returns JSX. TypeScript's job is to
+        ensure callers pass the right props and the component returns valid JSX.
+      </p>
+
+      <h3>Defining a props interface</h3>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">Button.tsx</span>
+          <span class="code-lang">tsx</span>
+        </div>
+        <pre><code class="language-tsx">interface ButtonProps {
+  label: string
+  onClick: () => void
+  variant?: 'primary' | 'secondary' | 'danger'
+  disabled?: boolean
+  children?: React.ReactNode
+}
+
+function Button({ label, onClick, variant = 'primary', disabled = false }: ButtonProps) {
+  const baseClass = 'px-4 py-2 rounded font-medium transition-colors'
+  const variantClass = {
+    primary: 'bg-indigo-600 text-white hover:bg-indigo-700',
+    secondary: 'bg-gray-100 text-gray-900 hover:bg-gray-200',
+    danger: 'bg-red-600 text-white hover:bg-red-700',
+  }[variant]
+
+  return (
+    &lt;button
+      onClick={onClick}
+      disabled={disabled}
+      className={`${baseClass} ${variantClass} ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+    &gt;
+      {label}
+    &lt;/button&gt;
+  )
+}
+
+// Usage — TypeScript catches all mistakes at compile time
+&lt;Button label="Save" onClick={() =&gt; save()} variant="primary" /&gt;
+&lt;Button label="Delete" onClick={handleDelete} variant="danger" /&gt;
+// Error: 'giant' is not assignable to 'primary' | 'secondary' | 'danger'
+&lt;Button label="?" onClick={noop} variant="giant" /&gt;</code></pre>
+      </div>
+
+      <h3>React.FC vs direct props typing</h3>
+
+      <div class="callout callout-warning">
+        <div class="callout-icon">&#x26A0;</div>
+        <div class="callout-body">
+          <div class="callout-label">The React.FC Debate</div>
+          <p>
+            <code>React.FC&lt;ButtonProps&gt;</code> was popular but fell out of favour because it
+            implicitly added <code>children</code> to every component (fixed in React 18 types),
+            made generics awkward, and added noise without benefit. The community consensus today
+            is to type props directly on the function parameter. That's what I recommend, and what
+            you'll see throughout this chapter.
+          </p>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">comparison.tsx</span>
+          <span class="code-lang">tsx</span>
+        </div>
+        <pre><code class="language-tsx">// ✗ Old style — React.FC
+const Button: React.FC&lt;ButtonProps&gt; = ({ label }) =&gt; &lt;button&gt;{label}&lt;/button&gt;
+
+// ✓ Modern style — type props directly
+function Button({ label }: ButtonProps) {
+  return &lt;button&gt;{label}&lt;/button&gt;
+}
+
+// ✓ Also fine with arrow functions
+const Button = ({ label }: ButtonProps) =&gt; &lt;button&gt;{label}&lt;/button&gt;</code></pre>
+      </div>
+
+      <h3>Extending HTML element props</h3>
+      <p>
+        One of the most powerful patterns: use <code>React.ComponentProps&lt;'button'&gt;</code>
+        to inherit all native HTML attributes, then layer your own on top.
+      </p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">Button.tsx</span>
+          <span class="code-lang">tsx</span>
+        </div>
+        <pre><code class="language-tsx">// Extend native button props — gets all HTML attributes for free
+interface ButtonProps extends React.ComponentProps&lt;'button'&gt; {
+  variant?: 'primary' | 'secondary' | 'danger'
+  isLoading?: boolean
+}
+
+function Button({ variant = 'primary', isLoading, children, ...rest }: ButtonProps) {
+  return (
+    &lt;button
+      {...rest}                             // passes through type, aria-*, data-* etc
+      disabled={isLoading || rest.disabled}
+      className={cn(variantClass[variant], rest.className)}
+    &gt;
+      {isLoading ? &lt;Spinner /&gt; : children}
+    &lt;/button&gt;
+  )
+}
+
+// Now callers get full native button API plus our custom props
+&lt;Button variant="primary" type="submit" aria-label="Save changes"&gt;
+  Save
+&lt;/Button&gt;</code></pre>
+      </div>
+
+      <h3>Forwarding refs</h3>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">Input.tsx</span>
+          <span class="code-lang">tsx</span>
+        </div>
+        <pre><code class="language-tsx">interface InputProps extends React.ComponentProps&lt;'input'&gt; {
+  label: string
+  error?: string
+}
+
+// React.forwardRef needs two generics: the element type and props type
+const Input = React.forwardRef&lt;HTMLInputElement, InputProps&gt;(
+  ({ label, error, ...rest }, ref) =&gt; {
+    return (
+      &lt;div className="flex flex-col gap-1"&gt;
+        &lt;label className="text-sm font-medium"&gt;{label}&lt;/label&gt;
+        &lt;input ref={ref} {...rest} /&gt;
+        {error &amp;&amp; &lt;span className="text-red-600 text-sm"&gt;{error}&lt;/span&gt;}
+      &lt;/div&gt;
+    )
+  }
+)
+Input.displayName = 'Input'</code></pre>
+      </div>
+
+      <h3>Generic components</h3>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">Select.tsx</span>
+          <span class="code-lang">tsx</span>
+        </div>
+        <pre><code class="language-tsx">// A generic Select component that preserves the option value type
+interface SelectProps&lt;T extends string&gt; {
+  options: { label: string; value: T }[]
+  value: T
+  onChange: (value: T) =&gt; void
+  placeholder?: string
+}
+
+function Select&lt;T extends string&gt;({ options, value, onChange, placeholder }: SelectProps&lt;T&gt;) {
+  return (
+    &lt;select
+      value={value}
+      onChange={(e) =&gt; onChange(e.target.value as T)}
+    &gt;
+      {placeholder &amp;&amp; &lt;option value=""&gt;{placeholder}&lt;/option&gt;}
+      {options.map((opt) =&gt; (
+        &lt;option key={opt.value} value={opt.value}&gt;
+          {opt.label}
+        &lt;/option&gt;
+      ))}
+    &lt;/select&gt;
+  )
+}
+
+// T is inferred as 'light' | 'dark' from the options array
+&lt;Select
+  options={[
+    { label: 'Light', value: 'light' },
+    { label: 'Dark', value: 'dark' },
+  ]}
+  value={theme}
+  onChange={setTheme}
+/&gt;</code></pre>
+      </div>
+
+      <!-- Props Typing Cheat Sheet Table -->
+      <h3>Props typing cheat sheet</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Pattern</th>
+              <th>Type</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Any JSX content</td>
+              <td><code>React.ReactNode</code></td>
+              <td>strings, numbers, JSX, arrays, null — the catch-all</td>
+            </tr>
+            <tr>
+              <td>Only JSX elements</td>
+              <td><code>React.ReactElement</code></td>
+              <td>more restrictive — excludes strings/numbers</td>
+            </tr>
+            <tr>
+              <td>Click handler</td>
+              <td><code>React.MouseEventHandler&lt;HTMLButtonElement&gt;</code></td>
+              <td>shorthand for <code>(e: React.MouseEvent&lt;HTMLButtonElement&gt;) =&gt; void</code></td>
+            </tr>
+            <tr>
+              <td>Change handler</td>
+              <td><code>React.ChangeEventHandler&lt;HTMLInputElement&gt;</code></td>
+              <td>shorthand pattern</td>
+            </tr>
+            <tr>
+              <td>Ref to DOM element</td>
+              <td><code>React.RefObject&lt;HTMLDivElement&gt;</code></td>
+              <td>from <code>useRef</code></td>
+            </tr>
+            <tr>
+              <td>CSS class string</td>
+              <td><code>string</code></td>
+              <td>or <code>ClassValue</code> from clsx for conditional classes</td>
+            </tr>
+            <tr>
+              <td>Inline styles</td>
+              <td><code>React.CSSProperties</code></td>
+              <td>typed CSS-in-JS object</td>
+            </tr>
+            <tr>
+              <td>Extend a native element</td>
+              <td><code>React.ComponentProps&lt;'div'&gt;</code></td>
+              <td>or <code>React.ComponentPropsWithRef&lt;'input'&gt;</code></td>
+            </tr>
+            <tr>
+              <td>Wrap another component's props</td>
+              <td><code>React.ComponentProps&lt;typeof MyComp&gt;</code></td>
+              <td>useful for composition</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout callout-tip">
+        <div class="callout-icon">&#x2714;</div>
+        <div class="callout-body">
+          <div class="callout-label">Tip</div>
+          <p>Prefer <code>React.ReactNode</code> for <code>children</code> props — it's the most permissive
+          type that still excludes functions and undefined patterns that won't render correctly.
+          Use <code>React.ReactElement</code> only when you need to clone or inspect the child element.</p>
+        </div>
+      </div>
+
+      <!-- React Component Lifecycle SVG -->
+      <div class="diagram-wrap">
+        <div class="diagram-title">React Component Lifecycle with TypeScript</div>
+        <svg viewBox="0 0 720 260" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;display:block;margin:0 auto;">
+          <!-- Mount -->
+          <rect x="20" y="80" width="130" height="100" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+          <text x="85" y="108" text-anchor="middle" font-size="11" font-weight="700" fill="#4338CA">MOUNT</text>
+          <text x="85" y="126" text-anchor="middle" font-size="9.5" fill="#6366F1">useState initializes</text>
+          <text x="85" y="142" text-anchor="middle" font-size="9.5" fill="#6366F1">Props typed &amp; validated</text>
+          <text x="85" y="158" text-anchor="middle" font-size="9.5" fill="#6366F1">useEffect runs ([])</text>
+
+          <!-- Arrow Mount → Render -->
+          <path d="M150 130 L190 130" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+          <!-- Render -->
+          <rect x="190" y="80" width="130" height="100" rx="10" fill="#F0FDF4" stroke="#16A34A" stroke-width="1.5"/>
+          <text x="255" y="108" text-anchor="middle" font-size="11" font-weight="700" fill="#15803D">RENDER</text>
+          <text x="255" y="126" text-anchor="middle" font-size="9.5" fill="#166534">JSX returned</text>
+          <text x="255" y="142" text-anchor="middle" font-size="9.5" fill="#166534">TypeScript checks JSX</text>
+          <text x="255" y="158" text-anchor="middle" font-size="9.5" fill="#166534">Props flow down</text>
+
+          <!-- Arrow Render → Commit -->
+          <path d="M320 130 L360 130" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+          <!-- Commit -->
+          <rect x="360" y="80" width="130" height="100" rx="10" fill="#FFF7ED" stroke="#EA580C" stroke-width="1.5"/>
+          <text x="425" y="108" text-anchor="middle" font-size="11" font-weight="700" fill="#C2410C">COMMIT</text>
+          <text x="425" y="126" text-anchor="middle" font-size="9.5" fill="#9A3412">DOM updated</text>
+          <text x="425" y="142" text-anchor="middle" font-size="9.5" fill="#9A3412">Refs assigned</text>
+          <text x="425" y="158" text-anchor="middle" font-size="9.5" fill="#9A3412">useEffect fires</text>
+
+          <!-- Arrow Commit → Unmount -->
+          <path d="M490 130 L530 130" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+          <!-- Unmount -->
+          <rect x="530" y="80" width="130" height="100" rx="10" fill="#FFF1F2" stroke="#E11D48" stroke-width="1.5"/>
+          <text x="595" y="108" text-anchor="middle" font-size="11" font-weight="700" fill="#BE123C">UNMOUNT</text>
+          <text x="595" y="126" text-anchor="middle" font-size="9.5" fill="#9F1239">Cleanup runs</text>
+          <text x="595" y="142" text-anchor="middle" font-size="9.5" fill="#9F1239">Subscriptions end</text>
+          <text x="595" y="158" text-anchor="middle" font-size="9.5" fill="#9F1239">Refs cleared</text>
+
+          <!-- Re-render loop arrow -->
+          <path d="M255 80 C255 40 425 40 425 80" fill="none" stroke="#4F46E5" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow-indigo)"/>
+          <text x="340" y="32" text-anchor="middle" font-size="9" fill="#4338CA" font-weight="600">state/props change → re-render</text>
+
+          <!-- Labels -->
+          <text x="360" y="215" text-anchor="middle" font-size="9" fill="#9CA3AF">useEffect cleanup</text>
+          <path d="M490 210 L595 185" fill="none" stroke="#9CA3AF" stroke-width="1" stroke-dasharray="3,2" marker-end="url(#arrow-gray)"/>
+
+          <defs>
+            <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+              <path d="M0,0 L0,6 L8,3 z" fill="#94a3b8"/>
+            </marker>
+            <marker id="arrow-indigo" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+              <path d="M0,0 L0,6 L8,3 z" fill="#4F46E5"/>
+            </marker>
+            <marker id="arrow-gray" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+              <path d="M0,0 L0,6 L8,3 z" fill="#9CA3AF"/>
+            </marker>
+          </defs>
+        </svg>
+      </div>
+    </section>
+
+    <hr class="section-divider" />
+
+    <!-- ─── SECTION 3 ─── -->
+    <section class="section" id="s3">
+      <span id="anchor-s3" class="section-anchor"></span>
+      <div class="section-number">3</div>
+      <h2>Events and Event Handlers</h2>
+
+      <p>
+        React wraps native browser events in its own <strong>synthetic event system</strong>. TypeScript's
+        <code>@types/react</code> provides precise types for every event, parameterized by the element
+        type they originate from.
+      </p>
+
+      <h3>Core event types</h3>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">events.tsx</span>
+          <span class="code-lang">tsx</span>
+        </div>
+        <pre><code class="language-tsx">// Mouse events — button, div, etc.
+function handleClick(e: React.MouseEvent&lt;HTMLButtonElement&gt;) {
+  e.preventDefault()
+  console.log(e.currentTarget.tagName) // typed as HTMLButtonElement
+}
+
+// Change events — the most common
+function handleChange(e: React.ChangeEvent&lt;HTMLInputElement&gt;) {
+  setValue(e.target.value)             // e.target.value is string
+  setChecked(e.target.checked)        // for checkboxes
+}
+
+// For select elements
+function handleSelect(e: React.ChangeEvent&lt;HTMLSelectElement&gt;) {
+  setCategory(e.target.value)
+}
+
+// Keyboard events
+function handleKeyDown(e: React.KeyboardEvent&lt;HTMLInputElement&gt;) {
+  if (e.key === 'Enter') {
+    submitForm()
+  }
+  if (e.key === 'Escape') {
+    closeModal()
+  }
+}
+
+// Form submit
+function handleSubmit(e: React.FormEvent&lt;HTMLFormElement&gt;) {
+  e.preventDefault()
+  // process form...
+}
+
+// Drag events
+function handleDrop(e: React.DragEvent&lt;HTMLDivElement&gt;) {
+  const files = e.dataTransfer.files
+  processFiles(Array.from(files))
+}
+
+// Focus events
+function handleFocus(e: React.FocusEvent&lt;HTMLInputElement&gt;) {
+  e.target.select() // selects input text on focus
+}</code></pre>
+      </div>
+
+      <h3>Handler type shorthands</h3>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">handlers.tsx</span>
+          <span class="code-lang">tsx</span>
+        </div>
+        <pre><code class="language-tsx">// React provides shorthand types for event handlers as props
+interface InputProps {
+  // Verbose form
+  onChange: (e: React.ChangeEvent&lt;HTMLInputElement&gt;) =&gt; void
+  // Shorthand form — exactly equivalent
+  onClick: React.MouseEventHandler&lt;HTMLButtonElement&gt;
+  onKeyDown: React.KeyboardEventHandler&lt;HTMLInputElement&gt;
+  onSubmit: React.FormEventHandler&lt;HTMLFormElement&gt;
+}
+
+// Custom event handler type — useful for lifting state
+interface SearchBarProps {
+  onSearch: (query: string) =&gt; void   // not a DOM event — a processed value
+}
+
+function SearchBar({ onSearch }: SearchBarProps) {
+  const [query, setQuery] = React.useState('')
+
+  const handleChange = (e: React.ChangeEvent&lt;HTMLInputElement&gt;) =&gt; {
+    setQuery(e.target.value)
+  }
+
+  const handleSubmit = (e: React.FormEvent) =&gt; {
+    e.preventDefault()
+    onSearch(query)    // calls parent with clean string, not the DOM event
+  }
+
+  return (
+    &lt;form onSubmit={handleSubmit}&gt;
+      &lt;input value={query} onChange={handleChange} /&gt;
+    &lt;/form&gt;
+  )
+}</code></pre>
+      </div>
+
+      <div class="callout callout-tip">
+        <div class="callout-icon">&#x2714;</div>
+        <div class="callout-body">
+          <div class="callout-label">Tip</div>
+          <p>When lifting state up, prefer passing processed values (<code>string</code>, <code>number</code>,
+          your domain types) rather than raw DOM events. This keeps parent components decoupled from the
+          DOM structure of their children.</p>
+        </div>
+      </div>
+
+      <div class="callout callout-mistake">
+        <div class="callout-icon">&#x2717;</div>
+        <div class="callout-body">
+          <div class="callout-label">Common Mistake</div>
+          <p>Don't type events as <code>Event</code> (the native DOM type) or <code>any</code>.
+          Always use the React synthetic event types like <code>React.ChangeEvent&lt;HTMLInputElement&gt;</code>.
+          The native <code>Event</code> type won't have <code>e.target.value</code> typed correctly and
+          the TypeScript compiler will complain.</p>
+        </div>
+      </div>
+    </section>
+
+    <hr class="section-divider" />
+
+    <!-- ─── SECTION 4 ─── -->
+    <section class="section" id="s4">
+      <span id="anchor-s4" class="section-anchor"></span>
+      <div class="section-number">4</div>
+      <h2>Hooks with TypeScript</h2>
+
+      <p>
+        React hooks were designed with type inference in mind. Most of the time, TypeScript infers the
+        right types automatically. Occasionally you need to help it.
+      </p>
+
+      <!-- Hook Flow Diagram -->
+      <div class="diagram-wrap">
+        <div class="diagram-title">Hook Typing Decision Flow</div>
+        <svg viewBox="0 0 680 300" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;display:block;margin:0 auto;">
+          <!-- Start -->
+          <ellipse cx="340" cy="28" rx="90" ry="22" fill="#4F46E5"/>
+          <text x="340" y="32" text-anchor="middle" font-size="11" font-weight="700" fill="white">Using a hook?</text>
+
+          <!-- Arrow down -->
+          <path d="M340 50 L340 80" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#a1)"/>
+
+          <!-- Initial value clear? -->
+          <rect x="210" y="80" width="260" height="44" rx="8" fill="#F3F4F6" stroke="#D1D5DB" stroke-width="1.5"/>
+          <text x="340" y="99" text-anchor="middle" font-size="11" fill="#374151" font-weight="600">Is the initial value type-obvious?</text>
+          <text x="340" y="115" text-anchor="middle" font-size="9.5" fill="#6B7280">e.g. useState(0) → number</text>
+
+          <!-- Yes branch -->
+          <path d="M470 102 L560 102" stroke="#16A34A" stroke-width="1.5" marker-end="url(#a2)"/>
+          <text x="515" y="97" text-anchor="middle" font-size="9.5" fill="#16A34A" font-weight="600">Yes</text>
+
+          <rect x="560" y="82" width="110" height="40" rx="8" fill="#F0FDF4" stroke="#16A34A" stroke-width="1.5"/>
+          <text x="615" y="100" text-anchor="middle" font-size="10" fill="#15803D" font-weight="700">Let TS infer</text>
+          <text x="615" y="115" text-anchor="middle" font-size="9" fill="#166534">useState(0)</text>
+
+          <!-- No branch -->
+          <path d="M340 124 L340 165" stroke="#E11D48" stroke-width="1.5" marker-end="url(#a3)"/>
+          <text x="353" y="147" font-size="9.5" fill="#E11D48" font-weight="600">No</text>
+
+          <!-- Provide generic -->
+          <rect x="190" y="165" width="300" height="50" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+          <text x="340" y="185" text-anchor="middle" font-size="11" fill="#4338CA" font-weight="700">Provide explicit generic</text>
+          <text x="340" y="204" text-anchor="middle" font-size="9.5" fill="#4F46E5">useState&lt;User | null&gt;(null)</text>
+
+          <!-- Special cases -->
+          <path d="M340 215 L340 250" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#a1)"/>
+
+          <rect x="60" y="250" width="175" height="40" rx="8" fill="#FFF7ED" stroke="#EA580C" stroke-width="1.5"/>
+          <text x="147" y="268" text-anchor="middle" font-size="10" fill="#C2410C" font-weight="700">useRef&lt;HTMLElement&gt;</text>
+          <text x="147" y="283" text-anchor="middle" font-size="9" fill="#9A3412">always explicit</text>
+
+          <rect x="255" y="250" width="170" height="40" rx="8" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+          <text x="340" y="268" text-anchor="middle" font-size="10" fill="#6D28D9" font-weight="700">useReducer&lt;State,Action&gt;</text>
+          <text x="340" y="283" text-anchor="middle" font-size="9" fill="#5B21B6">discriminated unions</text>
+
+          <rect x="445" y="250" width="160" height="40" rx="8" fill="#CCFBF1" stroke="#0D9488" stroke-width="1.5"/>
+          <text x="525" y="268" text-anchor="middle" font-size="10" fill="#0F766E" font-weight="700">useContext&lt;T&gt;</text>
+          <text x="525" y="283" text-anchor="middle" font-size="9" fill="#134e4a">from createContext</text>
+
+          <!-- Connectors to bottom row -->
+          <path d="M210 250 L147 290" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3,2"/>
+          <path d="M340 250 L340 290" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3,2"/>
+          <path d="M470 250 L525 290" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3,2"/>
+
+          <defs>
+            <marker id="a1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#94a3b8"/></marker>
+            <marker id="a2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#16A34A"/></marker>
+            <marker id="a3" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#E11D48"/></marker>
+          </defs>
+        </svg>
+      </div>
+
+      <h3>useState</h3>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">useState-examples.tsx</span>
+          <span class="code-lang">tsx</span>
+        </div>
+        <pre><code class="language-tsx">// TypeScript infers the type from initial value — no annotation needed
+const [count, setCount] = React.useState(0)           // State&lt;number&gt;
+const [name, setName] = React.useState('')            // State&lt;string&gt;
+const [open, setOpen] = React.useState(false)         // State&lt;boolean&gt;
+
+// When initial value is null/undefined, provide the generic
+interface User {
+  id: string
+  name: string
+  email: string
+}
+
+const [user, setUser] = React.useState&lt;User | null&gt;(null)
+// user is User | null — TypeScript forces you to handle the null case
+
+// Arrays: infer from initial value or provide generic
+const [items, setItems] = React.useState&lt;string[]&gt;([])
+
+// Union types: provide explicit generic
+const [status, setStatus] = React.useState&lt;'idle' | 'loading' | 'error' | 'success'&gt;('idle')</code></pre>
+      </div>
+
+      <h3>useReducer</h3>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">useReducer-example.tsx</span>
+          <span class="code-lang">tsx</span>
+        </div>
+        <pre><code class="language-tsx">// Discriminated union for actions — exhaustive and type-safe
+type Action =
+  | { type: 'increment' }
+  | { type: 'decrement' }
+  | { type: 'reset'; payload: number }
+  | { type: 'set'; payload: number }
+
+interface CounterState {
+  count: number
+  history: number[]
+}
+
+function reducer(state: CounterState, action: Action): CounterState {
+  switch (action.type) {
+    case 'increment':
+      return { ...state, count: state.count + 1, history: [...state.history, state.count] }
+    case 'decrement':
+      return { ...state, count: state.count - 1, history: [...state.history, state.count] }
+    case 'reset':
+      return { count: action.payload, history: [] }  // payload typed as number
+    case 'set':
+      return { ...state, count: action.payload }
+    // TypeScript enforces exhaustiveness — if a case is missing, it's a type error
+  }
+}
+
+function Counter() {
+  const [state, dispatch] = React.useReducer(reducer, { count: 0, history: [] })
+
+  return (
+    &lt;div&gt;
+      &lt;p&gt;Count: {state.count}&lt;/p&gt;
+      &lt;button onClick={() =&gt; dispatch({ type: 'increment' })}&gt;+&lt;/button&gt;
+      &lt;button onClick={() =&gt; dispatch({ type: 'reset', payload: 0 })}&gt;Reset&lt;/button&gt;
+    &lt;/div&gt;
+  )
+}</code></pre>
+      </div>
+
+      <h3>useRef</h3>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">useRef-examples.tsx</span>
+          <span class="code-lang">tsx</span>
+        </div>
+        <pre><code class="language-tsx">// DOM refs — always provide the element type, always initialize with null
+function FocusableInput() {
+  const inputRef = React.useRef&lt;HTMLInputElement&gt;(null)
+
+  const focusInput = () =&gt; {
+    inputRef.current?.focus()  // nullable — could be null before mount
+  }
+
+  return &lt;input ref={inputRef} /&gt;
+}
+
+// Mutable refs for values that shouldn't trigger re-renders
+function Timer() {
+  const intervalRef = React.useRef&lt;ReturnType&lt;typeof setInterval&gt; | null&gt;(null)
+
+  const start = () =&gt; {
+    intervalRef.current = setInterval(() =&gt; tick(), 1000)
+  }
+
+  const stop = () =&gt; {
+    if (intervalRef.current !== null) {
+      clearInterval(intervalRef.current)
+      intervalRef.current = null
+    }
+  }
+
+  // ...
+}</code></pre>
+      </div>
+
+      <h3>Custom hooks</h3>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">useLocalStorage.ts</span>
+          <span class="code-lang">tsx</span>
+        </div>
+        <pre><code class="language-tsx">// Generic custom hook — full type safety for any value
+function useLocalStorage&lt;T&gt;(key: string, initialValue: T): [T, (value: T) =&gt; void] {
+  const [storedValue, setStoredValue] = React.useState&lt;T&gt;(() =&gt; {
+    try {
+      const item = window.localStorage.getItem(key)
+      return item ? (JSON.parse(item) as T) : initialValue
+    } catch {
+      return initialValue
+    }
+  })
+
+  const setValue = (value: T) =&gt; {
+    try {
+      setStoredValue(value)
+      window.localStorage.setItem(key, JSON.stringify(value))
+    } catch (error) {
+      console.error('localStorage error:', error)
+    }
+  }
+
+  return [storedValue, setValue]
+}
+
+// Usage — T is inferred as 'light' | 'dark'
+const [theme, setTheme] = useLocalStorage&lt;'light' | 'dark'&gt;('theme', 'light')
+
+// Another custom hook with a typed return object
+interface UseToggleReturn {
+  isOn: boolean
+  toggle: () =&gt; void
+  turnOn: () =&gt; void
+  turnOff: () =&gt; void
+}
+
+function useToggle(initial = false): UseToggleReturn {
+  const [isOn, setIsOn] = React.useState(initial)
+  return {
+    isOn,
+    toggle: () =&gt; setIsOn((prev) =&gt; !prev),
+    turnOn: () =&gt; setIsOn(true),
+    turnOff: () =&gt; setIsOn(false),
+  }
+}</code></pre>
+      </div>
+
+      <div class="callout callout-mental">
+        <div class="callout-icon">&#x1F9E0;</div>
+        <div class="callout-body">
+          <div class="callout-label">Mental Model</div>
+          <p>Think of hooks as functions that return values — because that's exactly what they are.
+          Typing a custom hook is just typing a function's return value. Use a named interface
+          for the return type rather than an inline type — it makes the hook's API visible and
+          gives you a label to reference in documentation and autocomplete.</p>
+        </div>
+      </div>
+    </section>
+
+    <hr class="section-divider" />
+
+    <!-- ─── SECTION 5 ─── -->
+    <section class="section" id="s5">
+      <span id="anchor-s5" class="section-anchor"></span>
+      <div class="section-number">5</div>
+      <h2>Context API with TypeScript</h2>
+
+      <p>
+        React Context propagates values down the component tree without prop drilling. TypeScript
+        makes context dramatically safer — you know exactly what the context contains, and you get
+        autocomplete everywhere it's consumed.
+      </p>
+
+      <h3>Typed context pattern</h3>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">ThemeContext.tsx</span>
+          <span class="code-lang">tsx</span>
+        </div>
+        <pre><code class="language-tsx">// 1. Define the shape of the context value
+interface ThemeContextType {
+  theme: 'light' | 'dark'
+  toggleTheme: () =&gt; void
+}
+
+// 2. Create context with undefined default — forces correct usage through provider
+const ThemeContext = React.createContext&lt;ThemeContextType | undefined&gt;(undefined)
+
+// 3. Create a custom hook that enforces provider presence
+function useTheme(): ThemeContextType {
+  const ctx = React.useContext(ThemeContext)
+  if (ctx === undefined) {
+    throw new Error('useTheme must be used within ThemeProvider')
+  }
+  return ctx
+}
+
+// 4. Provider component
+interface ThemeProviderProps {
+  children: React.ReactNode
+  defaultTheme?: 'light' | 'dark'
+}
+
+function ThemeProvider({ children, defaultTheme = 'light' }: ThemeProviderProps) {
+  const [theme, setTheme] = React.useState&lt;'light' | 'dark'&gt;(defaultTheme)
+
+  const value: ThemeContextType = {
+    theme,
+    toggleTheme: () =&gt; setTheme((prev) =&gt; (prev === 'light' ? 'dark' : 'light')),
+  }
+
+  return &lt;ThemeContext.Provider value={value}&gt;{children}&lt;/ThemeContext.Provider&gt;
+}
+
+// 5. Usage — fully typed, error if used outside provider
+function ThemedButton() {
+  const { theme, toggleTheme } = useTheme()
+  return (
+    &lt;button
+      onClick={toggleTheme}
+      className={theme === 'dark' ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'}
+    &gt;
+      Current: {theme}
+    &lt;/button&gt;
+  )
+}</code></pre>
+      </div>
+
+      <h3>Multiple contexts pattern</h3>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">providers.tsx</span>
+          <span class="code-lang">tsx</span>
+        </div>
+        <pre><code class="language-tsx">// Compose multiple providers into one — clean and maintainable
+interface AppProvidersProps {
+  children: React.ReactNode
+}
+
+function AppProviders({ children }: AppProvidersProps) {
+  return (
+    &lt;ThemeProvider&gt;
+      &lt;AuthProvider&gt;
+        &lt;ToastProvider&gt;
+          {children}
+        &lt;/ToastProvider&gt;
+      &lt;/AuthProvider&gt;
+    &lt;/ThemeProvider&gt;
+  )
+}
+
+// In main.tsx
+// &lt;AppProviders&gt;&lt;App /&gt;&lt;/AppProviders&gt;</code></pre>
+      </div>
+
+      <div class="callout callout-info">
+        <div class="callout-icon">&#x2139;</div>
+        <div class="callout-body">
+          <div class="callout-label">Info</div>
+          <p>Always initialize <code>createContext</code> with <code>undefined</code> and use a custom hook
+          with a runtime check rather than providing a dummy default value. The dummy value approach
+          makes silent failures possible — your component silently uses the wrong value with no error.
+          The <code>undefined</code> approach fails loudly and clearly at the point of misuse.</p>
+        </div>
+      </div>
+    </section>
+
+    <hr class="section-divider" />
+
+    <!-- ─── SECTION 6 ─── -->
+    <section class="section" id="s6">
+      <span id="anchor-s6" class="section-anchor"></span>
+      <div class="section-number">6</div>
+      <h2>Forms</h2>
+
+      <p>
+        Forms are where TypeScript's value is most visceral. Without types, form data is a bag of
+        strings. With TypeScript and the right libraries, form data is a validated, typed object
+        that can't be submitted unless it's correct.
+      </p>
+
+      <h3>react-hook-form + Zod</h3>
+      <p>
+        The industry standard combination: <code>react-hook-form</code> for performance (uncontrolled
+        inputs, minimal re-renders), <code>zod</code> for schema validation, and
+        <code>@hookform/resolvers</code> to connect them.
+      </p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">SignupForm.tsx</span>
+          <span class="code-lang">tsx</span>
+        </div>
+        <pre><code class="language-tsx">import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+
+// 1. Define the schema — single source of truth for validation AND types
+const signupSchema = z.object({
+  name: z.string().min(2, 'Name must be at least 2 characters'),
+  email: z.string().email('Invalid email address'),
+  password: z.string().min(8, 'Password must be at least 8 characters'),
+  role: z.enum(['admin', 'editor', 'viewer']),
+  agreeToTerms: z.literal(true, {
+    errorMap: () =&gt; ({ message: 'You must accept the terms' }),
+  }),
+})
+
+// 2. Derive TypeScript type from schema — no duplication
+type SignupFormData = z.infer&lt;typeof signupSchema&gt;
+// Equivalent to:
+// {
+//   name: string
+//   email: string
+//   password: string
+//   role: 'admin' | 'editor' | 'viewer'
+//   agreeToTerms: true
+// }
+
+// 3. Build the form
+function SignupForm() {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    watch,
+    reset,
+  } = useForm&lt;SignupFormData&gt;({
+    resolver: zodResolver(signupSchema),
+    defaultValues: {
+      role: 'viewer',
+    },
+  })
+
+  const onSubmit = async (data: SignupFormData) =&gt; {
+    // data is fully typed — TypeScript knows every field is valid here
+    await createUser(data)
+    reset()
+  }
+
+  return (
+    &lt;form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4"&gt;
+      &lt;div&gt;
+        &lt;label&gt;Name&lt;/label&gt;
+        &lt;input {...register('name')} /&gt;
+        {errors.name &amp;&amp; &lt;p className="text-red-600 text-sm"&gt;{errors.name.message}&lt;/p&gt;}
+      &lt;/div&gt;
+
+      &lt;div&gt;
+        &lt;label&gt;Email&lt;/label&gt;
+        &lt;input type="email" {...register('email')} /&gt;
+        {errors.email &amp;&amp; &lt;p className="text-red-600 text-sm"&gt;{errors.email.message}&lt;/p&gt;}
+      &lt;/div&gt;
+
+      &lt;div&gt;
+        &lt;label&gt;Password&lt;/label&gt;
+        &lt;input type="password" {...register('password')} /&gt;
+        {errors.password &amp;&amp; &lt;p className="text-red-600 text-sm"&gt;{errors.password.message}&lt;/p&gt;}
+      &lt;/div&gt;
+
+      &lt;div&gt;
+        &lt;label&gt;Role&lt;/label&gt;
+        &lt;select {...register('role')}&gt;
+          &lt;option value="viewer"&gt;Viewer&lt;/option&gt;
+          &lt;option value="editor"&gt;Editor&lt;/option&gt;
+          &lt;option value="admin"&gt;Admin&lt;/option&gt;
+        &lt;/select&gt;
+      &lt;/div&gt;
+
+      &lt;div&gt;
+        &lt;label&gt;
+          &lt;input type="checkbox" {...register('agreeToTerms')} /&gt;
+          I agree to the terms
+        &lt;/label&gt;
+        {errors.agreeToTerms &amp;&amp; &lt;p className="text-red-600 text-sm"&gt;{errors.agreeToTerms.message}&lt;/p&gt;}
+      &lt;/div&gt;
+
+      &lt;button type="submit" disabled={isSubmitting}&gt;
+        {isSubmitting ? 'Creating account...' : 'Sign up'}
+      &lt;/button&gt;
+    &lt;/form&gt;
+  )
+}</code></pre>
+      </div>
+
+      <div class="callout callout-tip">
+        <div class="callout-icon">&#x2714;</div>
+        <div class="callout-body">
+          <div class="callout-label">Tip</div>
+          <p>
+            Define your Zod schema once. From it you get: runtime validation, TypeScript types via
+            <code>z.infer</code>, error messages, and the shape for your API request. This is the
+            highest-leverage pattern in frontend TypeScript — one definition drives everything.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <hr class="section-divider" />
+
+    <!-- ─── SECTION 7 ─── -->
+    <section class="section" id="s7">
+      <span id="anchor-s7" class="section-anchor"></span>
+      <div class="section-number">7</div>
+      <h2>Fetching Data</h2>
+
+      <p>
+        Data fetching in React has evolved dramatically. The naive <code>useEffect</code> + <code>fetch</code>
+        pattern works but leaves you managing loading states, caching, deduplication, and error handling
+        yourself. TanStack Query solves all of this — and TypeScript makes the whole pipeline type-safe.
+      </p>
+
+      <h3>The useEffect + fetch pattern (and its problems)</h3>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">naive-fetch.tsx</span>
+          <span class="code-lang">tsx</span>
+        </div>
+        <pre><code class="language-tsx">// The naive pattern — works, but you're writing a lot of boilerplate
+interface User {
+  id: number
+  name: string
+  email: string
+}
+
+function UserList() {
+  const [users, setUsers] = React.useState&lt;User[]&gt;([])
+  const [isLoading, setIsLoading] = React.useState(true)
+  const [error, setError] = React.useState&lt;string | null&gt;(null)
+
+  React.useEffect(() =&gt; {
+    let cancelled = false   // prevent state updates after unmount
+
+    async function fetchUsers() {
+      try {
+        setIsLoading(true)
+        const res = await fetch('/api/users')
+        if (!res.ok) throw new Error(`HTTP ${res.status}`)
+        const data: User[] = await res.json()
+        if (!cancelled) setUsers(data)
+      } catch (err) {
+        if (!cancelled) setError(err instanceof Error ? err.message : 'Unknown error')
+      } finally {
+        if (!cancelled) setIsLoading(false)
+      }
+    }
+
+    fetchUsers()
+    return () =&gt; { cancelled = true }
+  }, [])
+
+  // No caching, no deduplication, no refetch on focus, no pagination...
+}</code></pre>
+      </div>
+
+      <h3>TanStack Query (React Query)</h3>
+      <p>
+        TanStack Query handles caching, background refetching, deduplication, pagination, and mutations.
+        Critically, it infers types from your query function.
+      </p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">UserList.tsx</span>
+          <span class="code-lang">tsx</span>
+        </div>
+        <pre><code class="language-tsx">import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+
+// Type your API functions separately — these drive type inference
+async function fetchUsers(): Promise&lt;User[]&gt; {
+  const res = await fetch('/api/users')
+  if (!res.ok) throw new Error(`HTTP ${res.status}`)
+  return res.json()
+}
+
+async function deleteUser(id: number): Promise&lt;void&gt; {
+  const res = await fetch(`/api/users/${id}`, { method: 'DELETE' })
+  if (!res.ok) throw new Error(`HTTP ${res.status}`)
+}
+
+// useQuery infers: data: User[] | undefined, error: Error | null
+function UserList() {
+  const queryClient = useQueryClient()
+
+  const { data: users, isLoading, error, isFetching } = useQuery({
+    queryKey: ['users'],
+    queryFn: fetchUsers,
+    staleTime: 5 * 60 * 1000,   // 5 minutes
+  })
+
+  const deleteMutation = useMutation({
+    mutationFn: deleteUser,
+    onSuccess: () =&gt; {
+      // Invalidate and refetch
+      queryClient.invalidateQueries({ queryKey: ['users'] })
+    },
+  })
+
+  if (isLoading) return &lt;Skeleton /&gt;
+  if (error) return &lt;ErrorBanner message={error.message} /&gt;
+
+  return (
+    &lt;ul&gt;
+      {users?.map((user) =&gt; (
+        &lt;li key={user.id}&gt;
+          {user.name}
+          &lt;button
+            onClick={() =&gt; deleteMutation.mutate(user.id)}
+            disabled={deleteMutation.isPending}
+          &gt;
+            Delete
+          &lt;/button&gt;
+        &lt;/li&gt;
+      ))}
+    &lt;/ul&gt;
+  )
+}</code></pre>
+      </div>
+
+      <h3>Optimistic updates</h3>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">optimistic.tsx</span>
+          <span class="code-lang">tsx</span>
+        </div>
+        <pre><code class="language-tsx">const toggleFavouriteMutation = useMutation({
+  mutationFn: (userId: number) =&gt; toggleFavourite(userId),
+
+  // Optimistically update the cache before the server responds
+  onMutate: async (userId: number) =&gt; {
+    await queryClient.cancelQueries({ queryKey: ['users'] })
+
+    const previous = queryClient.getQueryData&lt;User[]&gt;(['users'])
+
+    queryClient.setQueryData&lt;User[]&gt;(['users'], (old) =&gt;
+      old?.map((u) =&gt; u.id === userId ? { ...u, isFavourite: !u.isFavourite } : u)
+    )
+
+    return { previous }   // return snapshot for rollback
+  },
+
+  // Rollback on error
+  onError: (_err, _userId, context) =&gt; {
+    if (context?.previous) {
+      queryClient.setQueryData(['users'], context.previous)
+    }
+  },
+})</code></pre>
+      </div>
+
+      <div class="callout callout-info">
+        <div class="callout-icon">&#x2139;</div>
+        <div class="callout-body">
+          <div class="callout-label">Info</div>
+          <p>TanStack Query infers the data type directly from the return type of your <code>queryFn</code>.
+          This means if you correctly type your API functions, the entire data-fetching pipeline is
+          type-safe with no extra work. The <code>error</code> type defaults to <code>Error</code> in
+          TanStack Query v5.</p>
+        </div>
+      </div>
+    </section>
+
+    <hr class="section-divider" />
+
+    <!-- ─── SECTION 8 ─── -->
+    <section class="section" id="s8">
+      <span id="anchor-s8" class="section-anchor"></span>
+      <div class="section-number">8</div>
+      <h2>Component Composition Patterns</h2>
+
+      <p>
+        TypeScript unlocks advanced React patterns that would be fragile without types. These patterns
+        let you build highly flexible, reusable components without sacrificing safety.
+      </p>
+
+      <h3>Discriminated union props</h3>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">Alert.tsx</span>
+          <span class="code-lang">tsx</span>
+        </div>
+        <pre><code class="language-tsx">// Discriminated union for conditional prop requirements
+type AlertProps =
+  | {
+      variant: 'info' | 'success' | 'warning'
+      message: string
+      onDismiss?: () =&gt; void
+    }
+  | {
+      variant: 'error'
+      message: string
+      error: Error         // required when variant is 'error'
+      onRetry?: () =&gt; void // only makes sense for errors
+      onDismiss?: () =&gt; void
+    }
+
+function Alert(props: AlertProps) {
+  return (
+    &lt;div className={`alert alert-${props.variant}`}&gt;
+      &lt;p&gt;{props.message}&lt;/p&gt;
+      {props.variant === 'error' &amp;&amp; (
+        // TypeScript knows props.error and props.onRetry exist here
+        &lt;div&gt;
+          &lt;code&gt;{props.error.message}&lt;/code&gt;
+          {props.onRetry &amp;&amp; &lt;button onClick={props.onRetry}&gt;Retry&lt;/button&gt;}
+        &lt;/div&gt;
+      )}
+    &lt;/div&gt;
+  )
+}
+
+// TypeScript enforces the correct props for each variant
+&lt;Alert variant="success" message="Saved!" /&gt;
+&lt;Alert variant="error" message="Failed" error={new Error('Network error')} /&gt;
+// Error: Property 'error' is missing for variant 'error'
+&lt;Alert variant="error" message="Failed" /&gt;</code></pre>
+      </div>
+
+      <h3>Polymorphic "as" prop</h3>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">Text.tsx</span>
+          <span class="code-lang">tsx</span>
+        </div>
+        <pre><code class="language-tsx">// The polymorphic component — renders as any HTML element or React component
+type PolymorphicProps&lt;T extends React.ElementType&gt; = {
+  as?: T
+  children: React.ReactNode
+  className?: string
+} &amp; React.ComponentPropsWithoutRef&lt;T&gt;
+
+function Text&lt;T extends React.ElementType = 'span'&gt;({
+  as,
+  children,
+  className,
+  ...rest
+}: PolymorphicProps&lt;T&gt;) {
+  const Component = as ?? 'span'
+  return &lt;Component className={className} {...rest}&gt;{children}&lt;/Component&gt;
+}
+
+// Usage — TypeScript validates props based on the 'as' element
+&lt;Text&gt;Default span&lt;/Text&gt;
+&lt;Text as="h1"&gt;Heading&lt;/Text&gt;
+&lt;Text as="a" href="/home"&gt;Link&lt;/Text&gt;       // href is valid because 'a' has href
+// Error: 'href' doesn't exist on 'span'
+&lt;Text href="/home"&gt;Bad&lt;/Text&gt;</code></pre>
+      </div>
+
+      <h3>Compound components</h3>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">Card.tsx</span>
+          <span class="code-lang">tsx</span>
+        </div>
+        <pre><code class="language-tsx">// Compound components — namespace-style composition
+interface CardProps {
+  children: React.ReactNode
+  className?: string
+}
+
+function CardRoot({ children, className }: CardProps) {
+  return &lt;div className={cn('rounded-xl border bg-white shadow-sm', className)}&gt;{children}&lt;/div&gt;
+}
+
+function CardHeader({ children, className }: CardProps) {
+  return &lt;div className={cn('border-b px-6 py-4', className)}&gt;{children}&lt;/div&gt;
+}
+
+function CardBody({ children, className }: CardProps) {
+  return &lt;div className={cn('px-6 py-4', className)}&gt;{children}&lt;/div&gt;
+}
+
+function CardFooter({ children, className }: CardProps) {
+  return &lt;div className={cn('border-t px-6 py-3', className)}&gt;{children}&lt;/div&gt;
+}
+
+// Attach sub-components as properties
+const Card = Object.assign(CardRoot, {
+  Header: CardHeader,
+  Body: CardBody,
+  Footer: CardFooter,
+})
+
+// Usage — discoverable via autocomplete
+&lt;Card&gt;
+  &lt;Card.Header&gt;
+    &lt;h2&gt;Title&lt;/h2&gt;
+  &lt;/Card.Header&gt;
+  &lt;Card.Body&gt;
+    Content here
+  &lt;/Card.Body&gt;
+  &lt;Card.Footer&gt;
+    &lt;button&gt;Action&lt;/button&gt;
+  &lt;/Card.Footer&gt;
+&lt;/Card&gt;</code></pre>
+      </div>
+
+      <div class="callout callout-mental">
+        <div class="callout-icon">&#x1F9E0;</div>
+        <div class="callout-body">
+          <div class="callout-label">Mental Model</div>
+          <p>Discriminated unions for props are the same technique you use for Redux actions or API
+          response types. The discriminant (the <code>variant</code> field) narrows the type in a
+          switch or if-statement, giving TypeScript complete knowledge of what's available in each
+          branch. This is one of TypeScript's most powerful features — use it liberally in component design.</p>
+        </div>
+      </div>
+    </section>
+
+    <hr class="section-divider" />
+
+    <!-- ─── SECTION 9 ─── -->
+    <section class="section" id="s9">
+      <span id="anchor-s9" class="section-anchor"></span>
+      <div class="section-number">9</div>
+      <h2>UI Component Libraries</h2>
+
+      <p>
+        Don't build every component from scratch. The TypeScript ecosystem has excellent typed UI
+        libraries ranging from fully styled to completely headless.
+      </p>
+
+      <h3>shadcn/ui</h3>
+      <p>
+        shadcn/ui is the current community favourite — not a package you install, but components you
+        <em>copy into your project</em>. Built on Radix UI primitives with Tailwind CSS and full
+        TypeScript. You own the code.
+      </p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">terminal</span>
+          <span class="code-lang">shell</span>
+        </div>
+        <pre><code class="language-bash">pnpm dlx shadcn@latest init
+pnpm dlx shadcn@latest add button dialog table</code></pre>
+      </div>
+
+      <h3>The cn() utility</h3>
+      <p>
+        Every serious TypeScript + Tailwind project uses this tiny utility to compose class names
+        conditionally while avoiding conflicting Tailwind classes.
+      </p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">lib/utils.ts</span>
+          <span class="code-lang">tsx</span>
+        </div>
+        <pre><code class="language-tsx">import { type ClassValue, clsx } from 'clsx'
+import { twMerge } from 'tailwind-merge'
+
+// Merges class names, resolving Tailwind conflicts intelligently
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}
+
+// Usage — conditional classes with conflict resolution
+&lt;button
+  className={cn(
+    'px-4 py-2 rounded font-medium',          // always applied
+    variant === 'primary' &amp;&amp; 'bg-indigo-600',  // conditional
+    variant === 'danger' &amp;&amp; 'bg-red-600',      // conditional
+    disabled &amp;&amp; 'opacity-50 cursor-not-allowed',
+    className,                                  // allow override — conflicts resolved by twMerge
+  )}
+/&gt;</code></pre>
+      </div>
+
+      <h3>Library comparison</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Library</th>
+              <th>Style</th>
+              <th>TypeScript</th>
+              <th>Best for</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>shadcn/ui</td>
+              <td>Tailwind (copy-paste)</td>
+              <td><span class="badge badge-green">Excellent</span></td>
+              <td>Full control, custom design systems</td>
+            </tr>
+            <tr>
+              <td>Radix UI</td>
+              <td>Headless (bring your own CSS)</td>
+              <td><span class="badge badge-green">Excellent</span></td>
+              <td>Building your own library on top of</td>
+            </tr>
+            <tr>
+              <td>Mantine</td>
+              <td>Styled, CSS modules</td>
+              <td><span class="badge badge-green">Excellent</span></td>
+              <td>Feature-rich apps, form components</td>
+            </tr>
+            <tr>
+              <td>MUI (Material)</td>
+              <td>Material Design, CSS-in-JS</td>
+              <td><span class="badge badge-green">Excellent</span></td>
+              <td>Enterprise dashboards</td>
+            </tr>
+            <tr>
+              <td>Chakra UI</td>
+              <td>Styled, design tokens</td>
+              <td><span class="badge badge-indigo">Good</span></td>
+              <td>Rapid prototyping</td>
+            </tr>
+            <tr>
+              <td>Ant Design</td>
+              <td>Opinionated design system</td>
+              <td><span class="badge badge-indigo">Good</span></td>
+              <td>Admin tools, data tables</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <hr class="section-divider" />
+
+    <!-- ─── SECTION 10 ─── -->
+    <section class="section" id="s10">
+      <span id="anchor-s10" class="section-anchor"></span>
+      <div class="section-number">10</div>
+      <h2>Performance Optimization</h2>
+
+      <p>
+        TypeScript doesn't change React's rendering model, but it makes optimization patterns
+        safer and more maintainable. TypeScript will catch you passing the wrong type to a memoized
+        component or mistyping a dependency array element.
+      </p>
+
+      <h3>React.memo</h3>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">MemoExample.tsx</span>
+          <span class="code-lang">tsx</span>
+        </div>
+        <pre><code class="language-tsx">interface UserCardProps {
+  user: User
+  onSelect: (id: string) =&gt; void
+}
+
+// React.memo wraps the component — TypeScript preserves prop types
+const UserCard = React.memo(function UserCard({ user, onSelect }: UserCardProps) {
+  return (
+    &lt;div onClick={() =&gt; onSelect(user.id)}&gt;
+      &lt;h3&gt;{user.name}&lt;/h3&gt;
+    &lt;/div&gt;
+  )
+})
+
+// Custom comparison function — TypeScript types both prev and next
+const UserCard = React.memo(
+  function UserCard({ user, onSelect }: UserCardProps) { /* ... */ },
+  (prevProps, nextProps) =&gt; prevProps.user.id === nextProps.user.id
+    &amp;&amp; prevProps.onSelect === nextProps.onSelect
+)</code></pre>
+      </div>
+
+      <h3>useMemo and useCallback</h3>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">optimization.tsx</span>
+          <span class="code-lang">tsx</span>
+        </div>
+        <pre><code class="language-tsx">function UserDashboard({ users }: { users: User[] }) {
+  const [filter, setFilter] = React.useState('')
+
+  // useMemo — type inferred from the computation return type
+  const filteredUsers = React.useMemo(
+    () =&gt; users.filter((u) =&gt; u.name.toLowerCase().includes(filter.toLowerCase())),
+    [users, filter]
+  )
+  // filteredUsers: User[]  ✓ inferred
+
+  // useCallback — type inferred from the function signature
+  const handleDelete = React.useCallback(
+    async (userId: string) =&gt; {
+      await deleteUser(userId)
+    },
+    []  // stable reference — safe to pass to memoized children
+  )
+  // handleDelete: (userId: string) =&gt; Promise&lt;void&gt;  ✓ inferred
+
+  return &lt;UserList users={filteredUsers} onDelete={handleDelete} /&gt;
+}</code></pre>
+      </div>
+
+      <div class="callout callout-warning">
+        <div class="callout-icon">&#x26A0;</div>
+        <div class="callout-body">
+          <div class="callout-label">Warning</div>
+          <p>Don't reach for <code>useMemo</code> and <code>useCallback</code> by default — they add
+          memory and complexity. Profile first with React DevTools. Use them when: a computation is
+          genuinely expensive (&gt;1ms), you're passing callbacks to deeply memoized child components,
+          or you're stabilizing a reference used in a <code>useEffect</code> dependency array.</p>
+        </div>
+      </div>
+
+      <h3>Code splitting with React.lazy</h3>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">App.tsx</span>
+          <span class="code-lang">tsx</span>
+        </div>
+        <pre><code class="language-tsx">import React from 'react'
+
+// Dynamic import — TypeScript requires a default export in the target module
+const HeavyDashboard = React.lazy(() =&gt; import('./HeavyDashboard'))
+const AdminPanel = React.lazy(() =&gt; import('./AdminPanel'))
+
+function App() {
+  const { user } = useAuth()
+
+  return (
+    &lt;React.Suspense fallback={&lt;LoadingSpinner /&gt;}&gt;
+      &lt;HeavyDashboard /&gt;
+      {user.role === 'admin' &amp;&amp; &lt;AdminPanel /&gt;}
+    &lt;/React.Suspense&gt;
+  )
+}
+
+// Route-level splitting with React Router
+const routes = [
+  {
+    path: '/dashboard',
+    component: React.lazy(() =&gt; import('./pages/Dashboard')),
+  },
+  {
+    path: '/settings',
+    component: React.lazy(() =&gt; import('./pages/Settings')),
+  },
+]</code></pre>
+      </div>
+    </section>
+
+    <hr class="section-divider" />
+
+    <!-- ─── SECTION 11 ─── -->
+    <section class="section" id="s11">
+      <span id="anchor-s11" class="section-anchor"></span>
+      <div class="section-number">11</div>
+      <h2>Testing React Components</h2>
+
+      <p>
+        React Testing Library is the standard approach: test components from the user's perspective,
+        not the implementation. TypeScript integration is first-class.
+      </p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">vitest.config.ts</span>
+          <span class="code-lang">tsx</span>
+        </div>
+        <pre><code class="language-tsx">import { defineConfig } from 'vitest/config'
+import react from '@vitejs/plugin-react'
+
+export default defineConfig({
+  plugins: [react()],
+  test: {
+    environment: 'jsdom',
+    globals: true,
+    setupFiles: ['./src/test/setup.ts'],
+  },
+})</code></pre>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">Button.test.tsx</span>
+          <span class="code-lang">tsx</span>
+        </div>
+        <pre><code class="language-tsx">import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { describe, it, expect, vi } from 'vitest'
+import { Button } from './Button'
+
+describe('Button', () =&gt; {
+  it('renders with label', () =&gt; {
+    render(&lt;Button label="Click me" onClick={vi.fn()} /&gt;)
+    expect(screen.getByText('Click me')).toBeInTheDocument()
+  })
+
+  it('calls onClick when clicked', async () =&gt; {
+    const handleClick = vi.fn()
+    render(&lt;Button label="Click me" onClick={handleClick} /&gt;)
+
+    await userEvent.click(screen.getByRole('button'))
+    expect(handleClick).toHaveBeenCalledOnce()
+  })
+
+  it('is disabled when disabled prop is true', () =&gt; {
+    render(&lt;Button label="Disabled" onClick={vi.fn()} disabled /&gt;)
+    expect(screen.getByRole('button')).toBeDisabled()
+  })
+})
+
+// Testing custom hooks
+import { renderHook, act } from '@testing-library/react'
+import { useToggle } from './useToggle'
+
+describe('useToggle', () =&gt; {
+  it('starts with initial value', () =&gt; {
+    const { result } = renderHook(() =&gt; useToggle(false))
+    expect(result.current.isOn).toBe(false)
+  })
+
+  it('toggles state', () =&gt; {
+    const { result } = renderHook(() =&gt; useToggle(false))
+
+    act(() =&gt; result.current.toggle())
+    expect(result.current.isOn).toBe(true)
+
+    act(() =&gt; result.current.toggle())
+    expect(result.current.isOn).toBe(false)
+  })
+})</code></pre>
+      </div>
+
+      <div class="callout callout-tip">
+        <div class="callout-icon">&#x2714;</div>
+        <div class="callout-body">
+          <div class="callout-label">Tip</div>
+          <p>TypeScript in tests catches the same errors it catches in production code — passing the wrong
+          prop type to a component in a test file is an immediate red squiggle. This means your test
+          suite is also a type-checking exercise, not just a behaviour-checking one.
+          Use <code>vi.fn()</code> instead of <code>jest.fn()</code> when working with Vitest.</p>
+        </div>
+      </div>
+    </section>
+
+    <hr class="section-divider" />
+
+    <!-- ─── SECTION 12 ─── -->
+    <section class="section" id="s12">
+      <span id="anchor-s12" class="section-anchor"></span>
+      <div class="section-number">12</div>
+      <h2>Python Comparison</h2>
+
+      <div class="callout callout-python">
+        <div class="callout-icon">&#x1F40D;</div>
+        <div class="callout-body">
+          <div class="callout-label">Python Comparison</div>
+          <p><strong>Django/Flask + Jinja2 → React + TypeScript.</strong> In Django, templates are
+          strings of HTML with variable interpolation — runtime errors, no type checking on context
+          variables. In React + TypeScript, components are typed functions — compile-time errors, full
+          IDE support, refactoring that actually works.</p>
+          <p>A Django template context dict (<code>{"{'user': user, 'posts': posts}"}</code>) maps to
+          a React props interface. The difference: TypeScript enforces the interface on both the caller
+          and the component. Python's template context is unchecked at the call site and in the template.</p>
+          <p><strong>Server-side vs client-side rendering:</strong> Django renders HTML on the server
+          and sends complete pages — great for SEO, simpler mental model, page reload on navigation.
+          React renders on the client — instant navigation after initial load, rich interactivity,
+          but requires hydration strategy for SEO (Next.js solves this — that's Chapter 17).</p>
+        </div>
+      </div>
+
+      <h3>Mental model translation</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Python / Django concept</th>
+              <th>React + TypeScript equivalent</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Template context dict</td>
+              <td>Props interface</td>
+            </tr>
+            <tr>
+              <td>Template tag / filter</td>
+              <td>Custom component or hook</td>
+            </tr>
+            <tr>
+              <td>Template inheritance (<code>{% extends %}</code>)</td>
+              <td>Layout components, <code>children</code> prop</td>
+            </tr>
+            <tr>
+              <td>Django forms</td>
+              <td>react-hook-form + Zod</td>
+            </tr>
+            <tr>
+              <td>View function</td>
+              <td>React component</td>
+            </tr>
+            <tr>
+              <td>Context processor</td>
+              <td>React Context + Provider</td>
+            </tr>
+            <tr>
+              <td><code>{% if %}</code> block</td>
+              <td>Conditional rendering: <code>&#123;condition &amp;&amp; &lt;Component /&gt;&#125;</code></td>
+            </tr>
+            <tr>
+              <td><code>{% for item in items %}</code></td>
+              <td><code>&#123;items.map((item) =&gt; &lt;Row key={item.id} /&gt;)&#125;</code></td>
+            </tr>
+            <tr>
+              <td>HTMX / Django signals</td>
+              <td>React state + hooks + TanStack Query</td>
+            </tr>
+            <tr>
+              <td>Pydantic model</td>
+              <td>Zod schema + <code>z.infer&lt;&gt;</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- CHEAT SHEET -->
+    <div class="cheatsheet">
+      <div class="cheatsheet-title">Props Typing Quick Reference</div>
+      <div class="cheatsheet-grid">
+        <div class="cheat-item">
+          <div class="cheat-label">Basic component</div>
+          <div class="cheat-code"><span class="kw">function</span> Foo({ bar }: <span class="ty">FooProps</span>) &#123; ... &#125;</div>
+        </div>
+        <div class="cheat-item">
+          <div class="cheat-label">With children</div>
+          <div class="cheat-code">children?: <span class="ty">React.ReactNode</span></div>
+        </div>
+        <div class="cheat-item">
+          <div class="cheat-label">Click handler</div>
+          <div class="cheat-code">onClick: <span class="ty">React.MouseEventHandler</span>&lt;<span class="ty">HTMLButtonElement</span>&gt;</div>
+        </div>
+        <div class="cheat-item">
+          <div class="cheat-label">Change handler</div>
+          <div class="cheat-code">onChange: <span class="ty">React.ChangeEventHandler</span>&lt;<span class="ty">HTMLInputElement</span>&gt;</div>
+        </div>
+        <div class="cheat-item">
+          <div class="cheat-label">State with null</div>
+          <div class="cheat-code">useState&lt;<span class="ty">User | null</span>&gt;(null)</div>
+        </div>
+        <div class="cheat-item">
+          <div class="cheat-label">DOM ref</div>
+          <div class="cheat-code">useRef&lt;<span class="ty">HTMLInputElement</span>&gt;(null)</div>
+        </div>
+        <div class="cheat-item">
+          <div class="cheat-label">Extend native element</div>
+          <div class="cheat-code"><span class="kw">interface</span> <span class="ty">Props</span> <span class="kw">extends</span> <span class="ty">React.ComponentProps</span>&lt;<span class="st">'button'</span>&gt; &#123; ... &#125;</div>
+        </div>
+        <div class="cheat-item">
+          <div class="cheat-label">Forward ref</div>
+          <div class="cheat-code">React.forwardRef&lt;<span class="ty">HTMLInputElement</span>, <span class="ty">Props</span>&gt;((props, ref) =&gt; ...)</div>
+        </div>
+        <div class="cheat-item">
+          <div class="cheat-label">CSS classes</div>
+          <div class="cheat-code">import &#123; <span class="kw">type</span> <span class="ty">ClassValue</span> &#125; from <span class="st">'clsx'</span></div>
+        </div>
+        <div class="cheat-item">
+          <div class="cheat-label">Inline styles</div>
+          <div class="cheat-code">style?: <span class="ty">React.CSSProperties</span></div>
+        </div>
+        <div class="cheat-item">
+          <div class="cheat-label">Generic component</div>
+          <div class="cheat-code"><span class="kw">function</span> List&lt;<span class="ty">T</span>&gt;(&#123; items &#125;: &#123; items: <span class="ty">T</span>[] &#125;) &#123; ... &#125;</div>
+        </div>
+        <div class="cheat-item">
+          <div class="cheat-label">Custom hook return</div>
+          <div class="cheat-code"><span class="kw">function</span> useX(): [<span class="ty">T</span>, (<span class="ty">v: T</span>) =&gt; <span class="ty">void</span>]</div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ FOOTER -->
+<footer class="chapter-footer">
+  <div class="footer-inner">
+    <a href="chapter-15-auth.html" class="footer-nav-btn">
+      <span class="footer-nav-direction">← Previous</span>
+      <span class="footer-nav-title">Ch 15: Authentication &amp; Auth</span>
+    </a>
+
+    <div class="footer-center">
+      <div class="footer-author">Matt Pocock — Total TypeScript</div>
+      <div class="footer-byline">TypeScript for the AI Era &nbsp;·&nbsp; Chapter 16 of 24</div>
+      <div class="progress-bar-wrap">
+        <div class="progress-bar-fill"></div>
+      </div>
+    </div>
+
+    <a href="chapter-17-nextjs.html" class="footer-nav-btn" style="text-align:right;">
+      <span class="footer-nav-direction">Next →</span>
+      <span class="footer-nav-title">Ch 17: Next.js &amp; TypeScript</span>
+    </a>
+  </div>
+</footer>
+
+<script>
+  // Initialize highlight.js
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('pre code').forEach((el) => {
+      hljs.highlightElement(el)
+    })
+
+    // Active TOC on scroll
+    const sections = document.querySelectorAll('section[id]')
+    const tocLinks = document.querySelectorAll('.toc-list a')
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            tocLinks.forEach((link) => {
+              link.classList.remove('active')
+              if (link.getAttribute('href') === `#${entry.target.id}`) {
+                link.classList.add('active')
+              }
+            })
+          }
+        })
+      },
+      { rootMargin: '-20% 0px -70% 0px' }
+    )
+
+    sections.forEach((s) => observer.observe(s))
+  })
+</script>
+</body>
+</html>

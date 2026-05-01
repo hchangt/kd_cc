@@ -1,0 +1,2329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chapter 15: Authentication, Authorization & Security — TypeScript for the AI Era</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --white: #FFFFFF;
+      --surface: #F9FAFB;
+      --surface-2: #F3F4F6;
+      --border: #E5E7EB;
+      --text-primary: #111827;
+      --text-secondary: #6B7280;
+      --text-tertiary: #9CA3AF;
+      --indigo-50: #EEF2FF;
+      --indigo-100: #E0E7FF;
+      --indigo-200: #C7D2FE;
+      --indigo-600: #4F46E5;
+      --indigo-700: #4338CA;
+      --indigo-800: #3730A3;
+      --amber-50: #FFFBEB;
+      --amber-100: #FEF3C7;
+      --amber-600: #D97706;
+      --amber-700: #B45309;
+      --green-50: #F0FDF4;
+      --green-100: #DCFCE7;
+      --green-600: #16A34A;
+      --green-700: #15803D;
+      --sky-50: #F0F9FF;
+      --sky-100: #E0F2FE;
+      --sky-600: #0284C7;
+      --sky-700: #0369A1;
+      --violet-50: #F5F3FF;
+      --violet-100: #EDE9FE;
+      --violet-600: #7C3AED;
+      --violet-700: #6D28D9;
+      --red-600: #DC2626;
+      --red-50: #FEF2F2;
+      --red-100: #FEE2E2;
+      --red-700: #B91C1C;
+      --font-body: system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
+      --font-code: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--white);
+      color: var(--text-primary);
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ───── TOP NAV ───── */
+    .top-nav {
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      height: 56px;
+      display: flex;
+      align-items: center;
+      padding: 0 2rem;
+      gap: 1rem;
+      justify-content: space-between;
+    }
+
+    .nav-prev-next {
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+      font-size: 0.85rem;
+    }
+
+    .nav-prev-next a {
+      color: var(--indigo-600);
+      text-decoration: none;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      transition: color 0.15s;
+    }
+    .nav-prev-next a:hover { color: var(--indigo-700); }
+
+    .nav-center {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-align: center;
+      letter-spacing: 0.03em;
+    }
+
+    .nav-progress {
+      font-size: 0.75rem;
+      color: var(--text-tertiary);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 0.25rem 0.65rem;
+      border-radius: 999px;
+    }
+
+    /* ───── CHAPTER HERO ───── */
+    .chapter-hero {
+      background: linear-gradient(135deg, #1E1B4B 0%, #312E81 40%, #4F46E5 80%, #6366F1 100%);
+      padding: 4rem 2rem 3.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .chapter-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M50 50c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10c0 5.523-4.477 10-10 10s-10-4.477-10-10 4.477-10 10-10zM10 10c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10c0 5.523-4.477 10-10 10S0 25.523 0 20s4.477-10 10-10z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+
+    .chapter-hero-inner {
+      position: relative;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .chapter-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.25);
+      color: rgba(255,255,255,0.9);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.3rem 0.85rem;
+      border-radius: 999px;
+      margin-bottom: 1.25rem;
+    }
+
+    .chapter-hero h1 {
+      font-size: clamp(2rem, 5vw, 3.25rem);
+      font-weight: 800;
+      color: white;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      margin-bottom: 1rem;
+    }
+
+    .chapter-hero-subtitle {
+      font-size: 1.1rem;
+      color: rgba(255,255,255,0.78);
+      max-width: 680px;
+      line-height: 1.65;
+      margin-bottom: 2rem;
+    }
+
+    .chapter-meta {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .chapter-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.82rem;
+      color: rgba(255,255,255,0.7);
+    }
+
+    .chapter-meta-item svg { opacity: 0.8; }
+
+    /* ───── MAIN LAYOUT ───── */
+    .page-body {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 3rem 2rem 6rem;
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      gap: 3.5rem;
+      align-items: start;
+    }
+
+    /* ───── SIDEBAR TOC ───── */
+    .sidebar {
+      position: sticky;
+      top: 72px;
+      max-height: calc(100vh - 90px);
+      overflow-y: auto;
+    }
+
+    .toc-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-tertiary);
+      margin-bottom: 0.75rem;
+    }
+
+    .toc-list {
+      list-style: none;
+      border-left: 2px solid var(--border);
+    }
+
+    .toc-list li a {
+      display: block;
+      padding: 0.3rem 0.75rem;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      text-decoration: none;
+      line-height: 1.4;
+      transition: color 0.15s, border-color 0.15s;
+      border-left: 2px solid transparent;
+      margin-left: -2px;
+    }
+
+    .toc-list li a:hover {
+      color: var(--indigo-600);
+      border-left-color: var(--indigo-600);
+    }
+
+    .toc-list li.toc-sub a {
+      padding-left: 1.5rem;
+      font-size: 0.75rem;
+      color: var(--text-tertiary);
+    }
+
+    .toc-list li.toc-sub a:hover { color: var(--indigo-600); }
+
+    .toc-security-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      background: var(--red-50);
+      border: 1px solid #FECACA;
+      color: var(--red-600);
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      margin-top: 1.25rem;
+      margin-bottom: 0.5rem;
+    }
+
+    /* ───── ARTICLE ───── */
+    article { min-width: 0; }
+
+    article h2 {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      letter-spacing: -0.025em;
+      margin-top: 3.5rem;
+      margin-bottom: 1rem;
+      padding-bottom: 0.6rem;
+      border-bottom: 2px solid var(--border);
+      scroll-margin-top: 72px;
+    }
+
+    article h2:first-child { margin-top: 0; }
+
+    article h3 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-top: 2rem;
+      margin-bottom: 0.75rem;
+      letter-spacing: -0.01em;
+      scroll-margin-top: 72px;
+    }
+
+    article h4 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-top: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    article p {
+      margin-bottom: 1rem;
+      color: var(--text-primary);
+    }
+
+    article ul, article ol {
+      margin: 0.75rem 0 1rem 1.5rem;
+      color: var(--text-primary);
+    }
+
+    article li { margin-bottom: 0.3rem; }
+
+    article a {
+      color: var(--indigo-600);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
+    article strong { font-weight: 700; }
+
+    code {
+      font-family: var(--font-code);
+      font-size: 0.85em;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      padding: 0.1em 0.35em;
+      border-radius: 4px;
+      color: #C7254E;
+    }
+
+    /* ───── CODE BLOCKS ───── */
+    .code-block {
+      margin: 1.25rem 0;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    }
+
+    .code-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--surface-2);
+      border-bottom: 1px solid var(--border);
+      padding: 0.45rem 1rem;
+    }
+
+    .code-lang {
+      font-family: var(--font-code);
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-tertiary);
+    }
+
+    .code-filename {
+      font-family: var(--font-code);
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+    }
+
+    .code-block pre {
+      margin: 0;
+      padding: 1.1rem 1.25rem;
+      overflow-x: auto;
+      background: #F6F8FA;
+    }
+
+    .code-block pre code {
+      font-family: var(--font-code);
+      font-size: 0.83rem;
+      background: none;
+      border: none;
+      padding: 0;
+      color: inherit;
+      line-height: 1.6;
+    }
+
+    /* ───── CALLOUTS ───── */
+    .callout {
+      border-radius: 10px;
+      padding: 1rem 1.25rem;
+      margin: 1.5rem 0;
+      border-left: 4px solid;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 0 0.75rem;
+    }
+
+    .callout-icon {
+      font-size: 1.1rem;
+      line-height: 1.6;
+      grid-row: 1 / 3;
+    }
+
+    .callout-label {
+      font-size: 0.7rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 0.25rem;
+      display: block;
+    }
+
+    .callout-body {
+      font-size: 0.92rem;
+      line-height: 1.6;
+    }
+
+    .callout-body p { margin-bottom: 0.5rem; }
+    .callout-body p:last-child { margin-bottom: 0; }
+    .callout-body ul { margin: 0.4rem 0 0.4rem 1.25rem; }
+    .callout-body li { margin-bottom: 0.2rem; }
+
+    .callout.tip {
+      background: var(--green-50);
+      border-color: var(--green-600);
+    }
+    .callout.tip .callout-label { color: var(--green-700); }
+
+    .callout.info {
+      background: var(--sky-50);
+      border-color: var(--sky-600);
+    }
+    .callout.info .callout-label { color: var(--sky-700); }
+
+    .callout.warning {
+      background: var(--amber-50);
+      border-color: var(--amber-600);
+    }
+    .callout.warning .callout-label { color: var(--amber-700); }
+
+    .callout.python {
+      background: var(--violet-50);
+      border-color: var(--violet-600);
+    }
+    .callout.python .callout-label { color: var(--violet-700); }
+
+    .callout.ai-era {
+      background: var(--indigo-50);
+      border-color: var(--indigo-600);
+    }
+    .callout.ai-era .callout-label { color: var(--indigo-700); }
+
+    .callout.security {
+      background: var(--red-50);
+      border-color: var(--red-600);
+    }
+    .callout.security .callout-label { color: var(--red-700); }
+
+    /* ───── SVG DIAGRAMS ───── */
+    .diagram-container {
+      margin: 2rem 0;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      background: var(--surface);
+    }
+
+    .diagram-title {
+      background: var(--surface-2);
+      border-bottom: 1px solid var(--border);
+      padding: 0.6rem 1.25rem;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .diagram-container svg {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    /* ───── TABLES ───── */
+    .table-container {
+      overflow-x: auto;
+      margin: 1.5rem 0;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+    }
+
+    thead {
+      background: var(--surface-2);
+    }
+
+    thead th {
+      padding: 0.75rem 1rem;
+      text-align: left;
+      font-weight: 700;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-secondary);
+      border-bottom: 1px solid var(--border);
+    }
+
+    tbody td {
+      padding: 0.7rem 1rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+
+    tbody tr:last-child td { border-bottom: none; }
+
+    tbody tr:hover { background: var(--surface); }
+
+    .perm-yes {
+      display: inline-block;
+      background: var(--green-100);
+      color: var(--green-700);
+      font-weight: 700;
+      font-size: 0.75rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+    }
+
+    .perm-no {
+      display: inline-block;
+      background: var(--red-100);
+      color: var(--red-700);
+      font-weight: 700;
+      font-size: 0.75rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+    }
+
+    .perm-own {
+      display: inline-block;
+      background: var(--amber-100);
+      color: var(--amber-700);
+      font-weight: 700;
+      font-size: 0.75rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+    }
+
+    /* ───── SECTION DIVIDER ───── */
+    .section-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      background: var(--indigo-600);
+      color: white;
+      font-size: 0.75rem;
+      font-weight: 800;
+      border-radius: 6px;
+      margin-right: 0.5rem;
+      flex-shrink: 0;
+      vertical-align: middle;
+    }
+
+    /* ───── COMMON MISTAKES ───── */
+    .mistakes-grid {
+      display: grid;
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+
+    .mistake-card {
+      border: 1px solid #FECACA;
+      border-left: 4px solid var(--red-600);
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      background: var(--red-50);
+    }
+
+    .mistake-card h4 {
+      color: var(--red-700);
+      font-size: 0.9rem;
+      margin-top: 0;
+      margin-bottom: 0.4rem;
+    }
+
+    .mistake-card p {
+      font-size: 0.875rem;
+      color: #7F1D1D;
+      margin-bottom: 0;
+    }
+
+    /* ───── FOOTER ───── */
+    .chapter-footer {
+      border-top: 1px solid var(--border);
+      padding: 2.5rem 2rem;
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .footer-nav-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.65rem 1.25rem;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.875rem;
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      transition: border-color 0.15s, color 0.15s;
+    }
+
+    .footer-nav-btn:hover {
+      border-color: var(--indigo-600);
+      color: var(--indigo-600);
+    }
+
+    .footer-center {
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text-tertiary);
+    }
+
+    /* ───── RESPONSIVE ───── */
+    @media (max-width: 800px) {
+      .page-body {
+        grid-template-columns: 1fr;
+      }
+      .sidebar {
+        position: static;
+        max-height: none;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 1.25rem;
+        background: var(--surface);
+      }
+    }
+
+    @media (max-width: 560px) {
+      .top-nav { padding: 0 1rem; }
+      .chapter-hero { padding: 2.5rem 1rem 2rem; }
+      .page-body { padding: 2rem 1rem 4rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ───── TOP NAV ───── -->
+<nav class="top-nav">
+  <div class="nav-prev-next">
+    <a href="chapter-14-databases.html">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 12L6 8l4-4" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Ch 14 Databases
+    </a>
+  </div>
+  <div class="nav-center">TypeScript for the AI Era</div>
+  <div style="display:flex;align-items:center;gap:1rem;">
+    <span class="nav-progress">Chapter 15 of 24</span>
+    <div class="nav-prev-next">
+      <a href="chapter-16-react.html">
+        Ch 16 React
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- ───── CHAPTER HERO ───── -->
+<header class="chapter-hero">
+  <div class="chapter-hero-inner">
+    <div class="chapter-eyebrow">Chapter 15</div>
+    <h1>Authentication, Authorization<br>&amp; Security</h1>
+    <p class="chapter-hero-subtitle">
+      Security is not a feature — it's a foundation. Learn how to build auth systems that are correct by construction using TypeScript's type system, from JWT signing to RBAC middleware to secrets management in production.
+    </p>
+    <div class="chapter-meta">
+      <div class="chapter-meta-item">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        ~60 min read
+      </div>
+      <div class="chapter-meta-item">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Senior Staff Engineer @ Anthropic (security focus)
+      </div>
+      <div class="chapter-meta-item">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        Security-critical chapter
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ───── PAGE BODY ───── -->
+<div class="page-body">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <p class="toc-label">In this chapter</p>
+    <ul class="toc-list">
+      <li><a href="#auth-vs-authz">1. Authentication vs Authorization</a></li>
+      <li><a href="#jwt">2. JWT (JSON Web Tokens)</a></li>
+      <li class="toc-sub"><a href="#jwt-structure">Structure &amp; signing</a></li>
+      <li class="toc-sub"><a href="#jwt-pitfalls">Pitfalls &amp; attacks</a></li>
+      <li><a href="#sessions">3. Sessions</a></li>
+      <li><a href="#oauth2">4. OAuth2 &amp; OpenID Connect</a></li>
+      <li class="toc-sub"><a href="#oauth-flow">Authorization code + PKCE</a></li>
+      <li class="toc-sub"><a href="#authjs">Auth.js &amp; Clerk</a></li>
+      <li><a href="#passwords">5. Password Hashing</a></li>
+      <li><a href="#rbac">6. Role-Based Access Control</a></li>
+      <li class="toc-sub"><a href="#rbac-middleware">Middleware</a></li>
+      <li class="toc-sub"><a href="#casl">CASL library</a></li>
+      <li><a href="#api-security">7. API Security</a></li>
+      <li class="toc-sub"><a href="#cors">CORS</a></li>
+      <li class="toc-sub"><a href="#rate-limiting">Rate limiting</a></li>
+      <li class="toc-sub"><a href="#injection">Injection prevention</a></li>
+      <li><a href="#https">8. HTTPS &amp; TLS</a></li>
+      <li><a href="#secrets">9. Secrets Management</a></li>
+      <li><a href="#audit-logging">10. Audit Logging</a></li>
+      <li><a href="#ts-best-practices">11. TypeScript Best Practices</a></li>
+      <li><a href="#common-mistakes">Common Mistakes</a></li>
+      <div class="toc-security-badge">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Security focus
+      </div>
+      <li><a href="#common-mistakes">Auth antipatterns</a></li>
+    </ul>
+  </aside>
+
+  <!-- ARTICLE -->
+  <article>
+
+    <!-- ═══ 1. AUTH VS AUTHZ ═══ -->
+    <h2 id="auth-vs-authz"><span class="section-number">1</span> Authentication vs Authorization</h2>
+
+    <p>
+      These two words are often conflated, but they answer fundamentally different questions. Getting the distinction right is the first step to building a secure system.
+    </p>
+
+    <ul>
+      <li><strong>Authentication (AuthN)</strong> — <em>Who are you?</em> Verifying identity: "I am user #42, proven by this signed token."</li>
+      <li><strong>Authorization (AuthZ)</strong> — <em>What can you do?</em> Verifying permissions: "User #42 may read posts but not delete them."</li>
+    </ul>
+
+    <p>
+      Both must be correct. Authentication without authorization means anyone who logs in can do anything. Authorization without authentication means anyone can claim to be an authorized user.
+    </p>
+
+    <h3>The Auth Flow</h3>
+
+    <div class="diagram-container">
+      <div class="diagram-title">Auth Flow — Login to Resource Access</div>
+      <svg viewBox="0 0 780 200" xmlns="http://www.w3.org/2000/svg" style="padding:1.5rem;">
+        <!-- Actors -->
+        <rect x="10" y="60" width="110" height="44" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+        <text x="65" y="79" text-anchor="middle" font-family="system-ui" font-size="12" font-weight="600" fill="#3730A3">Client</text>
+        <text x="65" y="95" text-anchor="middle" font-family="system-ui" font-size="10" fill="#6366F1">(Browser/App)</text>
+
+        <rect x="175" y="60" width="120" height="44" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+        <text x="235" y="79" text-anchor="middle" font-family="system-ui" font-size="12" font-weight="600" fill="#3730A3">Auth Server</text>
+        <text x="235" y="95" text-anchor="middle" font-family="system-ui" font-size="10" fill="#6366F1">(login endpoint)</text>
+
+        <rect x="350" y="60" width="110" height="44" rx="8" fill="#F0FDF4" stroke="#16A34A" stroke-width="1.5"/>
+        <text x="405" y="79" text-anchor="middle" font-family="system-ui" font-size="12" font-weight="600" fill="#15803D">Token Store</text>
+        <text x="405" y="95" text-anchor="middle" font-family="system-ui" font-size="10" fill="#16A34A">(JWT / Session)</text>
+
+        <rect x="520" y="60" width="110" height="44" rx="8" fill="#FFF7ED" stroke="#EA580C" stroke-width="1.5"/>
+        <text x="575" y="79" text-anchor="middle" font-family="system-ui" font-size="12" font-weight="600" fill="#C2410C">API Server</text>
+        <text x="575" y="95" text-anchor="middle" font-family="system-ui" font-size="10" fill="#EA580C">(resource endpoint)</text>
+
+        <rect x="690" y="60" width="80" height="44" rx="8" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+        <text x="730" y="79" text-anchor="middle" font-family="system-ui" font-size="12" font-weight="600" fill="#6D28D9">AuthZ</text>
+        <text x="730" y="95" text-anchor="middle" font-family="system-ui" font-size="10" fill="#7C3AED">(RBAC check)</text>
+
+        <!-- Arrows -->
+        <!-- 1: login -->
+        <line x1="120" y1="74" x2="173" y2="74" stroke="#4F46E5" stroke-width="1.5" marker-end="url(#arrow-indigo)"/>
+        <text x="147" y="67" text-anchor="middle" font-family="system-ui" font-size="9" fill="#4F46E5">① credentials</text>
+
+        <!-- 2: issue token -->
+        <line x1="295" y1="82" x2="348" y2="82" stroke="#16A34A" stroke-width="1.5" marker-end="url(#arrow-green)"/>
+        <text x="322" y="75" text-anchor="middle" font-family="system-ui" font-size="9" fill="#16A34A">② issue token</text>
+
+        <!-- 3: token returned -->
+        <path d="M405 104 Q235 150 120 104" stroke="#6B7280" stroke-width="1.5" fill="none" marker-end="url(#arrow-gray)" stroke-dasharray="4 2"/>
+        <text x="260" y="168" text-anchor="middle" font-family="system-ui" font-size="9" fill="#6B7280">③ token returned to client</text>
+
+        <!-- 4: API request with token -->
+        <line x1="120" y1="82" x2="518" y2="82" stroke="#EA580C" stroke-width="1.5" marker-end="url(#arrow-orange)" stroke-dasharray="0"/>
+        <!-- overlay the line segments conceptually — draw separate for clarity -->
+
+        <!-- Let's redo the flow more clearly with y offsets -->
+        <!-- Redo: use rows -->
+
+        <!-- Row 1: credentials -->
+        <!-- Row 2: API call -->
+
+        <!-- Arrow markers -->
+        <defs>
+          <marker id="arrow-indigo" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#4F46E5"/>
+          </marker>
+          <marker id="arrow-green" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#16A34A"/>
+          </marker>
+          <marker id="arrow-gray" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#6B7280"/>
+          </marker>
+          <marker id="arrow-orange" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#EA580C"/>
+          </marker>
+          <marker id="arrow-purple" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#7C3AED"/>
+          </marker>
+        </defs>
+
+        <!-- Step 4: client → API with bearer token -->
+        <line x1="120" y1="98" x2="518" y2="110" stroke="#EA580C" stroke-width="1.5" marker-end="url(#arrow-orange)"/>
+        <text x="320" y="122" text-anchor="middle" font-family="system-ui" font-size="9" fill="#EA580C">④ request + Bearer token</text>
+
+        <!-- Step 5: API → AuthZ -->
+        <line x1="630" y1="82" x2="688" y2="82" stroke="#7C3AED" stroke-width="1.5" marker-end="url(#arrow-purple)"/>
+        <text x="659" y="75" text-anchor="middle" font-family="system-ui" font-size="9" fill="#7C3AED">⑤ check perms</text>
+      </svg>
+    </div>
+
+    <h3>Common Auth Patterns</h3>
+
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Pattern</th>
+            <th>How it works</th>
+            <th>Best for</th>
+            <th>Caveats</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Session-based</strong></td>
+            <td>Server stores session, sends session ID in cookie</td>
+            <td>Traditional web apps</td>
+            <td>Requires server-side storage (Redis)</td>
+          </tr>
+          <tr>
+            <td><strong>JWT</strong></td>
+            <td>Signed token, self-contained, stateless</td>
+            <td>APIs, microservices, SPAs</td>
+            <td>Cannot revoke before expiry</td>
+          </tr>
+          <tr>
+            <td><strong>OAuth2</strong></td>
+            <td>Delegate auth to provider, get access token</td>
+            <td>Third-party integrations, social login</td>
+            <td>Complex flows; use a library</td>
+          </tr>
+          <tr>
+            <td><strong>API Keys</strong></td>
+            <td>Opaque secret sent in header</td>
+            <td>Server-to-server, machine clients</td>
+            <td>No expiry by default; rotate manually</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ═══ 2. JWT ═══ -->
+    <h2 id="jwt"><span class="section-number">2</span> JWT (JSON Web Tokens)</h2>
+
+    <p>
+      A JWT is a compact, URL-safe token that proves a claim was signed by someone who holds a secret key. The server can verify the token without storing state — it just checks the signature.
+    </p>
+
+    <h3 id="jwt-structure">Structure: Header.Payload.Signature</h3>
+
+    <div class="diagram-container">
+      <div class="diagram-title">JWT Structure</div>
+      <svg viewBox="0 0 740 130" xmlns="http://www.w3.org/2000/svg" style="padding:1.25rem 1.5rem;">
+        <!-- Three segments -->
+        <rect x="0" y="10" width="215" height="44" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+        <text x="107" y="28" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="10" fill="#4F46E5" font-weight="700">HEADER</text>
+        <text x="107" y="45" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="9" fill="#3730A3">eyJhbGciOiJIUzI1NiJ9</text>
+
+        <text x="225" y="36" text-anchor="middle" font-family="monospace" font-size="18" fill="#9CA3AF">.</text>
+
+        <rect x="235" y="10" width="215" height="44" rx="8" fill="#F0FDF4" stroke="#16A34A" stroke-width="1.5"/>
+        <text x="342" y="28" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="10" fill="#16A34A" font-weight="700">PAYLOAD</text>
+        <text x="342" y="45" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="9" fill="#15803D">eyJ1c2VySWQiOiIxMjMifQ</text>
+
+        <text x="460" y="36" text-anchor="middle" font-family="monospace" font-size="18" fill="#9CA3AF">.</text>
+
+        <rect x="470" y="10" width="265" height="44" rx="8" fill="#FEF2F2" stroke="#DC2626" stroke-width="1.5"/>
+        <text x="602" y="28" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="10" fill="#DC2626" font-weight="700">SIGNATURE</text>
+        <text x="602" y="45" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="9" fill="#B91C1C">HMAC-SHA256(base64(h+p), secret)</text>
+
+        <!-- Annotations -->
+        <text x="107" y="80" text-anchor="middle" font-family="system-ui" font-size="10" fill="#6B7280">alg: HS256, typ: JWT</text>
+        <text x="342" y="80" text-anchor="middle" font-family="system-ui" font-size="10" fill="#6B7280">userId, email, exp, iat, iss</text>
+        <text x="602" y="80" text-anchor="middle" font-family="system-ui" font-size="10" fill="#6B7280">Tamper-proof. Verify with secret.</text>
+
+        <text x="107" y="97" text-anchor="middle" font-family="system-ui" font-size="9" fill="#9CA3AF">Base64URL encoded</text>
+        <text x="342" y="97" text-anchor="middle" font-family="system-ui" font-size="9" fill="#9CA3AF">Base64URL encoded (NOT encrypted)</text>
+        <text x="602" y="97" text-anchor="middle" font-family="system-ui" font-size="9" fill="#9CA3AF">Only valid if secret matches</text>
+      </svg>
+    </div>
+
+    <div class="callout security">
+      <span class="callout-icon">🔒</span>
+      <span class="callout-label">Security</span>
+      <div class="callout-body">
+        <p>The payload is <strong>Base64URL-encoded, not encrypted</strong>. Anyone who holds the token can decode and read the payload. Never store sensitive data (passwords, PII, secrets) in JWT claims. Only store the minimum needed: <code>userId</code>, <code>email</code>, <code>role</code>.</p>
+      </div>
+    </div>
+
+    <h3>Signing JWTs with TypeScript</h3>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">TypeScript</span>
+        <span class="code-filename">auth/jwt.ts</span>
+      </div>
+      <pre><code class="language-typescript">import jwt from 'jsonwebtoken'
+import { z } from 'zod'
+
+// Strongly type your payload — never use 'any'
+const JWTPayloadSchema = z.object({
+  userId: z.string().uuid(),
+  email: z.string().email(),
+  role: z.enum(['admin', 'editor', 'viewer']),
+  iat: z.number().optional(),
+  exp: z.number().optional(),
+})
+
+export type JWTPayload = z.infer&lt;typeof JWTPayloadSchema&gt;
+
+const SECRET = process.env.JWT_SECRET
+if (!SECRET) throw new Error('JWT_SECRET environment variable is required')
+
+export function signToken(payload: Omit&lt;JWTPayload, 'iat' | 'exp'&gt;): string {
+  return jwt.sign(payload, SECRET, {
+    expiresIn: '15m',      // access tokens: short-lived
+    algorithm: 'HS256',   // explicitly specify — never trust defaults
+    issuer: 'myapp.com',
+    audience: 'myapp-api',
+  })
+}
+
+export function signRefreshToken(userId: string): string {
+  return jwt.sign({ userId, type: 'refresh' }, SECRET, {
+    expiresIn: '7d',
+    algorithm: 'HS256',
+  })
+}
+
+export function verifyToken(token: string): JWTPayload {
+  // jwt.verify throws if invalid, expired, or tampered
+  const raw = jwt.verify(token, SECRET, {
+    algorithms: ['HS256'],  // whitelist — prevents alg confusion attacks
+    issuer: 'myapp.com',
+    audience: 'myapp-api',
+  })
+
+  // Parse and validate with Zod — do not cast with 'as'
+  return JWTPayloadSchema.parse(raw)
+}</code></pre>
+    </div>
+
+    <div class="callout tip">
+      <span class="callout-icon">💡</span>
+      <span class="callout-label">Tip</span>
+      <div class="callout-body">
+        <p>Always validate the JWT payload with Zod after verification. <code>jwt.verify()</code> only checks the signature — it won't catch missing fields or wrong types. Using <code>as JWTPayload</code> skips runtime validation and creates a false sense of security.</p>
+      </div>
+    </div>
+
+    <h3>Access Tokens vs Refresh Tokens</h3>
+
+    <p>Use a two-token strategy in production:</p>
+
+    <ul>
+      <li><strong>Access token</strong> — Short-lived (15 minutes). Sent on every API request in the <code>Authorization: Bearer ...</code> header. If stolen, it expires quickly.</li>
+      <li><strong>Refresh token</strong> — Long-lived (7–30 days). Stored securely (httpOnly cookie). Used only to obtain a new access token. Can be revoked server-side.</li>
+    </ul>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">TypeScript</span>
+        <span class="code-filename">auth/refresh.ts</span>
+      </div>
+      <pre><code class="language-typescript">// Refresh endpoint — issues new access token
+app.post('/auth/refresh', async (c) => {
+  const refreshToken = getCookie(c, 'refresh_token')
+  if (!refreshToken) return c.json({ error: 'No refresh token' }, 401)
+
+  let payload: { userId: string; type: string }
+  try {
+    payload = jwt.verify(refreshToken, SECRET, {
+      algorithms: ['HS256'],
+    }) as { userId: string; type: string }
+  } catch {
+    return c.json({ error: 'Invalid refresh token' }, 401)
+  }
+
+  if (payload.type !== 'refresh') {
+    return c.json({ error: 'Wrong token type' }, 401)
+  }
+
+  // Check refresh token hasn't been revoked in Redis
+  const isRevoked = await redis.get(`revoked:${refreshToken}`)
+  if (isRevoked) return c.json({ error: 'Token revoked' }, 401)
+
+  const user = await db.users.findUnique({ where: { id: payload.userId } })
+  if (!user) return c.json({ error: 'User not found' }, 401)
+
+  const newAccessToken = signToken({
+    userId: user.id,
+    email: user.email,
+    role: user.role,
+  })
+
+  return c.json({ accessToken: newAccessToken })
+})</code></pre>
+    </div>
+
+    <h3>Token Storage: localStorage vs httpOnly Cookies</h3>
+
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Storage</th>
+            <th>XSS risk</th>
+            <th>CSRF risk</th>
+            <th>Recommendation</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>localStorage</code></td>
+            <td><span class="perm-no">HIGH</span> — any script can read</td>
+            <td><span class="perm-yes">None</span></td>
+            <td>Avoid for auth tokens</td>
+          </tr>
+          <tr>
+            <td><code>sessionStorage</code></td>
+            <td><span class="perm-no">HIGH</span> — any script can read</td>
+            <td><span class="perm-yes">None</span></td>
+            <td>Avoid for auth tokens</td>
+          </tr>
+          <tr>
+            <td>httpOnly Cookie</td>
+            <td><span class="perm-yes">None</span> — JS cannot access</td>
+            <td><span class="perm-own">Medium</span> — mitigate with SameSite</td>
+            <td>Use for refresh tokens</td>
+          </tr>
+          <tr>
+            <td>Memory (JS var)</td>
+            <td><span class="perm-own">Low</span> — lost on refresh</td>
+            <td><span class="perm-yes">None</span></td>
+            <td>Use for access tokens in SPAs</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 id="jwt-pitfalls">JWT Pitfalls and Attacks</h3>
+
+    <div class="callout security">
+      <span class="callout-icon">🔒</span>
+      <span class="callout-label">Security — alg:none Attack</span>
+      <div class="callout-body">
+        <p>The <code>"alg": "none"</code> attack: an attacker crafts a JWT with <code>"alg": "none"</code> in the header and no signature. Naive libraries accept it. Always pass an explicit <code>algorithms</code> whitelist to <code>jwt.verify()</code> — never let the token header dictate the algorithm.</p>
+      </div>
+    </div>
+
+    <div class="callout security">
+      <span class="callout-icon">🔒</span>
+      <span class="callout-label">Security — Weak Secrets</span>
+      <div class="callout-body">
+        <p>HS256 secrets must be at least 256 bits (32 bytes) of cryptographically random data. <strong>Never use a password or short string.</strong> Generate with: <code>openssl rand -base64 32</code>. For production, use RS256 (asymmetric) so you can distribute the public key to multiple services without sharing the private key.</p>
+      </div>
+    </div>
+
+    <!-- ═══ 3. SESSIONS ═══ -->
+    <h2 id="sessions"><span class="section-number">3</span> Sessions</h2>
+
+    <p>
+      Session-based auth stores the session state server-side. The client holds only an opaque session ID (in a cookie). This allows instant revocation — just delete the session from the store.
+    </p>
+
+    <h3>Secure Cookie Attributes</h3>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">TypeScript</span>
+        <span class="code-filename">auth/session.ts</span>
+      </div>
+      <pre><code class="language-typescript">import { Hono } from 'hono'
+import { getCookie, setCookie, deleteCookie } from 'hono/cookie'
+import { randomBytes } from 'crypto'
+import { redis } from './redis'
+
+const SESSION_TTL = 60 * 60 * 24 * 7 // 7 days in seconds
+
+interface Session {
+  userId: string
+  email: string
+  role: string
+  createdAt: number
+}
+
+export async function createSession(userId: string, data: Session): Promise&lt;string&gt; {
+  const sessionId = randomBytes(32).toString('hex') // 256-bit random ID
+  await redis.setex(`session:${sessionId}`, SESSION_TTL, JSON.stringify(data))
+  return sessionId
+}
+
+export async function getSession(sessionId: string): Promise&lt;Session | null&gt; {
+  const raw = await redis.get(`session:${sessionId}`)
+  if (!raw) return null
+  return JSON.parse(raw) as Session
+}
+
+export async function destroySession(sessionId: string): Promise&lt;void&gt; {
+  await redis.del(`session:${sessionId}`)
+}
+
+// Hono login route
+app.post('/auth/login', async (c) => {
+  const { email, password } = await c.req.json()
+  const user = await verifyCredentials(email, password)
+  if (!user) return c.json({ error: 'Invalid credentials' }, 401)
+
+  // Session fixation: always create a NEW session ID on login
+  const sessionId = await createSession(user.id, {
+    userId: user.id,
+    email: user.email,
+    role: user.role,
+    createdAt: Date.now(),
+  })
+
+  setCookie(c, 'session_id', sessionId, {
+    httpOnly: true,   // JS cannot read — prevents XSS token theft
+    secure: true,     // HTTPS only — never sent over plain HTTP
+    sameSite: 'Lax',  // Protects against CSRF on navigations
+    maxAge: SESSION_TTL,
+    path: '/',
+  })
+
+  return c.json({ success: true })
+})</code></pre>
+    </div>
+
+    <div class="callout warning">
+      <span class="callout-icon">⚠️</span>
+      <span class="callout-label">Warning — Session Fixation</span>
+      <div class="callout-body">
+        <p>Always generate a <strong>new</strong> session ID after a successful login, even if the user already had an anonymous session. If you reuse the pre-login session ID, an attacker who knows it (e.g., from a shared computer) can hijack the authenticated session.</p>
+      </div>
+    </div>
+
+    <h3>SameSite Explained</h3>
+
+    <ul>
+      <li><code>SameSite=Strict</code> — Cookie never sent on cross-site requests. Breaks OAuth callbacks and external links. Too strict for most apps.</li>
+      <li><code>SameSite=Lax</code> — Cookie sent on top-level navigations (clicking a link) but not on cross-origin sub-requests (AJAX, forms). Good default.</li>
+      <li><code>SameSite=None; Secure</code> — Cookie sent everywhere. Required for cross-site embeds. Must pair with <code>Secure</code>.</li>
+    </ul>
+
+    <!-- ═══ 4. OAUTH2 ═══ -->
+    <h2 id="oauth2"><span class="section-number">4</span> OAuth2 and OpenID Connect</h2>
+
+    <p>
+      OAuth2 is an authorization framework that lets users grant your app access to their data at another service (GitHub, Google, etc.) without sharing their password. OpenID Connect (OIDC) is a thin identity layer on top of OAuth2 — it adds a signed <strong>ID token</strong> that proves who the user is.
+    </p>
+
+    <h3 id="oauth-flow">Authorization Code Flow with PKCE</h3>
+
+    <p>PKCE (Proof Key for Code Exchange) is mandatory for public clients (SPAs, mobile apps) where a client secret cannot be kept secret. Use it for all new OAuth integrations — even for server-side apps as a defense in depth.</p>
+
+    <div class="diagram-container">
+      <div class="diagram-title">OAuth2 Authorization Code + PKCE Flow</div>
+      <svg viewBox="0 0 720 420" xmlns="http://www.w3.org/2000/svg" style="padding:1.5rem;">
+        <defs>
+          <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#4F46E5"/>
+          </marker>
+          <marker id="arr-green" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#16A34A"/>
+          </marker>
+          <marker id="arr-gray" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#6B7280"/>
+          </marker>
+        </defs>
+
+        <!-- Columns headers -->
+        <rect x="10" y="5" width="130" height="32" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+        <text x="75" y="26" text-anchor="middle" font-family="system-ui" font-size="12" font-weight="700" fill="#3730A3">Browser / App</text>
+
+        <rect x="290" y="5" width="140" height="32" rx="6" fill="#F0FDF4" stroke="#16A34A" stroke-width="1.5"/>
+        <text x="360" y="26" text-anchor="middle" font-family="system-ui" font-size="12" font-weight="700" fill="#15803D">Auth Provider</text>
+        <text x="360" y="38" text-anchor="middle" font-family="system-ui" font-size="9" fill="#16A34A">(Google / GitHub)</text>
+
+        <rect x="560" y="5" width="140" height="32" rx="6" fill="#FFF7ED" stroke="#EA580C" stroke-width="1.5"/>
+        <text x="630" y="26" text-anchor="middle" font-family="system-ui" font-size="12" font-weight="700" fill="#C2410C">Your Backend</text>
+
+        <!-- Vertical lanes -->
+        <line x1="75" y1="50" x2="75" y2="400" stroke="#E5E7EB" stroke-width="1" stroke-dasharray="4 3"/>
+        <line x1="360" y1="50" x2="360" y2="400" stroke="#E5E7EB" stroke-width="1" stroke-dasharray="4 3"/>
+        <line x1="630" y1="50" x2="630" y2="400" stroke="#E5E7EB" stroke-width="1" stroke-dasharray="4 3"/>
+
+        <!-- Step 1: Generate code_verifier + code_challenge -->
+        <text x="10" y="76" font-family="system-ui" font-size="10" fill="#6B7280">① Generate code_verifier (random 43-128 chars)</text>
+        <text x="10" y="90" font-family="system-ui" font-size="10" fill="#6B7280">   code_challenge = BASE64URL(SHA256(verifier))</text>
+
+        <!-- Step 2: Redirect to provider -->
+        <line x1="75" y1="108" x2="350" y2="108" stroke="#4F46E5" stroke-width="1.5" marker-end="url(#arr)"/>
+        <text x="210" y="103" text-anchor="middle" font-family="system-ui" font-size="10" fill="#4F46E5">② Redirect: authorize?code_challenge=...&amp;scope=openid</text>
+
+        <!-- Step 3: User logs in at provider -->
+        <rect x="300" y="118" width="120" height="22" rx="4" fill="#DCFCE7" stroke="#16A34A" stroke-width="1"/>
+        <text x="360" y="133" text-anchor="middle" font-family="system-ui" font-size="10" fill="#15803D">User logs in &amp; consents</text>
+
+        <!-- Step 4: Redirect back with code -->
+        <line x1="360" y1="148" x2="90" y2="148" stroke="#16A34A" stroke-width="1.5" marker-end="url(#arr-green)"/>
+        <text x="220" y="143" text-anchor="middle" font-family="system-ui" font-size="10" fill="#16A34A">③ Redirect: callback?code=AUTH_CODE</text>
+
+        <!-- Step 5: Send code + verifier to backend -->
+        <line x1="75" y1="175" x2="610" y2="175" stroke="#4F46E5" stroke-width="1.5" marker-end="url(#arr)"/>
+        <text x="340" y="170" text-anchor="middle" font-family="system-ui" font-size="10" fill="#4F46E5">④ POST /callback: code + code_verifier</text>
+
+        <!-- Step 6: Backend exchanges code -->
+        <line x1="630" y1="195" x2="380" y2="195" stroke="#EA580C" stroke-width="1.5" stroke-dasharray="5 2"/>
+        <defs><marker id="arr-orange" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#EA580C"/></marker></defs>
+        <line x1="630" y1="195" x2="380" y2="195" stroke="#EA580C" stroke-width="1.5" marker-end="url(#arr-orange)"/>
+        <text x="505" y="190" text-anchor="middle" font-family="system-ui" font-size="10" fill="#C2410C">⑤ POST token_endpoint: code + verifier + client_secret</text>
+
+        <!-- Step 7: Provider returns tokens -->
+        <line x1="360" y1="218" x2="610" y2="218" stroke="#16A34A" stroke-width="1.5" marker-end="url(#arr-green)"/>
+        <text x="495" y="213" text-anchor="middle" font-family="system-ui" font-size="10" fill="#15803D">⑥ access_token + id_token + refresh_token</text>
+
+        <!-- Step 8: Backend validates id_token -->
+        <rect x="545" y="228" width="165" height="22" rx="4" fill="#FEF2F2" stroke="#DC2626" stroke-width="1"/>
+        <text x="630" y="243" text-anchor="middle" font-family="system-ui" font-size="10" fill="#DC2626">⑦ Verify id_token signature (JWKS)</text>
+
+        <!-- Step 9: Create app session -->
+        <rect x="545" y="258" width="165" height="22" rx="4" fill="#FFF7ED" stroke="#EA580C" stroke-width="1"/>
+        <text x="630" y="273" text-anchor="middle" font-family="system-ui" font-size="10" fill="#C2410C">⑧ Create/update user in DB</text>
+
+        <!-- Step 10: Return session to client -->
+        <line x1="630" y1="288" x2="90" y2="288" stroke="#6B7280" stroke-width="1.5" marker-end="url(#arr-gray)"/>
+        <text x="360" y="283" text-anchor="middle" font-family="system-ui" font-size="10" fill="#6B7280">⑨ Set session cookie / return JWT</text>
+
+        <!-- Step 11: Client is authenticated -->
+        <rect x="10" y="300" width="130" height="22" rx="4" fill="#DCFCE7" stroke="#16A34A" stroke-width="1"/>
+        <text x="75" y="315" text-anchor="middle" font-family="system-ui" font-size="10" fill="#15803D">⑩ User is authenticated!</text>
+
+        <!-- PKCE annotation -->
+        <rect x="10" y="340" width="690" height="48" rx="6" fill="#FEF2F2" stroke="#DC2626" stroke-width="1"/>
+        <text x="355" y="360" text-anchor="middle" font-family="system-ui" font-size="10" font-weight="700" fill="#DC2626">PKCE protects against authorization code interception attacks.</text>
+        <text x="355" y="378" text-anchor="middle" font-family="system-ui" font-size="10" fill="#7F1D1D">Without PKCE, a malicious app intercepting the redirect URL in step ③ could exchange the code for tokens. The verifier makes this impossible.</text>
+      </svg>
+    </div>
+
+    <h3 id="authjs">Auth.js (NextAuth) for TypeScript</h3>
+
+    <p>Auth.js is the standard for Next.js + TypeScript OAuth integrations. It handles the entire OAuth flow, session management, and database adapters.</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">TypeScript</span>
+        <span class="code-filename">auth.ts (Next.js App Router)</span>
+      </div>
+      <pre><code class="language-typescript">import NextAuth from 'next-auth'
+import Google from 'next-auth/providers/google'
+import GitHub from 'next-auth/providers/github'
+import { PrismaAdapter } from '@auth/prisma-adapter'
+import { prisma } from '@/lib/prisma'
+import type { Role } from '@prisma/client'
+
+// Extend the session type to include our custom fields
+declare module 'next-auth' {
+  interface Session {
+    user: {
+      id: string
+      email: string
+      name: string | null
+      image: string | null
+      role: Role
+    }
+  }
+}
+
+export const { auth, handlers, signIn, signOut } = NextAuth({
+  adapter: PrismaAdapter(prisma),
+  providers: [
+    Google({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    }),
+    GitHub({
+      clientId: process.env.GITHUB_CLIENT_ID!,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET!,
+    }),
+  ],
+  callbacks: {
+    // Attach role and id to the session token
+    async jwt({ token, user }) {
+      if (user) {
+        token.role = (user as { role: Role }).role
+        token.userId = user.id
+      }
+      return token
+    },
+    async session({ session, token }) {
+      return {
+        ...session,
+        user: {
+          ...session.user,
+          id: token.userId as string,
+          role: token.role as Role,
+        },
+      }
+    },
+  },
+  session: { strategy: 'jwt' },
+})</code></pre>
+    </div>
+
+    <h3>Clerk — Managed Auth</h3>
+
+    <p>Clerk is a hosted auth solution that handles registration, login, MFA, social login, and user management via a dashboard. The TypeScript SDK is excellent:</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">TypeScript</span>
+        <span class="code-filename">middleware.ts (Clerk)</span>
+      </div>
+      <pre><code class="language-typescript">import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
+
+const isPublicRoute = createRouteMatcher([
+  '/sign-in(.*)',
+  '/sign-up(.*)',
+  '/api/webhook(.*)',
+  '/',
+])
+
+export default clerkMiddleware(async (auth, request) => {
+  if (!isPublicRoute(request)) {
+    await auth.protect()  // Redirects to sign-in if unauthenticated
+  }
+})
+
+// In a Server Action:
+import { auth } from '@clerk/nextjs/server'
+
+export async function deletePost(postId: string) {
+  const { userId } = await auth()
+  if (!userId) throw new Error('Unauthorized')
+  // ... delete logic
+}</code></pre>
+    </div>
+
+    <h3>Managed Auth vs Roll Your Own</h3>
+
+    <div class="callout info">
+      <span class="callout-icon">ℹ️</span>
+      <span class="callout-label">When to use managed auth (Clerk, Auth0, Supabase Auth)</span>
+      <div class="callout-body">
+        <ul>
+          <li>You need MFA, magic links, passkeys, or social login quickly</li>
+          <li>Your team is small and security expertise is limited</li>
+          <li>You don't want to maintain the attack surface of an auth system</li>
+          <li>Compliance requirements (SOC2, HIPAA) benefit from a certified provider</li>
+        </ul>
+        <p>Roll your own when: strict data residency, complex custom claims, or you need full control over the auth flow (e.g., AI-era agent identity).</p>
+      </div>
+    </div>
+
+    <!-- ═══ 5. PASSWORDS ═══ -->
+    <h2 id="passwords"><span class="section-number">5</span> Password Hashing</h2>
+
+    <div class="callout security">
+      <span class="callout-icon">🔒</span>
+      <span class="callout-label">Security — Never Store Plain Text Passwords</span>
+      <div class="callout-body">
+        <p>Never store passwords in plain text, never store them with reversible encryption (AES, base64), and never use fast hashing algorithms (MD5, SHA-1, SHA-256). Fast hashes can be brute-forced at billions of attempts per second with a GPU.</p>
+      </div>
+    </div>
+
+    <p>Use a slow, purpose-built password hashing function. The leading options in 2025:</p>
+
+    <ul>
+      <li><strong>Argon2id</strong> — Winner of the Password Hashing Competition. Resistant to GPU and side-channel attacks. The modern first choice.</li>
+      <li><strong>bcrypt</strong> — Battle-tested, widely supported. Fine for most applications. Max password length of 72 bytes.</li>
+      <li><strong>scrypt</strong> — Memory-hard like Argon2. Use when Argon2 is unavailable.</li>
+    </ul>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">TypeScript</span>
+        <span class="code-filename">auth/passwords.ts</span>
+      </div>
+      <pre><code class="language-typescript">import { hash, verify } from '@node-rs/argon2'
+import { timingSafeEqual, randomBytes } from 'crypto'
+
+// Argon2id is the recommended variant (combines Argon2i + Argon2d)
+const ARGON2_OPTIONS = {
+  memoryCost: 65536,      // 64 MB — tune to ~500ms on your hardware
+  timeCost: 3,            // iterations
+  parallelism: 4,
+  outputLen: 32,
+}
+
+export async function hashPassword(password: string): Promise&lt;string&gt; {
+  // Validate length before hashing
+  if (password.length &lt; 8) throw new Error('Password too short')
+  if (password.length &gt; 256) throw new Error('Password too long')
+
+  return hash(password, ARGON2_OPTIONS)
+  // Returns: $argon2id$v=19$m=65536,t=3,p=4$&lt;salt&gt;$&lt;hash&gt;
+  // Salt is automatically generated and embedded in the output
+}
+
+export async function verifyPassword(
+  password: string,
+  storedHash: string
+): Promise&lt;boolean&gt; {
+  try {
+    // verify() is timing-safe — no early return on mismatch
+    return await verify(storedHash, password, ARGON2_OPTIONS)
+  } catch {
+    // Hash format mismatch — treat as invalid
+    return false
+  }
+}
+
+// ── bcrypt example (if you prefer the battle-tested option) ──
+import bcrypt from 'bcrypt'
+
+const BCRYPT_ROUNDS = 12  // ~300ms on modern hardware
+
+export async function hashPasswordBcrypt(password: string): Promise&lt;string&gt; {
+  // bcrypt truncates at 72 bytes — pre-hash if needed for long passwords
+  return bcrypt.hash(password, BCRYPT_ROUNDS)
+}
+
+export async function verifyPasswordBcrypt(
+  password: string,
+  hash: string
+): Promise&lt;boolean&gt; {
+  return bcrypt.compare(password, hash)  // timing-safe
+}</code></pre>
+    </div>
+
+    <div class="callout tip">
+      <span class="callout-icon">💡</span>
+      <span class="callout-label">Timing-Safe Comparison</span>
+      <div class="callout-body">
+        <p>Never use <code>hash1 === hash2</code> to compare hashes. JavaScript string comparison short-circuits on the first mismatch, creating a timing oracle. Both <code>bcrypt.compare()</code> and <code>argon2.verify()</code> are timing-safe. For other secrets (API keys, HMAC values), use Node's <code>crypto.timingSafeEqual()</code>.</p>
+      </div>
+    </div>
+
+    <!-- ═══ 6. RBAC ═══ -->
+    <h2 id="rbac"><span class="section-number">6</span> Role-Based Access Control (RBAC)</h2>
+
+    <p>
+      RBAC assigns permissions to roles, and roles to users. It is simpler to reason about than per-user permissions and scales well to most applications.
+    </p>
+
+    <h3>Permission Matrix</h3>
+
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Resource / Action</th>
+            <th>admin</th>
+            <th>editor</th>
+            <th>author</th>
+            <th>viewer</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Read posts</td>
+            <td><span class="perm-yes">YES</span></td>
+            <td><span class="perm-yes">YES</span></td>
+            <td><span class="perm-yes">YES</span></td>
+            <td><span class="perm-yes">YES</span></td>
+          </tr>
+          <tr>
+            <td>Create posts</td>
+            <td><span class="perm-yes">YES</span></td>
+            <td><span class="perm-yes">YES</span></td>
+            <td><span class="perm-yes">YES</span></td>
+            <td><span class="perm-no">NO</span></td>
+          </tr>
+          <tr>
+            <td>Edit own posts</td>
+            <td><span class="perm-yes">YES</span></td>
+            <td><span class="perm-yes">YES</span></td>
+            <td><span class="perm-own">OWN ONLY</span></td>
+            <td><span class="perm-no">NO</span></td>
+          </tr>
+          <tr>
+            <td>Edit any post</td>
+            <td><span class="perm-yes">YES</span></td>
+            <td><span class="perm-yes">YES</span></td>
+            <td><span class="perm-no">NO</span></td>
+            <td><span class="perm-no">NO</span></td>
+          </tr>
+          <tr>
+            <td>Delete posts</td>
+            <td><span class="perm-yes">YES</span></td>
+            <td><span class="perm-own">OWN ONLY</span></td>
+            <td><span class="perm-no">NO</span></td>
+            <td><span class="perm-no">NO</span></td>
+          </tr>
+          <tr>
+            <td>Manage users</td>
+            <td><span class="perm-yes">YES</span></td>
+            <td><span class="perm-no">NO</span></td>
+            <td><span class="perm-no">NO</span></td>
+            <td><span class="perm-no">NO</span></td>
+          </tr>
+          <tr>
+            <td>View audit logs</td>
+            <td><span class="perm-yes">YES</span></td>
+            <td><span class="perm-no">NO</span></td>
+            <td><span class="perm-no">NO</span></td>
+            <td><span class="perm-no">NO</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 id="rbac-middleware">Role-Checking Middleware (Hono)</h3>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">TypeScript</span>
+        <span class="code-filename">middleware/rbac.ts</span>
+      </div>
+      <pre><code class="language-typescript">import type { Context, Next } from 'hono'
+import { HTTPException } from 'hono/http-exception'
+
+type Role = 'admin' | 'editor' | 'author' | 'viewer'
+
+// Role hierarchy: each role includes all permissions of roles below it
+const ROLE_HIERARCHY: Record&lt;Role, number&gt; = {
+  viewer: 0,
+  author: 1,
+  editor: 2,
+  admin: 3,
+}
+
+// requireRole: user must have this role or higher
+export const requireRole = (minRole: Role) =&gt;
+  async (c: Context, next: Next) =&gt; {
+    const user = c.get('user')  // set by auth middleware upstream
+
+    if (!user) {
+      throw new HTTPException(401, { message: 'Authentication required' })
+    }
+
+    if (ROLE_HIERARCHY[user.role as Role] &lt; ROLE_HIERARCHY[minRole]) {
+      throw new HTTPException(403, {
+        message: `Requires ${minRole} role or higher`,
+      })
+    }
+
+    await next()
+  }
+
+// requireOwnerOrRole: user owns the resource OR has the required role
+export const requireOwnerOrRole = (
+  minRole: Role,
+  getOwnerId: (c: Context) =&gt; Promise&lt;string&gt;
+) =&gt;
+  async (c: Context, next: Next) =&gt; {
+    const user = c.get('user')
+    if (!user) throw new HTTPException(401, { message: 'Authentication required' })
+
+    const hasRole = ROLE_HIERARCHY[user.role as Role] &gt;= ROLE_HIERARCHY[minRole]
+    if (hasRole) return next()
+
+    const ownerId = await getOwnerId(c)
+    if (ownerId !== user.id) {
+      throw new HTTPException(403, { message: 'Forbidden' })
+    }
+
+    await next()
+  }
+
+// Usage:
+app.delete('/posts/:id',
+  authMiddleware,                     // sets c.get('user')
+  requireOwnerOrRole('editor', async (c) =&gt; {
+    const post = await db.post.findUnique({ where: { id: c.req.param('id') } })
+    return post?.authorId ?? ''
+  }),
+  async (c) =&gt; {
+    await db.post.delete({ where: { id: c.req.param('id') } })
+    return c.json({ success: true })
+  }
+)</code></pre>
+    </div>
+
+    <h3 id="casl">Attribute-Based Access Control with CASL</h3>
+
+    <p>
+      When RBAC becomes complex — "editor can edit posts but only in their department, and only before they're published" — switch to ABAC with the <strong>CASL</strong> library:
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">TypeScript</span>
+        <span class="code-filename">auth/abilities.ts</span>
+      </div>
+      <pre><code class="language-typescript">import { AbilityBuilder, createMongoAbility } from '@casl/ability'
+
+type Action = 'create' | 'read' | 'update' | 'delete' | 'manage'
+type Subject = 'Post' | 'User' | 'Comment' | 'all'
+
+interface User { id: string; role: Role; departmentId: string }
+interface Post { authorId: string; departmentId: string; published: boolean }
+
+export function defineAbilitiesFor(user: User) {
+  const { can, cannot, build } = new AbilityBuilder(createMongoAbility)
+
+  if (user.role === 'admin') {
+    can('manage', 'all')  // admin can do everything
+  } else if (user.role === 'editor') {
+    can('read', 'Post')
+    can('update', 'Post', { departmentId: user.departmentId })
+    can('delete', 'Post', { departmentId: user.departmentId, published: false })
+    cannot('delete', 'Post', { published: true }).because('Cannot delete published posts')
+  } else if (user.role === 'author') {
+    can('create', 'Post')
+    can('read', 'Post')
+    can('update', 'Post', { authorId: user.id })
+    can('delete', 'Post', { authorId: user.id, published: false })
+  } else {
+    can('read', 'Post', { published: true })
+  }
+
+  return build()
+}
+
+// Usage in a route handler:
+const ability = defineAbilitiesFor(user)
+if (!ability.can('delete', post)) {
+  throw new HTTPException(403, { message: ability.relevantRules[0]?.reason })
+}</code></pre>
+    </div>
+
+    <div class="callout python">
+      <span class="callout-icon">🐍</span>
+      <span class="callout-label">Python Comparison</span>
+      <div class="callout-body">
+        <p>Python's Django has a built-in permission system (<code>user.has_perm('app.delete_post')</code>) and the <code>django-guardian</code> package for object-level permissions. CASL is the TypeScript equivalent of django-guardian: fine-grained, attribute-based, and expressive. The difference is TypeScript gives you compile-time type safety on the action and subject types.</p>
+      </div>
+    </div>
+
+    <!-- ═══ 7. API SECURITY ═══ -->
+    <h2 id="api-security"><span class="section-number">7</span> API Security</h2>
+
+    <h3 id="cors">CORS</h3>
+
+    <p>
+      CORS (Cross-Origin Resource Sharing) is enforced by browsers to prevent malicious sites from making authenticated requests to your API using the visitor's credentials. <strong>CORS is a browser mechanism — it does not protect your API from server-to-server requests or curl.</strong>
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">TypeScript</span>
+        <span class="code-filename">middleware/cors.ts</span>
+      </div>
+      <pre><code class="language-typescript">import { cors } from 'hono/cors'
+
+const ALLOWED_ORIGINS = new Set([
+  'https://myapp.com',
+  'https://www.myapp.com',
+  // Add staging origins only in non-production
+  ...(process.env.NODE_ENV !== 'production' ? ['http://localhost:3000'] : []),
+])
+
+app.use(cors({
+  origin: (origin) =&gt; {
+    // origin is undefined for same-origin requests
+    if (!origin || ALLOWED_ORIGINS.has(origin)) return origin
+    return null  // null = rejected
+  },
+  allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,       // required if you send cookies cross-origin
+  maxAge: 86400,            // cache preflight 24h
+}))</code></pre>
+    </div>
+
+    <div class="callout security">
+      <span class="callout-icon">🔒</span>
+      <span class="callout-label">Security — Never use <code>origin: '*'</code> with credentials</span>
+      <div class="callout-body">
+        <p>Setting <code>origin: '*'</code> (wildcard) and <code>credentials: true</code> is invalid per the CORS spec and browsers will reject it — but more importantly, never use a wildcard origin for authenticated APIs. Always allowlist specific origins. Also avoid dynamically reflecting the request origin without validation.</p>
+      </div>
+    </div>
+
+    <h3 id="rate-limiting">Rate Limiting</h3>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">TypeScript</span>
+        <span class="code-filename">middleware/ratelimit.ts</span>
+      </div>
+      <pre><code class="language-typescript">import { rateLimiter } from 'hono-rate-limiter'
+import { redis } from './redis'
+
+// General API rate limit: 100 req/min per IP
+export const apiRateLimit = rateLimiter({
+  windowMs: 60_000,
+  limit: 100,
+  standardHeaders: 'draft-7',
+  keyGenerator: (c) =&gt; c.req.header('cf-connecting-ip') ?? c.req.raw.headers.get('x-forwarded-for') ?? 'unknown',
+})
+
+// Auth endpoint rate limit: 5 attempts/15 min per IP (brute-force prevention)
+export const authRateLimit = rateLimiter({
+  windowMs: 15 * 60_000,
+  limit: 5,
+  standardHeaders: 'draft-7',
+  keyGenerator: (c) =&gt; `auth:${c.req.header('cf-connecting-ip') ?? 'unknown'}`,
+  handler: (c) =&gt;
+    c.json({ error: 'Too many attempts. Try again in 15 minutes.' }, 429),
+})
+
+// Usage:
+app.use('/auth/*', authRateLimit)
+app.use('/api/*', apiRateLimit)</code></pre>
+    </div>
+
+    <h3 id="injection">SQL Injection Prevention</h3>
+
+    <div class="callout security">
+      <span class="callout-icon">🔒</span>
+      <span class="callout-label">Security — Parameterized Queries Only</span>
+      <div class="callout-body">
+        <p>Never concatenate user input into SQL strings. SQL injection remains the #1 web vulnerability. Use parameterized queries (Prisma, Drizzle, pg's <code>$1</code> syntax, Kysely). If you must write raw SQL, use tagged template literals that enforce parameterization.</p>
+      </div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">TypeScript</span>
+        <span class="code-filename">— SQL injection: safe vs unsafe</span>
+      </div>
+      <pre><code class="language-typescript">// ❌ NEVER DO THIS — SQL injection vulnerability
+const users = await db.query(
+  `SELECT * FROM users WHERE email = '${email}'`  // attacker input: ' OR '1'='1
+)
+
+// ✅ Parameterized query (pg driver)
+const users = await db.query(
+  'SELECT * FROM users WHERE email = $1',
+  [email]
+)
+
+// ✅ Prisma — always parameterized
+const user = await prisma.user.findUnique({ where: { email } })
+
+// ✅ Prisma raw — use Prisma.sql template tag
+const users = await prisma.$queryRaw`
+  SELECT * FROM users WHERE email = ${email}
+`
+// Prisma.sql automatically parameterizes — safe
+
+// ❌ Prisma raw string — bypasses parameterization
+const users = await prisma.$queryRawUnsafe(
+  `SELECT * FROM users WHERE email = '${email}'`  // vulnerable!
+)</code></pre>
+    </div>
+
+    <h3>XSS Prevention and Content Security Policy</h3>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">TypeScript</span>
+        <span class="code-filename">middleware/security-headers.ts</span>
+      </div>
+      <pre><code class="language-typescript">import { secureHeaders } from 'hono/secure-headers'
+
+// Hono's built-in security headers middleware
+app.use(secureHeaders({
+  contentSecurityPolicy: {
+    defaultSrc: ["'self'"],
+    scriptSrc: ["'self'", "'strict-dynamic'"],  // no unsafe-inline!
+    styleSrc: ["'self'", 'https://fonts.googleapis.com'],
+    imgSrc: ["'self'", 'data:', 'https:'],
+    connectSrc: ["'self'", 'https://api.myapp.com'],
+    fontSrc: ["'self'", 'https://fonts.gstatic.com'],
+    objectSrc: ["'none'"],
+    baseUri: ["'self'"],
+    frameAncestors: ["'none'"],  // prevents clickjacking
+    upgradeInsecureRequests: [],
+  },
+  xFrameOptions: 'DENY',
+  xContentTypeOptions: 'nosniff',
+  referrerPolicy: 'strict-origin-when-cross-origin',
+  strictTransportSecurity: {
+    maxAge: 63_072_000,  // 2 years
+    includeSubDomains: true,
+    preload: true,
+  },
+  permissionsPolicy: {
+    camera: [],
+    microphone: [],
+    geolocation: [],
+  },
+}))</code></pre>
+    </div>
+
+    <h3>CSRF Protection</h3>
+
+    <p>
+      CSRF (Cross-Site Request Forgery) tricks a user's browser into making authenticated requests to your site from a malicious page. With <code>SameSite=Lax/Strict</code> cookies, CSRF is largely mitigated for modern browsers. For older browsers or APIs that accept cookies with <code>SameSite=None</code>, use a CSRF token:
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">TypeScript</span>
+        <span class="code-filename">middleware/csrf.ts</span>
+      </div>
+      <pre><code class="language-typescript">import { csrf } from 'hono/csrf'
+
+// Hono CSRF middleware — validates Origin/Referer header
+app.use(csrf({
+  origin: ['https://myapp.com', 'https://www.myapp.com'],
+}))
+
+// For APIs that use a CSRF token pattern:
+// 1. GET /csrf-token → returns a token (also stored in session)
+// 2. Client sends token in X-CSRF-Token header on mutations
+// 3. Server validates header token matches session token</code></pre>
+    </div>
+
+    <!-- ═══ 8. HTTPS ═══ -->
+    <h2 id="https"><span class="section-number">8</span> HTTPS and TLS</h2>
+
+    <div class="callout security">
+      <span class="callout-icon">🔒</span>
+      <span class="callout-label">Security — HTTPS Everywhere</span>
+      <div class="callout-body">
+        <p>Never serve auth endpoints over plain HTTP in production. Not even for internal services. TLS prevents credential interception, session hijacking, and man-in-the-middle attacks. Modern deployment platforms (Railway, Fly.io, Vercel, AWS ALB) provide TLS termination for free. There is no valid excuse to skip HTTPS in 2025.</p>
+      </div>
+    </div>
+
+    <h3>HTTP → HTTPS Redirect + HSTS</h3>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">TypeScript</span>
+        <span class="code-filename">middleware/https-redirect.ts</span>
+      </div>
+      <pre><code class="language-typescript">// Force HTTPS redirect
+app.use(async (c, next) => {
+  const proto = c.req.header('x-forwarded-proto')
+  if (proto === 'http') {
+    const url = new URL(c.req.url)
+    url.protocol = 'https:'
+    return c.redirect(url.toString(), 301)
+  }
+  await next()
+})
+
+// HSTS: instruct browsers to always use HTTPS for 2 years
+// (included in secureHeaders above, but shown explicitly)
+// Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+//
+// ⚠️  Do not set preload until you're certain your entire domain
+//    can serve HTTPS — it's very hard to undo.</code></pre>
+    </div>
+
+    <h3>TLS Certificates with Let's Encrypt</h3>
+
+    <p>
+      Let's Encrypt provides free, auto-renewing TLS certificates. Use <strong>Caddy</strong> as a reverse proxy for automatic certificate management — it handles ACME challenges, renewal, and HTTPS redirect out of the box:
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">text</span>
+        <span class="code-filename">Caddyfile</span>
+      </div>
+      <pre><code class="language-plaintext">myapp.com {
+    reverse_proxy localhost:3000
+    # Caddy automatically obtains and renews TLS from Let's Encrypt
+    # Redirects HTTP → HTTPS
+    # Sets HSTS header
+}</code></pre>
+    </div>
+
+    <!-- ═══ 9. SECRETS ═══ -->
+    <h2 id="secrets"><span class="section-number">9</span> Secrets and Environment Security</h2>
+
+    <div class="callout security">
+      <span class="callout-icon">🔒</span>
+      <span class="callout-label">Security — Never Commit Secrets</span>
+      <div class="callout-body">
+        <p>Never commit secrets to version control — not even in a private repo. Assume any secret that touches git is compromised. Git history is permanent. Use <code>.gitignore</code> for <code>.env</code> files and pre-commit hooks (e.g., <code>detect-secrets</code>, <code>gitleaks</code>) to catch accidents.</p>
+      </div>
+    </div>
+
+    <h3>Type-Safe Environment Variables with Zod</h3>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">TypeScript</span>
+        <span class="code-filename">config/env.ts</span>
+      </div>
+      <pre><code class="language-typescript">import { z } from 'zod'
+
+const EnvSchema = z.object({
+  NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
+  DATABASE_URL: z.string().url(),
+  JWT_SECRET: z.string().min(32, 'JWT_SECRET must be at least 32 characters'),
+  GOOGLE_CLIENT_ID: z.string(),
+  GOOGLE_CLIENT_SECRET: z.string(),
+  REDIS_URL: z.string().url(),
+  AWS_REGION: z.string().optional(),
+  AWS_SECRET_ARN: z.string().optional(),
+})
+
+// Validate at startup — fail fast if misconfigured
+const result = EnvSchema.safeParse(process.env)
+if (!result.success) {
+  console.error('Environment configuration error:')
+  console.error(result.error.flatten().fieldErrors)
+  process.exit(1)
+}
+
+export const env = result.data
+
+// Usage:
+import { env } from '@/config/env'
+const token = jwt.sign(payload, env.JWT_SECRET)  // fully typed</code></pre>
+    </div>
+
+    <h3>Secret Management Services</h3>
+
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Service</th>
+            <th>Best for</th>
+            <th>Key feature</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>AWS Secrets Manager</strong></td>
+            <td>AWS-native workloads</td>
+            <td>Automatic rotation, IAM integration</td>
+          </tr>
+          <tr>
+            <td><strong>HashiCorp Vault</strong></td>
+            <td>Multi-cloud, self-hosted</td>
+            <td>Dynamic secrets, full audit trail</td>
+          </tr>
+          <tr>
+            <td><strong>Doppler</strong></td>
+            <td>Teams, any cloud</td>
+            <td>Developer UX, sync to multiple envs</td>
+          </tr>
+          <tr>
+            <td><strong>Infisical</strong></td>
+            <td>Open-source teams</td>
+            <td>Self-hostable, E2E encrypted</td>
+          </tr>
+          <tr>
+            <td><strong>1Password Secrets</strong></td>
+            <td>Teams already using 1Password</td>
+            <td>Unified UX for humans and apps</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">TypeScript</span>
+        <span class="code-filename">config/secrets.ts (AWS Secrets Manager)</span>
+      </div>
+      <pre><code class="language-typescript">import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager'
+
+const client = new SecretsManagerClient({ region: env.AWS_REGION })
+
+interface AppSecrets {
+  jwtSecret: string
+  databaseUrl: string
+  stripeApiKey: string
+}
+
+let cachedSecrets: AppSecrets | null = null
+
+export async function getSecrets(): Promise&lt;AppSecrets&gt; {
+  if (cachedSecrets) return cachedSecrets
+
+  const { SecretString } = await client.send(
+    new GetSecretValueCommand({ SecretId: env.AWS_SECRET_ARN })
+  )
+
+  if (!SecretString) throw new Error('Secret is empty')
+
+  // Validate shape with Zod — don't trust the secrets store blindly
+  const SecretsSchema = z.object({
+    jwtSecret: z.string().min(32),
+    databaseUrl: z.string().url(),
+    stripeApiKey: z.string().startsWith('sk_'),
+  })
+
+  cachedSecrets = SecretsSchema.parse(JSON.parse(SecretString))
+  return cachedSecrets
+}</code></pre>
+    </div>
+
+    <div class="callout security">
+      <span class="callout-icon">🔒</span>
+      <span class="callout-label">Security — Never Log Secrets</span>
+      <div class="callout-body">
+        <p>Structured logging libraries like <code>pino</code> log entire objects. Never log objects that might contain secrets: request bodies, environment variables, or JWT payloads. Use a <code>redact</code> config to strip known sensitive fields, and audit your logs regularly.</p>
+      </div>
+    </div>
+
+    <!-- ═══ 10. AUDIT LOGGING ═══ -->
+    <h2 id="audit-logging"><span class="section-number">10</span> Audit Logging</h2>
+
+    <p>
+      Audit logs are your security camera footage. They tell you what happened, when, and by whom — essential for incident response, compliance, and detecting intrusions.
+    </p>
+
+    <h3>What to Log</h3>
+
+    <ul>
+      <li><strong>Auth events</strong> — successful login, failed login, logout, password change, MFA enable/disable</li>
+      <li><strong>Permission denials</strong> — every 403 response, with user ID and resource attempted</li>
+      <li><strong>Data mutations</strong> — create, update, delete operations on sensitive resources</li>
+      <li><strong>Admin actions</strong> — role changes, user creation/deletion, configuration changes</li>
+      <li><strong>Anomalies</strong> — login from new IP/device, bulk data export, rate limit hits</li>
+    </ul>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">TypeScript</span>
+        <span class="code-filename">audit/logger.ts</span>
+      </div>
+      <pre><code class="language-typescript">import { z } from 'zod'
+
+const AuditEventSchema = z.object({
+  eventType: z.enum([
+    'auth.login.success',
+    'auth.login.failure',
+    'auth.logout',
+    'auth.password_change',
+    'authz.denied',
+    'data.create',
+    'data.update',
+    'data.delete',
+    'admin.role_change',
+    'admin.user_delete',
+  ]),
+  timestamp: z.string().datetime(),
+  userId: z.string().uuid().nullable(),
+  sessionId: z.string().nullable(),
+  ipAddress: z.string(),
+  userAgent: z.string().optional(),
+  resource: z.string().optional(),
+  resourceId: z.string().optional(),
+  outcome: z.enum(['success', 'failure', 'denied']),
+  metadata: z.record(z.unknown()).optional(),
+})
+
+type AuditEvent = z.infer&lt;typeof AuditEventSchema&gt;
+
+export async function logAuditEvent(event: AuditEvent): Promise&lt;void&gt; {
+  const validated = AuditEventSchema.parse(event)
+
+  // Write to immutable audit log (append-only table or log service)
+  await db.auditLog.create({ data: validated })
+
+  // Also stream to SIEM (Splunk, Datadog, CloudWatch)
+  logger.info({ audit: validated }, 'audit_event')
+}
+
+// Middleware that auto-logs all auth events:
+app.use(async (c, next) =&gt; {
+  await next()
+
+  const status = c.res.status
+  if (status === 401 || status === 403) {
+    await logAuditEvent({
+      eventType: status === 401 ? 'auth.login.failure' : 'authz.denied',
+      timestamp: new Date().toISOString(),
+      userId: c.get('user')?.id ?? null,
+      sessionId: c.get('sessionId') ?? null,
+      ipAddress: c.req.header('cf-connecting-ip') ?? 'unknown',
+      resource: c.req.path,
+      outcome: 'denied',
+    })
+  }
+})</code></pre>
+    </div>
+
+    <div class="callout info">
+      <span class="callout-icon">ℹ️</span>
+      <span class="callout-label">Log Retention</span>
+      <div class="callout-body">
+        <p>Retain auth audit logs for at least 90 days (hot) and 1 year (cold archive). Many compliance frameworks (SOC2, PCI-DSS, HIPAA) mandate this. Use append-only storage — audit logs must be tamper-evident. AWS CloudWatch Logs with log group protection or WORM-compliant S3 are good options.</p>
+      </div>
+    </div>
+
+    <!-- ═══ 11. TS BEST PRACTICES ═══ -->
+    <h2 id="ts-best-practices"><span class="section-number">11</span> TypeScript Security Best Practices</h2>
+
+    <h3>Never Use <code>any</code> for User Input</h3>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">TypeScript</span>
+        <span class="code-filename">— Input validation patterns</span>
+      </div>
+      <pre><code class="language-typescript">// ❌ Dangerous — any bypasses all type checking
+app.post('/users', async (c) =&gt; {
+  const body: any = await c.req.json()  // untrusted user data, no validation
+  await db.user.create({ data: body })  // mass assignment vulnerability!
+})
+
+// ✅ Always validate external data with Zod at the boundary
+const CreateUserSchema = z.object({
+  email: z.string().email().max(255),
+  name: z.string().min(1).max(100).trim(),
+  // role is NOT in the schema — users cannot self-assign roles
+})
+
+app.post('/users', async (c) =&gt; {
+  const raw = await c.req.json()
+  const body = CreateUserSchema.parse(raw)  // throws ZodError if invalid
+  await db.user.create({
+    data: { ...body, role: 'viewer' },  // role is server-controlled
+  })
+})</code></pre>
+    </div>
+
+    <div class="callout security">
+      <span class="callout-icon">🔒</span>
+      <span class="callout-label">Security — Mass Assignment</span>
+      <div class="callout-body">
+        <p>Mass assignment is a critical vulnerability: if you pass the entire request body to your database layer, an attacker can include fields like <code>"role": "admin"</code> or <code>"balance": 999999</code>. Always define explicit Zod schemas that only allow the fields users are permitted to set. Never use <code>spread</code> on unvalidated input.</p>
+      </div>
+    </div>
+
+    <h3>TypeScript Configuration for Security</h3>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">JSON</span>
+        <span class="code-filename">tsconfig.json (security-focused settings)</span>
+      </div>
+      <pre><code class="language-json">{
+  "compilerOptions": {
+    "strict": true,               // enables all strict checks
+    "noImplicitAny": true,        // no implicit any types
+    "strictNullChecks": true,     // null/undefined must be handled
+    "noUncheckedIndexedAccess": true,  // array access returns T | undefined
+    "exactOptionalPropertyTypes": true, // distinguish undefined from missing
+    "noImplicitReturns": true,    // all code paths must return
+    "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true
+  }
+}</code></pre>
+    </div>
+
+    <h3>Dependency Security</h3>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">bash</span>
+        <span class="code-filename">— Dependency security checks</span>
+      </div>
+      <pre><code class="language-bash"># Check for known vulnerabilities in your dependencies
+npm audit
+
+# Auto-fix safe upgrades
+npm audit fix
+
+# Snyk — deeper analysis with license and SBOM scanning
+npx snyk test
+
+# Check for outdated packages
+npm outdated
+
+# Lock file integrity — ensure package-lock.json wasn't tampered
+npm ci  # uses exact versions from lock file, fails if out of sync</code></pre>
+    </div>
+
+    <div class="callout ai-era">
+      <span class="callout-icon">🤖</span>
+      <span class="callout-label">AI Era — LLM Agent Identity</span>
+      <div class="callout-body">
+        <p>AI agents make API calls on behalf of users. Apply the same auth principles: each agent should have its own API key or scoped JWT with the minimum required permissions (principle of least privilege). Log all agent API calls with the agent ID and the user it acted on behalf of. Implement agent-specific rate limits to prevent runaway loops from causing damage. Never give an agent admin-level credentials.</p>
+      </div>
+    </div>
+
+    <!-- ═══ COMMON MISTAKES ═══ -->
+    <h2 id="common-mistakes">Common Mistakes — Auth Antipatterns</h2>
+
+    <div class="mistakes-grid">
+      <div class="mistake-card">
+        <h4>Storing JWT in localStorage</h4>
+        <p>Any XSS vulnerability — including from a compromised npm package — can read <code>localStorage</code> and steal all tokens. Store access tokens in memory and refresh tokens in httpOnly cookies.</p>
+      </div>
+      <div class="mistake-card">
+        <h4>Using <code>alg: none</code> or not whitelisting algorithms</h4>
+        <p>Not passing <code>algorithms: ['HS256']</code> to <code>jwt.verify()</code> allows attackers to craft unsigned tokens with <code>"alg": "none"</code>. Always explicitly whitelist the expected algorithm.</p>
+      </div>
+      <div class="mistake-card">
+        <h4>Storing passwords with MD5 / SHA-256</h4>
+        <p>These are fast hashes, trivially brute-forced with GPUs. A 7-character password hashed with MD5 cracks in seconds. Always use bcrypt, Argon2id, or scrypt.</p>
+      </div>
+      <div class="mistake-card">
+        <h4>Sending the JWT secret in client-side code</h4>
+        <p>NEXT_PUBLIC_ variables in Next.js, Vite's <code>VITE_</code> prefix — anything that starts with these prefixes gets bundled into the client. Never prefix a secret with these patterns.</p>
+      </div>
+      <div class="mistake-card">
+        <h4>Logging the request body</h4>
+        <p>Request bodies often contain passwords (login endpoint), tokens (refresh endpoint), or PII. Log only sanitized summaries of auth-related endpoints, never the raw body.</p>
+      </div>
+      <div class="mistake-card">
+        <h4>Not revoking sessions on logout</h4>
+        <p>Deleting a cookie on the client doesn't invalidate the session server-side. If the attacker captured the cookie, they can still use it. Always delete the session from the server store (Redis) on logout.</p>
+      </div>
+      <div class="mistake-card">
+        <h4>Trusting user-supplied roles or permissions</h4>
+        <p>Never accept <code>role</code> or permission flags from the client. Always look them up server-side from the database. Mass assignment of <code>"role": "admin"</code> is trivial if you trust the request body.</p>
+      </div>
+      <div class="mistake-card">
+        <h4>Missing rate limiting on auth endpoints</h4>
+        <p>Without rate limiting, login and password-reset endpoints are open to brute-force attacks. Apply strict rate limits (5 attempts per 15 minutes per IP) and implement account lockout policies.</p>
+      </div>
+      <div class="mistake-card">
+        <h4>Verbose error messages on auth failure</h4>
+        <p>Returning "User not found" vs "Wrong password" reveals whether an email is registered. Always return the same generic message: "Invalid email or password." This prevents user enumeration attacks.</p>
+      </div>
+    </div>
+
+    <!-- Summary -->
+    <div style="margin-top:3rem; padding:1.5rem; background:var(--indigo-50); border-radius:12px; border:1px solid var(--indigo-200);">
+      <h3 style="margin-top:0; color:var(--indigo-700);">Chapter Summary</h3>
+      <ul style="margin-left:1.25rem;">
+        <li><strong>AuthN vs AuthZ</strong> — identity and permissions are separate concerns; enforce both</li>
+        <li><strong>JWT</strong> — use short-lived access tokens + long-lived httpOnly refresh tokens; always whitelist algorithms</li>
+        <li><strong>Sessions</strong> — Redis-backed sessions with HttpOnly, Secure, SameSite cookies; regenerate ID on login</li>
+        <li><strong>OAuth2 + PKCE</strong> — never implement the OAuth flow yourself in a SPA; use PKCE; verify the ID token</li>
+        <li><strong>Passwords</strong> — Argon2id or bcrypt; never MD5/SHA; always timing-safe comparison</li>
+        <li><strong>RBAC</strong> — roles in the database, not in the token; enforce with middleware; use CASL for complex rules</li>
+        <li><strong>API Security</strong> — allowlist CORS origins, rate-limit auth endpoints, parameterize SQL, set CSP headers</li>
+        <li><strong>Secrets</strong> — validate with Zod at startup; use a secrets manager in production; never log them</li>
+        <li><strong>Audit logs</strong> — log auth events, permission denials, and data mutations; retain for compliance</li>
+        <li><strong>TypeScript</strong> — strict mode, Zod at boundaries, no <code>any</code> for user input, <code>npm audit</code> in CI</li>
+      </ul>
+    </div>
+
+  </article>
+</div>
+
+<!-- ───── FOOTER ───── -->
+<footer class="chapter-footer">
+  <a href="chapter-14-databases.html" class="footer-nav-btn">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 12L6 8l4-4" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Ch 14 · Databases &amp; Prisma
+  </a>
+  <div class="footer-center">
+    <div style="font-weight:700; font-size:0.875rem; margin-bottom:0.2rem;">TypeScript for the AI Era</div>
+    <div style="color:var(--text-tertiary); font-size:0.78rem;">Chapter 15 of 24 — Authentication, Authorization &amp; Security</div>
+  </div>
+  <a href="chapter-16-react.html" class="footer-nav-btn">
+    Ch 16 · React &amp; Next.js
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </a>
+</footer>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    hljs.highlightAll()
+
+    // Active TOC link on scroll
+    const headings = document.querySelectorAll('article h2, article h3')
+    const tocLinks = document.querySelectorAll('.toc-list a')
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const id = entry.target.id
+            tocLinks.forEach(link => {
+              link.style.color = ''
+              link.style.borderLeftColor = ''
+            })
+            const active = document.querySelector(`.toc-list a[href="#${id}"]`)
+            if (active) {
+              active.style.color = 'var(--indigo-600)'
+              active.style.borderLeftColor = 'var(--indigo-600)'
+            }
+          }
+        })
+      },
+      { rootMargin: '-60px 0px -70% 0px' }
+    )
+
+    headings.forEach(h => { if (h.id) observer.observe(h) })
+  })
+</script>
+
+</body>
+</html>

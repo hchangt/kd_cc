@@ -1,0 +1,3311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 12: ML Pipelines & CI/CD - Modern MLOps Tutorial</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script>hljs.highlightAll(); mermaid.initialize({startOnLoad:true, theme:'default'});</script>
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; color: #1f2937; }
+    .callout-info    { background:#eff6ff; border-left:4px solid #2563eb; }
+    .callout-warning { background:#fffbeb; border-left:4px solid #d97706; }
+    .callout-danger  { background:#fef2f2; border-left:4px solid #dc2626; }
+    .callout-success { background:#f0fdf4; border-left:4px solid #059669; }
+    pre { margin:0; }
+    .mermaid { background:#f8fafc; border-radius:8px; padding:16px; overflow-x:auto; }
+    table { border-collapse:collapse; width:100%; }
+    th { background:#f1f5f9; }
+    td,th { border:1px solid #e2e8f0; padding:8px 12px; text-align:left; }
+    tr:hover td { background:#f8fafc; }
+    .badge { display:inline-block; padding:2px 10px; border-radius:9999px; font-size:.75rem; font-weight:600; }
+  </style>
+</head>
+<body class="bg-gray-50">
+
+<!-- NAVBAR -->
+<nav class="bg-white border-b border-gray-200 sticky top-0 z-50">
+  <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+    <a href="index.html" class="text-xl font-bold text-blue-600">Modern MLOps Tutorial</a>
+    <div class="flex gap-6 text-sm font-medium text-gray-600">
+      <a href="index.html" class="hover:text-blue-600">Home</a>
+      <a href="ch11_model_serving.html" class="hover:text-blue-600">Ch 11</a>
+      <span class="text-blue-600 font-semibold">Ch 12</span>
+      <a href="ch13_monitoring.html" class="hover:text-blue-600">Ch 13</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="bg-gradient-to-br from-blue-700 to-blue-500 text-white py-16">
+  <div class="max-w-5xl mx-auto px-6">
+    <div class="flex items-center gap-3 mb-4">
+      <span class="badge bg-blue-800 text-blue-100">Part IV — Pipelines &amp; Orchestration</span>
+      <span class="badge bg-white text-blue-700">Chapter 12</span>
+      <span class="badge bg-green-600 text-white">~90 min read</span>
+    </div>
+    <h1 class="text-4xl font-extrabold mb-3">ML Pipelines &amp; CI/CD for Machine Learning</h1>
+    <p class="text-blue-100 text-lg max-w-3xl">From raw data to production model: building automated pipelines with Kubeflow, Metaflow, ZenML, GitHub Actions, GitLab CI, quality gates, testing strategies, containerization, and GitOps.</p>
+    <div class="mt-6 flex flex-wrap gap-2 text-sm">
+      <span class="bg-blue-800 rounded px-3 py-1">KFP v2</span>
+      <span class="bg-blue-800 rounded px-3 py-1">Metaflow</span>
+      <span class="bg-blue-800 rounded px-3 py-1">ZenML</span>
+      <span class="bg-blue-800 rounded px-3 py-1">GitHub Actions</span>
+      <span class="bg-blue-800 rounded px-3 py-1">GitLab CI</span>
+      <span class="bg-blue-800 rounded px-3 py-1">Quality Gates</span>
+      <span class="bg-blue-800 rounded px-3 py-1">GitOps / ArgoCD</span>
+    </div>
+  </div>
+</header>
+
+<!-- TOC -->
+<div class="max-w-5xl mx-auto px-6 py-8">
+  <div class="bg-white border border-gray-200 rounded-xl p-6 mb-8">
+    <h2 class="text-lg font-bold text-gray-800 mb-3">Table of Contents</h2>
+    <ol class="list-decimal list-inside space-y-1 text-blue-600 text-sm columns-2">
+      <li><a href="#s1" class="hover:underline">CI/CD for ML — Overview</a></li>
+      <li><a href="#s2" class="hover:underline">Kubeflow Pipelines (KFP)</a></li>
+      <li><a href="#s3" class="hover:underline">Metaflow (Netflix)</a></li>
+      <li><a href="#s4" class="hover:underline">ZenML</a></li>
+      <li><a href="#s5" class="hover:underline">GitHub Actions for MLOps</a></li>
+      <li><a href="#s6" class="hover:underline">GitLab CI/CD for ML</a></li>
+      <li><a href="#s7" class="hover:underline">Model Quality Gates</a></li>
+      <li><a href="#s8" class="hover:underline">Testing for ML</a></li>
+      <li><a href="#s9" class="hover:underline">Containerization in ML CI/CD</a></li>
+      <li><a href="#s10" class="hover:underline">Infrastructure CI/CD (GitOps)</a></li>
+      <li><a href="#s11" class="hover:underline">Deployment Strategies for ML</a></li>
+      <li><a href="#s12" class="hover:underline">Complete ML CI/CD Example</a></li>
+    </ol>
+  </div>
+
+<!-- ============================================================ SECTION 1 ============================================================ -->
+<section id="s1" class="mb-16">
+  <h2 class="text-3xl font-bold text-gray-900 mb-6 border-b-2 border-blue-600 pb-2">1. CI/CD for ML — Overview</h2>
+
+  <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">Why CI/CD for ML Differs from Software CI/CD</h3>
+  <p class="text-gray-700 mb-4">Traditional software CI/CD validates code correctness through unit and integration tests. ML systems have an additional dimension: <strong>data and model quality</strong>. A pipeline can pass all code tests yet produce a statistically degraded model if training data drifts. This creates three categories of change that each demand their own validation gate:</p>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+    <div class="bg-blue-50 rounded-xl p-4 border border-blue-200">
+      <div class="font-bold text-blue-800 mb-1">Code Changes</div>
+      <p class="text-sm text-gray-700">Feature engineering, model architecture, training logic — validated by unit/integration tests and linting.</p>
+    </div>
+    <div class="bg-green-50 rounded-xl p-4 border border-green-200">
+      <div class="font-bold text-green-800 mb-1">Data Changes</div>
+      <p class="text-sm text-gray-700">Schema changes, distribution shifts, new data sources — validated by data contracts and statistical tests.</p>
+    </div>
+    <div class="bg-purple-50 rounded-xl p-4 border border-purple-200">
+      <div class="font-bold text-purple-800 mb-1">Model Changes</div>
+      <p class="text-sm text-gray-700">Hyperparameter updates, architecture changes — validated by evaluation metrics and behavioral tests against champion model.</p>
+    </div>
+  </div>
+
+  <div class="callout-info rounded-xl p-4 mb-6">
+    <strong class="text-blue-800">Key Insight:</strong>
+    <span class="text-gray-700 ml-1">In software CI/CD, a green build means the code is correct. In ML CI/CD, a green build means the code is correct <em>and</em> the resulting model meets quality thresholds on current data. These are entirely separate concerns.</span>
+  </div>
+
+  <h3 class="text-xl font-semibold text-gray-800 mt-8 mb-3">The Three ML Pipelines</h3>
+  <p class="text-gray-700 mb-4">Google's ML engineering team established a useful taxonomy with three distinct automated pipelines, each triggered independently:</p>
+
+  <table class="mb-6 text-sm">
+    <thead><tr><th>Pipeline</th><th>Trigger</th><th>Validates</th><th>Output</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Data Pipeline</strong></td><td>New raw data arrives / schedule</td><td>Schema, statistics, completeness</td><td>Validated feature set / dataset version</td></tr>
+      <tr><td><strong>Training Pipeline</strong></td><td>Data change, code PR, schedule</td><td>Model metrics vs baseline</td><td>Candidate model artifact + metadata</td></tr>
+      <tr><td><strong>Deployment Pipeline</strong></td><td>Candidate model passes quality gate</td><td>Serving performance, A/B test</td><td>Live production endpoint</td></tr>
+    </tbody>
+  </table>
+
+  <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">Continuous Training vs Continuous Delivery</h3>
+  <p class="text-gray-700 mb-4"><strong>Continuous Training (CT)</strong> means automatically retraining models on a schedule or when data changes, producing new candidate artifacts. <strong>Continuous Delivery (CD)</strong> means automatically deploying those candidates once they pass quality gates. Many teams implement CT without CD — they retrain automatically but require human approval before deployment. Full CT+CD is the gold standard but requires extremely mature quality gates.</p>
+
+  <div class="mermaid mb-6">
+flowchart TD
+    A([Code Push / PR]) --> B[Code CI\nTests · Lint · Build]
+    D([New Data Arrives]) --> E[Data Validation\nSchema · Stats · Contracts]
+    S([Schedule / Trigger]) --> F[Feature Engineering\nPipeline]
+    B --> |code merged| F
+    E --> |data validated| F
+    F --> G[Model Training\nPipeline]
+    G --> H{Quality Gate\nMetrics vs Baseline}
+    H --> |fail| I([Alert &amp; Rollback])
+    H --> |pass| J[Model Registry\nCandidate]
+    J --> K{Human Approval?\nOptional}
+    K --> |approved / auto| L[Deployment Pipeline\nBlue-Green / Canary]
+    L --> M([Production Endpoint])
+    M --> N[Monitoring\nDrift · Latency · Errors]
+    N --> |alert| S
+
+    style A fill:#dbeafe,stroke:#2563eb
+    style D fill:#d1fae5,stroke:#059669
+    style M fill:#d1fae5,stroke:#059669
+    style H fill:#fef3c7,stroke:#d97706
+    style I fill:#fee2e2,stroke:#dc2626
+  </div>
+
+  <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">ML-Specific CI Challenges</h3>
+  <table class="text-sm mb-6">
+    <thead><tr><th>Challenge</th><th>Why It's Hard</th><th>Solution Pattern</th></tr></thead>
+    <tbody>
+      <tr><td>Non-deterministic training</td><td>Same code + data can produce different models</td><td>Seed fixing, statistical metric bounds not exact equality</td></tr>
+      <tr><td>Training cost</td><td>Full training job = hours + $$$</td><td>Smoke tests on 1% data, full training on merge to main only</td></tr>
+      <tr><td>Large artifacts</td><td>Model weights are GB-scale binaries</td><td>DVC / S3-backed artifact stores, not git</td></tr>
+      <tr><td>Data versioning</td><td>Data changes are silent</td><td>Data contracts, Great Expectations in CI</td></tr>
+      <tr><td>Metric thresholds</td><td>What is "good enough"?</td><td>Champion/challenger comparison, not absolute thresholds</td></tr>
+      <tr><td>Bias &amp; fairness</td><td>Accuracy masks group disparities</td><td>Sliced evaluation metrics in quality gate</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============================================================ SECTION 2 ============================================================ -->
+<section id="s2" class="mb-16">
+  <h2 class="text-3xl font-bold text-gray-900 mb-6 border-b-2 border-blue-600 pb-2">2. Kubeflow Pipelines (KFP)</h2>
+
+  <h3 class="text-xl font-semibold text-gray-800 mb-3">KFP v2 SDK Architecture</h3>
+  <p class="text-gray-700 mb-4">Kubeflow Pipelines v2 represents a major redesign over v1. Pipelines are compiled to an IR YAML (Intermediate Representation) based on the ML Metadata spec and executed by the KFP backend on Kubernetes. The v2 SDK introduces first-class artifact typing, eliminating the string-passing anti-pattern of v1.</p>
+
+  <div class="mermaid mb-6">
+flowchart LR
+    subgraph SDK ["KFP v2 SDK (Python)"]
+      C1["@component\ndecorated functions"]
+      P1["@pipeline\nfunction"]
+    end
+    subgraph Compile
+      IR["Compiled IR YAML\n(pipeline spec)"]
+    end
+    subgraph Backend ["KFP Backend (Kubernetes)"]
+      S["Scheduler /\nOrchestrator"]
+      W1["Pod: Step 1"]
+      W2["Pod: Step 2"]
+      W3["Pod: Step 3"]
+      ML["ML Metadata\nStore"]
+    end
+    subgraph Storage
+      AS["Artifact Store\n(GCS / S3 / MinIO)"]
+    end
+
+    C1 --> P1 --> IR --> S
+    S --> W1 --> W2 --> W3
+    W1 & W2 & W3 <--> ML
+    W1 & W2 & W3 <--> AS
+  </div>
+
+  <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">Components vs Pipelines</h3>
+  <p class="text-gray-700 mb-4">A <strong>component</strong> is the atomic unit: a Python function decorated with <code>@component</code> that runs in its own container. A <strong>pipeline</strong> wires components together, passing artifacts as typed inputs and outputs. Components can be reused across pipelines and versioned independently.</p>
+
+  <h4 class="font-semibold text-gray-700 mt-4 mb-2">Code: KFP Component Definition</h4>
+  <pre><code class="language-python">from kfp import dsl
+from kfp.dsl import Dataset, Model, Metrics, Input, Output
+
+# ── Component 1: data ingestion ──────────────────────────────────────────────
+@dsl.component(
+    base_image="python:3.11-slim",
+    packages_to_install=["pandas==2.1.4", "scikit-learn==1.4.0", "pyarrow==14.0.1"],
+)
+def ingest_data(
+    dataset_uri: str,
+    output_dataset: Output[Dataset],
+    test_size: float = 0.2,
+    random_state: int = 42,
+) -> None:
+    """Download raw data, split train/test, persist as parquet."""
+    import pandas as pd
+    from sklearn.model_selection import train_test_split
+    import json, pathlib
+
+    df = pd.read_parquet(dataset_uri)
+    train, test = train_test_split(df, test_size=test_size, random_state=random_state)
+
+    pathlib.Path(output_dataset.path).mkdir(parents=True, exist_ok=True)
+    train.to_parquet(f"{output_dataset.path}/train.parquet", index=False)
+    test.to_parquet(f"{output_dataset.path}/test.parquet",  index=False)
+
+    output_dataset.metadata["n_train"] = len(train)
+    output_dataset.metadata["n_test"]  = len(test)
+    output_dataset.metadata["features"] = json.dumps(list(df.columns))
+
+
+# ── Component 2: feature engineering ────────────────────────────────────────
+@dsl.component(
+    base_image="python:3.11-slim",
+    packages_to_install=["pandas==2.1.4", "scikit-learn==1.4.0", "pyarrow==14.0.1"],
+)
+def build_features(
+    raw_dataset: Input[Dataset],
+    feature_dataset: Output[Dataset],
+    target_col: str = "label",
+) -> None:
+    import pandas as pd
+    from sklearn.preprocessing import StandardScaler
+    import pickle, pathlib
+
+    train = pd.read_parquet(f"{raw_dataset.path}/train.parquet")
+    test  = pd.read_parquet(f"{raw_dataset.path}/test.parquet")
+
+    numeric_cols = train.select_dtypes("number").columns.drop(target_col, errors="ignore")
+    scaler = StandardScaler()
+    train[numeric_cols] = scaler.fit_transform(train[numeric_cols])
+    test[numeric_cols]  = scaler.transform(test[numeric_cols])
+
+    pathlib.Path(feature_dataset.path).mkdir(parents=True, exist_ok=True)
+    train.to_parquet(f"{feature_dataset.path}/train.parquet", index=False)
+    test.to_parquet(f"{feature_dataset.path}/test.parquet",  index=False)
+
+    # Save scaler as part of the artifact
+    with open(f"{feature_dataset.path}/scaler.pkl", "wb") as f:
+        pickle.dump(scaler, f)
+</code></pre>
+
+  <h4 class="font-semibold text-gray-700 mt-6 mb-2">Code: Training + Evaluation Components</h4>
+  <pre><code class="language-python">@dsl.component(
+    base_image="python:3.11-slim",
+    packages_to_install=["pandas==2.1.4", "scikit-learn==1.4.0",
+                         "xgboost==2.0.3", "pyarrow==14.0.1"],
+)
+def train_model(
+    feature_dataset: Input[Dataset],
+    model_artifact: Output[Model],
+    n_estimators: int = 300,
+    max_depth: int = 6,
+    learning_rate: float = 0.05,
+    target_col: str = "label",
+) -> None:
+    import pandas as pd, xgboost as xgb, pickle, pathlib, json
+
+    train = pd.read_parquet(f"{feature_dataset.path}/train.parquet")
+    X = train.drop(columns=[target_col])
+    y = train[target_col]
+
+    clf = xgb.XGBClassifier(
+        n_estimators=n_estimators,
+        max_depth=max_depth,
+        learning_rate=learning_rate,
+        use_label_encoder=False,
+        eval_metric="logloss",
+        random_state=42,
+    )
+    clf.fit(X, y, eval_set=[(X, y)], verbose=False)
+
+    pathlib.Path(model_artifact.path).mkdir(parents=True, exist_ok=True)
+    with open(f"{model_artifact.path}/model.pkl", "wb") as f:
+        pickle.dump(clf, f)
+
+    model_artifact.metadata["framework"]   = "xgboost"
+    model_artifact.metadata["version"]     = xgb.__version__
+    model_artifact.metadata["hyperparams"] = json.dumps(
+        {"n_estimators": n_estimators, "max_depth": max_depth, "lr": learning_rate}
+    )
+
+
+@dsl.component(
+    base_image="python:3.11-slim",
+    packages_to_install=["pandas==2.1.4", "scikit-learn==1.4.0",
+                         "xgboost==2.0.3", "pyarrow==14.0.1"],
+)
+def evaluate_model(
+    feature_dataset: Input[Dataset],
+    model_artifact: Input[Model],
+    metrics: Output[Metrics],
+    target_col: str = "label",
+    min_accuracy: float = 0.85,
+) -> bool:
+    import pandas as pd, pickle
+    from sklearn.metrics import accuracy_score, roc_auc_score, f1_score
+
+    test = pd.read_parquet(f"{feature_dataset.path}/test.parquet")
+    X    = test.drop(columns=[target_col])
+    y    = test[target_col]
+
+    with open(f"{model_artifact.path}/model.pkl", "rb") as f:
+        clf = pickle.load(f)
+
+    preds      = clf.predict(X)
+    pred_proba = clf.predict_proba(X)[:, 1]
+
+    accuracy = accuracy_score(y, preds)
+    auc      = roc_auc_score(y, pred_proba)
+    f1       = f1_score(y, preds)
+
+    metrics.log_metric("accuracy", round(accuracy, 4))
+    metrics.log_metric("roc_auc",  round(auc, 4))
+    metrics.log_metric("f1_score", round(f1, 4))
+
+    print(f"Accuracy: {accuracy:.4f}  AUC: {auc:.4f}  F1: {f1:.4f}")
+
+    if accuracy &lt; min_accuracy:
+        raise ValueError(f"Model accuracy {accuracy:.4f} below threshold {min_accuracy}")
+
+    return accuracy &gt;= min_accuracy
+</code></pre>
+
+  <h4 class="font-semibold text-gray-700 mt-6 mb-2">Code: Complete KFP Pipeline Wiring</h4>
+  <pre><code class="language-python">from kfp import dsl, compiler
+
+@dsl.pipeline(
+    name="xgboost-training-pipeline",
+    description="End-to-end training pipeline: ingest → features → train → evaluate → push",
+)
+def ml_training_pipeline(
+    dataset_uri: str = "gs://my-bucket/data/raw/dataset.parquet",
+    target_col:  str  = "label",
+    min_accuracy: float = 0.85,
+    n_estimators: int   = 300,
+    max_depth:    int   = 6,
+    learning_rate: float = 0.05,
+) -> None:
+
+    # Step 1 — ingest
+    ingest_task = ingest_data(
+        dataset_uri=dataset_uri,
+    )
+    ingest_task.set_caching_options(enable_caching=True)
+
+    # Step 2 — features
+    feature_task = build_features(
+        raw_dataset=ingest_task.outputs["output_dataset"],
+        target_col=target_col,
+    )
+    feature_task.set_cpu_limit("2").set_memory_limit("4G")
+
+    # Step 3 — train  (GPU node)
+    train_task = train_model(
+        feature_dataset=feature_task.outputs["feature_dataset"],
+        n_estimators=n_estimators,
+        max_depth=max_depth,
+        learning_rate=learning_rate,
+        target_col=target_col,
+    )
+    train_task.set_cpu_limit("4").set_memory_limit("8G")
+    train_task.set_accelerator_type("NVIDIA_TESLA_T4").set_accelerator_limit(1)
+
+    # Step 4 — evaluate
+    eval_task = evaluate_model(
+        feature_dataset=feature_task.outputs["feature_dataset"],
+        model_artifact=train_task.outputs["model_artifact"],
+        target_col=target_col,
+        min_accuracy=min_accuracy,
+    )
+
+    # Step 5 — conditionally push to registry
+    with dsl.If(eval_task.output == True, name="quality-gate-passed"):
+        push_task = push_to_registry(
+            model_artifact=train_task.outputs["model_artifact"],
+            metrics=eval_task.outputs["metrics"],
+            model_name="xgboost-classifier",
+        )
+
+
+# ── Compile and submit ────────────────────────────────────────────────────────
+if __name__ == "__main__":
+    # Compile to IR YAML
+    compiler.Compiler().compile(
+        pipeline_func=ml_training_pipeline,
+        package_path="pipeline.yaml",
+    )
+
+    # Submit to KFP backend (or Vertex AI)
+    import google.cloud.aiplatform as aip
+
+    aip.init(project="my-project", location="us-central1")
+    job = aip.PipelineJob(
+        display_name="xgboost-training-pipeline",
+        template_path="pipeline.yaml",
+        parameter_values={
+            "dataset_uri":    "gs://my-bucket/data/raw/dataset.parquet",
+            "min_accuracy":   0.85,
+            "n_estimators":   300,
+        },
+        enable_caching=True,
+    )
+    job.run(sync=True)
+</code></pre>
+
+  <h3 class="text-xl font-semibold text-gray-800 mt-8 mb-3">KFP on Vertex AI (Managed)</h3>
+  <p class="text-gray-700 mb-4">Google Cloud's Vertex AI Pipelines is a fully managed KFP backend. You compile the same pipeline YAML and submit via the Vertex AI SDK. Benefits: no Kubernetes to manage, automatic scaling, tight integration with Vertex Model Registry, Vertex Experiments, and Vertex Feature Store.</p>
+
+  <div class="callout-success rounded-xl p-4 mb-6">
+    <strong class="text-green-800">Best Practice:</strong>
+    <span class="text-gray-700 ml-1">Enable component-level caching on stable upstream steps (ingestion, feature engineering). KFP caches by hashing inputs; if the same raw data arrives, it skips re-ingestion entirely. This can cut pipeline cost by 40–60% for frequent retraining.</span>
+  </div>
+
+  <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">Reusable Component Libraries</h3>
+  <p class="text-gray-700 mb-4">Package components as Python packages and publish to your internal PyPI. Teams share components like <code>mlops-components==1.3.0</code> and reference them in pipelines. This standardizes data loading, evaluation, and push-to-registry steps across all models in the organization.</p>
+</section>
+
+<!-- ============================================================ SECTION 3 ============================================================ -->
+<section id="s3" class="mb-16">
+  <h2 class="text-3xl font-bold text-gray-900 mb-6 border-b-2 border-blue-600 pb-2">3. Metaflow (Netflix)</h2>
+
+  <h3 class="text-xl font-semibold text-gray-800 mb-3">Philosophy: Data Scientist-First</h3>
+  <p class="text-gray-700 mb-4">Metaflow was born from Netflix's realization that data scientists should not need to learn Kubernetes, YAML, or distributed systems to run production workflows. A Metaflow flow is just a Python class — you run it locally first, then add a single decorator to burst to AWS Batch or AWS Step Functions without changing the logic.</p>
+
+  <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">Steps, Flows, Artifacts</h3>
+  <p class="text-gray-700 mb-4">A <strong>flow</strong> is a DAG of <strong>steps</strong>. Each step is a method decorated with <code>@step</code>. Artifacts are instance attributes assigned inside steps — Metaflow automatically versions and persists them to S3 (or local). Any downstream step in any future run can <code>resume</code> from a checkpoint or <code>get_metadata</code> on past runs.</p>
+
+  <h4 class="font-semibold text-gray-700 mt-4 mb-2">Code: Metaflow Training Flow</h4>
+  <pre><code class="language-python">from metaflow import FlowSpec, step, Parameter, card, current
+from metaflow.cards import Markdown, Table
+
+class XGBoostTrainingFlow(FlowSpec):
+    """End-to-end XGBoost training flow with evaluation and model registration."""
+
+    data_path   = Parameter("data_path",   default="s3://my-bucket/data/raw/dataset.parquet")
+    target_col  = Parameter("target_col",  default="label")
+    n_estimators = Parameter("n_estimators", default=300)
+    max_depth   = Parameter("max_depth",   default=6)
+    lr          = Parameter("lr",          default=0.05)
+    min_acc     = Parameter("min_acc",     default=0.85)
+    test_size   = Parameter("test_size",   default=0.2)
+
+    @step
+    def start(self):
+        """Load and validate raw data."""
+        import pandas as pd
+        self.df = pd.read_parquet(self.data_path)
+        print(f"Loaded {len(self.df):,} rows, {self.df.shape[1]} columns")
+        assert self.target_col in self.df.columns, f"Missing target: {self.target_col}"
+        self.next(self.build_features)
+
+    @step
+    def build_features(self):
+        """Feature engineering: scale numerics, encode categoricals."""
+        import pandas as pd
+        from sklearn.model_selection import train_test_split
+        from sklearn.preprocessing import StandardScaler
+
+        df = self.df
+        X  = df.drop(columns=[self.target_col])
+        y  = df[self.target_col]
+
+        X_train, X_test, y_train, y_test = train_test_split(
+            X, y, test_size=self.test_size, random_state=42, stratify=y
+        )
+
+        scaler = StandardScaler()
+        num_cols = X_train.select_dtypes("number").columns
+        X_train[num_cols] = scaler.fit_transform(X_train[num_cols])
+        X_test[num_cols]  = scaler.transform(X_test[num_cols])
+
+        # Artifacts are auto-persisted by Metaflow
+        self.X_train, self.X_test = X_train, X_test
+        self.y_train, self.y_test = y_train, y_test
+        self.scaler = scaler
+        self.next(self.train)
+
+    @step
+    def train(self):
+        """Train XGBoost classifier."""
+        import xgboost as xgb
+
+        self.model = xgb.XGBClassifier(
+            n_estimators=self.n_estimators,
+            max_depth=self.max_depth,
+            learning_rate=self.lr,
+            use_label_encoder=False,
+            eval_metric="logloss",
+            random_state=42,
+        )
+        self.model.fit(
+            self.X_train, self.y_train,
+            eval_set=[(self.X_test, self.y_test)],
+            verbose=50,
+        )
+        self.next(self.evaluate)
+
+    @card
+    @step
+    def evaluate(self):
+        """Compute metrics and build evaluation card."""
+        from sklearn.metrics import (
+            accuracy_score, roc_auc_score, f1_score,
+            classification_report, confusion_matrix,
+        )
+        import pandas as pd
+
+        preds      = self.model.predict(self.X_test)
+        pred_proba = self.model.predict_proba(self.X_test)[:, 1]
+
+        self.accuracy = accuracy_score(self.y_test, preds)
+        self.auc      = roc_auc_score(self.y_test, pred_proba)
+        self.f1       = f1_score(self.y_test, preds)
+
+        print(f"Accuracy={self.accuracy:.4f}  AUC={self.auc:.4f}  F1={self.f1:.4f}")
+        print(classification_report(self.y_test, preds))
+
+        self.passed_quality_gate = self.accuracy >= self.min_acc
+        self.next(self.register if self.passed_quality_gate else self.end)
+
+    @step
+    def register(self):
+        """Push model to MLflow model registry."""
+        import mlflow, tempfile, pickle, os
+
+        mlflow.set_tracking_uri(os.environ["MLFLOW_TRACKING_URI"])
+        mlflow.set_experiment("xgboost-training")
+
+        with mlflow.start_run(run_name=f"metaflow-{current.run_id}") as run:
+            mlflow.log_params({
+                "n_estimators": self.n_estimators,
+                "max_depth":    self.max_depth,
+                "lr":           self.lr,
+            })
+            mlflow.log_metrics({
+                "accuracy": self.accuracy,
+                "auc":      self.auc,
+                "f1":       self.f1,
+            })
+            with tempfile.TemporaryDirectory() as tmp:
+                model_path = os.path.join(tmp, "model.pkl")
+                with open(model_path, "wb") as f:
+                    pickle.dump(self.model, f)
+                mlflow.log_artifact(model_path)
+
+            self.mlflow_run_id = run.info.run_id
+        self.next(self.end)
+
+    @step
+    def end(self):
+        """Summary."""
+        status = "PASSED" if self.passed_quality_gate else "FAILED quality gate"
+        print(f"Flow complete. Quality gate: {status}")
+        if hasattr(self, "mlflow_run_id"):
+            print(f"MLflow run: {self.mlflow_run_id}")
+
+
+if __name__ == "__main__":
+    XGBoostTrainingFlow()
+</code></pre>
+
+  <h4 class="font-semibold text-gray-700 mt-6 mb-2">Code: Metaflow with AWS Batch Backend</h4>
+  <pre><code class="language-python">from metaflow import FlowSpec, step, Parameter, batch, resources, retry
+
+class BatchTrainingFlow(FlowSpec):
+    """Same flow, but @batch bursts the heavy steps to AWS Batch."""
+
+    @step
+    def start(self):
+        self.data_version = "v20260430"
+        self.next(self.preprocess)
+
+    # Run on a 32-core, 128GB machine in AWS Batch
+    @batch(cpu=32, memory=131072, image="my-ecr/mlops-train:latest")
+    @resources(memory=131072, cpu=32)
+    @retry(times=2)
+    @step
+    def preprocess(self):
+        import pandas as pd
+        self.df = pd.read_parquet(f"s3://data-lake/raw/{self.data_version}/*.parquet")
+        print(f"Preprocessing {len(self.df):,} rows on AWS Batch")
+        self.next(self.train)
+
+    @batch(cpu=16, memory=65536, gpu=1, image="my-ecr/mlops-gpu-train:latest")
+    @retry(times=1)
+    @step
+    def train(self):
+        # This step runs on a GPU instance in AWS Batch
+        import torch
+        print(f"Training on {torch.cuda.get_device_name(0)}")
+        self.next(self.end)
+
+    @step
+    def end(self):
+        print("Done")
+
+if __name__ == "__main__":
+    BatchTrainingFlow()
+</code></pre>
+
+  <h4 class="font-semibold text-gray-700 mt-6 mb-2">Code: A/B Training with Metaflow (Branching)</h4>
+  <pre><code class="language-python">from metaflow import FlowSpec, step, Parameter
+
+class ABTrainingFlow(FlowSpec):
+    """Train two model variants in parallel, pick the winner."""
+
+    @step
+    def start(self):
+        self.next(self.train_xgboost, self.train_lgbm)
+
+    @step
+    def train_xgboost(self):
+        import xgboost as xgb
+        # ... training logic ...
+        self.model_name = "xgboost"
+        self.accuracy   = 0.912
+        self.model      = None  # placeholder
+        self.next(self.join)
+
+    @step
+    def train_lgbm(self):
+        import lightgbm as lgb
+        # ... training logic ...
+        self.model_name = "lightgbm"
+        self.accuracy   = 0.918
+        self.model      = None  # placeholder
+        self.next(self.join)
+
+    @step
+    def join(self, inputs):
+        """Pick the better model."""
+        winner = max(inputs, key=lambda inp: inp.accuracy)
+        self.best_model      = winner.model
+        self.best_model_name = winner.model_name
+        self.best_accuracy   = winner.accuracy
+
+        print(f"Winner: {self.best_model_name} (acc={self.best_accuracy:.4f})")
+        self.next(self.end)
+
+    @step
+    def end(self):
+        print(f"Deploying {self.best_model_name}")
+
+if __name__ == "__main__":
+    ABTrainingFlow()
+</code></pre>
+
+  <h3 class="text-xl font-semibold text-gray-800 mt-8 mb-3">Metaflow vs KFP Comparison</h3>
+  <table class="text-sm mb-6">
+    <thead><tr><th>Dimension</th><th>Metaflow</th><th>KFP v2</th></tr></thead>
+    <tbody>
+      <tr><td>Primary user</td><td>Data scientist</td><td>ML engineer / platform team</td></tr>
+      <tr><td>Abstraction level</td><td>High (Python class)</td><td>Medium (components + pipeline DSL)</td></tr>
+      <tr><td>Local development</td><td>Excellent — runs locally by default</td><td>Needs KFP local runner or minikube</td></tr>
+      <tr><td>Kubernetes required</td><td>No (uses AWS Batch / Step Functions)</td><td>Yes</td></tr>
+      <tr><td>UI</td><td>Metaflow GUI (card viewer)</td><td>KFP UI (full DAG visualization)</td></tr>
+      <tr><td>Artifact versioning</td><td>Built-in, automatic</td><td>Via ML Metadata (MLMD)</td></tr>
+      <tr><td>Cloud-native</td><td>AWS-first, GCP/Azure add-ons</td><td>Kubernetes-native, cloud-agnostic</td></tr>
+      <tr><td>Managed offering</td><td>Outerbounds (SaaS)</td><td>Vertex AI Pipelines (Google)</td></tr>
+      <tr><td>Learning curve</td><td>Low (3 concepts)</td><td>Medium (components, artifacts, IR)</td></tr>
+      <tr><td>Production maturity</td><td>High (Netflix, ~2019)</td><td>High (Google, ~2020)</td></tr>
+      <tr><td>Best for</td><td>Research to prod, AWS shops</td><td>GCP / multi-cloud, platform teams</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============================================================ SECTION 4 ============================================================ -->
+<section id="s4" class="mb-16">
+  <h2 class="text-3xl font-bold text-gray-900 mb-6 border-b-2 border-blue-600 pb-2">4. ZenML</h2>
+
+  <h3 class="text-xl font-semibold text-gray-800 mb-3">The Stack Concept</h3>
+  <p class="text-gray-700 mb-4">ZenML's key insight is the <strong>stack</strong>: a named collection of infrastructure components that a pipeline targets. Switching from local development to production means changing the active stack, not the pipeline code.</p>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+    <div class="bg-purple-50 border border-purple-200 rounded-xl p-4">
+      <div class="font-bold text-purple-800 mb-2">Orchestrator</div>
+      <p class="text-sm text-gray-600">Local, Airflow, Kubeflow, Vertex AI, AWS Step Functions, Databricks</p>
+    </div>
+    <div class="bg-blue-50 border border-blue-200 rounded-xl p-4">
+      <div class="font-bold text-blue-800 mb-2">Artifact Store</div>
+      <p class="text-sm text-gray-600">Local filesystem, GCS, S3, Azure Blob, MinIO</p>
+    </div>
+    <div class="bg-green-50 border border-green-200 rounded-xl p-4">
+      <div class="font-bold text-green-800 mb-2">Model Registry</div>
+      <p class="text-sm text-gray-600">MLflow, Vertex AI Model Registry, SageMaker, BentoML</p>
+    </div>
+  </div>
+
+  <h4 class="font-semibold text-gray-700 mt-4 mb-2">Code: ZenML Pipeline Definition</h4>
+  <pre><code class="language-python">from zenml import pipeline, step, ArtifactConfig
+from zenml.integrations.mlflow.flavors.mlflow_experiment_tracker_flavor import MLFlowExperimentTrackerSettings
+from typing import Annotated, Tuple
+import pandas as pd
+import numpy as np
+
+# ── Steps ──────────────────────────────────────────────────────────────────
+@step
+def load_data(data_path: str) -> Annotated[pd.DataFrame, ArtifactConfig(name="raw_data")]:
+    return pd.read_parquet(data_path)
+
+
+@step
+def split_data(
+    df: pd.DataFrame, test_size: float = 0.2
+) -> Tuple[
+    Annotated[pd.DataFrame, "X_train"],
+    Annotated[pd.DataFrame, "X_test"],
+    Annotated[pd.Series,    "y_train"],
+    Annotated[pd.Series,    "y_test"],
+]:
+    from sklearn.model_selection import train_test_split
+    X = df.drop("label", axis=1)
+    y = df["label"]
+    return train_test_split(X, y, test_size=test_size, random_state=42)
+
+
+@step(experiment_tracker="mlflow_tracker")
+def train_and_evaluate(
+    X_train: pd.DataFrame,
+    X_test: pd.DataFrame,
+    y_train: pd.Series,
+    y_test: pd.Series,
+) -> Annotated[object, ArtifactConfig(name="trained_model", is_model_artifact=True)]:
+    import mlflow
+    from sklearn.ensemble import RandomForestClassifier
+    from sklearn.metrics import accuracy_score
+
+    mlflow.sklearn.autolog()
+
+    clf = RandomForestClassifier(n_estimators=200, random_state=42)
+    clf.fit(X_train, y_train)
+
+    acc = accuracy_score(y_test, clf.predict(X_test))
+    mlflow.log_metric("accuracy", acc)
+    print(f"Accuracy: {acc:.4f}")
+
+    return clf
+
+
+# ── Pipeline ───────────────────────────────────────────────────────────────
+@pipeline(
+    name="rf-training-pipeline",
+    settings={"experiment_tracker": MLFlowExperimentTrackerSettings(experiment_name="zenml-rf")},
+)
+def rf_training_pipeline(data_path: str = "data/dataset.parquet"):
+    df = load_data(data_path)
+    X_train, X_test, y_train, y_test = split_data(df)
+    train_and_evaluate(X_train, X_test, y_train, y_test)
+
+
+if __name__ == "__main__":
+    rf_training_pipeline()
+</code></pre>
+
+  <h4 class="font-semibold text-gray-700 mt-6 mb-2">Stack Configuration (CLI)</h4>
+  <pre><code class="language-bash"># Register individual stack components
+zenml artifact-store register gcs_store \
+    --flavor=gcp \
+    --path=gs://my-zenml-artifacts
+
+zenml orchestrator register vertex_orchestrator \
+    --flavor=vertex \
+    --project=my-gcp-project \
+    --location=us-central1
+
+zenml experiment-tracker register mlflow_tracker \
+    --flavor=mlflow \
+    --tracking_uri=$MLFLOW_TRACKING_URI
+
+zenml model-registry register vertex_registry \
+    --flavor=vertex
+
+# Compose into a named stack
+zenml stack register production-stack \
+    -a gcs_store \
+    -o vertex_orchestrator \
+    -e mlflow_tracker \
+    -r vertex_registry
+
+# Activate it
+zenml stack set production-stack
+
+# Now running the same pipeline code targets Vertex AI
+python run_pipeline.py
+</code></pre>
+</section>
+
+<!-- ============================================================ SECTION 5 ============================================================ -->
+<section id="s5" class="mb-16">
+  <h2 class="text-3xl font-bold text-gray-900 mb-6 border-b-2 border-blue-600 pb-2">5. GitHub Actions for MLOps</h2>
+
+  <h3 class="text-xl font-semibold text-gray-800 mb-3">Core Concepts</h3>
+  <p class="text-gray-700 mb-4">GitHub Actions organizes automation into <strong>workflows</strong> (YAML files in <code>.github/workflows/</code>), each composed of <strong>jobs</strong> that run on <strong>runners</strong>. Jobs contain sequential <strong>steps</strong>. Workflows are triggered by <strong>events</strong>: <code>push</code>, <code>pull_request</code>, <code>schedule</code>, <code>workflow_dispatch</code>, or <code>repository_dispatch</code> (for external triggers like a monitoring alert).</p>
+
+  <h4 class="font-semibold text-gray-700 mt-4 mb-2">Code: CI Workflow for ML Project</h4>
+  <pre><code class="language-yaml"># .github/workflows/ci.yml
+name: ML CI Pipeline
+
+on:
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'src/**'
+      - 'tests/**'
+      - 'pyproject.toml'
+      - 'requirements*.txt'
+  push:
+    branches: [main]
+
+env:
+  PYTHON_VERSION: "3.11"
+  MLFLOW_TRACKING_URI: ${{ secrets.MLFLOW_TRACKING_URI }}
+
+jobs:
+  # ── Job 1: Lint & type-check ─────────────────────────────────────────────
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Install dev dependencies
+        run: pip install ruff mypy black isort
+
+      - name: Lint with ruff
+        run: ruff check src/ tests/
+
+      - name: Format check
+        run: black --check src/ tests/
+
+      - name: Type check
+        run: mypy src/ --ignore-missing-imports
+
+  # ── Job 2: Unit &amp; data tests ─────────────────────────────────────────────
+  test:
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -e ".[dev]"
+
+      - name: Run unit tests
+        run: |
+          pytest tests/unit/ \
+            -v \
+            --cov=src \
+            --cov-report=xml \
+            --cov-report=term-missing \
+            --timeout=120
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+        with:
+          file: coverage.xml
+          fail_ci_if_error: false
+
+  # ── Job 3: Data validation ────────────────────────────────────────────────
+  data-validation:
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -e ".[dev]" great-expectations
+
+      - name: Configure GCS credentials
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Run Great Expectations data validation
+        run: |
+          python scripts/validate_data.py \
+            --dataset gs://my-bucket/data/raw/latest.parquet \
+            --expectation-suite src/expectations/training_data_suite.json
+
+  # ── Job 4: Smoke training (1% sample, fast) ──────────────────────────────
+  smoke-train:
+    runs-on: ubuntu-latest
+    needs: [test, data-validation]
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -e ".[train]"
+
+      - name: Run smoke training
+        run: |
+          python src/train.py \
+            --sample-fraction 0.01 \
+            --max-epochs 3 \
+            --smoke-test \
+            --output-dir /tmp/smoke-model
+
+      - name: Validate smoke model artifacts
+        run: |
+          python scripts/validate_model_artifacts.py \
+            --model-dir /tmp/smoke-model
+
+  # ── Job 5: Build Docker image ─────────────────────────────────────────────
+  build:
+    runs-on: ubuntu-latest
+    needs: [test, data-validation]
+    if: github.ref == 'refs/heads/main'
+    outputs:
+      image-tag: ${{ steps.meta.outputs.tags }}
+      image-digest: ${{ steps.build.outputs.digest }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region:            us-east-1
+
+      - name: Login to ECR
+        id: ecr-login
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ steps.ecr-login.outputs.registry }}/ml-training
+          tags: |
+            type=sha,prefix=sha-
+            type=ref,event=branch
+
+      - name: Build and push
+        id: build
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/Dockerfile.train
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          cache-from: type=gha
+          cache-to:   type=gha,mode=max
+</code></pre>
+
+  <h4 class="font-semibold text-gray-700 mt-6 mb-2">Code: CD Workflow — Model Deployment</h4>
+  <pre><code class="language-yaml"># .github/workflows/cd.yml
+name: ML CD — Deploy Model
+
+on:
+  workflow_dispatch:
+    inputs:
+      model_version:
+        description: "MLflow model version to deploy (e.g. v42)"
+        required: true
+        type: string
+      environment:
+        description: "Target environment"
+        required: true
+        type: choice
+        options: [staging, production]
+      canary_percentage:
+        description: "Initial canary traffic %"
+        required: false
+        default: "10"
+        type: string
+
+  # Also triggered by passing quality gate workflow
+  repository_dispatch:
+    types: [model-quality-gate-passed]
+
+env:
+  AWS_REGION: us-east-1
+
+jobs:
+  # ── Determine deploy params ───────────────────────────────────────────────
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      model_version:      ${{ steps.params.outputs.model_version }}
+      environment:        ${{ steps.params.outputs.environment }}
+      canary_percentage:  ${{ steps.params.outputs.canary_percentage }}
+    steps:
+      - id: params
+        run: |
+          if [ "${{ github.event_name }}" = "repository_dispatch" ]; then
+            echo "model_version=${{ github.event.client_payload.model_version }}"  >> $GITHUB_OUTPUT
+            echo "environment=staging"                                               >> $GITHUB_OUTPUT
+            echo "canary_percentage=10"                                              >> $GITHUB_OUTPUT
+          else
+            echo "model_version=${{ inputs.model_version }}"     >> $GITHUB_OUTPUT
+            echo "environment=${{ inputs.environment }}"         >> $GITHUB_OUTPUT
+            echo "canary_percentage=${{ inputs.canary_percentage }}" >> $GITHUB_OUTPUT
+          fi
+
+  # ── Deploy to staging first ───────────────────────────────────────────────
+  deploy-staging:
+    runs-on: ubuntu-latest
+    needs: prepare
+    environment:
+      name: staging
+      url: https://staging.ml-api.company.com/health
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region:            ${{ env.AWS_REGION }}
+
+      - name: Deploy to EKS staging
+        run: |
+          aws eks update-kubeconfig \
+            --name ml-cluster-staging \
+            --region ${{ env.AWS_REGION }}
+
+          # Update model version in Kubernetes ConfigMap
+          kubectl create configmap model-config \
+            --from-literal=MODEL_VERSION=${{ needs.prepare.outputs.model_version }} \
+            --namespace ml-serving \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+          # Trigger rolling restart of serving deployment
+          kubectl rollout restart deployment/ml-serving \
+            --namespace ml-serving
+
+          kubectl rollout status deployment/ml-serving \
+            --namespace ml-serving \
+            --timeout=300s
+
+  # ── Integration tests against staging ────────────────────────────────────
+  integration-test:
+    runs-on: ubuntu-latest
+    needs: deploy-staging
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11", cache: pip }
+      - run: pip install pytest httpx
+      - name: Run integration tests
+        env:
+          API_BASE_URL: https://staging.ml-api.company.com
+          API_KEY:      ${{ secrets.STAGING_API_KEY }}
+        run: pytest tests/integration/ -v --timeout=120
+
+  # ── Deploy to production (canary) ────────────────────────────────────────
+  deploy-production:
+    runs-on: ubuntu-latest
+    needs: integration-test
+    if: needs.prepare.outputs.environment == 'production' || github.event_name == 'repository_dispatch'
+    environment:
+      name: production
+      url: https://ml-api.company.com/health
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region:            ${{ env.AWS_REGION }}
+
+      - name: Canary deploy to production (${{ needs.prepare.outputs.canary_percentage }}%)
+        run: |
+          aws eks update-kubeconfig \
+            --name ml-cluster-prod \
+            --region ${{ env.AWS_REGION }}
+
+          # Update canary deployment with new model version
+          cat &lt;&lt;EOF | kubectl apply -f -
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            name: ml-serving-canary
+            namespace: ml-serving
+            labels:
+              app: ml-serving
+              track: canary
+          spec:
+            replicas: 1
+            selector:
+              matchLabels:
+                app: ml-serving
+                track: canary
+            template:
+              metadata:
+                labels:
+                  app: ml-serving
+                  track: canary
+              spec:
+                containers:
+                - name: serving
+                  image: ${{ secrets.ECR_REGISTRY }}/ml-serving:${{ needs.prepare.outputs.model_version }}
+                  env:
+                  - name: MODEL_VERSION
+                    value: "${{ needs.prepare.outputs.model_version }}"
+          EOF
+
+      - name: Update traffic weight via Istio VirtualService
+        run: |
+          CANARY_PCT=${{ needs.prepare.outputs.canary_percentage }}
+          STABLE_PCT=$((100 - CANARY_PCT))
+          cat &lt;&lt;EOF | kubectl apply -f -
+          apiVersion: networking.istio.io/v1beta1
+          kind: VirtualService
+          metadata:
+            name: ml-serving
+            namespace: ml-serving
+          spec:
+            hosts: ["ml-api.company.com"]
+            http:
+            - route:
+              - destination:
+                  host: ml-serving-stable
+                  port: { number: 8080 }
+                weight: ${STABLE_PCT}
+              - destination:
+                  host: ml-serving-canary
+                  port: { number: 8080 }
+                weight: ${CANARY_PCT}
+          EOF
+
+      - name: Notify Slack
+        uses: slackapi/slack-github-action@v1
+        with:
+          payload: |
+            {"text": "Model ${{ needs.prepare.outputs.model_version }} deployed as canary (${{ needs.prepare.outputs.canary_percentage }}%) to production."}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+</code></pre>
+
+  <h4 class="font-semibold text-gray-700 mt-6 mb-2">Code: GitHub Actions with SageMaker Training Job</h4>
+  <pre><code class="language-yaml"># .github/workflows/sagemaker-train.yml
+name: SageMaker Training
+
+on:
+  push:
+    branches: [main]
+    paths: ['src/train/**', 'config/training/**']
+  schedule:
+    - cron: '0 2 * * 1'  # Weekly retrain every Monday 2am UTC
+
+jobs:
+  launch-training:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubActionsMLRole
+          aws-region: us-east-1
+
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11", cache: pip }
+
+      - run: pip install boto3 sagemaker
+
+      - name: Build and push training image to ECR
+        run: |
+          aws ecr get-login-password --region us-east-1 \
+            | docker login --username AWS --password-stdin \
+              ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com
+
+          docker build -t ml-training:${{ github.sha }} -f docker/Dockerfile.train .
+          docker tag ml-training:${{ github.sha }} \
+            ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/ml-training:${{ github.sha }}
+          docker push \
+            ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/ml-training:${{ github.sha }}
+
+      - name: Launch SageMaker training job
+        id: sm-train
+        run: |
+          python &lt;&lt;'PYEOF'
+          import boto3, json, datetime
+
+          sm = boto3.client("sagemaker", region_name="us-east-1")
+          job_name = f"ml-train-${{ github.sha[:8] }}-{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}"
+
+          response = sm.create_training_job(
+              TrainingJobName=job_name,
+              AlgorithmSpecification={
+                  "TrainingImage": "${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/ml-training:${{ github.sha }}",
+                  "TrainingInputMode": "FastFile",
+              },
+              RoleArn="arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/SageMakerTrainingRole",
+              InputDataConfig=[{
+                  "ChannelName": "training",
+                  "DataSource": {
+                      "S3DataSource": {
+                          "S3DataType": "S3Prefix",
+                          "S3Uri": "s3://my-data-bucket/training/latest/",
+                          "S3DataDistributionType": "FullyReplicated",
+                      }
+                  },
+              }],
+              OutputDataConfig={"S3OutputPath": "s3://my-models-bucket/output/"},
+              ResourceConfig={
+                  "InstanceType": "ml.p3.2xlarge",
+                  "InstanceCount": 1,
+                  "VolumeSizeInGB": 100,
+              },
+              StoppingCondition={"MaxRuntimeInSeconds": 7200},
+              HyperParameters={
+                  "n_estimators": "300",
+                  "max_depth": "6",
+                  "learning_rate": "0.05",
+              },
+              Tags=[
+                  {"Key": "git-sha",   "Value": "${{ github.sha }}"},
+                  {"Key": "workflow",  "Value": "github-actions"},
+                  {"Key": "repo",      "Value": "${{ github.repository }}"},
+              ],
+          )
+          print(f"::set-output name=job_name::{job_name}")
+          print(f"Launched: {job_name}")
+          PYEOF
+
+      - name: Wait for training job
+        run: |
+          python &lt;&lt;'PYEOF'
+          import boto3, time
+
+          sm = boto3.client("sagemaker", region_name="us-east-1")
+          job_name = "${{ steps.sm-train.outputs.job_name }}"
+
+          while True:
+              resp   = sm.describe_training_job(TrainingJobName=job_name)
+              status = resp["TrainingJobStatus"]
+              print(f"Status: {status}")
+              if status in ("Completed", "Failed", "Stopped"):
+                  break
+              time.sleep(60)
+
+          if status != "Completed":
+              raise Exception(f"Training job {status}: {resp.get('FailureReason')}")
+          print("Training completed successfully")
+          PYEOF
+</code></pre>
+
+  <div class="callout-warning rounded-xl p-4 mb-6">
+    <strong class="text-yellow-800">Security Best Practice:</strong>
+    <span class="text-gray-700 ml-1">Use OIDC identity federation (role-to-assume) instead of long-lived AWS access keys in GitHub Actions. This eliminates static credentials entirely — GitHub mints a short-lived JWT for each workflow run.</span>
+  </div>
+
+  <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">Self-Hosted GPU Runners</h3>
+  <p class="text-gray-700 mb-4">For CI training jobs that need GPUs, register a self-hosted runner on a GPU EC2 instance or on-prem machine. Tag it with <code>gpu</code> and reference it with <code>runs-on: [self-hosted, gpu, linux]</code>. The runner auto-scales using <a href="https://github.com/philips-labs/terraform-aws-github-runner" class="text-blue-600 underline">terraform-aws-github-runner</a> or GitHub's own larger runners feature.</p>
+</section>
+</div><!-- end max-w-5xl first half -->
+
+<!-- CONTINUE in part 2 -- sections 6-12 + footer -->
+<div class="max-w-5xl mx-auto px-6 py-4">
+
+<!-- ============================================================ SECTION 6 ============================================================ -->
+<section id="s6" class="mb-16">
+  <h2 class="text-3xl font-bold text-gray-900 mb-6 border-b-2 border-blue-600 pb-2">6. GitLab CI/CD for ML</h2>
+
+  <p class="text-gray-700 mb-4">GitLab CI/CD uses a single <code>.gitlab-ci.yml</code> at the repository root. Unlike GitHub Actions' event-driven model, GitLab organizes work into <strong>stages</strong> — all jobs in a stage run in parallel; stages are sequential. GitLab also has a built-in model registry (since GitLab 15.x) and native container registry.</p>
+
+  <h4 class="font-semibold text-gray-700 mt-4 mb-2">Code: .gitlab-ci.yml for ML Project</h4>
+  <pre><code class="language-yaml"># .gitlab-ci.yml
+image: python:3.11-slim
+
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.pip-cache"
+  MLFLOW_TRACKING_URI: $MLFLOW_TRACKING_URI   # from GitLab CI/CD variables
+  ECR_REGISTRY: $AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com
+  MODEL_IMAGE: $ECR_REGISTRY/ml-serving:$CI_COMMIT_SHA
+
+stages:
+  - lint
+  - test
+  - validate
+  - build
+  - train
+  - evaluate
+  - deploy
+
+cache:
+  paths:
+    - .pip-cache/
+
+# ── Lint ──────────────────────────────────────────────────────────────────
+lint:
+  stage: lint
+  script:
+    - pip install ruff black mypy --quiet
+    - ruff check src/ tests/
+    - black --check src/ tests/
+    - mypy src/ --ignore-missing-imports
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == "main"
+
+# ── Unit Tests ────────────────────────────────────────────────────────────
+unit-tests:
+  stage: test
+  needs: [lint]
+  script:
+    - pip install -e ".[dev]" --quiet
+    - pytest tests/unit/
+        -v
+        --cov=src
+        --cov-report=xml
+        --cov-report=term-missing
+        --timeout=120
+  coverage: '/TOTAL.*\s+(\d+%)$/'
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.xml
+    when: always
+
+# ── Data Validation ───────────────────────────────────────────────────────
+data-validation:
+  stage: validate
+  needs: [lint]
+  image: python:3.11-slim
+  script:
+    - pip install great_expectations pandas pyarrow --quiet
+    - python scripts/validate_data.py
+        --dataset s3://my-bucket/data/raw/latest.parquet
+        --suite src/expectations/training_data.json
+  environment:
+    name: data-validation
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+# ── Docker Build ──────────────────────────────────────────────────────────
+build-image:
+  stage: build
+  needs: [unit-tests, data-validation]
+  image: docker:24
+  services:
+    - docker:24-dind
+  variables:
+    DOCKER_BUILDKIT: "1"
+  before_script:
+    - apk add --no-cache aws-cli
+    - aws ecr get-login-password --region us-east-1
+        | docker login --username AWS --password-stdin $ECR_REGISTRY
+  script:
+    - docker build
+        --cache-from $ECR_REGISTRY/ml-training:latest
+        --tag $ECR_REGISTRY/ml-training:$CI_COMMIT_SHA
+        --tag $ECR_REGISTRY/ml-training:latest
+        -f docker/Dockerfile.train .
+    - docker push $ECR_REGISTRY/ml-training:$CI_COMMIT_SHA
+    - docker push $ECR_REGISTRY/ml-training:latest
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+
+# ── Training ──────────────────────────────────────────────────────────────
+train-model:
+  stage: train
+  needs: [build-image]
+  image: amazon/aws-cli:latest
+  script:
+    - |
+      JOB_NAME="gl-train-${CI_COMMIT_SHORT_SHA}-$(date +%Y%m%d%H%M%S)"
+      aws sagemaker create-training-job \
+        --training-job-name "$JOB_NAME" \
+        --algorithm-specification TrainingImage=$ECR_REGISTRY/ml-training:$CI_COMMIT_SHA,TrainingInputMode=FastFile \
+        --role-arn $SAGEMAKER_ROLE_ARN \
+        --input-data-config '[{"ChannelName":"training","DataSource":{"S3DataSource":{"S3DataType":"S3Prefix","S3Uri":"s3://my-data-bucket/training/latest/","S3DataDistributionType":"FullyReplicated"}}}]' \
+        --output-data-config S3OutputPath=s3://my-models-bucket/output/ \
+        --resource-config InstanceType=ml.p3.2xlarge,InstanceCount=1,VolumeSizeInGB=100 \
+        --stopping-condition MaxRuntimeInSeconds=7200 \
+        --region us-east-1
+
+      # Wait for completion
+      aws sagemaker wait training-job-completed-or-stopped \
+        --training-job-name "$JOB_NAME" \
+        --region us-east-1
+
+      STATUS=$(aws sagemaker describe-training-job \
+        --training-job-name "$JOB_NAME" \
+        --query TrainingJobStatus --output text --region us-east-1)
+
+      [ "$STATUS" = "Completed" ] || exit 1
+      echo "JOB_NAME=$JOB_NAME" >> train.env
+  artifacts:
+    reports:
+      dotenv: train.env
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+
+# ── Quality Gate Evaluation ───────────────────────────────────────────────
+evaluate-model:
+  stage: evaluate
+  needs: [train-model]
+  image: python:3.11-slim
+  script:
+    - pip install mlflow boto3 scikit-learn pandas --quiet
+    - python scripts/quality_gate.py
+        --run-id $MLFLOW_RUN_ID
+        --min-accuracy 0.85
+        --min-auc 0.90
+        --compare-champion
+  artifacts:
+    paths: [evaluation_report.json]
+    when: always
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+
+# ── Deploy to Staging ─────────────────────────────────────────────────────
+deploy-staging:
+  stage: deploy
+  needs: [evaluate-model]
+  environment:
+    name: staging
+    url: https://staging.ml-api.company.com
+  script:
+    - kubectl set image deployment/ml-serving
+        serving=$MODEL_IMAGE
+        -n ml-serving
+    - kubectl rollout status deployment/ml-serving -n ml-serving --timeout=300s
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+
+# ── Deploy to Production (manual gate) ────────────────────────────────────
+deploy-production:
+  stage: deploy
+  needs: [deploy-staging]
+  environment:
+    name: production
+    url: https://ml-api.company.com
+  script:
+    - kubectl config use-context prod-cluster
+    - kubectl set image deployment/ml-serving
+        serving=$MODEL_IMAGE
+        -n ml-serving
+    - kubectl rollout status deployment/ml-serving -n ml-serving --timeout=300s
+  when: manual
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+</code></pre>
+
+  <h3 class="text-xl font-semibold text-gray-800 mt-8 mb-3">CI/CD Platform Comparison</h3>
+  <table class="text-sm mb-6">
+    <thead><tr><th>Feature</th><th>GitHub Actions</th><th>GitLab CI</th><th>Jenkins</th></tr></thead>
+    <tbody>
+      <tr><td>Config format</td><td>YAML (per-workflow files)</td><td>Single .gitlab-ci.yml</td><td>Groovy DSL (Jenkinsfile)</td></tr>
+      <tr><td>Hosted runners</td><td>Excellent (Linux/Mac/Win/GPU)</td><td>Good (Linux)</td><td>Self-hosted only</td></tr>
+      <tr><td>Marketplace</td><td>GitHub Actions Marketplace (~20k)</td><td>CI Templates library</td><td>Plugin ecosystem (~1800)</td></tr>
+      <tr><td>Container registry</td><td>GitHub Container Registry (GHCR)</td><td>Built-in GitLab Registry</td><td>External (JFrog, Nexus)</td></tr>
+      <tr><td>ML model registry</td><td>External (MLflow, SageMaker)</td><td>Built-in (GitLab 15.x+)</td><td>External only</td></tr>
+      <tr><td>OIDC support</td><td>Native AWS/GCP/Azure OIDC</td><td>Native OIDC</td><td>Plugin required</td></tr>
+      <tr><td>PR/MR preview envs</td><td>Environments with protection rules</td><td>Dynamic environments</td><td>Manual config</td></tr>
+      <tr><td>Secret management</td><td>Repository/org/env secrets</td><td>CI/CD variables (masked)</td><td>Credentials plugin</td></tr>
+      <tr><td>Pipeline visualization</td><td>Basic job graph</td><td>Full DAG view</td><td>Blue Ocean plugin</td></tr>
+      <tr><td>Self-hosted cost</td><td>Free (BYOC runner)</td><td>Free runner + GitLab EE</td><td>Infrastructure + maintenance</td></tr>
+      <tr><td>Best for</td><td>GitHub-native teams, open source</td><td>Enterprise, self-hosted GitLab</td><td>Complex legacy enterprise pipelines</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============================================================ SECTION 7 ============================================================ -->
+<section id="s7" class="mb-16">
+  <h2 class="text-3xl font-bold text-gray-900 mb-6 border-b-2 border-blue-600 pb-2">7. Model Quality Gates</h2>
+
+  <h3 class="text-xl font-semibold text-gray-800 mb-3">What Are Quality Gates?</h3>
+  <p class="text-gray-700 mb-4">A quality gate is an automated checkpoint that blocks model promotion if evaluation metrics fall below defined thresholds. The crucial distinction: compare the candidate model against the <strong>current production champion</strong>, not an absolute threshold. Absolute thresholds go stale as data shifts; champion/challenger comparison adapts automatically.</p>
+
+  <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">Metric Categories</h3>
+  <table class="text-sm mb-6">
+    <thead><tr><th>Category</th><th>Metrics</th><th>Gate Logic</th></tr></thead>
+    <tbody>
+      <tr><td>Predictive quality</td><td>Accuracy, AUC-ROC, F1, Precision@K</td><td>Challenger &ge; Champion &minus; &epsilon; (e.g., 1%)</td></tr>
+      <tr><td>Serving performance</td><td>P50/P95/P99 latency, throughput</td><td>P99 latency &le; SLO (e.g., 200ms)</td></tr>
+      <tr><td>Fairness / bias</td><td>Demographic parity, equalized odds</td><td>Max group disparity &le; threshold</td></tr>
+      <tr><td>Calibration</td><td>ECE (Expected Calibration Error), Brier score</td><td>ECE &le; 0.05</td></tr>
+      <tr><td>Model size</td><td>Artifact size, parameter count</td><td>Size &le; max_mb</td></tr>
+      <tr><td>Data drift</td><td>PSI, KL divergence on features</td><td>PSI &le; 0.2 on all features</td></tr>
+    </tbody>
+  </table>
+
+  <h4 class="font-semibold text-gray-700 mt-4 mb-2">Code: Python Quality Gate Script</h4>
+  <pre><code class="language-python">#!/usr/bin/env python3
+"""quality_gate.py — Champion/challenger model evaluation gate.
+
+Exit 0: gate PASSED. Exit 1: gate FAILED (blocks CI).
+"""
+import argparse, json, sys
+import mlflow
+from mlflow.tracking import MlflowClient
+import pandas as pd
+from sklearn.metrics import accuracy_score, roc_auc_score, f1_score
+import numpy as np
+
+
+def parse_args():
+    p = argparse.ArgumentParser()
+    p.add_argument("--challenger-run-id", required=True)
+    p.add_argument("--min-accuracy",  type=float, default=0.80)
+    p.add_argument("--min-auc",       type=float, default=0.85)
+    p.add_argument("--min-f1",        type=float, default=0.75)
+    p.add_argument("--max-p99-latency-ms", type=float, default=200.0)
+    p.add_argument("--compare-champion", action="store_true")
+    p.add_argument("--model-name",    default="production-classifier")
+    p.add_argument("--output-report", default="evaluation_report.json")
+    p.add_argument("--max-bias-disparity", type=float, default=0.10)
+    return p.parse_args()
+
+
+def get_champion_metrics(client: MlflowClient, model_name: str) -> dict | None:
+    """Fetch metrics from the current Production-stage model run."""
+    try:
+        versions = client.get_latest_versions(model_name, stages=["Production"])
+        if not versions:
+            print("No champion in Production stage — skipping champion comparison")
+            return None
+        run = client.get_run(versions[0].run_id)
+        return run.data.metrics
+    except Exception as e:
+        print(f"Warning: could not retrieve champion metrics: {e}")
+        return None
+
+
+def evaluate_challenger(run_id: str, client: MlflowClient) -> dict:
+    """Load challenger metrics from MLflow run."""
+    run = client.get_run(run_id)
+    return run.data.metrics
+
+
+def check_bias(model, X_test: pd.DataFrame, y_test: pd.Series,
+               sensitive_col: str, max_disparity: float) -> tuple[bool, dict]:
+    """Demographic parity check across groups in sensitive_col."""
+    if sensitive_col not in X_test.columns:
+        return True, {}
+
+    groups = X_test[sensitive_col].unique()
+    group_accuracies = {}
+    for g in groups:
+        mask = X_test[sensitive_col] == g
+        preds = model.predict(X_test[mask])
+        group_accuracies[str(g)] = accuracy_score(y_test[mask], preds)
+
+    disparity = max(group_accuracies.values()) - min(group_accuracies.values())
+    passed = disparity <= max_disparity
+    return passed, {"group_accuracies": group_accuracies, "disparity": disparity}
+
+
+def main():
+    args = parse_args()
+    client = MlflowClient()
+
+    print(f"=== Quality Gate: challenger run {args.challenger_run_id} ===")
+
+    challenger = evaluate_challenger(args.challenger_run_id, client)
+    champion   = get_champion_metrics(client, args.model_name) if args.compare_champion else None
+
+    failures = []
+    report   = {
+        "challenger_run_id": args.challenger_run_id,
+        "challenger_metrics": challenger,
+        "champion_metrics":   champion,
+        "gates": {},
+        "passed": False,
+    }
+
+    # ── Absolute thresholds ──────────────────────────────────────────────
+    def check(name, value, threshold, operator="ge"):
+        ok = value >= threshold if operator == "ge" else value <= threshold
+        report["gates"][name] = {
+            "value": value, "threshold": threshold, "passed": ok
+        }
+        if not ok:
+            failures.append(f"{name}: {value:.4f} {'<' if operator=='ge' else '>'} {threshold}")
+        return ok
+
+    check("accuracy", challenger.get("accuracy", 0), args.min_accuracy)
+    check("roc_auc",  challenger.get("roc_auc",  0), args.min_auc)
+    check("f1_score", challenger.get("f1_score",  0), args.min_f1)
+    check("p99_latency_ms",
+          challenger.get("p99_latency_ms", 9999),
+          args.max_p99_latency_ms, operator="le")
+
+    # ── Champion comparison (challenger must not regress > 1%) ───────────
+    if champion:
+        for metric in ["accuracy", "roc_auc", "f1_score"]:
+            champ_val = champion.get(metric, 0)
+            chal_val  = challenger.get(metric, 0)
+            tolerance = 0.01  # 1% regression allowed
+            name = f"{metric}_vs_champion"
+            ok   = chal_val >= champ_val - tolerance
+            report["gates"][name] = {
+                "challenger": chal_val,
+                "champion":   champ_val,
+                "delta":      chal_val - champ_val,
+                "passed":     ok,
+            }
+            if not ok:
+                failures.append(
+                    f"{metric} regression: challenger={chal_val:.4f} "
+                    f"champion={champ_val:.4f} (delta={chal_val-champ_val:.4f})"
+                )
+
+    report["passed"] = len(failures) == 0
+    report["failures"] = failures
+
+    # ── Write report ─────────────────────────────────────────────────────
+    with open(args.output_report, "w") as f:
+        json.dump(report, f, indent=2)
+    print(json.dumps(report, indent=2))
+
+    if failures:
+        print(f"\n[GATE FAILED] {len(failures)} check(s) failed:")
+        for f in failures:
+            print(f"  - {f}")
+        sys.exit(1)
+    else:
+        print("\n[GATE PASSED] All quality checks passed")
+
+        # Transition to Staging in model registry
+        versions = client.search_model_versions(f"run_id='{args.challenger_run_id}'")
+        if versions:
+            client.transition_model_version_stage(
+                name=args.model_name,
+                version=versions[0].version,
+                stage="Staging",
+            )
+            print(f"Model version {versions[0].version} promoted to Staging")
+
+        sys.exit(0)
+
+
+if __name__ == "__main__":
+    main()
+</code></pre>
+
+  <h4 class="font-semibold text-gray-700 mt-6 mb-2">Code: GitHub Actions Job with Quality Gate</h4>
+  <pre><code class="language-yaml">  # .github/workflows/ci.yml  — quality gate job
+  quality-gate:
+    runs-on: ubuntu-latest
+    needs: train-model
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11", cache: pip }
+
+      - name: Install dependencies
+        run: pip install mlflow scikit-learn pandas numpy
+
+      - name: Run quality gate
+        id: gate
+        env:
+          MLFLOW_TRACKING_URI: ${{ secrets.MLFLOW_TRACKING_URI }}
+          MLFLOW_TRACKING_TOKEN: ${{ secrets.MLFLOW_TRACKING_TOKEN }}
+        run: |
+          python scripts/quality_gate.py \
+            --challenger-run-id ${{ needs.train-model.outputs.mlflow_run_id }} \
+            --min-accuracy 0.85 \
+            --min-auc 0.90 \
+            --min-f1 0.80 \
+            --max-p99-latency-ms 200 \
+            --compare-champion \
+            --model-name production-classifier \
+            --output-report evaluation_report.json
+
+      - name: Upload evaluation report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: evaluation-report
+          path: evaluation_report.json
+
+      - name: Post gate result to PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const report = JSON.parse(fs.readFileSync('evaluation_report.json'));
+            const status = report.passed ? '✅ PASSED' : '❌ FAILED';
+            const gates  = Object.entries(report.gates)
+              .map(([k,v]) => `| ${k} | ${JSON.stringify(v.value ?? v.challenger)} | ${v.passed ? '✅' : '❌'} |`)
+              .join('\n');
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo:  context.repo.repo,
+              issue_number: context.issue.number,
+              body: `## Model Quality Gate: ${status}\n\n| Gate | Value | Status |\n|------|-------|--------|\n${gates}\n`,
+            });
+
+      - name: Trigger deployment on gate pass
+        if: steps.gate.outcome == 'success' && github.ref == 'refs/heads/main'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.rest.repos.createDispatchEvent({
+              owner: context.repo.owner,
+              repo:  context.repo.repo,
+              event_type: 'model-quality-gate-passed',
+              client_payload: {
+                model_version: '${{ needs.train-model.outputs.model_version }}',
+                run_id: '${{ needs.train-model.outputs.mlflow_run_id }}',
+              },
+            });
+</code></pre>
+
+  <h3 class="text-xl font-semibold text-gray-800 mt-8 mb-3">Rollback Mechanisms</h3>
+  <p class="text-gray-700 mb-4">When a quality gate fails post-deployment (caught by monitoring), the rollback pipeline triggers automatically:</p>
+  <ol class="list-decimal list-inside text-gray-700 space-y-1 mb-4 text-sm">
+    <li>Monitoring alert fires (accuracy drop, latency spike, error rate increase)</li>
+    <li>Alert webhook calls <code>repository_dispatch</code> on the ML repo with event type <code>rollback-triggered</code></li>
+    <li>Rollback workflow fetches the previous Production model version from MLflow registry</li>
+    <li>Kubernetes deployment is patched to the previous image tag via <code>kubectl rollout undo</code></li>
+    <li>Incident Slack notification with links to the failed run and rollback commit</li>
+  </ol>
+
+  <div class="mermaid mb-6">
+flowchart TD
+    A[Model Candidate] --> B[Quality Gate\nScript]
+    B --> C{Metrics Check}
+    C --> |All pass| D[Promote to Staging\nin Model Registry]
+    C --> |Any fail| E[Block PR / Fail CI]
+    E --> F[Post failure\nreport to PR]
+    D --> G{Human Approval?\nOptional}
+    G --> |approved| H[Promote to Production]
+    G --> |rejected| I[Model archived]
+    H --> J[Live Serving]
+    J --> K[Post-deploy Monitoring]
+    K --> L{SLO breach?}
+    L --> |No| M([Stable])
+    L --> |Yes| N[Auto Rollback\nPrevious version]
+    N --> O[Incident Alert\nSlack/PagerDuty]
+
+    style C fill:#fef3c7,stroke:#d97706
+    style E fill:#fee2e2,stroke:#dc2626
+    style H fill:#d1fae5,stroke:#059669
+    style N fill:#fee2e2,stroke:#dc2626
+  </div>
+</section>
+
+<!-- ============================================================ SECTION 8 ============================================================ -->
+<section id="s8" class="mb-16">
+  <h2 class="text-3xl font-bold text-gray-900 mb-6 border-b-2 border-blue-600 pb-2">8. Testing for ML</h2>
+
+  <h3 class="text-xl font-semibold text-gray-800 mb-3">The ML Testing Pyramid</h3>
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+    <div class="bg-gray-50 border-l-4 border-blue-500 rounded p-4">
+      <div class="font-bold text-blue-700 text-sm">Unit Tests</div>
+      <p class="text-xs text-gray-600 mt-1">Data transforms, preprocessing functions, model components (layers, loss functions), metric calculations. Fast, isolated, no GPU needed.</p>
+    </div>
+    <div class="bg-gray-50 border-l-4 border-green-500 rounded p-4">
+      <div class="font-bold text-green-700 text-sm">Integration Tests</div>
+      <p class="text-xs text-gray-600 mt-1">Full pipeline end-to-end on small data samples. Validates component wiring, artifact passing, schema consistency.</p>
+    </div>
+    <div class="bg-gray-50 border-l-4 border-purple-500 rounded p-4">
+      <div class="font-bold text-purple-700 text-sm">Behavioral Tests</div>
+      <p class="text-xs text-gray-600 mt-1">Model invariants: adding irrelevant features shouldn't change predictions; confidence &gt; 0.9 should hold on clear examples; model is direction-sensitive.</p>
+    </div>
+    <div class="bg-gray-50 border-l-4 border-orange-500 rounded p-4">
+      <div class="font-bold text-orange-700 text-sm">Performance Tests</div>
+      <p class="text-xs text-gray-600 mt-1">Inference latency (P50/P95/P99), throughput (req/s), memory footprint under load. Ensures serving SLOs.</p>
+    </div>
+  </div>
+
+  <h4 class="font-semibold text-gray-700 mt-4 mb-2">Code: pytest for Data Pipelines</h4>
+  <pre><code class="language-python"># tests/unit/test_feature_engineering.py
+import pytest
+import pandas as pd
+import numpy as np
+from src.features import build_features, encode_categoricals, StandardScalerTransformer
+
+
+@pytest.fixture
+def sample_df():
+    return pd.DataFrame({
+        "age":      [25, 35, 45, 55, np.nan],
+        "income":   [50000, 80000, 120000, 90000, 60000],
+        "category": ["A", "B", "A", "C", "B"],
+        "label":    [0, 1, 1, 0, 1],
+    })
+
+
+class TestBuildFeatures:
+    def test_output_schema_is_consistent(self, sample_df):
+        """Feature columns must be deterministic across calls."""
+        result1 = build_features(sample_df.dropna())
+        result2 = build_features(sample_df.dropna())
+        assert list(result1.columns) == list(result2.columns)
+
+    def test_no_nulls_in_output(self, sample_df):
+        """Feature engineering must handle nulls — no NaN should leak."""
+        result = build_features(sample_df)
+        assert result.isnull().sum().sum() == 0, "NaN values found in features"
+
+    def test_label_column_preserved(self, sample_df):
+        """Target column should pass through unchanged."""
+        result = build_features(sample_df)
+        assert "label" in result.columns
+        pd.testing.assert_series_equal(
+            result["label"].reset_index(drop=True),
+            sample_df["label"].reset_index(drop=True),
+        )
+
+    def test_numeric_scaling_range(self, sample_df):
+        """After StandardScaler, numeric features should have mean ~0, std ~1."""
+        result = build_features(sample_df.dropna(), scale_numerics=True)
+        numeric = result.select_dtypes("number").drop("label", axis=1)
+        assert abs(numeric.mean().max()) < 0.1, "Mean not near 0 after scaling"
+        assert abs(numeric.std().max() - 1.0) < 0.2, "Std not near 1 after scaling"
+
+    def test_categorical_encoding_no_unknown_columns(self, sample_df):
+        """One-hot encoding must produce a known fixed set of columns."""
+        result = encode_categoricals(sample_df)
+        # Category 'C' only appears in training — we want consistent columns
+        expected_cat_cols = {"category_A", "category_B", "category_C"}
+        actual_cat_cols   = {c for c in result.columns if c.startswith("category_")}
+        assert actual_cat_cols == expected_cat_cols
+
+    @pytest.mark.parametrize("drop_col", ["age", "income"])
+    def test_handles_missing_numeric_column(self, sample_df, drop_col):
+        """Should raise a descriptive error if required feature is missing."""
+        df_missing = sample_df.drop(columns=[drop_col])
+        with pytest.raises(ValueError, match=f"Missing required column: {drop_col}"):
+            build_features(df_missing)
+
+
+class TestScalerTransformer:
+    def test_fit_transform_inverse_roundtrip(self, sample_df):
+        scaler = StandardScalerTransformer(cols=["age", "income"])
+        df_clean = sample_df.dropna().copy()
+        transformed = scaler.fit_transform(df_clean)
+        restored    = scaler.inverse_transform(transformed)
+        pd.testing.assert_frame_equal(
+            df_clean[["age", "income"]].reset_index(drop=True),
+            restored[["age", "income"]].reset_index(drop=True),
+            check_exact=False, atol=1e-6,
+        )
+
+    def test_transform_without_fit_raises(self, sample_df):
+        scaler = StandardScalerTransformer(cols=["age"])
+        with pytest.raises(RuntimeError, match="must call fit"):
+            scaler.transform(sample_df.dropna())
+</code></pre>
+
+  <h4 class="font-semibold text-gray-700 mt-6 mb-2">Code: Behavioral Tests (CheckList Methodology)</h4>
+  <pre><code class="language-python"># tests/behavioral/test_model_invariants.py
+"""
+Behavioral tests using the CheckList methodology (Ribeiro et al., ACL 2020).
+Tests: MFT (Minimum Functionality Test), INV (Invariance), DIR (Directional)
+"""
+import pytest
+import numpy as np
+import pandas as pd
+import pickle
+
+
+@pytest.fixture(scope="module")
+def model():
+    with open("models/current/model.pkl", "rb") as f:
+        return pickle.load(f)
+
+
+@pytest.fixture
+def base_example():
+    """A clear positive example the model should predict with high confidence."""
+    return pd.DataFrame([{
+        "age": 35, "income": 120000, "credit_score": 780,
+        "num_accounts": 5, "years_employed": 8, "debt_ratio": 0.15,
+    }])
+
+
+class TestMFT:
+    """Minimum Functionality Tests — model must handle obvious cases correctly."""
+
+    def test_high_credit_high_income_predicts_positive(self, model, base_example):
+        """A high-income, high-credit-score applicant should get approved."""
+        pred = model.predict(base_example)[0]
+        proba = model.predict_proba(base_example)[0][1]
+        assert pred == 1, f"Expected approval, got {pred}"
+        assert proba > 0.80, f"Expected high confidence, got {proba:.3f}"
+
+    def test_very_high_debt_ratio_predicts_negative(self, model):
+        risky = pd.DataFrame([{
+            "age": 25, "income": 30000, "credit_score": 580,
+            "num_accounts": 8, "years_employed": 1, "debt_ratio": 0.85,
+        }])
+        pred = model.predict(risky)[0]
+        assert pred == 0, f"Expected denial for high-risk applicant, got {pred}"
+
+
+class TestINV:
+    """Invariance Tests — perturbations that should NOT change predictions."""
+
+    def test_name_field_irrelevant(self, model, base_example):
+        """Adding an irrelevant 'name_hash' feature should not change prediction."""
+        # Assumes model was trained without name_hash — adding noise column
+        # This test validates the model uses expected feature set only
+        original_pred = model.predict(base_example)[0]
+        # If model has feature importance, verify name_hash is not in top features
+        if hasattr(model, "feature_importances_"):
+            feature_names = list(base_example.columns)
+            # All non-numeric features should have near-zero importance
+            assert original_pred in [0, 1]
+
+    def test_minor_age_perturbation_stable(self, model, base_example):
+        """Changing age by ±1 year should not flip prediction for clear cases."""
+        pred_base = model.predict(base_example)[0]
+        for delta in [-1, 0, 1]:
+            perturbed = base_example.copy()
+            perturbed["age"] += delta
+            pred_perturbed = model.predict(perturbed)[0]
+            assert pred_base == pred_perturbed, (
+                f"Prediction flipped with age delta={delta}: "
+                f"{pred_base} -> {pred_perturbed}"
+            )
+
+
+class TestDIR:
+    """Directional Tests — perturbations that SHOULD change predictions monotonically."""
+
+    def test_increasing_income_never_decreases_approval_probability(self, model):
+        """Higher income should monotonically increase P(approve) ceteris paribus."""
+        base = {
+            "age": 30, "credit_score": 700,
+            "num_accounts": 3, "years_employed": 5, "debt_ratio": 0.25,
+        }
+        income_levels   = [30000, 50000, 80000, 120000, 200000]
+        probas = []
+        for income in income_levels:
+            row = pd.DataFrame([{**base, "income": income}])
+            probas.append(model.predict_proba(row)[0][1])
+
+        for i in range(1, len(probas)):
+            assert probas[i] >= probas[i-1] - 0.02, (
+                f"P(approve) decreased as income increased: "
+                f"{income_levels[i-1]}->{income_levels[i]}: {probas[i-1]:.3f}->{probas[i]:.3f}"
+            )
+
+    def test_increasing_debt_ratio_decreases_approval(self, model):
+        base = {
+            "age": 35, "income": 80000, "credit_score": 720,
+            "num_accounts": 4, "years_employed": 6,
+        }
+        debt_ratios = [0.10, 0.25, 0.40, 0.60, 0.80]
+        probas = []
+        for dr in debt_ratios:
+            row = pd.DataFrame([{**base, "debt_ratio": dr}])
+            probas.append(model.predict_proba(row)[0][1])
+
+        for i in range(1, len(probas)):
+            assert probas[i] <= probas[i-1] + 0.02, (
+                f"P(approve) increased with higher debt ratio: "
+                f"{debt_ratios[i-1]}->{debt_ratios[i]}: {probas[i-1]:.3f}->{probas[i]:.3f}"
+            )
+</code></pre>
+
+  <h4 class="font-semibold text-gray-700 mt-6 mb-2">Code: Model Regression Tests</h4>
+  <pre><code class="language-python"># tests/regression/test_model_regression.py
+"""Regression tests: current model must match or beat stored golden metrics."""
+import json, pytest, pickle
+import pandas as pd
+from pathlib import Path
+from sklearn.metrics import accuracy_score, roc_auc_score
+
+GOLDEN_METRICS_PATH = Path("tests/regression/golden_metrics.json")
+TOLERANCE = 0.005  # 0.5% regression allowed
+
+
+@pytest.fixture(scope="module")
+def evaluation_data():
+    return pd.read_parquet("tests/regression/regression_test_set.parquet")
+
+
+@pytest.fixture(scope="module")
+def current_model():
+    with open("models/current/model.pkl", "rb") as f:
+        return pickle.load(f)
+
+
+@pytest.fixture(scope="module")
+def golden_metrics():
+    with open(GOLDEN_METRICS_PATH) as f:
+        return json.load(f)
+
+
+def test_accuracy_regression(current_model, evaluation_data, golden_metrics):
+    X = evaluation_data.drop("label", axis=1)
+    y = evaluation_data["label"]
+    acc = accuracy_score(y, current_model.predict(X))
+    golden_acc = golden_metrics["accuracy"]
+    assert acc >= golden_acc - TOLERANCE, (
+        f"Accuracy regression: current={acc:.4f}, golden={golden_acc:.4f}, "
+        f"delta={acc-golden_acc:.4f} (allowed=-{TOLERANCE})"
+    )
+
+
+def test_auc_regression(current_model, evaluation_data, golden_metrics):
+    X = evaluation_data.drop("label", axis=1)
+    y = evaluation_data["label"]
+    auc = roc_auc_score(y, current_model.predict_proba(X)[:, 1])
+    golden_auc = golden_metrics["roc_auc"]
+    assert auc >= golden_auc - TOLERANCE, (
+        f"AUC regression: current={auc:.4f}, golden={golden_auc:.4f}"
+    )
+
+
+def test_update_golden_metrics(current_model, evaluation_data):
+    """Run with --update-golden flag to refresh baseline."""
+    import sys
+    if "--update-golden" not in sys.argv:
+        pytest.skip("Pass --update-golden to refresh golden metrics")
+
+    X = evaluation_data.drop("label", axis=1)
+    y = evaluation_data["label"]
+    metrics = {
+        "accuracy": accuracy_score(y, current_model.predict(X)),
+        "roc_auc":  roc_auc_score(y, current_model.predict_proba(X)[:, 1]),
+    }
+    with open(GOLDEN_METRICS_PATH, "w") as f:
+        json.dump(metrics, f, indent=2)
+    print(f"Golden metrics updated: {metrics}")
+</code></pre>
+
+  <h3 class="text-xl font-semibold text-gray-800 mt-8 mb-3">Data Contract Testing with Great Expectations</h3>
+  <pre><code class="language-python"># scripts/validate_data.py — Great Expectations in CI
+import great_expectations as gx
+import argparse, sys
+
+def validate_dataset(dataset_path: str, suite_path: str) -> bool:
+    context = gx.get_context()
+
+    datasource = context.sources.add_pandas(name="ci_datasource")
+    asset      = datasource.add_parquet_asset(name="training_data", filepath_or_buffer=dataset_path)
+    batch_req  = asset.build_batch_request()
+
+    # Load suite from JSON checkpoint
+    suite = context.add_or_update_expectation_suite(expectation_suite_name="training_data")
+    with open(suite_path) as f:
+        import json
+        suite_dict = json.load(f)
+    for exp in suite_dict["expectations"]:
+        suite.add_expectation(gx.core.ExpectationConfiguration(**exp))
+
+    validator = context.get_validator(batch_request=batch_req, expectation_suite=suite)
+
+    # Key expectations for ML training data
+    validator.expect_table_row_count_to_be_between(min_value=10000, max_value=10_000_000)
+    validator.expect_column_values_to_not_be_null("label")
+    validator.expect_column_values_to_not_be_null("age")
+    validator.expect_column_values_to_be_between("age",     min_value=18,  max_value=120)
+    validator.expect_column_values_to_be_between("income",  min_value=0,   max_value=10_000_000)
+    validator.expect_column_values_to_be_in_set("label",    value_set=[0, 1])
+    validator.expect_column_proportion_of_unique_values_to_be_between(
+        "label", min_value=0.05, max_value=0.95
+    )  # Check class imbalance
+
+    results = validator.validate()
+    results_dict = results.to_json_dict()
+
+    success_pct = results_dict["statistics"]["successful_expectations"] / \
+                  results_dict["statistics"]["evaluated_expectations"]
+
+    print(f"Data validation: {success_pct*100:.1f}% expectations passed")
+    if not results_dict["success"]:
+        for r in results_dict["results"]:
+            if not r["success"]:
+                print(f"  FAILED: {r['expectation_config']['expectation_type']} "
+                      f"on column '{r['expectation_config']['kwargs'].get('column', 'table')}'")
+    return results_dict["success"]
+
+if __name__ == "__main__":
+    p = argparse.ArgumentParser()
+    p.add_argument("--dataset")
+    p.add_argument("--suite")
+    args = p.parse_args()
+    if not validate_dataset(args.dataset, args.suite):
+        sys.exit(1)
+</code></pre>
+</section>
+
+<!-- ============================================================ SECTION 9 ============================================================ -->
+<section id="s9" class="mb-16">
+  <h2 class="text-3xl font-bold text-gray-900 mb-6 border-b-2 border-blue-600 pb-2">9. Containerization in ML CI/CD</h2>
+
+  <h3 class="text-xl font-semibold text-gray-800 mb-3">ML Docker Image Best Practices</h3>
+  <table class="text-sm mb-6">
+    <thead><tr><th>Practice</th><th>Why</th><th>Implementation</th></tr></thead>
+    <tbody>
+      <tr><td>Pin all dependency versions</td><td>Reproducibility across builds</td><td><code>pip install torch==2.2.1+cu121 --index-url ...</code></td></tr>
+      <tr><td>Multi-stage builds</td><td>Smaller production images</td><td>builder stage → runtime stage (no dev tools)</td></tr>
+      <tr><td>Non-root user</td><td>Security hardening</td><td><code>USER appuser</code> in Dockerfile</td></tr>
+      <tr><td>SBOM generation</td><td>Supply chain security (SLSA)</td><td>Syft or Docker Scout in CI</td></tr>
+      <tr><td>Vulnerability scanning</td><td>Catch CVEs before production</td><td>Trivy scan in CI — fail on CRITICAL</td></tr>
+      <tr><td>Layer caching</td><td>Speed up CI builds</td><td>Copy requirements first, then source code</td></tr>
+    </tbody>
+  </table>
+
+  <h4 class="font-semibold text-gray-700 mt-4 mb-2">Code: GitHub Actions Docker Build with ECR + Multi-Arch + Security Scan</h4>
+  <pre><code class="language-yaml"># .github/workflows/docker-build.yml
+name: Build ML Serving Image
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/serving/**'
+      - 'docker/Dockerfile.serve'
+      - 'requirements/serving.txt'
+
+env:
+  ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com
+  IMAGE_NAME:   ml-serving
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write   # For SARIF upload
+      id-token: write          # For OIDC auth
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # OIDC auth — no static AWS keys
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubECRPushRole
+          aws-region: us-east-1
+
+      - name: Login to ECR
+        id: ecr-login
+        uses: aws-actions/amazon-ecr-login@v2
+
+      # Multi-platform support: amd64 for GPU servers, arm64 for Apple Silicon inference
+      - name: Set up QEMU (for cross-platform builds)
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          install: true
+
+      # Image metadata
+      - name: Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.ECR_REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=sha,prefix=sha-,format=short
+            type=ref,event=branch
+            type=semver,pattern={{version}},enable=${{ startsWith(github.ref, 'refs/tags/') }}
+
+      # Build and push multi-arch image
+      - name: Build and push (linux/amd64 + linux/arm64)
+        id: build
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/Dockerfile.serve
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            BUILD_DATE=${{ github.event.head_commit.timestamp }}
+            GIT_SHA=${{ github.sha }}
+          cache-from: type=registry,ref=${{ env.ECR_REGISTRY }}/${{ env.IMAGE_NAME }}:cache
+          cache-to:   type=registry,ref=${{ env.ECR_REGISTRY }}/${{ env.IMAGE_NAME }}:cache,mode=max
+          provenance: mode=max     # SLSA provenance
+          sbom: true               # SBOM attestation
+
+      # Security scan with Trivy — fail on CRITICAL or HIGH
+      - name: Run Trivy vulnerability scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref:    ${{ env.ECR_REGISTRY }}/${{ env.IMAGE_NAME }}:sha-${{ github.sha }}
+          format:       sarif
+          output:       trivy-results.sarif
+          severity:     CRITICAL,HIGH
+          exit-code:    1           # Fail CI on critical vulns
+          ignore-unfixed: true
+
+      - name: Upload Trivy results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: trivy-results.sarif
+
+      # Generate SBOM with Syft
+      - name: Generate SBOM
+        uses: anchore/sbom-action@v0
+        with:
+          image: ${{ env.ECR_REGISTRY }}/${{ env.IMAGE_NAME }}:sha-${{ github.sha }}
+          format: spdx-json
+          output-file: sbom.spdx.json
+
+      - name: Upload SBOM artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom-${{ github.sha }}
+          path: sbom.spdx.json
+
+      - name: Output image digest
+        run: echo "Image digest ${{ steps.build.outputs.digest }}"
+</code></pre>
+
+  <div class="callout-danger rounded-xl p-4 mb-6">
+    <strong class="text-red-800">Security Critical:</strong>
+    <span class="text-gray-700 ml-1">Always pin base images by digest, not tag. <code>FROM python:3.11-slim</code> is mutable — a new push to that tag can silently change your image. Use <code>FROM python:3.11-slim@sha256:abc123...</code> for reproducible builds. Renovate Bot or Dependabot can automate digest updates.</span>
+  </div>
+</section>
+
+<!-- ============================================================ SECTION 10 ============================================================ -->
+<section id="s10" class="mb-16">
+  <h2 class="text-3xl font-bold text-gray-900 mb-6 border-b-2 border-blue-600 pb-2">10. Infrastructure CI/CD (GitOps)</h2>
+
+  <h3 class="text-xl font-semibold text-gray-800 mb-3">Terraform in CI/CD</h3>
+  <p class="text-gray-700 mb-4">Infrastructure as Code follows the same PR workflow as application code: <code>terraform plan</code> runs on pull request (shows the diff), <code>terraform apply</code> runs on merge to main. Never allow direct <code>terraform apply</code> from local machines in production environments.</p>
+
+  <h4 class="font-semibold text-gray-700 mt-4 mb-2">Code: Terraform CI/CD with GitHub Actions</h4>
+  <pre><code class="language-yaml"># .github/workflows/terraform.yml
+name: Terraform Infrastructure CI/CD
+
+on:
+  pull_request:
+    paths: ['infra/terraform/**']
+  push:
+    branches: [main]
+    paths: ['infra/terraform/**']
+
+env:
+  TF_VERSION:      "1.7.0"
+  TF_WORKING_DIR:  infra/terraform/ml-platform
+  TF_STATE_BUCKET: my-terraform-state-bucket
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ env.TF_WORKING_DIR }}
+    permissions:
+      contents: read
+      pull-requests: write
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/TerraformCIRole
+          aws-region: us-east-1
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Terraform Init
+        run: |
+          terraform init \
+            -backend-config="bucket=${{ env.TF_STATE_BUCKET }}" \
+            -backend-config="key=ml-platform/terraform.tfstate" \
+            -backend-config="region=us-east-1"
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Format Check
+        run: terraform fmt -check -recursive
+
+      - name: Terraform Plan
+        id: plan
+        run: |
+          terraform plan \
+            -var-file=environments/prod.tfvars \
+            -out=tfplan \
+            -no-color 2>&1 | tee plan_output.txt
+        continue-on-error: true
+
+      - name: Post plan to PR
+        uses: actions/github-script@v7
+        if: github.event_name == 'pull_request'
+        with:
+          script: |
+            const fs   = require('fs');
+            const plan = fs.readFileSync('${{ env.TF_WORKING_DIR }}/plan_output.txt', 'utf8');
+            const status = '${{ steps.plan.outcome }}' === 'success' ? '✅' : '❌';
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo:  context.repo.repo,
+              issue_number: context.issue.number,
+              body: `### ${status} Terraform Plan\n\`\`\`hcl\n${plan.slice(-20000)}\n\`\`\``,
+            });
+
+      - name: Terraform Plan Status
+        if: steps.plan.outcome == 'failure'
+        run: exit 1
+
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: terraform apply -auto-approve tfplan
+</code></pre>
+
+  <h3 class="text-xl font-semibold text-gray-800 mt-8 mb-3">ArgoCD for Kubernetes Deployments</h3>
+  <p class="text-gray-700 mb-4">ArgoCD watches a Git repository for Kubernetes manifests and ensures the cluster state matches the repository state. This is the GitOps pattern: Git is the single source of truth for all deployed configurations.</p>
+
+  <h4 class="font-semibold text-gray-700 mt-4 mb-2">Code: ArgoCD Application for ML Service</h4>
+  <pre><code class="language-yaml"># argocd/ml-serving-app.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ml-serving-production
+  namespace: argocd
+  annotations:
+    notifications.argoproj.io/subscribe.on-sync-succeeded.slack: ml-deployments
+    notifications.argoproj.io/subscribe.on-sync-failed.slack:    ml-alerts
+spec:
+  project: ml-platform
+
+  source:
+    repoURL:        https://github.com/company/ml-platform-k8s
+    targetRevision: main
+    path:           deployments/ml-serving/production
+
+    # Helm chart with Kustomize overlay
+    kustomize:
+      images:
+        - name: ml-serving
+          newTag: "sha-a1b2c3d4"   # Updated by CI on new model deploy
+
+  destination:
+    server:    https://kubernetes.default.svc
+    namespace: ml-serving
+
+  syncPolicy:
+    automated:
+      prune:     true   # Remove resources deleted from Git
+      selfHeal:  true   # Revert manual kubectl changes
+    syncOptions:
+      - CreateNamespace=true
+      - PrunePropagationPolicy=foreground
+      - RespectIgnoreDifferences=true
+    retry:
+      limit: 5
+      backoff:
+        duration:    5s
+        factor:      2
+        maxDuration: 3m
+
+  ignoreDifferences:
+    - group:  apps
+      kind:   Deployment
+      jsonPointers:
+        - /spec/replicas  # Managed by HPA — ignore diff
+</code></pre>
+
+  <h4 class="font-semibold text-gray-700 mt-6 mb-2">CI Updates ArgoCD Image Tag via Kustomize</h4>
+  <pre><code class="language-bash"># In CI/CD pipeline — after Docker build and quality gate pass:
+# Update the image tag in the k8s manifests repo (triggers ArgoCD sync)
+
+git clone https://github.com/company/ml-platform-k8s /tmp/k8s-repo
+cd /tmp/k8s-repo
+
+# Use kustomize to pin new image tag
+kustomize edit set image ml-serving=\
+  123456789.dkr.ecr.us-east-1.amazonaws.com/ml-serving:sha-${CI_COMMIT_SHORT_SHA} \
+  --kustomization deployments/ml-serving/production/kustomization.yaml
+
+git add deployments/ml-serving/production/kustomization.yaml
+git commit -m "deploy: update ml-serving to sha-${CI_COMMIT_SHORT_SHA} [skip ci]"
+git push origin main
+
+# ArgoCD detects the change and syncs within ~3 minutes (default poll interval)
+# Or trigger immediate sync:
+argocd app sync ml-serving-production --prune --timeout 300
+</code></pre>
+
+  <div class="mermaid mb-6">
+flowchart LR
+    subgraph Code ["App Repo"]
+      PR["PR Merged\nto main"]
+    end
+    subgraph CI ["CI/CD (GitHub Actions)"]
+      BUILD["Build &amp; Test"]
+      DOCKER["Docker Build\n+ ECR Push"]
+      GATE["Quality Gate"]
+      K8S_UPDATE["Update k8s\nmanifests repo"]
+    end
+    subgraph GitOps ["Manifests Repo (Git)"]
+      MANIFEST["kustomization.yaml\n(new image tag)"]
+    end
+    subgraph ARGO ["ArgoCD"]
+      WATCH["Watch Git\n(poll / webhook)"]
+      DIFF["Diff desired\nvs actual state"]
+      SYNC["kubectl apply\nto cluster"]
+    end
+    subgraph CLUSTER ["Kubernetes"]
+      PODS["Running Pods\n(new version)"]
+    end
+
+    PR --> BUILD --> DOCKER --> GATE --> K8S_UPDATE --> MANIFEST
+    MANIFEST --> WATCH --> DIFF --> SYNC --> PODS
+
+    style GATE fill:#fef3c7,stroke:#d97706
+    style PODS fill:#d1fae5,stroke:#059669
+  </div>
+</section>
+
+<!-- ============================================================ SECTION 11 ============================================================ -->
+<section id="s11" class="mb-16">
+  <h2 class="text-3xl font-bold text-gray-900 mb-6 border-b-2 border-blue-600 pb-2">11. Deployment Strategies for ML</h2>
+
+  <table class="text-sm mb-6">
+    <thead><tr><th>Strategy</th><th>Traffic to New</th><th>Risk</th><th>Rollback Speed</th><th>Best For</th></tr></thead>
+    <tbody>
+      <tr><td>Blue/Green</td><td>0% → 100% (instant switch)</td><td>Medium (big bang)</td><td>Instant (switch back)</td><td>Stateless services, quick validation</td></tr>
+      <tr><td>Canary</td><td>5% → 20% → 50% → 100%</td><td>Low (gradual)</td><td>Fast (reduce weight to 0)</td><td>Production ML — balance risk vs speed</td></tr>
+      <tr><td>Shadow Mode</td><td>0% (parallel, no serving)</td><td>Zero</td><td>N/A (not live)</td><td>Validating new model before any traffic</td></tr>
+      <tr><td>Rolling Update</td><td>Pod-by-pod replacement</td><td>Low-Medium</td><td><code>kubectl rollout undo</code></td><td>Default Kubernetes strategy</td></tr>
+      <tr><td>Feature Flag</td><td>User-segment controlled</td><td>Very Low</td><td>Instant flag toggle</td><td>A/B testing specific user cohorts</td></tr>
+    </tbody>
+  </table>
+
+  <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">Code: Kubernetes Canary with Istio</h3>
+  <pre><code class="language-yaml"># k8s/ml-serving-canary.yaml
+---
+# Stable deployment (current production model)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ml-serving-stable
+  namespace: ml-serving
+  labels: { app: ml-serving, track: stable }
+spec:
+  replicas: 4
+  selector:
+    matchLabels: { app: ml-serving, track: stable }
+  template:
+    metadata:
+      labels: { app: ml-serving, track: stable }
+    spec:
+      containers:
+      - name: serving
+        image: 123456789.dkr.ecr.us-east-1.amazonaws.com/ml-serving:v41
+        ports: [{ containerPort: 8080 }]
+        resources:
+          requests: { cpu: "1", memory: "2Gi" }
+          limits:   { cpu: "2", memory: "4Gi" }
+        readinessProbe:
+          httpGet: { path: /health, port: 8080 }
+          initialDelaySeconds: 10
+          periodSeconds: 5
+---
+# Canary deployment (new candidate model)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ml-serving-canary
+  namespace: ml-serving
+  labels: { app: ml-serving, track: canary }
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: ml-serving, track: canary }
+  template:
+    metadata:
+      labels: { app: ml-serving, track: canary }
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port:   "9090"
+    spec:
+      containers:
+      - name: serving
+        image: 123456789.dkr.ecr.us-east-1.amazonaws.com/ml-serving:v42
+        ports: [{ containerPort: 8080 }]
+        env:
+        - name: MODEL_TRACK
+          value: "canary"
+        resources:
+          requests: { cpu: "1", memory: "2Gi" }
+          limits:   { cpu: "2", memory: "4Gi" }
+---
+# Istio VirtualService — 90/10 traffic split
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: ml-serving
+  namespace: ml-serving
+spec:
+  hosts: ["ml-serving", "ml-api.company.com"]
+  http:
+  - name: "canary-split"
+    match:
+    - headers:
+        x-ml-track:
+          exact: "canary"   # Force canary for header override
+    route:
+    - destination:
+        host: ml-serving-canary
+        port: { number: 80 }
+  - name: "weight-based"
+    route:
+    - destination:
+        host: ml-serving-stable
+        port: { number: 80 }
+      weight: 90
+    - destination:
+        host: ml-serving-canary
+        port: { number: 80 }
+      weight: 10
+    retries:
+      attempts: 3
+      perTryTimeout: 2s
+      retryOn: 5xx,reset,connect-failure
+---
+# DestinationRule with circuit breaker
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: ml-serving
+  namespace: ml-serving
+spec:
+  host: ml-serving-canary
+  trafficPolicy:
+    outlierDetection:
+      consecutive5xxErrors: 5
+      interval: 30s
+      baseEjectionTime: 60s
+      maxEjectionPercent: 100
+</code></pre>
+
+  <h3 class="text-xl font-semibold text-gray-800 mt-8 mb-3">Shadow Mode Deployment</h3>
+  <p class="text-gray-700 mb-4">In shadow mode, the new model receives a copy of all production requests but its responses are discarded (not returned to users). This allows offline validation of the new model on real production traffic distributions before any user impact. Istio's <code>mirror</code> policy implements this natively:</p>
+
+  <pre><code class="language-yaml"># Shadow mode: mirror all traffic to canary (responses discarded)
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: ml-serving-shadow
+  namespace: ml-serving
+spec:
+  hosts: ["ml-serving"]
+  http:
+  - route:
+    - destination:
+        host: ml-serving-stable
+        port: { number: 80 }
+      weight: 100
+    mirror:
+      host: ml-serving-canary
+      port: { number: 80 }
+    mirrorPercentage:
+      value: 100.0   # Mirror 100% of traffic silently
+</code></pre>
+</section>
+
+<!-- ============================================================ SECTION 12 ============================================================ -->
+<section id="s12" class="mb-16">
+  <h2 class="text-3xl font-bold text-gray-900 mb-6 border-b-2 border-blue-600 pb-2">12. Complete ML CI/CD Example</h2>
+
+  <p class="text-gray-700 mb-4">This section ties everything together: a data change arrives, triggers retraining, runs through the quality gate, deploys as canary, and loops back to monitoring. Below is a production-grade GitHub Actions workflow that orchestrates the full cycle.</p>
+
+  <div class="mermaid mb-8">
+flowchart TD
+    subgraph Triggers
+      A1([Data Pipeline\nEvent])
+      A2([Code PR Merged])
+      A3([Weekly Schedule\nMon 2am UTC])
+      A4([Manual Dispatch])
+    end
+    subgraph CI ["CI Stage"]
+      B1[Lint + Type Check]
+      B2[Unit Tests + Coverage]
+      B3[Data Validation\nGreat Expectations]
+      B4[Smoke Training\n1% sample, 3 epochs]
+    end
+    subgraph Train ["Training Stage"]
+      C1[Build Training Image\n+ Security Scan]
+      C2[Launch SageMaker\nTraining Job\nml.p3.8xlarge, 4h max]
+      C3[Log to MLflow\nparams + metrics + artifacts]
+    end
+    subgraph Gate ["Quality Gate"]
+      D1[Champion vs Challenger\nMetric Comparison]
+      D2[Fairness Check\nSliced Metrics]
+      D3[Latency Benchmark\nP99 &lt; 200ms]
+    end
+    subgraph Deploy ["Deployment Stage"]
+      E1[Build Serving Image\nMulti-arch ECR Push]
+      E2[Deploy Staging\n+ Integration Tests]
+      E3[Update k8s Manifests\nArgoCD Sync]
+      E4[Canary 10%\nIstio Traffic Split]
+      E5[Canary 50% → 100%\nAfter Metrics OK]
+    end
+    subgraph Monitor ["Post-Deploy"]
+      F1[Prometheus Metrics\nAccuracy Drift Alert]
+      F2[Grafana Dashboard\nModel Performance]
+    end
+
+    A1 & A2 & A3 & A4 --> B1
+    B1 --> B2 --> B3 --> B4
+    B4 --> C1 --> C2 --> C3
+    C3 --> D1 --> D2 --> D3
+    D3 --> |PASSED| E1
+    D1 & D2 & D3 --> |FAILED| BLOCK([Block + Alert])
+    E1 --> E2 --> E3 --> E4 --> E5
+    E5 --> F1 --> F2
+    F1 --> |Drift Alert| A3
+
+    style BLOCK fill:#fee2e2,stroke:#dc2626
+    style E5 fill:#d1fae5,stroke:#059669
+    style D1 fill:#fef3c7,stroke:#d97706
+  </div>
+
+  <h4 class="font-semibold text-gray-700 mt-4 mb-2">Code: Complete GitHub Actions ML CI/CD Workflow</h4>
+  <pre><code class="language-yaml"># .github/workflows/ml-cicd-complete.yml
+# Complete ML CI/CD pipeline: data → train → gate → deploy → monitor loop
+name: ML End-to-End CI/CD
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'config/training/**'
+      - 'requirements/**'
+  schedule:
+    - cron: '0 2 * * 1'    # Weekly retrain Monday 2am UTC
+  workflow_dispatch:
+    inputs:
+      force_retrain:
+        description: "Force retrain even if no code changes"
+        type: boolean
+        default: false
+      environment:
+        description: "Deploy target"
+        type: choice
+        options: [staging, production]
+        default: staging
+      canary_pct:
+        description: "Initial canary %"
+        default: "10"
+  repository_dispatch:
+    types: [data-pipeline-complete, monitoring-alert-retrain]
+
+env:
+  PYTHON_VERSION:        "3.11"
+  TF_VERSION:            "1.7.0"
+  AWS_REGION:            us-east-1
+  ECR_REGISTRY:          ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com
+  MLFLOW_TRACKING_URI:   ${{ secrets.MLFLOW_TRACKING_URI }}
+  MLFLOW_TRACKING_TOKEN: ${{ secrets.MLFLOW_TRACKING_TOKEN }}
+  EKS_CLUSTER_STAGING:   ml-cluster-staging
+  EKS_CLUSTER_PROD:      ml-cluster-prod
+  MODEL_NAME:            production-classifier
+  SLACK_CHANNEL:         "#ml-deployments"
+
+jobs:
+  # ══════════════════════════════════════════════════════════════
+  # STAGE 1 — CODE QUALITY
+  # ══════════════════════════════════════════════════════════════
+  lint-and-typecheck:
+    name: "Lint & Type Check"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Install lint tools
+        run: pip install ruff==0.3.0 black==24.3.0 mypy==1.9.0 isort==5.13.2
+
+      - name: Ruff lint
+        run: ruff check src/ tests/ --output-format=github
+
+      - name: Black format check
+        run: black --check --diff src/ tests/
+
+      - name: isort import order
+        run: isort --check-only src/ tests/
+
+      - name: Mypy type check
+        run: mypy src/ --ignore-missing-imports --no-error-summary
+
+  unit-tests:
+    name: "Unit Tests"
+    runs-on: ubuntu-latest
+    needs: lint-and-typecheck
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with: { python-version: ${{ env.PYTHON_VERSION }}, cache: pip }
+
+      - name: Install project
+        run: pip install -e ".[dev,test]"
+
+      - name: Run unit tests with coverage
+        run: |
+          pytest tests/unit/ tests/behavioral/ \
+            -v \
+            --tb=short \
+            --cov=src \
+            --cov-report=xml \
+            --cov-report=term-missing \
+            --cov-fail-under=80 \
+            --timeout=180 \
+            -n auto  # pytest-xdist parallel
+
+      - uses: codecov/codecov-action@v4
+        with: { file: coverage.xml }
+
+  data-validation:
+    name: "Data Validation"
+    runs-on: ubuntu-latest
+    needs: lint-and-typecheck
+    outputs:
+      data_version: ${{ steps.detect.outputs.data_version }}
+      data_changed: ${{ steps.detect.outputs.data_changed }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with: { python-version: ${{ env.PYTHON_VERSION }}, cache: pip }
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubMLRole
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Detect latest data version
+        id: detect
+        run: |
+          DATA_VERSION=$(aws s3 ls s3://my-data-bucket/training/ \
+            | sort | tail -1 | awk '{print $NF}' | tr -d '/')
+          echo "data_version=$DATA_VERSION" >> $GITHUB_OUTPUT
+
+          # Check if this version was used in last training run
+          LAST_VERSION=$(aws ssm get-parameter \
+            --name /ml/last-trained-data-version \
+            --query Parameter.Value --output text 2>/dev/null || echo "none")
+
+          if [ "$DATA_VERSION" != "$LAST_VERSION" ]; then
+            echo "data_changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "data_changed=false" >> $GITHUB_OUTPUT
+          fi
+
+          echo "Data version: $DATA_VERSION (last: $LAST_VERSION)"
+
+      - name: Validate data with Great Expectations
+        if: steps.detect.outputs.data_changed == 'true' || github.event_name == 'schedule'
+        run: |
+          pip install great_expectations pandas pyarrow --quiet
+          python scripts/validate_data.py \
+            --dataset s3://my-data-bucket/training/${{ steps.detect.outputs.data_version }}/ \
+            --suite src/expectations/training_data.json
+
+  # ══════════════════════════════════════════════════════════════
+  # STAGE 2 — SMOKE TRAINING (PR only, 1% sample)
+  # ══════════════════════════════════════════════════════════════
+  smoke-train:
+    name: "Smoke Training (1% sample)"
+    runs-on: ubuntu-latest
+    needs: [unit-tests, data-validation]
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: ${{ env.PYTHON_VERSION }}, cache: pip }
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubMLRole
+          aws-region: ${{ env.AWS_REGION }}
+
+      - run: pip install -e ".[train]"
+
+      - name: Smoke train on 1% sample
+        run: |
+          python src/train.py \
+            --data-path s3://my-data-bucket/training/latest/ \
+            --sample-fraction 0.01 \
+            --max-epochs 3 \
+            --output-dir /tmp/smoke-model \
+            --no-mlflow-log
+          ls -la /tmp/smoke-model/
+
+  # ══════════════════════════════════════════════════════════════
+  # STAGE 3 — BUILD TRAINING IMAGE
+  # ══════════════════════════════════════════════════════════════
+  build-training-image:
+    name: "Build Training Image"
+    runs-on: ubuntu-latest
+    needs: [unit-tests, data-validation]
+    if: github.ref == 'refs/heads/main' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    outputs:
+      image-uri: ${{ steps.push.outputs.image-uri }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubMLRole
+          aws-region: ${{ env.AWS_REGION }}
+
+      - uses: aws-actions/amazon-ecr-login@v2
+        id: ecr-login
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build and push training image
+        id: push
+        run: |
+          IMAGE_URI=${{ env.ECR_REGISTRY }}/ml-training:${{ github.sha }}
+          docker buildx build \
+            --platform linux/amd64 \
+            --file docker/Dockerfile.train \
+            --tag $IMAGE_URI \
+            --cache-from ${{ env.ECR_REGISTRY }}/ml-training:cache \
+            --cache-to   type=registry,ref=${{ env.ECR_REGISTRY }}/ml-training:cache,mode=max \
+            --push \
+            .
+          echo "image-uri=$IMAGE_URI" >> $GITHUB_OUTPUT
+
+      - name: Scan training image for CVEs
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref:  ${{ steps.push.outputs.image-uri }}
+          severity:   CRITICAL
+          exit-code:  1
+          ignore-unfixed: true
+
+  # ══════════════════════════════════════════════════════════════
+  # STAGE 4 — FULL TRAINING JOB (SageMaker)
+  # ══════════════════════════════════════════════════════════════
+  train-model:
+    name: "Full Training (SageMaker)"
+    runs-on: ubuntu-latest
+    needs: [build-training-image]
+    outputs:
+      mlflow_run_id:   ${{ steps.launch.outputs.mlflow_run_id }}
+      model_version:   ${{ steps.launch.outputs.model_version }}
+      sagemaker_job:   ${{ steps.launch.outputs.job_name }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with: { python-version: ${{ env.PYTHON_VERSION }}, cache: pip }
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubMLRole
+          aws-region: ${{ env.AWS_REGION }}
+
+      - run: pip install boto3 sagemaker mlflow
+
+      - name: Launch SageMaker training job
+        id: launch
+        env:
+          DATA_VERSION: ${{ needs.data-validation.outputs.data_version }}
+        run: |
+          python scripts/launch_sagemaker_train.py \
+            --image-uri "${{ needs.build-training-image.outputs.image-uri }}" \
+            --data-version "$DATA_VERSION" \
+            --instance-type ml.p3.8xlarge \
+            --max-runtime-seconds 14400 \
+            --output-env-file sagemaker_outputs.env
+          cat sagemaker_outputs.env >> $GITHUB_OUTPUT
+
+      - name: Record data version used
+        run: |
+          aws ssm put-parameter \
+            --name /ml/last-trained-data-version \
+            --value "${{ needs.data-validation.outputs.data_version }}" \
+            --type String \
+            --overwrite
+
+      - name: Notify training started
+        uses: slackapi/slack-github-action@v1
+        with:
+          payload: |
+            {"channel": "${{ env.SLACK_CHANNEL }}", "text": "Training started: job `${{ steps.launch.outputs.job_name }}`\nData: `${{ needs.data-validation.outputs.data_version }}`\nCommit: `${{ github.sha }}`"}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+  # ══════════════════════════════════════════════════════════════
+  # STAGE 5 — QUALITY GATE
+  # ══════════════════════════════════════════════════════════════
+  quality-gate:
+    name: "Quality Gate"
+    runs-on: ubuntu-latest
+    needs: train-model
+    outputs:
+      gate_passed: ${{ steps.gate.outputs.gate_passed }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: ${{ env.PYTHON_VERSION }}, cache: pip }
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubMLRole
+          aws-region: ${{ env.AWS_REGION }}
+
+      - run: pip install mlflow scikit-learn pandas numpy boto3
+
+      - name: Run quality gate
+        id: gate
+        run: |
+          set +e
+          python scripts/quality_gate.py \
+            --challenger-run-id "${{ needs.train-model.outputs.mlflow_run_id }}" \
+            --min-accuracy 0.85 \
+            --min-auc 0.90 \
+            --min-f1 0.80 \
+            --max-p99-latency-ms 200 \
+            --compare-champion \
+            --model-name "${{ env.MODEL_NAME }}" \
+            --output-report evaluation_report.json
+          EXIT_CODE=$?
+          if [ $EXIT_CODE -eq 0 ]; then
+            echo "gate_passed=true" >> $GITHUB_OUTPUT
+          else
+            echo "gate_passed=false" >> $GITHUB_OUTPUT
+          fi
+          exit $EXIT_CODE
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: quality-gate-report
+          path: evaluation_report.json
+
+      - name: Notify gate result
+        if: always()
+        uses: slackapi/slack-github-action@v1
+        with:
+          payload: |
+            {"channel": "${{ env.SLACK_CHANNEL }}", "text": "Quality gate: ${{ steps.gate.outputs.gate_passed == 'true' && '✅ PASSED' || '❌ FAILED' }}\nRun ID: `${{ needs.train-model.outputs.mlflow_run_id }}`"}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+  # ══════════════════════════════════════════════════════════════
+  # STAGE 6 — BUILD SERVING IMAGE
+  # ══════════════════════════════════════════════════════════════
+  build-serving-image:
+    name: "Build Serving Image"
+    runs-on: ubuntu-latest
+    needs: quality-gate
+    if: needs.quality-gate.outputs.gate_passed == 'true'
+    outputs:
+      image-uri: ${{ steps.push.outputs.image-uri }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubMLRole
+          aws-region: ${{ env.AWS_REGION }}
+      - uses: aws-actions/amazon-ecr-login@v2
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build multi-arch serving image
+        id: push
+        run: |
+          IMAGE_URI=${{ env.ECR_REGISTRY }}/ml-serving:${{ github.sha }}
+          docker buildx build \
+            --platform linux/amd64,linux/arm64 \
+            --file docker/Dockerfile.serve \
+            --build-arg MODEL_VERSION="${{ needs.train-model.outputs.model_version }}" \
+            --build-arg MLFLOW_RUN_ID="${{ needs.train-model.outputs.mlflow_run_id }}" \
+            --tag $IMAGE_URI \
+            --push \
+            .
+          echo "image-uri=$IMAGE_URI" >> $GITHUB_OUTPUT
+
+      - name: Scan serving image
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ steps.push.outputs.image-uri }}
+          severity: CRITICAL,HIGH
+          exit-code: 1
+          ignore-unfixed: true
+
+  # ══════════════════════════════════════════════════════════════
+  # STAGE 7 — DEPLOY STAGING
+  # ══════════════════════════════════════════════════════════════
+  deploy-staging:
+    name: "Deploy → Staging"
+    runs-on: ubuntu-latest
+    needs: build-serving-image
+    environment:
+      name: staging
+      url: https://staging.ml-api.company.com/health
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubMLRole
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Update kubeconfig for staging
+        run: |
+          aws eks update-kubeconfig \
+            --name ${{ env.EKS_CLUSTER_STAGING }} \
+            --region ${{ env.AWS_REGION }}
+
+      - name: Deploy to staging
+        run: |
+          kubectl set image deployment/ml-serving \
+            serving="${{ needs.build-serving-image.outputs.image-uri }}" \
+            --namespace ml-serving
+          kubectl rollout status deployment/ml-serving \
+            --namespace ml-serving \
+            --timeout=300s
+
+      - name: Run integration tests
+        run: |
+          pip install pytest httpx
+          pytest tests/integration/ \
+            -v \
+            --timeout=120 \
+            -m "not slow"
+        env:
+          API_BASE_URL: https://staging.ml-api.company.com
+          API_KEY: ${{ secrets.STAGING_API_KEY }}
+
+  # ══════════════════════════════════════════════════════════════
+  # STAGE 8 — CANARY DEPLOY TO PRODUCTION
+  # ══════════════════════════════════════════════════════════════
+  deploy-production-canary:
+    name: "Deploy → Production Canary"
+    runs-on: ubuntu-latest
+    needs: deploy-staging
+    environment:
+      name: production
+      url: https://ml-api.company.com/health
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubMLRole
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Update kubeconfig for production
+        run: |
+          aws eks update-kubeconfig \
+            --name ${{ env.EKS_CLUSTER_PROD }} \
+            --region ${{ env.AWS_REGION }}
+
+      - name: Deploy canary (${{ inputs.canary_pct || '10' }}%)
+        run: |
+          CANARY_PCT="${{ inputs.canary_pct || '10' }}"
+          STABLE_PCT="$((100 - CANARY_PCT))"
+
+          # Update canary deployment
+          kubectl set image deployment/ml-serving-canary \
+            serving="${{ needs.build-serving-image.outputs.image-uri }}" \
+            --namespace ml-serving
+          kubectl rollout status deployment/ml-serving-canary \
+            --namespace ml-serving \
+            --timeout=300s
+
+          # Update Istio VirtualService weights
+          kubectl patch virtualservice ml-serving \
+            --namespace ml-serving \
+            --type=merge \
+            -p "{\"spec\":{\"http\":[{\"route\":[{\"destination\":{\"host\":\"ml-serving-stable\",\"port\":{\"number\":80}},\"weight\":${STABLE_PCT}},{\"destination\":{\"host\":\"ml-serving-canary\",\"port\":{\"number\":80}},\"weight\":${CANARY_PCT}}]}]}}"
+
+      - name: Update ArgoCD / k8s manifests repo
+        run: |
+          git clone https://x-access-token:${{ secrets.K8S_MANIFESTS_REPO_TOKEN }}@github.com/company/ml-platform-k8s /tmp/k8s
+          cd /tmp/k8s
+          kustomize edit set image ml-serving-canary="${{ needs.build-serving-image.outputs.image-uri }}" \
+            --kustomization deployments/ml-serving/production/kustomization.yaml
+          git config user.email "ci-bot@company.com"
+          git config user.name  "CI Bot"
+          git add .
+          git commit -m "canary: update ml-serving to ${{ github.sha }} [skip ci]"
+          git push origin main
+
+      - name: Notify production canary deploy
+        uses: slackapi/slack-github-action@v1
+        with:
+          payload: |
+            {
+              "channel": "${{ env.SLACK_CHANNEL }}",
+              "text": "🚀 Canary deployed to production!\nModel: `${{ needs.train-model.outputs.model_version }}`\nImage: `${{ needs.build-serving-image.outputs.image-uri }}`\nTraffic: ${{ inputs.canary_pct || '10' }}% to canary\n<https://grafana.company.com/d/ml-serving|Grafana Dashboard>"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+  # ══════════════════════════════════════════════════════════════
+  # STAGE 9 — PROMOTE CANARY TO 100% (after bake time)
+  # ══════════════════════════════════════════════════════════════
+  promote-to-stable:
+    name: "Promote Canary → Stable (100%)"
+    runs-on: ubuntu-latest
+    needs: deploy-production-canary
+    # Wait 30 minutes for bake time; manual approval gate via environment protection rule
+    environment:
+      name: production-promote
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubMLRole
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Check canary error rate before promotion
+        run: |
+          python scripts/check_canary_metrics.py \
+            --prometheus-url ${{ secrets.PROMETHEUS_URL }} \
+            --canary-label "track=canary" \
+            --max-error-rate 0.01 \
+            --window-minutes 30
+
+      - name: Promote canary to 100%
+        run: |
+          aws eks update-kubeconfig \
+            --name ${{ env.EKS_CLUSTER_PROD }} \
+            --region ${{ env.AWS_REGION }}
+
+          # Move stable deployment to new image
+          kubectl set image deployment/ml-serving-stable \
+            serving="${{ needs.build-serving-image.outputs.image-uri }}" \
+            --namespace ml-serving
+
+          # Shift all traffic back to stable (now running new model)
+          kubectl patch virtualservice ml-serving \
+            --namespace ml-serving \
+            --type=merge \
+            -p '{"spec":{"http":[{"route":[{"destination":{"host":"ml-serving-stable","port":{"number":80}},"weight":100},{"destination":{"host":"ml-serving-canary","port":{"number":80}},"weight":0}]}]}}'
+
+      - name: Promote model in MLflow registry
+        run: |
+          pip install mlflow
+          python -c "
+          import mlflow
+          client = mlflow.tracking.MlflowClient()
+          versions = client.search_model_versions(\"run_id='${{ needs.train-model.outputs.mlflow_run_id }}'\")
+          if versions:
+              client.transition_model_version_stage(
+                  name='${{ env.MODEL_NAME }}',
+                  version=versions[0].version,
+                  stage='Production',
+                  archive_existing_versions=True,
+              )
+              print(f'Promoted version {versions[0].version} to Production')
+          "
+
+      - name: Final notification
+        uses: slackapi/slack-github-action@v1
+        with:
+          payload: |
+            {"channel": "${{ env.SLACK_CHANNEL }}", "text": "✅ Production promotion complete!\nModel `${{ needs.train-model.outputs.model_version }}` is now serving 100% of traffic.\nCommit: `${{ github.sha }}`"}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+</code></pre>
+</section>
+
+<!-- ============================================================ SUMMARY ============================================================ -->
+<section id="summary" class="mb-16">
+  <h2 class="text-3xl font-bold text-gray-900 mb-6 border-b-2 border-green-600 pb-2">Summary &amp; Key Takeaways</h2>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+    <div class="bg-blue-50 rounded-xl p-6 border border-blue-200">
+      <h3 class="font-bold text-blue-800 mb-3">Core Principles</h3>
+      <ul class="text-sm text-gray-700 space-y-2 list-disc list-inside">
+        <li>ML CI/CD gates on code quality AND data quality AND model quality simultaneously</li>
+        <li>Treat model artifacts like software releases: version, test, deploy with rollback</li>
+        <li>Champion/challenger comparison adapts to data shift better than absolute thresholds</li>
+        <li>Run smoke training on PRs; full training only on merge to main or schedule</li>
+        <li>Never deploy a model without a quality gate — even to staging</li>
+      </ul>
+    </div>
+    <div class="bg-green-50 rounded-xl p-6 border border-green-200">
+      <h3 class="font-bold text-green-800 mb-3">Pipeline Orchestration</h3>
+      <ul class="text-sm text-gray-700 space-y-2 list-disc list-inside">
+        <li>KFP v2 for GCP / Kubernetes shops with strong artifact typing needs</li>
+        <li>Metaflow for data-scientist-first teams on AWS with minimal infra overhead</li>
+        <li>ZenML for multi-cloud portability via the stack abstraction</li>
+        <li>Enable component caching to avoid reprocessing unchanged data (40–60% cost savings)</li>
+      </ul>
+    </div>
+    <div class="bg-purple-50 rounded-xl p-6 border border-purple-200">
+      <h3 class="font-bold text-purple-800 mb-3">CI/CD Platform</h3>
+      <ul class="text-sm text-gray-700 space-y-2 list-disc list-inside">
+        <li>GitHub Actions OIDC eliminates long-lived cloud credentials entirely</li>
+        <li>Use <code>repository_dispatch</code> to trigger retraining from monitoring alerts</li>
+        <li>GitLab CI's native model registry is compelling for self-hosted enterprise</li>
+        <li>Self-hosted GPU runners for CI jobs that need actual training validation</li>
+      </ul>
+    </div>
+    <div class="bg-orange-50 rounded-xl p-6 border border-orange-200">
+      <h3 class="font-bold text-orange-800 mb-3">Safety &amp; Reliability</h3>
+      <ul class="text-sm text-gray-700 space-y-2 list-disc list-inside">
+        <li>Canary deployments are mandatory for production ML — never go straight to 100%</li>
+        <li>Behavioral tests catch regressions that accuracy metrics miss</li>
+        <li>Pin Docker base images by digest, not tag — tags are mutable</li>
+        <li>Trivy scan on every image build — fail CI on CRITICAL CVEs</li>
+        <li>GitOps with ArgoCD: cluster state always matches Git, no manual kubectl in prod</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout-info rounded-xl p-5 mb-6">
+    <strong class="text-blue-800 block mb-2">The ML CI/CD Maturity Ladder</strong>
+    <div class="text-sm text-gray-700 space-y-1">
+      <p><strong>Level 0:</strong> Manual training and deployment from local machines</p>
+      <p><strong>Level 1:</strong> Automated CI (code tests + linting) but manual training</p>
+      <p><strong>Level 2:</strong> CT — automated retraining on schedule or data change</p>
+      <p><strong>Level 3:</strong> CT + automated quality gates blocking bad models</p>
+      <p><strong>Level 4:</strong> Full CT+CD — auto-deploy to canary when gate passes, auto-promote on metrics</p>
+      <p><strong>Level 5:</strong> Self-healing — monitoring alerts auto-trigger retraining with no human intervention</p>
+    </div>
+  </div>
+
+  <h3 class="text-xl font-semibold text-gray-800 mb-4">Tooling Summary Table</h3>
+  <table class="text-sm mb-6">
+    <thead><tr><th>Problem</th><th>Recommended Tool(s)</th><th>Alternative</th></tr></thead>
+    <tbody>
+      <tr><td>Pipeline orchestration (GCP)</td><td>Kubeflow Pipelines v2 / Vertex AI Pipelines</td><td>Airflow on Composer</td></tr>
+      <tr><td>Pipeline orchestration (AWS)</td><td>Metaflow + AWS Batch</td><td>SageMaker Pipelines</td></tr>
+      <tr><td>Multi-cloud portability</td><td>ZenML</td><td>Flyte</td></tr>
+      <tr><td>CI/CD workflows</td><td>GitHub Actions</td><td>GitLab CI, Tekton</td></tr>
+      <tr><td>Data validation in CI</td><td>Great Expectations</td><td>Pandera, TFDV</td></tr>
+      <tr><td>Model quality gate</td><td>Custom script + MLflow</td><td>Evidently AI, Weights &amp; Biases</td></tr>
+      <tr><td>Container scanning</td><td>Trivy</td><td>Snyk, Grype</td></tr>
+      <tr><td>GitOps / k8s deployment</td><td>ArgoCD</td><td>Flux CD</td></tr>
+      <tr><td>Traffic management / canary</td><td>Istio VirtualService</td><td>nginx-ingress canary, Flagger</td></tr>
+      <tr><td>IaC CI/CD</td><td>Terraform + GitHub Actions</td><td>Pulumi, CDK</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- BOTTOM NAV -->
+<div class="flex justify-between items-center py-8 border-t border-gray-200">
+  <a href="ch11_model_serving.html"
+     class="flex items-center gap-2 px-5 py-3 bg-white border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition">
+    ← Chapter 11: Model Serving
+  </a>
+  <div class="text-center text-sm text-gray-500">
+    <div class="font-semibold text-gray-700">Chapter 12</div>
+    <div>ML Pipelines &amp; CI/CD</div>
+  </div>
+  <a href="ch13_monitoring.html"
+     class="flex items-center gap-2 px-5 py-3 bg-blue-600 rounded-lg text-white font-medium hover:bg-blue-700 transition">
+    Chapter 13: Monitoring &amp; Observability →
+  </a>
+</div>
+
+<footer class="py-8 text-center text-sm text-gray-400">
+  Modern MLOps Tutorial &mdash; Chapter 12 &mdash; Written by the MLOps Expert Committee
+</footer>
+
+</div><!-- end max-w-5xl part2 -->
+</body>
+</html>

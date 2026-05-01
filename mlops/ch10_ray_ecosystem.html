@@ -1,0 +1,2002 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 10: The Ray Ecosystem - Modern MLOps Tutorial</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script>hljs.highlightAll(); mermaid.initialize({startOnLoad:true, theme:'default'});</script>
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; color: #1f2937; }
+    .prose-custom h2 { font-size:1.75rem; font-weight:700; color:#1e3a8a; margin:2.5rem 0 1rem; border-bottom:2px solid #dbeafe; padding-bottom:.5rem; }
+    .prose-custom h3 { font-size:1.25rem; font-weight:600; color:#1d4ed8; margin:2rem 0 .75rem; }
+    .prose-custom h4 { font-size:1.05rem; font-weight:600; color:#2563eb; margin:1.5rem 0 .5rem; }
+    .prose-custom p  { line-height:1.75; margin-bottom:1rem; }
+    .prose-custom ul { list-style:disc; padding-left:1.5rem; margin-bottom:1rem; }
+    .prose-custom li { margin-bottom:.4rem; line-height:1.7; }
+    pre code.hljs { border-radius:.5rem; font-size:.82rem; }
+    .callout-tip  { background:#ecfdf5; border-left:4px solid #059669; padding:1rem 1.25rem; border-radius:0 .5rem .5rem 0; margin:1.5rem 0; }
+    .callout-warn { background:#fffbeb; border-left:4px solid #d97706; padding:1rem 1.25rem; border-radius:0 .5rem .5rem 0; margin:1.5rem 0; }
+    .callout-info { background:#eff6ff; border-left:4px solid #2563eb; padding:1rem 1.25rem; border-radius:0 .5rem .5rem 0; margin:1.5rem 0; }
+    .callout-danger{ background:#fef2f2; border-left:4px solid #dc2626; padding:1rem 1.25rem; border-radius:0 .5rem .5rem 0; margin:1.5rem 0; }
+    table { width:100%; border-collapse:collapse; margin:1.5rem 0; font-size:.88rem; }
+    th { background:#1e40af; color:#fff; padding:.65rem 1rem; text-align:left; }
+    td { padding:.6rem 1rem; border-bottom:1px solid #e5e7eb; }
+    tr:nth-child(even) td { background:#f9fafb; }
+    .section-badge { display:inline-block; background:#dbeafe; color:#1d4ed8; font-size:.75rem; font-weight:600; padding:.2rem .7rem; border-radius:9999px; margin-bottom:.5rem; text-transform:uppercase; letter-spacing:.05em; }
+    .mermaid-wrap { background:#f8fafc; border:1px solid #e2e8f0; border-radius:.75rem; padding:1.5rem; margin:1.5rem 0; overflow-x:auto; }
+    .code-label { font-size:.72rem; font-weight:600; color:#6b7280; text-transform:uppercase; letter-spacing:.07em; margin-bottom:.25rem; }
+    .toc-link { display:block; padding:.3rem .75rem; color:#374151; border-radius:.375rem; font-size:.9rem; transition:background .15s; }
+    .toc-link:hover { background:#dbeafe; color:#1d4ed8; }
+    .nav-btn { display:inline-flex; align-items:center; gap:.5rem; padding:.6rem 1.25rem; border-radius:.5rem; font-weight:600; font-size:.9rem; transition:background .15s; }
+  </style>
+</head>
+<body class="bg-gray-50">
+
+<!-- NAVBAR -->
+<nav class="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-14">
+    <a href="index.html" class="flex items-center gap-2 font-semibold text-blue-700 text-sm">
+      &#8592; Modern MLOps Tutorial
+    </a>
+    <span class="text-sm text-gray-500 hidden sm:block">Chapter 10 &mdash; The Ray Ecosystem</span>
+    <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-3 py-1 rounded-full">~90 min read</span>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="bg-gradient-to-br from-blue-700 via-blue-800 to-indigo-900 text-white py-16">
+  <div class="max-w-5xl mx-auto px-6">
+    <div class="text-blue-200 text-sm font-semibold mb-2 uppercase tracking-widest">Part IV &mdash; Distributed Computing Platforms</div>
+    <h1 class="text-4xl sm:text-5xl font-black mb-4 leading-tight">Chapter 10: The Ray Ecosystem</h1>
+    <p class="text-blue-100 text-xl max-w-3xl leading-relaxed">Ray Core &bull; Ray Train &bull; Ray Serve &bull; Ray Tune &bull; Ray Data &mdash; A unified Python-native framework for every ML workload from laptop to thousand-node cluster.</p>
+    <div class="mt-6 flex flex-wrap gap-3">
+      <span class="bg-blue-600/60 px-3 py-1 rounded-full text-sm">&#128187; 14+ Code Examples</span>
+      <span class="bg-blue-600/60 px-3 py-1 rounded-full text-sm">&#128202; 5+ Comparison Tables</span>
+      <span class="bg-blue-600/60 px-3 py-1 rounded-full text-sm">&#128444; 4 Architecture Diagrams</span>
+      <span class="bg-blue-600/60 px-3 py-1 rounded-full text-sm">&#9201; ~90 min</span>
+    </div>
+  </div>
+</header>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex gap-8">
+
+  <!-- SIDEBAR TOC -->
+  <aside class="hidden xl:block w-64 flex-shrink-0">
+    <div class="sticky top-20 bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
+      <p class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">Contents</p>
+      <nav class="space-y-0.5 text-sm">
+        <a href="#s1" class="toc-link">1. Why Ray?</a>
+        <a href="#s2" class="toc-link">2. Ray Core</a>
+        <a href="#s3" class="toc-link">3. Cluster Setup</a>
+        <a href="#s4" class="toc-link">4. Ray Data</a>
+        <a href="#s5" class="toc-link">5. Ray Train</a>
+        <a href="#s6" class="toc-link">6. Ray Tune</a>
+        <a href="#s7" class="toc-link">7. Ray Serve</a>
+        <a href="#s8" class="toc-link">8. Ray Workflows</a>
+        <a href="#s9" class="toc-link">9. Anyscale Platform</a>
+        <a href="#s10" class="toc-link">10. Real-World Architecture</a>
+        <a href="#s11" class="toc-link">11. Performance Tuning</a>
+        <a href="#summary" class="toc-link">Summary</a>
+      </nav>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="flex-1 min-w-0 prose-custom">
+
+    <!-- ===== SECTION 1: WHY RAY ===== -->
+    <section id="s1">
+      <div class="section-badge">Section 1</div>
+      <h2>Why Ray?</h2>
+
+      <h3>The Python Distributed Computing Gap</h3>
+      <p>Python dominates ML workloads. Yet Python's GIL, single-process model, and library ecosystem were never designed for distributed execution. Before Ray, engineering teams faced a painful choice: rewrite training loops in Spark (JVM, not Python-native), hand-roll MPI scripts with brittle NCCL topology logic, or stitch together Celery + Redis for actor-style workloads — and then run separate infrastructure for hyperparameter search, serving, and preprocessing. Each tool brought its own cluster management story, its own serialization format, and its own failure modes.</p>
+      <p>Ray's thesis, published by the RISELab at UC Berkeley in 2018, was simple but radical: <strong>a single, Python-native distributed runtime that is general enough to express tasks, actors, and dataflows — and specialized enough to handle GPU-heavy ML natively.</strong> Today Ray is the backbone of workloads at OpenAI, Spotify, Instacart, Shopify, and dozens of AI labs.</p>
+
+      <h3>Ray Architecture</h3>
+      <div class="mermaid-wrap">
+        <div class="mermaid">
+graph TB
+    subgraph Head["Head Node"]
+        GCS["Global Control Store (GCS)\nCluster metadata, ownership"]
+        Sched["Distributed Scheduler"]
+        Dashboard["Ray Dashboard\n:8265"]
+        Driver["Driver Process\nray.init() entry point"]
+    end
+    subgraph W1["Worker Node 1"]
+        R1["Raylet\n(local scheduler)"]
+        OS1["Plasma Object Store\n(shared memory)"]
+        WP1["Worker Processes\n(tasks / actors)"]
+        R1 --- OS1
+        R1 --- WP1
+    end
+    subgraph W2["Worker Node 2"]
+        R2["Raylet"]
+        OS2["Plasma Object Store"]
+        WP2["Worker Processes"]
+        R2 --- OS2
+        R2 --- WP2
+    end
+    subgraph W3["Worker Node 3 (GPU)"]
+        R3["Raylet"]
+        OS3["Plasma Object Store"]
+        GPU["GPU Workers\nA100 x 8"]
+        R3 --- OS3
+        R3 --- GPU
+    end
+    GCS <-->|heartbeat| R1
+    GCS <-->|heartbeat| R2
+    GCS <-->|heartbeat| R3
+    Sched --> R1
+    Sched --> R2
+    Sched --> R3
+    Driver --> GCS
+    Driver --> Sched
+        </div>
+      </div>
+
+      <p><strong>Key components:</strong></p>
+      <ul>
+        <li><strong>Global Control Store (GCS)</strong>: Stores cluster metadata, object ownership tables, and actor locations. In Ray 2.x the GCS is fault-tolerant via Redis or an embedded store.</li>
+        <li><strong>Raylet</strong>: Each node runs a raylet that acts as a local scheduler. It manages the node's resources, object store, and worker processes.</li>
+        <li><strong>Plasma Object Store</strong>: A shared-memory store (Apache Arrow format) for zero-copy passing of large NumPy arrays and other objects between co-located processes.</li>
+        <li><strong>Driver</strong>: The process that calls <code>ray.init()</code> and submits tasks/actors. On a cluster this runs on the head node.</li>
+        <li><strong>Dashboard</strong>: A built-in web UI at port 8265 showing cluster utilization, task timelines, memory, and logs.</li>
+      </ul>
+
+      <h3>Ray vs Alternatives</h3>
+      <table>
+        <thead><tr><th>Dimension</th><th>Ray</th><th>Apache Spark</th><th>Dask</th><th>Celery</th></tr></thead>
+        <tbody>
+          <tr><td>Primary abstraction</td><td>Tasks + Actors + Data</td><td>RDDs / DataFrames</td><td>Delayed graphs / Arrays</td><td>Task queues</td></tr>
+          <tr><td>ML-native</td><td>Yes (Train, Serve, Tune)</td><td>MLlib (limited)</td><td>Via integrations</td><td>No</td></tr>
+          <tr><td>GPU support</td><td>First-class</td><td>Limited (3rd-party)</td><td>Limited</td><td>No</td></tr>
+          <tr><td>Actor model</td><td>Yes (stateful)</td><td>No</td><td>No</td><td>Partial (task chaining)</td></tr>
+          <tr><td>Fault tolerance</td><td>Lineage reconstruction + GCS HA</td><td>RDD lineage</td><td>Recompute (limited)</td><td>Retry policies</td></tr>
+          <tr><td>Streaming</td><td>Ray Data streaming</td><td>Spark Streaming / SS</td><td>Limited</td><td>No</td></tr>
+          <tr><td>Scheduling latency</td><td>Sub-ms (local)</td><td>Seconds (stage-level)</td><td>~ms</td><td>~ms (broker-bound)</td></tr>
+          <tr><td>Python ecosystem</td><td>Native (pickle / cloudpickle)</td><td>PySpark wrapper</td><td>Native</td><td>Native</td></tr>
+          <tr><td>Serving</td><td>Ray Serve (built-in)</td><td>No</td><td>No</td><td>No</td></tr>
+          <tr><td>HPO</td><td>Ray Tune (built-in)</td><td>No</td><td>No</td><td>No</td></tr>
+        </tbody>
+      </table>
+
+      <h3>When Ray Shines (and When It Doesn't)</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-4">
+        <div class="bg-green-50 border border-green-200 rounded-xl p-4">
+          <p class="font-bold text-green-800 mb-2">Ray excels at:</p>
+          <ul class="text-sm text-green-900 space-y-1">
+            <li>Large-scale distributed training (DDP, FSDP)</li>
+            <li>Parallel HPO with thousands of trials</li>
+            <li>Online inference with heterogeneous models</li>
+            <li>Python-heavy ML preprocessing pipelines</li>
+            <li>Multi-agent RL environments (RLlib)</li>
+            <li>Workloads mixing CPU and GPU workers</li>
+          </ul>
+        </div>
+        <div class="bg-red-50 border border-red-200 rounded-xl p-4">
+          <p class="font-bold text-red-800 mb-2">Consider alternatives when:</p>
+          <ul class="text-sm text-red-900 space-y-1">
+            <li>SQL analytics at petabyte scale (use Spark/Trino)</li>
+            <li>Existing heavy Spark investment with complex SQL DAGs</li>
+            <li>Simple job queuing with no ML (use Celery/SQS)</li>
+            <li>Purely streaming pipelines (Flink is more mature)</li>
+            <li>Team has zero Python experience</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== SECTION 2: RAY CORE ===== -->
+    <section id="s2">
+      <div class="section-badge">Section 2</div>
+      <h2>Ray Core</h2>
+
+      <p>Ray Core provides three primitives: <strong>remote functions (tasks)</strong>, <strong>remote classes (actors)</strong>, and the <strong>distributed object store</strong>. Everything in Ray Train, Tune, Serve, and Data is built on top of these three primitives.</p>
+
+      <h3>Tasks — @ray.remote Functions</h3>
+      <p>A task is a stateless function that Ray schedules on any available worker. Tasks are submitted asynchronously and return <em>object references</em> (futures).</p>
+
+      <div class="code-label">Example 1 — Ray tasks, actors, and object store</div>
+      <pre><code class="language-python">import ray
+import numpy as np
+import time
+
+# Initialize Ray (auto-detects local CPUs, or connects to a cluster)
+ray.init()  # or ray.init(address="ray://head-node:10001")
+
+# ── TASKS ──────────────────────────────────────────────────────────────────────
+@ray.remote
+def train_fold(fold_id: int, data: np.ndarray, lr: float) -> dict:
+    """Simulates training on one CV fold. Runs in a separate worker process."""
+    time.sleep(0.1)  # simulate work
+    loss = float(np.random.rand()) + lr * 0.01
+    return {"fold": fold_id, "val_loss": loss, "lr": lr}
+
+# Submit tasks — non-blocking, returns ObjectRef immediately
+data = np.random.randn(10_000, 128)
+refs = [train_fold.remote(i, data, lr=0.001 * (i + 1)) for i in range(5)]
+
+# Block and collect results
+results = ray.get(refs)
+print(results)
+
+# ── OBJECT STORE ───────────────────────────────────────────────────────────────
+# Put large data into the object store once; pass the ref to many tasks.
+# Zero-copy within the same node (Plasma shared memory).
+large_dataset = np.random.randn(100_000, 512)
+dataset_ref = ray.put(large_dataset)  # returns ObjectRef
+
+@ray.remote
+def preprocess_chunk(data_ref, start: int, end: int) -> np.ndarray:
+    data = ray.get(data_ref)   # zero-copy on same node
+    return data[start:end] * 2.0 - 1.0
+
+chunk_refs = [
+    preprocess_chunk.remote(dataset_ref, i * 10_000, (i + 1) * 10_000)
+    for i in range(10)
+]
+chunks = ray.get(chunk_refs)
+processed = np.vstack(chunks)
+print(f"Processed shape: {processed.shape}")
+
+# ── ACTORS ─────────────────────────────────────────────────────────────────────
+@ray.remote
+class ParameterServer:
+    """Stateful actor — lives as a long-running process on a worker node."""
+    def __init__(self, model_size: int):
+        self.params = np.zeros(model_size)
+        self.step = 0
+
+    def apply_gradient(self, grad: np.ndarray, lr: float = 0.01) -> None:
+        self.params -= lr * grad
+        self.step += 1
+
+    def get_params(self) -> np.ndarray:
+        return self.params.copy()
+
+    def get_step(self) -> int:
+        return self.step
+
+# Create actor (returns ActorHandle, actor lives until handle goes out of scope)
+ps = ParameterServer.remote(model_size=1024)
+
+# Multiple workers push gradients concurrently
+@ray.remote
+def worker_step(ps_handle, worker_id: int):
+    grad = np.random.randn(1024) * 0.1
+    ps_handle.apply_gradient.remote(grad)
+    return worker_id
+
+worker_refs = [worker_step.remote(ps, i) for i in range(8)]
+ray.get(worker_refs)
+
+params = ray.get(ps.get_params.remote())
+step   = ray.get(ps.get_step.remote())
+print(f"PS step={step}, param norm={np.linalg.norm(params):.4f}")
+
+ray.shutdown()
+</code></pre>
+
+      <h3>Parallel Hyperparameter Search with Ray Core</h3>
+      <div class="code-label">Example 2 — Manual parallel HPO with Ray tasks</div>
+      <pre><code class="language-python">import ray
+import numpy as np
+from itertools import product
+from typing import List, Dict
+
+ray.init()
+
+@ray.remote(num_cpus=2)
+def evaluate_config(config: Dict) -> Dict:
+    """Train a small model and return validation metric."""
+    lr         = config["lr"]
+    batch_size = config["batch_size"]
+    dropout    = config["dropout"]
+
+    # Simulate training: replace with real training loop
+    np.random.seed(int(lr * 1e6) % 9999)
+    val_loss = (
+        0.5
+        + 0.3 * np.log(1 / lr)
+        + 0.1 * np.random.randn()
+        + 0.05 * (dropout - 0.3) ** 2
+        - 0.002 * batch_size
+    )
+    return {**config, "val_loss": float(val_loss)}
+
+# Build search grid
+lrs         = [1e-4, 3e-4, 1e-3, 3e-3]
+batch_sizes = [32, 64, 128]
+dropouts    = [0.1, 0.3, 0.5]
+
+configs = [
+    {"lr": lr, "batch_size": bs, "dropout": dr}
+    for lr, bs, dr in product(lrs, batch_sizes, dropouts)
+]
+print(f"Total configs: {len(configs)}")
+
+# Submit all in parallel — Ray schedules across available CPUs
+refs = [evaluate_config.remote(cfg) for cfg in configs]
+results: List[Dict] = ray.get(refs)
+
+# Find best
+best = min(results, key=lambda r: r["val_loss"])
+print(f"Best config: {best}")
+
+ray.shutdown()
+</code></pre>
+
+      <h3>Remote Options: Resources and Scheduling</h3>
+      <pre><code class="language-python">import ray
+
+# Request specific resources on decorator
+@ray.remote(num_cpus=4, num_gpus=1, memory=8 * 1024**3)  # 8 GB RAM
+def gpu_training_task(config):
+    import torch
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    # ... training code ...
+    return {"device": str(device)}
+
+# Override resources at call time
+ref = gpu_training_task.options(num_cpus=8, num_gpus=2).remote(config={})
+
+# Custom resources (e.g., special accelerators, licenses)
+@ray.remote(resources={"TPU": 1, "custom_license": 1})
+def tpu_task():
+    pass
+
+# Scheduling strategies
+from ray.util.scheduling_strategies import (
+    NodeAffinitySchedulingStrategy,
+    PlacementGroupSchedulingStrategy,
+)
+
+# Pin actor to a specific node
+node_id = ray.get_runtime_context().get_node_id()
+
+@ray.remote
+class PinnedActor:
+    pass
+
+actor = PinnedActor.options(
+    scheduling_strategy=NodeAffinitySchedulingStrategy(
+        node_id=node_id, soft=False
+    )
+).remote()
+</code></pre>
+
+      <div class="callout-tip">
+        <p class="font-semibold text-green-800">Performance Tip: Object Store Pinning</p>
+        <p class="text-green-900 text-sm mt-1">When passing a large NumPy array to many tasks, always use <code>ray.put()</code> first. Without it, Ray serializes and copies the array once per task submission. With <code>ray.put()</code>, the array lives in the Plasma store and is referenced by all tasks — zero copies on the same node.</p>
+      </div>
+    </section>
+
+    <!-- ===== SECTION 3: CLUSTER SETUP ===== -->
+    <section id="s3">
+      <div class="section-badge">Section 3</div>
+      <h2>Ray Cluster Setup</h2>
+
+      <h3>Local Multi-Process Mode</h3>
+      <pre><code class="language-python">import ray
+
+# Single-machine, multi-process (default)
+ray.init()
+
+# Limit to 4 CPUs and 1 GPU for local testing
+ray.init(num_cpus=4, num_gpus=1)
+
+# Connect to a running cluster
+ray.init(address="ray://my-head-node:10001")
+
+# Auto-connect to existing Ray instance (e.g., inside a Ray Job)
+ray.init(address="auto")
+</code></pre>
+
+      <h3>KubeRay — Ray on Kubernetes</h3>
+      <p>KubeRay is the official Kubernetes operator for Ray. It defines three CRDs: <code>RayCluster</code>, <code>RayJob</code>, and <code>RayService</code>.</p>
+
+      <div class="code-label">Example 4 — KubeRay RayCluster manifest</div>
+      <pre><code class="language-yaml">apiVersion: ray.io/v1alpha1
+kind: RayCluster
+metadata:
+  name: ray-ml-cluster
+  namespace: ray-system
+spec:
+  rayVersion: "2.9.0"
+  enableInTreeAutoscaling: true
+  autoscalerOptions:
+    upscalingMode: Default
+    idleTimeoutSeconds: 60
+    resources:
+      requests:
+        cpu: "500m"
+        memory: "512Mi"
+
+  # ── HEAD NODE ──────────────────────────────────────────────────────────────
+  headGroupSpec:
+    rayStartParams:
+      dashboard-host: "0.0.0.0"
+      num-cpus: "0"          # Head does scheduling, not computation
+      block: "true"
+    template:
+      spec:
+        containers:
+          - name: ray-head
+            image: rayproject/ray-ml:2.9.0-gpu
+            resources:
+              requests:
+                cpu: "2"
+                memory: "8Gi"
+              limits:
+                cpu: "4"
+                memory: "16Gi"
+            env:
+              - name: RAY_ENABLE_RECORD_ACTOR_TASK_LOGGING
+                value: "1"
+            volumeMounts:
+              - mountPath: /tmp/ray
+                name: ray-logs
+        volumes:
+          - name: ray-logs
+            emptyDir: {}
+
+  # ── WORKER GROUPS ──────────────────────────────────────────────────────────
+  workerGroupSpecs:
+    # CPU workers for preprocessing
+    - replicas: 4
+      minReplicas: 2
+      maxReplicas: 10
+      groupName: cpu-workers
+      rayStartParams:
+        num-cpus: "8"
+        block: "true"
+      template:
+        spec:
+          containers:
+            - name: ray-worker
+              image: rayproject/ray-ml:2.9.0
+              resources:
+                requests:
+                  cpu: "8"
+                  memory: "32Gi"
+                limits:
+                  cpu: "8"
+                  memory: "32Gi"
+
+    # GPU workers for training / inference
+    - replicas: 2
+      minReplicas: 0
+      maxReplicas: 8
+      groupName: gpu-workers
+      rayStartParams:
+        num-cpus: "8"
+        num-gpus: "8"
+        block: "true"
+      template:
+        spec:
+          containers:
+            - name: ray-worker-gpu
+              image: rayproject/ray-ml:2.9.0-gpu
+              resources:
+                requests:
+                  cpu: "8"
+                  memory: "64Gi"
+                  nvidia.com/gpu: "8"
+                limits:
+                  cpu: "8"
+                  memory: "64Gi"
+                  nvidia.com/gpu: "8"
+          nodeSelector:
+            cloud.google.com/gke-accelerator: nvidia-tesla-a100
+          tolerations:
+            - key: nvidia.com/gpu
+              operator: Exists
+              effect: NoSchedule
+</code></pre>
+
+      <div class="code-label">Example 5 — Autoscaling Ray cluster config (ray up)</div>
+      <pre><code class="language-yaml"># cluster.yaml — used with `ray up cluster.yaml`
+cluster_name: ml-training-cluster
+max_workers: 50
+upscaling_speed: 1.0
+idle_timeout_minutes: 5
+
+provider:
+  type: aws
+  region: us-east-1
+  availability_zone: us-east-1a,us-east-1b
+  cache_stopped_nodes: false
+
+auth:
+  ssh_user: ubuntu
+  ssh_private_key: ~/.ssh/ray_key.pem
+
+available_node_types:
+  ray.head.default:
+    resources: {}
+    node_config:
+      InstanceType: m5.2xlarge
+      ImageId: ami-0a1234567890abcde   # Deep Learning AMI
+      BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            VolumeSize: 100
+            VolumeType: gp3
+
+  ray.worker.cpu:
+    min_workers: 2
+    max_workers: 20
+    resources: {"CPU": 16, "memory": 64000000000}
+    node_config:
+      InstanceType: c5.4xlarge
+      ImageId: ami-0a1234567890abcde
+      IamInstanceProfile:
+        Name: ray-worker-profile
+
+  ray.worker.gpu:
+    min_workers: 0
+    max_workers: 8
+    resources: {"CPU": 8, "GPU": 8, "memory": 128000000000}
+    node_config:
+      InstanceType: p4d.24xlarge   # 8x A100
+      ImageId: ami-0a1234567890abcde
+      IamInstanceProfile:
+        Name: ray-worker-profile
+
+head_node_type: ray.head.default
+
+setup_commands:
+  - pip install -U ray[all]==2.9.0
+  - pip install torch==2.1.0 torchvision transformers deepspeed
+
+head_setup_commands:
+  - ray start --head --port=6379 --dashboard-host=0.0.0.0
+
+worker_setup_commands: []
+
+file_mounts:
+  "/home/ubuntu/code": "."
+
+initialization_commands:
+  - pip install boto3
+
+# Ray client server (allows ray.init("ray://head:10001"))
+head_start_ray_commands:
+  - ray stop
+  - ulimit -n 65536; ray start --head --port=6379 --ray-client-server-port=10001
+    --object-manager-port=8076 --autoscaling-config=~/ray_bootstrap_config.yaml
+    --dashboard-host=0.0.0.0
+</code></pre>
+
+      <div class="callout-info">
+        <p class="font-semibold text-blue-800">Ray Client</p>
+        <p class="text-blue-900 text-sm mt-1">Ray Client lets you connect to a remote Ray cluster from your laptop using <code>ray.init("ray://head-node:10001")</code>. Your driver code runs locally but tasks/actors execute on the cluster. This is useful for interactive development, but for production jobs use <strong>Ray Jobs API</strong> (<code>ray job submit</code>) which runs the driver on the head node for better fault isolation.</p>
+      </div>
+    </section>
+
+    <!-- ===== SECTION 4: RAY DATA ===== -->
+    <section id="s4">
+      <div class="section-badge">Section 4</div>
+      <h2>Ray Data — Distributed ML Preprocessing</h2>
+
+      <p>Ray Data is a scalable data processing library built on top of Ray Core and Apache Arrow. It handles the "last mile" problem of getting data from storage into your training loop, including distributed preprocessing, format conversion, and streaming.</p>
+
+      <div class="mermaid-wrap">
+        <div class="mermaid">
+flowchart LR
+    S3["S3 / GCS\nParquet / JSON / Images"]
+    RD["ray.data.read_parquet()\nor read_images()"]
+    Map["dataset.map_batches()\npreprocess, tokenize, augment"]
+    Filter["dataset.filter()\nremove bad samples"]
+    Split["dataset.split()\ntrain / val / test"]
+    Shard["Per-worker shards\n(streaming)"]
+    DL1["PyTorch DataLoader\nWorker 0"]
+    DL2["PyTorch DataLoader\nWorker 1"]
+    DL3["PyTorch DataLoader\nWorker N"]
+
+    S3 --> RD --> Map --> Filter --> Split --> Shard
+    Shard --> DL1
+    Shard --> DL2
+    Shard --> DL3
+        </div>
+      </div>
+
+      <div class="code-label">Example 6 — Ray Data preprocessing pipeline</div>
+      <pre><code class="language-python">import ray
+import ray.data
+import numpy as np
+from typing import Dict
+
+ray.init()
+
+# ── READ ──────────────────────────────────────────────────────────────────────
+# Reads lazily; actual I/O happens when consuming
+ds = ray.data.read_parquet(
+    "s3://my-bucket/training-data/",
+    columns=["text", "label", "split"],
+)
+print(f"Dataset: {ds.count()} rows, schema: {ds.schema()}")
+
+# ── MAP BATCHES (vectorized preprocessing) ────────────────────────────────────
+from transformers import AutoTokenizer
+
+# Use ActorPoolStrategy to keep the tokenizer loaded across batches
+class Tokenizer:
+    def __init__(self):
+        self.tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
+
+    def __call__(self, batch: Dict[str, list]) -> Dict[str, np.ndarray]:
+        encoded = self.tokenizer(
+            batch["text"],
+            padding="max_length",
+            truncation=True,
+            max_length=128,
+            return_tensors="np",
+        )
+        return {
+            "input_ids":      encoded["input_ids"],
+            "attention_mask": encoded["attention_mask"],
+            "label":          np.array(batch["label"]),
+        }
+
+tokenized_ds = ds.map_batches(
+    Tokenizer,
+    batch_size=256,
+    compute=ray.data.ActorPoolStrategy(size=4),   # 4 persistent tokenizer actors
+    num_cpus=2,
+)
+
+# ── FILTER ─────────────────────────────────────────────────────────────────────
+# Keep only rows where label is valid
+tokenized_ds = tokenized_ds.filter(lambda row: row["label"] in [0, 1, 2])
+
+# ── REPARTITION for balanced shards ───────────────────────────────────────────
+tokenized_ds = tokenized_ds.repartition(200)  # 200 blocks
+
+# ── SPLIT for train/val/test ───────────────────────────────────────────────────
+train_ds, val_ds, test_ds = tokenized_ds.split_proportionately([0.8, 0.1, 0.1])
+
+# ── MATERIALIZE to object store (optional, for small datasets) ────────────────
+# train_ds = train_ds.materialize()
+
+print(f"Train: {train_ds.count()}, Val: {val_ds.count()}, Test: {test_ds.count()}")
+
+ray.shutdown()
+</code></pre>
+
+      <div class="code-label">Example 7 — Ray Data with PyTorch Lightning</div>
+      <pre><code class="language-python">import ray
+import ray.data
+from ray.train.torch import TorchTrainer
+from ray.train import ScalingConfig, RunConfig, CheckpointConfig
+import torch
+import torch.nn as nn
+from torch.utils.data import DataLoader
+import pytorch_lightning as pl
+
+# ── DATASET ───────────────────────────────────────────────────────────────────
+def build_datasets():
+    ds = ray.data.read_parquet("s3://my-bucket/nlp-data/")
+    train_ds, val_ds = ds.train_test_split(test_size=0.1)
+    return train_ds, val_ds
+
+# ── LIGHTNING MODULE ──────────────────────────────────────────────────────────
+class TextClassifier(pl.LightningModule):
+    def __init__(self, vocab_size=30522, hidden=256, num_classes=3):
+        super().__init__()
+        self.embed = nn.Embedding(vocab_size, hidden)
+        self.pool  = nn.AdaptiveAvgPool1d(1)
+        self.head  = nn.Linear(hidden, num_classes)
+
+    def forward(self, x):
+        e = self.embed(x)               # (B, T, H)
+        e = self.pool(e.transpose(1,2)) # (B, H, 1)
+        return self.head(e.squeeze(-1))
+
+    def training_step(self, batch, _):
+        logits = self(batch["input_ids"])
+        loss   = nn.CrossEntropyLoss()(logits, batch["label"])
+        self.log("train/loss", loss, prog_bar=True)
+        return loss
+
+    def configure_optimizers(self):
+        return torch.optim.AdamW(self.parameters(), lr=3e-4)
+
+# ── RAY TRAIN WORKER FUNCTION ─────────────────────────────────────────────────
+def train_loop_per_worker(config):
+    from ray.train import get_dataset_shard
+    from ray.train.torch import get_device
+
+    train_shard = get_dataset_shard("train")
+    val_shard   = get_dataset_shard("val")
+
+    def to_torch_dataset(ray_shard):
+        """Convert Ray Data shard to PyTorch IterableDataset."""
+        class RayIterableDataset(torch.utils.data.IterableDataset):
+            def __iter__(self):
+                for batch in ray_shard.iter_torch_batches(batch_size=32):
+                    for i in range(len(batch["input_ids"])):
+                        yield {k: v[i] for k, v in batch.items()}
+        return RayIterableDataset()
+
+    train_loader = DataLoader(to_torch_dataset(train_shard), batch_size=32)
+    val_loader   = DataLoader(to_torch_dataset(val_shard),   batch_size=64)
+
+    model   = TextClassifier()
+    trainer = pl.Trainer(
+        max_epochs=config["epochs"],
+        accelerator="gpu" if torch.cuda.is_available() else "cpu",
+        devices=1,
+        enable_progress_bar=False,
+    )
+    trainer.fit(model, train_loader, val_loader)
+
+# ── LAUNCH DISTRIBUTED TRAINING ───────────────────────────────────────────────
+ray.init()
+train_ds, val_ds = build_datasets()
+
+trainer = TorchTrainer(
+    train_loop_per_worker=train_loop_per_worker,
+    train_loop_config={"epochs": 5},
+    scaling_config=ScalingConfig(num_workers=4, use_gpu=True),
+    datasets={"train": train_ds, "val": val_ds},
+    run_config=RunConfig(name="text-clf-lightning"),
+)
+result = trainer.fit()
+ray.shutdown()
+</code></pre>
+
+      <h3>Ray Data vs Alternatives</h3>
+      <table>
+        <thead><tr><th>Feature</th><th>Ray Data</th><th>Apache Spark</th><th>tf.data</th></tr></thead>
+        <tbody>
+          <tr><td>Language</td><td>Python-native</td><td>Scala/PySpark</td><td>Python (TF-coupled)</td></tr>
+          <tr><td>GPU preprocessing</td><td>Yes (map_batches + GPU)</td><td>No</td><td>Partial</td></tr>
+          <tr><td>Streaming</td><td>Yes (lazy blocks)</td><td>Yes (Structured Streaming)</td><td>Yes</td></tr>
+          <tr><td>Arrow format</td><td>Native</td><td>Via Arrow bridge</td><td>No</td></tr>
+          <tr><td>Integration with training</td><td>Native (Ray Train)</td><td>Manual</td><td>Native (Keras)</td></tr>
+          <tr><td>Random shuffle at scale</td><td>Global shuffle (experimental)</td><td>Yes</td><td>Window shuffle</td></tr>
+          <tr><td>SQL support</td><td>No</td><td>Full SQL</td><td>No</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ===== SECTION 5: RAY TRAIN ===== -->
+    <section id="s5">
+      <div class="section-badge">Section 5</div>
+      <h2>Ray Train — Distributed Training</h2>
+
+      <p>Ray Train abstracts the complexity of distributed training — process group setup, rank assignment, gradient synchronization, checkpointing, fault recovery — so you write a standard single-device training loop and Ray handles distribution.</p>
+
+      <h3>Ray Train Architecture</h3>
+      <div class="mermaid-wrap">
+        <div class="mermaid">
+sequenceDiagram
+    participant D as Driver (TorchTrainer.fit)
+    participant C as TrainingController (Actor)
+    participant W0 as Worker 0 (rank 0)
+    participant W1 as Worker 1 (rank 1)
+    participant W2 as Worker 2 (rank 2)
+    participant S as Storage (S3/NFS)
+
+    D->>C: fit(train_loop, scaling_config)
+    C->>W0: launch worker actor
+    C->>W1: launch worker actor
+    C->>W2: launch worker actor
+    W0->>W0: init_process_group(rank=0)
+    W1->>W1: init_process_group(rank=1)
+    W2->>W2: init_process_group(rank=2)
+    Note over W0,W2: DDP AllReduce on each backward pass
+    loop Each epoch
+        W0->>S: save_checkpoint (rank 0 only)
+        W0-->>C: report(metrics)
+        W1-->>C: report(metrics)
+        W2-->>C: report(metrics)
+    end
+    C-->>D: Result(checkpoint, metrics)
+        </div>
+      </div>
+
+      <h3>TorchTrainer — Complete DDP Script</h3>
+      <div class="code-label">Example 8 — Ray Train TorchTrainer with DDP</div>
+      <pre><code class="language-python">import ray
+from ray import train
+from ray.train import ScalingConfig, RunConfig, CheckpointConfig
+from ray.train.torch import TorchTrainer, get_device, prepare_model, prepare_data_loader
+import torch
+import torch.nn as nn
+from torch.utils.data import DataLoader, TensorDataset
+
+# ── MODEL ─────────────────────────────────────────────────────────────────────
+class MLP(nn.Module):
+    def __init__(self, in_features=512, hidden=256, num_classes=10):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Linear(in_features, hidden),
+            nn.ReLU(),
+            nn.Dropout(0.3),
+            nn.Linear(hidden, hidden),
+            nn.ReLU(),
+            nn.Linear(hidden, num_classes),
+        )
+
+    def forward(self, x):
+        return self.net(x)
+
+# ── PER-WORKER TRAINING LOOP ──────────────────────────────────────────────────
+def train_loop_per_worker(config: dict):
+    # Unpack hyperparams
+    lr         = config["lr"]
+    batch_size = config["batch_size"]
+    epochs     = config["epochs"]
+    in_features = config.get("in_features", 512)
+
+    # Build dataset (workers share the same random data for this example)
+    torch.manual_seed(42 + train.get_context().get_world_rank())
+    X = torch.randn(10_000, in_features)
+    y = torch.randint(0, 10, (10_000,))
+    dataset = TensorDataset(X, y)
+
+    # prepare_data_loader handles DistributedSampler automatically
+    loader = prepare_data_loader(
+        DataLoader(dataset, batch_size=batch_size, shuffle=True),
+        add_dist_sampler=True,
+    )
+
+    # prepare_model wraps in DistributedDataParallel
+    model     = prepare_model(MLP(in_features=in_features))
+    optimizer = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=1e-4)
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=epochs)
+    criterion = nn.CrossEntropyLoss()
+    device    = get_device()
+
+    for epoch in range(epochs):
+        model.train()
+        total_loss, correct, total = 0.0, 0, 0
+
+        for xb, yb in loader:
+            xb, yb = xb.to(device), yb.to(device)
+            optimizer.zero_grad()
+            logits = model(xb)
+            loss   = criterion(logits, yb)
+            loss.backward()
+            torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+            optimizer.step()
+            total_loss += loss.item() * len(xb)
+            correct    += (logits.argmax(1) == yb).sum().item()
+            total      += len(xb)
+
+        scheduler.step()
+
+        epoch_loss = total_loss / total
+        epoch_acc  = correct / total
+
+        # Checkpoint + metrics reporting (only rank-0 saves by default)
+        checkpoint = train.Checkpoint.from_dict({
+            "epoch":       epoch,
+            "model_state": model.module.state_dict(),  # .module unwraps DDP
+            "optimizer":   optimizer.state_dict(),
+            "lr":          scheduler.get_last_lr()[0],
+        })
+        train.report(
+            {"loss": epoch_loss, "accuracy": epoch_acc, "epoch": epoch},
+            checkpoint=checkpoint,
+        )
+
+# ── LAUNCH ────────────────────────────────────────────────────────────────────
+ray.init()
+
+trainer = TorchTrainer(
+    train_loop_per_worker=train_loop_per_worker,
+    train_loop_config={
+        "lr": 3e-4,
+        "batch_size": 128,
+        "epochs": 10,
+        "in_features": 512,
+    },
+    scaling_config=ScalingConfig(
+        num_workers=4,
+        use_gpu=True,
+        resources_per_worker={"GPU": 1, "CPU": 4},
+    ),
+    run_config=RunConfig(
+        name="mlp-ddp-training",
+        storage_path="s3://my-bucket/ray-results",
+        checkpoint_config=CheckpointConfig(
+            num_to_keep=3,
+            checkpoint_score_attribute="accuracy",
+            checkpoint_score_order="max",
+        ),
+    ),
+)
+
+result = trainer.fit()
+print(f"Best checkpoint: {result.best_checkpoints}")
+print(f"Metrics: {result.metrics}")
+ray.shutdown()
+</code></pre>
+
+      <h3>FSDP and DeepSpeed with Ray Train</h3>
+      <div class="code-label">Example 9 — Ray Train with DeepSpeed ZeRO-3</div>
+      <pre><code class="language-python">import ray
+from ray import train
+from ray.train import ScalingConfig, RunConfig
+from ray.train.torch import TorchTrainer
+import torch
+import torch.nn as nn
+from transformers import AutoModelForSequenceClassification, AutoTokenizer
+import deepspeed
+
+DEEPSPEED_CONFIG = {
+    "zero_optimization": {
+        "stage": 3,
+        "allgather_partitions": True,
+        "allgather_bucket_size": 2e8,
+        "reduce_scatter": True,
+        "reduce_bucket_size": 2e8,
+        "overlap_comm": True,
+        "contiguous_gradients": True,
+        "offload_optimizer": {
+            "device": "cpu",
+            "pin_memory": True,
+        },
+        "offload_param": {
+            "device": "cpu",
+            "pin_memory": True,
+        },
+    },
+    "fp16": {
+        "enabled": True,
+        "loss_scale": 0,
+        "loss_scale_window": 1000,
+        "hysteresis": 2,
+        "min_loss_scale": 1,
+    },
+    "gradient_clipping": 1.0,
+    "train_micro_batch_size_per_gpu": 8,
+    "gradient_accumulation_steps": 4,
+    "steps_per_print": 100,
+    "wall_clock_breakdown": False,
+}
+
+def train_loop_per_worker(config):
+    from ray.train import get_dataset_shard
+
+    rank       = train.get_context().get_world_rank()
+    world_size = train.get_context().get_world_size()
+
+    # Initialize DeepSpeed
+    model_name = config["model_name"]
+    model      = AutoModelForSequenceClassification.from_pretrained(
+        model_name, num_labels=config["num_labels"]
+    )
+
+    optimizer = torch.optim.AdamW(model.parameters(), lr=config["lr"])
+
+    # DeepSpeed init — wraps model with ZeRO-3 sharding
+    engine, optimizer, _, _ = deepspeed.initialize(
+        model=model,
+        optimizer=optimizer,
+        config=DEEPSPEED_CONFIG,
+    )
+
+    train_shard = get_dataset_shard("train")
+
+    for epoch in range(config["epochs"]):
+        engine.train()
+        total_loss = 0.0
+
+        for batch in train_shard.iter_torch_batches(batch_size=8):
+            input_ids = batch["input_ids"].to(engine.local_rank)
+            attn_mask = batch["attention_mask"].to(engine.local_rank)
+            labels    = batch["labels"].to(engine.local_rank)
+
+            outputs = engine(input_ids=input_ids,
+                             attention_mask=attn_mask,
+                             labels=labels)
+            loss    = outputs.loss
+            engine.backward(loss)
+            engine.step()
+            total_loss += loss.item()
+
+        if rank == 0:
+            print(f"Epoch {epoch}: loss={total_loss:.4f}")
+
+        train.report({"epoch": epoch, "loss": total_loss})
+
+ray.init()
+
+trainer = TorchTrainer(
+    train_loop_per_worker=train_loop_per_worker,
+    train_loop_config={
+        "model_name": "bert-large-uncased",
+        "num_labels": 3,
+        "lr": 2e-5,
+        "epochs": 3,
+    },
+    scaling_config=ScalingConfig(num_workers=8, use_gpu=True),
+    run_config=RunConfig(name="bert-deepspeed-zero3"),
+)
+
+result = trainer.fit()
+ray.shutdown()
+</code></pre>
+
+      <h3>Fault-Tolerant Training</h3>
+      <div class="code-label">Example 10 — Fault-tolerant training with automatic restart</div>
+      <pre><code class="language-python">import ray
+from ray import train
+from ray.train import ScalingConfig, RunConfig, FailureConfig, CheckpointConfig
+from ray.train.torch import TorchTrainer
+import torch
+import torch.nn as nn
+
+def train_loop_with_recovery(config):
+    # Restore from checkpoint if restarting after failure
+    checkpoint = train.get_checkpoint()
+    start_epoch = 0
+
+    model     = nn.Linear(128, 10)
+    optimizer = torch.optim.SGD(model.parameters(), lr=config["lr"])
+
+    if checkpoint:
+        state = checkpoint.to_dict()
+        model.load_state_dict(state["model_state"])
+        optimizer.load_state_dict(state["optimizer_state"])
+        start_epoch = state["epoch"] + 1
+        print(f"Resumed from epoch {start_epoch}")
+
+    criterion = nn.CrossEntropyLoss()
+
+    for epoch in range(start_epoch, config["epochs"]):
+        # Training step (simplified)
+        x = torch.randn(64, 128)
+        y = torch.randint(0, 10, (64,))
+        optimizer.zero_grad()
+        loss = criterion(model(x), y)
+        loss.backward()
+        optimizer.step()
+
+        # Save checkpoint every epoch
+        ckpt = train.Checkpoint.from_dict({
+            "epoch":          epoch,
+            "model_state":    model.state_dict(),
+            "optimizer_state": optimizer.state_dict(),
+        })
+        train.report({"loss": loss.item(), "epoch": epoch}, checkpoint=ckpt)
+
+ray.init()
+
+trainer = TorchTrainer(
+    train_loop_per_worker=train_loop_with_recovery,
+    train_loop_config={"lr": 0.01, "epochs": 20},
+    scaling_config=ScalingConfig(num_workers=4, use_gpu=False),
+    run_config=RunConfig(
+        name="fault-tolerant-training",
+        failure_config=FailureConfig(
+            max_failures=3,         # Restart training up to 3 times
+        ),
+        checkpoint_config=CheckpointConfig(
+            num_to_keep=2,
+            checkpoint_score_attribute="loss",
+            checkpoint_score_order="min",
+        ),
+    ),
+)
+
+result = trainer.fit()
+ray.shutdown()
+</code></pre>
+
+      <h3>Ray Train Strategy Comparison</h3>
+      <table>
+        <thead><tr><th>Strategy</th><th>Use Case</th><th>Memory Efficiency</th><th>Communication</th><th>Setup Complexity</th></tr></thead>
+        <tbody>
+          <tr><td>DDP (PyTorch)</td><td>Models fitting on 1 GPU</td><td>Low (full replica per GPU)</td><td>AllReduce gradients</td><td>Low</td></tr>
+          <tr><td>FSDP</td><td>Large models (10B–100B)</td><td>High (params sharded)</td><td>AllGather + ReduceScatter</td><td>Medium</td></tr>
+          <tr><td>DeepSpeed ZeRO-1</td><td>Optimizer state sharding</td><td>Medium</td><td>AllReduce</td><td>Medium</td></tr>
+          <tr><td>DeepSpeed ZeRO-2</td><td>+ Gradient sharding</td><td>High</td><td>AllReduce + scatter</td><td>Medium</td></tr>
+          <tr><td>DeepSpeed ZeRO-3</td><td>100B+ models, CPU offload</td><td>Very High</td><td>AllGather per layer</td><td>High</td></tr>
+          <tr><td>Horovod</td><td>Legacy MPI-based workloads</td><td>Low (full replica)</td><td>Ring AllReduce</td><td>High (MPI)</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ===== SECTION 6: RAY TUNE ===== -->
+    <section id="s6">
+      <div class="section-badge">Section 6</div>
+      <h2>Ray Tune — Hyperparameter Optimization</h2>
+
+      <p>Ray Tune is the gold standard for distributed hyperparameter optimization in Python. It integrates with Optuna, Hyperopt, HyperBand, PBT, and dozens of other search algorithms, and it can scale from a single machine to thousands of concurrent trials.</p>
+
+      <div class="code-label">Example 11 — Basic Ray Tune with ASHA + Optuna</div>
+      <pre><code class="language-python">import ray
+from ray import tune
+from ray.tune import TuneConfig
+from ray.tune.schedulers import ASHAScheduler
+from ray.tune.search.optuna import OptunaSearch
+import torch
+import torch.nn as nn
+import numpy as np
+
+# ── TRAINABLE FUNCTION ────────────────────────────────────────────────────────
+def train_model(config):
+    """One trial: train a model with the given hyperparameters."""
+    # Build model
+    model = nn.Sequential(
+        nn.Linear(64, config["hidden_size"]),
+        nn.ReLU(),
+        nn.Dropout(config["dropout"]),
+        nn.Linear(config["hidden_size"], 10),
+    )
+    optimizer = torch.optim.Adam(model.parameters(), lr=config["lr"])
+    criterion = nn.CrossEntropyLoss()
+
+    # Fake dataset
+    X_train = torch.randn(5000, 64)
+    y_train = torch.randint(0, 10, (5000,))
+    X_val   = torch.randn(1000, 64)
+    y_val   = torch.randint(0, 10, (1000,))
+
+    for epoch in range(config["max_epochs"]):
+        # Training
+        model.train()
+        perm  = torch.randperm(len(X_train))
+        total_loss = 0.0
+        bs = config["batch_size"]
+        for i in range(0, len(X_train), bs):
+            idx   = perm[i:i+bs]
+            xb, yb = X_train[idx], y_train[idx]
+            optimizer.zero_grad()
+            loss = criterion(model(xb), yb)
+            loss.backward()
+            optimizer.step()
+            total_loss += loss.item()
+
+        # Validation
+        model.eval()
+        with torch.no_grad():
+            val_logits = model(X_val)
+            val_loss   = criterion(val_logits, y_val).item()
+            val_acc    = (val_logits.argmax(1) == y_val).float().mean().item()
+
+        # Report to Tune — ASHA uses this to prune bad trials early
+        tune.report({"val_loss": val_loss, "val_accuracy": val_acc, "epoch": epoch})
+
+# ── SEARCH SPACE ──────────────────────────────────────────────────────────────
+search_space = {
+    "lr":          tune.loguniform(1e-5, 1e-2),
+    "hidden_size": tune.choice([64, 128, 256, 512]),
+    "dropout":     tune.uniform(0.0, 0.5),
+    "batch_size":  tune.choice([32, 64, 128]),
+    "max_epochs":  20,
+}
+
+# ── ASHA SCHEDULER (early stopping of bad trials) ─────────────────────────────
+asha = ASHAScheduler(
+    metric="val_loss",
+    mode="min",
+    max_t=20,              # max epochs
+    grace_period=3,        # run at least 3 epochs before pruning
+    reduction_factor=2,    # halve the population at each rung
+)
+
+# ── OPTUNA SEARCH ALGORITHM ───────────────────────────────────────────────────
+optuna_search = OptunaSearch(metric="val_loss", mode="min")
+
+# ── TUNER ─────────────────────────────────────────────────────────────────────
+ray.init()
+
+tuner = tune.Tuner(
+    tune.with_resources(
+        train_model,
+        resources={"CPU": 2, "GPU": 0},
+    ),
+    param_space=search_space,
+    tune_config=TuneConfig(
+        search_alg=optuna_search,
+        scheduler=asha,
+        num_samples=50,          # 50 trials total
+        max_concurrent_trials=8, # 8 parallel trials
+        metric="val_loss",
+        mode="min",
+    ),
+    run_config=ray.train.RunConfig(
+        name="mlp-hpo",
+        storage_path="s3://my-bucket/tune-results",
+    ),
+)
+
+results = tuner.fit()
+best    = results.get_best_result(metric="val_loss", mode="min")
+print(f"Best config: {best.config}")
+print(f"Best val_loss: {best.metrics['val_loss']:.4f}")
+ray.shutdown()
+</code></pre>
+
+      <div class="code-label">Example 12 — Population-Based Training (PBT)</div>
+      <pre><code class="language-python">from ray import tune
+from ray.tune.schedulers import PopulationBasedTraining
+import ray
+
+def pbt_trainable(config):
+    """Stateful trainable for PBT — must handle config perturbation."""
+    import torch
+    import torch.nn as nn
+
+    model     = nn.Linear(32, 1)
+    optimizer = torch.optim.SGD(model.parameters(), lr=config["lr"],
+                                 momentum=config["momentum"])
+
+    # Restore checkpoint if PBT exploited a better performer
+    checkpoint = tune.get_checkpoint()
+    step = 0
+    if checkpoint:
+        state = checkpoint.to_dict()
+        model.load_state_dict(state["model_state"])
+        optimizer.load_state_dict(state["optimizer_state"])
+        step = state["step"]
+        # PBT may have mutated config.lr — update optimizer
+        for g in optimizer.param_groups:
+            g["lr"] = config["lr"]
+
+    criterion = nn.MSELoss()
+
+    while True:   # PBT controls stopping via scheduler
+        x = torch.randn(128, 32)
+        y = torch.randn(128, 1)
+
+        optimizer.zero_grad()
+        loss = criterion(model(x), y)
+        loss.backward()
+        optimizer.step()
+        step += 1
+
+        ckpt = tune.Checkpoint.from_dict({
+            "model_state":     model.state_dict(),
+            "optimizer_state": optimizer.state_dict(),
+            "step":            step,
+        })
+        tune.report({"loss": loss.item(), "step": step}, checkpoint=ckpt)
+
+pbt = PopulationBasedTraining(
+    metric="loss",
+    mode="min",
+    perturbation_interval=5,        # perturb every 5 iterations
+    hyperparam_mutations={
+        "lr":       tune.loguniform(1e-5, 1e-1),
+        "momentum": tune.uniform(0.5, 0.99),
+    },
+    quantile_fraction=0.25,         # top 25% exploit bottom 25%
+    resample_probability=0.25,
+)
+
+ray.init()
+tuner = tune.Tuner(
+    pbt_trainable,
+    param_space={"lr": 0.01, "momentum": 0.9},
+    tune_config=tune.TuneConfig(
+        scheduler=pbt,
+        num_samples=8,
+        metric="loss",
+        mode="min",
+    ),
+    run_config=ray.train.RunConfig(
+        name="pbt-demo",
+        stop={"training_iteration": 50},
+    ),
+)
+results = tuner.fit()
+print(results.get_best_result().config)
+ray.shutdown()
+</code></pre>
+
+      <h3>HPO at Scale Comparison</h3>
+      <table>
+        <thead><tr><th>Framework</th><th>Parallel Trials</th><th>Schedulers</th><th>Search Algorithms</th><th>GPU-aware</th><th>Best For</th></tr></thead>
+        <tbody>
+          <tr><td>Ray Tune</td><td>1000s</td><td>ASHA, PBT, BOHB, HyperBand</td><td>Optuna, Hyperopt, HEBO, Ax</td><td>Yes</td><td>Large-scale distributed HPO</td></tr>
+          <tr><td>Optuna</td><td>~100 (manual)</td><td>MedianPruner, HyperbandPruner</td><td>TPE, CMA-ES, NSGA-II</td><td>Via storage</td><td>Single-node, Optuna-native</td></tr>
+          <tr><td>W&amp;B Sweeps</td><td>~100</td><td>Bayesian, Grid, Random</td><td>Bayesian</td><td>Partial</td><td>W&amp;B-integrated projects</td></tr>
+          <tr><td>Keras Tuner</td><td>~10</td><td>HyperBand</td><td>Random, Bayesian</td><td>Via Keras</td><td>Keras/TF models only</td></tr>
+          <tr><td>SigOpt</td><td>~100</td><td>SigOpt proprietary</td><td>Bayesian</td><td>No</td><td>Enterprise/cloud HPO</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ===== SECTION 7: RAY SERVE ===== -->
+    <section id="s7">
+      <div class="section-badge">Section 7</div>
+      <h2>Ray Serve — Model Serving</h2>
+
+      <p>Ray Serve is a scalable model serving library built on Ray. Unlike Triton (NVIDIA-specific) or TorchServe (PyTorch-only), Ray Serve is framework-agnostic, Python-native, and can compose multiple models into pipelines. It supports HTTP, gRPC, and Python-native calling.</p>
+
+      <div class="code-label">Example 13 — Simple model serving with Ray Serve</div>
+      <pre><code class="language-python">import ray
+from ray import serve
+from ray.serve.handle import DeploymentHandle
+import torch
+import torch.nn as nn
+from fastapi import FastAPI
+from pydantic import BaseModel
+import numpy as np
+from typing import List
+
+ray.init()
+serve.start(http_options={"host": "0.0.0.0", "port": 8000})
+
+app = FastAPI()
+
+# ── REQUEST / RESPONSE SCHEMAS ────────────────────────────────────────────────
+class PredictRequest(BaseModel):
+    features: List[float]
+
+class PredictResponse(BaseModel):
+    prediction: int
+    confidence: float
+    model_version: str
+
+# ── DEPLOYMENT ────────────────────────────────────────────────────────────────
+@serve.deployment(
+    num_replicas=3,
+    ray_actor_options={"num_cpus": 2, "num_gpus": 0.5},  # fractional GPU sharing
+    autoscaling_config={
+        "min_replicas": 1,
+        "max_replicas": 10,
+        "target_num_ongoing_requests_per_replica": 5,
+        "upscale_delay_s": 5,
+        "downscale_delay_s": 60,
+    },
+    max_concurrent_queries=100,
+)
+@serve.ingress(app)
+class ClassifierDeployment:
+    def __init__(self):
+        # Model loaded once per replica at startup
+        self.model = nn.Sequential(
+            nn.Linear(64, 128), nn.ReLU(), nn.Linear(128, 10)
+        )
+        self.model.eval()
+        self.version = "v1.2.0"
+        # In production: load from S3 / MLflow / W&B
+        print(f"Replica initialized, model {self.version}")
+
+    @app.post("/predict", response_model=PredictResponse)
+    async def predict(self, request: PredictRequest) -> PredictResponse:
+        x = torch.tensor(request.features, dtype=torch.float32).unsqueeze(0)
+        with torch.no_grad():
+            logits = self.model(x)
+            probs  = torch.softmax(logits, dim=-1)
+            pred   = int(probs.argmax().item())
+            conf   = float(probs.max().item())
+        return PredictResponse(
+            prediction=pred,
+            confidence=conf,
+            model_version=self.version,
+        )
+
+    @app.get("/health")
+    async def health(self):
+        return {"status": "ok", "version": self.version}
+
+# ── BIND AND DEPLOY ───────────────────────────────────────────────────────────
+deployment = ClassifierDeployment.bind()
+serve.run(deployment, route_prefix="/classifier")
+
+# Test the deployment
+import requests
+response = requests.post(
+    "http://localhost:8000/classifier/predict",
+    json={"features": [float(i) for i in range(64)]},
+)
+print(response.json())
+</code></pre>
+
+      <div class="code-label">Example 14 — Multi-model pipeline: preprocessing → model → postprocessing</div>
+      <pre><code class="language-python">import ray
+from ray import serve
+from ray.serve.handle import DeploymentHandle
+from fastapi import FastAPI
+from pydantic import BaseModel
+from typing import List, Dict
+import torch
+import torch.nn as nn
+import numpy as np
+
+ray.init()
+serve.start()
+
+app = FastAPI()
+
+# ── STAGE 1: PREPROCESSOR ─────────────────────────────────────────────────────
+@serve.deployment(num_replicas=2, ray_actor_options={"num_cpus": 1})
+class Preprocessor:
+    def __init__(self):
+        self.mean = np.zeros(64)
+        self.std  = np.ones(64)
+
+    async def preprocess(self, raw_features: List[float]) -> List[float]:
+        x = (np.array(raw_features) - self.mean) / (self.std + 1e-8)
+        return x.tolist()
+
+# ── STAGE 2: PRIMARY MODEL ─────────────────────────────────────────────────────
+@serve.deployment(num_replicas=3, ray_actor_options={"num_cpus": 2, "num_gpus": 1})
+class PrimaryModel:
+    def __init__(self):
+        self.model = nn.Linear(64, 128)
+        self.model.eval()
+
+    async def embed(self, features: List[float]) -> List[float]:
+        x = torch.tensor(features, dtype=torch.float32).unsqueeze(0)
+        with torch.no_grad():
+            emb = self.model(x)
+        return emb.squeeze(0).tolist()
+
+# ── STAGE 3: CLASSIFIER ───────────────────────────────────────────────────────
+@serve.deployment(num_replicas=2, ray_actor_options={"num_cpus": 1})
+class Classifier:
+    def __init__(self):
+        self.model = nn.Linear(128, 10)
+        self.model.eval()
+
+    async def classify(self, embedding: List[float]) -> Dict:
+        x      = torch.tensor(embedding, dtype=torch.float32).unsqueeze(0)
+        logits = self.model(x)
+        probs  = torch.softmax(logits, dim=-1).squeeze(0)
+        return {
+            "class":      int(probs.argmax().item()),
+            "confidence": float(probs.max().item()),
+            "all_probs":  probs.tolist(),
+        }
+
+# ── PIPELINE ORCHESTRATOR ─────────────────────────────────────────────────────
+class PredictRequest(BaseModel):
+    features: List[float]
+
+@serve.deployment(num_replicas=1)
+@serve.ingress(app)
+class Pipeline:
+    def __init__(
+        self,
+        preprocessor: DeploymentHandle,
+        primary_model: DeploymentHandle,
+        classifier: DeploymentHandle,
+    ):
+        self.preprocessor  = preprocessor
+        self.primary_model = primary_model
+        self.classifier    = classifier
+
+    @app.post("/pipeline/predict")
+    async def predict(self, request: PredictRequest):
+        # Async pipeline — each stage runs on its own replicas
+        normalized = await self.preprocessor.preprocess.remote(request.features)
+        embedding  = await self.primary_model.embed.remote(normalized)
+        result     = await self.classifier.classify.remote(embedding)
+        return result
+
+# ── COMPOSE AND DEPLOY ────────────────────────────────────────────────────────
+preprocessor  = Preprocessor.bind()
+primary_model = PrimaryModel.bind()
+classifier    = Classifier.bind()
+pipeline      = Pipeline.bind(preprocessor, primary_model, classifier)
+
+serve.run(pipeline, route_prefix="/")
+</code></pre>
+
+      <div class="code-label">Example 15 — Batched inference for throughput optimization</div>
+      <pre><code class="language-python">from ray import serve
+import torch
+import torch.nn as nn
+from typing import List
+import asyncio
+
+@serve.deployment(
+    num_replicas=2,
+    ray_actor_options={"num_gpus": 1, "num_cpus": 2},
+    max_concurrent_queries=200,
+)
+class BatchedClassifier:
+    def __init__(self):
+        self.model = nn.Sequential(
+            nn.Linear(512, 256), nn.ReLU(), nn.Linear(256, 10)
+        )
+        self.model.eval()
+        if torch.cuda.is_available():
+            self.model = self.model.cuda()
+
+    @serve.batch(
+        max_batch_size=64,   # accumulate up to 64 requests
+        batch_wait_timeout_s=0.01,  # wait max 10ms for a full batch
+    )
+    async def batch_predict(self, features_list: List[List[float]]) -> List[dict]:
+        """Called with a batch of requests when batch is full or timeout fires."""
+        x = torch.tensor(features_list, dtype=torch.float32)
+        if torch.cuda.is_available():
+            x = x.cuda()
+        with torch.no_grad():
+            logits = self.model(x)
+            probs  = torch.softmax(logits, dim=-1).cpu()
+
+        # Return one dict per request in the batch
+        return [
+            {"class": int(p.argmax()), "confidence": float(p.max())}
+            for p in probs
+        ]
+
+    async def __call__(self, request):
+        body = await request.json()
+        return await self.batch_predict(body["features"])
+
+serve.run(BatchedClassifier.bind(), route_prefix="/batched")
+</code></pre>
+
+      <h3>Ray Serve vs Alternatives</h3>
+      <table>
+        <thead><tr><th>Dimension</th><th>Ray Serve</th><th>NVIDIA Triton</th><th>TorchServe</th><th>BentoML</th></tr></thead>
+        <tbody>
+          <tr><td>Framework support</td><td>Any Python</td><td>TF, PyTorch, ONNX, TRT</td><td>PyTorch only</td><td>Any Python</td></tr>
+          <tr><td>Multi-model pipeline</td><td>Native (DAG)</td><td>Ensemble (limited)</td><td>No</td><td>Partial (Runner)</td></tr>
+          <tr><td>Batching</td><td>@serve.batch</td><td>Dynamic batching</td><td>Batch inference</td><td>Adaptive batching</td></tr>
+          <tr><td>Autoscaling</td><td>Native</td><td>Via K8s HPA</td><td>Via K8s</td><td>Via K8s</td></tr>
+          <tr><td>GPU optimization</td><td>Fractional GPU sharing</td><td>TensorRT, CUDA graphs</td><td>TorchScript</td><td>Partial</td></tr>
+          <tr><td>Python overhead</td><td>Low</td><td>Very Low (C++)</td><td>Low</td><td>Low</td></tr>
+          <tr><td>gRPC</td><td>Yes (Ray 2.7+)</td><td>Yes (native)</td><td>Yes</td><td>Yes</td></tr>
+          <tr><td>Best for</td><td>Python-heavy pipelines, Ray ecosystem</td><td>GPU inference, TRT optimization</td><td>PyTorch + TorchScript</td><td>MLflow/W&amp;B integration</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ===== SECTION 8: RAY WORKFLOWS ===== -->
+    <section id="s8">
+      <div class="section-badge">Section 8</div>
+      <h2>Ray Workflows — Durable ML Pipelines</h2>
+
+      <p>Ray Workflows (introduced in Ray 1.7) provides durable execution of DAGs. Unlike plain Ray tasks, Workflow steps persist their outputs — if the cluster crashes, execution resumes from the last completed step. This is critical for long-running ML pipelines.</p>
+
+      <div class="code-label">Example 16 — Ray Workflow for a full ML pipeline</div>
+      <pre><code class="language-python">import ray
+from ray import workflow
+from typing import List, Dict
+import pandas as pd
+import numpy as np
+
+ray.init()
+workflow.init()   # uses /tmp/ray/workflow_data by default; override with storage
+
+# ── PIPELINE STEPS ────────────────────────────────────────────────────────────
+@workflow.step
+def ingest_data(source_path: str) -> pd.DataFrame:
+    """Read raw data. If this step completes, it won't re-run on restart."""
+    print(f"Ingesting data from {source_path}")
+    # In production: pd.read_parquet(source_path) from S3
+    return pd.DataFrame({"x": np.random.randn(10000), "y": np.random.randint(0, 2, 10000)})
+
+@workflow.step
+def validate_data(df: pd.DataFrame) -> pd.DataFrame:
+    """Data quality checks."""
+    assert len(df) > 0, "Empty dataset"
+    assert "x" in df.columns and "y" in df.columns
+    df = df.dropna()
+    print(f"Validated: {len(df)} rows, {df['y'].value_counts().to_dict()}")
+    return df
+
+@workflow.step
+def feature_engineering(df: pd.DataFrame) -> pd.DataFrame:
+    """Transform features."""
+    df["x_squared"] = df["x"] ** 2
+    df["x_log"]     = np.log1p(np.abs(df["x"]))
+    return df
+
+@workflow.step
+def train_model(df: pd.DataFrame, config: Dict) -> Dict:
+    """Train model and return metrics + serialized model."""
+    from sklearn.ensemble import GradientBoostingClassifier
+    from sklearn.model_selection import train_test_split
+    from sklearn.metrics import accuracy_score
+    import pickle
+
+    X = df[["x", "x_squared", "x_log"]].values
+    y = df["y"].values
+
+    X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2)
+    clf = GradientBoostingClassifier(
+        n_estimators=config.get("n_estimators", 100),
+        learning_rate=config.get("lr", 0.1),
+    )
+    clf.fit(X_train, y_train)
+    val_acc = accuracy_score(y_val, clf.predict(X_val))
+    print(f"Validation accuracy: {val_acc:.4f}")
+    return {"accuracy": val_acc, "model": pickle.dumps(clf)}
+
+@workflow.step
+def register_model(train_result: Dict, min_accuracy: float = 0.7) -> str:
+    """Register model in MLflow if above threshold."""
+    if train_result["accuracy"] < min_accuracy:
+        raise ValueError(f"Model accuracy {train_result['accuracy']} < {min_accuracy}")
+    # In production: mlflow.sklearn.log_model(...)
+    model_uri = f"s3://my-bucket/models/run_latest"
+    print(f"Model registered at {model_uri}")
+    return model_uri
+
+# ── RUN THE WORKFLOW ──────────────────────────────────────────────────────────
+def run_pipeline(source_path: str, config: Dict) -> str:
+    raw_df       = ingest_data.step(source_path)
+    valid_df     = validate_data.step(raw_df)
+    engineered   = feature_engineering.step(valid_df)
+    train_result = train_model.step(engineered, config)
+    model_uri    = register_model.step(train_result)
+    return model_uri
+
+# Execute workflow with a unique ID (allows resumption on failure)
+model_uri = workflow.run(
+    run_pipeline("s3://my-bucket/raw-data/", {"n_estimators": 200, "lr": 0.05}),
+    workflow_id="ml-pipeline-2024-01-15",
+)
+print(f"Pipeline complete. Model at: {model_uri}")
+
+ray.shutdown()
+</code></pre>
+
+      <div class="callout-info">
+        <p class="font-semibold text-blue-800">Workflows vs Orchestrators</p>
+        <p class="text-blue-900 text-sm mt-1">Ray Workflows provides durability and DAG execution but is not a replacement for full orchestrators like Airflow or Prefect. Use Ray Workflows for <em>within-Ray</em> pipeline steps (data processing + training + registration). Use Airflow/Prefect for <em>cross-system</em> orchestration (triggering Ray jobs, waiting for data, sending alerts). The two layers complement each other — Airflow triggers a Ray Workflow via the Ray Jobs API.</p>
+      </div>
+    </section>
+
+    <!-- ===== SECTION 9: ANYSCALE ===== -->
+    <section id="s9">
+      <div class="section-badge">Section 9</div>
+      <h2>Anyscale Platform</h2>
+
+      <p>Anyscale is the commercial platform built by the Ray team. It provides managed Ray clusters, Workspaces (JupyterLab with Ray pre-installed), Jobs (scheduled/triggered Ray scripts), and Services (managed Ray Serve). Think of it as "Ray as a Service" with enterprise features.</p>
+
+      <table>
+        <thead><tr><th>Feature</th><th>Self-managed Ray</th><th>Anyscale</th></tr></thead>
+        <tbody>
+          <tr><td>Cluster provisioning</td><td>Manual (KubeRay / ray up)</td><td>Fully managed, 1-click</td></tr>
+          <tr><td>Autoscaling</td><td>KubeRay autoscaler</td><td>Smart autoscaler with spot integration</td></tr>
+          <tr><td>Workspaces</td><td>DIY notebook + SSH</td><td>Managed cloud IDE</td></tr>
+          <tr><td>Jobs</td><td>ray job submit</td><td>Anyscale Jobs with retries, cron</td></tr>
+          <tr><td>Services (Serve)</td><td>Manual K8s RayService</td><td>Anyscale Services with canary deploys</td></tr>
+          <tr><td>Observability</td><td>Ray Dashboard + custom</td><td>Integrated monitoring, cost tracking</td></tr>
+          <tr><td>Multi-cloud</td><td>Manual setup per cloud</td><td>Unified UI across AWS/GCP/Azure</td></tr>
+          <tr><td>Cost</td><td>Infra cost only</td><td>Infra + Anyscale markup (~20-40%)</td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout-warn">
+        <p class="font-semibold text-yellow-800">Anyscale vs Self-Managed Decision Guide</p>
+        <p class="text-yellow-900 text-sm mt-1">Use <strong>Anyscale</strong> if your team is small, ML infra is not a core competency, or you're doing rapid prototyping. Use <strong>self-managed KubeRay</strong> if you have a dedicated MLOps team, need full control over networking/security, have complex on-prem requirements, or are at a cost-optimization stage of growth.</p>
+      </div>
+    </section>
+
+    <!-- ===== SECTION 10: REAL-WORLD ARCHITECTURE ===== -->
+    <section id="s10">
+      <div class="section-badge">Section 10</div>
+      <h2>Real-World Ray Architecture</h2>
+
+      <div class="mermaid-wrap">
+        <div class="mermaid">
+graph TB
+    subgraph Ingestion["Data Ingestion Layer"]
+        Kafka["Apache Kafka\n(event streams)"]
+        S3["S3 / GCS\n(batch data)"]
+        DB["Feature Store\n(Feast / Tecton)"]
+    end
+
+    subgraph Processing["Ray Data Layer"]
+        RD["ray.data.read_*()\n+ map_batches preprocessing"]
+        Cache["Object Store Cache\n(Plasma)"]
+        RD --> Cache
+    end
+
+    subgraph Training["Ray Train / Tune Layer"]
+        HPO["Ray Tune\nHPO (ASHA + Optuna)"]
+        DDP["Ray Train TorchTrainer\nDDP / FSDP / DeepSpeed"]
+        HPO --> DDP
+    end
+
+    subgraph Registry["Model Registry"]
+        MLflow["MLflow / W&B\nExperiment Tracking"]
+        S3M["S3 Model Artifacts\n+ Versioning"]
+        MLflow --> S3M
+    end
+
+    subgraph Serving["Ray Serve Layer"]
+        GW["API Gateway\n(FastAPI ingress)"]
+        PP["Preprocessor\nDeployment"]
+        M1["Primary Model\nDeployment (auto-scaled)"]
+        M2["Challenger Model\nDeployment (A/B)"]
+        Post["Postprocessor\nDeployment"]
+        GW --> PP --> M1 --> Post
+        GW --> PP --> M2 --> Post
+    end
+
+    subgraph Monitoring["Observability"]
+        Prom["Prometheus\nMetrics"]
+        Graf["Grafana\nDashboards"]
+        RDash["Ray Dashboard\n:8265"]
+    end
+
+    S3 --> RD
+    Kafka --> RD
+    DB --> RD
+    Cache --> DDP
+    DDP --> MLflow
+    S3M --> M1
+    S3M --> M2
+    Serving --> Prom --> Graf
+    DDP --> RDash
+        </div>
+      </div>
+
+      <h3>A/B Testing with Ray Serve</h3>
+      <p>Ray Serve's deployment composition makes A/B testing straightforward — route a fraction of traffic to a challenger model while monitoring metrics.</p>
+
+      <div class="code-label">Example 17 — Complete ML serving platform with A/B testing</div>
+      <pre><code class="language-python">import ray
+from ray import serve
+from ray.serve.handle import DeploymentHandle
+from fastapi import FastAPI, Header
+from pydantic import BaseModel
+from typing import Optional, List
+import torch
+import torch.nn as nn
+import random
+import time
+
+ray.init()
+serve.start()
+
+app = FastAPI(title="ML Serving Platform")
+
+# ── MODEL VERSIONS ────────────────────────────────────────────────────────────
+@serve.deployment(name="model-v1", num_replicas=3, ray_actor_options={"num_gpus": 0.5})
+class ModelV1:
+    def __init__(self):
+        self.model = nn.Linear(64, 10)
+        self.model.eval()
+        self.version = "v1"
+
+    async def predict(self, features: List[float]) -> dict:
+        x = torch.tensor(features, dtype=torch.float32).unsqueeze(0)
+        with torch.no_grad():
+            logits = self.model(x)
+            probs  = torch.softmax(logits, dim=-1).squeeze(0)
+        return {"class": int(probs.argmax()), "prob": float(probs.max()), "version": self.version}
+
+@serve.deployment(name="model-v2", num_replicas=1, ray_actor_options={"num_gpus": 0.5})
+class ModelV2:
+    def __init__(self):
+        self.model = nn.Sequential(
+            nn.Linear(64, 128), nn.ReLU(), nn.Linear(128, 10)
+        )
+        self.model.eval()
+        self.version = "v2-challenger"
+
+    async def predict(self, features: List[float]) -> dict:
+        x = torch.tensor(features, dtype=torch.float32).unsqueeze(0)
+        with torch.no_grad():
+            logits = self.model(x)
+            probs  = torch.softmax(logits, dim=-1).squeeze(0)
+        return {"class": int(probs.argmax()), "prob": float(probs.max()), "version": self.version}
+
+# ── A/B ROUTER ────────────────────────────────────────────────────────────────
+class PredictRequest(BaseModel):
+    features: List[float]
+    user_id:  Optional[str] = None
+
+@serve.deployment(num_replicas=1)
+@serve.ingress(app)
+class ABRouter:
+    def __init__(
+        self,
+        model_v1: DeploymentHandle,
+        model_v2: DeploymentHandle,
+        v2_traffic_pct: float = 10.0,  # 10% of traffic to challenger
+    ):
+        self.model_v1       = model_v1
+        self.model_v2       = model_v2
+        self.v2_traffic_pct = v2_traffic_pct
+        self.stats          = {"v1_requests": 0, "v2_requests": 0, "v1_latency_ms": 0.0, "v2_latency_ms": 0.0}
+
+    def _route_to_v2(self, user_id: Optional[str]) -> bool:
+        """Deterministic routing: same user always goes to same variant."""
+        if user_id:
+            return (hash(user_id) % 100) < self.v2_traffic_pct
+        return random.random() * 100 < self.v2_traffic_pct
+
+    @app.post("/predict")
+    async def predict(self, request: PredictRequest) -> dict:
+        start = time.perf_counter()
+        use_v2 = self._route_to_v2(request.user_id)
+        if use_v2:
+            result = await self.model_v2.predict.remote(request.features)
+            self.stats["v2_requests"] += 1
+            self.stats["v2_latency_ms"] += (time.perf_counter() - start) * 1000
+        else:
+            result = await self.model_v1.predict.remote(request.features)
+            self.stats["v1_requests"] += 1
+            self.stats["v1_latency_ms"] += (time.perf_counter() - start) * 1000
+        return result
+
+    @app.get("/ab-stats")
+    async def ab_stats(self) -> dict:
+        s = self.stats
+        v1_avg = s["v1_latency_ms"] / max(s["v1_requests"], 1)
+        v2_avg = s["v2_latency_ms"] / max(s["v2_requests"], 1)
+        return {
+            "v1_requests": s["v1_requests"],
+            "v2_requests": s["v2_requests"],
+            "v1_avg_latency_ms": round(v1_avg, 2),
+            "v2_avg_latency_ms": round(v2_avg, 2),
+            "v2_traffic_pct": self.v2_traffic_pct,
+        }
+
+    @app.put("/update-traffic")
+    async def update_traffic(self, v2_pct: float) -> dict:
+        self.v2_traffic_pct = v2_pct
+        return {"message": f"Updated v2 traffic to {v2_pct}%"}
+
+# Deploy
+model_v1  = ModelV1.bind()
+model_v2  = ModelV2.bind()
+ab_router = ABRouter.bind(model_v1, model_v2, v2_traffic_pct=10.0)
+serve.run(ab_router, route_prefix="/")
+</code></pre>
+    </section>
+
+    <!-- ===== SECTION 11: PERFORMANCE TUNING ===== -->
+    <section id="s11">
+      <div class="section-badge">Section 11</div>
+      <h2>Performance Tuning Ray</h2>
+
+      <h3>Object Store Memory Configuration</h3>
+      <pre><code class="language-python">import ray
+
+# Configure object store size at init
+ray.init(
+    object_store_memory=20 * 1024**3,  # 20 GB for Plasma store
+    _system_config={
+        # Spill objects to disk when store is 70% full
+        "object_spilling_config": '{"type":"filesystem","params":{"directory_path":"/tmp/ray_spill"}}',
+        "automatic_object_spilling_enabled": True,
+        "max_io_workers": 8,
+        "min_spilling_size": 100 * 1024 * 1024,  # 100 MB min before spilling
+    }
+)
+</code></pre>
+
+      <h3>Placement Groups for GPU Locality</h3>
+      <div class="code-label">Example 18 — Placement group for GPU training with locality</div>
+      <pre><code class="language-python">import ray
+from ray.util.placement_group import placement_group, placement_group_table
+from ray.util.scheduling_strategies import PlacementGroupSchedulingStrategy
+
+ray.init()
+
+# Create a placement group: ensure all 8 GPUs are on the SAME node
+# (critical for NVLink bandwidth in distributed training)
+pg = placement_group(
+    bundles=[
+        {"GPU": 1, "CPU": 4} for _ in range(8)   # 8 bundles, each 1 GPU + 4 CPU
+    ],
+    strategy="PACK",    # PACK = all on same node; SPREAD = different nodes
+)
+ray.get(pg.ready())   # wait for group to be provisioned
+print(placement_group_table(pg))
+
+@ray.remote(num_gpus=1, num_cpus=4)
+class GPUTrainer:
+    def __init__(self, rank: int):
+        import torch
+        self.rank   = rank
+        self.device = torch.device(f"cuda:{rank}")
+
+    def train_step(self, data_ref):
+        import torch
+        data  = ray.get(data_ref)
+        # ... actual training step ...
+        return {"rank": self.rank, "loss": 0.1}
+
+# Pin each trainer to a bundle in the placement group
+trainers = [
+    GPUTrainer.options(
+        scheduling_strategy=PlacementGroupSchedulingStrategy(
+            placement_group=pg,
+            placement_group_bundle_index=i,
+        )
+    ).remote(rank=i)
+    for i in range(8)
+]
+
+# Now all 8 trainers are guaranteed to be on the same node
+data_ref = ray.put({"x": [1, 2, 3]})
+results  = ray.get([t.train_step.remote(data_ref) for t in trainers])
+print(results)
+
+ray.shutdown()
+</code></pre>
+
+      <h3>Common Performance Pitfalls</h3>
+      <table>
+        <thead><tr><th>Pitfall</th><th>Symptom</th><th>Fix</th></tr></thead>
+        <tbody>
+          <tr><td>Passing large objects without ray.put()</td><td>High serialization time, OOM on head node</td><td>Use ray.put() once, pass ObjectRef</td></tr>
+          <tr><td>Too many tiny tasks</td><td>High scheduling overhead, low CPU utilization</td><td>Batch work into larger tasks; use map_batches</td></tr>
+          <tr><td>Blocking ray.get() in a loop</td><td>Low parallelism, sequential execution</td><td>Submit all tasks first, then ray.get(all_refs)</td></tr>
+          <tr><td>Object store full — no spilling configured</td><td>OOM errors, worker crashes</td><td>Configure object_spilling_config or increase store size</td></tr>
+          <tr><td>Actor on wrong node (GPU mismatch)</td><td>Slow training, no NVLink utilization</td><td>Use placement groups with PACK strategy</td></tr>
+          <tr><td>Head node doing compute work</td><td>Cluster instability, GCS slowdowns</td><td>Set num-cpus=0 on head node</td></tr>
+          <tr><td>Uneven data partitioning in Ray Data</td><td>Stragglers, low throughput</td><td>Call repartition() after filter/join operations</td></tr>
+          <tr><td>Too many concurrent trials in Ray Tune</td><td>GPU memory OOM</td><td>Set max_concurrent_trials; use fractional GPU (num_gpus=0.5)</td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout-tip">
+        <p class="font-semibold text-green-800">Profiling Ray Applications</p>
+        <p class="text-green-900 text-sm mt-1">Use the Ray Dashboard at <code>localhost:8265</code> for task timelines, object store usage, and actor status. For deeper profiling, enable <code>RAY_PROFILING=1</code> to get Chrome tracing output. For memory debugging, use <code>ray memory --stats-only</code> or the Dashboard's memory tab to identify which objects are consuming store space.</p>
+      </div>
+    </section>
+
+    <!-- ===== SUMMARY ===== -->
+    <section id="summary">
+      <div class="section-badge">Summary</div>
+      <h2>Key Takeaways</h2>
+
+      <div class="bg-blue-50 border border-blue-200 rounded-xl p-6 my-6">
+        <h3 class="text-blue-900 text-lg font-bold mb-4">Chapter 10 Key Takeaways</h3>
+        <ul class="space-y-2 text-blue-900">
+          <li><span class="font-semibold">Ray Core</span> provides three primitives — tasks, actors, and object store — sufficient to express any distributed ML workload. Master these before reaching for higher-level APIs.</li>
+          <li><span class="font-semibold">Ray Train</span> abstracts DDP/FSDP/DeepSpeed setup. Write a single-device training loop; Ray handles process groups, gradient sync, and fault recovery. Use <code>prepare_model()</code> and <code>prepare_data_loader()</code>.</li>
+          <li><span class="font-semibold">Ray Tune</span> scales HPO to thousands of concurrent trials. Combine ASHA (early stopping) with Optuna (Bayesian search) for maximum efficiency. PBT is ideal for RL and adaptive learning rate schedules.</li>
+          <li><span class="font-semibold">Ray Serve</span> enables Python-native multi-model serving pipelines. Use <code>@serve.batch</code> for throughput, fractional GPU for dense packing, and deployment DAGs for preprocessing-model-postprocessing chains.</li>
+          <li><span class="font-semibold">Ray Data</span> closes the gap between storage and training. Use <code>ActorPoolStrategy</code> for expensive transforms (tokenization, image augmentation) to avoid per-batch initialization overhead.</li>
+          <li><span class="font-semibold">Placement groups</span> are essential for multi-GPU training — use <code>PACK</code> to ensure NVLink locality; use <code>SPREAD</code> for fault isolation in non-communication-heavy workloads.</li>
+          <li><span class="font-semibold">KubeRay</span> is the production path for Kubernetes. Define separate worker groups for CPU preprocessing nodes and GPU training nodes; enable autoscaling with appropriate <code>minReplicas=0</code> for GPU nodes to save cost.</li>
+          <li><span class="font-semibold">Object store hygiene</span>: always <code>ray.put()</code> large arrays before broadcasting, configure object spilling for datasets larger than available RAM, and never block on <code>ray.get()</code> inside a task loop.</li>
+        </ul>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 my-6">
+        <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
+          <div class="text-2xl font-black text-blue-700 mb-1">Ray Core</div>
+          <p class="text-sm text-gray-600">Tasks + Actors + Object Store. The universal building block for distributed Python.</p>
+        </div>
+        <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
+          <div class="text-2xl font-black text-green-700 mb-1">Ray Train</div>
+          <p class="text-sm text-gray-600">DDP/FSDP/DeepSpeed with one training loop. Fault-tolerant, checkpoint-native.</p>
+        </div>
+        <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
+          <div class="text-2xl font-black text-purple-700 mb-1">Ray Serve</div>
+          <p class="text-sm text-gray-600">Composable model serving with autoscaling, batching, and A/B testing built in.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- BOTTOM NAVIGATION -->
+<footer class="bg-white border-t border-gray-200 mt-16">
+  <div class="max-w-5xl mx-auto px-6 py-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+    <a href="ch09_feature_stores.html" class="nav-btn bg-gray-100 text-gray-700 hover:bg-gray-200">
+      &#8592; Chapter 09: Feature Stores
+    </a>
+    <a href="index.html" class="text-sm text-gray-500 hover:text-blue-600">&#8962; Table of Contents</a>
+    <a href="ch11_mlflow_wandb.html" class="nav-btn bg-blue-600 text-white hover:bg-blue-700">
+      Chapter 11: MLflow &amp; W&amp;B &#8594;
+    </a>
+  </div>
+  <div class="text-center pb-6 text-xs text-gray-400">
+    Modern MLOps Tutorial &mdash; Chapter 10 &mdash; The Ray Ecosystem &mdash; Written by the Anyscale / Ray Core Team
+  </div>
+</footer>
+
+</body>
+</html>

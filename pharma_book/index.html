@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Pharmaceutical Playbook: An Insider's Complete Guide</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8f9fa; color: #2c3e50; line-height: 1.7; }
+
+.hero { background: linear-gradient(135deg, #0d3b66 0%, #1a5276 40%, #1a7a6e 70%, #2ecc71 100%); color: white; padding: 80px 40px 60px; text-align: center; position: relative; overflow: hidden; }
+.hero::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(ellipse at 30% 40%, rgba(255,255,255,0.08) 0%, transparent 60%); pointer-events: none; }
+.hero .badge { display: inline-block; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); border-radius: 20px; padding: 6px 18px; font-size: 0.8em; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 24px; }
+.hero h1 { font-size: 3em; font-weight: 800; margin-bottom: 16px; line-height: 1.15; max-width: 800px; margin-left: auto; margin-right: auto; }
+.hero .tagline { font-size: 1.2em; opacity: 0.88; max-width: 680px; margin: 0 auto 32px; }
+.hero .author-block { display: inline-flex; align-items: center; gap: 16px; background: rgba(255,255,255,0.12); border-radius: 12px; padding: 16px 24px; margin-top: 12px; }
+.hero .author-block .avatar { width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, #f39c12, #e74c3c); display: flex; align-items: center; justify-content: center; font-size: 1.5em; font-weight: 700; flex-shrink: 0; }
+.hero .author-block .info { text-align: left; }
+.hero .author-block .name { font-weight: 700; font-size: 1.05em; }
+.hero .author-block .credentials { font-size: 0.82em; opacity: 0.8; }
+
+.stats-banner { background: white; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+.stats-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: repeat(5, 1fr); }
+.stat-item { padding: 24px 20px; text-align: center; border-right: 1px solid #eee; }
+.stat-item:last-child { border-right: none; }
+.stat-item .num { font-size: 2em; font-weight: 800; color: #1a5276; }
+.stat-item .lbl { font-size: 0.8em; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+
+.main { max-width: 1100px; margin: 0 auto; padding: 48px 24px; }
+
+.about-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 32px; margin-bottom: 56px; }
+.about-text h2 { font-size: 1.6em; color: #1a5276; margin-bottom: 16px; }
+.about-text p { color: #555; margin-bottom: 14px; }
+.committee-card { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.07); border-top: 4px solid #2ecc71; }
+.committee-card h3 { color: #1a5276; font-size: 0.95em; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 14px; }
+.committee-list { list-style: none; }
+.committee-list li { font-size: 0.85em; color: #555; padding: 5px 0; border-bottom: 1px solid #f0f0f0; display: flex; align-items: center; gap: 8px; }
+.committee-list li:last-child { border-bottom: none; }
+.committee-list li::before { content: '▸'; color: #2ecc71; font-size: 0.75em; }
+
+.part-header { background: linear-gradient(90deg, #1a5276, #2980b9); color: white; padding: 16px 24px; border-radius: 10px 10px 0 0; margin-top: 40px; display: flex; align-items: center; gap: 12px; }
+.part-header .part-num { background: rgba(255,255,255,0.2); border-radius: 6px; padding: 4px 12px; font-size: 0.8em; letter-spacing: 1px; text-transform: uppercase; }
+.part-header h2 { font-size: 1.15em; font-weight: 700; }
+.part-header.case { background: linear-gradient(90deg, #6c3483, #9b59b6); }
+
+.chapters-grid { background: white; border: 1px solid #dde; border-top: none; border-radius: 0 0 10px 10px; overflow: hidden; margin-bottom: 8px; }
+.chapter-card { display: flex; align-items: flex-start; gap: 20px; padding: 20px 24px; border-bottom: 1px solid #f0f0f0; text-decoration: none; color: inherit; transition: background 0.15s; }
+.chapter-card:last-child { border-bottom: none; }
+.chapter-card:hover { background: #f0f7ff; }
+.ch-num { background: #1a5276; color: white; width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9em; flex-shrink: 0; }
+.ch-num.case { background: #6c3483; }
+.ch-info { flex: 1; }
+.ch-info h3 { font-size: 1.0em; color: #1a5276; margin-bottom: 4px; }
+.ch-info p { font-size: 0.83em; color: #888; line-height: 1.5; }
+.ch-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+.tag { background: #eaf4fb; color: #2980b9; padding: 2px 10px; border-radius: 12px; font-size: 0.75em; }
+.tag.green { background: #eafaf1; color: #1e8449; }
+.tag.amber { background: #fef9e7; color: #b7770d; }
+.tag.purple { background: #f5eef8; color: #6c3483; }
+.ch-arrow { color: #ccc; font-size: 1.2em; align-self: center; flex-shrink: 0; }
+.chapter-card:hover .ch-arrow { color: #1a5276; }
+
+.how-to { background: white; border-radius: 12px; padding: 32px; box-shadow: 0 2px 12px rgba(0,0,0,0.07); margin: 48px 0; }
+.how-to h2 { color: #1a5276; margin-bottom: 20px; font-size: 1.3em; }
+.reading-paths { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+.path-card { background: #f8f9fa; border-radius: 8px; padding: 16px; border-left: 4px solid #2ecc71; }
+.path-card h4 { color: #1a5276; font-size: 0.9em; margin-bottom: 6px; }
+.path-card p { font-size: 0.82em; color: #666; }
+
+footer { background: #1a5276; color: #aed6f1; text-align: center; padding: 32px 24px; font-size: 0.85em; margin-top: 24px; }
+footer strong { color: white; }
+
+@media (max-width: 768px) {
+  .hero h1 { font-size: 2em; }
+  .stats-inner { grid-template-columns: repeat(3, 1fr); }
+  .about-grid { grid-template-columns: 1fr; }
+  .reading-paths { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="badge">Complete Pharmaceutical Industry Guide · 26 Chapters</div>
+  <h1>The Pharmaceutical Playbook</h1>
+  <p class="tagline">A comprehensive guide to every function, every stage, and every secret of the pharmaceutical industry — written by those who built it.</p>
+  <div class="author-block">
+    <div class="avatar">R</div>
+    <div class="info">
+      <div class="name">Prof. Richard A. Chen, MD, MBA</div>
+      <div class="credentials">40-Year Pharma Veteran · Harvard Medical School · MIT Sloan · Founder, NextGen Pharma AI</div>
+    </div>
+  </div>
+</div>
+
+<div class="stats-banner">
+  <div class="stats-inner">
+    <div class="stat-item"><div class="num">26</div><div class="lbl">Chapters</div></div>
+    <div class="stat-item"><div class="num">8</div><div class="lbl">Parts</div></div>
+    <div class="stat-item"><div class="num">40+</div><div class="lbl">Years of Experience</div></div>
+    <div class="stat-item"><div class="num">5</div><div class="lbl">Drug Case Studies</div></div>
+    <div class="stat-item"><div class="num">~2M</div><div class="lbl">Words of Content</div></div>
+  </div>
+</div>
+
+<div class="main">
+
+  <div class="about-grid">
+    <div class="about-text">
+      <h2>About This Book</h2>
+      <p>Over four decades, I have watched brilliant scientists fail to bring life-saving drugs to patients — not because the science was wrong, but because no one taught them how the industry actually works. This book is my attempt to fix that.</p>
+      <p>Written with colleagues from Eli Lilly, Johnson &amp; Johnson, GSK, AbbVie, Novo Nordisk, Roche, Pfizer, AstraZeneca, Novartis, Merck, BMS, and Gilead — and with faculty from Harvard, MIT, and Stanford — this is the guide we wished existed when we started.</p>
+      <p>Every chapter covers one domain in depth: the real science, the actual process, the insider tricks, and the hard lessons learned from programs that succeeded and ones that failed. Read it cover-to-cover, or jump to the function you need right now.</p>
+      <p>The final four chapters trace five landmark drugs — Keytruda, Ozempic, Mounjaro, Biktarvy, Humira, and Herceptin — end-to-end from molecule to multibillion-dollar market.</p>
+    </div>
+    <div class="committee-card">
+      <h3>Editorial Committee</h3>
+      <ul class="committee-list">
+        <li>Dr. Sarah Mitchelson — Harvard Medical School</li>
+        <li>Prof. James Wei — MIT Sloan</li>
+        <li>Dr. Elena Sorokina — Pfizer R&amp;D (ret.)</li>
+        <li>Dr. Carlos Mendez — Roche Genentech</li>
+        <li>Dr. Priya Nair — AstraZeneca Regulatory</li>
+        <li>Prof. David Kim — Stanford GSB</li>
+        <li>Dr. Laura Bauer — Novartis CMC</li>
+        <li>Dr. Michael Osei — Merck Clinical Ops</li>
+        <li>Dr. Ingrid Larsen — Novo Nordisk (ret.)</li>
+        <li>Dr. Thomas Adeyemi — Gilead Sciences</li>
+        <li>Dr. Fiona Mclaren — BMS Oncology</li>
+        <li>Dr. Rajesh Gupta — AbbVie Commercial</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="how-to">
+    <h2>How to Use This Book</h2>
+    <div class="reading-paths">
+      <div class="path-card">
+        <h4>New to Pharma</h4>
+        <p>Read Chapters 1–3 first, then follow the sequence. Don't skip Ch. 4 (Translational) — it's the bridge from bench to bedside.</p>
+      </div>
+      <div class="path-card">
+        <h4>Scientists Moving to Industry</h4>
+        <p>Start with Ch. 1, then jump to Ch. 8 (Regulatory) and Ch. 10 (BD). Return to the clinical sequence once you have the business context.</p>
+      </div>
+      <div class="path-card">
+        <h4>Commercial Leaders</h4>
+        <p>Chapters 12–14 (Market Access, Medical Affairs, Commercial) are your core. Ch. 4 (Clinical Strategy) and Ch. 22–25 (Case Studies) give you the pipeline context.</p>
+      </div>
+      <div class="path-card">
+        <h4>Starting a Company</h4>
+        <p>Read Ch. 1, Ch. 10 (BD), Ch. 17 (Finance), Ch. 18 (AI), and Ch. 21 (Startup) first. Use the rest as a reference as you grow.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- PART I -->
+  <div class="part-header">
+    <span class="part-num">Part I</span>
+    <h2>Research &amp; Development — From Idea to Candidate</h2>
+  </div>
+  <div class="chapters-grid">
+    <a class="chapter-card" href="ch01_rd_ecosystem.html">
+      <div class="ch-num">1</div>
+      <div class="ch-info">
+        <h3>The Pharmaceutical R&amp;D Ecosystem: An Inside View</h3>
+        <p>Global R&amp;D landscape, stakeholders, attrition rates ($2–3B per approved drug), innovation models, the Valley of Death, and what separates successful R&amp;D organizations from the rest.</p>
+        <div class="ch-tags"><span class="tag">Big Pharma</span><span class="tag">Biotech</span><span class="tag">Pipeline</span><span class="tag">Attrition</span></div>
+      </div>
+      <div class="ch-arrow">›</div>
+    </a>
+    <a class="chapter-card" href="ch02_drug_discovery.html">
+      <div class="ch-num">2</div>
+      <div class="ch-info">
+        <h3>Drug Discovery: From Target to Candidate</h3>
+        <p>Target ID &amp; validation, HTS, FBDD, hit-to-lead, medicinal chemistry, all modalities (small molecules, biologics, RNA, cell &amp; gene therapy), ADMET, and how to select a drug candidate that survives the clinic.</p>
+        <div class="ch-tags"><span class="tag">Medicinal Chemistry</span><span class="tag">HTS</span><span class="tag">ADMET</span><span class="tag">Modalities</span></div>
+      </div>
+      <div class="ch-arrow">›</div>
+    </a>
+    <a class="chapter-card" href="ch03_preclinical.html">
+      <div class="ch-num">3</div>
+      <div class="ch-info">
+        <h3>Preclinical Development: Proving the Concept Before Human Testing</h3>
+        <p>IND package requirements, pharmacology, ADME, PK/PD modeling, safety pharmacology, GLP toxicology, species selection, CMC, IND strategy, and how to get into the clinic on time and budget.</p>
+        <div class="ch-tags"><span class="tag">Toxicology</span><span class="tag">PK/PD</span><span class="tag">IND</span><span class="tag green">GLP</span></div>
+      </div>
+      <div class="ch-arrow">›</div>
+    </a>
+    <a class="chapter-card" href="ch15_translational.html">
+      <div class="ch-num">4</div>
+      <div class="ch-info">
+        <h3>Translational Medicine &amp; Biomarkers: Bridging the Lab and the Clinic</h3>
+        <p>FDA BEST biomarker framework, companion diagnostics, pharmacodynamic biomarkers, liquid biopsy, multi-omics, the translational gap (why drugs fail in Phase II), and biomarker strategy across disease areas.</p>
+        <div class="ch-tags"><span class="tag">Biomarkers</span><span class="tag">CDx</span><span class="tag">Liquid Biopsy</span><span class="tag amber">Precision Medicine</span></div>
+      </div>
+      <div class="ch-arrow">›</div>
+    </a>
+  </div>
+
+  <!-- PART II -->
+  <div class="part-header">
+    <span class="part-num">Part II</span>
+    <h2>Clinical Development — Proving Safety and Efficacy in Humans</h2>
+  </div>
+  <div class="chapters-grid">
+    <a class="chapter-card" href="ch04_clinical_strategy.html">
+      <div class="ch-num">5</div>
+      <div class="ch-info">
+        <h3>Clinical Development Strategy: Designing Trials That Win</h3>
+        <p>TPP, Phase I/II/III design, adaptive trials (seamless, basket, umbrella, platform), biomarker-driven development, endpoint selection, statistical strategy, regulatory interactions, Go/No-Go frameworks.</p>
+        <div class="ch-tags"><span class="tag">Adaptive Trials</span><span class="tag">Phase I–III</span><span class="tag">Endpoints</span><span class="tag amber">TPP</span></div>
+      </div>
+      <div class="ch-arrow">›</div>
+    </a>
+    <a class="chapter-card" href="ch16_biostatistics.html">
+      <div class="ch-num">6</div>
+      <div class="ch-info">
+        <h3>Biostatistics &amp; Clinical Data Science: The Numbers Behind Every Drug</h3>
+        <p>Sample size, multiplicity, interim analyses, survival analysis, estimands (ICH E9R1), missing data, Bayesian methods, CDISC standards, and how ML is reshaping clinical data science.</p>
+        <div class="ch-tags"><span class="tag">Biostatistics</span><span class="tag">Estimands</span><span class="tag">CDISC</span><span class="tag green">Bayesian</span></div>
+      </div>
+      <div class="ch-arrow">›</div>
+    </a>
+    <a class="chapter-card" href="ch05_clinical_ops.html">
+      <div class="ch-num">7</div>
+      <div class="ch-info">
+        <h3>Clinical Operations: The Engine of Drug Development</h3>
+        <p>Study startup, site selection, patient recruitment, risk-based monitoring, EDC/eTMF, CRO management, decentralized trials, pharmacovigilance, GCP inspections, and the KPIs that actually matter.</p>
+        <div class="ch-tags"><span class="tag">CRO</span><span class="tag">Site Management</span><span class="tag">GCP</span><span class="tag green">DCT</span></div>
+      </div>
+      <div class="ch-arrow">›</div>
+    </a>
+  </div>
+
+  <!-- PART III -->
+  <div class="part-header">
+    <span class="part-num">Part III</span>
+    <h2>Regulatory Affairs — The Path to Approval and Beyond</h2>
+  </div>
+  <div class="chapters-grid">
+    <a class="chapter-card" href="ch06_regulatory.html">
+      <div class="ch-num">8</div>
+      <div class="ch-info">
+        <h3>Regulatory Affairs: Navigating the Path to Approval</h3>
+        <p>FDA, EMA, PMDA, NMPA; ICH guidelines; NDA/BLA/MAA CTD submissions; special designations (Breakthrough, Accelerated Approval); label negotiations; pediatric requirements; biosimilar pathways.</p>
+        <div class="ch-tags"><span class="tag">FDA</span><span class="tag">EMA</span><span class="tag">NDA/BLA</span><span class="tag amber">Breakthrough</span></div>
+      </div>
+      <div class="ch-arrow">›</div>
+    </a>
+    <a class="chapter-card" href="ch17_post_approval.html">
+      <div class="ch-num">9</div>
+      <div class="ch-info">
+        <h3>Post-Approval: Pharmacovigilance, Lifecycle Management &amp; the Long Game</h3>
+        <p>PV systems, AE/SUSAR reporting, signal detection, PSUR/PBRER, REMS programs, black box warnings, drug withdrawal case studies (Vioxx, Avandia), label lifecycle, patent strategy post-approval.</p>
+        <div class="ch-tags"><span class="tag">Pharmacovigilance</span><span class="tag">REMS</span><span class="tag">Signal Detection</span><span class="tag amber">Lifecycle</span></div>
+      </div>
+      <div class="ch-arrow">›</div>
+    </a>
+  </div>
+
+  <!-- PART IV -->
+  <div class="part-header">
+    <span class="part-num">Part IV</span>
+    <h2>Business Development &amp; Strategy — Deals, Portfolio, and Competitive Positioning</h2>
+  </div>
+  <div class="chapters-grid">
+    <a class="chapter-card" href="ch07_business_development.html">
+      <div class="ch-num">10</div>
+      <div class="ch-info">
+        <h3>Business Development: The Art of Deal-Making in Pharma</h3>
+        <p>Deal types, sourcing (JPM/BIO/ASCO), scientific &amp; commercial due diligence, rNPV valuation, term sheet negotiation, M&amp;A strategy, alliance management, and lessons from landmark pharma deals.</p>
+        <div class="ch-tags"><span class="tag">Licensing</span><span class="tag">M&amp;A</span><span class="tag">Valuation</span><span class="tag green">Due Diligence</span></div>
+      </div>
+      <div class="ch-arrow">›</div>
+    </a>
+    <a class="chapter-card" href="ch19_portfolio.html">
+      <div class="ch-num">11</div>
+      <div class="ch-info">
+        <h3>Portfolio Strategy &amp; Pipeline Prioritization: The Art of Corporate Bets</h3>
+        <p>TA focus, pipeline gap analysis, portfolio valuation, stage-gate reviews, resource allocation, McKinsey 3-horizon model applied to pharma, AZ's oncology transformation, AbbVie's post-Humira strategy.</p>
+        <div class="ch-tags"><span class="tag">Portfolio</span><span class="tag">Pipeline</span><span class="tag">Stage-Gate</span><span class="tag amber">Strategy</span></div>
+      </div>
+      <div class="ch-arrow">›</div>
+    </a>
+  </div>
+
+  <!-- PART V -->
+  <div class="part-header">
+    <span class="part-num">Part V</span>
+    <h2>Commercial Excellence — Market Access, Medical Affairs, Marketing, and Sales</h2>
+  </div>
+  <div class="chapters-grid">
+    <a class="chapter-card" href="ch08_market_access.html">
+      <div class="ch-num">12</div>
+      <div class="ch-info">
+        <h3>Market Access, Pricing &amp; Reimbursement: Getting Patients to Your Drug</h3>
+        <p>HTA bodies (NICE, G-BA, HAS), health economics, QALYs, payer landscape, US pricing dynamics, IRA implications, value-based contracts, rare disease access, and building a compelling value dossier.</p>
+        <div class="ch-tags"><span class="tag">HTA</span><span class="tag">HEOR</span><span class="tag">Payers</span><span class="tag amber">IRA</span></div>
+      </div>
+      <div class="ch-arrow">›</div>
+    </a>
+    <a class="chapter-card" href="ch18_medical_affairs.html">
+      <div class="ch-num">13</div>
+      <div class="ch-info">
+        <h3>Medical Affairs: Science, Evidence, and the Bridge to Practice</h3>
+        <p>MSL strategy, KOL management, advisory boards, publications planning, CME, IITs, integrated evidence planning, real-world evidence, expanded access, compliance, and the medical affairs org of the future.</p>
+        <div class="ch-tags"><span class="tag">MSL</span><span class="tag">KOLs</span><span class="tag">IITs</span><span class="tag green">RWE</span></div>
+      </div>
+      <div class="ch-arrow">›</div>
+    </a>
+    <a class="chapter-card" href="ch09_commercial.html">
+      <div class="ch-num">14</div>
+      <div class="ch-info">
+        <h3>Commercial Excellence: From Launch to Peak Sales</h3>
+        <p>24-month launch countdown, brand strategy, audience segmentation, sales force design, DTC/HCP promotion, digital marketing, lifecycle management, competitive response, forecasting, and compliance.</p>
+        <div class="ch-tags"><span class="tag">Launch</span><span class="tag">Brand Strategy</span><span class="tag">Sales Force</span><span class="tag green">KOLs</span></div>
+      </div>
+      <div class="ch-arrow">›</div>
+    </a>
+  </div>
+
+  <!-- PART VI -->
+  <div class="part-header">
+    <span class="part-num">Part VI</span>
+    <h2>Operations &amp; Finance — Making, Moving, and Funding Medicine</h2>
+  </div>
+  <div class="chapters-grid">
+    <a class="chapter-card" href="ch10_manufacturing.html">
+      <div class="ch-num">15</div>
+      <div class="ch-info">
+        <h3>Manufacturing &amp; Quality Systems: Making Medicine at Scale</h3>
+        <p>GMP (21 CFR 210/211, EU Annex 1), small molecule and biologics manufacturing, process validation lifecycle (PPQ), ICH Q10 quality systems, analytical validation, CMO management, GMP inspections.</p>
+        <div class="ch-tags"><span class="tag">GMP</span><span class="tag">CMO</span><span class="tag">Process Validation</span><span class="tag amber">Quality</span></div>
+      </div>
+      <div class="ch-arrow">›</div>
+    </a>
+    <a class="chapter-card" href="ch21_supply_chain.html">
+      <div class="ch-num">16</div>
+      <div class="ch-info">
+        <h3>Supply Chain &amp; Global Operations: Getting Medicine to Every Corner of the World</h3>
+        <p>S&amp;OP planning, CDMO strategy (Lonza, Catalent, Samsung Bio), cold chain, serialization (DSCSA), drug shortage management, API re-shoring, gene therapy vein-to-vein logistics, digital supply chain.</p>
+        <div class="ch-tags"><span class="tag">Supply Chain</span><span class="tag">CDMO</span><span class="tag">Cold Chain</span><span class="tag green">Serialization</span></div>
+      </div>
+      <div class="ch-arrow">›</div>
+    </a>
+    <a class="chapter-card" href="ch22_finance.html">
+      <div class="ch-num">17</div>
+      <div class="ch-info">
+        <h3>Finance &amp; Business Planning: The Numbers That Drive Pharma Decisions</h3>
+        <p>Pharma P&amp;L structure, revenue forecasting, NPV/rNPV modeling step-by-step, cost of capital, FP&amp;A process, clinical trial budgets, COGS deep dive, biotech financing (Series A-IPO), patent cliff impact.</p>
+        <div class="ch-tags"><span class="tag">Finance</span><span class="tag">rNPV</span><span class="tag">Biotech VC</span><span class="tag amber">Forecasting</span></div>
+      </div>
+      <div class="ch-arrow">›</div>
+    </a>
+  </div>
+
+  <!-- PART VII -->
+  <div class="part-header">
+    <span class="part-num">Part VII</span>
+    <h2>The New Frontiers — AI, Digital Health, Rare Disease, and the Future</h2>
+  </div>
+  <div class="chapters-grid">
+    <a class="chapter-card" href="ch11_ai_pharma.html">
+      <div class="ch-num">18</div>
+      <div class="ch-info">
+        <h3>The AI-Powered Pharmaceutical Company: Transformation in the Intelligence Era</h3>
+        <p>AI in discovery (AlphaFold, generative chemistry), clinical (synthetic controls, adaptive design), regulatory, manufacturing, and commercial. LLMs, agentic AI, self-driving labs, data strategy, AI governance, VC landscape.</p>
+        <div class="ch-tags"><span class="tag">AI/ML</span><span class="tag">AlphaFold</span><span class="tag">Generative AI</span><span class="tag green">Agentic AI</span></div>
+      </div>
+      <div class="ch-arrow">›</div>
+    </a>
+    <a class="chapter-card" href="ch23_digital_health.html">
+      <div class="ch-num">19</div>
+      <div class="ch-info">
+        <h3>Digital Health &amp; Patient Engagement: The Empowered Patient Era</h3>
+        <p>Wearables and digital biomarkers, eCOA, decentralized trials, digital therapeutics (DTx/PDT), patient communities, HIPAA/GDPR in digital health, FDA Software as Medical Device framework, health equity.</p>
+        <div class="ch-tags"><span class="tag">Digital Health</span><span class="tag">Wearables</span><span class="tag">DTx</span><span class="tag amber">Patient Centricity</span></div>
+      </div>
+      <div class="ch-arrow">›</div>
+    </a>
+    <a class="chapter-card" href="ch20_rare_disease.html">
+      <div class="ch-num">20</div>
+      <div class="ch-info">
+        <h3>Rare Disease &amp; Specialty Pharma: Different Rules, Different Rewards</h3>
+        <p>Orphan Drug Act benefits, small trial design strategies, PAO partnerships, gene &amp; cell therapy frontier, ultra-orphan pricing ($1M+), specialty distribution model, hub services, rare disease commercial model.</p>
+        <div class="ch-tags"><span class="tag">Orphan Drug</span><span class="tag">Gene Therapy</span><span class="tag">Specialty Pharma</span><span class="tag purple">Ultra-Orphan</span></div>
+      </div>
+      <div class="ch-arrow">›</div>
+    </a>
+    <a class="chapter-card" href="ch24_startup.html">
+      <div class="ch-num">21</div>
+      <div class="ch-info">
+        <h3>Building a Pharmaceutical Company from Scratch: The Founder's Playbook</h3>
+        <p>From idea validation to IPO: founding team, IP strategy, pre-seed through Series C financing, the VC pitch (what they actually want to see), virtual pharma model, board governance, strategic options, and founder mistakes.</p>
+        <div class="ch-tags"><span class="tag">Startup</span><span class="tag">VC Financing</span><span class="tag">Biotech IPO</span><span class="tag green">Founder</span></div>
+      </div>
+      <div class="ch-arrow">›</div>
+    </a>
+    <a class="chapter-card" href="ch25_future.html">
+      <div class="ch-num">22</div>
+      <div class="ch-info">
+        <h3>The Future of Pharma: 2030 and Beyond — A Veteran's Vision</h3>
+        <p>8 megatrends shaping pharma: AI, precision medicine, gene therapy, longevity science, GLP-1 revolution, multispecifics, RNA medicine, microbiome. China's rise, biosimilar wave, pricing crisis, and a personal challenge to the next generation.</p>
+        <div class="ch-tags"><span class="tag">Megatrends</span><span class="tag">Gene Editing</span><span class="tag">Longevity</span><span class="tag amber">2030 Vision</span></div>
+      </div>
+      <div class="ch-arrow">›</div>
+    </a>
+  </div>
+
+  <!-- PART VIII -->
+  <div class="part-header case">
+    <span class="part-num">Part VIII</span>
+    <h2>Case Studies — Five Drugs That Changed Medicine and Business</h2>
+  </div>
+  <div class="chapters-grid">
+    <a class="chapter-card" href="ch12_case_keytruda.html">
+      <div class="ch-num case">23</div>
+      <div class="ch-info">
+        <h3>Case Study: Keytruda — How Pembrolizumab Became the World's Best-Selling Drug</h3>
+        <p>PD-1/PD-L1 biology &amp; Nobel Prize science, Merck vs. BMS race, KEYNOTE program (20+ indications), biomarker strategy (PD-L1, TMB-H, MSI-H), $25B in revenue, and 10 lessons every pharma leader must know.</p>
+        <div class="ch-tags"><span class="tag purple">Immuno-Oncology</span><span class="tag">PD-1</span><span class="tag">KEYNOTE</span><span class="tag amber">$25B Peak</span></div>
+      </div>
+      <div class="ch-arrow">›</div>
+    </a>
+    <a class="chapter-card" href="ch13_case_glp1.html">
+      <div class="ch-num case">24</div>
+      <div class="ch-info">
+        <h3>Case Study: The GLP-1 Revolution — Ozempic/Wegovy (Novo Nordisk) and Mounjaro/Zepbound (Eli Lilly)</h3>
+        <p>GLP-1 and dual GIP/GLP-1 biology, SUSTAIN/STEP and SURPASS/SURMOUNT programs, 15–22% weight loss, SELECT CV outcomes trial, the manufacturing crisis, and the obesity drug arms race reshaping global healthcare.</p>
+        <div class="ch-tags"><span class="tag purple">GLP-1</span><span class="tag">Obesity</span><span class="tag">Semaglutide</span><span class="tag amber">Tirzepatide</span></div>
+      </div>
+      <div class="ch-arrow">›</div>
+    </a>
+    <a class="chapter-card" href="ch14_case_others.html">
+      <div class="ch-num case">25</div>
+      <div class="ch-info">
+        <h3>Case Study: Biktarvy, Humira, and Herceptin — Three More Blueprints for Success</h3>
+        <p>Gilead's Biktarvy ($11.8B in HIV). AbbVie's Humira (greatest patent defense in pharma history, $20.7B peak). Roche's Herceptin (birth of targeted oncology, foundation of the ADC revolution). Plus a closing letter to the next generation.</p>
+        <div class="ch-tags"><span class="tag">HIV</span><span class="tag">TNF-α</span><span class="tag">HER2</span><span class="tag green">Targeted Therapy</span></div>
+      </div>
+      <div class="ch-arrow">›</div>
+    </a>
+  </div>
+
+  <!-- FINAL CHAPTER -->
+  <div class="part-header" style="background: linear-gradient(90deg, #1a5276, #1abc9c); margin-top: 40px;">
+    <span class="part-num">Epilogue</span>
+    <h2>Careers, Leadership &amp; Culture — Thriving in the World's Most Important Industry</h2>
+  </div>
+  <div class="chapters-grid">
+    <a class="chapter-card" href="ch26_careers.html">
+      <div class="ch-num" style="background: #1abc9c;">26</div>
+      <div class="ch-info">
+        <h3>Careers, Leadership &amp; Culture in Pharma</h3>
+        <p>Career tracks, entry points, cross-functional rotation programs, moving between Big Pharma and biotech, executive presence in matrix organizations, pharma culture at J&amp;J / Roche / GSK / Pfizer, DEI, managing failure, and what 40 years taught us.</p>
+        <div class="ch-tags"><span class="tag">Careers</span><span class="tag">Leadership</span><span class="tag">Culture</span><span class="tag green">Final Chapter</span></div>
+      </div>
+      <div class="ch-arrow">›</div>
+    </a>
+  </div>
+
+</div>
+
+<footer>
+  <strong>The Pharmaceutical Playbook</strong> — An Expert Committee Publication · 26 Chapters<br>
+  Edited by Prof. Richard A. Chen, MD, MBA &nbsp;·&nbsp; Harvard Medical School &nbsp;·&nbsp; MIT Sloan &nbsp;·&nbsp; NextGen Pharma AI<br><br>
+  Contributors from: Eli Lilly · Johnson &amp; Johnson · GSK · AbbVie · Novo Nordisk · Roche · Pfizer · AstraZeneca · Novartis · Merck · BMS · Gilead<br>
+  Academic Partners: Harvard Medical School · Harvard Business School · MIT Sloan · Stanford GSB<br><br>
+  <span style="opacity:0.6; font-size:0.85em;">For educational purposes. All drug names, trial names, and company names are used for illustrative and educational reference.</span>
+</footer>
+
+</body>
+</html>

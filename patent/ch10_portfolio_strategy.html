@@ -1,0 +1,2144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Chapter 10: Building a Patent Portfolio — From Single Patent to Strategic Asset. Continuation strategy, claim laddering, competitive intelligence, startup IP roadmaps, and portfolio valuation for AI companies." />
+  <title>Chapter 10: Building a Patent Portfolio — Patent Law for Technologists</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* ── Chapter 10 local styles ─────────────────────── */
+    .family-tree-svg { width: 100%; max-width: 780px; height: auto; display: block; margin: 0 auto; }
+
+    .claim-ladder { display: flex; flex-direction: column; gap: 1rem; margin: 2rem 0; }
+    .claim-ladder-item {
+      border-left: 5px solid;
+      border-radius: 0 var(--radius) var(--radius) 0;
+      padding: 1.25rem 1.5rem;
+      background: var(--gray-50);
+    }
+    .claim-ladder-item.broad   { border-color: #1a2744; }
+    .claim-ladder-item.medium  { border-color: #c8942a; }
+    .claim-ladder-item.narrow  { border-color: #1e8449; }
+    .claim-ladder-label {
+      font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em;
+      margin-bottom: .5rem;
+    }
+    .claim-ladder-item.broad  .claim-ladder-label { color: #1a2744; }
+    .claim-ladder-item.medium .claim-ladder-label { color: #c8942a; }
+    .claim-ladder-item.narrow .claim-ladder-label { color: #1e8449; }
+    .claim-ladder-item h4 { margin-top: 0; font-size: 1rem; }
+    .claim-ladder-item p  { margin-bottom: 0; font-size: .9375rem; color: var(--text-light); }
+
+    .value-badge {
+      display: inline-block; padding: .2rem .6rem; border-radius: 12px;
+      font-size: .75rem; font-weight: 700; margin-left: .5rem;
+    }
+    .value-high   { background: #d4efdf; color: #1e8449; }
+    .value-medium { background: #fef9e7; color: #b7770d; }
+    .value-low    { background: #fdedec; color: #922b21; }
+
+    .portfolio-matrix {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--gray-300);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin: 2rem 0;
+    }
+    .matrix-cell {
+      background: var(--white);
+      padding: 1rem;
+      text-align: center;
+    }
+    .matrix-cell.header { background: var(--navy); color: white; font-weight: 700; font-size: .8125rem; }
+    .matrix-cell.axis   { background: var(--gray-100); font-weight: 600; font-size: .875rem; }
+    .matrix-cell.hot    { background: #fdf2f8; }
+    .matrix-cell.warm   { background: #fef9e7; }
+    .matrix-cell.cool   { background: #eaf4fb; }
+
+    .tool-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    .tool-card {
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 1rem 1.25rem;
+      background: var(--white);
+      box-shadow: var(--shadow-sm);
+    }
+    .tool-card h4 { margin-top: 0; font-size: .9375rem; color: var(--navy); margin-bottom: .375rem; }
+    .tool-card p  { margin: 0; font-size: .8125rem; color: var(--text-light); }
+    .tool-badge {
+      display: inline-block; font-size: .65rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .08em; padding: .15rem .45rem; border-radius: 8px;
+      margin-bottom: .5rem;
+    }
+    .tool-badge.free { background: #d4efdf; color: #1e8449; }
+    .tool-badge.paid { background: #d6eaf8; color: #1a6b8a; }
+    .tool-badge.freemium { background: #fef9e7; color: #b7770d; }
+
+    .committee-roles {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    .role-card {
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem;
+      background: var(--gray-50);
+      border-top: 4px solid var(--navy);
+    }
+    .role-card.gold-top { border-top-color: var(--gold); }
+    .role-card.green-top { border-top-color: var(--success); }
+    .role-card.info-top { border-top-color: var(--info); }
+    .role-card h4 { margin-top: 0; font-size: .9375rem; color: var(--navy); }
+    .role-card ul { margin: 0; padding-left: 1.25rem; font-size: .875rem; color: var(--text-light); }
+    .role-card ul li { margin-bottom: .25rem; }
+
+    .pledge-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    .pledge-card {
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem;
+      background: var(--white);
+      box-shadow: var(--shadow-sm);
+    }
+    .pledge-card h4 { margin-top: 0; font-size: 1rem; color: var(--navy); }
+    .pledge-card p  { margin: 0; font-size: .875rem; color: var(--text-light); }
+
+    .audit-phases {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    .audit-phase {
+      background: var(--gray-50);
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 1rem;
+      text-align: center;
+    }
+    .audit-phase-num {
+      width: 2rem; height: 2rem;
+      background: var(--navy); color: white;
+      border-radius: 50%; display: inline-flex;
+      align-items: center; justify-content: center;
+      font-weight: 700; font-size: .875rem; margin-bottom: .625rem;
+    }
+    .audit-phase h4 { font-size: .9rem; margin-top: 0; margin-bottom: .375rem; }
+    .audit-phase p  { font-size: .8125rem; color: var(--text-light); margin: 0; }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════
+     TOP NAVIGATION
+══════════════════════════════════════════════════ -->
+<nav class="top-nav">
+  <div class="nav-container">
+    <a href="index.html" class="nav-logo">Patent Law <span>for Technologists</span></a>
+    <div class="nav-links">
+      <a href="ch01_patent_system_overview.html">Ch.1</a>
+      <a href="ch02_patent_eligibility.html">Ch.2</a>
+      <a href="ch03_prior_art_research.html">Ch.3</a>
+      <a href="ch04_patent_anatomy.html">Ch.4</a>
+      <a href="ch05_writing_claims.html">Ch.5</a>
+      <a href="ch06_specification.html">Ch.6</a>
+      <a href="ch07_drawings.html">Ch.7</a>
+      <a href="ch08_application_process.html">Ch.8</a>
+      <a href="ch09_office_actions.html">Ch.9</a>
+      <a href="ch10_portfolio_strategy.html" class="active">Ch.10</a>
+      <a href="ch11_international.html">Ch.11</a>
+      <a href="ch12_monetization.html">Ch.12</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════════════════
+     CHAPTER HERO
+══════════════════════════════════════════════════ -->
+<header class="chapter-hero">
+  <div class="chapter-hero-content">
+    <div class="chapter-badge">Chapter 10</div>
+    <h1>Building a Patent Portfolio</h1>
+    <p class="subtitle">
+      From Single Patent to Strategic Asset — Continuation Strategy, Claim Laddering,
+      Competitive Intelligence, and the AI Portfolio Blueprint
+    </p>
+    <div class="chapter-meta">
+      <span>Dr. Rachael Y. Kim &mdash; Fish &amp; Richardson, Silicon Valley</span>
+      <span>~90 min read</span>
+      <span>Portfolio Strategy &bull; AI &amp; ML Focus</span>
+    </div>
+  </div>
+</header>
+
+<!-- ══════════════════════════════════════════════════
+     PAGE LAYOUT
+══════════════════════════════════════════════════ -->
+<div class="page-layout">
+
+  <!-- SIDEBAR / TOC -->
+  <aside class="sidebar">
+    <nav class="toc">
+      <h3>In This Chapter</h3>
+      <ol>
+        <li><a href="#why-portfolio">Why a Portfolio?</a></li>
+        <li><a href="#patent-family">The Patent Family</a></li>
+        <li><a href="#claim-laddering">Claim Laddering Strategy</a></li>
+        <li><a href="#ai-blueprint">The AI Portfolio Blueprint</a></li>
+        <li><a href="#patent-mining">Patent Mining from Research</a></li>
+        <li><a href="#competitive-intel">Competitive Intelligence</a></li>
+        <li><a href="#defensive-pub">Defensive Publications</a></li>
+        <li><a href="#review-committee">The Patent Review Committee</a></li>
+        <li><a href="#valuation">Portfolio Valuation &amp; Analytics</a></li>
+        <li><a href="#startup-portfolio">Startup Portfolio Strategy</a></li>
+        <li><a href="#pruning">Pruning &amp; Maintenance</a></li>
+        <li><a href="#checklist">Portfolio Strategy Checklist</a></li>
+      </ol>
+    </nav>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="chapter-content">
+
+    <!-- ──────────────────────────────────────────────
+         SECTION 1: WHY A PORTFOLIO?
+    ─────────────────────────────────────────────── -->
+    <section id="why-portfolio" class="section-anchor">
+      <h2>10.1 Why a Portfolio? The Strategic Case for Multiple Patents</h2>
+
+      <p>
+        A single patent is a bet. A portfolio is a strategy. Ask any seasoned in-house counsel at a major
+        technology company and they will tell you the same thing: the value of any individual patent is
+        highly uncertain, but a well-constructed portfolio of fifty, five hundred, or fifty thousand patents
+        creates durable competitive advantages that are nearly impossible to replicate quickly. This insight
+        drives the patent arms race you see in the numbers below.
+      </p>
+
+      <div class="stats-row">
+        <div class="stat-item">
+          <div class="stat-number">~50K</div>
+          <div class="stat-label">IBM active AI &amp; computing patents (2025 est.)</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">~30K</div>
+          <div class="stat-label">Google active AI-related patents</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">~25K</div>
+          <div class="stat-label">Microsoft active AI patent portfolio</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">~8K</div>
+          <div class="stat-label">Meta AI active patents</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">~6K</div>
+          <div class="stat-label">OpenAI + Microsoft AI-specific filings (2020–2025)</div>
+        </div>
+      </div>
+
+      <h3>The Single Patent vs. Portfolio Analogy</h3>
+
+      <p>
+        Think of a single patent like a single stock pick. It might be brilliant — a
+        foundational claim on a transformer architecture or a CRISPR gene-editing construct —
+        but it is still one bet on one invention in one jurisdiction. The patent may be invalidated in
+        inter partes review (IPR), designed around by a clever competitor, or simply become obsolete
+        as technology evolves. Any of these outcomes leaves you with nothing.
+      </p>
+
+      <p>
+        A portfolio, by contrast, is more like a diversified fund. Individual patents fail; portfolios
+        persist. A competitor who designs around your broad system claim runs into your narrower
+        method claim. The company that invalidates your foundational patent discovers that ten continuation
+        patents covering specific improvements remain fully valid. The country that refuses your
+        broad software claim grants your narrower implementation claim. Redundancy and diversity are
+        features, not inefficiencies.
+      </p>
+
+      <div class="callout callout-tip">
+        <div class="callout-icon">&#9733;</div>
+        <div class="callout-body">
+          <div class="callout-title">The Three Functions of a Patent Portfolio</div>
+          <p>
+            <strong>Defensive moat:</strong> A large portfolio deters competitors from suing you — they know
+            you can countersue with your own patents, creating mutually assured destruction that keeps
+            everyone at the negotiating table rather than in court.
+            <strong>Revenue stream:</strong> Licensed portfolios generate royalty income. IBM's patent
+            licensing program has historically generated over $1 billion per year.
+            <strong>Competitive intelligence:</strong> Reading competitor patent filings gives you a
+            12-to-18-month preview of their R&amp;D roadmap, before any product launches.
+          </p>
+        </div>
+      </div>
+
+      <h3>Defensive Moats</h3>
+
+      <p>
+        The concept of the patent <span class="key-term" title="A barrier to entry created by a large patent portfolio that competitors cannot easily design around">defensive moat</span>
+        is central to big-technology IP strategy. When a company accumulates a large, technically diverse patent
+        portfolio around its core products, it becomes both harder to attack (because any infringement suit
+        triggers a counter-suit analysis) and more attractive as a licensing partner. This is why Google paid
+        $12.5 billion for Motorola Mobility in 2012 — a deal that was widely understood at the time to be
+        primarily a patent acquisition.
+      </p>
+
+      <p>
+        For AI companies, the defensive moat extends beyond direct competitors. A portfolio covering
+        training methods, model architectures, inference optimization, and data preprocessing creates
+        overlapping rings of protection. Even if a competitor successfully designs around your architecture
+        patent, they still need to solve the training efficiency problem — and you have patents there too.
+      </p>
+
+      <h3>Licensing Revenue Streams</h3>
+
+      <p>
+        For companies whose primary business is not patent licensing, royalty income from a well-structured
+        portfolio can be substantial. Qualcomm's entire business model rests on patent licensing. IBM,
+        despite declining hardware revenues, has maintained a profitable patent licensing program for
+        decades. In the AI space, companies like Interdigital and Acacia Research have built businesses
+        around licensing foundational patents in connectivity and signal processing that AI systems depend upon.
+      </p>
+
+      <p>
+        For operating companies — companies that actually make products — patent licensing serves a
+        different but complementary function: it becomes a tool for resolving competitor disputes without
+        costly litigation. When two large technology companies are in dispute, a cross-license is often
+        the outcome. The company with the larger, higher-quality portfolio negotiates from a position of
+        strength.
+      </p>
+
+      <h3>The Portfolio Size vs. Innovation Quality Debate</h3>
+
+      <p>
+        Not everyone agrees that more patents is always better. Critics of the patent arms race point out
+        that many large portfolio patents are low-quality — filed not because the invention is important
+        but because the company's patent bonus program rewards quantity. Research by Lemley and Shapiro
+        has shown that the average patent has a relatively low probability of being valid if litigated.
+        The patents that actually get enforced tend to be the narrow slice of high-quality foundational
+        claims at the top of each technology tree.
+      </p>
+
+      <div class="callout callout-warning">
+        <div class="callout-icon">&#9888;</div>
+        <div class="callout-body">
+          <div class="callout-title">Quality vs. Quantity Trap</div>
+          <p>
+            A thousand weak patents do not equal one strong one. Filing low-quality applications wastes
+            prosecution budget, bloats maintenance fee obligations, and creates prosecution history estoppel
+            that can actually narrow the scope of your better patents. The goal is a portfolio of meaningful
+            claim scope, not a raw count of issued patents. Most patent counsel experienced in portfolio
+            management will tell you: 20 high-quality patents are worth more than 200 mediocre ones.
+          </p>
+        </div>
+      </div>
+
+      <p>
+        The best-performing portfolios combine both breadth (many patents covering many aspects of the
+        technology) and depth (foundational claims that competitors cannot easily design around). Building
+        this kind of portfolio requires a deliberate strategy — not just filing applications on every
+        invention as it appears, but thinking several years in advance about where the technology is going
+        and what claim scope will matter when it gets there.
+      </p>
+    </section>
+
+    <!-- ──────────────────────────────────────────────
+         SECTION 2: THE PATENT FAMILY
+    ─────────────────────────────────────────────── -->
+    <section id="patent-family" class="section-anchor">
+      <h2>10.2 The Patent Family</h2>
+
+      <p>
+        A <span class="key-term" title="A group of related patent applications sharing a common priority date, including continuations, CIPs, divisionals, and foreign counterparts">patent family</span>
+        is the collection of related applications that spring from a single original filing. Understanding
+        how to build and manage a patent family is one of the most important skills in portfolio strategy.
+        The different members of a family serve distinct strategic purposes, and the decision of when to
+        file each type has significant consequences for claim scope, prosecution history, and competitive
+        positioning.
+      </p>
+
+      <div class="figure">
+        <div class="figure-content" style="width:100%; max-width:780px;">
+          <svg class="family-tree-svg" viewBox="0 0 780 480" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Patent family tree diagram showing parent application branching into continuations, CIP, divisional, and international PCT filings">
+
+            <!-- Background -->
+            <rect width="780" height="480" fill="#f8f9fa" rx="12"/>
+
+            <!-- Title -->
+            <text x="390" y="30" text-anchor="middle" font-family="Inter,sans-serif" font-size="13" font-weight="700" fill="#1a2744">Patent Family Tree — Illustrative AI System Patent</text>
+
+            <!-- Parent Application Box -->
+            <rect x="290" y="50" width="200" height="64" rx="8" fill="#1a2744"/>
+            <text x="390" y="76" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" font-weight="700" fill="white">Parent Application</text>
+            <text x="390" y="93" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="rgba(255,255,255,0.8)">US 17/123,456 (2021)</text>
+            <text x="390" y="107" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="rgba(255,255,255,0.65)">Broad system + method claims</text>
+
+            <!-- Vertical line from parent -->
+            <line x1="390" y1="114" x2="390" y2="148" stroke="#adb5bd" stroke-width="2"/>
+
+            <!-- Horizontal branch line -->
+            <line x1="100" y1="148" x2="680" y2="148" stroke="#adb5bd" stroke-width="2"/>
+
+            <!-- Branch verticals -->
+            <line x1="100" y1="148" x2="100" y2="185" stroke="#adb5bd" stroke-width="2"/>
+            <line x1="270" y1="148" x2="270" y2="185" stroke="#adb5bd" stroke-width="2"/>
+            <line x1="440" y1="148" x2="440" y2="185" stroke="#adb5bd" stroke-width="2"/>
+            <line x1="610" y1="148" x2="610" y2="185" stroke="#adb5bd" stroke-width="2"/>
+
+            <!-- CON 1 -->
+            <rect x="40" y="185" width="120" height="70" rx="8" fill="#2d3f6b"/>
+            <text x="100" y="208" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" font-weight="700" fill="white">Continuation 1</text>
+            <text x="100" y="224" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">US 17/456,789</text>
+            <text x="100" y="240" text-anchor="middle" font-family="Inter,sans-serif" font-size="8.5" fill="rgba(255,255,255,0.65)">Training method claims</text>
+            <text x="100" y="254" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#e8b84b">Filed 2022</text>
+
+            <!-- CON 2 -->
+            <rect x="210" y="185" width="120" height="70" rx="8" fill="#2d3f6b"/>
+            <text x="270" y="208" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" font-weight="700" fill="white">Continuation 2</text>
+            <text x="270" y="224" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">US 17/789,012</text>
+            <text x="270" y="240" text-anchor="middle" font-family="Inter,sans-serif" font-size="8.5" fill="rgba(255,255,255,0.65)">Inference optimization</text>
+            <text x="270" y="254" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#e8b84b">Filed 2023</text>
+
+            <!-- CIP -->
+            <rect x="380" y="185" width="120" height="70" rx="8" fill="#c8942a"/>
+            <text x="440" y="208" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" font-weight="700" fill="white">CIP Application</text>
+            <text x="440" y="224" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="rgba(255,255,255,0.9)">US 18/234,567</text>
+            <text x="440" y="240" text-anchor="middle" font-family="Inter,sans-serif" font-size="8.5" fill="rgba(255,255,255,0.8)">New architecture add'l</text>
+            <text x="440" y="254" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="white">Filed 2023</text>
+
+            <!-- PCT Application -->
+            <rect x="550" y="185" width="120" height="70" rx="8" fill="#1a6b8a"/>
+            <text x="610" y="208" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" font-weight="700" fill="white">PCT Application</text>
+            <text x="610" y="224" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">PCT/US2022/012345</text>
+            <text x="610" y="240" text-anchor="middle" font-family="Inter,sans-serif" font-size="8.5" fill="rgba(255,255,255,0.65)">International protection</text>
+            <text x="610" y="254" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#e8b84b">Filed 2022</text>
+
+            <!-- National Phase lines from PCT -->
+            <line x1="610" y1="255" x2="610" y2="305" stroke="#adb5bd" stroke-width="1.5"/>
+            <line x1="490" y1="305" x2="730" y2="305" stroke="#adb5bd" stroke-width="1.5"/>
+            <line x1="490" y1="305" x2="490" y2="330" stroke="#adb5bd" stroke-width="1.5"/>
+            <line x1="610" y1="305" x2="610" y2="330" stroke="#adb5bd" stroke-width="1.5"/>
+            <line x1="730" y1="305" x2="730" y2="330" stroke="#adb5bd" stroke-width="1.5"/>
+
+            <!-- EP National Phase -->
+            <rect x="448" y="330" width="85" height="52" rx="6" fill="#495057"/>
+            <text x="490" y="352" text-anchor="middle" font-family="Inter,sans-serif" font-size="9.5" font-weight="700" fill="white">EPO (Europe)</text>
+            <text x="490" y="367" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="rgba(255,255,255,0.7)">EP 22/123456.7</text>
+            <text x="490" y="379" text-anchor="middle" font-family="Inter,sans-serif" font-size="7.5" fill="#e8b84b">National Phase 2024</text>
+
+            <!-- CN National Phase -->
+            <rect x="568" y="330" width="85" height="52" rx="6" fill="#495057"/>
+            <text x="610" y="352" text-anchor="middle" font-family="Inter,sans-serif" font-size="9.5" font-weight="700" fill="white">CNIPA (China)</text>
+            <text x="610" y="367" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="rgba(255,255,255,0.7)">CN 202280XXXXXX</text>
+            <text x="610" y="379" text-anchor="middle" font-family="Inter,sans-serif" font-size="7.5" fill="#e8b84b">National Phase 2024</text>
+
+            <!-- JP National Phase -->
+            <rect x="688" y="330" width="85" height="52" rx="6" fill="#495057"/>
+            <text x="730" y="352" text-anchor="middle" font-family="Inter,sans-serif" font-size="9.5" font-weight="700" fill="white">JPO (Japan)</text>
+            <text x="730" y="367" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="rgba(255,255,255,0.7)">JP 2024-XXXXXX</text>
+            <text x="730" y="379" text-anchor="middle" font-family="Inter,sans-serif" font-size="7.5" fill="#e8b84b">National Phase 2024</text>
+
+            <!-- DIV line from CON 1 -->
+            <line x1="100" y1="255" x2="100" y2="305" stroke="#adb5bd" stroke-width="1.5"/>
+            <!-- DIVISIONAL -->
+            <rect x="40" y="305" width="120" height="52" rx="6" fill="#1e8449"/>
+            <text x="100" y="327" text-anchor="middle" font-family="Inter,sans-serif" font-size="9.5" font-weight="700" fill="white">Divisional</text>
+            <text x="100" y="342" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="rgba(255,255,255,0.8)">US 18/567,890</text>
+            <text x="100" y="355" text-anchor="middle" font-family="Inter,sans-serif" font-size="7.5" fill="rgba(255,255,255,0.65)">Restricted species</text>
+
+            <!-- Legend -->
+            <rect x="30" y="415" width="720" height="55" rx="8" fill="white" stroke="#dee2e6" stroke-width="1"/>
+            <rect x="45" y="430" width="14" height="14" rx="3" fill="#1a2744"/>
+            <text x="65" y="441" font-family="Inter,sans-serif" font-size="9" fill="#495057">Continuation (same disclosure)</text>
+            <rect x="200" y="430" width="14" height="14" rx="3" fill="#c8942a"/>
+            <text x="220" y="441" font-family="Inter,sans-serif" font-size="9" fill="#495057">CIP (new matter added)</text>
+            <rect x="355" y="430" width="14" height="14" rx="3" fill="#1a6b8a"/>
+            <text x="375" y="441" font-family="Inter,sans-serif" font-size="9" fill="#495057">PCT / National Phase</text>
+            <rect x="510" y="430" width="14" height="14" rx="3" fill="#1e8449"/>
+            <text x="530" y="441" font-family="Inter,sans-serif" font-size="9" fill="#495057">Divisional (restricted invention)</text>
+
+            <text x="45" y="460" font-family="Inter,sans-serif" font-size="8.5" fill="#6c757d">All family members share the 2021 priority date. CIP claims covering new matter get new 2023 priority date for those claims only.</text>
+          </svg>
+        </div>
+        <p class="figure-caption">Figure 10.1 — Illustrative patent family structure for an AI system patent, showing how a single parent application can branch into continuations, CIP, divisional, and international PCT filings.</p>
+      </div>
+
+      <h3>Continuation Applications</h3>
+
+      <p>
+        A <span class="key-term" title="A patent application that claims the benefit of a parent application's filing date and discloses the same invention, typically pursuing different claim scope">continuation application</span>
+        (CON) allows you to pursue additional claims based on the same specification as a parent application,
+        as long as the parent is still pending. The continuation shares the parent's priority date and
+        discloses the same invention — you cannot add new matter. What you can do is draft entirely different
+        claims: broader, narrower, or focused on different aspects of the disclosed invention.
+      </p>
+
+      <p>
+        The strategic power of continuations is enormous. A skilled practitioner files the parent application
+        with broad, system-level claims but also deliberately leaves material in the specification that can
+        support narrower, more specific claims in continuations. When competitors design around the broad
+        claims, those continuation claims — which are still pending and can be tailored to cover the
+        competitor's specific implementation — spring into position. This is claim laddering in action,
+        covered in detail in Section 10.3.
+      </p>
+
+      <div class="callout callout-info">
+        <div class="callout-icon">&#8505;</div>
+        <div class="callout-body">
+          <div class="callout-title">Key Rule: Continuation Must Be Filed While Parent Is Pending</div>
+          <p>
+            A continuation must be filed before the parent application issues as a patent or is abandoned.
+            Once the parent issues, it is too late to file a continuation. This rule creates enormous urgency
+            at the moment of allowance: before paying the issue fee, patent counsel should evaluate whether
+            a continuation should be filed. Many companies maintain a standing policy of filing at least one
+            continuation before every parent application issues.
+          </p>
+        </div>
+      </div>
+
+      <h3>Continuation-in-Part (CIP) Applications</h3>
+
+      <p>
+        A <span class="key-term" title="A patent application that adds new subject matter to the parent disclosure while retaining priority for the subject matter that was in the parent">continuation-in-part (CIP)</span>
+        is a hybrid: it contains all the disclosure from the parent plus new matter. Claims that rely only
+        on the parent disclosure get the parent's priority date. Claims that require the new matter get only
+        the CIP's own filing date as their priority date.
+      </p>
+
+      <p>
+        CIPs are particularly useful in fast-moving fields like AI, where a research team may improve upon
+        their initial invention while the original application is still pending. Rather than filing a
+        completely new application (and losing the parent's priority date for the original concepts), they
+        file a CIP that covers both the original and improved inventions in a single prosecution effort.
+      </p>
+
+      <div class="callout callout-warning">
+        <div class="callout-icon">&#9888;</div>
+        <div class="callout-body">
+          <div class="callout-title">CIP Trap: Split Priority Dates</div>
+          <p>
+            The split priority date in a CIP creates hidden vulnerability. Claims covering new matter have a
+            later priority date, which means that anything published between the parent filing date and the
+            CIP filing date is potentially prior art against those claims. In AI, where preprint servers
+            publish daily, an 18-month gap between a parent filing and a CIP filing can expose new matter
+            claims to substantial prior art. Always analyze the prior art landscape carefully before choosing
+            CIP over a standalone new application.
+          </p>
+        </div>
+      </div>
+
+      <h3>Divisional Applications</h3>
+
+      <p>
+        When a restriction requirement issues — the USPTO's way of saying your application covers
+        more than one distinct invention — you must elect one invention to prosecute in the original
+        application. A <span class="key-term" title="A patent application carved out of a parent application to pursue claims that were restricted out during prosecution">divisional application</span>
+        allows you to pursue the non-elected inventions in separate applications, while retaining the
+        parent's priority date.
+      </p>
+
+      <p>
+        Experienced patent counsel treat restriction requirements strategically. Rather than fighting
+        the restriction (which rarely succeeds and wastes prosecution time), they use it as an opportunity
+        to build out the patent family. Each restricted species becomes a separate divisional, creating
+        a natural mechanism for portfolio expansion at no extra invention cost.
+      </p>
+
+      <h3>Foreign Counterparts and PCT Applications</h3>
+
+      <p>
+        A PCT application preserves your right to enter national phase in over 150 countries, with a
+        single international filing. Within 30 months of the priority date (12 months from the PCT filing,
+        in most cases), you choose which national phase entries to pursue. Chapter 11 covers PCT strategy
+        in depth. For portfolio purposes, the key point is that foreign counterparts are essential
+        members of a well-structured patent family, particularly for AI companies with global markets.
+      </p>
+
+      <h3>Prosecution History Considerations Across the Family</h3>
+
+      <p>
+        Every statement made during prosecution of any family member can be used against you in the others.
+        This is the <span class="key-term" title="The principle that arguments made in prosecuting one patent application can limit the scope of related applications">prosecution history estoppel</span>
+        principle extended across a patent family. If you narrow a claim in the parent application to
+        distinguish a reference, that narrowing argument can constrain the scope of continuation claims even
+        if the continuation uses broader language. Prosecutors must maintain consistent, coordinated
+        claim strategies across the entire family.
+      </p>
+    </section>
+
+    <!-- ──────────────────────────────────────────────
+         SECTION 3: CLAIM LADDERING
+    ─────────────────────────────────────────────── -->
+    <section id="claim-laddering" class="section-anchor">
+      <h2>10.3 Claim Laddering Strategy</h2>
+
+      <p>
+        <span class="key-term" title="A patent portfolio strategy that uses multiple continuation applications to protect an invention at multiple levels of specificity">Claim laddering</span>
+        is the art of building a progression of claims — from the broadest possible articulation of an
+        invention down to extremely specific implementations — spread across multiple patents in a family.
+        The analogy is a ladder: the broad claims at the top cover the widest possible scope; the narrow
+        claims at the bottom are the hardest to design around because they track specific technical details
+        that competitors are likely to implement.
+      </p>
+
+      <p>
+        Why spread claims across multiple patents rather than including all levels in a single application?
+        Several reasons. First, independent claims in a single application are often argued against each
+        other — if you assert both a broad claim and a narrow claim, the examiner may use the narrow claim
+        as evidence of what "the invention" actually is, limiting the broad claim. Second, separate patents
+        for different claim levels allow you to pursue prosecution strategies tailored to each level's
+        prior art landscape. Third, separate patents create separate enforcement opportunities and licensing
+        leverage.
+      </p>
+
+      <h3>The Transformer Architecture Ladder — A Worked Example</h3>
+
+      <p>
+        The following example demonstrates claim laddering using a fictional transformer-based AI system
+        patent family with three continuation applications, each narrower than the previous but each
+        creating a distinct enforcement position.
+      </p>
+
+      <div class="claim-ladder">
+
+        <div class="claim-ladder-item broad">
+          <div class="claim-ladder-label">Parent Application &mdash; Broad Foundational Claims</div>
+          <h4>US Patent 11,234,567 — "Neural Network System for Sequence-to-Sequence Processing"</h4>
+          <p style="margin-bottom:.75rem;">
+            The broadest system and method claims cover the general concept of attention-based
+            processing across arbitrary sequence data. Resistant to design-around only if the
+            prior art truly didn't disclose attention mechanisms at this level.
+          </p>
+          <div class="claim-box" style="margin-top:.75rem; margin-bottom:0;">
+            <div class="claim-header">Representative Independent Claim (Broad)</div>
+            <p>
+              <span class="claim-number">1.</span> A computer-implemented method for processing
+              sequence data, the method comprising:
+            </p>
+            <div class="claim-indent">
+              <span class="claim-element">receiving an input sequence comprising a plurality of tokens;</span>
+              <span class="claim-element">computing, for each token, an attention score based on relationships between said token and at least one other token in the input sequence;</span>
+              <span class="claim-element">generating a weighted representation of the input sequence based on the computed attention scores; and</span>
+              <span class="claim-element">producing an output sequence using the weighted representation.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="claim-ladder-item medium">
+          <div class="claim-ladder-label">Continuation 1 &mdash; Medium Specificity Claims</div>
+          <h4>US Patent 11,456,789 — "Multi-Head Self-Attention for Natural Language Processing"</h4>
+          <p style="margin-bottom:.75rem;">
+            Narrows to multi-head attention specifically, with explicit language about parallel attention
+            heads and learned projection matrices. Covers the core transformer architecture as implemented
+            in practice by GPT-style and BERT-style systems.
+          </p>
+          <div class="claim-box" style="margin-top:.75rem; margin-bottom:0;">
+            <div class="claim-header">Representative Independent Claim (Medium)</div>
+            <p>
+              <span class="claim-number">1.</span> A system for processing natural language input, comprising:
+            </p>
+            <div class="claim-indent">
+              <span class="claim-element">a multi-head attention module configured to process an input token sequence using a plurality of attention heads operating in parallel, each attention head computing query, key, and value projections using learned weight matrices;</span>
+              <span class="claim-element">a feedforward sublayer configured to apply position-wise transformations to the output of the multi-head attention module; and</span>
+              <span class="claim-element">a position encoding module configured to inject positional information into the input token embeddings prior to attention processing.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="claim-ladder-item narrow">
+          <div class="claim-ladder-label">Continuation 2 &mdash; Narrow Defensible Claims</div>
+          <h4>US Patent 11,678,901 — "Scaled Dot-Product Attention with Temperature Scaling"</h4>
+          <p style="margin-bottom:.75rem;">
+            Narrows to the specific mathematical operations and the temperature scaling trick used in
+            practice to stabilize training. Highly specific but nearly impossible to design around
+            without degrading model quality — competitors who implement state-of-the-art transformers
+            will almost certainly fall within this claim.
+          </p>
+          <div class="claim-box" style="margin-top:.75rem; margin-bottom:0;">
+            <div class="claim-header">Representative Independent Claim (Narrow)</div>
+            <p>
+              <span class="claim-number">1.</span> A method for computing scaled dot-product attention in a neural network, comprising:
+            </p>
+            <div class="claim-indent">
+              <span class="claim-element">computing attention logits as a dot product between a query matrix Q and a transposed key matrix K, scaled by the inverse square root of the key dimension d<sub>k</sub>;</span>
+              <span class="claim-element">applying a softmax function to the scaled attention logits to produce an attention weight distribution; and</span>
+              <span class="claim-element">computing an attended output as a weighted sum of a value matrix V using the attention weight distribution, wherein the scaling by 1/√d<sub>k</sub> reduces gradient magnitude variance during training.</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="callout callout-example">
+        <div class="callout-icon">&#128221;</div>
+        <div class="callout-body">
+          <div class="callout-title">Strategic Insight: The Unavoidable Narrow Claim</div>
+          <p>
+            The most powerful claim ladder positions narrow claims that cover implementation details that
+            state-of-the-art practitioners will invariably adopt for performance reasons. In the transformer
+            example above, the temperature scaling by 1/√d<sub>k</sub> is mathematically motivated — it
+            keeps the dot products in a range where the softmax function has useful gradients. Any competitive
+            implementation of multi-head attention will use this or a functionally equivalent scaling.
+            A narrow claim that covers this specific, technically motivated detail is substantially harder
+            to design around than a broad functional claim.
+          </p>
+        </div>
+      </div>
+
+      <h3>Protecting Against Design-Arounds</h3>
+
+      <p>
+        Every broad claim is vulnerable to a design-around. A sophisticated competitor will analyze your
+        patent, identify the elements of your claims, and modify their implementation to avoid at least
+        one element. The defense against design-arounds is having multiple claim levels in the ladder,
+        such that the design-around of the broad claim falls squarely within the medium claim, and the
+        design-around of the medium claim falls within the narrow claim.
+      </p>
+
+      <p>
+        For this to work, the specification — from the very first filing — must contain sufficient disclosure
+        to support all levels of the claim ladder. This means that the original specification must be written
+        with portfolio strategy in mind, disclosing not just the preferred embodiment but also alternative
+        embodiments, specific mechanisms, and the technical reasons why particular implementations are
+        preferred. That technical detail becomes the ammunition for future continuation claims.
+      </p>
+
+      <blockquote>
+        "The specification is the portfolio's foundation. A thin specification supports only thin claims.
+        Write the specification assuming you'll be prosecuting continuations for the next fifteen years —
+        because if the invention is important, you will be."
+        <cite>— Senior Patent Counsel, Major AI Company (anonymous)</cite>
+      </blockquote>
+    </section>
+
+    <!-- ──────────────────────────────────────────────
+         SECTION 4: AI PATENT PORTFOLIO BLUEPRINT
+    ─────────────────────────────────────────────── -->
+    <section id="ai-blueprint" class="section-anchor">
+      <h2>10.4 The AI Patent Portfolio Blueprint</h2>
+
+      <p>
+        Building a comprehensive AI patent portfolio requires thinking across multiple technological
+        layers simultaneously. A company whose portfolio covers only model architectures is exposed to
+        competitors who improve the training process, the data pipeline, or the deployment infrastructure.
+        A complete AI portfolio blueprint addresses all six layers of the AI technology stack.
+      </p>
+
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-icon">&#127965;</div>
+          <h3>Core Architecture Patents</h3>
+          <p>
+            Foundational model architecture inventions: novel attention mechanisms, network topologies,
+            layer configurations, activation functions. These are the hardest to obtain (heavy prior art)
+            and the most valuable if obtained. File broadly, prosecute aggressively, build continuations
+            from day one.
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="card-icon">&#128200;</div>
+          <h3>Training Method Patents</h3>
+          <p>
+            Novel training procedures: loss functions, regularization techniques, curriculum learning
+            strategies, federated learning protocols, RLHF variants, preference optimization methods.
+            Often easier to obtain than architecture patents and frequently required for competitive
+            performance.
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="card-icon">&#128260;</div>
+          <h3>Data Pipeline Patents</h3>
+          <p>
+            Data collection, preprocessing, augmentation, and curation methods. Often undervalued by
+            AI teams but critically important — companies that develop superior data pipelines achieve
+            model quality advantages that competitors struggle to replicate even with the same
+            architecture.
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="card-icon">&#127921;</div>
+          <h3>Application-Specific Patents</h3>
+          <p>
+            Domain-specific applications of AI methods: medical imaging diagnostics, natural language
+            contract analysis, autonomous vehicle perception. These patents are often easier to get
+            past eligibility challenges because they tie the AI method to a specific technical result
+            in a specific domain.
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="card-icon">&#128084;</div>
+          <h3>User Interface Patents</h3>
+          <p>
+            Novel UI/UX inventions for AI-powered products: prompt engineering interfaces, model
+            output visualization, human-in-the-loop feedback systems. Often overlooked by technical
+            teams but valuable for protecting the product experience that drives customer adoption.
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="card-icon">&#9881;</div>
+          <h3>System Integration Patents</h3>
+          <p>
+            Infrastructure for deploying AI at scale: model serving architectures, inference
+            optimization, hardware-software co-design, multimodal system integration, API protocols
+            for AI services. Protects the operational know-how that turns a research model into
+            a production product.
+          </p>
+        </div>
+      </div>
+
+      <h3>Strategic Value Matrix by Patent Type</h3>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Patent Category</th>
+              <th>Defensive Value</th>
+              <th>Licensing Value</th>
+              <th>Litigation Strength</th>
+              <th>Typical Cost to Obtain</th>
+              <th>Time to Grant</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Core Architecture (foundational)</td>
+              <td><span class="badge badge-success">Very High</span></td>
+              <td><span class="badge badge-success">Very High</span></td>
+              <td><span class="badge badge-warning">Medium</span></td>
+              <td>$25K–$60K</td>
+              <td>3–6 years</td>
+            </tr>
+            <tr>
+              <td>Training Method</td>
+              <td><span class="badge badge-success">High</span></td>
+              <td><span class="badge badge-success">High</span></td>
+              <td><span class="badge badge-success">High</span></td>
+              <td>$15K–$35K</td>
+              <td>2–4 years</td>
+            </tr>
+            <tr>
+              <td>Data Pipeline</td>
+              <td><span class="badge badge-warning">Medium</span></td>
+              <td><span class="badge badge-warning">Medium</span></td>
+              <td><span class="badge badge-success">High</span></td>
+              <td>$12K–$25K</td>
+              <td>2–3 years</td>
+            </tr>
+            <tr>
+              <td>Application-Specific</td>
+              <td><span class="badge badge-warning">Medium</span></td>
+              <td><span class="badge badge-success">High</span></td>
+              <td><span class="badge badge-success">Very High</span></td>
+              <td>$15K–$40K</td>
+              <td>2–4 years</td>
+            </tr>
+            <tr>
+              <td>User Interface</td>
+              <td><span class="badge badge-warning">Low–Medium</span></td>
+              <td><span class="badge badge-warning">Medium</span></td>
+              <td><span class="badge badge-warning">Medium</span></td>
+              <td>$10K–$20K</td>
+              <td>1.5–3 years</td>
+            </tr>
+            <tr>
+              <td>System Integration</td>
+              <td><span class="badge badge-success">High</span></td>
+              <td><span class="badge badge-warning">Medium</span></td>
+              <td><span class="badge badge-success">High</span></td>
+              <td>$15K–$30K</td>
+              <td>2–4 years</td>
+            </tr>
+            <tr>
+              <td>Continuation (narrow)</td>
+              <td><span class="badge badge-success">High</span></td>
+              <td><span class="badge badge-warning">Medium</span></td>
+              <td><span class="badge badge-success">Very High</span></td>
+              <td>$8K–$18K</td>
+              <td>1–2 years</td>
+            </tr>
+            <tr>
+              <td>Provisional (placeholder)</td>
+              <td><span class="badge badge-info">Strategic</span></td>
+              <td><span class="badge badge-danger">None (pre-patent)</span></td>
+              <td><span class="badge badge-danger">None (pre-patent)</span></td>
+              <td>$2K–$8K</td>
+              <td>N/A</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="table-caption">Table 10.1 — Strategic value matrix for AI patent portfolio categories. Costs represent U.S. prosecution through issuance; foreign prosecution adds substantially to the total.</p>
+
+      <div class="callout callout-tip">
+        <div class="callout-icon">&#9733;</div>
+        <div class="callout-body">
+          <div class="callout-title">Portfolio Balance Guideline</div>
+          <p>
+            For an AI company with a significant product, a balanced portfolio typically allocates roughly
+            30–40% of patent budget to core architecture and training method patents (high value, harder to get),
+            30–40% to application-specific and system integration patents (easier to get, strong for enforcement),
+            and 20–30% to maintaining continuation chains from foundational filings. Data pipeline and UI
+            patents fill the remainder. Adjust this allocation based on where your specific competitive
+            threats actually come from.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ──────────────────────────────────────────────
+         SECTION 5: PATENT MINING FROM RESEARCH
+    ─────────────────────────────────────────────── -->
+    <section id="patent-mining" class="section-anchor">
+      <h2>10.5 Patent Mining from Research</h2>
+
+      <p>
+        For most technology companies, the biggest bottleneck in portfolio building is not money or
+        legal capacity — it is the identification of patentable inventions from the stream of research
+        output that the engineering and science teams produce daily. Researchers are not trained to think
+        in terms of patent claims; they think in terms of papers, experiments, and benchmarks. The patent
+        mining process is the bridge between research culture and IP strategy.
+      </p>
+
+      <h3>How to Identify Patentable Inventions</h3>
+
+      <p>
+        Not every research result is a patentable invention. The filter is novelty, non-obviousness, and —
+        for AI and biotech — patent eligibility. But within that filter, the candidates are wider than most
+        researchers expect. The following categories of AI research output frequently give rise to patentable
+        inventions:
+      </p>
+
+      <ul>
+        <li><strong>Novel architectures:</strong> Any new neural network architecture, attention variant, or layer configuration that achieves better performance or efficiency than prior work.</li>
+        <li><strong>Training innovations:</strong> New loss functions, optimizers, regularization techniques, learning rate schedules, or training curricula that improve performance or reduce training cost.</li>
+        <li><strong>Data processing methods:</strong> Novel approaches to data collection, labeling, augmentation, or filtering that enable better model training.</li>
+        <li><strong>Inference optimizations:</strong> Quantization methods, pruning techniques, distillation procedures, and speculative decoding approaches that reduce deployment cost.</li>
+        <li><strong>Application-specific adaptations:</strong> Novel applications of general AI methods to specific domains, particularly where the adaptation requires non-obvious domain-specific insights.</li>
+        <li><strong>Evaluation methods:</strong> Novel benchmarks or evaluation methodologies, particularly if they require specific technical implementations.</li>
+      </ul>
+
+      <h3>The Innovation Identification Workshop</h3>
+
+      <p>
+        The most effective mechanism for systematically identifying patentable inventions is the
+        <span class="key-term" title="A structured session where researchers describe their work to patent counsel for invention identification">innovation identification workshop</span>
+        — a structured, regular meeting between patent counsel and research/engineering teams. The format
+        typically involves researchers presenting recent work, with patent counsel actively probing for
+        patentable elements that the researcher may have overlooked.
+      </p>
+
+      <ol class="process-steps">
+        <li>
+          <div class="step-content">
+            <h4>Pre-Meeting Preparation</h4>
+            <p>Patent counsel reviews recent research papers, internal presentations, and code check-ins.
+            Identifies candidate inventions before the meeting. Researchers complete a one-page invention
+            disclosure form for each candidate.</p>
+          </div>
+        </li>
+        <li>
+          <div class="step-content">
+            <h4>Technical Presentation</h4>
+            <p>Researcher presents the work informally — not as a legal document but as a technical
+            explanation. Patent counsel listens for novel elements, unexpected results, and technical
+            choices that were non-obvious.</p>
+          </div>
+        </li>
+        <li>
+          <div class="step-content">
+            <h4>Probing Questions</h4>
+            <p>Patent counsel asks: "What would happen if you didn't do X?" "Did prior systems try Y?"
+            "What was surprising about this result?" "Why this particular parameter choice?" These
+            questions often reveal patentable elements the researcher didn't flag.</p>
+          </div>
+        </li>
+        <li>
+          <div class="step-content">
+            <h4>Patent Eligibility Screen</h4>
+            <p>Quick first-pass § 101 analysis. Does the invention have a specific technical character?
+            Is it tied to a particular machine? Does it improve the technology itself? If the answer
+            to all three is "no," it may be a better candidate for defensive publication than patent filing.</p>
+          </div>
+        </li>
+        <li>
+          <div class="step-content">
+            <h4>Filing Decision and Priority Assignment</h4>
+            <p>Each identified invention is scored on patentability, business value, and enforcement
+            feasibility. High-priority inventions go directly to provisional or non-provisional filing.
+            Lower-priority inventions may be defensively published.</p>
+          </div>
+        </li>
+      </ol>
+
+      <h3>When to File vs. When to Publish</h3>
+
+      <p>
+        The decision to file a patent application versus publish a research paper is one of the most
+        consequential in AI IP strategy. Publication destroys your own patent rights in most jurisdictions
+        outside the U.S. — and even in the U.S., post-AIA grace period rights are limited and subject
+        to erosion. The fundamental rule: <strong>file before you publish</strong>.
+      </p>
+
+      <h3>The Publish-Then-File Strategy (12-Month Grace Period)</h3>
+
+      <p>
+        Under the AIA, inventors have a 12-month grace period after their own public disclosure to file
+        a U.S. patent application. This grace period creates the
+        <span class="key-term" title="A strategy where inventors publish first to establish priority and prevent competitors from patenting the same idea, then file a patent within the 12-month grace period">publish-then-file strategy</span>:
+        publish the paper to establish prior art (blocking competitors from patenting the same idea),
+        then file within 12 months to secure U.S. patent rights.
+      </p>
+
+      <p>
+        This strategy is common in academic and open-source AI research. The publication creates a
+        defensive publication that blocks competitors, and the subsequent patent application captures
+        the commercial value. The risk: the publication starts a 12-month countdown that requires
+        careful calendar management, and the grace period is U.S.-only — publication typically destroys
+        patent rights in Europe, Japan, China, and other major jurisdictions unless a patent was filed
+        before the publication date.
+      </p>
+
+      <div class="callout callout-danger">
+        <div class="callout-icon">&#9888;</div>
+        <div class="callout-body">
+          <div class="callout-title">Critical Limitation: Grace Period is U.S.-Only</div>
+          <p>
+            The 12-month grace period under 35 U.S.C. § 102(b)(1) only applies in the United States.
+            If you publish before filing, you <strong>permanently lose</strong> the ability to obtain
+            patent protection in Europe (EPO), most of Asia (including China, Japan, Korea), and most
+            other major jurisdictions. For AI companies with global markets, publishing without first
+            filing a PCT application (or at least a U.S. provisional) is a serious strategic error.
+          </p>
+        </div>
+      </div>
+
+      <h3>Coordinating Research and IP Teams</h3>
+
+      <p>
+        The most effective AI patent programs embed IP awareness into the research culture itself.
+        Researchers should understand, at a minimum: (1) what types of innovations are patentable;
+        (2) why publication timing matters; (3) how to submit an invention disclosure; and
+        (4) what happens after they submit one. Companies that treat IP education as a one-time
+        orientation exercise rather than an ongoing cultural priority consistently underfile relative
+        to their actual innovation output.
+      </p>
+
+      <p>
+        Best practices include: designating IP liaisons within each research team, incorporating
+        invention disclosure deadlines into the paper submission process, creating financial incentives
+        for researchers to identify patentable inventions (inventor compensation programs), and making
+        the patent submission process as frictionless as possible — a researcher who has to fill out
+        a 20-page form before a filing decision will find reasons not to.
+      </p>
+    </section>
+
+    <!-- ──────────────────────────────────────────────
+         SECTION 6: COMPETITIVE INTELLIGENCE
+    ─────────────────────────────────────────────── -->
+    <section id="competitive-intel" class="section-anchor">
+      <h2>10.6 Competitive Intelligence Using Patents</h2>
+
+      <p>
+        Patent filings are the best publicly available source of competitive intelligence in technology.
+        A patent application filed today reveals the inventor's technical thinking from 12 to 18 months
+        ago — and because applications are published 18 months after filing, you get a structured,
+        documented view of what your competitors were working on before any product announcement.
+        Building a systematic patent monitoring program is one of the highest-ROI activities in
+        corporate IP strategy.
+      </p>
+
+      <h3>Monitoring Competitor Filings</h3>
+
+      <p>
+        The basic infrastructure for competitor patent monitoring involves setting up automated alerts
+        for new filings by competitor companies (by assignee name), in relevant technology classifications
+        (CPC codes for AI include G06N 3/00 series for neural networks), and by relevant inventor names
+        (top researchers who move between companies often signal technology direction before any public
+        announcement).
+      </p>
+
+      <div class="tool-grid">
+        <div class="tool-card">
+          <div class="tool-badge free">Free</div>
+          <h4>USPTO Patent Alert</h4>
+          <p>USPTO's built-in saved search and email alert system. Covers U.S. applications and patents.
+          Limited analytics but free and reliable for basic monitoring.</p>
+        </div>
+        <div class="tool-card">
+          <div class="tool-badge free">Free</div>
+          <h4>Google Patents Alerts</h4>
+          <p>Google's patent search with email alerts. Covers USPTO, EPO, WIPO, and most major patent
+          offices. Best free option for multi-jurisdictional monitoring.</p>
+        </div>
+        <div class="tool-card">
+          <div class="tool-badge free">Free</div>
+          <h4>Espacenet (EPO)</h4>
+          <p>European Patent Office's database covering 100+ million documents. Strong for international
+          prior art searches and monitoring European filings.</p>
+        </div>
+        <div class="tool-card">
+          <div class="tool-badge paid">Enterprise</div>
+          <h4>Derwent Innovation</h4>
+          <p>Clarivate's professional patent intelligence platform. Derwent World Patents Index adds
+          value abstracts. Best for sophisticated portfolio analysis and competitor mapping.</p>
+        </div>
+        <div class="tool-card">
+          <div class="tool-badge paid">Enterprise</div>
+          <h4>PatSnap</h4>
+          <p>AI-powered patent analytics with landscape mapping, portfolio analysis, and inventor
+          tracking. Strong visualization capabilities for technology mapping.</p>
+        </div>
+        <div class="tool-card">
+          <div class="tool-badge paid">Enterprise</div>
+          <h4>IPlytics</h4>
+          <p>Market intelligence platform combining patent data with market and standards information.
+          Particularly useful for SEP (standard essential patent) analysis in AI hardware and
+          connectivity domains.</p>
+        </div>
+        <div class="tool-card">
+          <div class="tool-badge freemium">Freemium</div>
+          <h4>Lens.org</h4>
+          <p>Free, open patent analytics platform. Covers 170+ million patent documents.
+          Strong for academic and research-stage companies with limited IP budgets.</p>
+        </div>
+        <div class="tool-card">
+          <div class="tool-badge paid">Subscription</div>
+          <h4>Anaqua / CPA Global</h4>
+          <p>IP lifecycle management combined with competitive intelligence. Popular with large
+          in-house IP departments managing portfolios of 1,000+ active patents.</p>
+        </div>
+      </div>
+
+      <h3>Reading Competitor Applications to Predict Product Roadmaps</h3>
+
+      <p>
+        A patent application tells you several things about its assignee's technical direction. The claims
+        indicate what the company considers commercially valuable. The specification reveals the technical
+        approach in detail. The inventor list shows who is working on the problem. The referenced prior art
+        shows what the inventors consider the state of the art and how they position their contribution
+        relative to it.
+      </p>
+
+      <p>
+        Sophisticated competitive intelligence analysts build technology maps by clustering related patent
+        filings into technology themes, tracking the velocity of filings within each theme over time, and
+        correlating patent activity with product announcements and research publications. A sudden surge
+        in filings in a particular CPC subclass — say, G06N 3/08 (backpropagation methods) or
+        G06N 20/00 (machine learning) — can signal a major development push before any public announcement.
+      </p>
+
+      <h3>Patent Landscaping for AI Domains</h3>
+
+      <p>
+        <span class="key-term" title="A systematic survey of all patents in a given technology area to understand the competitive IP landscape">Patent landscaping</span>
+        is the systematic analysis of all patents in a given technology domain. A well-executed landscape
+        answers: Who are the major patent holders? What technologies are most heavily patented? Where are
+        the white spaces — areas of technical importance with relatively sparse patent coverage? What is
+        the trajectory of filings over time, and what does it imply about where the technology is heading?
+      </p>
+
+      <p>
+        For AI patent landscapes, the following CPC classifications are particularly relevant:
+      </p>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>CPC Classification</th>
+              <th>Technology Domain</th>
+              <th>Key Patent Holders (2025)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>G06N 3/04</code></td>
+              <td>Neural network architectures</td>
+              <td>Google, IBM, Microsoft, Samsung</td>
+            </tr>
+            <tr>
+              <td><code>G06N 3/08</code></td>
+              <td>Learning methods (backprop, etc.)</td>
+              <td>IBM, Google, Baidu, Qualcomm</td>
+            </tr>
+            <tr>
+              <td><code>G06N 20/00</code></td>
+              <td>Machine learning (general)</td>
+              <td>IBM, Microsoft, Google, Amazon</td>
+            </tr>
+            <tr>
+              <td><code>G06F 40/00</code></td>
+              <td>Natural language processing</td>
+              <td>Google, Microsoft, Amazon, Nuance</td>
+            </tr>
+            <tr>
+              <td><code>G06V 10/00</code></td>
+              <td>Computer vision / image recognition</td>
+              <td>Samsung, Sony, Google, Qualcomm</td>
+            </tr>
+            <tr>
+              <td><code>G06N 3/063</code></td>
+              <td>Hardware AI accelerators</td>
+              <td>Intel, NVIDIA, Qualcomm, Google</td>
+            </tr>
+            <tr>
+              <td><code>G16H</code></td>
+              <td>Healthcare informatics / AI in medicine</td>
+              <td>Siemens, Philips, IBM, GE Healthcare</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="table-caption">Table 10.2 — Key CPC classifications for AI patent landscaping, with major portfolio holders as of 2025.</p>
+
+      <h3>Freedom-to-Operate Implications</h3>
+
+      <p>
+        Competitive intelligence feeds directly into <span class="key-term" title="An analysis of whether a product or process infringes any valid, enforceable patent claims in a given jurisdiction">freedom-to-operate (FTO)</span>
+        analysis. Before launching a new AI product, a thorough FTO review must map the product's features
+        against the patents identified in the competitive landscape. FTO opinions are not just for legal
+        protection — they are strategic documents that inform product design decisions. If a particular
+        feature is found to infringe a competitor's valid patent, the product team can redesign before
+        launch rather than litigating after.
+      </p>
+
+      <p>
+        FTO analysis for AI products is particularly complex because a single AI system may invoke
+        hundreds of patented techniques — architectures, training methods, tokenization approaches,
+        inference optimizations. The standard approach is to decompose the product into its constituent
+        technical components and run targeted searches for each component, prioritizing those where
+        the company has largest patent exposure risk.
+      </p>
+    </section>
+
+    <!-- ──────────────────────────────────────────────
+         SECTION 7: DEFENSIVE PUBLICATIONS
+    ─────────────────────────────────────────────── -->
+    <section id="defensive-pub" class="section-anchor">
+      <h2>10.7 Defensive Publications</h2>
+
+      <p>
+        Not every invention that reaches the patent review committee should be patented. Sometimes,
+        the best move is a <span class="key-term" title="A publication that establishes prior art to prevent others from patenting an idea, without seeking patent protection for the idea itself">defensive publication</span>
+        — a deliberate public disclosure of an invention designed to prevent competitors from
+        patenting the same idea, without incurring the cost and complexity of a patent application.
+      </p>
+
+      <h3>When to Publish Instead of Patent</h3>
+
+      <p>
+        Defensive publication makes sense in several scenarios. First, when the invention is not
+        patentable but is novel and useful — if you know it fails a § 101 analysis but a competitor
+        might try to patent it anyway, publishing prevents that. Second, when the enforcement cost
+        exceeds the licensing value — a narrow incremental improvement with limited commercial
+        impact may not justify $20,000–$50,000 in prosecution costs plus ongoing maintenance fees.
+        Third, when open dissemination supports business strategy — many AI companies compete on
+        execution speed and data advantages, not IP, and publishing freely advances their ecosystem goals.
+      </p>
+
+      <p>
+        Fourth — and most strategically — when a patent application would result in a prosecution
+        history that narrows the scope of related patents in the family, defensive publication may
+        be preferable. If the claim scope you can obtain for an incremental improvement is narrower
+        than what the competitor's design-around would already avoid, paying $30,000 in prosecution
+        costs to get a patent with no enforcement value is purely wasteful.
+      </p>
+
+      <h3>Defensive Publication Databases</h3>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Platform</th>
+              <th>Type</th>
+              <th>USPTO Recognition</th>
+              <th>Cost</th>
+              <th>Best For</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>IP.com</strong></td>
+              <td>Commercial defensive publication database</td>
+              <td>Yes — cited as prior art in USPTO searches</td>
+              <td>~$500–$2,000/disclosure</td>
+              <td>Technology companies, established IP programs</td>
+            </tr>
+            <tr>
+              <td><strong>Research Disclosure</strong></td>
+              <td>Technical journal (IEE-published)</td>
+              <td>Yes — indexed by USPTO</td>
+              <td>~$800–$2,500/disclosure</td>
+              <td>Deep-tech inventions, academic spin-offs</td>
+            </tr>
+            <tr>
+              <td><strong>Prior Art Archive (PAA)</strong></td>
+              <td>Non-profit database (MIT-backed)</td>
+              <td>Yes — actively submitted to USPTO/EPO</td>
+              <td>Free (for qualifying companies)</td>
+              <td>Startups, academic institutions</td>
+            </tr>
+            <tr>
+              <td><strong>arXiv + Blog Posts</strong></td>
+              <td>Open publication</td>
+              <td>Yes — if public and indexed before filing date</td>
+              <td>Free</td>
+              <td>Academic research, open-source AI communities</td>
+            </tr>
+            <tr>
+              <td><strong>GitHub (public repos)</strong></td>
+              <td>Open source code disclosure</td>
+              <td>Partial — code may establish prior art for method claims</td>
+              <td>Free</td>
+              <td>Software/AI implementations</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="table-caption">Table 10.3 — Defensive publication platforms with USPTO recognition status and typical costs.</p>
+
+      <div class="callout callout-info">
+        <div class="callout-icon">&#8505;</div>
+        <div class="callout-body">
+          <div class="callout-title">The Structured Defensive Publication</div>
+          <p>
+            A defensive publication is most effective when it is written to anticipate the claim language
+            a competitor might use. This means including specific technical details, parameter ranges,
+            method steps, and examples that would be recited in patent claims — not just a general
+            description. A generic "we built a neural network that does X" publication will not
+            block a competitor from patenting "a neural network that does X using the specific
+            architecture Y with parameter range Z." Write your defensive publications with patent
+            claim structure in mind.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ──────────────────────────────────────────────
+         SECTION 8: THE PATENT REVIEW COMMITTEE
+    ─────────────────────────────────────────────── -->
+    <section id="review-committee" class="section-anchor">
+      <h2>10.8 The Patent Review Committee</h2>
+
+      <p>
+        A portfolio doesn't build itself. The organizational infrastructure that separates
+        companies with strategic patent portfolios from those with ad hoc collections is the
+        <span class="key-term" title="An internal committee that reviews invention disclosures and makes filing, publication, or abandonment decisions">Patent Review Committee (PRC)</span>
+        — a standing cross-functional body that systematically evaluates every potential patent
+        and makes informed filing, publication, and abandonment decisions.
+      </p>
+
+      <h3>Committee Composition</h3>
+
+      <div class="committee-roles">
+        <div class="role-card">
+          <h4>Chief Technology Officer (or VP Engineering)</h4>
+          <ul>
+            <li>Provides technical context and future roadmap perspective</li>
+            <li>Assesses commercial importance of technical inventions</li>
+            <li>Ensures alignment between IP strategy and R&amp;D direction</li>
+          </ul>
+        </div>
+        <div class="role-card gold-top">
+          <h4>Patent Counsel (Internal or External)</h4>
+          <ul>
+            <li>Assesses patentability and likely claim scope</li>
+            <li>Evaluates prosecution risk and cost estimates</li>
+            <li>Manages portfolio coordination and family strategy</li>
+          </ul>
+        </div>
+        <div class="role-card green-top">
+          <h4>Research/Engineering Leads</h4>
+          <ul>
+            <li>Presents technical disclosures</li>
+            <li>Identifies potential prior art from literature</li>
+            <li>Clarifies technical details for claim drafting</li>
+          </ul>
+        </div>
+        <div class="role-card info-top">
+          <h4>Product Management</h4>
+          <ul>
+            <li>Identifies product features most in need of protection</li>
+            <li>Flags competitive threats driving FTO concerns</li>
+            <li>Connects patent decisions to product roadmap</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>The Patent Disclosure Pipeline</h3>
+
+      <p>
+        The pipeline from invention identification to filing decision typically flows through five stages:
+      </p>
+
+      <ol class="process-steps">
+        <li>
+          <div class="step-content">
+            <h4>Invention Disclosure Submission</h4>
+            <p>Inventor submits a one-to-three-page invention disclosure describing what is new, why it is
+            different from prior work, what technical problem it solves, and how it is commercially relevant.
+            This is not a legal document — it is a technical document.</p>
+          </div>
+        </li>
+        <li>
+          <div class="step-content">
+            <h4>Initial Patentability Screening</h4>
+            <p>Patent counsel performs a quick (1–2 hour) prior art search to assess whether the invention
+            is likely novel. Also checks against the company's existing portfolio to identify
+            continuation opportunities versus new application opportunities.</p>
+          </div>
+        </li>
+        <li>
+          <div class="step-content">
+            <h4>Patent Review Committee Meeting</h4>
+            <p>The committee meets monthly (weekly for high-velocity companies) to review screened disclosures.
+            Each disclosure receives a patentability score, business value score, and enforcement
+            feasibility score.</p>
+          </div>
+        </li>
+        <li>
+          <div class="step-content">
+            <h4>Filing Decision</h4>
+            <p>Four outcomes: (A) File non-provisional immediately (high priority), (B) File provisional
+            to preserve rights while gathering more information, (C) Defensively publish to block
+            competitors, (D) Abandon — insufficient novelty or business value to justify any action.</p>
+          </div>
+        </li>
+        <li>
+          <div class="step-content">
+            <h4>Prosecution and Portfolio Integration</h4>
+            <p>Once the filing decision is made, the application is prepared, filed, and integrated
+            into the overall portfolio strategy. The patent is tracked through prosecution, with
+            continuation decisions made at each key prosecution milestone.</p>
+          </div>
+        </li>
+      </ol>
+
+      <h3>Decision Criteria Matrix</h3>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Factor</th>
+              <th>Weight</th>
+              <th>High Score (3)</th>
+              <th>Medium Score (2)</th>
+              <th>Low Score (1)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Patentability Likelihood</td>
+              <td>30%</td>
+              <td>Novel + non-obvious; clear prior art differentiation</td>
+              <td>Probably novel; some prior art concerns</td>
+              <td>Heavy prior art; eligibility concerns</td>
+            </tr>
+            <tr>
+              <td>Business Value</td>
+              <td>30%</td>
+              <td>Core product feature; competitors likely to copy</td>
+              <td>Useful feature; moderate competitive risk</td>
+              <td>Marginal feature; low commercial impact</td>
+            </tr>
+            <tr>
+              <td>Enforcement Feasibility</td>
+              <td>25%</td>
+              <td>Infringement easily detected in competitor products</td>
+              <td>Infringement detectable with analysis</td>
+              <td>Method claim; infringement invisible externally</td>
+            </tr>
+            <tr>
+              <td>Portfolio Fit</td>
+              <td>15%</td>
+              <td>Fills critical gap; supports continuation chain</td>
+              <td>Complements existing patents</td>
+              <td>Isolated; no portfolio synergy</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="table-caption">Table 10.4 — Patent Review Committee scoring matrix. Applications scoring below a weighted threshold of 1.75 are typically redirected to defensive publication or abandonment.</p>
+
+      <h3>Budget Allocation Framework</h3>
+
+      <p>
+        How much should a company spend on patents? There is no universal answer, but useful benchmarks
+        exist. Large technology companies like Google and Microsoft spend roughly 1–2% of revenue on
+        IP (including litigation). For a $10 billion revenue company, that is $100–$200 million annually.
+        For early-stage startups, a common rule of thumb is $200,000–$500,000 per year for a meaningful
+        foundational portfolio, covering 5–15 new filings per year plus prosecution costs on pending
+        applications.
+      </p>
+
+      <p>
+        A simple budget allocation framework for a mid-size AI company (~$100M ARR):
+      </p>
+
+      <ul>
+        <li><strong>New filings (provisionals + nonprovisionals):</strong> 40% of IP budget</li>
+        <li><strong>Prosecution costs (responding to office actions, RCEs):</strong> 25%</li>
+        <li><strong>Continuation strategy:</strong> 15%</li>
+        <li><strong>Foreign prosecution (PCT, national phase):</strong> 15%</li>
+        <li><strong>Maintenance fees + portfolio management:</strong> 5%</li>
+      </ul>
+    </section>
+
+    <!-- ──────────────────────────────────────────────
+         SECTION 9: PORTFOLIO VALUATION
+    ─────────────────────────────────────────────── -->
+    <section id="valuation" class="section-anchor">
+      <h2>10.9 Portfolio Valuation and Analytics</h2>
+
+      <p>
+        Patent portfolios appear on balance sheets as intangible assets, but their actual value is
+        frequently misunderstood — both understated and overstated. Building the analytical tools to
+        assess portfolio value accurately is essential for strategic decision-making: which patents
+        to maintain, which to license, which to abandon, and which merit litigation investment.
+      </p>
+
+      <h3>Patent Quality Metrics</h3>
+
+      <p>
+        Individual patent quality is measured along several dimensions. No single metric tells the
+        whole story, but a combination provides a useful signal.
+      </p>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Quality Metric</th>
+              <th>What It Measures</th>
+              <th>Benchmark (Good)</th>
+              <th>Data Source</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Forward Citations</strong></td>
+              <td>How many later patents cite this patent</td>
+              <td>&gt;10 citations in 5 years (top quartile in CPC class)</td>
+              <td>USPTO, Derwent, PatSnap</td>
+            </tr>
+            <tr>
+              <td><strong>Claim Breadth Score</strong></td>
+              <td>Number of words in shortest independent claim (fewer = broader)</td>
+              <td>&lt;100 words in independent claim 1</td>
+              <td>Manual analysis; Lex Machina</td>
+            </tr>
+            <tr>
+              <td><strong>Family Size</strong></td>
+              <td>Number of related applications across jurisdictions</td>
+              <td>&gt;5 family members for foundational patents</td>
+              <td>Derwent, INPADOC</td>
+            </tr>
+            <tr>
+              <td><strong>Independent Claim Count</strong></td>
+              <td>Number of independent claims (more = more coverage angles)</td>
+              <td>3–5 independent claims per patent</td>
+              <td>USPTO, Google Patents</td>
+            </tr>
+            <tr>
+              <td><strong>Litigation History</strong></td>
+              <td>Whether patent has been asserted and survived validity challenges</td>
+              <td>Asserted + survived IPR = strong validity signal</td>
+              <td>Lex Machina, Docket Navigator</td>
+            </tr>
+            <tr>
+              <td><strong>Technology Relevance Score</strong></td>
+              <td>Is the patented technology still commercially relevant?</td>
+              <td>Technology in active products of multiple companies</td>
+              <td>Market analysis, competitive intel</td>
+            </tr>
+            <tr>
+              <td><strong>Patent Term Remaining</strong></td>
+              <td>Years of protection left (20 years from filing)</td>
+              <td>&gt;8 years for licensing deals; &gt;12 for major transactions</td>
+              <td>USPTO Patent Center</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="table-caption">Table 10.5 — Patent quality metrics with benchmarks for AI patent portfolios. No single metric suffices; use a weighted composite score.</p>
+
+      <h3>DCF Valuation for Patent Portfolios</h3>
+
+      <p>
+        The theoretically correct method for valuing a patent portfolio is
+        <span class="key-term" title="A financial model that values an asset based on the present value of future cash flows it is expected to generate">discounted cash flow (DCF) analysis</span>.
+        The model projects future royalty income or cost savings attributable to the patent portfolio,
+        discounts those cash flows at a risk-adjusted rate (typically 15–25% for early-stage technology IP),
+        and sums to a net present value.
+      </p>
+
+      <p>
+        In practice, DCF patent valuation is difficult because future royalty streams are highly
+        uncertain, especially for early-stage portfolios that have not yet been licensed. Most patent
+        transactions use comparable transactions analysis as a sanity check: what have similar portfolios
+        sold or licensed for recently? For AI portfolios, per-patent prices in recent transactions have
+        ranged from $500,000 to $5 million for high-quality foundational patents, with most commercial
+        transactions in the $50,000–$500,000 per patent range for technology-specific portfolios.
+      </p>
+
+      <h3>Royalty Rates for AI Patents</h3>
+
+      <p>
+        When licensing AI patents, the royalty rate discussion begins with industry benchmarks.
+        These benchmarks vary significantly by technology domain, application field, and license structure.
+      </p>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>AI Technology Domain</th>
+              <th>Typical Royalty Rate</th>
+              <th>Common License Structure</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Foundation model architectures</td>
+              <td>1–5% of net sales</td>
+              <td>Running royalty on inference revenue</td>
+              <td>Few precedents; often settled as lump sum</td>
+            </tr>
+            <tr>
+              <td>NLP applications (enterprise)</td>
+              <td>2–8% of net sales</td>
+              <td>Per-query or per-user revenue share</td>
+              <td>Comparable to software patent benchmarks</td>
+            </tr>
+            <tr>
+              <td>Computer vision (consumer)</td>
+              <td>1–4% of unit price</td>
+              <td>Per-unit device license</td>
+              <td>Large volume; rates compressed</td>
+            </tr>
+            <tr>
+              <td>Medical AI diagnostics</td>
+              <td>3–10% of net sales</td>
+              <td>Running royalty + upfront milestone</td>
+              <td>Regulatory hurdles reduce comparables</td>
+            </tr>
+            <tr>
+              <td>Drug discovery AI platforms</td>
+              <td>2–8% + milestone payments</td>
+              <td>License + success milestones</td>
+              <td>Hybrid with traditional pharma structures</td>
+            </tr>
+            <tr>
+              <td>Autonomous vehicle AI</td>
+              <td>0.5–3% of vehicle cost</td>
+              <td>Per-vehicle license + fleet arrangements</td>
+              <td>Multi-stack licensing; stacking risk</td>
+            </tr>
+            <tr>
+              <td>AI hardware accelerators</td>
+              <td>1–5% of chip ASP</td>
+              <td>Per-unit chip license</td>
+              <td>FRAND constraints if standards-essential</td>
+            </tr>
+            <tr>
+              <td>Training method patents</td>
+              <td>0.5–3% of training costs</td>
+              <td>Running royalty on compute spend</td>
+              <td>Novel structure; limited precedent</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="table-caption">Table 10.6 — Industry royalty rate benchmarks for AI patent licensing. These are starting-point ranges; actual rates depend on Georgia-Pacific factor analysis, portfolio breadth, and negotiating leverage. Not legal advice.</p>
+
+      <div class="callout callout-warning">
+        <div class="callout-icon">&#9888;</div>
+        <div class="callout-body">
+          <div class="callout-title">Patent Royalty Stacking Risk in AI</div>
+          <p>
+            A complex AI product may potentially infringe patents held by dozens of companies —
+            semiconductor patents, training method patents, architecture patents, application patents,
+            and UI patents all potentially apply to a single model deployment. If each patent holder
+            demands a royalty rate based on the value of the entire product, the cumulative royalties
+            quickly exceed the product's profit margin. This
+            <span class="key-term" title="The problem that occurs when multiple patent holders each demand royalties based on the full value of a product, resulting in cumulative royalties that exceed the product's value">royalty stacking</span>
+            problem is particularly acute in AI and is a key argument in Georgia-Pacific factor 9
+            (the benefit of the patented invention to licensees) in any reasonable royalty analysis.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ──────────────────────────────────────────────
+         SECTION 10: STARTUP PORTFOLIO STRATEGY
+    ─────────────────────────────────────────────── -->
+    <section id="startup-portfolio" class="section-anchor">
+      <h2>10.10 Building a Startup Patent Portfolio</h2>
+
+      <p>
+        The strategic considerations for a well-funded Big Tech patent program are not the same as
+        those for a startup operating on a Series A budget with a six-month runway. Startups face
+        specific constraints — limited budget, urgent competitive threats, and the need to demonstrate
+        IP value to investors — that require a tailored approach to portfolio building.
+      </p>
+
+      <h3>The "Patent Pending" Value for Fundraising</h3>
+
+      <p>
+        For pre-revenue startups, the primary near-term value of a patent portfolio is not licensing
+        revenue but <strong>fundraising leverage</strong>. Investors — particularly at Series A and B —
+        view patent filings as signals of technology differentiation and long-term defensibility.
+        A startup that can say "we have three issued patents and eight pending applications covering
+        our core technology" tells a different story than one that says "we have no IP protection
+        yet." The former suggests founders who think strategically about competitive moats; the latter
+        raises questions about defensibility.
+      </p>
+
+      <p>
+        The most efficient use of limited startup IP budget is to file provisional applications on
+        every significant invention — even before a full non-provisional is financially feasible —
+        to establish priority dates and generate "patent pending" status. A provisional application
+        costs $2,000–$8,000 in attorney fees (compared to $15,000–$35,000 for a non-provisional)
+        and buys 12 months to decide whether to convert to a full application.
+      </p>
+
+      <h3>Provisional Applications as Budget Strategy</h3>
+
+      <p>
+        The provisional strategy is: file provisionals broadly and cheaply to lock in priority dates;
+        convert only the most commercially valuable inventions to full non-provisionals within 12 months.
+        Provisionals need not be as precisely drafted as non-provisionals (they do not require formal
+        claims), but they must contain sufficient disclosure to support the claims you plan to file later.
+        A poorly drafted provisional that fails to disclose the key technical details of the final
+        invention provides little priority date benefit.
+      </p>
+
+      <div class="callout callout-tip">
+        <div class="callout-icon">&#9733;</div>
+        <div class="callout-body">
+          <div class="callout-title">Provisional Application Best Practice</div>
+          <p>
+            Draft your provisional application as if it were a non-provisional without claims. Include:
+            a detailed description of the problem being solved, the specific technical approach
+            (with enough detail to enable a skilled person to reproduce it), multiple embodiments and
+            variants, examples with experimental data if available, and a section describing what
+            distinguishes this from prior approaches. When you convert to non-provisional, this
+            specification becomes the foundation for claim drafting. A well-drafted provisional
+            protects not just your priority date but your ability to draft broad continuation claims
+            years later.
+          </p>
+        </div>
+      </div>
+
+      <h3>Patent Pledge Programs</h3>
+
+      <p>
+        Several patent pledge frameworks offer startups a way to build goodwill with the developer
+        community while still maintaining defensive IP rights. Understanding these programs helps
+        startups decide whether to participate — and whether potential investors or partners have
+        made commitments that affect the company's IP strategy.
+      </p>
+
+      <div class="pledge-grid">
+        <div class="pledge-card">
+          <h4>Open Invention Network (OIN)</h4>
+          <p>
+            The world's largest patent non-aggression community, specifically protecting the Linux
+            ecosystem. Members commit not to assert patents against Linux or core open-source software.
+            Membership is free and grants access to a substantial defensive portfolio.
+            Over 3,700 members including Google, IBM, Microsoft, and most major AI hardware companies.
+          </p>
+        </div>
+        <div class="pledge-card">
+          <h4>LOT Network</h4>
+          <p>
+            License on Transfer (LOT) agreement: members grant each other a patent license that
+            activates only if a patent is transferred to a patent assertion entity (PAE/NPE). Protects
+            against PAE litigation. Free to join; particularly useful for startups worried about
+            portfolio transactions that put formerly-friendly patents in hostile hands.
+          </p>
+        </div>
+        <div class="pledge-card">
+          <h4>Defensive Patent License (DPL)</h4>
+          <p>
+            A reciprocal pledge framework for open-source and open-technology communities. DPL
+            members grant each other royalty-free licenses to all patents, conditioned on the
+            licensee also pledging their portfolio to DPL. Smaller community than OIN but aligned
+            with open-source values.
+          </p>
+        </div>
+        <div class="pledge-card">
+          <h4>Tesla's Patent Pledge</h4>
+          <p>
+            Tesla committed in 2014 not to initiate patent suits against parties who use Tesla's
+            patents in good faith. A unilateral non-aggression pledge used as a PR and ecosystem-building
+            tool. Several AI companies have made similar pledges for specific technology domains
+            to signal open collaboration.
+          </p>
+        </div>
+      </div>
+
+      <h3>Suggested 3-Year IP Roadmap for a Startup</h3>
+
+      <div class="timeline">
+
+        <div class="timeline-item">
+          <div class="timeline-date">Year 1 — Months 1–6: Foundation</div>
+          <h4>Establish Priority Dates for Core Inventions</h4>
+          <p>
+            File provisional applications on all significant inventions before any public disclosure,
+            investor demo, or conference presentation. Budget: $15,000–$30,000. Target: 3–6
+            provisional applications covering the core technical approach, key novel features,
+            and at least one application-specific implementation.
+          </p>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-date">Year 1 — Months 7–12: First Non-Provisionals</div>
+          <h4>Convert Top-Priority Provisionals</h4>
+          <p>
+            Convert the 1–2 most important provisionals to non-provisional applications. Consider
+            PCT filing to preserve international rights if the product has a global market. Budget:
+            $30,000–$60,000. File continuation on the first provisional before it expires to keep
+            the family alive while the non-provisional is examined.
+          </p>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-date">Year 2 — Months 13–18: Portfolio Expansion</div>
+          <h4>File Continuation Applications and New Inventions</h4>
+          <p>
+            File continuation applications on issued/pending non-provisionals, targeting medium-specificity
+            claims that cover specific product features. File new provisionals and non-provisionals on
+            inventions from the second wave of R&amp;D. Implement innovation identification workshop
+            quarterly. Budget: $40,000–$80,000.
+          </p>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-date">Year 2 — Months 19–24: International Expansion</div>
+          <h4>National Phase Entry for Top Patents</h4>
+          <p>
+            Enter national phase in the 3–5 most commercially important jurisdictions (EP, CN, JP
+            at minimum for global AI products; add KR and CA depending on markets). Budget:
+            $50,000–$100,000 for 2–3 patents in 3 jurisdictions. Prioritize patents most likely
+            to be enforced against competitors with operations in those countries.
+          </p>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-date">Year 3 — Months 25–36: Strategic Depth</div>
+          <h4>Narrow Claims, Application Patents, and First Issuances</h4>
+          <p>
+            File narrower continuation applications targeting design-around scenarios identified
+            through competitive intelligence. File application-specific patents on the top 2–3
+            product use cases. Expect first patents to issue from the Year 1 provisionals (USPTO
+            examination typically takes 2–4 years). Celebrate the first issuance — it is a milestone
+            for future fundraising. Budget: $60,000–$100,000.
+          </p>
+        </div>
+
+      </div>
+
+      <div class="highlight-box">
+        <h4>Startup IP Budget Summary (3-Year Plan)</h4>
+        <p>
+          Total estimated investment over three years: <strong>$195,000–$370,000</strong>, producing
+          approximately 8–15 pending/issued U.S. patent applications and 4–8 international counterparts
+          in key jurisdictions. This portfolio, if the underlying technology proves valuable, provides
+          meaningful defensive and fundraising value. It will not equal the portfolios of Google or
+          IBM, but it is sufficient to (1) deter many potential copycat competitors, (2) support
+          Series B+ fundraising narratives, and (3) create leverage in potential M&amp;A discussions.
+        </p>
+      </div>
+    </section>
+
+    <!-- ──────────────────────────────────────────────
+         SECTION 11: PORTFOLIO PRUNING
+    ─────────────────────────────────────────────── -->
+    <section id="pruning" class="section-anchor">
+      <h2>10.11 Portfolio Pruning and Maintenance</h2>
+
+      <p>
+        A patent portfolio is not a one-way accumulation machine. Patents have ongoing maintenance costs,
+        and as technology evolves, patents that were once commercially relevant become worthless. Systematic
+        portfolio pruning — regularly evaluating which patents to maintain, which to let lapse, and which
+        to license or sell — is essential to maintaining an efficient, cost-effective portfolio.
+      </p>
+
+      <h3>Maintenance Fee Schedule</h3>
+
+      <p>
+        U.S. utility patents require maintenance fees at three intervals after issuance.
+        Failure to pay any maintenance fee results in automatic lapse of the patent. The USPTO
+        provides a 6-month grace period after each due date, but late fees apply.
+      </p>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Maintenance Period</th>
+              <th>Due Date (from issue)</th>
+              <th>Small Entity Fee (2025)</th>
+              <th>Large Entity Fee (2025)</th>
+              <th>Late Fee (surcharge)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>First Maintenance</strong></td>
+              <td>3.5 years (3 years + 6 months window)</td>
+              <td>$800</td>
+              <td>$2,000</td>
+              <td>+$160 / +$400</td>
+            </tr>
+            <tr>
+              <td><strong>Second Maintenance</strong></td>
+              <td>7.5 years (7 years + 6 months window)</td>
+              <td>$1,800</td>
+              <td>$3,760</td>
+              <td>+$160 / +$400</td>
+            </tr>
+            <tr>
+              <td><strong>Third Maintenance</strong></td>
+              <td>11.5 years (11 years + 6 months window)</td>
+              <td>$3,700</td>
+              <td>$7,700</td>
+              <td>+$160 / +$400</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="table-caption">Table 10.7 — USPTO maintenance fee schedule for U.S. utility patents (approximate 2025 rates; fees adjusted periodically by USPTO rule). Small entity status requires a formal size determination. Micro-entity fees (50% discount) available for qualifying inventors.</p>
+
+      <div class="callout callout-info">
+        <div class="callout-icon">&#8505;</div>
+        <div class="callout-body">
+          <div class="callout-title">Cumulative Maintenance Cost Over Patent Life</div>
+          <p>
+            A large-entity patent held to expiration (20 years from filing) incurs roughly $13,460 in
+            maintenance fees alone, not counting prosecution costs ($15,000–$50,000 to obtain),
+            foreign filing costs, or attorney oversight fees for each maintenance period. For a portfolio
+            of 100 active patents, that is $1.35 million in maintenance fees over the life of those
+            patents. This is why pruning matters: a patent that generates no licensing revenue and
+            creates no defensive value should be allowed to lapse.
+          </p>
+        </div>
+      </div>
+
+      <h3>The Portfolio Audit Process</h3>
+
+      <div class="audit-phases">
+        <div class="audit-phase">
+          <div class="audit-phase-num">1</div>
+          <h4>Inventory &amp; Classify</h4>
+          <p>Catalog all active patents by technology area, claim type, and product relevance. Update the classification annually as products evolve.</p>
+        </div>
+        <div class="audit-phase">
+          <div class="audit-phase-num">2</div>
+          <div style="width:2rem; height:.125rem; background:var(--gray-300); margin: 0 auto .5rem;"></div>
+          <h4>Quality Score</h4>
+          <p>Apply the quality metrics from Section 10.9: forward citations, claim breadth, family size, remaining term, and current commercial relevance.</p>
+        </div>
+        <div class="audit-phase">
+          <div class="audit-phase-num">3</div>
+          <h4>Commercial Review</h4>
+          <p>For each patent, ask: Is it practiced by the company's current products? Is it practiced by known competitors? Has it generated any licensing revenue?</p>
+        </div>
+        <div class="audit-phase">
+          <div class="audit-phase-num">4</div>
+          <h4>Cost-Benefit Decision</h4>
+          <p>Compare ongoing cost (maintenance fees + attorney oversight) to estimated value. Patents with no commercial relevance and declining citation rates are prime abandonment candidates.</p>
+        </div>
+        <div class="audit-phase">
+          <div class="audit-phase-num">5</div>
+          <h4>Action</h4>
+          <p>Options: maintain, actively license, sell to patent broker, donate to defensive pledge program, or allow to lapse at next maintenance fee date.</p>
+        </div>
+      </div>
+
+      <h3>When to Abandon</h3>
+
+      <p>
+        The decision to abandon (stop paying maintenance fees and let a patent lapse) should be made
+        deliberately, not by default. Before abandoning, consider: (1) Can the patent be sold?
+        A patent with no value to your company may have significant value to a competitor or a
+        licensing entity. Patent brokers like IPValue and Acacia can provide quick market assessments.
+        (2) Can the patent be donated to a defensive pledge program? The Open Invention Network
+        and LOT Network accept patent contributions that can offset licensing costs elsewhere in
+        your portfolio. (3) Is the technology actually obsolete, or has the product simply changed?
+        AI patents covering training methods for architectures that are no longer in production may
+        still cover the methods used in deployed models that continue to operate.
+      </p>
+
+      <h3>Licensing as an Alternative to Abandonment</h3>
+
+      <p>
+        Before abandoning any patent with remaining term, evaluate whether a licensing campaign
+        would recover more than the ongoing maintenance cost. Even a modest one-time license fee
+        of $50,000 from a single licensee substantially exceeds the maintenance fee for an individual
+        patent. Patent licensing requires finding willing licensees — which requires understanding who
+        is actually practicing the patented technology — but a focused effort on a small number of
+        high-quality patents that are being widely practiced can generate substantial returns with
+        relatively modest investment.
+      </p>
+    </section>
+
+    <!-- ──────────────────────────────────────────────
+         SECTION 12: CHECKLIST
+    ─────────────────────────────────────────────── -->
+    <section id="checklist" class="section-anchor">
+      <h2>10.12 Portfolio Strategy Checklist</h2>
+
+      <p>
+        The following checklist covers the key strategic decisions every AI company should address
+        when building and managing a patent portfolio. Use this as an annual audit tool, not just
+        an initial planning guide — portfolio strategy must evolve as the technology and competitive
+        landscape evolve.
+      </p>
+
+      <h3>A. Foundation Strategy</h3>
+      <ul class="checklist">
+        <li>Have we identified and filed patents on all foundational technology innovations (architecture, training methods, data pipeline)?</li>
+        <li>Does every significant invention have a priority date established before any public disclosure (conference, paper, demo, open-source release)?</li>
+        <li>Have we written specifications broad enough to support continuation claim laddering for the next 10–15 years?</li>
+        <li>Have we established a formal invention disclosure process that researchers actually use?</li>
+        <li>Do we hold at least quarterly innovation identification workshops with technical teams?</li>
+        <li>Are key researchers trained on what is patentable and why publication timing matters?</li>
+      </ul>
+
+      <h3>B. Family and Continuation Strategy</h3>
+      <ul class="checklist">
+        <li>Have we filed at least one continuation before each parent application issued?</li>
+        <li>Do our continuation applications cover different claim types (system, method, medium) from the parent?</li>
+        <li>Have we analyzed our top 10 issued patents for continuation opportunities to cover narrower, design-around-resistant claims?</li>
+        <li>Have we coordinated prosecution history across family members to avoid creating prosecution history estoppel that limits scope in related patents?</li>
+        <li>Have we evaluated CIP opportunities for inventions that are improvements on existing patented technologies?</li>
+        <li>Are all divisional election decisions being treated strategically (not just acquiescing to restriction requirements without continuing)?</li>
+      </ul>
+
+      <h3>C. International Strategy</h3>
+      <ul class="checklist">
+        <li>Have we filed PCT applications on our most commercially important inventions within 12 months of the U.S. filing date?</li>
+        <li>Have we entered national phase in the key jurisdictions where our competitors operate or manufacture (EP, CN, JP at minimum)?</li>
+        <li>Do we have a clear policy on which inventions merit international protection, based on market and enforcement analysis?</li>
+        <li>Are all PCT applications drafted to satisfy EPO written description standards as well as USPTO standards?</li>
+      </ul>
+
+      <h3>D. Competitive Intelligence</h3>
+      <ul class="checklist">
+        <li>Have we set up automated alerts to monitor patent filings by our top 5 competitors?</li>
+        <li>Have we conducted a patent landscape analysis for our core technology domain within the past 18 months?</li>
+        <li>Have we completed a freedom-to-operate analysis for every major product launch?</li>
+        <li>Do we have a protocol for reviewing competitor patent publications and extracting competitive intelligence?</li>
+        <li>Are we tracking the patent activity of top researchers who might be recruited by competitors?</li>
+      </ul>
+
+      <h3>E. Defensive and Collaborative Programs</h3>
+      <ul class="checklist">
+        <li>Have we established a defensive publication program for inventions that do not meet the filing threshold?</li>
+        <li>Have we evaluated membership in OIN, LOT Network, or other defensive pledge programs?</li>
+        <li>Do we have a policy on how to handle open-source releases to minimize loss of patent rights?</li>
+        <li>Have we considered making strategic defensive publications to block competitors in technology areas we are not patenting?</li>
+      </ul>
+
+      <h3>F. Portfolio Management and Valuation</h3>
+      <ul class="checklist">
+        <li>Do we have a Patent Review Committee with clear decision criteria and quarterly meetings?</li>
+        <li>Have we scored our entire portfolio on quality metrics (forward citations, claim breadth, family size, commercial relevance) within the past year?</li>
+        <li>Have we completed a maintenance fee audit to identify patents that should be abandoned?</li>
+        <li>Do we have current DCF or comparable transaction estimates for our top 20 patents?</li>
+        <li>Have we explored licensing or sale of patents that are no longer core to our product strategy?</li>
+        <li>Does our annual IP budget reflect the actual strategic priorities of the business (not just historical spending patterns)?</li>
+        <li>Are we prepared to present a coherent IP narrative to Series B+ investors or M&amp;A acquirers?</li>
+      </ul>
+
+      <div class="callout callout-tip">
+        <div class="callout-icon">&#9733;</div>
+        <div class="callout-body">
+          <div class="callout-title">The Most Common Startup IP Mistake</div>
+          <p>
+            In ten years of advising AI startups at Fish &amp; Richardson, the single most common and
+            costly mistake I see is founders who say: "We'll do the IP work once we have product-market
+            fit." By the time product-market fit is achieved, the company has typically published papers,
+            presented at conferences, and open-sourced code — destroying patent rights in every jurisdiction
+            that doesn't have a grace period (i.e., most of the world). The cost to retroactively build
+            a portfolio from disclosures that are already public is orders of magnitude higher — and the
+            scope you can obtain is orders of magnitude narrower — than if you had filed provisionals
+            before the first disclosure. File first. Always.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ──────────────────────────────────────────────
+         CHAPTER NAV
+    ─────────────────────────────────────────────── -->
+    <nav class="chapter-nav">
+      <a href="ch09_office_actions.html" class="chapter-nav-btn">
+        <span class="nav-label">&#8592; Previous Chapter</span>
+        <span class="nav-title">Chapter 9: Office Actions</span>
+      </a>
+      <a href="ch11_international.html" class="chapter-nav-btn nav-next">
+        <span class="nav-label">Next Chapter &#8594;</span>
+        <span class="nav-title">Chapter 11: International Patent Protection</span>
+      </a>
+    </nav>
+
+  </main><!-- /chapter-content -->
+</div><!-- /page-layout -->
+
+<!-- ══════════════════════════════════════════════════
+     FOOTER
+══════════════════════════════════════════════════ -->
+<footer>
+  <div class="footer-content">
+    <p style="font-size:1rem; font-weight:600; color:white; margin-bottom:.625rem;">
+      Patent Law for Technologists: A Practical Guide for AI, ML, and Biotech Innovators
+    </p>
+    <p>
+      Chapter 10 &mdash; Building a Patent Portfolio: From Single Patent to Strategic Asset<br>
+      Dr. Rachael Y. Kim &bull; Fish &amp; Richardson, Silicon Valley
+    </p>
+    <p style="margin-top:1.25rem;">
+      <a href="index.html">Table of Contents</a> &nbsp;&bull;&nbsp;
+      <a href="ch09_office_actions.html">Chapter 9</a> &nbsp;&bull;&nbsp;
+      <a href="ch10_portfolio_strategy.html">Chapter 10</a> &nbsp;&bull;&nbsp;
+      <a href="ch11_international.html">Chapter 11</a> &nbsp;&bull;&nbsp;
+      <a href="ch12_monetization.html">Chapter 12</a>
+    </p>
+    <p style="margin-top:1.5rem; font-size:.775rem; color:rgba(255,255,255,.4);">
+      &copy; 2025 Fish &amp; Richardson P.C. &bull; Stanford Law School &bull; All rights reserved.
+      This chapter is for educational purposes only and does not constitute legal advice.
+      Consult qualified patent counsel for all filing, prosecution, and enforcement decisions.
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>
